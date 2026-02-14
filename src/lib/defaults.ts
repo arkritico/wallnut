@@ -244,5 +244,28 @@ export const DEFAULT_PROJECT: BuildingProject = {
     municipality: "Lisboa",
     documents: [],
     notes: "",
+    waterUtilityDocs: [],
+    consultedEntities: [],
+  },
+
+  // 17. Drawing Quality
+  drawingQuality: {
+    hasCorrectScaleForPrint: false,
+    hasConsistentFonts: false,
+    hasReadableTextAtScale: false,
+    hasStandardSymbols: false,
+    hasLegendOnEverySheet: false,
+    hasNorthArrow: false,
+    hasScaleBar: false,
+    hasConsistentLineWeights: false,
+    hasDimensioning: false,
+    hasSheetTitleBlock: false,
+  },
+
+  // 18. Project Context
+  projectContext: {
+    description: "",
+    questions: [],
+    specificConcerns: "",
   },
 };

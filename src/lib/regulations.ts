@@ -1071,3 +1071,139 @@ export const CIVIL_CODE_BUILDING = {
     },
   },
 } as const;
+
+// ============================================================
+// LICENSING PROCESS - Legal Timelines (RJUE - DL 555/99)
+// ============================================================
+
+/** Legal deadlines for municipal responses (working days) */
+export const PROCESS_LEGAL_TIMELINES = {
+  /** Pedido de Informação Prévia (PIP) */
+  pip: {
+    label: "Informação Prévia (PIP)",
+    municipalResponseDays: 20,
+    externalConsultationDays: 20,
+    totalMaxDays: 40,
+    silenceEffect: "deferimento_tácito",
+  },
+  /** Licenciamento */
+  licensing: {
+    label: "Licenciamento",
+    municipalResponseDays: 45,
+    commercialResponseDays: 60,
+    externalConsultationDays: 20,
+    totalMaxDays: 65,
+    silenceEffect: "deferimento_tácito",
+  },
+  /** Comunicação Prévia */
+  communication_prior: {
+    label: "Comunicação Prévia",
+    startWorkDays: 20,
+    rejectionPeriodDays: 20,
+    silenceEffect: "pode_iniciar",
+  },
+  /** Autorização Especial */
+  special_authorization: {
+    label: "Autorização Especial",
+    municipalResponseDays: 30,
+    externalConsultationDays: 30,
+    totalMaxDays: 60,
+    silenceEffect: "deferimento_tácito",
+  },
+  /** Licença de Utilização */
+  utilization_license: {
+    label: "Licença de Utilização",
+    inspectionDays: 10,
+    emissionDays: 5,
+    totalMaxDays: 15,
+    silenceEffect: "deferimento_tácito",
+  },
+} as const;
+
+// ============================================================
+// ENTITY CONSULTATION - Entities by location/project type
+// ============================================================
+
+/** Common entities that may need to be consulted */
+export const CONSULTATION_ENTITIES = {
+  mandatory: [
+    { name: "Câmara Municipal", type: "municipality" as const, scope: "Licenciamento urbanístico, PDM, condicionantes" },
+  ],
+  conditional: [
+    { name: "ANPC / Proteção Civil", type: "fire_authority" as const, condition: "2ª categoria de risco ou superior (SCIE)", scope: "Segurança contra incêndio" },
+    { name: "DGPC / IGESPAR", type: "heritage" as const, condition: "Imóvel classificado ou zona de proteção", scope: "Património cultural" },
+    { name: "CCDR", type: "environment" as const, condition: "Fora de perímetro urbano ou RAN/REN", scope: "Ordenamento do território" },
+    { name: "APA / ARH", type: "environment" as const, condition: "Próximo de recursos hídricos", scope: "Domínio hídrico, linhas de água" },
+    { name: "ICNF", type: "environment" as const, condition: "Área protegida ou Rede Natura 2000", scope: "Conservação da natureza" },
+    { name: "Infraestruturas de Portugal", type: "transport" as const, condition: "Próximo de estradas nacionais ou ferrovias", scope: "Servidões rodoviárias/ferroviárias" },
+    { name: "ANA / Navegação Aérea", type: "transport" as const, condition: "Zona de servidão aeronáutica", scope: "Restrições de altura" },
+    { name: "DGEG", type: "energy" as const, condition: "Instalações elétricas > 41.4 kVA ou gás", scope: "Aprovação de projetos elétricos e gás" },
+    { name: "ANACOM", type: "telecom" as const, condition: "Edifícios com ITED/ITUR", scope: "Certificação telecomunicações" },
+    { name: "Entidade Gestora de Águas", type: "water_utility" as const, condition: "Sempre que haja ligação à rede pública", scope: "Ramais de água e esgoto, regulamentos municipais" },
+    { name: "Direção Regional de Cultura", type: "heritage" as const, condition: "Imóvel com interesse patrimonial", scope: "Parecer patrimonial" },
+    { name: "Autoridade de Saúde", type: "other" as const, condition: "Estabelecimentos de saúde, alimentação", scope: "Condições sanitárias" },
+  ],
+} as const;
+
+// ============================================================
+// WATER UTILITY PROVIDERS - Common Portuguese providers
+// ============================================================
+
+export const WATER_UTILITY_PROVIDERS = [
+  { name: "EPAL", municipalities: ["Lisboa"], scope: "Abastecimento de água" },
+  { name: "SIMAS Oeiras e Amadora", municipalities: ["Oeiras", "Amadora"], scope: "Água e saneamento" },
+  { name: "SIMAS Sintra", municipalities: ["Sintra"], scope: "Água e saneamento" },
+  { name: "SIMAR Loures e Odivelas", municipalities: ["Loures", "Odivelas"], scope: "Água e saneamento" },
+  { name: "Águas de Cascais", municipalities: ["Cascais"], scope: "Água e saneamento" },
+  { name: "Águas do Porto", municipalities: ["Porto"], scope: "Água e saneamento" },
+  { name: "Águas de Gaia", municipalities: ["Vila Nova de Gaia"], scope: "Água e saneamento" },
+  { name: "INDAQUA", municipalities: ["Matosinhos", "Santo Tirso", "Vila do Conde", "Fafe", "Feira"], scope: "Água e saneamento" },
+  { name: "AdP - Águas de Portugal", municipalities: [], scope: "Grupo empresarial (várias subsidiárias)" },
+  { name: "Águas do Algarve", municipalities: ["Faro", "Albufeira", "Loulé", "Portimão", "Lagos"], scope: "Água e saneamento" },
+  { name: "Águas do Tejo Atlântico", municipalities: [], scope: "Saneamento em alta (Grande Lisboa)" },
+  { name: "Águas do Norte", municipalities: [], scope: "Água e saneamento norte de Portugal" },
+  { name: "Águas do Centro Litoral", municipalities: [], scope: "Água e saneamento centro litoral" },
+  { name: "CARTAGUAS", municipalities: ["Cartaxo"], scope: "Água e saneamento" },
+  { name: "Serviços Municipalizados (CM)", municipalities: [], scope: "Serviços municipais diretos" },
+] as const;
+
+// ============================================================
+// DRAWING QUALITY STANDARDS (Portaria 701-H/2008, ISO 3098)
+// ============================================================
+
+export const DRAWING_STANDARDS = {
+  /** Recommended scales by drawing type */
+  scales: {
+    locationPlan: ["1:1000", "1:2000", "1:5000"],
+    implantationPlan: ["1:200", "1:500"],
+    floorPlans: ["1:50", "1:100"],
+    sections: ["1:50", "1:100"],
+    elevations: ["1:50", "1:100"],
+    details: ["1:5", "1:10", "1:20"],
+    structuralPlans: ["1:50", "1:100"],
+    specialtyPlans: ["1:50", "1:100"],
+  },
+  /** Minimum font sizes for readability at scale (ISO 3098) */
+  fonts: {
+    minimumHeightMm: 2.5,
+    titleBlockMinMm: 3.5,
+    dimensionTextMinMm: 2.5,
+    noteTextMinMm: 2.0,
+  },
+  /** Symbol standards by specialty */
+  symbols: {
+    fireSymbols: "EN ISO 7010 / NT04 SCIE",
+    electricalSymbols: "IEC 60617",
+    architecturalSymbols: "NP EN ISO 7518",
+    hvacSymbols: "NP EN ISO 7519",
+    pipingSymbols: "NP EN ISO 6412",
+    accessibilitySymbol: "ISO 7001 / DL 163/2006",
+  },
+  /** Line weights (mm) */
+  lineWeights: {
+    thin: 0.18,
+    medium: 0.35,
+    thick: 0.50,
+    extraThick: 0.70,
+  },
+} as const;

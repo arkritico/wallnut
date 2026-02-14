@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import type { BuildingProject, BuildingType, LocalRegulationDoc } from "@/lib/types";
-import { CLIMATE_DATA, PORTUGAL_DISTRICTS } from "@/lib/regulations";
+import type { BuildingProject, BuildingType, LocalRegulationDoc, ConsultedEntity } from "@/lib/types";
+import { CLIMATE_DATA, PORTUGAL_DISTRICTS, WATER_UTILITY_PROVIDERS, PROCESS_LEGAL_TIMELINES, CONSULTATION_ENTITIES } from "@/lib/regulations";
 import { DEFAULT_PROJECT } from "@/lib/defaults";
 
 interface ProjectFormProps {
@@ -12,7 +12,7 @@ interface ProjectFormProps {
 
 export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
   const [project, setProject] = useState<BuildingProject>(DEFAULT_PROJECT);
-  const [activeSection, setActiveSection] = useState<string>("general");
+  const [activeSection, setActiveSection] = useState<string>("context");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function updateField<K extends keyof BuildingProject>(key: K, value: BuildingProject[K]) {
@@ -144,6 +144,60 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     }));
   }
 
+  function updateDrawingQuality(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      drawingQuality: { ...prev.drawingQuality, [field]: value },
+    }));
+  }
+
+  function updateProjectContext(field: string, value: string | string[]) {
+    setProject(prev => ({
+      ...prev,
+      projectContext: { ...prev.projectContext, [field]: value },
+    }));
+  }
+
+  function addWaterUtilityDoc(doc: LocalRegulationDoc) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: {
+        ...prev.localRegulations,
+        waterUtilityDocs: [...prev.localRegulations.waterUtilityDocs, doc],
+      },
+    }));
+  }
+
+  function removeWaterUtilityDoc(id: string) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: {
+        ...prev.localRegulations,
+        waterUtilityDocs: prev.localRegulations.waterUtilityDocs.filter(d => d.id !== id),
+      },
+    }));
+  }
+
+  function addConsultedEntity(entity: ConsultedEntity) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: {
+        ...prev.localRegulations,
+        consultedEntities: [...prev.localRegulations.consultedEntities, entity],
+      },
+    }));
+  }
+
+  function removeConsultedEntity(id: string) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: {
+        ...prev.localRegulations,
+        consultedEntities: prev.localRegulations.consultedEntities.filter(e => e.id !== id),
+      },
+    }));
+  }
+
   function addLocalDocument(doc: LocalRegulationDoc) {
     setProject(prev => ({
       ...prev,
@@ -171,6 +225,7 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
 
   // Organized by project specialty hierarchy
   const sections = [
+    { id: "context", label: "Contexto" },
     { id: "general", label: "Geral" },
     { id: "architecture", label: "Arquitetura" },
     { id: "structural", label: "Estruturas" },
@@ -187,6 +242,7 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     { id: "elevators", label: "Ascensores" },
     { id: "licensing", label: "Licenciamento" },
     { id: "waste", label: "Resíduos" },
+    { id: "drawings", label: "Desenhos" },
     { id: "local", label: "Municipal" },
   ];
 
@@ -209,6 +265,75 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
           </button>
         ))}
       </div>
+
+      {/* Context Section */}
+      {activeSection === "context" && (
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              Descreva o seu projeto e coloque questões específicas. Esta informação contextualiza a análise regulamentar e permite identificar preocupações prioritárias.
+            </p>
+          </div>
+
+          <div>
+            <Label>Descrição do Projeto</Label>
+            <textarea
+              value={project.projectContext.description}
+              onChange={e => updateProjectContext("description", e.target.value)}
+              placeholder="Descreva o projeto: tipo de obra, estado atual, objetivos, condicionantes conhecidas..."
+              rows={4}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <Label>Preocupações Regulamentares Específicas</Label>
+            <textarea
+              value={project.projectContext.specificConcerns}
+              onChange={e => updateProjectContext("specificConcerns", e.target.value)}
+              placeholder="Ex: Tenho dúvidas sobre a classificação SCIE, o PDM limita a cércea a 9m, a câmara exige parecer patrimonial..."
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <Label>Perguntas sobre o Projeto</Label>
+            <div className="space-y-2">
+              {project.projectContext.questions.map((q, i) => (
+                <div key={i} className="flex gap-2">
+                  <Input
+                    value={q}
+                    onChange={e => {
+                      const newQuestions = [...project.projectContext.questions];
+                      newQuestions[i] = e.target.value;
+                      updateProjectContext("questions", newQuestions);
+                    }}
+                    placeholder="Escreva a sua pergunta..."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newQuestions = project.projectContext.questions.filter((_, idx) => idx !== i);
+                      updateProjectContext("questions", newQuestions);
+                    }}
+                    className="px-3 py-2 text-red-500 hover:text-red-700 text-sm"
+                  >
+                    Remover
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => updateProjectContext("questions", [...project.projectContext.questions, ""])}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                + Adicionar pergunta
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* General Section */}
       {activeSection === "general" && (
@@ -249,6 +374,46 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
                 <option key={d} value={d}>{d}</option>
               ))}
             </Select>
+          </div>
+
+          <div>
+            <Label>Município</Label>
+            <Input
+              value={project.location.municipality}
+              onChange={e => updateLocation("municipality", e.target.value)}
+              placeholder="Ex: Lisboa, Sintra, Cascais..."
+            />
+          </div>
+
+          <div>
+            <Label>Freguesia</Label>
+            <Input
+              value={project.location.parish ?? ""}
+              onChange={e => updateLocation("parish", e.target.value)}
+              placeholder="Ex: Estrela, Belém, Ajuda..."
+            />
+          </div>
+
+          <div>
+            <Label>Latitude</Label>
+            <Input
+              type="number"
+              step="0.000001"
+              value={project.location.latitude ?? ""}
+              onChange={e => updateLocation("latitude", Number(e.target.value))}
+              placeholder="Ex: 38.7223"
+            />
+          </div>
+
+          <div>
+            <Label>Longitude</Label>
+            <Input
+              type="number"
+              step="0.000001"
+              value={project.location.longitude ?? ""}
+              onChange={e => updateLocation("longitude", Number(e.target.value))}
+              placeholder="Ex: -9.1393"
+            />
           </div>
 
           <div>
@@ -1838,6 +2003,75 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
             </Select>
           </div>
 
+          <div>
+            <Label>Tipo de Processo (para cálculo de prazos)</Label>
+            <Select
+              value={project.licensing.processType ?? ""}
+              onChange={e => updateLicensing("processType", e.target.value || undefined as unknown as string)}
+            >
+              <option value="">Selecionar...</option>
+              <option value="pip">Informação Prévia (PIP) - 40 dias úteis</option>
+              <option value="licensing">Licenciamento - 65 dias úteis</option>
+              <option value="communication_prior">Comunicação Prévia - 20 dias úteis</option>
+              <option value="special_authorization">Autorização Especial - 60 dias úteis</option>
+              <option value="utilization_license">Licença de Utilização - 15 dias úteis</option>
+            </Select>
+          </div>
+
+          {project.licensing.processType && (
+            <>
+              <div>
+                <Label>Data de Submissão</Label>
+                <Input
+                  type="date"
+                  value={project.licensing.submissionDate ?? ""}
+                  onChange={e => updateLicensing("submissionDate", e.target.value)}
+                />
+              </div>
+              {project.licensing.submissionDate && (() => {
+                const pt = project.licensing.processType as keyof typeof PROCESS_LEGAL_TIMELINES;
+                const timeline = pt ? PROCESS_LEGAL_TIMELINES[pt] : null;
+                const totalDays = timeline && "totalMaxDays" in timeline ? timeline.totalMaxDays : (timeline && "startWorkDays" in timeline ? timeline.startWorkDays : 0);
+                const sub = new Date(project.licensing.submissionDate!);
+                const expected = new Date(sub);
+                expected.setDate(expected.getDate() + Math.ceil(totalDays * 7 / 5));
+                return (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm text-blue-800">
+                      <strong>Prazo legal:</strong> {totalDays} dias úteis<br />
+                      <strong>Data expectável:</strong> ~{expected.toLocaleDateString("pt-PT")}<br />
+                      <strong>Efeito do silêncio:</strong> {timeline && timeline.silenceEffect === "deferimento_tácito" ? "Deferimento tácito" : "Pode iniciar obras"}
+                    </p>
+                  </div>
+                );
+              })()}
+            </>
+          )}
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">PIP / Direito à Informação</h3>
+          <div className="md:col-span-2">
+            <CheckboxField
+              id="hasPIPResponse"
+              label="Tem PIP ou Direito à Informação respondido"
+              checked={project.licensing.hasPIPResponse ?? false}
+              onChange={v => updateLicensing("hasPIPResponse", v)}
+            />
+          </div>
+          {project.licensing.hasPIPResponse && (
+            <div className="md:col-span-2">
+              <Label>Resumo do PIP / Informação Prévia</Label>
+              <textarea
+                value={project.licensing.pipResponseSummary ?? ""}
+                onChange={e => updateLicensing("pipResponseSummary", e.target.value)}
+                placeholder="Resuma os condicionalismos e informações fornecidas pela câmara..."
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          )}
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Projetos e Licenças</h3>
+
           <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
             <CheckboxField
               id="hasArchProject"
@@ -1903,7 +2137,13 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
       {/* Local/Municipal Section */}
       {activeSection === "local" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="text-sm text-amber-800">
+              Os regulamentos municipais, de hidráulica e de entidades concessionárias variam por concelho. Carregue documentação local para que a análise considere regras específicas.
+            </p>
+          </div>
+
+          <div>
             <Label>Município</Label>
             <Input
               value={project.localRegulations.municipality}
@@ -1912,58 +2152,184 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
             />
           </div>
 
-          <div className="md:col-span-2 bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p className="text-sm text-amber-800">
-              Os regulamentos municipais variam por concelho. Carregue documentação local (PDM, regulamentos de urbanização, etc.) para que a análise possa considerar regras específicas do município.
-            </p>
+          {/* PDM / Urban Management */}
+          <div>
+            <Label>Classificação PDM</Label>
+            <Input
+              value={project.localRegulations.pdmZoning ?? ""}
+              onChange={e => updateLocalRegulations("pdmZoning", e.target.value)}
+              placeholder="Ex: Solo urbano - Espaços centrais e residenciais"
+            />
           </div>
 
           <div className="md:col-span-2">
-            <Label>Carregar Documento Local</Label>
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.txt"
-                onChange={e => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    addLocalDocument({
-                      id: crypto.randomUUID(),
-                      name: file.name.replace(/\.[^.]+$/, ""),
-                      municipality: project.localRegulations.municipality,
-                      description: "",
-                      fileName: file.name,
-                      uploadedAt: new Date().toISOString(),
-                    });
-                    e.target.value = "";
-                  }
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm file:mr-4 file:py-1 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
+            <Label>Notas PDM / Instrumentos de Gestão Urbanística</Label>
+            <textarea
+              value={project.localRegulations.pdmNotes ?? ""}
+              onChange={e => updateLocalRegulations("pdmNotes", e.target.value)}
+              placeholder="Condicionantes do PDM: cércea máxima, índice de construção, alinhamentos, servidões..."
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {/* Water Utility Provider */}
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Entidade Gestora de Águas</h3>
+          <div>
+            <Label>Entidade</Label>
+            <Select
+              value={project.localRegulations.waterUtilityProvider ?? ""}
+              onChange={e => updateLocalRegulations("waterUtilityProvider", e.target.value)}
+            >
+              <option value="">Selecionar...</option>
+              {WATER_UTILITY_PROVIDERS.map(p => (
+                <option key={p.name} value={p.name}>{p.name}</option>
+              ))}
+              <option value="outra">Outra</option>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Carregar Regulamento de Águas</Label>
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx,.txt"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  addWaterUtilityDoc({
+                    id: crypto.randomUUID(),
+                    name: file.name.replace(/\.[^.]+$/, ""),
+                    municipality: project.localRegulations.municipality,
+                    description: "Regulamento de águas/saneamento",
+                    fileName: file.name,
+                    uploadedAt: new Date().toISOString(),
+                  });
+                  e.target.value = "";
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm file:mr-4 file:py-1 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
+          </div>
+
+          {project.localRegulations.waterUtilityDocs.length > 0 && (
+            <div className="md:col-span-2">
+              <Label>Documentos de Águas/Saneamento</Label>
+              <div className="space-y-2">
+                {project.localRegulations.waterUtilityDocs.map(doc => (
+                  <div key={doc.id} className="flex items-center justify-between p-3 bg-sky-50 rounded-lg border border-sky-200">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{doc.fileName}</p>
+                      <p className="text-xs text-gray-500">{project.localRegulations.waterUtilityProvider || doc.municipality}</p>
+                    </div>
+                    <button type="button" onClick={() => removeWaterUtilityDoc(doc.id)} className="ml-2 text-red-500 hover:text-red-700 text-sm font-medium">Remover</button>
+                  </div>
+                ))}
+              </div>
             </div>
+          )}
+
+          {/* Entity Consultation */}
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Entidades a Consultar</h3>
+          <div className="md:col-span-2 bg-gray-50 border border-gray-200 rounded-lg p-3">
+            <p className="text-xs text-gray-600 mb-2">Entidades que podem requerer consulta (baseado no projeto):</p>
+            <div className="flex flex-wrap gap-2">
+              {[...CONSULTATION_ENTITIES.mandatory, ...CONSULTATION_ENTITIES.conditional].map(entity => {
+                const isAdded = project.localRegulations.consultedEntities.some(e => e.name === entity.name);
+                return (
+                  <button
+                    key={entity.name}
+                    type="button"
+                    onClick={() => {
+                      if (!isAdded) {
+                        addConsultedEntity({
+                          id: crypto.randomUUID(),
+                          name: entity.name,
+                          type: entity.type,
+                          consultationRequired: true,
+                        });
+                      }
+                    }}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${isAdded ? "bg-green-100 border-green-300 text-green-700" : "bg-white border-gray-300 text-gray-700 hover:bg-blue-50 hover:border-blue-300"}`}
+                    title={"condition" in entity ? entity.condition : entity.scope}
+                  >
+                    {isAdded ? "\u2713 " : ""}{entity.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {project.localRegulations.consultedEntities.length > 0 && (
+            <div className="md:col-span-2 space-y-2">
+              {project.localRegulations.consultedEntities.map(entity => (
+                <div key={entity.id} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">{entity.name}</p>
+                    <p className="text-xs text-gray-500">{entity.type}</p>
+                  </div>
+                  <Select
+                    value={entity.responseStatus ?? "pending"}
+                    onChange={e => {
+                      setProject(prev => ({
+                        ...prev,
+                        localRegulations: {
+                          ...prev.localRegulations,
+                          consultedEntities: prev.localRegulations.consultedEntities.map(en =>
+                            en.id === entity.id ? { ...en, responseStatus: e.target.value as ConsultedEntity["responseStatus"] } : en
+                          ),
+                        },
+                      }));
+                    }}
+                  >
+                    <option value="pending">Pendente</option>
+                    <option value="approved">Aprovado</option>
+                    <option value="approved_conditions">Aprovado c/ condições</option>
+                    <option value="rejected">Rejeitado</option>
+                    <option value="no_response">Sem resposta</option>
+                  </Select>
+                  <button type="button" onClick={() => removeConsultedEntity(entity.id)} className="text-red-500 hover:text-red-700 text-sm">Remover</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* General Local Documents */}
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Documentos Municipais</h3>
+          <div className="md:col-span-2">
+            <Label>Carregar PDM, Regulamentos, etc.</Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.txt"
+              onChange={e => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  addLocalDocument({
+                    id: crypto.randomUUID(),
+                    name: file.name.replace(/\.[^.]+$/, ""),
+                    municipality: project.localRegulations.municipality,
+                    description: "",
+                    fileName: file.name,
+                    uploadedAt: new Date().toISOString(),
+                  });
+                  e.target.value = "";
+                }
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm file:mr-4 file:py-1 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+            />
           </div>
 
           {project.localRegulations.documents.length > 0 && (
             <div className="md:col-span-2">
-              <Label>Documentos Carregados</Label>
               <div className="space-y-2">
                 {project.localRegulations.documents.map(doc => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
-                  >
+                  <div key={doc.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{doc.fileName}</p>
                       <p className="text-xs text-gray-500">{doc.municipality} - {new Date(doc.uploadedAt).toLocaleDateString("pt-PT")}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeLocalDocument(doc.id)}
-                      className="ml-2 text-red-500 hover:text-red-700 text-sm font-medium"
-                    >
-                      Remover
-                    </button>
+                    <button type="button" onClick={() => removeLocalDocument(doc.id)} className="ml-2 text-red-500 hover:text-red-700 text-sm font-medium">Remover</button>
                   </div>
                 ))}
               </div>
@@ -2033,6 +2399,139 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
               max={100}
               value={project.waste.recyclingPercentageTarget}
               onChange={e => updateWaste("recyclingPercentageTarget", Number(e.target.value))}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Drawings Section */}
+      {activeSection === "drawings" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
+              Avaliação da qualidade das peças desenhadas: escalas, tipos de letra, simbologia, legendas e apresentação geral conforme Portaria 701-H/2008 e ISO 3098.
+            </p>
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800">Escalas</h3>
+          <div>
+            <Label>Escala das Plantas (Arquitetura)</Label>
+            <Select
+              value={project.drawingQuality.architectureScale ?? ""}
+              onChange={e => updateDrawingQuality("architectureScale", e.target.value)}
+            >
+              <option value="">Selecionar...</option>
+              <option value="1:50">1:50</option>
+              <option value="1:100">1:100</option>
+              <option value="1:200">1:200</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Escala dos Pormenores</Label>
+            <Select
+              value={project.drawingQuality.detailScale ?? ""}
+              onChange={e => updateDrawingQuality("detailScale", e.target.value)}
+            >
+              <option value="">Selecionar...</option>
+              <option value="1:5">1:5</option>
+              <option value="1:10">1:10</option>
+              <option value="1:20">1:20</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Escala da Planta de Localização</Label>
+            <Select
+              value={project.drawingQuality.locationPlanScale ?? ""}
+              onChange={e => updateDrawingQuality("locationPlanScale", e.target.value)}
+            >
+              <option value="">Selecionar...</option>
+              <option value="1:1000">1:1000</option>
+              <option value="1:2000">1:2000</option>
+              <option value="1:5000">1:5000</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Nº de Folhas</Label>
+            <Input
+              type="number"
+              value={project.drawingQuality.numberOfSheets ?? ""}
+              onChange={e => updateDrawingQuality("numberOfSheets", Number(e.target.value))}
+              placeholder="Total de folhas"
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Qualidade Visual</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasCorrectScale"
+              label="Escalas adequadas à impressão"
+              checked={project.drawingQuality.hasCorrectScaleForPrint}
+              onChange={v => updateDrawingQuality("hasCorrectScaleForPrint", v)}
+            />
+            <CheckboxField
+              id="hasConsistentFonts"
+              label="Fontes consistentes"
+              checked={project.drawingQuality.hasConsistentFonts}
+              onChange={v => updateDrawingQuality("hasConsistentFonts", v)}
+            />
+            <CheckboxField
+              id="hasReadableText"
+              label="Texto legível na escala"
+              checked={project.drawingQuality.hasReadableTextAtScale}
+              onChange={v => updateDrawingQuality("hasReadableTextAtScale", v)}
+            />
+            <CheckboxField
+              id="hasStdSymbols"
+              label="Simbologia normalizada"
+              checked={project.drawingQuality.hasStandardSymbols}
+              onChange={v => updateDrawingQuality("hasStandardSymbols", v)}
+            />
+            <CheckboxField
+              id="hasLegendEvery"
+              label="Legenda em cada folha c/ símbolos"
+              checked={project.drawingQuality.hasLegendOnEverySheet}
+              onChange={v => updateDrawingQuality("hasLegendOnEverySheet", v)}
+            />
+            <CheckboxField
+              id="hasNorthArrow"
+              label="Indicação do Norte"
+              checked={project.drawingQuality.hasNorthArrow}
+              onChange={v => updateDrawingQuality("hasNorthArrow", v)}
+            />
+            <CheckboxField
+              id="hasScaleBar"
+              label="Escala gráfica (barra)"
+              checked={project.drawingQuality.hasScaleBar}
+              onChange={v => updateDrawingQuality("hasScaleBar", v)}
+            />
+            <CheckboxField
+              id="hasLineWeights"
+              label="Espessuras de linha consistentes"
+              checked={project.drawingQuality.hasConsistentLineWeights}
+              onChange={v => updateDrawingQuality("hasConsistentLineWeights", v)}
+            />
+            <CheckboxField
+              id="hasDimensioning"
+              label="Cotagem completa"
+              checked={project.drawingQuality.hasDimensioning}
+              onChange={v => updateDrawingQuality("hasDimensioning", v)}
+            />
+            <CheckboxField
+              id="hasTitleBlock"
+              label="Carimbo / Legenda nas folhas"
+              checked={project.drawingQuality.hasSheetTitleBlock}
+              onChange={v => updateDrawingQuality("hasSheetTitleBlock", v)}
+            />
+          </div>
+
+          <div>
+            <Label>Tamanho mínimo de letra (mm)</Label>
+            <Input
+              type="number"
+              step="0.5"
+              value={project.drawingQuality.minimumFontSize ?? ""}
+              onChange={e => updateDrawingQuality("minimumFontSize", Number(e.target.value))}
+              placeholder="Ex: 2.5"
             />
           </div>
         </div>

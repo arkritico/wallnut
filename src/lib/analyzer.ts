@@ -34,6 +34,9 @@ import {
   SCIE_NOTAS_TECNICAS,
   ELECTRICAL_TECHNICAL_DOCS,
   ANACOM_TECHNICAL_DOCS,
+  PROCESS_LEGAL_TIMELINES,
+  CONSULTATION_ENTITIES,
+  DRAWING_STANDARDS,
 } from "./regulations";
 
 let findingCounter = 0;
@@ -70,7 +73,8 @@ export function analyzeProject(project: BuildingProject): AnalysisResult {
   findings.push(...analyzeElevators(project));         // 13. Elevators
   findings.push(...analyzeLicensing(project));         // 14. Licensing
   findings.push(...analyzeWaste(project));             // 15. Waste
-  findings.push(...analyzeGeneral(project));           // 16. General
+  findings.push(...analyzeDrawingQuality(project));    // 16. Drawing Quality
+  findings.push(...analyzeGeneral(project));           // 17. General
 
   recommendations.push(...generateRecommendations(project, findings));
 
@@ -2285,6 +2289,153 @@ function analyzeWaste(project: BuildingProject): Finding[] {
 }
 
 // ============================================================
+// DRAWING QUALITY ANALYSIS (Portaria 701-H/2008, ISO 3098)
+// ============================================================
+
+function analyzeDrawingQuality(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const dq = project.drawingQuality;
+
+  // Scale correctness
+  if (!dq.hasCorrectScaleForPrint) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008",
+      article: "Art. 11.º - Escalas",
+      description: `As escalas dos desenhos devem ser adequadas ao formato de impressão, garantindo legibilidade. Escalas recomendadas: plantas ${DRAWING_STANDARDS.scales.floorPlans.join("/")}, cortes ${DRAWING_STANDARDS.scales.sections.join("/")}, detalhes ${DRAWING_STANDARDS.scales.details.join("/")}.`,
+      severity: "warning",
+    });
+  }
+
+  // Consistent fonts
+  if (!dq.hasConsistentFonts) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "ISO 3098 - Escrita Técnica",
+      article: "",
+      description: `Os tipos e tamanhos de letra devem ser consistentes em todas as peças desenhadas. Altura mínima recomendada: ${DRAWING_STANDARDS.fonts.minimumHeightMm}mm quando impresso.`,
+      severity: "warning",
+    });
+  }
+
+  // Readable text at scale
+  if (!dq.hasReadableTextAtScale) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "ISO 3098",
+      article: "Legibilidade",
+      description: `O texto deve manter legibilidade quando os desenhos são impressos na escala definida. Verificar que anotações, cotas e legendas são legíveis no formato de impressão previsto.`,
+      severity: "warning",
+      requiredValue: `≥ ${DRAWING_STANDARDS.fonts.minimumHeightMm}mm`,
+    });
+  }
+
+  // Standard symbols
+  if (!dq.hasStandardSymbols) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Normas de Simbologia",
+      article: "",
+      description: `Os símbolos utilizados devem seguir as normas aplicáveis: ${Object.entries(DRAWING_STANDARDS.symbols).map(([k, v]) => v).join(", ")}. Símbolos não normalizados devem ser evitados.`,
+      severity: "warning",
+    });
+  }
+
+  // Legend on every sheet
+  if (!dq.hasLegendOnEverySheet) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008",
+      article: "Legendas",
+      description: `Cada folha de desenho que utilize simbologia deve conter a respetiva legenda. A legenda deve estar presente e visível em todas as páginas onde os símbolos são utilizados.`,
+      severity: "critical",
+    });
+  }
+
+  // North arrow
+  if (!dq.hasNorthArrow) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008",
+      article: "Orientação",
+      description: `As plantas devem incluir indicação do norte geográfico para correta orientação do projeto.`,
+      severity: "warning",
+    });
+  }
+
+  // Scale bar
+  if (!dq.hasScaleBar) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008",
+      article: "Escala gráfica",
+      description: `Os desenhos devem incluir escala gráfica (barra de escala) para além da indicação numérica, permitindo verificação mesmo após redução/ampliação de cópias.`,
+      severity: "warning",
+    });
+  }
+
+  // Consistent line weights
+  if (!dq.hasConsistentLineWeights) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "ISO 128 - Desenho Técnico",
+      article: "Espessuras de linha",
+      description: `As espessuras de linha devem ser consistentes e seguir a hierarquia visual: elementos cortados (${DRAWING_STANDARDS.lineWeights.extraThick}mm), paredes (${DRAWING_STANDARDS.lineWeights.thick}mm), geral (${DRAWING_STANDARDS.lineWeights.medium}mm), cotagem (${DRAWING_STANDARDS.lineWeights.thin}mm).`,
+      severity: "info",
+    });
+  }
+
+  // Dimensioning
+  if (!dq.hasDimensioning) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008",
+      article: "Cotagem",
+      description: `As peças desenhadas devem incluir cotagem completa: dimensões gerais, parciais, cotas de nível e referências altimétrias. Fundamental para verificação regulamentar.`,
+      severity: "warning",
+    });
+  }
+
+  // Sheet title block (carimbo)
+  if (!dq.hasSheetTitleBlock) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008",
+      article: "Carimbo / Legenda",
+      description: `Todas as folhas devem ter carimbo/legenda com: identificação do projeto, dono de obra, autor, especialidade, escala, data e número da folha.`,
+      severity: "critical",
+    });
+  }
+
+  // If all pass
+  const passChecks = [dq.hasCorrectScaleForPrint, dq.hasConsistentFonts, dq.hasReadableTextAtScale,
+    dq.hasStandardSymbols, dq.hasLegendOnEverySheet, dq.hasNorthArrow, dq.hasScaleBar,
+    dq.hasConsistentLineWeights, dq.hasDimensioning, dq.hasSheetTitleBlock];
+  if (passChecks.every(Boolean)) {
+    findings.push({
+      id: nextFindingId(),
+      area: "drawings",
+      regulation: "Portaria 701-H/2008 / ISO 3098",
+      article: "",
+      description: `As peças desenhadas cumprem os requisitos de qualidade: escalas, fontes, simbologia, legendas e apresentação geral.`,
+      severity: "pass",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
 // RECOMMENDATIONS ENGINE
 // ============================================================
 
@@ -2663,6 +2814,70 @@ function generateRecommendations(project: BuildingProject, findings: Finding[]):
     });
   }
 
+  // Drawing quality recommendations
+  if (criticalAreas.has("drawings") || warningAreas.has("drawings")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "drawings",
+      title: "Melhorar qualidade das peças desenhadas",
+      description: `Rever as peças desenhadas garantindo: escalas adequadas ao formato de impressão, legendas com simbologia em todas as folhas, carimbo normalizado, norte geográfico, escala gráfica e cotagem completa.`,
+      impact: "high",
+      regulatoryBasis: "Portaria 701-H/2008, ISO 3098, ISO 128",
+    });
+  }
+
+  // Water utility provider recommendations
+  if (!project.localRegulations.waterUtilityProvider) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "water_drainage",
+      title: "Identificar entidade gestora de águas",
+      description: `Identificar a entidade gestora de águas e saneamento do município (EPAL, SIMAS, SIMAR, CARTAGUAS, etc.) e obter os regulamentos específicos para ligação de ramais de água e esgoto.`,
+      impact: "high",
+      regulatoryBasis: "RGSPPDADAR / Regulamento municipal de águas",
+    });
+  }
+
+  // Entity consultation recommendations
+  if (project.localRegulations.consultedEntities.length === 0) {
+    const entities: string[] = CONSULTATION_ENTITIES.mandatory.map(e => e.name);
+    // Add conditional entities based on project
+    if (Number(project.fireSafety.riskCategory) >= 2) {
+      entities.push("ANPC / Proteção Civil");
+    }
+    if (project.licensing.isProtectedArea) {
+      entities.push("DGPC / IGESPAR", "Direção Regional de Cultura");
+    }
+    if (project.electrical.contractedPower > 41.4 || project.gas.hasGasInstallation) {
+      entities.push("DGEG");
+    }
+
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "licensing",
+      title: "Identificar entidades a consultar",
+      description: `Para este projeto devem ser consultadas as seguintes entidades: ${entities.join(", ")}. Identificar precocemente as consultas externas evita atrasos no licenciamento.`,
+      impact: "high",
+      regulatoryBasis: "RJUE - DL 555/99, Art. 13.º",
+    });
+  }
+
+  // Process timeline recommendation
+  if (project.licensing.processType) {
+    const timeline = PROCESS_LEGAL_TIMELINES[project.licensing.processType];
+    if (timeline) {
+      const totalDays = "totalMaxDays" in timeline ? timeline.totalMaxDays : ("startWorkDays" in timeline ? timeline.startWorkDays : 0);
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "licensing",
+        title: `Prazo legal: ${timeline.label}`,
+        description: `Para o processo de ${timeline.label}, o prazo legal máximo para resposta é de ${totalDays} dias úteis. Efeito do silêncio: ${timeline.silenceEffect === "deferimento_tácito" ? "deferimento tácito (aprovação implícita)" : "pode iniciar obras"}.`,
+        impact: "medium",
+        regulatoryBasis: "RJUE - DL 555/99",
+      });
+    }
+  }
+
   return recommendations;
 }
 
@@ -2688,7 +2903,8 @@ function buildRegulationSummary(findings: Finding[]): RegulationSummary[] {
     { area: "licensing", name: "14. Licenciamento (RJUE)" },
     { area: "waste", name: "15. Resíduos de Construção (DL 46/2008)" },
     { area: "local", name: "16. Regulamentos Municipais" },
-    { area: "general", name: "17. Regulamento Geral (RGEU)" },
+    { area: "drawings", name: "17. Qualidade das Peças Desenhadas" },
+    { area: "general", name: "18. Regulamento Geral (RGEU)" },
   ];
 
   return areas.map(({ area, name }) => {

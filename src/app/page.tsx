@@ -5,7 +5,7 @@ import ProjectForm from "@/components/ProjectForm";
 import AnalysisResults from "@/components/AnalysisResults";
 import { analyzeProject } from "@/lib/analyzer";
 import type { BuildingProject, AnalysisResult } from "@/lib/types";
-import { Building, Shield, Zap, ChevronRight, Plug, Wifi, Volume2, Fuel, Droplets, Columns3, ArrowUpDown, FileText, Recycle, Ruler, Wind, MapPin } from "lucide-react";
+import { Building, Shield, Zap, ChevronRight, Plug, Wifi, Volume2, Fuel, Droplets, Columns3, ArrowUpDown, FileText, Recycle, Ruler, Wind, MapPin, PenTool, Accessibility } from "lucide-react";
 
 export default function Home() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -123,9 +123,19 @@ export default function Home() {
               description="Gestão de RCD conforme DL 46/2008: PPG, triagem, transporte licenciado, destino e registo e-GAR."
             />
             <FeatureCard
+              icon={<Accessibility className="w-8 h-8 text-purple-500" />}
+              title="Acessibilidade"
+              description="Conformidade DL 163/2006: entradas acessíveis, elevadores, largura de portas e corredores, WC acessível e estacionamento."
+            />
+            <FeatureCard
+              icon={<PenTool className="w-8 h-8 text-pink-500" />}
+              title="Qualidade dos Desenhos"
+              description="Escalas, fontes, simbologia normalizada, legendas por folha, cotagem, carimbo e apresentação conforme Portaria 701-H/2008."
+            />
+            <FeatureCard
               icon={<MapPin className="w-8 h-8 text-rose-500" />}
               title="Regulamentos Municipais"
-              description="Upload de PDM e regulamentação municipal específica. Análise dependente de documentação local carregada."
+              description="PDM, entidades gestoras de águas (EPAL, SIMAS, etc.), consulta de entidades e prazos legais de licenciamento."
             />
           </div>
 

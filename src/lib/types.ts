@@ -23,6 +23,7 @@ export type RegulationArea =
   | "licensing"
   | "waste"
   | "local"
+  | "drawings"
   | "general";
 
 export interface BuildingProject {
@@ -89,6 +90,12 @@ export interface BuildingProject {
 
   // 16. Local municipal regulations
   localRegulations: LocalRegulationsInfo;
+
+  // 17. Drawing quality
+  drawingQuality: DrawingQualityInfo;
+
+  // 18. Project context
+  projectContext: ProjectContext;
 }
 
 export interface PortugalLocation {
@@ -98,6 +105,9 @@ export interface PortugalLocation {
   distanceToCoast: number; // km
   climateZoneWinter: "I1" | "I2" | "I3";
   climateZoneSummer: "V1" | "V2" | "V3";
+  latitude?: number;
+  longitude?: number;
+  parish?: string; // Freguesia
 }
 
 export interface ArchitectureInfo {
@@ -140,7 +150,54 @@ export interface LocalRegulationDoc {
 export interface LocalRegulationsInfo {
   municipality: string;
   documents: LocalRegulationDoc[];
-  notes: string; // User notes about local requirements
+  notes: string;
+  // Municipal utility providers
+  waterUtilityProvider?: string; // SIMAS, EPAL, SIMAR, CARTAGUAS, etc.
+  waterUtilityDocs: LocalRegulationDoc[];
+  // PDM and urban management
+  pdmZoning?: string; // Classificação PDM
+  pdmNotes?: string;
+  // Entity consultation
+  consultedEntities: ConsultedEntity[];
+}
+
+export interface ConsultedEntity {
+  id: string;
+  name: string;
+  type: "municipality" | "water_utility" | "fire_authority" | "heritage" | "environment" | "transport" | "energy" | "telecom" | "other";
+  consultationRequired: boolean;
+  consultationDate?: string;
+  responseDate?: string;
+  responseStatus?: "pending" | "approved" | "approved_conditions" | "rejected" | "no_response";
+  notes?: string;
+}
+
+export interface DrawingQualityInfo {
+  // Scales
+  architectureScale?: string; // e.g. "1:100", "1:50"
+  detailScale?: string; // e.g. "1:20", "1:10"
+  locationPlanScale?: string; // e.g. "1:1000", "1:2000"
+  hasCorrectScaleForPrint: boolean;
+  // Fonts and text
+  hasConsistentFonts: boolean;
+  minimumFontSize?: number; // mm when printed
+  hasReadableTextAtScale: boolean;
+  // Symbols and legends
+  hasStandardSymbols: boolean; // EN ISO 7010, NP/EN standards
+  hasLegendOnEverySheet: boolean;
+  hasNorthArrow: boolean;
+  hasScaleBar: boolean;
+  // General quality
+  hasConsistentLineWeights: boolean;
+  hasDimensioning: boolean;
+  hasSheetTitleBlock: boolean; // Carimbo/legendas nas folhas
+  numberOfSheets?: number;
+}
+
+export interface ProjectContext {
+  description: string; // Free-text project description
+  questions: string[]; // User questions about the project
+  specificConcerns: string; // Specific regulatory concerns
 }
 
 export interface BuildingEnvelope {
@@ -377,6 +434,10 @@ export interface LicensingInfo {
   hasTechnicalDirector: boolean; // Diretor de obra/fiscalização
   isInARU: boolean; // Área de Reabilitação Urbana
   isProtectedArea: boolean; // Área protegida / património
+  processType?: "pip" | "licensing" | "communication_prior" | "special_authorization" | "utilization_license";
+  submissionDate?: string; // ISO date
+  hasPIPResponse?: boolean; // PIP ou direito à informação já respondido
+  pipResponseSummary?: string;
 }
 
 export interface WasteInfo {

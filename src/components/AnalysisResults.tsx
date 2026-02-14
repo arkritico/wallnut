@@ -26,6 +26,7 @@ import {
   Ruler,
   Wind,
   MapPin,
+  PenTool,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -224,6 +225,7 @@ function RegulationCard({ summary }: { summary: RegulationSummary }) {
     licensing: <FileText className="w-5 h-5 text-emerald-600" />,
     waste: <Recycle className="w-5 h-5 text-lime-600" />,
     local: <MapPin className="w-5 h-5 text-rose-500" />,
+    drawings: <PenTool className="w-5 h-5 text-pink-500" />,
     general: <Building className="w-5 h-5 text-gray-500" />,
   };
 
