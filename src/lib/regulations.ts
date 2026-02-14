@@ -9,6 +9,14 @@
  * - DL 163/2006 - Accessibility
  * - RGEU (Regulamento Geral das Edificações Urbanas) - General urban building rules
  * - SCE (Sistema de Certificação Energética dos Edifícios) - Energy certification
+ * - RTIEBT (Regras Técnicas das Instalações Elétricas de Baixa Tensão) - Electrical
+ * - ITED / ITUR - Telecommunications in buildings and urbanizations
+ * - DL 521/99 - Gas installations
+ * - DL 23/95 (RGSPPDADAR) - Water supply and drainage
+ * - Eurocodes (EC0-EC8) - Structural / Seismic
+ * - DL 320/2002 - Elevators
+ * - RJUE (DL 555/99) - Licensing
+ * - DL 46/2008 - Construction waste management
  */
 
 // ============================================================
@@ -415,6 +423,268 @@ export const ITUR_REQUIREMENTS = {
     required: true,
     projectRequired: true, // ITUR project mandatory
     installerLicenseRequired: true,
+  },
+} as const;
+
+// ============================================================
+// GAS INSTALLATIONS (DL 521/99, Portaria 361/98)
+// ============================================================
+
+export const GAS_REQUIREMENTS = {
+  /** Gas detector requirements */
+  detector: {
+    requiredForNaturalGas: true, // Indoor installations
+    requiredForLPG: true,
+  },
+  /** Ventilation of rooms with gas appliances */
+  ventilation: {
+    minOpeningArea: 150, // cm² per appliance
+    requiredForAllEnclosedAppliances: true,
+  },
+  /** Flue/exhaust system */
+  flue: {
+    requiredForTypeB: true, // Type B appliances (open flue)
+    requiredForTypeC: true, // Type C appliances (sealed)
+    minDiameter: 80, // mm
+  },
+  /** Pipe materials allowed */
+  allowedPipeMaterials: ["copper", "steel", "polyethylene", "multilayer"] as const,
+  /** Pressure testing */
+  pressureTest: {
+    required: true,
+    testPressure: 150, // mbar for low pressure
+    duration: 15, // minutes
+  },
+  /** Emergency valve */
+  emergencyValve: {
+    required: true, // At building entrance
+    accessibleLocation: true,
+  },
+  /** Certification */
+  certification: {
+    required: true,
+    installerCredentialRequired: true,
+    entity: "DGEG",
+  },
+  /** Inspection intervals (years) */
+  inspectionInterval: {
+    residential: 10,
+    commercial: 5,
+  },
+} as const;
+
+// ============================================================
+// WATER SUPPLY & DRAINAGE (DL 23/95 - RGSPPDADAR)
+// ============================================================
+
+export const WATER_DRAINAGE_REQUIREMENTS = {
+  /** Water supply - pressure */
+  waterSupply: {
+    minPressure: 100, // kPa (1 bar) at highest fixture
+    maxPressure: 600, // kPa (6 bar)
+    requiresCheckValve: true,
+    requiresPressureReducerAbove: 400, // kPa
+  },
+  /** Pipe materials - minimum requirements */
+  pipeMaterials: {
+    coldWater: ["ppr", "pex", "copper", "multicamada"] as const,
+    hotWater: ["ppr", "pex", "copper", "multicamada"] as const,
+    deprecatedMaterials: ["galvanized"] as const,
+  },
+  /** Drainage system */
+  drainage: {
+    requiresSeparateSystem: true, // Separate rainwater/sewage
+    requiresVentilation: true, // Ventilation columns
+    requiresSiphons: true, // All fixtures must have siphons
+    minSiphonHeight: 50, // mm water seal
+    minDrainSlope: 1, // % minimum slope
+  },
+  /** Grease trap */
+  greaseTrap: {
+    requiredForCommercial: true,
+    requiredForResidentialKitchens: false,
+  },
+  /** Rainwater management */
+  stormwater: {
+    requiresRetention: true, // For new developments
+    requiresInfiltration: false, // Depends on municipality
+  },
+  /** Water meter */
+  waterMeter: {
+    required: true,
+    individualMeteringForMultiDwelling: true,
+  },
+} as const;
+
+// ============================================================
+// STRUCTURAL / SEISMIC (Eurocodes, particularly EC8 - NP EN 1998-1)
+// ============================================================
+
+export const STRUCTURAL_REQUIREMENTS = {
+  /** Seismic zones Portugal - Peak Ground Acceleration (m/s²) */
+  seismicZones: {
+    type1: { // Far-field (interplate)
+      "1.1": 2.5, "1.2": 2.0, "1.3": 1.5, "1.4": 1.0, "1.5": 0.6, "1.6": 0.35,
+    },
+    type2: { // Near-field (intraplate)
+      "2.1": 2.5, "2.2": 2.0, "2.3": 1.7, "2.4": 1.1, "2.5": 0.8,
+    },
+  },
+  /** Soil amplification factors */
+  soilFactors: {
+    A: 1.0, B: 1.2, C: 1.15, D: 1.35, E: 1.4,
+  },
+  /** Importance classes (γI factor) */
+  importanceFactors: {
+    I: 0.65, // Low importance (temporary)
+    II: 1.0, // Normal importance (residential, commercial)
+    III: 1.45, // High importance (schools, hospitals)
+    IV: 1.95, // Essential (emergency, civil protection)
+  },
+  /** Geotechnical study required thresholds */
+  geotechnicalStudy: {
+    requiredAboveFloors: 2,
+    requiredForDeepFoundations: true,
+    requiredInSeismicZones: true,
+  },
+  /** Structural project requirements */
+  structuralProject: {
+    required: true, // Always required for new buildings
+    responsibleEngineer: true, // Must be signed by structural engineer
+  },
+} as const;
+
+// ============================================================
+// ELEVATORS (DL 320/2002, EN 81-20, EN 81-50)
+// ============================================================
+
+export const ELEVATOR_REQUIREMENTS = {
+  /** CE marking mandatory since 1999 */
+  ceMarkingRequired: true,
+  /** Maintenance requirements */
+  maintenance: {
+    contractRequired: true,
+    minInspectionsPerYear: 2, // Minimum 2 maintenance visits/year
+  },
+  /** Periodic inspection by IPQ-approved body */
+  inspection: {
+    required: true,
+    intervalYears: 2, // Every 2 years
+    entity: "IPQ / Organismo Notificado",
+  },
+  /** Emergency communication */
+  emergencyCommunication: {
+    required: true, // Bidirectional communication to rescue service
+    available24h: true,
+  },
+  /** Pit and headroom */
+  pit: {
+    minDepth: 1.20, // meters (varies by speed)
+    minHeadroom: 3.50, // meters above top landing
+  },
+  /** Accessible elevator dimensions (DL 163/2006) */
+  accessible: {
+    minCabinWidth: 1.10, // meters
+    minCabinDepth: 1.40, // meters
+    minDoorWidth: 0.90, // meters
+    requiresBraille: true,
+    requiresVoiceAnnouncement: true,
+  },
+  /** Number of elevators required */
+  minElevators: {
+    above4floors: 1,
+    above8floors: 2,
+    above12floors: 3,
+  },
+} as const;
+
+// ============================================================
+// LICENSING - RJUE (DL 555/99, alterado por DL 136/2014)
+// ============================================================
+
+export const LICENSING_REQUIREMENTS = {
+  /** Operations requiring licensing (licença) */
+  requiresLicensing: {
+    newConstruction: true,
+    reconstruction: true,
+    expansion: true,
+    significantAlteration: true,
+    demolition: true,
+  },
+  /** Operations under prior communication (comunicação prévia) */
+  priorCommunication: {
+    minorAlterations: true,
+    interiorWorks: true,
+  },
+  /** Required specialty projects */
+  specialtyProjects: {
+    stability: true, // Estabilidade / Estruturas
+    waterAndDrainage: true, // Águas e esgotos
+    electrical: true, // Eletricidade
+    gas: true, // Gás (if applicable)
+    telecommunications: true, // ITED
+    thermal: true, // Térmica (REH/RECS)
+    acoustic: true, // Acústica (RRAE)
+    fireSafety: true, // SCIE
+    accessibility: true, // Acessibilidade
+  },
+  /** Termo de responsabilidade required for */
+  termoResponsabilidade: {
+    architect: true,
+    specialtyEngineers: true,
+    constructionDirector: true,
+  },
+  /** Technical director requirements */
+  technicalDirector: {
+    required: true,
+    qualifications: "Engenheiro ou Arquiteto inscrito na respetiva Ordem",
+  },
+  /** Key deadlines (days) */
+  deadlines: {
+    licensingDecision: 45, // Days for municipal decision
+    priorCommunicationDecision: 20,
+    utilizationLicenseDecision: 10,
+  },
+  /** Protected areas additional requirements */
+  protectedAreas: {
+    requiresCulturalHeritage: true, // DGPC / Câmara
+    requiresEnvironmentalImpact: true, // APA / CCDR
+  },
+} as const;
+
+// ============================================================
+// CONSTRUCTION WASTE (DL 46/2008, alterado por DL 73/2011)
+// ============================================================
+
+export const WASTE_REQUIREMENTS = {
+  /** PPG (Plano de Prevenção e Gestão) required */
+  ppgRequired: {
+    newConstruction: true,
+    demolition: true,
+    rehabilitationAbove: 0, // Always for rehabilitation
+  },
+  /** Minimum recycling target */
+  recyclingTarget: 70, // % by 2020 target (EU Directive)
+  /** Waste registration */
+  registration: {
+    eGAR: true, // Electronic waste tracking
+    required: true,
+  },
+  /** Demolition audit */
+  demolitionAudit: {
+    requiredForDemolition: true,
+    requiredForMajorRehab: true,
+  },
+  /** Licensed operators */
+  operators: {
+    transporterLicenseRequired: true,
+    destinationLicenseRequired: true,
+    licensingEntity: "APA",
+  },
+  /** Sorting requirements */
+  sorting: {
+    onSiteSortingRequired: true,
+    minimumCategories: ["concrete", "metals", "wood", "plastics", "glass", "hazardous"] as const,
   },
 } as const;
 

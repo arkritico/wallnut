@@ -73,6 +73,55 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     }));
   }
 
+  function updateAcoustic(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      acoustic: { ...prev.acoustic, [field]: value },
+    }));
+  }
+
+  function updateGas(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      gas: { ...prev.gas, [field]: value },
+    }));
+  }
+
+  function updateWaterDrainage(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      waterDrainage: { ...prev.waterDrainage, [field]: value },
+    }));
+  }
+
+  function updateStructural(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      structural: { ...prev.structural, [field]: value },
+    }));
+  }
+
+  function updateElevators(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      elevators: { ...prev.elevators, [field]: value },
+    }));
+  }
+
+  function updateLicensing(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      licensing: { ...prev.licensing, [field]: value },
+    }));
+  }
+
+  function updateWaste(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      waste: { ...prev.waste, [field]: value },
+    }));
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onSubmit(project);
@@ -82,10 +131,17 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     { id: "general", label: "Geral" },
     { id: "envelope", label: "Envolvente" },
     { id: "systems", label: "Sistemas" },
+    { id: "acoustic", label: "Acústica" },
     { id: "accessibility", label: "Acessibilidade" },
     { id: "fire", label: "Incêndio" },
     { id: "electrical", label: "Elétrico" },
     { id: "telecom", label: "ITED/ITUR" },
+    { id: "gas", label: "Gás" },
+    { id: "water", label: "Águas" },
+    { id: "structural", label: "Estruturas" },
+    { id: "elevators", label: "Ascensores" },
+    { id: "licensing", label: "Licenciamento" },
+    { id: "waste", label: "Resíduos" },
   ];
 
   return (
@@ -1073,6 +1129,607 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
               </div>
             </>
           )}
+        </div>
+      )}
+
+      {/* Acoustic Section */}
+      {activeSection === "acoustic" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Localização Acústica</Label>
+            <Select
+              value={project.acoustic.buildingLocation}
+              onChange={e => updateAcoustic("buildingLocation", e.target.value)}
+            >
+              <option value="quiet">Zona Sensível (residencial)</option>
+              <option value="mixed">Zona Mista</option>
+              <option value="noisy">Zona Ruidosa (próximo de vias)</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasAcousticProject"
+              label="Projeto Acústico (RRAE)"
+              checked={project.acoustic.hasAcousticProject}
+              onChange={v => updateAcoustic("hasAcousticProject", v)}
+            />
+            <CheckboxField
+              id="hasAirborneInsul"
+              label="Isolamento Sons Aéreos"
+              checked={project.acoustic.hasAirborneInsulation}
+              onChange={v => updateAcoustic("hasAirborneInsulation", v)}
+            />
+            <CheckboxField
+              id="hasImpactInsul"
+              label="Isolamento Sons Percussão"
+              checked={project.acoustic.hasImpactInsulation}
+              onChange={v => updateAcoustic("hasImpactInsulation", v)}
+            />
+            <CheckboxField
+              id="hasFacadeInsul"
+              label="Isolamento de Fachada"
+              checked={project.acoustic.hasFacadeInsulation}
+              onChange={v => updateAcoustic("hasFacadeInsulation", v)}
+            />
+            <CheckboxField
+              id="hasEquipNoise"
+              label="Controlo Ruído Equipamentos"
+              checked={project.acoustic.hasEquipmentNoiseControl}
+              onChange={v => updateAcoustic("hasEquipmentNoiseControl", v)}
+            />
+          </div>
+
+          {project.acoustic.hasAirborneInsulation && (
+            <div>
+              <Label>Isolamento Aéreo D&apos;nT,w (dB)</Label>
+              <Input
+                type="number"
+                step="1"
+                value={project.acoustic.airborneInsulationValue ?? 0}
+                onChange={e => updateAcoustic("airborneInsulationValue", Number(e.target.value))}
+              />
+            </div>
+          )}
+
+          {project.acoustic.hasImpactInsulation && (
+            <div>
+              <Label>Sons de Percussão L&apos;nT,w (dB)</Label>
+              <Input
+                type="number"
+                step="1"
+                value={project.acoustic.impactInsulationValue ?? 0}
+                onChange={e => updateAcoustic("impactInsulationValue", Number(e.target.value))}
+              />
+            </div>
+          )}
+
+          {project.acoustic.hasFacadeInsulation && (
+            <div>
+              <Label>Isolamento Fachada D2m,nT,w (dB)</Label>
+              <Input
+                type="number"
+                step="1"
+                value={project.acoustic.facadeInsulationValue ?? 0}
+                onChange={e => updateAcoustic("facadeInsulationValue", Number(e.target.value))}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Gas Section */}
+      {activeSection === "gas" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <CheckboxField
+              id="hasGasInstall"
+              label="Instalação de Gás"
+              checked={project.gas.hasGasInstallation}
+              onChange={v => updateGas("hasGasInstallation", v)}
+            />
+          </div>
+
+          {project.gas.hasGasInstallation && (
+            <>
+              <div>
+                <Label>Tipo de Gás</Label>
+                <Select
+                  value={project.gas.gasType}
+                  onChange={e => updateGas("gasType", e.target.value)}
+                >
+                  <option value="natural_gas">Gás Natural</option>
+                  <option value="lpg_piped">GPL Canalizado</option>
+                  <option value="lpg_bottle">GPL Garrafa</option>
+                  <option value="none">Nenhum</option>
+                </Select>
+              </div>
+
+              <div>
+                <Label>Material da Tubagem</Label>
+                <Select
+                  value={project.gas.pipesMaterial}
+                  onChange={e => updateGas("pipesMaterial", e.target.value)}
+                >
+                  <option value="copper">Cobre</option>
+                  <option value="steel">Aço</option>
+                  <option value="polyethylene">Polietileno</option>
+                  <option value="multilayer">Multicamada</option>
+                  <option value="none">N/A</option>
+                </Select>
+              </div>
+
+              <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <CheckboxField
+                  id="hasGasProject"
+                  label="Projeto de Gás Aprovado"
+                  checked={project.gas.hasGasProject}
+                  onChange={v => updateGas("hasGasProject", v)}
+                />
+                <CheckboxField
+                  id="hasGasDetector"
+                  label="Detetor de Gás"
+                  checked={project.gas.hasGasDetector}
+                  onChange={v => updateGas("hasGasDetector", v)}
+                />
+                <CheckboxField
+                  id="hasEmergValve"
+                  label="Válvula de Emergência"
+                  checked={project.gas.hasEmergencyValve}
+                  onChange={v => updateGas("hasEmergencyValve", v)}
+                />
+                <CheckboxField
+                  id="hasGasVent"
+                  label="Ventilação Adequada"
+                  checked={project.gas.hasVentilation}
+                  onChange={v => updateGas("hasVentilation", v)}
+                />
+                <CheckboxField
+                  id="hasFlue"
+                  label="Sistema de Exaustão"
+                  checked={project.gas.hasFlueSystem}
+                  onChange={v => updateGas("hasFlueSystem", v)}
+                />
+                <CheckboxField
+                  id="hasPressureTest"
+                  label="Ensaio de Estanquidade"
+                  checked={project.gas.hasPressureTest}
+                  onChange={v => updateGas("hasPressureTest", v)}
+                />
+                <CheckboxField
+                  id="hasGasCert"
+                  label="Certificação DGEG"
+                  checked={project.gas.hasGasCertification}
+                  onChange={v => updateGas("hasGasCertification", v)}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Water & Drainage Section */}
+      {activeSection === "water" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="md:col-span-2 font-semibold text-gray-800">Abastecimento de Água</h3>
+          <div>
+            <Label>Material das Tubagens</Label>
+            <Select
+              value={project.waterDrainage.waterPipeMaterial}
+              onChange={e => updateWaterDrainage("waterPipeMaterial", e.target.value)}
+            >
+              <option value="ppr">PPR</option>
+              <option value="pex">PEX</option>
+              <option value="copper">Cobre</option>
+              <option value="multicamada">Multicamada</option>
+              <option value="galvanized">Aço Galvanizado</option>
+              <option value="other">Outro</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasPublicWater"
+              label="Ligação à Rede Pública"
+              checked={project.waterDrainage.hasPublicWaterConnection}
+              onChange={v => updateWaterDrainage("hasPublicWaterConnection", v)}
+            />
+            <CheckboxField
+              id="hasWaterMeter"
+              label="Contador de Água"
+              checked={project.waterDrainage.hasWaterMeter}
+              onChange={v => updateWaterDrainage("hasWaterMeter", v)}
+            />
+            <CheckboxField
+              id="hasCheckValve"
+              label="Válvula Anti-retorno"
+              checked={project.waterDrainage.hasCheckValve}
+              onChange={v => updateWaterDrainage("hasCheckValve", v)}
+            />
+            <CheckboxField
+              id="hasPressReducer"
+              label="Redutor de Pressão"
+              checked={project.waterDrainage.hasPressureReducer}
+              onChange={v => updateWaterDrainage("hasPressureReducer", v)}
+            />
+            <CheckboxField
+              id="hasRecirculation"
+              label="Recirculação AQS"
+              checked={project.waterDrainage.hotWaterRecirculation}
+              onChange={v => updateWaterDrainage("hotWaterRecirculation", v)}
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Drenagem</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasSepDrainage"
+              label="Sistema Separativo"
+              checked={project.waterDrainage.hasSeparateDrainageSystem}
+              onChange={v => updateWaterDrainage("hasSeparateDrainageSystem", v)}
+            />
+            <CheckboxField
+              id="hasVentDrain"
+              label="Ventilação da Rede"
+              checked={project.waterDrainage.hasVentilatedDrainage}
+              onChange={v => updateWaterDrainage("hasVentilatedDrainage", v)}
+            />
+            <CheckboxField
+              id="hasSiphons"
+              label="Sifões nos Aparelhos"
+              checked={project.waterDrainage.hasDrainageSiphons}
+              onChange={v => updateWaterDrainage("hasDrainageSiphons", v)}
+            />
+            <CheckboxField
+              id="hasGreaseTrap"
+              label="Caixa de Gorduras"
+              checked={project.waterDrainage.hasGreaseTrap}
+              onChange={v => updateWaterDrainage("hasGreaseTrap", v)}
+            />
+            <CheckboxField
+              id="hasStormwater"
+              label="Gestão Águas Pluviais"
+              checked={project.waterDrainage.hasStormwaterManagement}
+              onChange={v => updateWaterDrainage("hasStormwaterManagement", v)}
+            />
+            <CheckboxField
+              id="hasBackflow"
+              label="Prevenção de Refluxo"
+              checked={project.waterDrainage.hasBackflowPrevention}
+              onChange={v => updateWaterDrainage("hasBackflowPrevention", v)}
+            />
+            <CheckboxField
+              id="hasWaterReuse"
+              label="Reutilização de Águas"
+              checked={project.waterDrainage.hasWaterReuse}
+              onChange={v => updateWaterDrainage("hasWaterReuse", v)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Structural Section */}
+      {activeSection === "structural" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Sistema Estrutural</Label>
+            <Select
+              value={project.structural.structuralSystem}
+              onChange={e => updateStructural("structuralSystem", e.target.value)}
+            >
+              <option value="reinforced_concrete">Betão Armado</option>
+              <option value="steel">Estrutura Metálica</option>
+              <option value="masonry">Alvenaria Estrutural</option>
+              <option value="wood">Madeira</option>
+              <option value="mixed">Misto</option>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Zona Sísmica</Label>
+            <Select
+              value={project.structural.seismicZone}
+              onChange={e => updateStructural("seismicZone", e.target.value)}
+            >
+              <option value="1.1">1.1 (Maior sismicidade)</option>
+              <option value="1.2">1.2</option>
+              <option value="1.3">1.3</option>
+              <option value="1.4">1.4</option>
+              <option value="1.5">1.5</option>
+              <option value="1.6">1.6 (Menor sismicidade)</option>
+              <option value="2.1">2.1 (Ação tipo 2 - Maior)</option>
+              <option value="2.2">2.2</option>
+              <option value="2.3">2.3</option>
+              <option value="2.4">2.4</option>
+              <option value="2.5">2.5 (Ação tipo 2 - Menor)</option>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Tipo de Solo</Label>
+            <Select
+              value={project.structural.soilType}
+              onChange={e => updateStructural("soilType", e.target.value)}
+            >
+              <option value="A">A - Rocha</option>
+              <option value="B">B - Areia compacta / Cascalho</option>
+              <option value="C">C - Areia média / Argila rija</option>
+              <option value="D">D - Solo mole</option>
+              <option value="E">E - Aluvião sobre rocha</option>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Classe de Importância</Label>
+            <Select
+              value={project.structural.importanceClass}
+              onChange={e => updateStructural("importanceClass", e.target.value)}
+            >
+              <option value="I">I - Importância Reduzida</option>
+              <option value="II">II - Normal (Habitação/Comércio)</option>
+              <option value="III">III - Elevada (Escolas/Hospitais)</option>
+              <option value="IV">IV - Essencial (Proteção Civil)</option>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Tipo de Fundação</Label>
+            <Select
+              value={project.structural.foundationType}
+              onChange={e => updateStructural("foundationType", e.target.value)}
+            >
+              <option value="shallow">Superficial (Sapatas/Lintéis)</option>
+              <option value="deep">Profunda (Estacas/Microestacas)</option>
+              <option value="mixed">Mista</option>
+            </Select>
+          </div>
+
+          <div>
+            <Label>Classe de Ductilidade</Label>
+            <Select
+              value={project.structural.ductilityClass}
+              onChange={e => updateStructural("ductilityClass", e.target.value)}
+            >
+              <option value="DCL">DCL - Baixa</option>
+              <option value="DCM">DCM - Média</option>
+              <option value="DCH">DCH - Alta</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasStructProject"
+              label="Projeto de Estabilidade"
+              checked={project.structural.hasStructuralProject}
+              onChange={v => updateStructural("hasStructuralProject", v)}
+            />
+            <CheckboxField
+              id="hasGeoStudy"
+              label="Estudo Geotécnico"
+              checked={project.structural.hasGeotechnicalStudy}
+              onChange={v => updateStructural("hasGeotechnicalStudy", v)}
+            />
+            <CheckboxField
+              id="hasSeismicDesign"
+              label="Projeto Sismo-resistente"
+              checked={project.structural.hasSeismicDesign}
+              onChange={v => updateStructural("hasSeismicDesign", v)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Elevators Section */}
+      {activeSection === "elevators" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <CheckboxField
+              id="hasElevatorInst"
+              label="Edifício tem Ascensor"
+              checked={project.elevators.hasElevator}
+              onChange={v => updateElevators("hasElevator", v)}
+            />
+          </div>
+
+          {project.elevators.hasElevator && (
+            <>
+              <div>
+                <Label>Número de Ascensores</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={project.elevators.numberOfElevators}
+                  onChange={e => updateElevators("numberOfElevators", Number(e.target.value))}
+                />
+              </div>
+
+              <div>
+                <Label>Tipo de Ascensor</Label>
+                <Select
+                  value={project.elevators.elevatorType}
+                  onChange={e => updateElevators("elevatorType", e.target.value)}
+                >
+                  <option value="passenger">Passageiros</option>
+                  <option value="passenger_freight">Passageiros e Carga</option>
+                  <option value="freight">Carga (Monta-cargas)</option>
+                </Select>
+              </div>
+
+              <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <CheckboxField
+                  id="hasCEMark"
+                  label="Marcação CE"
+                  checked={project.elevators.hasCEMarking}
+                  onChange={v => updateElevators("hasCEMarking", v)}
+                />
+                <CheckboxField
+                  id="hasElevMaint"
+                  label="Contrato de Manutenção"
+                  checked={project.elevators.hasMaintenanceContract}
+                  onChange={v => updateElevators("hasMaintenanceContract", v)}
+                />
+                <CheckboxField
+                  id="hasElevInspection"
+                  label="Inspeção Periódica"
+                  checked={project.elevators.hasPeriodicInspection}
+                  onChange={v => updateElevators("hasPeriodicInspection", v)}
+                />
+                <CheckboxField
+                  id="hasElevComm"
+                  label="Comunicação de Emergência"
+                  checked={project.elevators.hasEmergencyCommunication}
+                  onChange={v => updateElevators("hasEmergencyCommunication", v)}
+                />
+                <CheckboxField
+                  id="hasPitHeadroom"
+                  label="Fosso e Altura Adequados"
+                  checked={project.elevators.hasPitAndHeadroom}
+                  onChange={v => updateElevators("hasPitAndHeadroom", v)}
+                />
+                <CheckboxField
+                  id="hasAccessElevator"
+                  label="Ascensor Acessível"
+                  checked={project.elevators.hasAccessibleElevator}
+                  onChange={v => updateElevators("hasAccessibleElevator", v)}
+                />
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Licensing Section */}
+      {activeSection === "licensing" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <Label>Fase do Projeto</Label>
+            <Select
+              value={project.licensing.projectPhase}
+              onChange={e => updateLicensing("projectPhase", e.target.value)}
+            >
+              <option value="prior_info">Informação Prévia (PIP)</option>
+              <option value="pip">Pedido de Informação Prévia</option>
+              <option value="licensing">Licenciamento</option>
+              <option value="communication">Comunicação Prévia</option>
+              <option value="utilization">Licença de Utilização</option>
+              <option value="none">Não definida</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasArchProject"
+              label="Projeto de Arquitetura"
+              checked={project.licensing.hasArchitecturalProject}
+              onChange={v => updateLicensing("hasArchitecturalProject", v)}
+            />
+            <CheckboxField
+              id="hasSpecProjects"
+              label="Projetos de Especialidades"
+              checked={project.licensing.hasSpecialtyProjects}
+              onChange={v => updateLicensing("hasSpecialtyProjects", v)}
+            />
+            <CheckboxField
+              id="hasTermoResp"
+              label="Termos de Responsabilidade"
+              checked={project.licensing.hasTermoDeResponsabilidade}
+              onChange={v => updateLicensing("hasTermoDeResponsabilidade", v)}
+            />
+            <CheckboxField
+              id="hasMunApproval"
+              label="Aprovação Municipal"
+              checked={project.licensing.hasMunicipalApproval}
+              onChange={v => updateLicensing("hasMunicipalApproval", v)}
+            />
+            <CheckboxField
+              id="hasConstLicense"
+              label="Alvará de Construção"
+              checked={project.licensing.hasConstructionLicense}
+              onChange={v => updateLicensing("hasConstructionLicense", v)}
+            />
+            <CheckboxField
+              id="hasUtilLicense"
+              label="Licença de Utilização"
+              checked={project.licensing.hasUtilizationLicense}
+              onChange={v => updateLicensing("hasUtilizationLicense", v)}
+            />
+            <CheckboxField
+              id="hasTechDirector"
+              label="Diretor de Obra/Fiscalização"
+              checked={project.licensing.hasTechnicalDirector}
+              onChange={v => updateLicensing("hasTechnicalDirector", v)}
+            />
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 gap-3 mt-2">
+            <CheckboxField
+              id="isInARU"
+              label="Área de Reabilitação Urbana (ARU)"
+              checked={project.licensing.isInARU}
+              onChange={v => updateLicensing("isInARU", v)}
+            />
+            <CheckboxField
+              id="isProtectedArea"
+              label="Área Protegida / Património"
+              checked={project.licensing.isProtectedArea}
+              onChange={v => updateLicensing("isProtectedArea", v)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Waste Section */}
+      {activeSection === "waste" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasWastePlan"
+              label="PPG (Plano de Gestão RCD)"
+              checked={project.waste.hasWasteManagementPlan}
+              onChange={v => updateWaste("hasWasteManagementPlan", v)}
+            />
+            <CheckboxField
+              id="hasSortingOnSite"
+              label="Triagem em Obra"
+              checked={project.waste.hasSortingOnSite}
+              onChange={v => updateWaste("hasSortingOnSite", v)}
+            />
+            <CheckboxField
+              id="hasLicTransporter"
+              label="Transportador Licenciado"
+              checked={project.waste.hasLicensedTransporter}
+              onChange={v => updateWaste("hasLicensedTransporter", v)}
+            />
+            <CheckboxField
+              id="hasLicDestination"
+              label="Destino Final Licenciado"
+              checked={project.waste.hasLicensedDestination}
+              onChange={v => updateWaste("hasLicensedDestination", v)}
+            />
+            <CheckboxField
+              id="hasWasteReg"
+              label="Registo e-GAR"
+              checked={project.waste.hasWasteRegistration}
+              onChange={v => updateWaste("hasWasteRegistration", v)}
+            />
+            <CheckboxField
+              id="hasDemoAudit"
+              label="Auditoria Prévia (Demolição)"
+              checked={project.waste.hasDemolitionAudit}
+              onChange={v => updateWaste("hasDemolitionAudit", v)}
+            />
+          </div>
+
+          <div>
+            <Label>Meta de Reciclagem (%)</Label>
+            <Input
+              type="number"
+              min={0}
+              max={100}
+              value={project.waste.recyclingPercentageTarget}
+              onChange={e => updateWaste("recyclingPercentageTarget", Number(e.target.value))}
+            />
+          </div>
         </div>
       )}
 

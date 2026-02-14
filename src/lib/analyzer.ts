@@ -13,6 +13,7 @@ import {
   MAX_SOLAR_FACTOR,
   REFERENCE_VENTILATION,
   MAX_LINEAR_THERMAL_BRIDGE,
+  ACOUSTIC_REQUIREMENTS,
   FIRE_RESISTANCE,
   MAX_EVACUATION_DISTANCE,
   MIN_EXIT_WIDTHS,
@@ -22,6 +23,12 @@ import {
   ELECTRICAL_REQUIREMENTS,
   ITED_REQUIREMENTS,
   ITUR_REQUIREMENTS,
+  GAS_REQUIREMENTS,
+  WATER_DRAINAGE_REQUIREMENTS,
+  STRUCTURAL_REQUIREMENTS,
+  ELEVATOR_REQUIREMENTS,
+  LICENSING_REQUIREMENTS,
+  WASTE_REQUIREMENTS,
 } from "./regulations";
 
 let findingCounter = 0;
@@ -44,12 +51,19 @@ export function analyzeProject(project: BuildingProject): AnalysisResult {
 
   // Run all analysis modules
   findings.push(...analyzeThermal(project));
+  findings.push(...analyzeAcoustic(project));
   findings.push(...analyzeFireSafety(project));
   findings.push(...analyzeAccessibility(project));
   findings.push(...analyzeEnergy(project));
   findings.push(...analyzeGeneral(project));
   findings.push(...analyzeElectrical(project));
   findings.push(...analyzeTelecom(project));
+  findings.push(...analyzeGas(project));
+  findings.push(...analyzeWaterDrainage(project));
+  findings.push(...analyzeStructural(project));
+  findings.push(...analyzeElevators(project));
+  findings.push(...analyzeLicensing(project));
+  findings.push(...analyzeWaste(project));
 
   recommendations.push(...generateRecommendations(project, findings));
 
@@ -1126,6 +1140,874 @@ function analyzeTelecom(project: BuildingProject): Finding[] {
 }
 
 // ============================================================
+// ACOUSTIC ANALYSIS (RRAE) - DL 129/2002 & DL 96/2008
+// ============================================================
+
+function analyzeAcoustic(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { acoustic } = project;
+  const isMultiDwelling = (project.numberOfDwellings ?? 1) > 1;
+
+  // Check acoustic project
+  if (!acoustic.hasAcousticProject && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "acoustic",
+      regulation: "RRAE - DL 96/2008",
+      article: "Art. 5º - Projeto de Condicionamento Acústico",
+      description: `O projeto de condicionamento acústico é obrigatório para edifícios novos. Deve ser elaborado por técnico competente e incluir verificação dos requisitos do RRAE.`,
+      severity: "warning",
+    });
+  }
+
+  // Check airborne insulation between dwellings
+  if (isMultiDwelling) {
+    if (!acoustic.hasAirborneInsulation) {
+      findings.push({
+        id: nextFindingId(),
+        area: "acoustic",
+        regulation: "RRAE - DL 96/2008",
+        article: "Art. 5º - Isolamento Sonoro a Sons Aéreos",
+        description: `Não está garantido o isolamento a sons aéreos entre frações. O RRAE exige D'nT,w ≥ ${ACOUSTIC_REQUIREMENTS.airborne.betweenDwellings} dB entre fogos.`,
+        severity: "critical",
+        requiredValue: `D'nT,w ≥ ${ACOUSTIC_REQUIREMENTS.airborne.betweenDwellings} dB`,
+      });
+    } else if (acoustic.airborneInsulationValue !== undefined) {
+      if (acoustic.airborneInsulationValue < ACOUSTIC_REQUIREMENTS.airborne.betweenDwellings) {
+        findings.push({
+          id: nextFindingId(),
+          area: "acoustic",
+          regulation: "RRAE - DL 96/2008",
+          article: "Art. 5º - Isolamento Sonoro a Sons Aéreos",
+          description: `O isolamento a sons aéreos entre frações (${acoustic.airborneInsulationValue} dB) é inferior ao mínimo exigido.`,
+          severity: "critical",
+          currentValue: `D'nT,w = ${acoustic.airborneInsulationValue} dB`,
+          requiredValue: `D'nT,w ≥ ${ACOUSTIC_REQUIREMENTS.airborne.betweenDwellings} dB`,
+        });
+      } else {
+        findings.push({
+          id: nextFindingId(),
+          area: "acoustic",
+          regulation: "RRAE - DL 96/2008",
+          article: "Art. 5º - Isolamento Sonoro a Sons Aéreos",
+          description: `O isolamento a sons aéreos entre frações cumpre o mínimo regulamentar.`,
+          severity: "pass",
+          currentValue: `D'nT,w = ${acoustic.airborneInsulationValue} dB`,
+          requiredValue: `D'nT,w ≥ ${ACOUSTIC_REQUIREMENTS.airborne.betweenDwellings} dB`,
+        });
+      }
+    }
+
+    // Check impact sound insulation
+    if (!acoustic.hasImpactInsulation) {
+      findings.push({
+        id: nextFindingId(),
+        area: "acoustic",
+        regulation: "RRAE - DL 96/2008",
+        article: "Art. 5º - Isolamento a Sons de Percussão",
+        description: `Não está garantido o isolamento a sons de percussão. O RRAE exige L'nT,w ≤ ${ACOUSTIC_REQUIREMENTS.impact.betweenDwellings} dB entre fogos.`,
+        severity: "critical",
+        requiredValue: `L'nT,w ≤ ${ACOUSTIC_REQUIREMENTS.impact.betweenDwellings} dB`,
+      });
+    } else if (acoustic.impactInsulationValue !== undefined) {
+      if (acoustic.impactInsulationValue > ACOUSTIC_REQUIREMENTS.impact.betweenDwellings) {
+        findings.push({
+          id: nextFindingId(),
+          area: "acoustic",
+          regulation: "RRAE - DL 96/2008",
+          article: "Art. 5º - Isolamento a Sons de Percussão",
+          description: `O nível de ruído de percussão entre frações (${acoustic.impactInsulationValue} dB) excede o máximo admissível. Considerar pavimento flutuante.`,
+          severity: "critical",
+          currentValue: `L'nT,w = ${acoustic.impactInsulationValue} dB`,
+          requiredValue: `L'nT,w ≤ ${ACOUSTIC_REQUIREMENTS.impact.betweenDwellings} dB`,
+        });
+      } else {
+        findings.push({
+          id: nextFindingId(),
+          area: "acoustic",
+          regulation: "RRAE - DL 96/2008",
+          article: "Art. 5º - Isolamento a Sons de Percussão",
+          description: `O isolamento a sons de percussão cumpre o limite regulamentar.`,
+          severity: "pass",
+          currentValue: `L'nT,w = ${acoustic.impactInsulationValue} dB`,
+          requiredValue: `L'nT,w ≤ ${ACOUSTIC_REQUIREMENTS.impact.betweenDwellings} dB`,
+        });
+      }
+    }
+  }
+
+  // Check facade insulation
+  const facadeReq = acoustic.buildingLocation === "quiet"
+    ? ACOUSTIC_REQUIREMENTS.facade.quietZone
+    : ACOUSTIC_REQUIREMENTS.facade.mixedZone;
+
+  if (!acoustic.hasFacadeInsulation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "acoustic",
+      regulation: "RRAE - DL 96/2008",
+      article: "Art. 5º - Isolamento Sonoro de Fachada",
+      description: `Não está verificado o isolamento sonoro de fachada. Para zona ${acoustic.buildingLocation === "quiet" ? "sensível" : "mista"}, o RRAE exige D2m,nT,w ≥ ${facadeReq} dB.`,
+      severity: "warning",
+      requiredValue: `D2m,nT,w ≥ ${facadeReq} dB`,
+    });
+  } else if (acoustic.facadeInsulationValue !== undefined) {
+    if (acoustic.facadeInsulationValue < facadeReq) {
+      findings.push({
+        id: nextFindingId(),
+        area: "acoustic",
+        regulation: "RRAE - DL 96/2008",
+        article: "Art. 5º - Isolamento Sonoro de Fachada",
+        description: `O isolamento de fachada (${acoustic.facadeInsulationValue} dB) é inferior ao mínimo para zona ${acoustic.buildingLocation === "quiet" ? "sensível" : "mista"}.`,
+        severity: "critical",
+        currentValue: `D2m,nT,w = ${acoustic.facadeInsulationValue} dB`,
+        requiredValue: `D2m,nT,w ≥ ${facadeReq} dB`,
+      });
+    } else {
+      findings.push({
+        id: nextFindingId(),
+        area: "acoustic",
+        regulation: "RRAE - DL 96/2008",
+        article: "Art. 5º - Isolamento Sonoro de Fachada",
+        description: `O isolamento sonoro de fachada cumpre o mínimo regulamentar.`,
+        severity: "pass",
+        currentValue: `D2m,nT,w = ${acoustic.facadeInsulationValue} dB`,
+        requiredValue: `D2m,nT,w ≥ ${facadeReq} dB`,
+      });
+    }
+  }
+
+  // Check equipment noise control
+  if (!acoustic.hasEquipmentNoiseControl && (project.buildingType === "commercial" || isMultiDwelling)) {
+    findings.push({
+      id: nextFindingId(),
+      area: "acoustic",
+      regulation: "RRAE - DL 96/2008",
+      article: "Art. 5º - Ruído de Equipamentos",
+      description: `Deve ser garantido o controlo de ruído dos equipamentos coletivos (elevadores, AVAC, bombas) para cumprimento dos limites do RRAE (LAr,nT ≤ 27-32 dB(A) conforme uso).`,
+      severity: "warning",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// GAS INSTALLATIONS ANALYSIS (DL 521/99)
+// ============================================================
+
+function analyzeGas(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { gas } = project;
+
+  if (!gas.hasGasInstallation || gas.gasType === "none") {
+    // No gas installation - no analysis needed
+    return findings;
+  }
+
+  // Check gas project approval
+  if (!gas.hasGasProject) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Art. 15º - Projeto de Gás",
+      description: `A instalação de gás requer projeto aprovado pela DGEG, elaborado por técnico credenciado. O projeto é obrigatório para instalações com gás canalizado.`,
+      severity: "critical",
+    });
+  }
+
+  // Check gas detector
+  if (!gas.hasGasDetector) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Segurança - Deteção de Gás",
+      description: `Recomenda-se a instalação de detetor de gás nos locais com aparelhos a gás. Para gás natural, o detetor deve ser instalado na parte superior; para GPL, na parte inferior.`,
+      severity: "warning",
+    });
+  }
+
+  // Check emergency valve
+  if (!gas.hasEmergencyValve) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Art. 12º - Válvula de Corte de Emergência",
+      description: `A instalação deve prever válvula de corte de emergência acessível na entrada do edifício/fração. Permite corte rápido do abastecimento em caso de fuga.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Art. 12º - Válvula de Corte de Emergência",
+      description: `Válvula de corte de emergência prevista na instalação.`,
+      severity: "pass",
+    });
+  }
+
+  // Check ventilation
+  if (!gas.hasVentilation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Art. 20º - Ventilação",
+      description: `Os locais com aparelhos a gás devem ter ventilação adequada (aberturas permanentes com área mínima de ${GAS_REQUIREMENTS.ventilation.minOpeningArea} cm² por aparelho). Essencial para combustão e segurança.`,
+      severity: "critical",
+    });
+  }
+
+  // Check flue system
+  if (!gas.hasFlueSystem && gas.gasType !== "lpg_bottle") {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Art. 21º - Evacuação de Produtos de Combustão",
+      description: `Os aparelhos a gás do tipo B e C requerem sistema de exaustão/chaminé para evacuação dos produtos de combustão. A ausência pode causar intoxicação por monóxido de carbono.`,
+      severity: "critical",
+    });
+  }
+
+  // Check pressure test
+  if (!gas.hasPressureTest) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Ensaio de Estanquidade",
+      description: `Antes da colocação em serviço, a rede de gás deve ser sujeita a ensaio de estanquidade (${GAS_REQUIREMENTS.pressureTest.testPressure} mbar durante ${GAS_REQUIREMENTS.pressureTest.duration} min). Obrigatório e registado.`,
+      severity: "critical",
+    });
+  }
+
+  // Check pipe material
+  const allowed = GAS_REQUIREMENTS.allowedPipeMaterials as readonly string[];
+  if (gas.pipesMaterial !== "none" && !allowed.includes(gas.pipesMaterial)) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Materiais da Tubagem",
+      description: `O material da tubagem não está entre os materiais permitidos para instalações de gás (cobre, aço, polietileno, multicamada).`,
+      severity: "critical",
+    });
+  }
+
+  // Check certification
+  if (!gas.hasGasCertification) {
+    findings.push({
+      id: nextFindingId(),
+      area: "gas",
+      regulation: "DL 521/99",
+      article: "Certificação da Instalação",
+      description: `A instalação de gás deve ser certificada por instalador credenciado pela DGEG. A certificação é obrigatória para ligação à rede e para obtenção de licença de utilização.`,
+      severity: "warning",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// WATER & DRAINAGE ANALYSIS (DL 23/95 - RGSPPDADAR)
+// ============================================================
+
+function analyzeWaterDrainage(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { waterDrainage } = project;
+
+  // Check public water connection
+  if (!waterDrainage.hasPublicWaterConnection) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Art. 20º - Abastecimento de Água",
+      description: `O edifício deve estar ligado à rede pública de abastecimento de água sempre que disponível. A ligação é obrigatória em zonas urbanizadas.`,
+      severity: "warning",
+    });
+  }
+
+  // Check water meter
+  if (!waterDrainage.hasWaterMeter) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Contagem de Água",
+      description: `Cada fração autónoma deve ter contador de água individual. A contagem individual é obrigatória em edifícios de habitação coletiva.`,
+      severity: "warning",
+    });
+  }
+
+  // Check valve
+  if (!waterDrainage.hasCheckValve) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Art. 93º - Válvula Anti-retorno",
+      description: `Deve existir válvula anti-retorno (de retenção) para evitar contaminação da rede pública por refluxo. Obrigatória na ligação ao ramal de distribuição.`,
+      severity: "critical",
+    });
+  }
+
+  // Check pipe material
+  const deprecated = WATER_DRAINAGE_REQUIREMENTS.pipeMaterials.deprecatedMaterials as readonly string[];
+  if (deprecated.includes(waterDrainage.waterPipeMaterial)) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Materiais das Tubagens",
+      description: `A tubagem em aço galvanizado é desaconselhada em novas instalações (problemas de corrosão e qualidade da água). Utilizar PPR, PEX, multicamada ou cobre.`,
+      severity: "warning",
+      currentValue: "Aço galvanizado",
+      requiredValue: "PPR, PEX, Multicamada ou Cobre",
+    });
+  }
+
+  // Check separate drainage system
+  if (!waterDrainage.hasSeparateDrainageSystem) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Art. 116º - Sistema Separativo",
+      description: `A rede de drenagem deve ser separativa (águas residuais domésticas separadas das pluviais). O sistema separativo é obrigatório em novas construções.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Art. 116º - Sistema Separativo",
+      description: `Sistema de drenagem separativo previsto, conforme exigido.`,
+      severity: "pass",
+    });
+  }
+
+  // Check drainage ventilation
+  if (!waterDrainage.hasVentilatedDrainage) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Art. 202º - Ventilação da Rede",
+      description: `A rede de drenagem de águas residuais deve ser ventilada para evitar sifonagem e maus odores. Prever colunas de ventilação ou válvulas de admissão de ar.`,
+      severity: "warning",
+    });
+  }
+
+  // Check siphons
+  if (!waterDrainage.hasDrainageSiphons) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Art. 209º - Sifões",
+      description: `Todos os aparelhos sanitários devem possuir sifão com fecho hídrico mínimo de ${WATER_DRAINAGE_REQUIREMENTS.drainage.minSiphonHeight}mm para impedir a entrada de gases da rede de esgotos.`,
+      severity: "critical",
+    });
+  }
+
+  // Check grease trap for commercial
+  if (project.buildingType === "commercial" && !waterDrainage.hasGreaseTrap) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Caixa de Gorduras",
+      description: `Edifícios comerciais com cozinha/restauração devem prever caixa de retenção de gorduras antes da ligação à rede pública de drenagem.`,
+      severity: "warning",
+    });
+  }
+
+  // Check backflow prevention
+  if (!waterDrainage.hasBackflowPrevention) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Prevenção de Refluxo",
+      description: `Devem ser previstos dispositivos anti-refluxo nas ligações de drenagem em pisos abaixo da cota da rede pública para prevenir inundações por refluxo.`,
+      severity: "info",
+    });
+  }
+
+  // Check stormwater management
+  if (!waterDrainage.hasStormwaterManagement && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "water_drainage",
+      regulation: "DL 23/95 - RGSPPDADAR",
+      article: "Gestão de Águas Pluviais",
+      description: `Recomenda-se a implementação de medidas de gestão de águas pluviais (retenção, infiltração ou reutilização) para reduzir o caudal de ponta na rede pública.`,
+      severity: "info",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// STRUCTURAL / SEISMIC ANALYSIS (Eurocodes)
+// ============================================================
+
+function analyzeStructural(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { structural } = project;
+
+  // Check structural project
+  if (!structural.hasStructuralProject) {
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "Eurocódigos (EC0-EC8)",
+      article: "Projeto de Estabilidade",
+      description: `O projeto de estabilidade (estruturas) é obrigatório para todos os edifícios novos. Deve ser elaborado por engenheiro civil inscrito na Ordem dos Engenheiros.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "Eurocódigos (EC0-EC8)",
+      article: "Projeto de Estabilidade",
+      description: `Projeto de estabilidade previsto.`,
+      severity: "pass",
+    });
+  }
+
+  // Check geotechnical study
+  if (!structural.hasGeotechnicalStudy) {
+    const required = project.numberOfFloors > STRUCTURAL_REQUIREMENTS.geotechnicalStudy.requiredAboveFloors
+      || structural.foundationType === "deep";
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "EC7 - NP EN 1997-1",
+      article: "Estudo Geotécnico",
+      description: `${required ? "O estudo geotécnico é obrigatório para este edifício" : "O estudo geotécnico é recomendado"} (${project.numberOfFloors} pisos, fundações ${structural.foundationType === "deep" ? "profundas" : "superficiais"}). Permite dimensionar corretamente as fundações e avaliar o comportamento do solo.`,
+      severity: required ? "critical" : "warning",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "EC7 - NP EN 1997-1",
+      article: "Estudo Geotécnico",
+      description: `Estudo geotécnico realizado.`,
+      severity: "pass",
+    });
+  }
+
+  // Check seismic design
+  if (!structural.hasSeismicDesign) {
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "EC8 - NP EN 1998-1",
+      article: "Projeto Sismo-resistente",
+      description: `O projeto estrutural deve incluir verificação à ação sísmica conforme o Eurocódigo 8. Portugal é um país com sismicidade moderada a elevada, especialmente no sul e região de Lisboa.`,
+      severity: "critical",
+    });
+  } else {
+    const importanceFactor = STRUCTURAL_REQUIREMENTS.importanceFactors[structural.importanceClass];
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "EC8 - NP EN 1998-1",
+      article: "Projeto Sismo-resistente",
+      description: `Projeto sismo-resistente previsto. Classe de importância ${structural.importanceClass} (γI=${importanceFactor}), zona sísmica ${structural.seismicZone}, solo tipo ${structural.soilType}, ductilidade ${structural.ductilityClass}.`,
+      severity: "pass",
+    });
+  }
+
+  // Check soil type amplification warning
+  if (structural.soilType === "D" || structural.soilType === "E") {
+    const factor = STRUCTURAL_REQUIREMENTS.soilFactors[structural.soilType];
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "EC8 - NP EN 1998-1",
+      article: "Classificação do Solo",
+      description: `O solo tipo ${structural.soilType} apresenta fator de amplificação sísmica elevado (S=${factor}). Requer atenção especial no dimensionamento das fundações e estrutura.`,
+      severity: "warning",
+      currentValue: `Solo tipo ${structural.soilType}`,
+      requiredValue: `Fator S = ${factor}`,
+    });
+  }
+
+  // Check importance class for special buildings
+  if ((project.buildingType === "commercial") && structural.importanceClass === "II") {
+    findings.push({
+      id: nextFindingId(),
+      area: "structural",
+      regulation: "EC8 - NP EN 1998-1",
+      article: "Classe de Importância",
+      description: `Verificar se a classe de importância II é adequada. Edifícios com grande ocupação (escolas, centros comerciais, hospitais) podem exigir classe III ou IV.`,
+      severity: "info",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// ELEVATOR ANALYSIS (DL 320/2002)
+// ============================================================
+
+function analyzeElevators(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { elevators } = project;
+
+  if (!elevators.hasElevator || elevators.numberOfElevators === 0) {
+    // Check if elevator is required
+    if (project.numberOfFloors >= 4) {
+      findings.push({
+        id: nextFindingId(),
+        area: "elevators",
+        regulation: "DL 163/2006 / RGEU",
+        article: "Obrigatoriedade de Ascensor",
+        description: `O edifício tem ${project.numberOfFloors} pisos. A instalação de pelo menos um ascensor é obrigatória em edifícios novos com 4 ou mais pisos (incluindo rés-do-chão).`,
+        severity: "critical",
+      });
+    }
+    return findings;
+  }
+
+  // Check number of elevators for tall buildings
+  if (project.numberOfFloors >= 8 && elevators.numberOfElevators < ELEVATOR_REQUIREMENTS.minElevators.above8floors) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "RGEU / Boas Práticas",
+      article: "Número de Ascensores",
+      description: `Edifícios com ${project.numberOfFloors} pisos devem ter pelo menos ${ELEVATOR_REQUIREMENTS.minElevators.above8floors} ascensores para garantir adequada mobilidade vertical e redundância.`,
+      severity: "warning",
+      currentValue: `${elevators.numberOfElevators} ascensor(es)`,
+      requiredValue: `≥ ${ELEVATOR_REQUIREMENTS.minElevators.above8floors} ascensores`,
+    });
+  }
+
+  // Check CE marking
+  if (!elevators.hasCEMarking) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "DL 320/2002",
+      article: "Diretiva Ascensores 2014/33/UE",
+      description: `Os ascensores novos devem possuir marcação CE conforme a Diretiva Europeia 2014/33/UE, garantindo conformidade com os requisitos essenciais de saúde e segurança.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "DL 320/2002",
+      article: "Diretiva Ascensores 2014/33/UE",
+      description: `Marcação CE do ascensor verificada.`,
+      severity: "pass",
+    });
+  }
+
+  // Check maintenance contract
+  if (!elevators.hasMaintenanceContract) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "DL 320/2002",
+      article: "Art. 4º - Manutenção",
+      description: `É obrigatório contrato de manutenção com empresa qualificada. A manutenção deve incluir pelo menos ${ELEVATOR_REQUIREMENTS.maintenance.minInspectionsPerYear} visitas anuais.`,
+      severity: "critical",
+    });
+  }
+
+  // Check periodic inspection
+  if (!elevators.hasPeriodicInspection) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "DL 320/2002",
+      article: "Art. 6º - Inspeção Periódica",
+      description: `Os ascensores devem ser sujeitos a inspeção periódica por entidade acreditada (organismo de inspeção) a cada ${ELEVATOR_REQUIREMENTS.inspection.intervalYears} anos. A inspeção é obrigatória por lei.`,
+      severity: "critical",
+    });
+  }
+
+  // Check emergency communication
+  if (!elevators.hasEmergencyCommunication) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "EN 81-20",
+      article: "Comunicação de Emergência",
+      description: `O ascensor deve dispor de sistema de comunicação bidirecional permanente (24h) com serviço de socorro, acessível da cabina. Obrigatório pela EN 81-20.`,
+      severity: "critical",
+    });
+  }
+
+  // Check accessible elevator
+  if (!elevators.hasAccessibleElevator) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "DL 163/2006",
+      article: "Secção 2.6 - Ascensor Acessível",
+      description: `Pelo menos um ascensor deve ser acessível (cabina mín. ${ELEVATOR_REQUIREMENTS.accessible.minCabinWidth}x${ELEVATOR_REQUIREMENTS.accessible.minCabinDepth}m, porta ≥${ELEVATOR_REQUIREMENTS.accessible.minDoorWidth}m) com sinalética em Braille e anúncio sonoro dos pisos.`,
+      severity: "warning",
+    });
+  }
+
+  // Check pit and headroom
+  if (!elevators.hasPitAndHeadroom) {
+    findings.push({
+      id: nextFindingId(),
+      area: "elevators",
+      regulation: "EN 81-20",
+      article: "Fosso e Altura Livre",
+      description: `O fosso do ascensor deve ter profundidade mínima e a caixa deve garantir altura livre adequada acima do último piso servido, conforme EN 81-20.`,
+      severity: "warning",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// LICENSING ANALYSIS (RJUE - DL 555/99)
+// ============================================================
+
+function analyzeLicensing(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { licensing } = project;
+
+  // Check architectural project
+  if (!licensing.hasArchitecturalProject) {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 11º - Projeto de Arquitetura",
+      description: `O projeto de arquitetura é obrigatório para operações urbanísticas sujeitas a licenciamento ou comunicação prévia. Deve ser subscrito por arquiteto inscrito na Ordem.`,
+      severity: "critical",
+    });
+  }
+
+  // Check specialty projects
+  if (!licensing.hasSpecialtyProjects) {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 11º - Projetos de Especialidades",
+      description: `Os projetos de especialidades são obrigatórios: estabilidade, águas e esgotos, eletricidade, gás, telecomunicações (ITED), térmica (REH/RECS), acústica (RRAE), SCIE e acessibilidade.`,
+      severity: "critical",
+    });
+  }
+
+  // Check termo de responsabilidade
+  if (!licensing.hasTermoDeResponsabilidade) {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 10º - Termo de Responsabilidade",
+      description: `Os termos de responsabilidade dos autores do projeto (arquiteto e engenheiros das especialidades) são obrigatórios para instruir o pedido de licenciamento.`,
+      severity: "critical",
+    });
+  }
+
+  // Check construction license
+  if (!licensing.hasConstructionLicense && licensing.projectPhase !== "none") {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 4º - Alvará de Construção",
+      description: `O alvará de construção (ou admissão de comunicação prévia) é obrigatório antes do início das obras. Iniciar obra sem licença constitui contraordenação grave.`,
+      severity: licensing.projectPhase === "utilization" ? "info" : "critical",
+    });
+  }
+
+  // Check technical director
+  if (!licensing.hasTechnicalDirector) {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 63º - Diretor de Obra",
+      description: `A obra deve ter diretor de obra e diretor de fiscalização designados, inscritos na respetiva Ordem profissional. A responsabilidade deve ser comunicada à câmara municipal.`,
+      severity: "warning",
+    });
+  }
+
+  // Check utilization license
+  if (!licensing.hasUtilizationLicense && licensing.projectPhase === "utilization") {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 62º - Licença de Utilização",
+      description: `A licença de utilização é obrigatória para ocupar ou utilizar o edifício. Requer conclusão da obra, certificações (ITED, gás, eletricidade) e vistoria municipal.`,
+      severity: "critical",
+    });
+  }
+
+  // Check protected area
+  if (licensing.isProtectedArea) {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 13º-A - Áreas Protegidas",
+      description: `O edifício está em área protegida ou com património classificado. O projeto requer parecer favorável da DGPC (Direção-Geral do Património Cultural) ou entidade competente. Os prazos de apreciação são mais longos.`,
+      severity: "warning",
+    });
+  }
+
+  // Check ARU benefits
+  if (licensing.isInARU && project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJRU - DL 307/2009",
+      article: "Área de Reabilitação Urbana",
+      description: `O edifício está em ARU (Área de Reabilitação Urbana). Pode beneficiar de: IVA a 6% na empreitada, isenção de IMI até 5 anos, isenção de IMT, dedução em IRS e taxas municipais reduzidas.`,
+      severity: "pass",
+    });
+  }
+
+  // Check municipal approval
+  if (!licensing.hasMunicipalApproval && licensing.projectPhase !== "none" && licensing.projectPhase !== "utilization") {
+    findings.push({
+      id: nextFindingId(),
+      area: "licensing",
+      regulation: "RJUE - DL 555/99",
+      article: "Aprovação Municipal",
+      description: `A câmara municipal aprecia o projeto no prazo de ${LICENSING_REQUIREMENTS.deadlines.licensingDecision} dias (licenciamento) ou ${LICENSING_REQUIREMENTS.deadlines.priorCommunicationDecision} dias (comunicação prévia). Aguardar deferimento antes de iniciar obras.`,
+      severity: "info",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// CONSTRUCTION WASTE ANALYSIS (DL 46/2008)
+// ============================================================
+
+function analyzeWaste(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { waste } = project;
+
+  // Check waste management plan (PPG)
+  if (!waste.hasWasteManagementPlan) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Art. 10º - Plano de Prevenção e Gestão (PPG)",
+      description: `O Plano de Prevenção e Gestão de Resíduos de Construção e Demolição (PPG-RCD) é obrigatório para obras sujeitas a licenciamento. Deve acompanhar o projeto para efeitos de licenciamento.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Art. 10º - Plano de Prevenção e Gestão (PPG)",
+      description: `Plano de Prevenção e Gestão de RCD previsto.`,
+      severity: "pass",
+    });
+  }
+
+  // Check sorting on site
+  if (!waste.hasSortingOnSite) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Art. 9º - Triagem em Obra",
+      description: `A triagem de RCD em obra é obrigatória. Os resíduos devem ser separados por fluxos (betão, metais, madeira, plásticos, vidro, resíduos perigosos) antes do transporte.`,
+      severity: "warning",
+    });
+  }
+
+  // Check licensed transporter
+  if (!waste.hasLicensedTransporter) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Art. 11º - Transporte de RCD",
+      description: `O transporte de RCD deve ser efetuado por operador de gestão de resíduos licenciado pela APA. O transporte sem licença constitui contraordenação ambiental.`,
+      severity: "critical",
+    });
+  }
+
+  // Check licensed destination
+  if (!waste.hasLicensedDestination) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Art. 12º - Destino Final",
+      description: `Os RCD devem ter destino final em operador licenciado (reciclagem, valorização ou aterro). A deposição em local não licenciado é crime ambiental.`,
+      severity: "critical",
+    });
+  }
+
+  // Check e-GAR registration
+  if (!waste.hasWasteRegistration) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Guia e-GAR",
+      description: `O transporte de RCD deve ser acompanhado de guia eletrónica de acompanhamento de resíduos (e-GAR) emitida na plataforma SILiAmb da APA.`,
+      severity: "warning",
+    });
+  }
+
+  // Check recycling target
+  if (waste.recyclingPercentageTarget < WASTE_REQUIREMENTS.recyclingTarget) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Meta de Reciclagem",
+      description: `A meta europeia é de ${WASTE_REQUIREMENTS.recyclingTarget}% de valorização de RCD. O objetivo definido (${waste.recyclingPercentageTarget}%) está abaixo da meta.`,
+      severity: "warning",
+      currentValue: `${waste.recyclingPercentageTarget}%`,
+      requiredValue: `≥ ${WASTE_REQUIREMENTS.recyclingTarget}%`,
+    });
+  }
+
+  // Check demolition audit
+  if (project.isRehabilitation && !waste.hasDemolitionAudit) {
+    findings.push({
+      id: nextFindingId(),
+      area: "waste",
+      regulation: "DL 46/2008",
+      article: "Auditoria Prévia à Demolição",
+      description: `Em obras de reabilitação ou demolição, é recomendada auditoria prévia para identificar materiais perigosos (amianto, tintas com chumbo) e maximizar a reutilização/reciclagem.`,
+      severity: "warning",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
 // RECOMMENDATIONS ENGINE
 // ============================================================
 
@@ -1364,6 +2246,102 @@ function generateRecommendations(project: BuildingProject, findings: Finding[]):
     });
   }
 
+  // Acoustic improvements
+  if (criticalAreas.has("acoustic") || warningAreas.has("acoustic")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "acoustic",
+      title: "Projeto de condicionamento acústico",
+      description: `Elaborar projeto de condicionamento acústico por técnico competente. Deve verificar isolamento a sons aéreos (paredes e lajes), sons de percussão (lajes com pavimento flutuante) e isolamento de fachada.`,
+      impact: "high",
+      regulatoryBasis: "RRAE - DL 96/2008",
+    });
+  }
+
+  // Gas improvements
+  if (criticalAreas.has("gas") || warningAreas.has("gas")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "gas",
+      title: "Revisão da instalação de gás",
+      description: `Garantir que a instalação de gás é projetada e executada por instalador credenciado pela DGEG. Incluir ensaio de estanquidade, válvulas de emergência, ventilação adequada e deteção de gás.`,
+      impact: "high",
+      regulatoryBasis: "DL 521/99",
+    });
+  }
+
+  // Water/drainage improvements
+  if (criticalAreas.has("water_drainage") || warningAreas.has("water_drainage")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "water_drainage",
+      title: "Revisão das redes de águas e drenagem",
+      description: `Garantir sistema separativo de drenagem, válvulas anti-retorno, ventilação da rede e sifões em todos os aparelhos. Utilizar materiais modernos (PPR, PEX, multicamada) para abastecimento.`,
+      impact: "high",
+      regulatoryBasis: "DL 23/95 - RGSPPDADAR",
+    });
+
+    if (!project.waterDrainage.hasWaterReuse && !project.isRehabilitation) {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "water_drainage",
+        title: "Reutilização de águas cinzentas/pluviais",
+        description: `Considerar sistema de reutilização de águas cinzentas ou recolha de águas pluviais para rega e autoclismos. Pode reduzir o consumo de água potável em 30-40%.`,
+        impact: "medium",
+        estimatedSavings: "Redução de 30-40% no consumo de água",
+        regulatoryBasis: "Boas práticas de sustentabilidade",
+      });
+    }
+  }
+
+  // Structural improvements
+  if (criticalAreas.has("structural")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "structural",
+      title: "Projeto de estabilidade e estudo geotécnico",
+      description: `Elaborar projeto de estabilidade conforme Eurocódigos e estudo geotécnico do terreno. Fundamental para a segurança estrutural e dimensionamento das fundações, especialmente em zona sísmica.`,
+      impact: "high",
+      regulatoryBasis: "Eurocódigos EC0-EC8",
+    });
+  }
+
+  // Elevator improvements
+  if (criticalAreas.has("elevators") || warningAreas.has("elevators")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "elevators",
+      title: "Conformidade do ascensor",
+      description: `Garantir marcação CE, contrato de manutenção com empresa qualificada, inspeção periódica por entidade acreditada e comunicação de emergência 24h. A acessibilidade do ascensor deve cumprir o DL 163/2006.`,
+      impact: "high",
+      regulatoryBasis: "DL 320/2002, EN 81-20",
+    });
+  }
+
+  // Licensing improvements
+  if (criticalAreas.has("licensing") || warningAreas.has("licensing")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "licensing",
+      title: "Regularização do licenciamento",
+      description: `Garantir todos os instrumentos de licenciamento: projeto de arquitetura, projetos de especialidades, termos de responsabilidade, alvará de construção e licença de utilização. Consultar a câmara municipal sobre o enquadramento legal da operação.`,
+      impact: "high",
+      regulatoryBasis: "RJUE - DL 555/99",
+    });
+  }
+
+  // Waste improvements
+  if (criticalAreas.has("waste") || warningAreas.has("waste")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "waste",
+      title: "Gestão de resíduos de construção",
+      description: `Elaborar PPG (Plano de Prevenção e Gestão de RCD), garantir triagem em obra, transporte por operador licenciado e destino final em operador autorizado. Registar movimentos via e-GAR.`,
+      impact: "medium",
+      regulatoryBasis: "DL 46/2008",
+    });
+  }
+
   // General best-practice recommendations (always included)
   recommendations.push({
     id: nextRecommendationId(),
@@ -1394,11 +2372,18 @@ function generateRecommendations(project: BuildingProject, findings: Finding[]):
 function buildRegulationSummary(findings: Finding[]): RegulationSummary[] {
   const areas: { area: RegulationArea; name: string }[] = [
     { area: "thermal", name: "Desempenho Térmico (REH/RECS)" },
+    { area: "acoustic", name: "Acústica (RRAE)" },
     { area: "fire_safety", name: "Segurança Contra Incêndio (SCIE)" },
     { area: "accessibility", name: "Acessibilidade (DL 163/2006)" },
     { area: "energy", name: "Eficiência Energética (SCE)" },
     { area: "electrical", name: "Instalações Elétricas (RTIEBT)" },
     { area: "ited_itur", name: "Telecomunicações (ITED/ITUR)" },
+    { area: "gas", name: "Instalações de Gás (DL 521/99)" },
+    { area: "water_drainage", name: "Águas e Drenagem (RGSPPDADAR)" },
+    { area: "structural", name: "Estruturas / Sísmica (Eurocódigos)" },
+    { area: "elevators", name: "Ascensores (DL 320/2002)" },
+    { area: "licensing", name: "Licenciamento (RJUE)" },
+    { area: "waste", name: "Resíduos de Construção (DL 46/2008)" },
     { area: "general", name: "Regulamento Geral (RGEU)" },
   ];
 

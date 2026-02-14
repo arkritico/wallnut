@@ -5,7 +5,7 @@ import ProjectForm from "@/components/ProjectForm";
 import AnalysisResults from "@/components/AnalysisResults";
 import { analyzeProject } from "@/lib/analyzer";
 import type { BuildingProject, AnalysisResult } from "@/lib/types";
-import { Building, Shield, Zap, ChevronRight, Plug, Wifi } from "lucide-react";
+import { Building, Shield, Zap, ChevronRight, Plug, Wifi, Volume2, Fuel, Droplets, Columns3, ArrowUpDown, FileText, Recycle } from "lucide-react";
 
 export default function Home() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -45,7 +45,7 @@ export default function Home() {
               Analise e melhore projetos de edifícios em Portugal
             </p>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Verificação de conformidade com REH, RECS, SCIE, RRAE, DL 163/2006, RGEU, SCE, RTIEBT, ITED e ITUR.
+              Verificação abrangente de conformidade com REH, RECS, RRAE, SCIE, DL 163/2006, RGEU, SCE, RTIEBT, ITED, ITUR, DL 521/99, RGSPPDADAR, Eurocódigos, DL 320/2002, RJUE e DL 46/2008.
               Recomendações de melhoria com base nas melhores práticas e regulamentação em vigor.
             </p>
           </div>
@@ -56,6 +56,11 @@ export default function Home() {
               icon={<Zap className="w-8 h-8 text-blue-500" />}
               title="Desempenho Térmico"
               description="Verificação de coeficientes U, fatores solares, ventilação e pontes térmicas conforme o REH e RECS."
+            />
+            <FeatureCard
+              icon={<Volume2 className="w-8 h-8 text-indigo-500" />}
+              title="Acústica (RRAE)"
+              description="Isolamento a sons aéreos, percussão e fachada. Verificação dos requisitos do Regulamento dos Requisitos Acústicos."
             />
             <FeatureCard
               icon={<Shield className="w-8 h-8 text-orange-500" />}
@@ -77,6 +82,36 @@ export default function Home() {
               title="ITED / ITUR"
               description="Telecomunicações em edifícios e urbanizações: fibra óptica, par de cobre, coaxial, ATE/ATI e certificação ANACOM."
             />
+            <FeatureCard
+              icon={<Fuel className="w-8 h-8 text-red-500" />}
+              title="Instalações de Gás"
+              description="Conformidade DL 521/99: tubagem, ventilação, exaustão, válvulas de emergência e certificação DGEG."
+            />
+            <FeatureCard
+              icon={<Droplets className="w-8 h-8 text-sky-500" />}
+              title="Águas e Drenagem"
+              description="Abastecimento de água e drenagem conforme RGSPPDADAR: sistema separativo, ventilação, materiais e válvulas."
+            />
+            <FeatureCard
+              icon={<Columns3 className="w-8 h-8 text-stone-600" />}
+              title="Estruturas / Sísmica"
+              description="Verificação de projeto estrutural e sismo-resistente conforme Eurocódigos. Estudo geotécnico e fundações."
+            />
+            <FeatureCard
+              icon={<ArrowUpDown className="w-8 h-8 text-violet-500" />}
+              title="Ascensores"
+              description="Conformidade DL 320/2002 e EN 81-20: marcação CE, manutenção, inspeção periódica e acessibilidade."
+            />
+            <FeatureCard
+              icon={<FileText className="w-8 h-8 text-emerald-600" />}
+              title="Licenciamento (RJUE)"
+              description="Verificação de projetos, termos de responsabilidade, alvarás, licenças e enquadramento urbanístico."
+            />
+            <FeatureCard
+              icon={<Recycle className="w-8 h-8 text-lime-600" />}
+              title="Resíduos de Construção"
+              description="Gestão de RCD conforme DL 46/2008: PPG, triagem, transporte licenciado, destino e registo e-GAR."
+            />
           </div>
 
           {/* CTA */}
@@ -97,6 +132,7 @@ export default function Home() {
               {[
                 "REH - Regulamento Energético Habitação",
                 "RECS - Regulamento Energético Comércio e Serviços",
+                "RRAE - Requisitos Acústicos dos Edifícios",
                 "SCIE - Segurança Contra Incêndio",
                 "DL 163/2006 - Acessibilidade",
                 "RGEU - Regulamento Geral Edificações Urbanas",
@@ -104,6 +140,12 @@ export default function Home() {
                 "RTIEBT - Instalações Elétricas Baixa Tensão",
                 "ITED - Telecomunicações em Edifícios",
                 "ITUR - Telecomunicações em Urbanizações",
+                "DL 521/99 - Instalações de Gás",
+                "RGSPPDADAR - Águas e Drenagem",
+                "Eurocódigos EC0-EC8 - Estruturas",
+                "DL 320/2002 - Ascensores",
+                "RJUE - Licenciamento Urbanístico",
+                "DL 46/2008 - Resíduos de Construção",
               ].map(reg => (
                 <span key={reg} className="bg-gray-100 px-3 py-1 rounded-full">{reg}</span>
               ))}

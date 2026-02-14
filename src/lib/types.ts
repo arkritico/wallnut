@@ -14,8 +14,13 @@ export type RegulationArea =
   | "energy"
   | "electrical"
   | "ited_itur"
-  | "general"
-  | "urbanistic";
+  | "gas"
+  | "water_drainage"
+  | "structural"
+  | "elevators"
+  | "licensing"
+  | "waste"
+  | "general";
 
 export interface BuildingProject {
   // General info
@@ -49,6 +54,27 @@ export interface BuildingProject {
 
   // Telecommunications (ITED/ITUR)
   telecommunications: TelecomInfo;
+
+  // Acoustic
+  acoustic: AcousticInfo;
+
+  // Gas installations
+  gas: GasInfo;
+
+  // Water and drainage
+  waterDrainage: WaterDrainageInfo;
+
+  // Structural / Seismic
+  structural: StructuralInfo;
+
+  // Elevators
+  elevators: ElevatorInfo;
+
+  // Licensing (RJUE)
+  licensing: LicensingInfo;
+
+  // Construction waste
+  waste: WasteInfo;
 }
 
 export interface PortugalLocation {
@@ -212,6 +238,99 @@ export interface TelecomInfo {
   // Certification
   hasITEDCertification: boolean; // Certificação ITED por instalador
   installerITEDLicense: boolean; // Instalador com credenciação ANACOM
+}
+
+export interface AcousticInfo {
+  buildingLocation: "quiet" | "mixed" | "noisy"; // Zona sensível, mista, ruidosa
+  hasAirborneInsulation: boolean; // Isolamento a sons aéreos entre frações
+  airborneInsulationValue?: number; // D'nT,w (dB)
+  hasImpactInsulation: boolean; // Isolamento a sons de percussão
+  impactInsulationValue?: number; // L'nT,w (dB)
+  hasFacadeInsulation: boolean; // Isolamento de fachada
+  facadeInsulationValue?: number; // D2m,nT,w (dB)
+  hasEquipmentNoiseControl: boolean; // Controlo de ruído de equipamentos
+  hasAcousticProject: boolean; // Projeto de condicionamento acústico
+}
+
+export interface GasInfo {
+  hasGasInstallation: boolean;
+  gasType: "natural_gas" | "lpg_piped" | "lpg_bottle" | "none";
+  hasGasProject: boolean; // Projeto aprovado
+  hasGasDetector: boolean;
+  hasEmergencyValve: boolean; // Válvula de corte de emergência
+  hasVentilation: boolean; // Ventilação dos locais com aparelhos a gás
+  hasFlueSystem: boolean; // Sistema de exaustão/chaminé
+  pipesMaterial: "copper" | "steel" | "polyethylene" | "multilayer" | "none";
+  hasPressureTest: boolean; // Ensaio de estanquidade
+  hasGasCertification: boolean; // Certificação por instalador credenciado
+  installationAge?: number; // Years
+}
+
+export interface WaterDrainageInfo {
+  // Water supply
+  hasPublicWaterConnection: boolean;
+  waterPipeMaterial: "ppr" | "pex" | "copper" | "multicamada" | "galvanized" | "other";
+  hasWaterMeter: boolean;
+  hasCheckValve: boolean; // Válvula anti-retorno
+  hasPressureReducer: boolean; // Redutor de pressão
+  hotWaterRecirculation: boolean;
+  // Drainage
+  hasSeparateDrainageSystem: boolean; // Separação pluvial/residual
+  hasVentilatedDrainage: boolean; // Ventilação da rede de drenagem
+  hasDrainageSiphons: boolean; // Sifões nos aparelhos
+  hasGreaseTrap: boolean; // Caixa de gorduras (commercial)
+  hasStormwaterManagement: boolean; // Gestão de águas pluviais
+  hasWaterReuse: boolean; // Reutilização de águas cinzentas/pluviais
+  hasBackflowPrevention: boolean; // Prevenção de refluxo
+}
+
+export interface StructuralInfo {
+  structuralSystem: "reinforced_concrete" | "steel" | "masonry" | "wood" | "mixed";
+  seismicZone: "1.1" | "1.2" | "1.3" | "1.4" | "1.5" | "1.6" | "2.1" | "2.2" | "2.3" | "2.4" | "2.5";
+  soilType: "A" | "B" | "C" | "D" | "E";
+  importanceClass: "I" | "II" | "III" | "IV"; // I=low, IV=essential
+  hasStructuralProject: boolean;
+  hasGeotechnicalStudy: boolean;
+  foundationType: "shallow" | "deep" | "mixed";
+  hasSeismicDesign: boolean; // Projetado para ação sísmica
+  ductilityClass: "DCL" | "DCM" | "DCH"; // Classe de ductilidade (Low/Medium/High)
+}
+
+export interface ElevatorInfo {
+  hasElevator: boolean;
+  numberOfElevators: number;
+  elevatorType: "passenger" | "passenger_freight" | "freight" | "none";
+  hasCEMarking: boolean; // Marcação CE
+  hasMaintenanceContract: boolean; // Contrato de manutenção
+  hasPeriodicInspection: boolean; // Inspeção periódica (IPQ)
+  hasEmergencyCommunication: boolean; // Comunicação bidirecional
+  hasPitAndHeadroom: boolean; // Fosso e altura livre adequados
+  hasAccessibleElevator: boolean; // Ascensor acessível (DL 163/2006)
+  elevatorAge?: number;
+}
+
+export interface LicensingInfo {
+  projectPhase: "prior_info" | "pip" | "licensing" | "communication" | "utilization" | "none";
+  hasArchitecturalProject: boolean;
+  hasSpecialtyProjects: boolean; // Projetos de especialidades
+  hasTermoDeResponsabilidade: boolean; // Termo de responsabilidade do técnico
+  hasMunicipalApproval: boolean; // Aprovação camarária
+  hasConstructionLicense: boolean; // Alvará de construção
+  hasUtilizationLicense: boolean; // Licença de utilização
+  hasTechnicalDirector: boolean; // Diretor de obra/fiscalização
+  isInARU: boolean; // Área de Reabilitação Urbana
+  isProtectedArea: boolean; // Área protegida / património
+}
+
+export interface WasteInfo {
+  hasWasteManagementPlan: boolean; // Plano de Prevenção e Gestão (PPG)
+  estimatedWasteVolume?: number; // m³
+  hasSortingOnSite: boolean; // Triagem em obra
+  hasLicensedTransporter: boolean; // Transportador licenciado
+  hasLicensedDestination: boolean; // Destino final licenciado
+  hasWasteRegistration: boolean; // Registo em plataforma eletrónica (e-GAR)
+  hasDemolitionAudit: boolean; // Auditoria prévia (demolições)
+  recyclingPercentageTarget: number; // % target
 }
 
 export interface AnalysisResult {

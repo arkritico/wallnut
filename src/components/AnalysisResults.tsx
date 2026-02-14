@@ -16,6 +16,13 @@ import {
   ChevronUp,
   Plug,
   Wifi,
+  Volume2,
+  Fuel,
+  Droplets,
+  Columns3,
+  ArrowUpDown,
+  FileText,
+  Recycle,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -199,11 +206,18 @@ function RegulationCard({ summary }: { summary: RegulationSummary }) {
 
   const areaIcons: Record<string, React.ReactNode> = {
     thermal: <Zap className="w-5 h-5 text-blue-500" />,
+    acoustic: <Volume2 className="w-5 h-5 text-indigo-500" />,
     fire_safety: <Flame className="w-5 h-5 text-orange-500" />,
     accessibility: <Accessibility className="w-5 h-5 text-purple-500" />,
     energy: <Lightbulb className="w-5 h-5 text-yellow-500" />,
     electrical: <Plug className="w-5 h-5 text-amber-600" />,
     ited_itur: <Wifi className="w-5 h-5 text-cyan-500" />,
+    gas: <Fuel className="w-5 h-5 text-red-500" />,
+    water_drainage: <Droplets className="w-5 h-5 text-sky-500" />,
+    structural: <Columns3 className="w-5 h-5 text-stone-600" />,
+    elevators: <ArrowUpDown className="w-5 h-5 text-violet-500" />,
+    licensing: <FileText className="w-5 h-5 text-emerald-600" />,
+    waste: <Recycle className="w-5 h-5 text-lime-600" />,
     general: <Building className="w-5 h-5 text-gray-500" />,
   };
 
