@@ -29,6 +29,11 @@ import {
   ELEVATOR_REQUIREMENTS,
   LICENSING_REQUIREMENTS,
   WASTE_REQUIREMENTS,
+  CIVIL_CODE_BUILDING,
+  AVAC_REQUIREMENTS,
+  SCIE_NOTAS_TECNICAS,
+  ELECTRICAL_TECHNICAL_DOCS,
+  ANACOM_TECHNICAL_DOCS,
 } from "./regulations";
 
 let findingCounter = 0;
@@ -49,21 +54,23 @@ export function analyzeProject(project: BuildingProject): AnalysisResult {
   const findings: Finding[] = [];
   const recommendations: Recommendation[] = [];
 
-  // Run all analysis modules
-  findings.push(...analyzeThermal(project));
-  findings.push(...analyzeAcoustic(project));
-  findings.push(...analyzeFireSafety(project));
-  findings.push(...analyzeAccessibility(project));
-  findings.push(...analyzeEnergy(project));
-  findings.push(...analyzeGeneral(project));
-  findings.push(...analyzeElectrical(project));
-  findings.push(...analyzeTelecom(project));
-  findings.push(...analyzeGas(project));
-  findings.push(...analyzeWaterDrainage(project));
-  findings.push(...analyzeStructural(project));
-  findings.push(...analyzeElevators(project));
-  findings.push(...analyzeLicensing(project));
-  findings.push(...analyzeWaste(project));
+  // Run all analysis modules (ordered by project specialty hierarchy)
+  findings.push(...analyzeArchitecture(project));     // 1. Architecture + Civil Code
+  findings.push(...analyzeStructural(project));        // 2. Structures
+  findings.push(...analyzeFireSafety(project));        // 3. Fire Safety (SCIE + NTs)
+  findings.push(...analyzeAVAC(project));              // 4. AVAC
+  findings.push(...analyzeWaterDrainage(project));     // 5. Water & Drainage
+  findings.push(...analyzeGas(project));               // 6. Gas
+  findings.push(...analyzeElectrical(project));        // 7. Electrical
+  findings.push(...analyzeTelecom(project));           // 8. ITED/ITUR
+  findings.push(...analyzeThermal(project));           // 9. Thermal
+  findings.push(...analyzeAcoustic(project));          // 10. Acoustic
+  findings.push(...analyzeAccessibility(project));     // 11. Accessibility
+  findings.push(...analyzeEnergy(project));            // 12. Energy
+  findings.push(...analyzeElevators(project));         // 13. Elevators
+  findings.push(...analyzeLicensing(project));         // 14. Licensing
+  findings.push(...analyzeWaste(project));             // 15. Waste
+  findings.push(...analyzeGeneral(project));           // 16. General
 
   recommendations.push(...generateRecommendations(project, findings));
 
@@ -82,6 +89,156 @@ export function analyzeProject(project: BuildingProject): AnalysisResult {
     recommendations,
     regulationSummary,
   };
+}
+
+// ============================================================
+// ARCHITECTURE ANALYSIS (RGEU + Civil Code)
+// ============================================================
+
+function analyzeArchitecture(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { architecture } = project;
+
+  // Check architectural project / permit design
+  if (!architecture.hasBuildingPermitDesign && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "RJUE - DL 555/99",
+      article: "Art. 11.º - Projeto de Arquitetura",
+      description: `O projeto de arquitetura é a base de todo o processo de licenciamento. Deve ser subscrito por arquiteto inscrito na Ordem dos Arquitetos e incluir peças desenhadas e memória descritiva.`,
+      severity: "critical",
+    });
+  }
+
+  // Check RGEU compliance
+  if (!architecture.meetsRGEU) {
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "RGEU - DL 38382/1951",
+      article: "Arts. 65.º-75.º",
+      description: `A conformidade com o RGEU deve ser verificada: pé-direito mínimo (2.70m habitável, 2.40m não habitável), áreas mínimas dos compartimentos, iluminação e ventilação naturais.`,
+      severity: "warning",
+    });
+  }
+
+  // Check ceiling height
+  if (architecture.ceilingHeight !== undefined) {
+    const minHeight = project.buildingType === "commercial" ? 3.00 : 2.70;
+    if (architecture.ceilingHeight < minHeight) {
+      findings.push({
+        id: nextFindingId(),
+        area: "architecture",
+        regulation: "RGEU - DL 38382/1951",
+        article: "Art. 65.º - Pé-direito",
+        description: `O pé-direito (${architecture.ceilingHeight}m) é inferior ao mínimo regulamentar para espaços ${project.buildingType === "commercial" ? "comerciais" : "habitáveis"}.`,
+        severity: "critical",
+        currentValue: `${architecture.ceilingHeight}m`,
+        requiredValue: `≥ ${minHeight}m`,
+      });
+    }
+  }
+
+  // Check natural light
+  if (!architecture.hasNaturalLight) {
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "RGEU - DL 38382/1951",
+      article: "Art. 71.º - Iluminação Natural",
+      description: `Todos os compartimentos de habitação principal (salas, quartos) devem ter iluminação natural direta com vãos de área não inferior a 10% da área do compartimento.`,
+      severity: "critical",
+    });
+  }
+
+  // Check cross ventilation
+  if (!architecture.hasCrossVentilation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "RGEU - DL 38382/1951",
+      article: "Art. 73.º - Ventilação Natural",
+      description: `O RGEU exige ventilação natural cruzada nos fogos de habitação. Deve ser garantida a possibilidade de ventilação através de fachadas opostas ou perpendiculares.`,
+      severity: "warning",
+    });
+  }
+
+  // --- Civil Code checks ---
+
+  // Window distance to neighbor (Art. 1360.º)
+  if (architecture.windowDistanceToNeighbor !== undefined) {
+    const minDist = CIVIL_CODE_BUILDING.neighborRelations.art1360.minDistance;
+    if (architecture.windowDistanceToNeighbor < minDist) {
+      findings.push({
+        id: nextFindingId(),
+        area: "architecture",
+        regulation: "Código Civil",
+        article: CIVIL_CODE_BUILDING.neighborRelations.art1360.article,
+        description: `${CIVIL_CODE_BUILDING.neighborRelations.art1360.title}: A distância de janelas/varandas ao limite do prédio vizinho (${architecture.windowDistanceToNeighbor}m) é inferior ao mínimo legal de ${minDist}m. As janelas/portas/varandas sobre prédio alheio devem distar pelo menos 1.5m do limite.`,
+        severity: "critical",
+        currentValue: `${architecture.windowDistanceToNeighbor}m`,
+        requiredValue: `≥ ${minDist}m`,
+      });
+    } else {
+      findings.push({
+        id: nextFindingId(),
+        area: "architecture",
+        regulation: "Código Civil",
+        article: CIVIL_CODE_BUILDING.neighborRelations.art1360.article,
+        description: `Distância de janelas ao limite vizinho cumpre o mínimo legal.`,
+        severity: "pass",
+      });
+    }
+  }
+
+  // Rainwater drainage (Art. 1362.º - estilicídio)
+  if (!architecture.hasRainwaterDrainage) {
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "Código Civil",
+      article: CIVIL_CODE_BUILDING.neighborRelations.art1362.article,
+      description: `${CIVIL_CODE_BUILDING.neighborRelations.art1362.title}: É proibido que as águas pluviais do telhado escorram diretamente para o terreno vizinho. Devem ser recolhidas e conduzidas por caleiras e tubos de queda.`,
+      severity: "warning",
+    });
+  }
+
+  // Horizontal property
+  if (architecture.isHorizontalProperty) {
+    if (!architecture.respectsCommonParts) {
+      findings.push({
+        id: nextFindingId(),
+        area: "architecture",
+        regulation: "Código Civil",
+        article: CIVIL_CODE_BUILDING.horizontalProperty.art1422.article,
+        description: `${CIVIL_CODE_BUILDING.horizontalProperty.art1422.title}: Em propriedade horizontal, é proibido prejudicar a segurança, linha arquitetónica ou arranjo estético do edifício. Alterações à fachada, estrutura e partes comuns requerem autorização da assembleia de condóminos.`,
+        severity: "critical",
+      });
+    }
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "Código Civil",
+      article: CIVIL_CODE_BUILDING.horizontalProperty.art1421.article,
+      description: `${CIVIL_CODE_BUILDING.horizontalProperty.art1421.title}: As partes comuns imperativas (solo, telhado, colunas, paredes mestras, escadas, elevadores, entradas) não podem ser objeto de utilização exclusiva por qualquer condómino.`,
+      severity: "info",
+    });
+  }
+
+  // Civil code general compliance
+  if (!architecture.hasCivilCodeCompliance) {
+    findings.push({
+      id: nextFindingId(),
+      area: "architecture",
+      regulation: "Código Civil",
+      article: "Arts. 1344.º-1422.º",
+      description: `O projeto deve verificar conformidade com o Código Civil no que respeita a: emissões para vizinhos (Art. 1346.º), distâncias de construções (Art. 1349.º), aberturas de janelas (Art. 1360.º), frestas (Art. 1361.º), estilicídio (Art. 1362.º) e regime de propriedade horizontal se aplicável.`,
+      severity: "warning",
+    });
+  }
+
+  return findings;
 }
 
 // ============================================================
@@ -369,6 +526,126 @@ function analyzeFireSafety(project: BuildingProject): Finding[] {
       article: "Art. 163º - Extintores",
       description: `A existência de extintores portáteis é obrigatória em todas as utilizações-tipo. Devem ser previstos extintores adequados.`,
       severity: "warning",
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// AVAC ANALYSIS (HVAC - RECS/REH + DL 118/2013)
+// ============================================================
+
+function analyzeAVAC(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { avac } = project;
+  const isCommercial = project.buildingType === "commercial" || project.buildingType === "mixed";
+
+  // Check HVAC project (required for commercial > 25kW)
+  if (isCommercial && !avac.hasHVACProject) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "RECS - DL 118/2013",
+      article: "Projeto AVAC",
+      description: `Edifícios de comércio e serviços requerem projeto de AVAC elaborado por engenheiro mecânico ou eletrotécnico. O projeto deve incluir cálculos de cargas térmicas, dimensionamento de equipamentos e rede de condutas.`,
+      severity: "critical",
+    });
+  }
+
+  // Check kitchen extraction
+  if (!avac.hasKitchenExtraction) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "RGEU / REH",
+      article: "Extração de Cozinha",
+      description: `A cozinha deve ter sistema de extração mecânica com caudal mínimo de ${AVAC_REQUIREMENTS.ventilationRates.residential.kitchens} m³/h para remoção de vapores, odores e produtos de combustão.`,
+      severity: "critical",
+    });
+  }
+
+  // Check bathroom extraction
+  if (!avac.hasBathroomExtraction) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "RGEU / REH",
+      article: "Extração de Instalações Sanitárias",
+      description: `As instalações sanitárias sem janela (ou mesmo com janela, como boa prática) devem ter extração mecânica com caudal mínimo de ${AVAC_REQUIREMENTS.ventilationRates.residential.bathrooms} m³/h.`,
+      severity: "warning",
+    });
+  }
+
+  // Check ventilation system for commercial
+  if (isCommercial && !avac.hasVentilationSystem) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "RECS - Portaria 353-A/2013",
+      article: "Ventilação Mecânica",
+      description: `Edifícios de comércio e serviços devem ter sistema de ventilação mecânica que garanta os caudais mínimos de ar novo por pessoa (escritórios: ${AVAC_REQUIREMENTS.ventilationRates.commercial.offices} m³/(h.pessoa)).`,
+      severity: "critical",
+    });
+  }
+
+  // Check indoor air quality control (RECS)
+  if (isCommercial && !avac.hasAirQualityControl) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "RECS - Portaria 353-A/2013",
+      article: "Qualidade do Ar Interior (QAI)",
+      description: `O RECS exige monitorização da qualidade do ar interior em edifícios de comércio e serviços: CO₂ máx. ${AVAC_REQUIREMENTS.indoorAirQuality.maxCO2} ppm, PM2.5 máx. ${AVAC_REQUIREMENTS.indoorAirQuality.maxPM2_5} μg/m³, TVOC máx. ${AVAC_REQUIREMENTS.indoorAirQuality.maxTVOC} μg/m³.`,
+      severity: "warning",
+    });
+  }
+
+  // Check radon protection (DL 108/2018)
+  if (!avac.hasRadonProtection) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "DL 108/2018",
+      article: "Proteção contra Radão",
+      description: `O DL 108/2018 estabelece o nível de referência de ${AVAC_REQUIREMENTS.indoorAirQuality.maxRadon} Bq/m³ para concentração de radão em edifícios. Em zonas de risco (granito), devem ser previstas medidas de mitigação (ventilação do solo, membranas).`,
+      severity: "info",
+    });
+  }
+
+  // Check maintenance plan
+  if (isCommercial && !avac.hasMaintenancePlan) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "RECS - DL 118/2013",
+      article: "Plano de Manutenção",
+      description: `Edifícios de comércio e serviços com potência instalada > 25 kW requerem plano de manutenção preventiva (PMP) e técnico responsável pelo STE (Sistema Técnico de Edifício). Qualificação mínima: ${AVAC_REQUIREMENTS.maintenance.technicianQualification}.`,
+      severity: "warning",
+    });
+  }
+
+  // Check F-Gas compliance
+  if (avac.installedHVACPower && avac.installedHVACPower > 0 && !avac.hasFGasCompliance) {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "Regulamento F-Gas (EU 517/2014)",
+      article: "Gases Fluorados",
+      description: `Equipamentos de refrigeração e AC com gases fluorados requerem: técnicos certificados, verificações de fugas periódicas, registo de intervenções e cumprimento dos limites de GWP.`,
+      severity: "warning",
+    });
+  }
+
+  // Natural ventilation checks for residential
+  if (!isCommercial && avac.ventilationType === "natural") {
+    findings.push({
+      id: nextFindingId(),
+      area: "avac",
+      regulation: "REH - DL 118/2013",
+      article: "Ventilação Natural",
+      description: `O sistema de ventilação é exclusivamente natural. Garantir admissão de ar pelas fachadas principais e extração por condutas nas cozinhas e WC. Caudal mínimo: ${AVAC_REQUIREMENTS.ventilationRates.residential.livingAreas} h⁻¹.`,
+      severity: "info",
     });
   }
 
@@ -2342,6 +2619,30 @@ function generateRecommendations(project: BuildingProject, findings: Finding[]):
     });
   }
 
+  // Architecture improvements
+  if (criticalAreas.has("architecture") || warningAreas.has("architecture")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "architecture",
+      title: "Conformidade com Código Civil e RGEU",
+      description: `Verificar conformidade do projeto de arquitetura com o Código Civil (vizinhança, aberturas, estilicídio) e RGEU (dimensões mínimas, pé-direito, iluminação natural, ventilação). Estes são requisitos de base para aprovação camarária.`,
+      impact: "high",
+      regulatoryBasis: "Código Civil + RGEU",
+    });
+  }
+
+  // AVAC improvements
+  if (criticalAreas.has("avac") || warningAreas.has("avac")) {
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "avac",
+      title: "Projeto de AVAC e qualidade do ar",
+      description: `Garantir projeto de AVAC com ventilação adequada (extração cozinha/WC, caudais de ar novo), controlo de qualidade do ar interior e plano de manutenção preventiva. Verificar conformidade com regulamento F-Gas para equipamentos com gases fluorados.`,
+      impact: "high",
+      regulatoryBasis: "RECS/REH - DL 118/2013",
+    });
+  }
+
   // General best-practice recommendations (always included)
   recommendations.push({
     id: nextRecommendationId(),
@@ -2371,20 +2672,23 @@ function generateRecommendations(project: BuildingProject, findings: Finding[]):
 
 function buildRegulationSummary(findings: Finding[]): RegulationSummary[] {
   const areas: { area: RegulationArea; name: string }[] = [
-    { area: "thermal", name: "Desempenho Térmico (REH/RECS)" },
-    { area: "acoustic", name: "Acústica (RRAE)" },
-    { area: "fire_safety", name: "Segurança Contra Incêndio (SCIE)" },
-    { area: "accessibility", name: "Acessibilidade (DL 163/2006)" },
-    { area: "energy", name: "Eficiência Energética (SCE)" },
-    { area: "electrical", name: "Instalações Elétricas (RTIEBT)" },
-    { area: "ited_itur", name: "Telecomunicações (ITED/ITUR)" },
-    { area: "gas", name: "Instalações de Gás (DL 521/99)" },
-    { area: "water_drainage", name: "Águas e Drenagem (RGSPPDADAR)" },
-    { area: "structural", name: "Estruturas / Sísmica (Eurocódigos)" },
-    { area: "elevators", name: "Ascensores (DL 320/2002)" },
-    { area: "licensing", name: "Licenciamento (RJUE)" },
-    { area: "waste", name: "Resíduos de Construção (DL 46/2008)" },
-    { area: "general", name: "Regulamento Geral (RGEU)" },
+    { area: "architecture", name: "1. Arquitetura (RGEU + Código Civil)" },
+    { area: "structural", name: "2. Estruturas / Sísmica (Eurocódigos)" },
+    { area: "fire_safety", name: "3. Segurança Contra Incêndio (SCIE + NTs)" },
+    { area: "avac", name: "4. AVAC (Ventilação e Ar Condicionado)" },
+    { area: "water_drainage", name: "5. Águas e Drenagem (RGSPPDADAR)" },
+    { area: "gas", name: "6. Instalações de Gás (DL 521/99)" },
+    { area: "electrical", name: "7. Instalações Elétricas (RTIEBT + ISQ/EREDES)" },
+    { area: "ited_itur", name: "8. Telecomunicações (ITED/ITUR + ANACOM)" },
+    { area: "thermal", name: "9. Desempenho Térmico (REH/RECS)" },
+    { area: "acoustic", name: "10. Acústica (RRAE)" },
+    { area: "accessibility", name: "11. Acessibilidade (DL 163/2006)" },
+    { area: "energy", name: "12. Eficiência Energética (SCE)" },
+    { area: "elevators", name: "13. Ascensores (DL 320/2002)" },
+    { area: "licensing", name: "14. Licenciamento (RJUE)" },
+    { area: "waste", name: "15. Resíduos de Construção (DL 46/2008)" },
+    { area: "local", name: "16. Regulamentos Municipais" },
+    { area: "general", name: "17. Regulamento Geral (RGEU)" },
   ];
 
   return areas.map(({ area, name }) => {

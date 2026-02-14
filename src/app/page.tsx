@@ -5,7 +5,7 @@ import ProjectForm from "@/components/ProjectForm";
 import AnalysisResults from "@/components/AnalysisResults";
 import { analyzeProject } from "@/lib/analyzer";
 import type { BuildingProject, AnalysisResult } from "@/lib/types";
-import { Building, Shield, Zap, ChevronRight, Plug, Wifi, Volume2, Fuel, Droplets, Columns3, ArrowUpDown, FileText, Recycle } from "lucide-react";
+import { Building, Shield, Zap, ChevronRight, Plug, Wifi, Volume2, Fuel, Droplets, Columns3, ArrowUpDown, FileText, Recycle, Ruler, Wind, MapPin } from "lucide-react";
 
 export default function Home() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -45,13 +45,53 @@ export default function Home() {
               Analise e melhore projetos de edifícios em Portugal
             </p>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Verificação abrangente de conformidade com REH, RECS, RRAE, SCIE, DL 163/2006, RGEU, SCE, RTIEBT, ITED, ITUR, DL 521/99, RGSPPDADAR, Eurocódigos, DL 320/2002, RJUE e DL 46/2008.
+              Verificação abrangente de conformidade com Código Civil, RGEU, Eurocódigos, SCIE (com Notas Técnicas), RECS, REH, RRAE, RTIEBT (ISQ/DGEG/E-REDES), ITED/ITUR (ANACOM), DL 521/99, RGSPPDADAR, DL 163/2006, DL 320/2002, RJUE, DL 46/2008 e regulamentação municipal.
               Recomendações de melhoria com base nas melhores práticas e regulamentação em vigor.
             </p>
           </div>
 
-          {/* Features */}
+          {/* Features - organized by project specialty hierarchy */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <FeatureCard
+              icon={<Ruler className="w-8 h-8 text-teal-600" />}
+              title="Arquitetura e Código Civil"
+              description="RGEU, Código Civil (Arts. 1344-1425): pé-direito, iluminação, ventilação, estilicídio, propriedade horizontal e partes comuns."
+            />
+            <FeatureCard
+              icon={<Columns3 className="w-8 h-8 text-stone-600" />}
+              title="Estruturas / Sísmica"
+              description="Verificação de projeto estrutural e sismo-resistente conforme Eurocódigos. Estudo geotécnico e fundações."
+            />
+            <FeatureCard
+              icon={<Shield className="w-8 h-8 text-orange-500" />}
+              title="Segurança Contra Incêndio"
+              description="SCIE com Notas Técnicas (NT01-NT22 publicadas em DR). Categorias de risco, evacuação, deteção e extintores."
+            />
+            <FeatureCard
+              icon={<Wind className="w-8 h-8 text-cyan-600" />}
+              title="AVAC e Qualidade do Ar"
+              description="Ventilação, climatização, qualidade do ar interior (RECS/Portaria 353-A), F-Gas, radão e planos de manutenção."
+            />
+            <FeatureCard
+              icon={<Droplets className="w-8 h-8 text-sky-500" />}
+              title="Águas e Drenagem"
+              description="Abastecimento de água e drenagem conforme RGSPPDADAR: sistema separativo, ventilação, materiais e válvulas."
+            />
+            <FeatureCard
+              icon={<Fuel className="w-8 h-8 text-red-500" />}
+              title="Instalações de Gás"
+              description="Conformidade DL 521/99: tubagem, ventilação, exaustão, válvulas de emergência e certificação DGEG."
+            />
+            <FeatureCard
+              icon={<Plug className="w-8 h-8 text-amber-600" />}
+              title="Instalações Elétricas"
+              description="RTIEBT com documentos ISQ, normas E-REDES e DGEG: proteções, terra, diferenciais, circuitos e mobilidade elétrica."
+            />
+            <FeatureCard
+              icon={<Wifi className="w-8 h-8 text-cyan-500" />}
+              title="ITED / ITUR"
+              description="Telecomunicações com documentos técnicos ANACOM (PET): fibra óptica, par de cobre, coaxial, ATE/ATI e certificação."
+            />
             <FeatureCard
               icon={<Zap className="w-8 h-8 text-blue-500" />}
               title="Desempenho Térmico"
@@ -63,39 +103,9 @@ export default function Home() {
               description="Isolamento a sons aéreos, percussão e fachada. Verificação dos requisitos do Regulamento dos Requisitos Acústicos."
             />
             <FeatureCard
-              icon={<Shield className="w-8 h-8 text-orange-500" />}
-              title="Segurança e Acessibilidade"
-              description="Análise de conformidade SCIE (segurança contra incêndio) e DL 163/2006 (acessibilidade)."
-            />
-            <FeatureCard
               icon={<Building className="w-8 h-8 text-green-500" />}
               title="Certificação Energética"
               description="Estimativa da classe energética e recomendações para melhorar a eficiência do edifício."
-            />
-            <FeatureCard
-              icon={<Plug className="w-8 h-8 text-amber-600" />}
-              title="Instalações Elétricas"
-              description="Conformidade RTIEBT: proteções, terra, diferenciais, circuitos, zonas especiais e mobilidade elétrica."
-            />
-            <FeatureCard
-              icon={<Wifi className="w-8 h-8 text-cyan-500" />}
-              title="ITED / ITUR"
-              description="Telecomunicações em edifícios e urbanizações: fibra óptica, par de cobre, coaxial, ATE/ATI e certificação ANACOM."
-            />
-            <FeatureCard
-              icon={<Fuel className="w-8 h-8 text-red-500" />}
-              title="Instalações de Gás"
-              description="Conformidade DL 521/99: tubagem, ventilação, exaustão, válvulas de emergência e certificação DGEG."
-            />
-            <FeatureCard
-              icon={<Droplets className="w-8 h-8 text-sky-500" />}
-              title="Águas e Drenagem"
-              description="Abastecimento de água e drenagem conforme RGSPPDADAR: sistema separativo, ventilação, materiais e válvulas."
-            />
-            <FeatureCard
-              icon={<Columns3 className="w-8 h-8 text-stone-600" />}
-              title="Estruturas / Sísmica"
-              description="Verificação de projeto estrutural e sismo-resistente conforme Eurocódigos. Estudo geotécnico e fundações."
             />
             <FeatureCard
               icon={<ArrowUpDown className="w-8 h-8 text-violet-500" />}
@@ -111,6 +121,11 @@ export default function Home() {
               icon={<Recycle className="w-8 h-8 text-lime-600" />}
               title="Resíduos de Construção"
               description="Gestão de RCD conforme DL 46/2008: PPG, triagem, transporte licenciado, destino e registo e-GAR."
+            />
+            <FeatureCard
+              icon={<MapPin className="w-8 h-8 text-rose-500" />}
+              title="Regulamentos Municipais"
+              description="Upload de PDM e regulamentação municipal específica. Análise dependente de documentação local carregada."
             />
           </div>
 
@@ -130,22 +145,29 @@ export default function Home() {
             <p className="text-center text-sm text-gray-400 mb-4">Regulamentação abrangida</p>
             <div className="flex flex-wrap justify-center gap-4 text-xs text-gray-500">
               {[
-                "REH - Regulamento Energético Habitação",
-                "RECS - Regulamento Energético Comércio e Serviços",
-                "RRAE - Requisitos Acústicos dos Edifícios",
-                "SCIE - Segurança Contra Incêndio",
-                "DL 163/2006 - Acessibilidade",
+                "Código Civil - Direitos de Propriedade",
                 "RGEU - Regulamento Geral Edificações Urbanas",
-                "SCE - Sistema Certificação Energética",
-                "RTIEBT - Instalações Elétricas Baixa Tensão",
+                "Eurocódigos EC0-EC8 - Estruturas",
+                "SCIE - Segurança Contra Incêndio",
+                "Notas Técnicas SCIE (NT01-NT22)",
+                "RECS - Reg. Energético Comércio/Serviços",
+                "Portaria 353-A/2013 - QAI",
+                "REH - Regulamento Energético Habitação",
+                "RGSPPDADAR - Águas e Drenagem",
+                "DL 521/99 - Instalações de Gás",
+                "RTIEBT - Instalações Elétricas",
+                "Documentos ISQ / E-REDES / DGEG",
                 "ITED - Telecomunicações em Edifícios",
                 "ITUR - Telecomunicações em Urbanizações",
-                "DL 521/99 - Instalações de Gás",
-                "RGSPPDADAR - Águas e Drenagem",
-                "Eurocódigos EC0-EC8 - Estruturas",
+                "Documentos Técnicos ANACOM (PET)",
+                "RRAE - Requisitos Acústicos",
+                "DL 163/2006 - Acessibilidade",
+                "SCE - Certificação Energética",
                 "DL 320/2002 - Ascensores",
                 "RJUE - Licenciamento Urbanístico",
                 "DL 46/2008 - Resíduos de Construção",
+                "EU 517/2014 - Gases Fluorados",
+                "DL 108/2018 - Radão",
               ].map(reg => (
                 <span key={reg} className="bg-gray-100 px-3 py-1 rounded-full">{reg}</span>
               ))}

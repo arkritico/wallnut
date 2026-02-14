@@ -164,6 +164,71 @@ export const FIRE_DETECTION_REQUIREMENTS = {
 } as const;
 
 // ============================================================
+// SCIE - NOTAS TÉCNICAS (Despacho n.º 2074/2009 - DR, 2ª série)
+// Published in Diário da República, with legal force
+// ============================================================
+
+/** Notas Técnicas SCIE published in Diário da República with legal force */
+export const SCIE_NOTAS_TECNICAS = {
+  /** NT01 - Utilizações-Tipo de Edifícios e Recintos */
+  NT01: { title: "Utilizações-Tipo", scope: "Classificação das utilizações-tipo" },
+  /** NT02 - Competências e Responsabilidades em SCIE */
+  NT02: { title: "Competências e Responsabilidades", scope: "Definição de responsabilidades" },
+  /** NT04 - Simbologia gráfica para plantas de SCIE */
+  NT04: { title: "Simbologia Gráfica", scope: "Obrigatória nos desenhos SCIE" },
+  /** NT05 - Locais de risco */
+  NT05: { title: "Locais de Risco", scope: "Classificação A, B, C, D, E, F" },
+  /** NT06 - Categorias de risco */
+  NT06: { title: "Categorias de Risco", scope: "1ª a 4ª categoria" },
+  /** NT07 - Resistência ao fogo de elementos de construção */
+  NT07: { title: "Resistência ao Fogo", scope: "REI, EI, E em minutos" },
+  /** NT08 - Reação ao fogo - Euroclasses */
+  NT08: { title: "Reação ao Fogo", scope: "Classes A1, A2, B, C, D, E, F" },
+  /** NT10 - Portas resistentes ao fogo */
+  NT10: { title: "Portas Resistentes ao Fogo", scope: "Classificação e marcação CE" },
+  /** NT11 - Sinalização de segurança */
+  NT11: { title: "Sinalização de Segurança", scope: "EN ISO 7010, fotoluminescente" },
+  /** NT12 - Sistemas Automáticos de Deteção de Incêndio (SADI) */
+  NT12: { title: "SADI", scope: "NP EN 54, configuração e zonas" },
+  /** NT13 - Redes de incêndio armadas (RIA) */
+  NT13: { title: "Redes de Incêndio Armadas", scope: "Tipo carretel, dimensionamento" },
+  /** NT14 - Fontes abastecedoras de água para serviço de incêndio */
+  NT14: { title: "Fontes de Abastecimento de Água", scope: "Reservas de água, hidrantes" },
+  /** NT15 - Centrais de bombagem para serviço de incêndio */
+  NT15: { title: "Centrais de Bombagem", scope: "Dimensionamento e redundância" },
+  /** NT16 - Sistemas extintores por água (sprinklers) */
+  NT16: { title: "Sistemas de Sprinklers", scope: "EN 12845, classes de risco" },
+  /** NT17 - Sistemas extintores por agente extintor diferente da água */
+  NT17: { title: "Sistemas Extintores Especiais", scope: "Gases, aerossóis, espuma" },
+  /** NT18 - Sistemas de cortina de água */
+  NT18: { title: "Cortinas de Água", scope: "Proteção de vãos e fachadas" },
+  /** NT19 - Sistemas de desenfumagem - Controlo de fumo */
+  NT19: { title: "Controlo de Fumo", scope: "Desenfumagem passiva e ativa" },
+  /** NT20 - Posto de Segurança */
+  NT20: { title: "Posto de Segurança", scope: "Requisitos para 3ª e 4ª categoria" },
+  /** NT21 - Planos de segurança */
+  NT21: { title: "Planos de Segurança", scope: "PSI, PSE, Registos de segurança" },
+  /** NT22 - Plantas de emergência */
+  NT22: { title: "Plantas de Emergência", scope: "NP 4386, conteúdo e localização" },
+} as const;
+
+/** Fire reaction classes (Euroclasses per NT08) */
+export const FIRE_REACTION_CLASSES = {
+  floorings: {
+    escapeRoutes: "CFL-s1", // Minimum for escape routes
+    general: "DFL-s1",
+  },
+  walls_ceilings: {
+    escapeRoutes: "C-s2,d0",
+    general: "D-s2,d0",
+  },
+  facades: {
+    above28m: "B-s2,d0",
+    below28m: "C-s2,d0",
+  },
+} as const;
+
+// ============================================================
 // ACCESSIBILITY (DL 163/2006)
 // ============================================================
 
@@ -325,6 +390,82 @@ export const ELECTRICAL_REQUIREMENTS = {
 } as const;
 
 // ============================================================
+// ELECTRICAL - ISQ, EREDES, DGEG Technical Documents
+// ============================================================
+
+/** Technical documents with regulatory/normative force for electrical installations */
+export const ELECTRICAL_TECHNICAL_DOCS = {
+  /** DGEG - Direção-Geral de Energia e Geologia */
+  dgeg: {
+    projectApproval: {
+      doc: "Portaria 949-A/2006",
+      scope: "Aprovação das Regras Técnicas (RTIEBT)",
+      force: "legal",
+    },
+    inspections: {
+      doc: "DL 101/2007",
+      scope: "Regime de inspeções periódicas das instalações elétricas",
+      force: "legal",
+    },
+    evCharging: {
+      doc: "DL 39/2010 (alterado por DL 90/2014)",
+      scope: "Mobilidade elétrica - infraestrutura em edifícios",
+      force: "legal",
+    },
+  },
+  /** ISQ - Instituto de Soldadura e Qualidade */
+  isq: {
+    inspection: {
+      doc: "Guia ISQ para inspeção de instalações elétricas",
+      scope: "Procedimentos de inspeção e ensaio",
+      force: "normative",
+    },
+    certificationReport: {
+      doc: "Relatório de inspeção ISQ",
+      scope: "Obrigatório para ligação à rede e licença de utilização",
+      force: "regulatory",
+    },
+    periodicInspection: {
+      doc: "Inspeção periódica ISQ",
+      scope: "Obrigatória a cada 5 anos para instalações > 41.4 kVA",
+      intervalYears: 5,
+      force: "legal",
+    },
+  },
+  /** E-REDES (ex-EDP Distribuição) - Technical Requirements */
+  eredes: {
+    connectionGuide: {
+      doc: "Guia Técnico de Ligações à Rede",
+      scope: "Requisitos para ligação ao RESP (Rede Elétrica de Serviço Público)",
+      force: "contractual",
+    },
+    meterBox: {
+      doc: "Especificação Técnica para Caixas de Contagem",
+      scope: "Dimensões, localização e acessibilidade da portinhola/caixa",
+      force: "contractual",
+    },
+    entryBoxSpecs: {
+      doc: "DMA-C62-815/N",
+      scope: "Especificação de caixas de entrada e portinholas",
+      force: "normative",
+    },
+    groundConnection: {
+      doc: "DMA-C63-200/N",
+      scope: "Ligação do elétrodo de terra ao neutro da rede (TN/TT)",
+      force: "normative",
+    },
+  },
+  /** Key Portuguese norms (NP/EN) */
+  norms: {
+    NP_EN_60364: "Instalações elétricas de baixa tensão (base do RTIEBT)",
+    NP_EN_62305: "Proteção contra descargas atmosféricas",
+    NP_EN_50160: "Qualidade da tensão de alimentação em redes públicas",
+    NP_EN_61439: "Conjuntos de aparelhagem de baixa tensão (quadros)",
+    EN_62196: "Tomadas para veículos elétricos (Modo 3)",
+  },
+} as const;
+
+// ============================================================
 // ITED - Infraestruturas de Telecomunicações em Edifícios
 // (DL 123/2009, Portaria 264/2023 - 4ª edição ITED)
 // ============================================================
@@ -423,6 +564,61 @@ export const ITUR_REQUIREMENTS = {
     required: true,
     projectRequired: true, // ITUR project mandatory
     installerLicenseRequired: true,
+  },
+} as const;
+
+// ============================================================
+// ANACOM - Technical Documents for ITED/ITUR
+// ============================================================
+
+/** ANACOM regulatory and technical documents */
+export const ANACOM_TECHNICAL_DOCS = {
+  /** Prescrições e Especificações Técnicas (PET) */
+  pet: {
+    doc: "PET - Prescrições e Especificações Técnicas",
+    scope: "Especificações obrigatórias para materiais e equipamentos ITED/ITUR",
+    force: "regulatory",
+    versions: {
+      ited4: "PET ITED 4ª Edição (2023)",
+      itur3: "PET ITUR 3ª Edição",
+    },
+  },
+  /** Installation certification requirements */
+  certification: {
+    doc: "Regulamento ANACOM n.º 123/2009",
+    scope: "Processo de certificação de instalações ITED/ITUR",
+    force: "legal",
+    requirements: {
+      installerLicense: "Credenciação ANACOM como instalador ITED",
+      certificationReport: "Relatório de certificação com ensaios",
+      technicianEI: "Engenheiro de Telecomunicações ou EI credenciado",
+    },
+  },
+  /** Conformity assessment for materials */
+  materialConformity: {
+    doc: "Regime de avaliação de conformidade de materiais ITED",
+    scope: "Materiais devem ter marca de conformidade ANACOM ou equivalente",
+    force: "regulatory",
+  },
+  /** ITED design requirements */
+  designRequirements: {
+    doc: "Manual ITED 4ª Edição - Capítulo de Projeto",
+    scope: "Regras de elaboração de projetos ITED",
+    force: "regulatory",
+    projectRequired: {
+      above1dwelling: true,
+      complexBuildings: true,
+      urbanizations: true,
+    },
+  },
+  /** Key telecom norms */
+  norms: {
+    EN_50173: "Cablagem genérica estruturada",
+    EN_50174: "Instalação de cablagem de telecomunicações",
+    EN_50346: "Ensaio de cablagem instalada",
+    IEC_61156: "Cabos metálicos de pares para telecomunicações",
+    IEC_60793: "Fibras ópticas",
+    EN_50117: "Cabos coaxiais",
   },
 } as const;
 
@@ -689,6 +885,73 @@ export const WASTE_REQUIREMENTS = {
 } as const;
 
 // ============================================================
+// AVAC - Aquecimento, Ventilação e Ar Condicionado
+// (RSECE anterior, agora integrado no RECS - DL 118/2013)
+// ============================================================
+
+export const AVAC_REQUIREMENTS = {
+  /** Ventilation rates - RECS Portaria 353-A/2013 */
+  ventilationRates: {
+    residential: {
+      livingAreas: 0.6, // h⁻¹ (REH)
+      kitchens: 60, // m³/h extraction
+      bathrooms: 45, // m³/h extraction
+    },
+    commercial: {
+      offices: 35, // m³/(h.pessoa) - RECS
+      retail: 30,
+      restaurants: 50,
+      classrooms: 30,
+    },
+  },
+  /** Indoor air quality - RECS Portaria 353-A/2013 */
+  indoorAirQuality: {
+    maxCO2: 1250, // ppm (above outdoor)
+    maxCO: 10, // mg/m³
+    maxFormaldehyde: 100, // μg/m³
+    maxPM2_5: 25, // μg/m³
+    maxPM10: 50, // μg/m³
+    maxTVOC: 600, // μg/m³
+    maxRadon: 300, // Bq/m³ (DL 108/2018)
+  },
+  /** Temperature comfort ranges */
+  comfortTemperature: {
+    heatingSetpoint: 20, // °C winter
+    coolingSetpoint: 25, // °C summer
+    maxHumidity: 70, // % relative
+    minHumidity: 30, // %
+  },
+  /** Ductwork requirements */
+  ductwork: {
+    minInsulationThickness: 25, // mm for non-residential
+    maxAirVelocity: {
+      mainDucts: 8, // m/s
+      branches: 5,
+      grilles: 3,
+    },
+    leakageClass: "B", // Minimum duct tightness class
+  },
+  /** Maintenance requirements - RECS */
+  maintenance: {
+    maintenancePlanRequired: true, // > 25kW installed
+    periodicInspection: {
+      boilers_20_100kW: 6, // years
+      boilers_above100kW: 3,
+      acSystems_12_100kW: 6,
+      acSystems_above100kW: 3,
+    },
+    technicianQualification: "TIM II ou TIM III (conforme potência)",
+  },
+  /** Refrigerant requirements - Regulamento F-Gas (EU 517/2014) */
+  refrigerants: {
+    fGasRegulation: true,
+    logRequired: true, // > 5 t CO2eq
+    leakCheckRequired: true,
+    maxGWP_2025: 750, // for splits < 3kg
+  },
+} as const;
+
+// ============================================================
 // CLIMATE DATA - Simplified by district
 // ============================================================
 
@@ -716,3 +979,95 @@ export const CLIMATE_DATA: Record<string, { winter: "I1" | "I2" | "I3"; summer: 
 };
 
 export const PORTUGAL_DISTRICTS = Object.keys(CLIMATE_DATA);
+
+// ============================================================
+// CÓDIGO CIVIL - Artigos relevantes para Projeto de Arquitetura
+// ============================================================
+
+export const CIVIL_CODE_BUILDING = {
+  /** Direito de propriedade e construção */
+  property: {
+    art1344: {
+      title: "Propriedade do solo",
+      scope: "Extensão do direito de propriedade ao espaço aéreo e subsolo",
+      article: "Art. 1344.º",
+    },
+    art1346: {
+      title: "Emissões",
+      scope: "Proibição de emissões de fumo, ruídos, etc. que prejudiquem vizinhos",
+      article: "Art. 1346.º",
+    },
+    art1347: {
+      title: "Instalações prejudiciais",
+      scope: "Distâncias mínimas para instalações que possam causar dano",
+      article: "Art. 1347.º",
+    },
+  },
+  /** Relações de vizinhança */
+  neighborRelations: {
+    art1349: {
+      title: "Construções e edificações",
+      scope: "Limitações à construção por razões de vizinhança",
+      article: "Art. 1349.º",
+    },
+    art1360: {
+      title: "Abertura de janelas e portas",
+      scope: "Distância mínima de 1.5m ao limite do prédio vizinho para janelas/varandas",
+      article: "Art. 1360.º",
+      minDistance: 1.5, // meters
+    },
+    art1361: {
+      title: "Frestas, seteiras e óculos",
+      scope: "Aberturas para luz e ar sem devassa visual",
+      article: "Art. 1361.º",
+    },
+    art1362: {
+      title: "Estilicídio",
+      scope: "Proibição de escorrência de águas pluviais para terreno vizinho",
+      article: "Art. 1362.º",
+    },
+    art1363: {
+      title: "Paredes e muros divisórios",
+      scope: "Regime de compropriedade de paredes divisórias",
+      article: "Art. 1363.º",
+    },
+    art1365: {
+      title: "Raízes e ramos invasores",
+      scope: "Direito de corte de raízes e ramos que invadam o prédio",
+      article: "Art. 1365.º",
+    },
+  },
+  /** Propriedade horizontal */
+  horizontalProperty: {
+    art1414: {
+      title: "Propriedade horizontal",
+      scope: "Regime de frações autónomas em edifícios",
+      article: "Art. 1414.º",
+    },
+    art1418: {
+      title: "Título constitutivo",
+      scope: "Conteúdo do título constitutivo da PH",
+      article: "Art. 1418.º",
+    },
+    art1420: {
+      title: "Partes comuns",
+      scope: "Definição de partes comuns do edifício",
+      article: "Art. 1420.º",
+    },
+    art1421: {
+      title: "Partes comuns imperativas",
+      scope: "Solo, telhado, colunas, paredes mestras, escadas, elevadores",
+      article: "Art. 1421.º",
+    },
+    art1422: {
+      title: "Limitações ao uso das frações",
+      scope: "Proibição de alterar fachada, estrutura e partes comuns",
+      article: "Art. 1422.º",
+    },
+    art1425: {
+      title: "Inovações",
+      scope: "Regime de obras nas partes comuns",
+      article: "Art. 1425.º",
+    },
+  },
+} as const;

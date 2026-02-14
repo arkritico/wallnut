@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import type { BuildingProject, BuildingType } from "@/lib/types";
+import { useState, useRef } from "react";
+import type { BuildingProject, BuildingType, LocalRegulationDoc } from "@/lib/types";
 import { CLIMATE_DATA, PORTUGAL_DISTRICTS } from "@/lib/regulations";
 import { DEFAULT_PROJECT } from "@/lib/defaults";
 
@@ -13,6 +13,7 @@ interface ProjectFormProps {
 export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
   const [project, setProject] = useState<BuildingProject>(DEFAULT_PROJECT);
   const [activeSection, setActiveSection] = useState<string>("general");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function updateField<K extends keyof BuildingProject>(key: K, value: BuildingProject[K]) {
     setProject(prev => ({ ...prev, [key]: value }));
@@ -122,26 +123,71 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     }));
   }
 
+  function updateArchitecture(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      architecture: { ...prev.architecture, [field]: value },
+    }));
+  }
+
+  function updateAVAC(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      avac: { ...prev.avac, [field]: value },
+    }));
+  }
+
+  function updateLocalRegulations(field: string, value: string) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: { ...prev.localRegulations, [field]: value },
+    }));
+  }
+
+  function addLocalDocument(doc: LocalRegulationDoc) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: {
+        ...prev.localRegulations,
+        documents: [...prev.localRegulations.documents, doc],
+      },
+    }));
+  }
+
+  function removeLocalDocument(id: string) {
+    setProject(prev => ({
+      ...prev,
+      localRegulations: {
+        ...prev.localRegulations,
+        documents: prev.localRegulations.documents.filter(d => d.id !== id),
+      },
+    }));
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onSubmit(project);
   }
 
+  // Organized by project specialty hierarchy
   const sections = [
     { id: "general", label: "Geral" },
+    { id: "architecture", label: "Arquitetura" },
+    { id: "structural", label: "Estruturas" },
+    { id: "fire", label: "Incêndio" },
+    { id: "avac", label: "AVAC" },
+    { id: "water", label: "Águas" },
+    { id: "gas", label: "Gás" },
+    { id: "electrical", label: "Elétrico" },
+    { id: "telecom", label: "ITED/ITUR" },
     { id: "envelope", label: "Envolvente" },
     { id: "systems", label: "Sistemas" },
     { id: "acoustic", label: "Acústica" },
     { id: "accessibility", label: "Acessibilidade" },
-    { id: "fire", label: "Incêndio" },
-    { id: "electrical", label: "Elétrico" },
-    { id: "telecom", label: "ITED/ITUR" },
-    { id: "gas", label: "Gás" },
-    { id: "water", label: "Águas" },
-    { id: "structural", label: "Estruturas" },
     { id: "elevators", label: "Ascensores" },
     { id: "licensing", label: "Licenciamento" },
     { id: "waste", label: "Resíduos" },
+    { id: "local", label: "Municipal" },
   ];
 
   return (
@@ -296,6 +342,182 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
             <label htmlFor="isRehab" className="text-sm text-gray-700">
               Projeto de Reabilitação
             </label>
+          </div>
+        </div>
+      )}
+
+      {/* Architecture Section */}
+      {activeSection === "architecture" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="md:col-span-2 font-semibold text-gray-800">Projeto de Arquitetura (RGEU)</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasBuildingPermit"
+              label="Projeto de Arquitetura Aprovado"
+              checked={project.architecture.hasBuildingPermitDesign}
+              onChange={v => updateArchitecture("hasBuildingPermitDesign", v)}
+            />
+            <CheckboxField
+              id="meetsRGEU"
+              label="Conformidade RGEU"
+              checked={project.architecture.meetsRGEU}
+              onChange={v => updateArchitecture("meetsRGEU", v)}
+            />
+            <CheckboxField
+              id="hasNaturalLight"
+              label="Iluminação Natural"
+              checked={project.architecture.hasNaturalLight}
+              onChange={v => updateArchitecture("hasNaturalLight", v)}
+            />
+            <CheckboxField
+              id="hasCrossVent"
+              label="Ventilação Cruzada"
+              checked={project.architecture.hasCrossVentilation}
+              onChange={v => updateArchitecture("hasCrossVentilation", v)}
+            />
+            <CheckboxField
+              id="hasRainDrain"
+              label="Drenagem Águas Pluviais (Estilicídio)"
+              checked={project.architecture.hasRainwaterDrainage}
+              onChange={v => updateArchitecture("hasRainwaterDrainage", v)}
+            />
+          </div>
+
+          <div>
+            <Label>Pé-direito (m)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={project.architecture.ceilingHeight ?? ""}
+              onChange={e => updateArchitecture("ceilingHeight", Number(e.target.value))}
+              placeholder="Ex: 2.70"
+            />
+          </div>
+
+          <div>
+            <Label>Distância Janelas ao Limite Vizinho (m)</Label>
+            <Input
+              type="number"
+              step="0.01"
+              value={project.architecture.windowDistanceToNeighbor ?? ""}
+              onChange={e => updateArchitecture("windowDistanceToNeighbor", Number(e.target.value))}
+              placeholder="Art. 1360.º CC - mín. 1.5m"
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Código Civil</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasCivilCode"
+              label="Conformidade Código Civil"
+              checked={project.architecture.hasCivilCodeCompliance}
+              onChange={v => updateArchitecture("hasCivilCodeCompliance", v)}
+            />
+            <CheckboxField
+              id="isHorizProp"
+              label="Propriedade Horizontal"
+              checked={project.architecture.isHorizontalProperty}
+              onChange={v => updateArchitecture("isHorizontalProperty", v)}
+            />
+            {project.architecture.isHorizontalProperty && (
+              <CheckboxField
+                id="respectsCommon"
+                label="Respeita Partes Comuns"
+                checked={project.architecture.respectsCommonParts}
+                onChange={v => updateArchitecture("respectsCommonParts", v)}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AVAC Section */}
+      {activeSection === "avac" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="md:col-span-2 font-semibold text-gray-800">Ventilação</h3>
+          <div>
+            <Label>Tipo de Ventilação</Label>
+            <Select
+              value={project.avac.ventilationType}
+              onChange={e => updateAVAC("ventilationType", e.target.value)}
+            >
+              <option value="natural">Natural</option>
+              <option value="mechanical_extract">Mecânica - Extração</option>
+              <option value="mechanical_supply_extract">Mecânica - Insuflação e Extração</option>
+              <option value="mixed">Mista</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasHVACProject"
+              label="Projeto AVAC"
+              checked={project.avac.hasHVACProject}
+              onChange={v => updateAVAC("hasHVACProject", v)}
+            />
+            <CheckboxField
+              id="hasVentSystem"
+              label="Sistema de Ventilação Mecânica"
+              checked={project.avac.hasVentilationSystem}
+              onChange={v => updateAVAC("hasVentilationSystem", v)}
+            />
+            <CheckboxField
+              id="hasKitchenExt"
+              label="Extração Cozinha"
+              checked={project.avac.hasKitchenExtraction}
+              onChange={v => updateAVAC("hasKitchenExtraction", v)}
+            />
+            <CheckboxField
+              id="hasBathExt"
+              label="Extração WC"
+              checked={project.avac.hasBathroomExtraction}
+              onChange={v => updateAVAC("hasBathroomExtraction", v)}
+            />
+            <CheckboxField
+              id="hasDuctwork"
+              label="Rede de Condutas"
+              checked={project.avac.hasDuctwork}
+              onChange={v => updateAVAC("hasDuctwork", v)}
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Qualidade do Ar e Manutenção</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasAirQuality"
+              label="Controlo QAI (RECS)"
+              checked={project.avac.hasAirQualityControl}
+              onChange={v => updateAVAC("hasAirQualityControl", v)}
+            />
+            <CheckboxField
+              id="hasMaintPlan"
+              label="Plano de Manutenção"
+              checked={project.avac.hasMaintenancePlan}
+              onChange={v => updateAVAC("hasMaintenancePlan", v)}
+            />
+            <CheckboxField
+              id="hasFGas"
+              label="Conformidade F-Gas"
+              checked={project.avac.hasFGasCompliance}
+              onChange={v => updateAVAC("hasFGasCompliance", v)}
+            />
+            <CheckboxField
+              id="hasRadon"
+              label="Proteção Radão (DL 108/2018)"
+              checked={project.avac.hasRadonProtection}
+              onChange={v => updateAVAC("hasRadonProtection", v)}
+            />
+          </div>
+
+          <div>
+            <Label>Potência AVAC Instalada (kW)</Label>
+            <Input
+              type="number"
+              step="0.1"
+              value={project.avac.installedHVACPower ?? ""}
+              onChange={e => updateAVAC("installedHVACPower", Number(e.target.value))}
+              placeholder="Opcional"
+            />
           </div>
         </div>
       )}
@@ -1673,6 +1895,89 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
               label="Área Protegida / Património"
               checked={project.licensing.isProtectedArea}
               onChange={v => updateLicensing("isProtectedArea", v)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Local/Municipal Section */}
+      {activeSection === "local" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="md:col-span-2">
+            <Label>Município</Label>
+            <Input
+              value={project.localRegulations.municipality}
+              onChange={e => updateLocalRegulations("municipality", e.target.value)}
+              placeholder="Ex: Lisboa, Porto, Coimbra..."
+            />
+          </div>
+
+          <div className="md:col-span-2 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="text-sm text-amber-800">
+              Os regulamentos municipais variam por concelho. Carregue documentação local (PDM, regulamentos de urbanização, etc.) para que a análise possa considerar regras específicas do município.
+            </p>
+          </div>
+
+          <div className="md:col-span-2">
+            <Label>Carregar Documento Local</Label>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.txt"
+                onChange={e => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    addLocalDocument({
+                      id: crypto.randomUUID(),
+                      name: file.name.replace(/\.[^.]+$/, ""),
+                      municipality: project.localRegulations.municipality,
+                      description: "",
+                      fileName: file.name,
+                      uploadedAt: new Date().toISOString(),
+                    });
+                    e.target.value = "";
+                  }
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm file:mr-4 file:py-1 file:px-4 file:rounded file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          </div>
+
+          {project.localRegulations.documents.length > 0 && (
+            <div className="md:col-span-2">
+              <Label>Documentos Carregados</Label>
+              <div className="space-y-2">
+                {project.localRegulations.documents.map(doc => (
+                  <div
+                    key={doc.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{doc.fileName}</p>
+                      <p className="text-xs text-gray-500">{doc.municipality} - {new Date(doc.uploadedAt).toLocaleDateString("pt-PT")}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeLocalDocument(doc.id)}
+                      className="ml-2 text-red-500 hover:text-red-700 text-sm font-medium"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="md:col-span-2">
+            <Label>Notas</Label>
+            <textarea
+              value={project.localRegulations.notes}
+              onChange={e => updateLocalRegulations("notes", e.target.value)}
+              placeholder="Notas adicionais sobre regulamentos locais aplicáveis..."
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>

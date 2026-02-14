@@ -18,39 +18,32 @@ export const DEFAULT_PROJECT: BuildingProject = {
   buildingHeight: 6,
   numberOfDwellings: 1,
 
-  envelope: {
-    externalWallUValue: 0.60,
-    externalWallArea: 200,
-    roofUValue: 0.50,
-    roofArea: 75,
-    floorUValue: 0.50,
-    floorArea: 75,
-    windowUValue: 3.10,
-    windowArea: 20,
-    windowSolarFactor: 0.50,
-    windowFrameType: "aluminum_no_break",
-    linearThermalBridges: 0.50,
-    airChangesPerHour: 0.5,
-    hasHRV: false,
+  // 1. Architecture
+  architecture: {
+    hasCivilCodeCompliance: false,
+    hasRainwaterDrainage: false,
+    isHorizontalProperty: false,
+    respectsCommonParts: true,
+    hasBuildingPermitDesign: false,
+    meetsRGEU: false,
+    hasNaturalLight: true,
+    hasCrossVentilation: false,
   },
 
-  systems: {
-    heatingSystem: "electric_radiator",
-    coolingSystem: "none",
-    dhwSystem: "gas_boiler",
-    hasSolarPV: false,
-    hasSolarThermal: false,
+  // 2. Structural
+  structural: {
+    structuralSystem: "reinforced_concrete",
+    seismicZone: "1.3",
+    soilType: "B",
+    importanceClass: "II",
+    hasStructuralProject: false,
+    hasGeotechnicalStudy: false,
+    foundationType: "shallow",
+    hasSeismicDesign: false,
+    ductilityClass: "DCM",
   },
 
-  accessibility: {
-    hasAccessibleEntrance: true,
-    hasElevator: false,
-    doorWidths: 0.80,
-    corridorWidths: 1.10,
-    hasAccessibleWC: false,
-    hasAccessibleParking: false,
-  },
-
+  // 3. Fire Safety
   fireSafety: {
     utilizationType: "I",
     riskCategory: "1",
@@ -65,6 +58,52 @@ export const DEFAULT_PROJECT: BuildingProject = {
     fireResistanceOfStructure: 30,
   },
 
+  // 4. AVAC
+  avac: {
+    hasHVACProject: false,
+    hasVentilationSystem: false,
+    ventilationType: "natural",
+    hasKitchenExtraction: true,
+    hasBathroomExtraction: false,
+    hasDuctwork: false,
+    hasAirQualityControl: false,
+    hasMaintenancePlan: false,
+    hasFGasCompliance: false,
+    hasRadonProtection: false,
+  },
+
+  // 5. Water & Drainage
+  waterDrainage: {
+    hasPublicWaterConnection: true,
+    waterPipeMaterial: "ppr",
+    hasWaterMeter: true,
+    hasCheckValve: false,
+    hasPressureReducer: false,
+    hotWaterRecirculation: false,
+    hasSeparateDrainageSystem: false,
+    hasVentilatedDrainage: false,
+    hasDrainageSiphons: true,
+    hasGreaseTrap: false,
+    hasStormwaterManagement: false,
+    hasWaterReuse: false,
+    hasBackflowPrevention: false,
+  },
+
+  // 6. Gas
+  gas: {
+    hasGasInstallation: false,
+    gasType: "none",
+    hasGasProject: false,
+    hasGasDetector: false,
+    hasEmergencyValve: false,
+    hasVentilation: false,
+    hasFlueSystem: false,
+    pipesMaterial: "none",
+    hasPressureTest: false,
+    hasGasCertification: false,
+  },
+
+  // 7. Electrical
   electrical: {
     supplyType: "single_phase",
     contractedPower: 6.9,
@@ -92,6 +131,7 @@ export const DEFAULT_PROJECT: BuildingProject = {
     hasSchematicDiagram: false,
   },
 
+  // 8. Telecommunications
   telecommunications: {
     itedEdition: "4",
     hasATE: false,
@@ -116,6 +156,32 @@ export const DEFAULT_PROJECT: BuildingProject = {
     installerITEDLicense: false,
   },
 
+  // 9-10. Envelope & Systems
+  envelope: {
+    externalWallUValue: 0.60,
+    externalWallArea: 200,
+    roofUValue: 0.50,
+    roofArea: 75,
+    floorUValue: 0.50,
+    floorArea: 75,
+    windowUValue: 3.10,
+    windowArea: 20,
+    windowSolarFactor: 0.50,
+    windowFrameType: "aluminum_no_break",
+    linearThermalBridges: 0.50,
+    airChangesPerHour: 0.5,
+    hasHRV: false,
+  },
+
+  systems: {
+    heatingSystem: "electric_radiator",
+    coolingSystem: "none",
+    dhwSystem: "gas_boiler",
+    hasSolarPV: false,
+    hasSolarThermal: false,
+  },
+
+  // 11. Acoustic
   acoustic: {
     buildingLocation: "mixed",
     hasAirborneInsulation: false,
@@ -125,47 +191,17 @@ export const DEFAULT_PROJECT: BuildingProject = {
     hasAcousticProject: false,
   },
 
-  gas: {
-    hasGasInstallation: false,
-    gasType: "none",
-    hasGasProject: false,
-    hasGasDetector: false,
-    hasEmergencyValve: false,
-    hasVentilation: false,
-    hasFlueSystem: false,
-    pipesMaterial: "none",
-    hasPressureTest: false,
-    hasGasCertification: false,
+  // 12. Accessibility
+  accessibility: {
+    hasAccessibleEntrance: true,
+    hasElevator: false,
+    doorWidths: 0.80,
+    corridorWidths: 1.10,
+    hasAccessibleWC: false,
+    hasAccessibleParking: false,
   },
 
-  waterDrainage: {
-    hasPublicWaterConnection: true,
-    waterPipeMaterial: "ppr",
-    hasWaterMeter: true,
-    hasCheckValve: false,
-    hasPressureReducer: false,
-    hotWaterRecirculation: false,
-    hasSeparateDrainageSystem: false,
-    hasVentilatedDrainage: false,
-    hasDrainageSiphons: true,
-    hasGreaseTrap: false,
-    hasStormwaterManagement: false,
-    hasWaterReuse: false,
-    hasBackflowPrevention: false,
-  },
-
-  structural: {
-    structuralSystem: "reinforced_concrete",
-    seismicZone: "1.3",
-    soilType: "B",
-    importanceClass: "II",
-    hasStructuralProject: false,
-    hasGeotechnicalStudy: false,
-    foundationType: "shallow",
-    hasSeismicDesign: false,
-    ductilityClass: "DCM",
-  },
-
+  // 13. Elevators
   elevators: {
     hasElevator: false,
     numberOfElevators: 0,
@@ -178,6 +214,7 @@ export const DEFAULT_PROJECT: BuildingProject = {
     hasAccessibleElevator: false,
   },
 
+  // 14. Licensing
   licensing: {
     projectPhase: "licensing",
     hasArchitecturalProject: false,
@@ -191,6 +228,7 @@ export const DEFAULT_PROJECT: BuildingProject = {
     isProtectedArea: false,
   },
 
+  // 15. Waste
   waste: {
     hasWasteManagementPlan: false,
     hasSortingOnSite: false,
@@ -199,5 +237,12 @@ export const DEFAULT_PROJECT: BuildingProject = {
     hasWasteRegistration: false,
     hasDemolitionAudit: false,
     recyclingPercentageTarget: 70,
+  },
+
+  // 16. Local Regulations
+  localRegulations: {
+    municipality: "Lisboa",
+    documents: [],
+    notes: "",
   },
 };

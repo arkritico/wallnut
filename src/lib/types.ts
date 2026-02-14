@@ -7,19 +7,22 @@ export type EnergyClass = "A+" | "A" | "B" | "B-" | "C" | "D" | "E" | "F";
 export type Severity = "critical" | "warning" | "info" | "pass";
 
 export type RegulationArea =
-  | "thermal"
-  | "acoustic"
+  | "architecture"
+  | "structural"
   | "fire_safety"
-  | "accessibility"
-  | "energy"
+  | "avac"
+  | "water_drainage"
+  | "gas"
   | "electrical"
   | "ited_itur"
-  | "gas"
-  | "water_drainage"
-  | "structural"
+  | "thermal"
+  | "acoustic"
+  | "accessibility"
+  | "energy"
   | "elevators"
   | "licensing"
   | "waste"
+  | "local"
   | "general";
 
 export interface BuildingProject {
@@ -37,44 +40,55 @@ export interface BuildingProject {
   buildingHeight: number; // meters
   numberOfDwellings?: number;
 
-  // Envelope
-  envelope: BuildingEnvelope;
+  // --- Organized by project specialty hierarchy ---
 
-  // Systems
-  systems: BuildingSystems;
+  // 1. Architecture (base project + Civil Code)
+  architecture: ArchitectureInfo;
 
-  // Accessibility
-  accessibility: AccessibilityInfo;
-
-  // Fire safety
-  fireSafety: FireSafetyInfo;
-
-  // Electrical installations
-  electrical: ElectricalInfo;
-
-  // Telecommunications (ITED/ITUR)
-  telecommunications: TelecomInfo;
-
-  // Acoustic
-  acoustic: AcousticInfo;
-
-  // Gas installations
-  gas: GasInfo;
-
-  // Water and drainage
-  waterDrainage: WaterDrainageInfo;
-
-  // Structural / Seismic
+  // 2. Structural / Seismic
   structural: StructuralInfo;
 
-  // Elevators
+  // 3. Fire Safety (SCIE + Notas Técnicas)
+  fireSafety: FireSafetyInfo;
+
+  // 4. AVAC (HVAC)
+  avac: AVACInfo;
+
+  // 5. Water and drainage (gravity systems)
+  waterDrainage: WaterDrainageInfo;
+
+  // 6. Gas installations
+  gas: GasInfo;
+
+  // 7. Electrical installations
+  electrical: ElectricalInfo;
+
+  // 8. Telecommunications (ITED/ITUR)
+  telecommunications: TelecomInfo;
+
+  // 9. Envelope (thermal)
+  envelope: BuildingEnvelope;
+
+  // 10. Systems (energy)
+  systems: BuildingSystems;
+
+  // 11. Acoustic
+  acoustic: AcousticInfo;
+
+  // 12. Accessibility
+  accessibility: AccessibilityInfo;
+
+  // 13. Elevators
   elevators: ElevatorInfo;
 
-  // Licensing (RJUE)
+  // 14. Licensing (RJUE)
   licensing: LicensingInfo;
 
-  // Construction waste
+  // 15. Construction waste
   waste: WasteInfo;
+
+  // 16. Local municipal regulations
+  localRegulations: LocalRegulationsInfo;
 }
 
 export interface PortugalLocation {
@@ -84,6 +98,49 @@ export interface PortugalLocation {
   distanceToCoast: number; // km
   climateZoneWinter: "I1" | "I2" | "I3";
   climateZoneSummer: "V1" | "V2" | "V3";
+}
+
+export interface ArchitectureInfo {
+  hasCivilCodeCompliance: boolean; // Conformidade com Código Civil
+  windowDistanceToNeighbor?: number; // Art. 1360.º - min 1.5m
+  hasRainwaterDrainage: boolean; // Art. 1362.º - estilicídio
+  isHorizontalProperty: boolean; // Propriedade horizontal
+  respectsCommonParts: boolean; // Art. 1421.º/1422.º
+  hasBuildingPermitDesign: boolean; // Projeto de arquitetura aprovado
+  meetsRGEU: boolean; // Conformidade RGEU (dimensões, alturas, luz natural)
+  ceilingHeight?: number; // Pé-direito (m)
+  hasNaturalLight: boolean; // Iluminação natural nos compartimentos principais
+  hasCrossVentilation: boolean; // Ventilação cruzada
+}
+
+export interface AVACInfo {
+  hasHVACProject: boolean; // Projeto AVAC
+  hasVentilationSystem: boolean; // Sistema de ventilação mecânica
+  ventilationType: "natural" | "mechanical_extract" | "mechanical_supply_extract" | "mixed";
+  hasKitchenExtraction: boolean; // Extração cozinha
+  hasBathroomExtraction: boolean; // Extração WC
+  hasDuctwork: boolean;
+  hasAirQualityControl: boolean; // Controlo QAI (RECS)
+  hasMaintenancePlan: boolean; // Plano de manutenção AVAC
+  installedHVACPower?: number; // kW total
+  hasFGasCompliance: boolean; // Conformidade com regulamento F-Gas
+  hasRadonProtection: boolean; // Proteção contra radão (DL 108/2018)
+}
+
+/** Local municipal regulations - user uploads */
+export interface LocalRegulationDoc {
+  id: string;
+  name: string;
+  municipality: string;
+  description: string;
+  fileName: string;
+  uploadedAt: string; // ISO date
+}
+
+export interface LocalRegulationsInfo {
+  municipality: string;
+  documents: LocalRegulationDoc[];
+  notes: string; // User notes about local requirements
 }
 
 export interface BuildingEnvelope {
