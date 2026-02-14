@@ -19,6 +19,9 @@ import {
   FIRE_DETECTION_REQUIREMENTS,
   ACCESSIBILITY_REQUIREMENTS,
   RENEWABLE_REQUIREMENTS,
+  ELECTRICAL_REQUIREMENTS,
+  ITED_REQUIREMENTS,
+  ITUR_REQUIREMENTS,
 } from "./regulations";
 
 let findingCounter = 0;
@@ -45,6 +48,8 @@ export function analyzeProject(project: BuildingProject): AnalysisResult {
   findings.push(...analyzeAccessibility(project));
   findings.push(...analyzeEnergy(project));
   findings.push(...analyzeGeneral(project));
+  findings.push(...analyzeElectrical(project));
+  findings.push(...analyzeTelecom(project));
 
   recommendations.push(...generateRecommendations(project, findings));
 
@@ -614,6 +619,513 @@ function analyzeGeneral(project: BuildingProject): Finding[] {
 }
 
 // ============================================================
+// ELECTRICAL ANALYSIS (RTIEBT)
+// ============================================================
+
+function analyzeElectrical(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { electrical } = project;
+
+  // Check power supply vs contracted power
+  if (electrical.contractedPower > ELECTRICAL_REQUIREMENTS.threePhaseThreshold && electrical.supplyType === "single_phase") {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 311 - Alimentação",
+      description: `A potência contratada (${electrical.contractedPower} kVA) excede o limite para alimentação monofásica (${ELECTRICAL_REQUIREMENTS.threePhaseThreshold} kVA). É obrigatória alimentação trifásica.`,
+      severity: "critical",
+      currentValue: `${electrical.contractedPower} kVA (monofásico)`,
+      requiredValue: `Trifásico acima de ${ELECTRICAL_REQUIREMENTS.threePhaseThreshold} kVA`,
+    });
+  }
+
+  // Check RCD (diferencial)
+  if (!electrical.hasResidualCurrentDevice) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 531.2 - Proteção Diferencial",
+      description: `O projeto não prevê dispositivo diferencial (RCD). A proteção diferencial é obrigatória em todas as instalações elétricas de baixa tensão.`,
+      severity: "critical",
+    });
+  } else {
+    if (electrical.rcdSensitivity > ELECTRICAL_REQUIREMENTS.rcd.highSensitivity) {
+      findings.push({
+        id: nextFindingId(),
+        area: "electrical",
+        regulation: "RTIEBT",
+        article: "Secção 531.2 - Sensibilidade do Diferencial",
+        description: `A sensibilidade do diferencial (${electrical.rcdSensitivity} mA) é insuficiente para circuitos de tomadas e zonas húmidas. É obrigatória proteção com sensibilidade ≤ 30 mA.`,
+        severity: "critical",
+        currentValue: `${electrical.rcdSensitivity} mA`,
+        requiredValue: `≤ ${ELECTRICAL_REQUIREMENTS.rcd.highSensitivity} mA`,
+      });
+    } else {
+      findings.push({
+        id: nextFindingId(),
+        area: "electrical",
+        regulation: "RTIEBT",
+        article: "Secção 531.2 - Proteção Diferencial",
+        description: `A proteção diferencial com sensibilidade de ${electrical.rcdSensitivity} mA cumpre o exigido.`,
+        severity: "pass",
+        currentValue: `${electrical.rcdSensitivity} mA`,
+        requiredValue: `≤ ${ELECTRICAL_REQUIREMENTS.rcd.highSensitivity} mA`,
+      });
+    }
+  }
+
+  // Check earthing system
+  if (!electrical.hasEarthingSystem) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 542 - Terra de Proteção",
+      description: `O projeto não prevê sistema de terra de proteção. O elétrodo de terra e a ligação à terra são obrigatórios em todas as instalações.`,
+      severity: "critical",
+    });
+  } else if (electrical.earthingResistance && electrical.earthingResistance > ELECTRICAL_REQUIREMENTS.maxEarthingResistance.recommended) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 542 - Resistência de Terra",
+      description: `A resistência do elétrodo de terra (${electrical.earthingResistance} Ω) é superior ao valor recomendado. Considerar melhorar o elétrodo de terra.`,
+      severity: "warning",
+      currentValue: `${electrical.earthingResistance} Ω`,
+      requiredValue: `≤ ${ELECTRICAL_REQUIREMENTS.maxEarthingResistance.recommended} Ω (recomendado)`,
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 542 - Terra de Proteção",
+      description: `O sistema de terra de proteção está previsto e a resistência cumpre os valores recomendados.`,
+      severity: "pass",
+    });
+  }
+
+  // Check equipotential bonding
+  if (!electrical.hasEquipotentialBonding) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 544 - Ligações Equipotenciais",
+      description: `Não estão previstas ligações equipotenciais. São obrigatórias as ligações equipotenciais principais e suplementares (casas de banho, cozinhas).`,
+      severity: "critical",
+    });
+  }
+
+  // Check main circuit breaker
+  if (!electrical.hasMainCircuitBreaker) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 530 - Aparelho de Corte Geral",
+      description: `Não está previsto disjuntor geral (aparelho de corte de entrada). É obrigatório um dispositivo de corte geral acessível na entrada da instalação.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 530 - Aparelho de Corte Geral",
+      description: `Disjuntor geral (aparelho de corte de entrada) está previsto.`,
+      severity: "pass",
+    });
+  }
+
+  // Check individual circuit protection
+  if (!electrical.hasIndividualCircuitProtection) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 533 - Proteção de Circuitos",
+      description: `Os circuitos individuais não possuem proteção própria. Cada circuito deve ter disjuntor/fusível dimensionado para a secção dos condutores.`,
+      severity: "critical",
+    });
+  }
+
+  // Check surge protection
+  if (!electrical.hasSurgeProtection && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 534 - Descarregadores de Sobretensões",
+      description: `Não está previsto descarregador de sobretensões (SPD). A proteção contra sobretensões transitórias é obrigatória em edifícios novos (Tipo 1+2 ou Tipo 2).`,
+      severity: "warning",
+    });
+  }
+
+  // Check minimum number of circuits
+  const dwellingSize = project.numberOfDwellings && project.numberOfDwellings > 0 ? "standard" : "small";
+  const minCircuits = project.grossFloorArea > 100 ? ELECTRICAL_REQUIREMENTS.minCircuits.t2t3 : ELECTRICAL_REQUIREMENTS.minCircuits.t0t1;
+  if (electrical.numberOfCircuits < minCircuits) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 801 - Circuitos Mínimos",
+      description: `O número de circuitos (${electrical.numberOfCircuits}) é inferior ao mínimo recomendado (${minCircuits}) para a tipologia da fração. Circuitos de iluminação, tomadas e equipamentos dedicados devem ser separados.`,
+      severity: "warning",
+      currentValue: `${electrical.numberOfCircuits} circuitos`,
+      requiredValue: `≥ ${minCircuits} circuitos`,
+    });
+  }
+
+  // Check bathroom zone compliance
+  if (!electrical.hasBathroomZoneCompliance) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 701 - Casas de Banho",
+      description: `Não é garantida a conformidade com as zonas de segurança das casas de banho (Zonas 0 a 3). Os equipamentos e aparelhagem devem respeitar os graus IP e restrições de cada zona.`,
+      severity: "warning",
+    });
+  }
+
+  // Check separate circuits
+  if (!electrical.hasSeparateLightingCircuits || !electrical.hasSeparateSocketCircuits) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 314 - Divisão em Circuitos",
+      description: `Os circuitos de iluminação e tomadas devem ser separados para garantir que uma avaria num circuito não afete toda a instalação.`,
+      severity: "warning",
+    });
+  }
+
+  // Check dedicated appliance circuits
+  if (!electrical.hasDedicatedApplianceCircuits) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 801 - Circuitos Dedicados",
+      description: `Equipamentos de potência elevada (forno, placa, máquina de lavar, secador) devem ter circuitos dedicados com proteção e secção de cabo adequadas.`,
+      severity: "warning",
+    });
+  }
+
+  // Check schematic diagram
+  if (!electrical.hasSchematicDiagram) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 514.5 - Documentação",
+      description: `O projeto deve incluir esquema unifilar da instalação elétrica, indicando circuitos, proteções, secções de cabos e potências.`,
+      severity: "warning",
+    });
+  }
+
+  // Check distribution board labelling
+  if (!electrical.hasDistributionBoardLabelling) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 514 - Identificação",
+      description: `O quadro elétrico deve ter identificação clara de todos os circuitos e respetivas proteções.`,
+      severity: "info",
+    });
+  }
+
+  // Check EV charging preparation for new buildings
+  if (!electrical.hasEVCharging && !project.isRehabilitation && project.buildingType === "residential") {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "DL 39/2010",
+      article: "Pré-instalação para VE",
+      description: `Edifícios residenciais novos com estacionamento devem prever pré-instalação para carregamento de veículos elétricos (mínimo ${ELECTRICAL_REQUIREMENTS.evCharging.minPowerPerSpot} kW por lugar).`,
+      severity: project.isRehabilitation ? "info" : "warning",
+    });
+  }
+
+  // Check outdoor IP protection
+  if (!electrical.hasOutdoorIPProtection) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Secção 512.2 - Proteção IP",
+      description: `Os equipamentos e aparelhagem instalados no exterior devem ter grau de proteção IP adequado (mínimo IP44 para uso exterior).`,
+      severity: "info",
+    });
+  }
+
+  // Check project approval for larger installations
+  if (!electrical.hasProjectApproval && electrical.contractedPower > 10.35) {
+    findings.push({
+      id: nextFindingId(),
+      area: "electrical",
+      regulation: "RTIEBT",
+      article: "Portaria 949-A/2006",
+      description: `Instalações com potência superior a 10,35 kVA requerem projeto de instalações elétricas elaborado por técnico responsável e aprovação pela DGEG.`,
+      severity: "critical",
+      currentValue: `${electrical.contractedPower} kVA`,
+      requiredValue: `Projeto obrigatório acima de 10.35 kVA`,
+    });
+  }
+
+  return findings;
+}
+
+// ============================================================
+// ITED / ITUR ANALYSIS
+// ============================================================
+
+function analyzeTelecom(project: BuildingProject): Finding[] {
+  const findings: Finding[] = [];
+  const { telecommunications: telecom } = project;
+  const isMultiDwelling = (project.numberOfDwellings ?? 1) > 1;
+
+  // --- ITED Analysis ---
+
+  // Check ITED edition
+  if (Number(telecom.itedEdition) < ITED_REQUIREMENTS.currentEdition && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "Manual ITED 4ª Edição",
+      description: `O projeto referencia a ${telecom.itedEdition}ª edição do manual ITED. A versão atual é a ${ITED_REQUIREMENTS.currentEdition}ª edição (Portaria 264/2023). Novos edifícios devem cumprir a edição em vigor.`,
+      severity: "warning",
+    });
+  }
+
+  // Check ATE requirement
+  if (isMultiDwelling && !telecom.hasATE) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "ATE - Armário de Telecomunicações de Edifício",
+      description: `O edifício tem ${project.numberOfDwellings} frações e não prevê ATE (Armário de Telecomunicações de Edifício). O ATE é obrigatório em edifícios com mais de 1 fração.`,
+      severity: "critical",
+    });
+  } else if (isMultiDwelling) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "ATE - Armário de Telecomunicações de Edifício",
+      description: `O ATE está previsto no projeto, conforme exigido.`,
+      severity: "pass",
+    });
+  }
+
+  // Check ATI requirement
+  if (!telecom.hasATI) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "ATI - Armário de Telecomunicações Individual",
+      description: `Não está previsto ATI (Armário de Telecomunicações Individual). Cada fração autónoma deve possuir um ATI para concentração das redes interiores.`,
+      severity: "critical",
+    });
+  } else {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "ATI - Armário de Telecomunicações Individual",
+      description: `O ATI está previsto para as frações.`,
+      severity: "pass",
+    });
+  }
+
+  // Check fiber optic (mandatory in 4th edition)
+  if (!telecom.hasFiberOptic && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - 4ª Edição",
+      article: "Cablagem em Fibra Óptica",
+      description: `O projeto não prevê cablagem em fibra óptica. A 4ª edição do ITED torna obrigatória a instalação de fibra óptica monomodo em edifícios novos.`,
+      severity: "critical",
+    });
+  } else if (telecom.hasFiberOptic) {
+    if (telecom.fiberType !== ITED_REQUIREMENTS.cabling.fiberType) {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITED - 4ª Edição",
+        article: "Tipo de Fibra Óptica",
+        description: `A fibra óptica prevista é do tipo ${telecom.fiberType === "multi_mode" ? "multimodo" : telecom.fiberType}. A 4ª edição do ITED exige fibra monomodo (single mode) para novas instalações.`,
+        severity: "warning",
+      });
+    } else {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITED - 4ª Edição",
+        article: "Cablagem em Fibra Óptica",
+        description: `Fibra óptica monomodo prevista, conforme exigido.`,
+        severity: "pass",
+      });
+    }
+  }
+
+  // Check copper cabling category
+  if (telecom.hasCopperCabling) {
+    const catOrder = ["none", "5e", "6", "6a", "7"];
+    const minIdx = catOrder.indexOf(ITED_REQUIREMENTS.cabling.minCopperCategory);
+    const curIdx = catOrder.indexOf(telecom.copperCableCategory);
+    if (curIdx < minIdx) {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITED - 4ª Edição",
+        article: "Cablagem de Par de Cobre",
+        description: `A cablagem de par de cobre é Categoria ${telecom.copperCableCategory}. A 4ª edição do ITED exige no mínimo Categoria ${ITED_REQUIREMENTS.cabling.minCopperCategory} para novas instalações.`,
+        severity: "warning",
+        currentValue: `Cat. ${telecom.copperCableCategory}`,
+        requiredValue: `≥ Cat. ${ITED_REQUIREMENTS.cabling.minCopperCategory}`,
+      });
+    } else {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITED - 4ª Edição",
+        article: "Cablagem de Par de Cobre",
+        description: `Cablagem de par de cobre Categoria ${telecom.copperCableCategory} cumpre o mínimo exigido.`,
+        severity: "pass",
+      });
+    }
+  }
+
+  // Check coaxial cabling
+  if (!telecom.hasCoaxialCabling && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - 4ª Edição",
+      article: "Cablagem Coaxial",
+      description: `Não está prevista cablagem coaxial. Apesar da tendência para IPTV, o cabo coaxial continua a ser exigido pelo ITED para distribuição de sinais CATV/MATV.`,
+      severity: "warning",
+    });
+  }
+
+  // Check minimum outlets
+  const dwellings = project.numberOfDwellings ?? 1;
+  const outletSize = project.grossFloorArea / dwellings;
+  const minRJ45 = outletSize > 120 ? ITED_REQUIREMENTS.outlets.rj45.t4plus
+    : outletSize > 90 ? ITED_REQUIREMENTS.outlets.rj45.t3
+    : outletSize > 60 ? ITED_REQUIREMENTS.outlets.rj45.t2
+    : ITED_REQUIREMENTS.outlets.rj45.t0t1;
+
+  if (telecom.rj45OutletsPerDwelling < minRJ45) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - 4ª Edição",
+      article: "Tomadas RJ45 Mínimas",
+      description: `O número de tomadas RJ45 por fração (${telecom.rj45OutletsPerDwelling}) é inferior ao mínimo exigido (${minRJ45}) para a tipologia estimada.`,
+      severity: "warning",
+      currentValue: `${telecom.rj45OutletsPerDwelling} tomadas RJ45`,
+      requiredValue: `≥ ${minRJ45} tomadas RJ45`,
+    });
+  }
+
+  if (telecom.fiberOutletsPerDwelling < ITED_REQUIREMENTS.outlets.fiber.minimum && telecom.hasFiberOptic) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - 4ª Edição",
+      article: "Tomadas de Fibra Óptica",
+      description: `Cada fração deve ter pelo menos ${ITED_REQUIREMENTS.outlets.fiber.minimum} tomada de fibra óptica no ATI.`,
+      severity: "warning",
+    });
+  }
+
+  // Check riser/ducting
+  if (isMultiDwelling && !telecom.hasRiserCableway) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "Caminhos de Cabos",
+      description: `Em edifícios com múltiplas frações, é obrigatória a coluna montante (caminhos de cabos verticais) entre o ATE e os pisos/frações.`,
+      severity: "critical",
+    });
+  }
+
+  // Check certification
+  if (!telecom.hasITEDCertification && !project.isRehabilitation) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "Certificação ITED",
+      description: `A instalação ITED requer certificação por instalador credenciado pela ANACOM. A certificação é obrigatória para obtenção de licença de utilização.`,
+      severity: "warning",
+    });
+  }
+
+  if (!telecom.installerITEDLicense) {
+    findings.push({
+      id: nextFindingId(),
+      area: "ited_itur",
+      regulation: "ITED - DL 123/2009",
+      article: "Instalador Credenciado",
+      description: `A execução do projeto ITED deve ser realizada por instalador com credenciação válida emitida pela ANACOM.`,
+      severity: "warning",
+    });
+  }
+
+  // --- ITUR Analysis (only for urbanizations) ---
+  if (telecom.isUrbanization) {
+    if (!telecom.hasITURProject) {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITUR - DL 123/2009",
+        article: "Projeto ITUR",
+        description: `Loteamentos e urbanizações requerem projeto ITUR aprovado. O projeto deve prever infraestruturas subterrâneas para telecomunicações multi-operador.`,
+        severity: "critical",
+      });
+    }
+
+    if (!telecom.hasUndergroundDucts) {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITUR - Manual 3ª Edição",
+        article: "Infraestrutura Subterrânea",
+        description: `O ITUR exige infraestrutura de tubagem subterrânea em PEAD (diâmetro mínimo ${ITUR_REQUIREMENTS.undergroundDucts.minDuctDiameter}mm, mínimo ${ITUR_REQUIREMENTS.undergroundDucts.minNumberOfDucts} tubos por percurso, profundidade ≥ ${ITUR_REQUIREMENTS.undergroundDucts.minDepth}m).`,
+        severity: "critical",
+      });
+    }
+
+    if (!telecom.hasCEE) {
+      findings.push({
+        id: nextFindingId(),
+        area: "ited_itur",
+        regulation: "ITUR - Manual 3ª Edição",
+        article: "CEE - Câmara de Entrada de Edifício",
+        description: `Cada edifício da urbanização deve possuir CEE (Câmara de Entrada de Edifício) para transição entre a rede ITUR e a rede ITED do edifício.`,
+        severity: "critical",
+      });
+    }
+  }
+
+  return findings;
+}
+
+// ============================================================
 // RECOMMENDATIONS ENGINE
 // ============================================================
 
@@ -761,6 +1273,97 @@ function generateRecommendations(project: BuildingProject, findings: Finding[]):
     });
   }
 
+  // Electrical improvements
+  if (criticalAreas.has("electrical") || warningAreas.has("electrical")) {
+    if (!project.electrical.hasResidualCurrentDevice || project.electrical.rcdSensitivity > 30) {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "electrical",
+        title: "Instalação de proteção diferencial adequada",
+        description: `Instalar disjuntores diferenciais de 30 mA (alta sensibilidade) em todos os circuitos de tomadas e zonas húmidas. Considerar diferenciais do tipo A ou tipo B para proteção contra correntes de defeito contínuas (inversores, VE).`,
+        impact: "high",
+        regulatoryBasis: "RTIEBT - Secção 531.2",
+      });
+    }
+
+    if (!project.electrical.hasSurgeProtection) {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "electrical",
+        title: "Instalação de descarregador de sobretensões (SPD)",
+        description: `Instalar SPD Tipo 2 (ou Tipo 1+2 combinado em zonas com risco de descargas atmosféricas) no quadro elétrico principal. Protege equipamentos eletrónicos sensíveis contra sobretensões transitórias.`,
+        impact: "medium",
+        regulatoryBasis: "RTIEBT - Secção 534",
+      });
+    }
+
+    if (!project.electrical.hasEVCharging && project.buildingType === "residential") {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "electrical",
+        title: "Pré-instalação para veículo elétrico",
+        description: `Prever pré-instalação de circuito dedicado para carregamento de veículo elétrico (mínimo ${ELECTRICAL_REQUIREMENTS.evCharging.minPowerPerSpot} kW). Incluir tubagem, cablagem dimensionada e proteção no quadro. O custo de pré-instalação é muito inferior ao da instalação posterior.`,
+        impact: "medium",
+        regulatoryBasis: "DL 39/2010 - Mobilidade Elétrica",
+      });
+    }
+
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "electrical",
+      title: "Revisão do projeto elétrico por técnico responsável",
+      description: `Garantir que o projeto elétrico é elaborado e assinado por técnico responsável (engenheiro eletrotécnico ou técnico DGEG). O projeto deve incluir esquema unifilar, memória descritiva, cálculos de dimensionamento e verificação de quedas de tensão.`,
+      impact: "high",
+      regulatoryBasis: "RTIEBT - Portaria 949-A/2006",
+    });
+  }
+
+  // ITED/ITUR improvements
+  if (criticalAreas.has("ited_itur") || warningAreas.has("ited_itur")) {
+    if (!project.telecommunications.hasFiberOptic) {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "ited_itur",
+        title: "Instalação de fibra óptica monomodo",
+        description: `A 4ª edição do ITED exige fibra óptica monomodo. Mesmo em reabilitação, a instalação de fibra é fortemente recomendada para preparar o edifício para serviços de banda larga de nova geração (≥1 Gbps).`,
+        impact: "high",
+        regulatoryBasis: "ITED 4ª Edição - Portaria 264/2023",
+      });
+    }
+
+    if (!project.telecommunications.hasATI) {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "ited_itur",
+        title: "Instalação de ATI em cada fração",
+        description: `Instalar Armário de Telecomunicações Individual (ATI) em cada fração para centralizar a distribuição de redes internas. O ATI deve ter dimensões mínimas de 30x50x12 cm e estar acessível.`,
+        impact: "high",
+        regulatoryBasis: "ITED - DL 123/2009",
+      });
+    }
+
+    const copperCategory = project.telecommunications.copperCableCategory;
+    if (copperCategory === "5e" || copperCategory === "none") {
+      recommendations.push({
+        id: nextRecommendationId(),
+        area: "ited_itur",
+        title: "Upgrade de cablagem de par de cobre",
+        description: `Utilizar cablagem UTP mínimo Categoria 6 (de preferência Cat. 6a) para suportar velocidades de 1-10 Gbps. A Cat. 5e limita a velocidade a 1 Gbps e distâncias menores.`,
+        impact: "medium",
+        regulatoryBasis: "ITED 4ª Edição",
+      });
+    }
+
+    recommendations.push({
+      id: nextRecommendationId(),
+      area: "ited_itur",
+      title: "Certificação ITED por instalador credenciado",
+      description: `A certificação ITED é obrigatória para obtenção da licença de utilização. Contratar instalador com credenciação ANACOM válida. O certificado ITED é emitido após ensaios e verificação da instalação.`,
+      impact: "high",
+      regulatoryBasis: "ITED - DL 123/2009",
+    });
+  }
+
   // General best-practice recommendations (always included)
   recommendations.push({
     id: nextRecommendationId(),
@@ -794,6 +1397,8 @@ function buildRegulationSummary(findings: Finding[]): RegulationSummary[] {
     { area: "fire_safety", name: "Segurança Contra Incêndio (SCIE)" },
     { area: "accessibility", name: "Acessibilidade (DL 163/2006)" },
     { area: "energy", name: "Eficiência Energética (SCE)" },
+    { area: "electrical", name: "Instalações Elétricas (RTIEBT)" },
+    { area: "ited_itur", name: "Telecomunicações (ITED/ITUR)" },
     { area: "general", name: "Regulamento Geral (RGEU)" },
   ];
 

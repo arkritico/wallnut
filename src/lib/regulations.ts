@@ -256,6 +256,169 @@ export const ENERGY_CLASS_THRESHOLDS = {
 } as const;
 
 // ============================================================
+// ELECTRICAL INSTALLATIONS (RTIEBT) - Regras Técnicas das
+// Instalações Elétricas de Baixa Tensão
+// ============================================================
+
+/** RTIEBT - Protection requirements */
+export const ELECTRICAL_REQUIREMENTS = {
+  /** Maximum earthing resistance (Ohms) - RTIEBT 542 */
+  maxEarthingResistance: {
+    tn: 20, // TN system
+    tt_30mA: 1667, // TT with 30mA RCD (Vl/Ia = 50/0.03)
+    tt_300mA: 167, // TT with 300mA RCD
+    recommended: 20, // Best practice
+  },
+  /** RCD (diferencial) requirements - RTIEBT 531.2 */
+  rcd: {
+    /** 30mA for socket circuits and wet areas */
+    highSensitivity: 30, // mA
+    /** 300mA for other circuits */
+    mediumSensitivity: 300, // mA
+  },
+  /** Bathroom zones - RTIEBT 701 */
+  bathroomZones: {
+    zone0: { ipRating: "IPX7", maxVoltage: 12 }, // Inside bath/shower
+    zone1: { ipRating: "IPX5", maxVoltage: 12 }, // Above bath up to 2.25m
+    zone2: { ipRating: "IPX4", allowedEquipment: "Class II" }, // 0.6m from zone 1
+    zone3: { ipRating: "IPX1", allowedEquipment: "RCD protected" }, // Beyond zone 2
+  },
+  /** Minimum number of circuits per dwelling - RTIEBT 801 */
+  minCircuits: {
+    t0t1: 3, // T0-T1: illumination, sockets, dedicated
+    t2t3: 5, // T2-T3: illumination, sockets, kitchen, dedicated, washing
+    t4plus: 7, // T4+: + additional dedicated circuits
+  },
+  /** Minimum socket outlets per room - RTIEBT 801.5 */
+  minSockets: {
+    livingRoom: 5,
+    bedroom: 3,
+    kitchen: 4, // + dedicated for appliances
+    bathroom: 1, // zone 3 only
+    hallway: 1,
+  },
+  /** Cable sizing minimum cross-sections (mm²) - RTIEBT 524 */
+  minCableSections: {
+    lighting: 1.5,
+    sockets: 2.5,
+    dedicatedAppliances: 4.0, // hob, oven, etc.
+    mainSupply_singlePhase: 6.0,
+    mainSupply_threePhase: 4.0,
+  },
+  /** Contracted power thresholds (kVA) requiring 3-phase */
+  threePhaseThreshold: 13.8, // Above 13.8 kVA requires 3-phase
+  /** Surge protection (SPD) required for new buildings - RTIEBT 534 */
+  surgeProtectionRequired: true,
+  /** EV charging pre-installation requirements (DL 39/2010) */
+  evCharging: {
+    requiredInNewBuildings: true, // New residential with parking
+    minPowerPerSpot: 3.7, // kW (single-phase 16A)
+  },
+} as const;
+
+// ============================================================
+// ITED - Infraestruturas de Telecomunicações em Edifícios
+// (DL 123/2009, Portaria 264/2023 - 4ª edição ITED)
+// ============================================================
+
+export const ITED_REQUIREMENTS = {
+  /** Current edition */
+  currentEdition: 4,
+  /** ATE (Armário de Telecomunicações de Edifício) requirements */
+  ate: {
+    requiredAbove: 1, // Required for buildings with > 1 dwelling
+    minDimensions: { width: 0.40, height: 0.60, depth: 0.20 }, // meters, small buildings
+  },
+  /** ATI (Armário de Telecomunicações Individual) per dwelling */
+  ati: {
+    required: true,
+    minDimensions: { width: 0.30, height: 0.50, depth: 0.12 }, // meters
+  },
+  /** Minimum cabling requirements per dwelling (4th edition) */
+  cabling: {
+    /** Minimum Category 6 UTP for new installations */
+    minCopperCategory: "6" as const,
+    /** Fiber optic is mandatory in new buildings (4th edition) */
+    fiberRequired: true,
+    fiberType: "single_mode" as const,
+    /** Coaxial still required for TV distribution */
+    coaxialRequired: true,
+  },
+  /** Minimum outlets per dwelling - ITED 4th edition */
+  outlets: {
+    /** Minimum RJ45 outlets */
+    rj45: {
+      t0t1: 2, // T0-T1: minimum 2
+      t2: 3, // T2: minimum 3
+      t3: 4, // T3: minimum 4
+      t4plus: 5, // T4+: minimum 5
+    },
+    /** Minimum coaxial outlets */
+    coaxial: {
+      t0t1: 1,
+      t2: 2,
+      t3: 2,
+      t4plus: 3,
+    },
+    /** Fiber optic outlets (4th edition) */
+    fiber: {
+      minimum: 1, // At least 1 FO outlet per dwelling
+    },
+  },
+  /** Tubagem (ducting) requirements */
+  ducting: {
+    minDiameterIndividual: 25, // mm - tube to dwelling
+    minDiameterRiser: 40, // mm - column/riser
+    minDiameterEntry: 63, // mm - building entry
+  },
+  /** Certification */
+  certification: {
+    required: true,
+    installerLicenseRequired: true, // ANACOM credentialed installer
+    certificationEntity: "ANACOM",
+  },
+} as const;
+
+// ============================================================
+// ITUR - Infraestruturas de Telecomunicações em Urbanizações
+// (DL 123/2009, Manual ITUR - 3ª edição)
+// ============================================================
+
+export const ITUR_REQUIREMENTS = {
+  /** Current edition */
+  currentEdition: 3,
+  /** Underground duct requirements */
+  undergroundDucts: {
+    required: true,
+    minDuctDiameter: 110, // mm - PEAD tubes
+    minNumberOfDucts: 2, // minimum tubes per path
+    minDepth: 0.60, // meters - minimum burial depth
+  },
+  /** CEE (Câmara de Entrada de Edifício) */
+  cee: {
+    required: true,
+    minDimensions: { width: 0.60, height: 0.60, depth: 0.60 }, // meters
+  },
+  /** CVM (Câmara de Visita Multi-operador) */
+  cvm: {
+    requiredAtIntersections: true,
+    maxDistanceBetween: 80, // meters
+  },
+  /** Fiber optic in urbanizations */
+  fiber: {
+    required: true,
+    type: "single_mode" as const,
+    minFibersPerLot: 2,
+  },
+  /** Certification requirements */
+  certification: {
+    required: true,
+    projectRequired: true, // ITUR project mandatory
+    installerLicenseRequired: true,
+  },
+} as const;
+
+// ============================================================
 // CLIMATE DATA - Simplified by district
 // ============================================================
 

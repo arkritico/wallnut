@@ -59,6 +59,20 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     }));
   }
 
+  function updateElectrical(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      electrical: { ...prev.electrical, [field]: value },
+    }));
+  }
+
+  function updateTelecom(field: string, value: string | number | boolean) {
+    setProject(prev => ({
+      ...prev,
+      telecommunications: { ...prev.telecommunications, [field]: value },
+    }));
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onSubmit(project);
@@ -70,6 +84,8 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
     { id: "systems", label: "Sistemas" },
     { id: "accessibility", label: "Acessibilidade" },
     { id: "fire", label: "Incêndio" },
+    { id: "electrical", label: "Elétrico" },
+    { id: "telecom", label: "ITED/ITUR" },
   ];
 
   return (
@@ -696,6 +712,367 @@ export default function ProjectForm({ onSubmit, isLoading }: ProjectFormProps) {
               onChange={v => updateFireSafety("hasFireExtinguishers", v)}
             />
           </div>
+        </div>
+      )}
+
+      {/* Electrical Section */}
+      {activeSection === "electrical" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="md:col-span-2 font-semibold text-gray-800">Alimentação</h3>
+          <div>
+            <Label>Tipo de Alimentação</Label>
+            <Select
+              value={project.electrical.supplyType}
+              onChange={e => updateElectrical("supplyType", e.target.value)}
+            >
+              <option value="single_phase">Monofásica</option>
+              <option value="three_phase">Trifásica</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Potência Contratada (kVA)</Label>
+            <Input
+              type="number"
+              step="0.1"
+              value={project.electrical.contractedPower}
+              onChange={e => updateElectrical("contractedPower", Number(e.target.value))}
+            />
+          </div>
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="hasProjectApproval"
+              checked={project.electrical.hasProjectApproval}
+              onChange={e => updateElectrical("hasProjectApproval", e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300"
+            />
+            <label htmlFor="hasProjectApproval" className="text-sm text-gray-700">
+              Projeto Aprovado (DGEG)
+            </label>
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Proteções</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasMainCB"
+              label="Disjuntor Geral"
+              checked={project.electrical.hasMainCircuitBreaker}
+              onChange={v => updateElectrical("hasMainCircuitBreaker", v)}
+            />
+            <CheckboxField
+              id="hasRCD"
+              label="Diferencial (RCD)"
+              checked={project.electrical.hasResidualCurrentDevice}
+              onChange={v => updateElectrical("hasResidualCurrentDevice", v)}
+            />
+            <CheckboxField
+              id="hasCircuitProt"
+              label="Proteção por Circuito"
+              checked={project.electrical.hasIndividualCircuitProtection}
+              onChange={v => updateElectrical("hasIndividualCircuitProtection", v)}
+            />
+            <CheckboxField
+              id="hasSPD"
+              label="Descarregador Sobretensões (SPD)"
+              checked={project.electrical.hasSurgeProtection}
+              onChange={v => updateElectrical("hasSurgeProtection", v)}
+            />
+          </div>
+          {project.electrical.hasResidualCurrentDevice && (
+            <div>
+              <Label>Sensibilidade do Diferencial (mA)</Label>
+              <Select
+                value={String(project.electrical.rcdSensitivity)}
+                onChange={e => updateElectrical("rcdSensitivity", Number(e.target.value))}
+              >
+                <option value="30">30 mA (Alta Sensibilidade)</option>
+                <option value="100">100 mA</option>
+                <option value="300">300 mA</option>
+              </Select>
+            </div>
+          )}
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Terra e Equipotenciais</h3>
+          <div className="md:col-span-2 grid grid-cols-2 gap-3">
+            <CheckboxField
+              id="hasEarthing"
+              label="Sistema de Terra"
+              checked={project.electrical.hasEarthingSystem}
+              onChange={v => updateElectrical("hasEarthingSystem", v)}
+            />
+            <CheckboxField
+              id="hasEquipotential"
+              label="Ligações Equipotenciais"
+              checked={project.electrical.hasEquipotentialBonding}
+              onChange={v => updateElectrical("hasEquipotentialBonding", v)}
+            />
+          </div>
+          {project.electrical.hasEarthingSystem && (
+            <div>
+              <Label>Resistência de Terra (Ohms)</Label>
+              <Input
+                type="number"
+                step="1"
+                value={project.electrical.earthingResistance ?? 20}
+                onChange={e => updateElectrical("earthingResistance", Number(e.target.value))}
+              />
+            </div>
+          )}
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Circuitos e Cablagem</h3>
+          <div>
+            <Label>Tipo de Canalização</Label>
+            <Select
+              value={project.electrical.wiringType}
+              onChange={e => updateElectrical("wiringType", e.target.value)}
+            >
+              <option value="embedded">Embebida (Embutida)</option>
+              <option value="surface">Aparente / Calha</option>
+              <option value="cable_tray">Esteira de Cabos</option>
+            </Select>
+          </div>
+          <div>
+            <Label>Número de Circuitos</Label>
+            <Input
+              type="number"
+              min={1}
+              value={project.electrical.numberOfCircuits}
+              onChange={e => updateElectrical("numberOfCircuits", Number(e.target.value))}
+            />
+          </div>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasSepLight"
+              label="Circuitos Iluminação Separados"
+              checked={project.electrical.hasSeparateLightingCircuits}
+              onChange={v => updateElectrical("hasSeparateLightingCircuits", v)}
+            />
+            <CheckboxField
+              id="hasSepSocket"
+              label="Circuitos Tomadas Separados"
+              checked={project.electrical.hasSeparateSocketCircuits}
+              onChange={v => updateElectrical("hasSeparateSocketCircuits", v)}
+            />
+            <CheckboxField
+              id="hasDedicated"
+              label="Circuitos Dedicados (Forno, etc.)"
+              checked={project.electrical.hasDedicatedApplianceCircuits}
+              onChange={v => updateElectrical("hasDedicatedApplianceCircuits", v)}
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Zonas Especiais e Extras</h3>
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasBathZone"
+              label="Conformidade Zonas WC"
+              checked={project.electrical.hasBathroomZoneCompliance}
+              onChange={v => updateElectrical("hasBathroomZoneCompliance", v)}
+            />
+            <CheckboxField
+              id="hasOutdoorIP"
+              label="IP Adequado Exterior"
+              checked={project.electrical.hasOutdoorIPProtection}
+              onChange={v => updateElectrical("hasOutdoorIPProtection", v)}
+            />
+            <CheckboxField
+              id="hasEV"
+              label="Carregamento VE"
+              checked={project.electrical.hasEVCharging}
+              onChange={v => updateElectrical("hasEVCharging", v)}
+            />
+            <CheckboxField
+              id="hasSchematic"
+              label="Esquema Unifilar"
+              checked={project.electrical.hasSchematicDiagram}
+              onChange={v => updateElectrical("hasSchematicDiagram", v)}
+            />
+            <CheckboxField
+              id="hasBoardLabel"
+              label="Quadro Identificado"
+              checked={project.electrical.hasDistributionBoardLabelling}
+              onChange={v => updateElectrical("hasDistributionBoardLabelling", v)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ITED/ITUR Section */}
+      {activeSection === "telecom" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h3 className="md:col-span-2 font-semibold text-gray-800">ITED - Infraestrutura do Edifício</h3>
+          <div>
+            <Label>Edição do Manual ITED</Label>
+            <Select
+              value={project.telecommunications.itedEdition}
+              onChange={e => updateTelecom("itedEdition", e.target.value)}
+            >
+              <option value="4">4ª Edição (2023 - Atual)</option>
+              <option value="3">3ª Edição</option>
+              <option value="2">2ª Edição</option>
+              <option value="1">1ª Edição</option>
+            </Select>
+          </div>
+
+          <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasATE"
+              label="ATE (Edifício)"
+              checked={project.telecommunications.hasATE}
+              onChange={v => updateTelecom("hasATE", v)}
+            />
+            <CheckboxField
+              id="hasATI"
+              label="ATI (Individual)"
+              checked={project.telecommunications.hasATI}
+              onChange={v => updateTelecom("hasATI", v)}
+            />
+            <CheckboxField
+              id="hasRiser"
+              label="Coluna Montante"
+              checked={project.telecommunications.hasRiserCableway}
+              onChange={v => updateTelecom("hasRiserCableway", v)}
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Cablagem</h3>
+          <div className="md:col-span-2 grid grid-cols-3 gap-3">
+            <CheckboxField
+              id="hasCopper"
+              label="Par de Cobre (UTP)"
+              checked={project.telecommunications.hasCopperCabling}
+              onChange={v => updateTelecom("hasCopperCabling", v)}
+            />
+            <CheckboxField
+              id="hasFiber"
+              label="Fibra Óptica"
+              checked={project.telecommunications.hasFiberOptic}
+              onChange={v => updateTelecom("hasFiberOptic", v)}
+            />
+            <CheckboxField
+              id="hasCoax"
+              label="Cabo Coaxial"
+              checked={project.telecommunications.hasCoaxialCabling}
+              onChange={v => updateTelecom("hasCoaxialCabling", v)}
+            />
+          </div>
+
+          {project.telecommunications.hasCopperCabling && (
+            <div>
+              <Label>Categoria do Cabo UTP</Label>
+              <Select
+                value={project.telecommunications.copperCableCategory}
+                onChange={e => updateTelecom("copperCableCategory", e.target.value)}
+              >
+                <option value="5e">Categoria 5e</option>
+                <option value="6">Categoria 6</option>
+                <option value="6a">Categoria 6a</option>
+                <option value="7">Categoria 7</option>
+              </Select>
+            </div>
+          )}
+
+          {project.telecommunications.hasFiberOptic && (
+            <div>
+              <Label>Tipo de Fibra</Label>
+              <Select
+                value={project.telecommunications.fiberType}
+                onChange={e => updateTelecom("fiberType", e.target.value)}
+              >
+                <option value="single_mode">Monomodo (Single Mode)</option>
+                <option value="multi_mode">Multimodo (Multi Mode)</option>
+              </Select>
+            </div>
+          )}
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Tomadas por Fração</h3>
+          <div>
+            <Label>Tomadas RJ45</Label>
+            <Input
+              type="number"
+              min={0}
+              value={project.telecommunications.rj45OutletsPerDwelling}
+              onChange={e => updateTelecom("rj45OutletsPerDwelling", Number(e.target.value))}
+            />
+          </div>
+          <div>
+            <Label>Tomadas Coaxiais</Label>
+            <Input
+              type="number"
+              min={0}
+              value={project.telecommunications.coaxialOutletsPerDwelling}
+              onChange={e => updateTelecom("coaxialOutletsPerDwelling", Number(e.target.value))}
+            />
+          </div>
+          <div>
+            <Label>Tomadas Fibra Óptica</Label>
+            <Input
+              type="number"
+              min={0}
+              value={project.telecommunications.fiberOutletsPerDwelling}
+              onChange={e => updateTelecom("fiberOutletsPerDwelling", Number(e.target.value))}
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">Certificação</h3>
+          <div className="md:col-span-2 grid grid-cols-2 gap-3">
+            <CheckboxField
+              id="hasITEDCert"
+              label="Certificação ITED"
+              checked={project.telecommunications.hasITEDCertification}
+              onChange={v => updateTelecom("hasITEDCertification", v)}
+            />
+            <CheckboxField
+              id="hasInstallerLicense"
+              label="Instalador Credenciado ANACOM"
+              checked={project.telecommunications.installerITEDLicense}
+              onChange={v => updateTelecom("installerITEDLicense", v)}
+            />
+          </div>
+
+          <h3 className="md:col-span-2 font-semibold text-gray-800 mt-2">ITUR - Urbanização</h3>
+          <div className="md:col-span-2">
+            <CheckboxField
+              id="isUrbanization"
+              label="Projeto de Loteamento / Urbanização"
+              checked={project.telecommunications.isUrbanization}
+              onChange={v => updateTelecom("isUrbanization", v)}
+            />
+          </div>
+
+          {project.telecommunications.isUrbanization && (
+            <>
+              <div className="md:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-3">
+                <CheckboxField
+                  id="hasITURProject"
+                  label="Projeto ITUR"
+                  checked={project.telecommunications.hasITURProject}
+                  onChange={v => updateTelecom("hasITURProject", v)}
+                />
+                <CheckboxField
+                  id="hasUndergroundDucts"
+                  label="Tubagem Subterrânea"
+                  checked={project.telecommunications.hasUndergroundDucts}
+                  onChange={v => updateTelecom("hasUndergroundDucts", v)}
+                />
+                <CheckboxField
+                  id="hasCEE"
+                  label="CEE (Câm. Entrada Edifício)"
+                  checked={project.telecommunications.hasCEE}
+                  onChange={v => updateTelecom("hasCEE", v)}
+                />
+              </div>
+              <div>
+                <Label>Número de Lotes</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={project.telecommunications.numberOfLots ?? 1}
+                  onChange={e => updateTelecom("numberOfLots", Number(e.target.value))}
+                />
+              </div>
+            </>
+          )}
         </div>
       )}
 

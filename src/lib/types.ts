@@ -12,6 +12,8 @@ export type RegulationArea =
   | "fire_safety"
   | "accessibility"
   | "energy"
+  | "electrical"
+  | "ited_itur"
   | "general"
   | "urbanistic";
 
@@ -41,6 +43,12 @@ export interface BuildingProject {
 
   // Fire safety
   fireSafety: FireSafetyInfo;
+
+  // Electrical installations
+  electrical: ElectricalInfo;
+
+  // Telecommunications (ITED/ITUR)
+  telecommunications: TelecomInfo;
 }
 
 export interface PortugalLocation {
@@ -128,6 +136,82 @@ export interface FireSafetyInfo {
   numberOfExits: number;
   maxEvacuationDistance: number; // meters
   fireResistanceOfStructure: number; // minutes (REI)
+}
+
+export interface ElectricalInfo {
+  // Supply
+  supplyType: "single_phase" | "three_phase";
+  contractedPower: number; // kVA
+  hasProjectApproval: boolean; // Projeto aprovado pela DGEG/ERSE
+
+  // Protection
+  hasMainCircuitBreaker: boolean;
+  hasResidualCurrentDevice: boolean; // Diferencial (RCD)
+  rcdSensitivity: 30 | 100 | 300; // mA
+  hasIndividualCircuitProtection: boolean;
+  hasSurgeProtection: boolean; // Descarregador de sobretensões (SPD)
+
+  // Earthing
+  hasEarthingSystem: boolean;
+  earthingResistance?: number; // Ohms
+  hasEquipotentialBonding: boolean; // Ligações equipotenciais
+
+  // Wiring
+  wiringType: "embedded" | "surface" | "cable_tray";
+  cableType: "h07v" | "xv" | "vav" | "other";
+  hasCorrectCableSizing: boolean;
+
+  // Circuits
+  numberOfCircuits: number;
+  hasSeparateLightingCircuits: boolean;
+  hasSeparateSocketCircuits: boolean;
+  hasDedicatedApplianceCircuits: boolean; // Máquina lavar, forno, etc.
+
+  // Special areas
+  hasBathroomZoneCompliance: boolean; // Zonas 0-3 casas de banho
+  hasOutdoorIPProtection: boolean; // IP adequado exterior
+  hasEVCharging: boolean; // Carregamento veículo elétrico
+  hasEmergencyCircuit: boolean; // Circuito de emergência (comercial)
+
+  // Labelling
+  hasDistributionBoardLabelling: boolean;
+  hasSchematicDiagram: boolean; // Esquema unifilar
+}
+
+export interface TelecomInfo {
+  // ITED - Building infrastructure
+  itedEdition: "4" | "3" | "2" | "1"; // Current is 4th edition
+  hasATE: boolean; // Armário de Telecomunicações de Edifício
+  hasATI: boolean; // Armário de Telecomunicações Individual (per dwelling)
+  numberOfATI: number;
+
+  // Cabling
+  hasCopperCabling: boolean; // Par de cobre (PC)
+  copperCableCategory: "5e" | "6" | "6a" | "7" | "none";
+  hasFiberOptic: boolean; // Fibra óptica (FO)
+  fiberType: "single_mode" | "multi_mode" | "none";
+  hasCoaxialCabling: boolean; // Cabo coaxial (CC)
+
+  // Distribution
+  hasRiserCableway: boolean; // Coluna montante / caminhos de cabos verticais
+  hasFoorDistribution: boolean; // Distribuição por piso
+  hasIndividualDucts: boolean; // Tubagem individual até frações
+
+  // Outlets per dwelling
+  rj45OutletsPerDwelling: number; // Tomadas RJ45
+  coaxialOutletsPerDwelling: number; // Tomadas coaxiais
+  fiberOutletsPerDwelling: number; // Tomadas FO
+
+  // ITUR - Urbanization infrastructure
+  isUrbanization: boolean; // Is this a loteamento/urbanização?
+  hasITURProject: boolean;
+  hasUndergroundDucts: boolean; // Infraestrutura subterrânea
+  hasCEE: boolean; // Câmaras de entrada de edifício
+  numberOfLots?: number;
+
+  // Certification
+  hasITEDCertification: boolean; // Certificação ITED por instalador
+  installerITEDLicense: boolean; // Instalador com credenciação ANACOM
 }
 
 export interface AnalysisResult {

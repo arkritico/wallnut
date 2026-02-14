@@ -5,7 +5,7 @@ import ProjectForm from "@/components/ProjectForm";
 import AnalysisResults from "@/components/AnalysisResults";
 import { analyzeProject } from "@/lib/analyzer";
 import type { BuildingProject, AnalysisResult } from "@/lib/types";
-import { Building, Shield, Zap, ChevronRight } from "lucide-react";
+import { Building, Shield, Zap, ChevronRight, Plug, Wifi } from "lucide-react";
 
 export default function Home() {
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -45,7 +45,7 @@ export default function Home() {
               Analise e melhore projetos de edifícios em Portugal
             </p>
             <p className="text-gray-500 max-w-2xl mx-auto">
-              Verificação de conformidade com REH, RECS, SCIE, RRAE, DL 163/2006, RGEU e SCE.
+              Verificação de conformidade com REH, RECS, SCIE, RRAE, DL 163/2006, RGEU, SCE, RTIEBT, ITED e ITUR.
               Recomendações de melhoria com base nas melhores práticas e regulamentação em vigor.
             </p>
           </div>
@@ -66,6 +66,16 @@ export default function Home() {
               icon={<Building className="w-8 h-8 text-green-500" />}
               title="Certificação Energética"
               description="Estimativa da classe energética e recomendações para melhorar a eficiência do edifício."
+            />
+            <FeatureCard
+              icon={<Plug className="w-8 h-8 text-amber-600" />}
+              title="Instalações Elétricas"
+              description="Conformidade RTIEBT: proteções, terra, diferenciais, circuitos, zonas especiais e mobilidade elétrica."
+            />
+            <FeatureCard
+              icon={<Wifi className="w-8 h-8 text-cyan-500" />}
+              title="ITED / ITUR"
+              description="Telecomunicações em edifícios e urbanizações: fibra óptica, par de cobre, coaxial, ATE/ATI e certificação ANACOM."
             />
           </div>
 
@@ -91,6 +101,9 @@ export default function Home() {
                 "DL 163/2006 - Acessibilidade",
                 "RGEU - Regulamento Geral Edificações Urbanas",
                 "SCE - Sistema Certificação Energética",
+                "RTIEBT - Instalações Elétricas Baixa Tensão",
+                "ITED - Telecomunicações em Edifícios",
+                "ITUR - Telecomunicações em Urbanizações",
               ].map(reg => (
                 <span key={reg} className="bg-gray-100 px-3 py-1 rounded-full">{reg}</span>
               ))}

@@ -14,6 +14,8 @@ import {
   Lightbulb,
   ChevronDown,
   ChevronUp,
+  Plug,
+  Wifi,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -200,6 +202,8 @@ function RegulationCard({ summary }: { summary: RegulationSummary }) {
     fire_safety: <Flame className="w-5 h-5 text-orange-500" />,
     accessibility: <Accessibility className="w-5 h-5 text-purple-500" />,
     energy: <Lightbulb className="w-5 h-5 text-yellow-500" />,
+    electrical: <Plug className="w-5 h-5 text-amber-600" />,
+    ited_itur: <Wifi className="w-5 h-5 text-cyan-500" />,
     general: <Building className="w-5 h-5 text-gray-500" />,
   };
 
