@@ -1,0 +1,128 @@
+{
+  "regulationRef": "despacho-15793e-2013",
+  "description": "Regras Despacho 15793-E/2013 — Fatores de conversão de energia primária (Fpu), contabilização de renováveis, créditos de exportação, metodologia de energia primária",
+  "extractedBy": "claude-regulatory-expansion-v3",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "ENE-FPU-ELEC-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Fpu Eletricidade = 2.5 kWhEP/kWh",
+      "description": "O fator de conversão de energia primária para eletricidade da rede é Fpu = 2.5 kWhEP/kWh. Este é o fator mais penalizante, tornando a produção PV de autoconsumo muito valiosa para reduzir Ntc.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.fpuElectricity", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Fpu eletricidade = 2.5 kWhEP/kWh (Despacho 15793-E)",
+      "remediation": "Fatores Fpu para energia primária: (1) Eletricidade rede: Fpu = 2.5. (2) Gás natural: Fpu = 1.0. (3) GPL: Fpu = 1.0. (4) Biomassa sólida: Fpu = 1.0. (5) Energia solar térmica/PV: Fpu = 1.0 (renovável). (6) Impacto: 1 kWh elétrico poupado por PV equivale a evitar 2.5 kWhEP. (7) Bomba de calor com COP 3.5: 1 kWh elétrico → 3.5 kWh térmicos, mas custa 2.5 kWhEP → eficácia líquida = 3.5/2.5 = 1.4.",
+      "enabled": true,
+      "tags": ["Fpu", "eletricidade", "energia primária", "conversão"]
+    },
+    {
+      "id": "ENE-FPU-GAS-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Fpu Gás Natural e GPL = 1.0 kWhEP/kWh",
+      "description": "O fator de conversão de energia primária para combustíveis gasosos é Fpu = 1.0, significando conversão direta sem penalização da rede elétrica.",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.dhwSystem", "operator": "in", "value": ["gas_heater", "gas_boiler"] },
+        { "field": "energy.fpuGas", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Fpu gás natural/GPL = 1.0 kWhEP/kWh",
+      "remediation": "Impacto do Fpu gás = 1.0 na estratégia energética: (1) Caldeira a gás η=0.89: 1/0.89 = 1.12 kWhEP por kWh útil. (2) Bomba de calor COP=3.5: 2.5/3.5 = 0.71 kWhEP por kWh útil. (3) Conclusão: bomba de calor é mais eficiente em energia primária que gás se COP > 2.5. (4) Para AQS: bomba de calor termodinâmica (COP 2.8) → 2.5/2.8 = 0.89 kWhEP/kWh vs. esquentador gás 1/0.82 = 1.22 kWhEP/kWh. (5) A gás só compete se COP da bomba de calor for < 2.5.",
+      "enabled": true,
+      "tags": ["Fpu", "gás", "GPL", "energia primária"]
+    },
+    {
+      "id": "ENE-FPU-BIOMASS-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Fpu Biomassa = 1.0 kWhEP/kWh",
+      "description": "A biomassa sólida (lenha, pellets) tem Fpu = 1.0, mas o rendimento dos equipamentos é inferior ao gás. A biomassa é considerada parcialmente renovável para efeitos de contabilização Eren.",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasBiomassHeating", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Fpu biomassa = 1.0, com contribuição renovável Eren contabilizável",
+      "remediation": "Biomassa no cálculo energético: (1) Fpu = 1.0 (igual ao gás). (2) Rendimentos típicos: lareira aberta 30%, recuperador de calor 65%, salamandra 75%, caldeira pellets 85-92%. (3) Eren (contribuição renovável): Eren_biomassa = Qútil × (1 - 1/η_ref) — parcela renovável. (4) Vantagem: reduz Ntc e contribui para requisito nZEB de renováveis. (5) Desvantagem: emissões locais (PM, CO, NOx) — verificar regulamentação local de qualidade do ar.",
+      "enabled": true,
+      "tags": ["Fpu", "biomassa", "pellets", "renovável", "Eren"]
+    },
+    {
+      "id": "ENE-FPU-RENEWABLE-EXPORT-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Exportação de Energia Renovável para a Rede",
+      "description": "A energia renovável exportada para a rede (excedente PV não autoconsumido) pode ser contabilizada no cálculo de Ntc, mas com um fator de ponderação de Fpu_exp = 2.5 × 0.30 = 0.75 kWhEP/kWh (30% do Fpu eletricidade).",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasSolarPV", "operator": "==", "value": true },
+        { "field": "energy.pvExportFraction", "operator": ">", "value": 0.5 }
+      ],
+      "currentValueTemplate": "Fração de exportação PV = {energy.pvExportFraction}",
+      "requiredValue": "Exportação limitada a Fpu_exp = 0.75 kWhEP/kWh (30% do crédito de autoconsumo)",
+      "remediation": "Otimizar autoconsumo vs. exportação PV: (1) Autoconsumo: cada kWh evita 2.5 kWhEP da rede — crédito total. (2) Exportação: cada kWh exportado recebe apenas 0.75 kWhEP (30%). (3) Para maximizar benefício: instalar bateria → autoconsumo 60-80% (vs. 30-40% sem bateria). (4) Dimensionar PV para cobrir consumo diurno, não para maximizar produção. (5) Tipicamente: 1.5-2.5 kWp para moradia T3 = 2300-3800 kWh/ano no Algarve.",
+      "enabled": true,
+      "tags": ["exportação", "PV", "autoconsumo", "Fpu", "rede"]
+    },
+    {
+      "id": "ENE-EREN-HEAT-PUMP-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Contribuição Renovável da Bomba de Calor Aerotérmica",
+      "description": "As bombas de calor aerotérmicas com SPF ≥ 2.5 são parcialmente renováveis conforme Diretiva 2009/28/CE. A contribuição renovável é: Eren = Qútil × (1 - 1/SPF).",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true },
+        { "field": "systems.heatPumpSPF", "operator": ">=", "value": 2.5 }
+      ],
+      "currentValueTemplate": "SPF = {systems.heatPumpSPF}",
+      "requiredValue": "SPF ≥ 2.5 para classificação como parcialmente renovável (Diretiva 2009/28/CE)",
+      "remediation": "Contabilização renovável da bomba de calor: (1) Eren = Qútil × (1 - 1/SPF). (2) Exemplo: SPF = 3.5, Qútil = 5000 kWh → Eren = 5000 × (1 - 1/3.5) = 3571 kWh renovável. (3) Requisito UE: SPF ≥ 2.5 (para clima PT, valor tipicamente superado). (4) SCOP (sazonal) é mais representativo que COP nominal — considerar EN 14825. (5) A parcela renovável da bomba de calor conta para o requisito nZEB.",
+      "enabled": true,
+      "tags": ["Eren", "bomba de calor", "SPF", "renovável", "Diretiva 2009/28"]
+    },
+    {
+      "id": "ENE-NTC-CALCULATION-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Cálculo de Ntc (Energia Primária Total)",
+      "description": "O valor de Ntc (necessidades nominais globais de energia primária) é calculado pela soma ponderada: Ntc = (Nic/η_h × Fpu_h) + (Nvc/η_c × Fpu_c) + (Nac/η_w × Fpu_w) - Eren × Fpu_ren - E_exp × Fpu_exp.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.Ntc", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "requiredValue": "Ntc calculado conforme metodologia REH (Despacho 15793-I + 15793-E)",
+      "remediation": "Decomposição de Ntc: (1) Parcela aquecimento: Nic/η_h × Fpu_h (tipicamente 40-60% de Ntc). (2) Parcela arrefecimento: Nvc/η_c × Fpu_c (tipicamente 5-15%). (3) Parcela AQS: Nac/η_w × Fpu_w (tipicamente 30-50%). (4) Dedução renováveis: -Eren × Fpu_ren (solar + bomba calor). (5) Dedução exportação: -E_exp × Fpu_exp (PV excedente). (6) Classe = Ntc/Nt: A+ ≤ 0.25, A ≤ 0.50, B ≤ 0.75, B- ≤ 1.00. (7) Estratégia ideal: minimizar todas as parcelas + maximizar deduções.",
+      "enabled": true,
+      "tags": ["Ntc", "energia primária", "cálculo", "parcelas", "classe"]
+    },
+    {
+      "id": "ENE-NTC-GT-NT-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Ntc > Nt (Incumprimento Global)",
+      "description": "As necessidades globais de energia primária (Ntc = {energy.Ntc} kWhEP/(m².ano)) excedem o limite regulamentar (Nt = {energy.Nt}), resultando em classe energética inferior a B- e incumprimento REH.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.Ntc", "operator": "formula_gt", "value": "energy.Nt" }
+      ],
+      "currentValueTemplate": "Ntc = {energy.Ntc} kWhEP/(m².ano), Nt = {energy.Nt}",
+      "requiredValue": "Ntc ≤ Nt (Ntc/Nt ≤ 1.00 = classe B- mínima)",
+      "remediation": "Reduzir Ntc abaixo de Nt: (1) Envolvente: U valores abaixo dos máximos (preferencialmente próximo da referência). (2) Sistemas eficientes: bomba de calor COP ≥ 3.5 para aquecimento, COP ≥ 2.8 para AQS. (3) Solar térmico: obrigatório, cobre 50-70% do Nac. (4) PV autoconsumo: cada kWh = -2.5 kWhEP em Ntc. (5) Ventilação: Rph otimizado com grelhas auto-reguláveis. (6) Se Ntc/Nt > 1.00: não se emite certificado energético favorável para edifício novo.",
+      "enabled": true,
+      "tags": ["Ntc", "Nt", "incumprimento", "classe B-", "REH"]
+    },
+    {
+      "id": "ENE-EREN-SOLAR-THERMAL-01",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Contabilização Solar Térmico (Esolar)",
+      "description": "A contribuição solar térmica (Esolar) deve ser calculada pelo programa SCE.ER e é deduzida diretamente do Nac antes da aplicação da eficiência do sistema de apoio.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.hasSolarThermal", "operator": "==", "value": true },
+        { "field": "energy.solarThermalContribution", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Esolar calculado por SCE.ER (ADENE) com certificação Solar Keymark",
+      "remediation": "Contabilização da energia solar térmica: (1) Esolar calculado pelo programa SCE.ER (ADENE). (2) Dados necessários: localização, orientação, inclinação, área, tipo de coletor (Solar Keymark). (3) Esolar é deduzido diretamente: Nac_líquido = Nac - Esolar. (4) Fração solar típica em Portugal: 60-75% das necessidades de AQS. (5) O Esolar não depende da eficiência do sistema de apoio — é contabilizado antes. (6) Impacto em Ntc: redução de 15-25 kWhEP/(m².ano) tipicamente.",
+      "enabled": true,
+      "tags": ["Esolar", "solar térmico", "SCE.ER", "Nac", "contabilização"]
+    }
+  ]
+}

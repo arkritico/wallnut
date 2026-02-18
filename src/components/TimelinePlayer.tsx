@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Play, Pause, SkipForward, SkipBack } from "lucide-react";
 import type { ProjectSchedule, ScheduleTask } from "@/lib/wbs-types";
+import type { ConstructionPhase } from "@/lib/wbs-types";
+import { phaseColor, phaseLabel } from "@/lib/phase-colors";
+import GanttTimeline from "./GanttTimeline";
 
 // ============================================================
 // Types
@@ -30,6 +33,10 @@ export interface TimelineState {
 export interface TimelinePlayerProps {
   schedule: ProjectSchedule;
   onStateChange: (state: TimelineState) => void;
+  /** Fired when user clicks a Gantt bar — forwards task UIDs */
+  onBarSelect?: (taskUids: number[]) => void;
+  /** Task UIDs currently selected (for Gantt bar visual ring) */
+  selectedTaskUids?: Set<number>;
   className?: string;
 }
 
@@ -57,12 +64,6 @@ function formatPT(ms: number): string {
   });
 }
 
-function phaseLabel(phase: string): string {
-  return phase
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 // ============================================================
 // Component
 // ============================================================
@@ -70,6 +71,8 @@ function phaseLabel(phase: string): string {
 export default function TimelinePlayer({
   schedule,
   onStateChange,
+  onBarSelect,
+  selectedTaskUids,
   className = "",
 }: TimelinePlayerProps) {
   const startMs = useMemo(() => toMs(schedule.startDate), [schedule.startDate]);
@@ -160,11 +163,11 @@ export default function TimelinePlayer({
   // ── Controls ───────────────────────────────────────────────
   const progress = totalMs > 0 ? (currentMs - startMs) / totalMs : 0;
 
-  const handleScrub = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setCurrentMs(startMs + parseFloat(e.target.value) * totalMs);
+  const handleSeek = useCallback(
+    (ms: number) => {
+      setCurrentMs(ms);
     },
-    [startMs, totalMs],
+    [],
   );
 
   const handleSkipBack = useCallback(() => {
@@ -184,16 +187,16 @@ export default function TimelinePlayer({
   // ── Render ─────────────────────────────────────────────────
   return (
     <div className={`bg-white border-t border-gray-200 ${className}`}>
-      {/* Scrubber */}
+      {/* Gantt timeline */}
       <div className="px-4 pt-3">
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.001}
-          value={progress}
-          onChange={handleScrub}
-          className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-accent"
+        <GanttTimeline
+          tasks={detailTasks}
+          startMs={startMs}
+          finishMs={finishMs}
+          currentMs={currentMs}
+          onSeek={handleSeek}
+          onBarSelect={onBarSelect}
+          selectedTaskUids={selectedTaskUids}
         />
         <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
           <span>{formatPT(startMs)}</span>
@@ -254,16 +257,20 @@ export default function TimelinePlayer({
             {timelineState.activePhases.map((phase) => (
               <span
                 key={phase}
-                className="px-2 py-0.5 text-[10px] font-medium bg-accent/10 text-accent rounded-full"
+                className="px-2 py-0.5 text-[10px] font-medium rounded-full"
+                style={{
+                  backgroundColor: `${phaseColor(phase as ConstructionPhase)}15`,
+                  color: phaseColor(phase as ConstructionPhase),
+                }}
               >
-                {phaseLabel(phase)}
+                {phaseLabel(phase as ConstructionPhase)}
               </span>
             ))}
           </div>
           <div className="flex gap-4 mt-2 text-[10px] text-gray-500">
             <span>{timelineState.activeWorkers} trabalhadores</span>
             <span>
-              {timelineState.accumulatedCost.toLocaleString("pt-PT")} €
+              {timelineState.accumulatedCost.toLocaleString("pt-PT")} &euro;
             </span>
             <span>{Math.round(progress * 100)}%</span>
           </div>

@@ -6613,7 +6613,7 @@
         },
         {
           "field": "fireSafety.riskCategory",
-          "operator": "lookup_eq",
+          "operator": "lookup_gte",
           "value": null,
           "table": "fire_sprinklers_required",
           "keys": [
@@ -6648,7 +6648,7 @@
         },
         {
           "field": "fireSafety.riskCategory",
-          "operator": "lookup_eq",
+          "operator": "lookup_gte",
           "value": null,
           "table": "fire_detection_required",
           "keys": [
@@ -9701,6 +9701,1987 @@
         "área",
         "categoria risco",
         "cave"
+      ]
+    },
+    {
+      "id": "SCIE-RISKD-LOC-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 (RJ) Art. 11.º n.4 — Localização de Locais de Risco D",
+      "description": "Os locais de risco D (permanência de acamados, crianças ≤ 3 anos ou pessoas com limitações de mobilidade/percepção) devem situar-se ao nível ou acima do piso de saída para o exterior. A implantação em pisos abaixo do plano de referência é proibida.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskDLocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskDFloorLevel",
+          "operator": "<",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Local de risco D no piso {fireSafety.riskDFloorLevel}",
+      "requiredValue": "Locais de risco D ao nível ou acima do piso de saída (≥ 0)",
+      "remediation": "Relocalizar os espaços classificados como local de risco D (enfermarias, quartos de acamados, salas para crianças ≤ 3 anos, blocos operatórios, unidades de cuidados intensivos) para pisos ao nível ou acima do plano de referência. A legislação não admite excepções a esta regra. Se a relocalização não for viável, o espaço não pode ser afecto a funções que impliquem a classificação como local de risco D. Referência: n.º 4 do art.º 11.º do DL 220/2008 (RJ-SCIE).",
+      "enabled": true,
+      "tags": [
+        "risco D",
+        "localização",
+        "plano referência",
+        "acamados",
+        "crianças"
+      ]
+    },
+    {
+      "id": "SCIE-RISKD-CPLUS-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 (RJ) Art. 11.º n.3 al. b) — Proibição de Comunicação Directa entre Risco D e Risco C+",
+      "description": "Os locais de risco D não podem comunicar directamente com locais de risco C+ (locais com riscos agravados de incêndio, como centrais térmicas > 70 kW, cozinhas com grande potência, armazéns de combustíveis).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskDLocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskDCommunicatesWithCPlus",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Comunicação directa risco D ↔ risco C+: {fireSafety.riskDCommunicatesWithCPlus}",
+      "requiredValue": "Proibida qualquer comunicação directa entre locais de risco D e C+",
+      "remediation": "Eliminar todas as comunicações directas entre locais de risco D e locais de risco C+. As comunicações, quando permitidas pelo regulamento, devem ser estabelecidas através de câmara corta-fogo (CCF). Caso exista uma porta directa entre um local de risco D e um local de risco C+, esta deve ser suprimida e o percurso reorganizado de modo a interpor uma CCF ou eliminar a adjacência. Referência: alínea b) do n.º 3 do art.º 11.º do DL 220/2008 (RJ-SCIE) e n.º 10 do art.º 64.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "risco D",
+        "risco C+",
+        "comunicação directa",
+        "proibição",
+        "CCF"
+      ]
+    },
+    {
+      "id": "SCIE-RISKE-LOC-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 (RJ) Art. 11.º n.4 — Localização de Locais de Risco E",
+      "description": "Os locais de risco E (estabelecimentos destinados a dormida — quartos de hotel, camaratas, alojamentos turísticos) devem situar-se ao nível ou acima do piso de saída para o exterior. A implantação em pisos abaixo do plano de referência é proibida.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskELocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskEFloorLevel",
+          "operator": "<",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Local de risco E no piso {fireSafety.riskEFloorLevel}",
+      "requiredValue": "Locais de risco E ao nível ou acima do piso de saída (≥ 0)",
+      "remediation": "Relocalizar os espaços classificados como local de risco E (quartos de hotel, camaratas, alojamento turístico) para pisos ao nível ou acima do plano de referência. A legislação não admite a implantação de locais de risco E em pisos enterrados. Referência: n.º 4 do art.º 11.º do DL 220/2008 (RJ-SCIE).",
+      "enabled": true,
+      "tags": [
+        "risco E",
+        "localização",
+        "plano referência",
+        "dormida",
+        "hotel"
+      ]
+    },
+    {
+      "id": "SCIE-RISKE-EVAC-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 56.º/57.º — Evacuação de Locais de Risco E",
+      "description": "As saídas dos locais de risco E devem ter largura mínima de 1 UP (0,90 m). A distância máxima a percorrer até à saída mais próxima (exterior ou via protegida) é de 15 m em impasse e 30 m com saídas alternativas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskELocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskEDeadEndDistance",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "Distância impasse local risco E: {fireSafety.riskEDeadEndDistance} m",
+      "requiredValue": "≤ 15 m em impasse; ≤ 30 m com saídas alternativas; saídas ≥ 1 UP",
+      "remediation": "Garantir que nos locais de risco E (dormida): 1) As saídas têm largura mínima de 1 UP (0,90 m), podendo abrir para o interior se o local não for utilizável por mais de 50 pessoas; 2) A distância máxima até à saída mais próxima é de 15 m nos pontos em impasse e 30 m nos pontos com acesso a saídas distintas; 3) Os percursos até às saídas devem estar claramente delineados. Referência: n.º 3 do art.º 56.º, alínea a) do n.º 1 do art.º 62.º e n.º 2 do art.º 57.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "risco E",
+        "evacuação",
+        "impasse",
+        "15 m",
+        "30 m",
+        "1 UP"
+      ]
+    },
+    {
+      "id": "SCIE-CCF-02",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 35.º/63.º — Requisitos Construtivos das Câmaras Corta-Fogo",
+      "description": "As câmaras corta-fogo (CCF) devem cumprir os seguintes requisitos construtivos mínimos: paredes sem função de suporte EI 60; pavimentos e paredes com função de suporte REI 60; portas E 30 C; altura mínima 2 m; iluminação de balizagem 5 lux (medidos a 1 m do pavimento); revestimentos A2-s1,d0.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFireLobby",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.ccfWallRating",
+          "operator": "<",
+          "value": 60
+        }
+      ],
+      "currentValueTemplate": "CCF: paredes EI {fireSafety.ccfWallRating}; portas E {fireSafety.ccfDoorRating}; altura {fireSafety.ccfHeight} m; iluminação {fireSafety.ccfLightingLevel} lux",
+      "requiredValue": "Paredes EI 60; pavimentos REI 60; portas E 30 C; h ≥ 2 m; 5 lux a 1 m do piso; revestimentos A2-s1,d0",
+      "remediation": "Garantir que todas as câmaras corta-fogo cumprem: 1) Paredes sem função de suporte: classe EI 60 mínimo (al. a) n.º 1 art.º 35.º); 2) Pavimentos e paredes com função de suporte: classe REI 60 (al. b) n.º 1 art.º 35.º); 3) Portas: classe E 30 C com fecho automático (al. c) n.º 1 art.º 35.º); 4) Altura livre mínima: 2 m (al. c) n.º 1 art.º 63.º); 5) Iluminação de balizagem: 5 lux medidos a 1 m do pavimento (al. d) n.º 5 art.º 14.º); 6) Revestimentos de paredes e tecto: classe A2-s1,d0 (art.º 40.º). Na CCF não podem existir ductos, canalizações de gases/líquidos combustíveis nem instalações eléctricas (excepto iluminação, SADI e comunicações de segurança). Referência: RT-SCIE Art. 35.º, 40.º e 63.º.",
+      "enabled": true,
+      "tags": [
+        "CCF",
+        "câmara corta-fogo",
+        "EI 60",
+        "REI 60",
+        "E 30 C",
+        "2 m",
+        "5 lux"
+      ]
+    },
+    {
+      "id": "SCIE-ELEC-03",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 76.º n.2 — Quadros Eléctricos > 115 kVA em Locais de Risco B/D/E/F e Vias de Evacuação",
+      "description": "Os quadros eléctricos com potência superior a 115 kVA, situados em locais de risco B, D, E ou F e em vias de evacuação, devem estar embebidos em alvenaria com resistência EI 60 (dotados de porta E 30) ou encerrados em armários com classe de resistência ao fogo equivalente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.electricalPanelPower",
+          "operator": ">",
+          "value": 115
+        },
+        {
+          "field": "fireSafety.electricalPanelEnclosureRating",
+          "operator": "<",
+          "value": 60
+        }
+      ],
+      "currentValueTemplate": "Quadro {fireSafety.electricalPanelPower} kVA; protecção: EI {fireSafety.electricalPanelEnclosureRating}",
+      "requiredValue": "Embebido em alvenaria EI 60 com porta E 30, ou armário equivalente",
+      "remediation": "Os quadros eléctricos com potência superior a 115 kVA (somatório das potências nominais dos aparelhos de protecção dos alimentadores que lhes possam fornecer energia simultaneamente), quando situados em locais de risco B, D, E ou F ou em vias de evacuação, devem ser: 1) Embebidos em alvenaria com resistência ao fogo EI 60, dotados de porta com resistência E 30; ou 2) Encerrados em armários garantindo classe de resistência ao fogo padrão equivalente (EI 60/E 30). Referência: n.º 2 do art.º 76.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "quadros eléctricos",
+        "115 kVA",
+        "EI 60",
+        "E 30",
+        "alvenaria",
+        "armário"
+      ]
+    },
+    {
+      "id": "SCIE-ELEC-04",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 76.º n.2 — Quadros Eléctricos 45–115 kVA em Locais de Risco B/D/E/F e Vias de Evacuação",
+      "description": "Os quadros eléctricos com potência entre 45 kVA e 115 kVA, situados em locais de risco B, D, E ou F e em vias de evacuação, devem ter invólucro metálico cuja aparelhagem e invólucro obedeçam ao ensaio do fio incandescente a 750 °C durante 5 segundos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.electricalPanelPower",
+          "operator": ">=",
+          "value": 45
+        },
+        {
+          "field": "fireSafety.electricalPanelPower",
+          "operator": "<=",
+          "value": 115
+        },
+        {
+          "field": "fireSafety.electricalPanelHasGlowWireTest",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Quadro {fireSafety.electricalPanelPower} kVA; ensaio fio incandescente: {fireSafety.electricalPanelHasGlowWireTest}",
+      "requiredValue": "Invólucro metálico com ensaio do fio incandescente 750 °C / 5 s",
+      "remediation": "Os quadros eléctricos com potência entre 45 kVA e 115 kVA, quando situados em locais de risco B, D, E ou F ou em vias de evacuação, devem ter invólucro metálico e a aparelhagem e o invólucro devem obedecer ao ensaio do fio incandescente a 750 °C durante 5 segundos, conforme IEC 60695-2-11. Alternativamente, podem cumprir os requisitos mais exigentes dos quadros > 115 kVA (alvenaria EI 60 ou armário equivalente). Referência: n.º 2 do art.º 76.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "quadros eléctricos",
+        "45 kVA",
+        "115 kVA",
+        "fio incandescente",
+        "750 °C",
+        "invólucro metálico"
+      ]
+    },
+    {
+      "id": "SCIE-ELEC-05",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 71.º n.1 — Ventilação Directa para Baterias de Acumuladores > 1000 VAh",
+      "description": "Os locais que alojam baterias de acumuladores com capacidade superior a 1000 VAh devem dispor de evacuação directa de ar para o exterior do edifício, independentemente da altura do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.batteryCapacity",
+          "operator": ">",
+          "value": 1000
+        },
+        {
+          "field": "fireSafety.batteryRoomHasDirectVentilation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Baterias {fireSafety.batteryCapacity} VAh; ventilação directa exterior: {fireSafety.batteryRoomHasDirectVentilation}",
+      "requiredValue": "Ventilação directa para o exterior obrigatória",
+      "remediation": "Garantir ventilação directa para o exterior nos locais que alojam baterias de acumuladores com capacidade superior a 1000 VAh. A ventilação deve permitir a evacuação dos gases (hidrogénio) libertados durante o carregamento. Caso a ventilação seja mecânica: a alimentação dos ventiladores deve ser apoiada por fontes de emergência e a paragem dos ventiladores deve provocar automaticamente a interrupção da alimentação dos dispositivos de carga das baterias. Referência: n.º 1 e 2 do art.º 71.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "baterias",
+        "acumuladores",
+        "1000 VAh",
+        "ventilação",
+        "exterior",
+        "hidrogénio"
+      ]
+    },
+    {
+      "id": "SCIE-ELEC-06",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 70.º n.1 — UPS > 40 kVA Classificado como Local de Risco C",
+      "description": "Os locais que alojam unidades de alimentação ininterrupta (UPS) com potência aparente superior a 40 kVA devem ser classificados como locais de risco C, com os requisitos de isolamento, reacção ao fogo e ventilação correspondentes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.upsPower",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "fireSafety.upsRoomClassifiedAsRiskC",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "UPS {fireSafety.upsPower} kVA; classificação risco C: {fireSafety.upsRoomClassifiedAsRiskC}",
+      "requiredValue": "Local classificado como risco C (paredes EI 90, portas EI 45 C)",
+      "remediation": "O local que aloja UPS com potência aparente > 40 kVA deve ser classificado como local de risco C, devendo cumprir: paredes EI 90; portas EI 45 C com fecho automático; revestimentos classe A1 (paredes/tectos) e CFL-s1 (pavimentos); acesso reservado a pessoal técnico, devidamente sinalizado; ventilação directa para o exterior. O mesmo requisito aplica-se a transformadores de potência, grupos geradores e baterias > 1000 VAh. Referência: n.º 1 do art.º 70.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "UPS",
+        "40 kVA",
+        "risco C",
+        "isolamento",
+        "serviços eléctricos"
+      ]
+    },
+    {
+      "id": "SCIE-CTTERM-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 80.º n.3/4 — Classificação de Centrais Térmicas por Potência",
+      "description": "As centrais térmicas devem ser classificadas e isoladas em função da potência útil total instalada: 40–70 kW → local de risco C; 70–2000 kW → local de risco C+; > 2000 kW → edifício isolado (excepto UT XII exclusiva).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantPower",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "fireSafety.thermalPlantClassification",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Central térmica {fireSafety.thermalPlantPower} kW; classificação: {fireSafety.thermalPlantClassification}",
+      "requiredValue": "40–70 kW: risco C (EI 60/E 30 C); 70–2000 kW: risco C+ (EI 90/EI 45 C + CCF); > 2000 kW: edifício isolado",
+      "remediation": "Classificar e isolar a central térmica conforme a potência útil total: 1) 40 kW < P ≤ 70 kW — local de risco C: paredes sem função de suporte EI 60, com função de suporte REI 60, portas E 30 C ou EI 45 C (conforme art.º 21.º); 2) 70 kW < P ≤ 2000 kW — local de risco C+: paredes EI 90, pavimentos REI 90, portas EI 45 C, comunicação com restante edifício obrigatoriamente por CCF; 3) P > 2000 kW — instalação em edifício isolado, excepto se afecta exclusivamente a UT XII, caso em que deve ser isolada como risco C+. Referência: n.º 2, 3 e 4 do art.º 80.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "40 kW",
+        "70 kW",
+        "2000 kW",
+        "risco C",
+        "risco C+",
+        "edifício isolado"
+      ]
+    },
+    {
+      "id": "SCIE-CTTERM-02",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 107.º n.6 — Proibição de Combustível com Ponto de Inflamação < 55 °C em Centrais Térmicas",
+      "description": "Nas centrais térmicas é proibido o emprego, como combustível, de líquidos inflamáveis com ponto de inflamação inferior a 55 °C, bem como o armazenamento de matérias inflamáveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantPower",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "fireSafety.thermalPlantFuelFlashPoint",
+          "operator": "<",
+          "value": 55
+        }
+      ],
+      "currentValueTemplate": "Ponto de inflamação do combustível: {fireSafety.thermalPlantFuelFlashPoint} °C",
+      "requiredValue": "Ponto de inflamação ≥ 55 °C; proibido armazenamento de matérias inflamáveis",
+      "remediation": "Substituir o combustível da central térmica por um com ponto de inflamação igual ou superior a 55 °C. São proibidos: gasolina, éteres, álcoois de baixo ponto de inflamação e outros líquidos inflamáveis da classe I (ponto de inflamação < 55 °C). Combustíveis admissíveis: gasóleo (ponto de inflamação > 55 °C), gás natural, GPL. Adicionalmente, é proibido o armazenamento de quaisquer matérias inflamáveis no interior da central térmica. Referência: n.º 6 do art.º 107.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "combustível",
+        "ponto inflamação",
+        "55 °C",
+        "proibição",
+        "líquidos inflamáveis"
+      ]
+    },
+    {
+      "id": "SCIE-CTTERM-03",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RT-SCIE Art. 163.º n.6 — Extintores em Centrais Térmicas > 70 kW",
+      "description": "As centrais térmicas com potência útil superior a 70 kW devem dispor de extintores de eficácia mínima 34B, à razão de 2 por queimador (máximo exigível de 4), como meios adicionais de primeira intervenção. Para combustível gasoso: extintor de pó químico ABC de eficácia mínima 5A/34B.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantPower",
+          "operator": ">",
+          "value": 70
+        },
+        {
+          "field": "fireSafety.thermalPlantHasAdditionalExtinguishers",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Central térmica {fireSafety.thermalPlantPower} kW; extintores adicionais: {fireSafety.thermalPlantHasAdditionalExtinguishers}",
+      "requiredValue": "Extintores 34B: 2 por queimador (máx. 4); combustível gasoso: pó ABC 5A/34B",
+      "remediation": "Instalar os seguintes meios adicionais de primeira intervenção na central térmica com potência útil > 70 kW (para além dos extintores gerais do edifício): 1) Para combustível sólido ou líquido: um recipiente com 100 litros de areia e uma pá + extintores de eficácia mínima 34B, à razão de 2 por queimador, com um máximo exigível de 4 extintores; 2) Para combustível gasoso: um extintor de pó químico ABC de eficácia mínima 5A/34B. Referência: n.º 6 do art.º 163.º do RT-SCIE.",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "extintores",
+        "34B",
+        "70 kW",
+        "queimador",
+        "primeira intervenção"
+      ]
+    },
+    {
+      "id": "SCIE-PATIO-DIM-01",
+      "regulationId": "rt-scie",
+      "article": "RT-SCIE Art. 19.º — Dimensão Mínima de Pátios Interiores",
+      "description": "A menor dimensão em planta do pátio interior ({fireSafety.patioMinDimension} m) é inferior ao mínimo exigido. Deve permitir inscrever um cilindro de diâmetro ≥ H/3 (mínimo 4 m se H ≤ 7 m).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasInternalPatio",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioMinDimension",
+          "operator": "<",
+          "value": 4
+        }
+      ],
+      "remediation": "Garantir que as dimensões em planta do pátio interior permitem inscrever um cilindro cujo diâmetro seja igual ou superior a H/3 (sendo H a altura do pátio), com um mínimo de 4 m. — alínea a) do n.º 1 do art.º 19.º do RT.",
+      "enabled": true,
+      "tags": [
+        "pátio interior",
+        "dimensões",
+        "vazio"
+      ]
+    },
+    {
+      "id": "SCIE-PATIO-PASSIVE-01",
+      "regulationId": "rt-scie",
+      "article": "RT-SCIE Art. 134.º n.º 4 — Proibição Desenfumagem Passiva em Pátios > 12 m",
+      "description": "O pátio interior tem altura superior a 12 m ({fireSafety.patioHeight} m). Não é permitido o recurso a desenfumagem passiva em locais amplos cobertos, incluindo pátios interiores e átrios, com altura superior a 12 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasInternalPatio",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioHeight",
+          "operator": ">",
+          "value": 12
+        },
+        {
+          "field": "fireSafety.patioSmokeControlType",
+          "operator": "==",
+          "value": "passive"
+        }
+      ],
+      "remediation": "Substituir a desenfumagem passiva por desenfumagem activa (mecânica) no pátio interior. — n.º 4 do art.º 134.º do RT.",
+      "enabled": true,
+      "tags": [
+        "pátio interior",
+        "desenfumagem",
+        "altura",
+        "12 m"
+      ]
+    },
+    {
+      "id": "SCIE-PATIO-SPRINK-02",
+      "regulationId": "rt-scie",
+      "article": "RT-SCIE Art. 173.º alínea e) — Extinção Automática em Pátios > 20 m",
+      "description": "Os locais adjacentes ao pátio interior com altura superior a 20 m ({fireSafety.patioHeight} m) não estão dotados de extinção automática por água. Obrigatória conforme alínea e) do n.º 1 do art.º 173.º do RT.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasInternalPatio",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioHeight",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "fireSafety.patioHasSprinklers",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Instalar sistema fixo de extinção automática de incêndios por água (sprinklers) nos locais adjacentes ao pátio interior com altura superior a 20 m. — alínea e) do n.º 1 do art.º 173.º do RT.",
+      "enabled": true,
+      "tags": [
+        "pátio interior",
+        "sprinklers",
+        "extinção automática",
+        "20 m"
+      ]
+    },
+    {
+      "id": "SCIE-PATIO-DETLIN-01",
+      "regulationId": "rt-scie",
+      "article": "RT-SCIE Art. 149.º n.º 6 — Detectores Lineares em Pátios Cobertos Fechados",
+      "description": "O pátio interior coberto fechado não está dotado de detectores ópticos lineares de absorção na zona superior. Para pátios com altura superior a 12 m, devem também ser instalados a meia altura.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasInternalPatio",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioHasLinearDetectors",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Instalar detectores ópticos lineares de absorção na zona superior do pátio coberto fechado. Se a altura do pátio for superior a 12 m, devem também ser instalados detectores idênticos a meia altura. — alínea 2) do n.º 6 do art.º 149.º do RT.",
+      "enabled": true,
+      "tags": [
+        "pátio interior",
+        "detectores lineares",
+        "detecção"
+      ]
+    },
+    {
+      "id": "SCIE-DUCTO-COMB-01",
+      "regulationId": "rt-scie",
+      "article": "RT-SCIE Art. 32.º alínea b) — Ductos de Líquidos e Gases Combustíveis",
+      "description": "O ducto de canalizações de líquidos ou gases combustíveis não cumpre os requisitos: é proibido qualquer seccionamento e os troços verticais devem dispor de aberturas permanentes de comunicação com o exterior (área ≥ 0,1 m²) na base e no topo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasCombustibleDucts",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.combustibleDuctVentArea",
+          "operator": "<",
+          "value": 0.1
+        }
+      ],
+      "remediation": "Garantir que os ductos de canalizações de líquidos e gases combustíveis: (a) não possuem qualquer seccionamento; (b) dispõem de abertura permanente na base (acima do nível do terreno) e no topo (ao nível da cobertura) com área ≥ 0,1 m² cada. — alínea b) do n.º 3 do art.º 32.º do RT.",
+      "enabled": true,
+      "tags": [
+        "ductos",
+        "gases combustíveis",
+        "ventilação",
+        "0.1 m²"
+      ]
+    },
+    {
+      "id": "SCIE-RISKB-PROF-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 Art. 11.º n.º 1 — Profundidade Máxima de Locais de Risco B Abaixo da Saída",
+      "description": "O local de risco B situa-se abaixo das saídas para o exterior com uma diferença de cota superior a 6 m ({fireSafety.riskBDepthBelowExit} m). Não é permitido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskBLocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskBDepthBelowExit",
+          "operator": ">",
+          "value": 6
+        }
+      ],
+      "remediation": "Relocalizar o local de risco B para que a diferença entre a cota de nível das saídas para o exterior e a do pavimento do local não seja superior a 6 m. — alínea b) do n.º 1 do art.º 11.º do RJ.",
+      "enabled": true,
+      "tags": [
+        "local de risco B",
+        "profundidade",
+        "abaixo PR",
+        "6 m"
+      ]
+    },
+    {
+      "id": "SCIE-RISKB-BARRA-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 62.º n.º 7 — Barras Antipânico em Portas > 200 Pessoas",
+      "description": "As portas utilizáveis por mais de 200 pessoas não estão equipadas com barras antipânico. Obrigatório conforme alínea a) do n.º 7 do art.º 62.º do RT.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.maxOccupancyPerDoor",
+          "operator": ">",
+          "value": 200
+        },
+        {
+          "field": "fireSafety.hasAntiPanicBars",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Equipar as portas utilizáveis por mais de 200 pessoas com sistemas de abertura dotados de barras antipânico, devidamente sinalizadas. — alínea a) do n.º 7 do art.º 62.º do RT.",
+      "enabled": true,
+      "tags": [
+        "barra antipânico",
+        "portas",
+        "200 pessoas",
+        "evacuação"
+      ]
+    },
+    {
+      "id": "SCIE-RISKB-FUMO-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 135.º alínea e) — Controlo de Fumo em Locais de Risco B > 500 Pessoas",
+      "description": "O local de risco B com efectivo superior a 500 pessoas ({fireSafety.riskBOccupancy} pessoas) não está dotado de controlo de fumo. Obrigatório conforme alínea e) do n.º 1 do art.º 135.º do RT.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskBOccupancy",
+          "operator": ">",
+          "value": 500
+        },
+        {
+          "field": "fireSafety.riskBHasSmokeControl",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Dotar o local de risco B com efectivo superior a 500 pessoas de sistema de controlo de fumo, cumprindo os requisitos da Secção V do Capítulo IV do Título VI do RT (art.º 151.º a 154.º). — alínea e) do n.º 1 do art.º 135.º do RT.",
+      "enabled": true,
+      "tags": [
+        "local de risco B",
+        "controlo de fumo",
+        "500 pessoas",
+        "desenfumagem"
+      ]
+    },
+    {
+      "id": "SCIE-RISKB-MESA-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 59.º n.º 4 — Espaçamento de Mesas Fixas em Locais de Risco B > 50 m²",
+      "description": "Nos locais de risco B com área de implantação de mesas superior a 50 m², as mesas fixas não garantem um espaçamento mínimo de 1,5 m para circulação de acesso.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "fireSafety.riskBTableAreaExceeds50",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskBFixedTableSpacing",
+          "operator": "<",
+          "value": 1.5
+        }
+      ],
+      "remediation": "Quando as mesas forem fixas em locais de risco B com zona de implantação > 50 m², garantir espaçamento mínimo de 1,5 m entre mesas para circulação de acesso. — n.º 4 do art.º 59.º do RT.",
+      "enabled": true,
+      "tags": [
+        "local de risco B",
+        "mesas",
+        "circulação",
+        "1.5 m"
+      ]
+    },
+    {
+      "id": "SCIE-RISKD-NIVEL-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 Art. 11.º n.º 4 — Locais de Risco D ao Nível ou Acima do PR",
+      "description": "O local de risco D não se situa ao nível ou acima do piso de saída para local seguro no exterior. Locais de risco D devem situar-se no mesmo nível ou acima do PR.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskDLocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskDIsBelowExit",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Relocalizar os espaços de risco D (pessoas acamadas, crianças ≤ 3 anos, mobilidade reduzida) para o nível ou acima do piso de saída para o exterior. — n.º 4 do art.º 11.º do RJ.",
+      "enabled": true,
+      "tags": [
+        "local de risco D",
+        "nível",
+        "plano referência",
+        "localização"
+      ]
+    },
+    {
+      "id": "SCIE-RISKD-SUBCOMP-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 22.º n.º 2 — Subcompartimentação de Locais de Risco D > 400 m²",
+      "description": "O local de risco D com área útil superior a 400 m² ({fireSafety.riskDArea} m²) não está subcompartimentado. Obrigatória a subdivisão por elementos de resistência ao fogo para permitir evacuação horizontal por transferência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskDLocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskDArea",
+          "operator": ">",
+          "value": 400
+        },
+        {
+          "field": "fireSafety.riskDIsSubcompartmented",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Subcompartimentar o local de risco D com área útil superior a 400 m² por elementos de resistência ao fogo padrão, possibilitando a evacuação horizontal dos ocupantes por transferência entre subcompartimentos. — n.º 2 do art.º 22.º do RT.",
+      "enabled": true,
+      "tags": [
+        "local de risco D",
+        "subcompartimentação",
+        "400 m²",
+        "evacuação horizontal"
+      ]
+    },
+    {
+      "id": "SCIE-RISKCP-COMM-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 Art. 11.º n.º 3 — Proibição de Comunicação Directa C+ com D/E/F",
+      "description": "O local de risco C+ comunica directamente com locais de risco D, E ou F, ou com vias verticais de evacuação que sirvam outros espaços do edifício. Proibido pelo n.º 3 do art.º 11.º do RJ.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasRiskCPlusLocations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.riskCPlusCommunicatesWithDEF",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Eliminar as comunicações directas entre locais de risco C+ e locais de risco D, E ou F, bem como com vias verticais de evacuação que sirvam outros espaços do edifício. As comunicações devem ser estabelecidas através de câmaras corta-fogo. — n.º 3 do art.º 11.º do RJ.",
+      "enabled": true,
+      "tags": [
+        "local de risco C+",
+        "comunicação",
+        "isolamento",
+        "D/E/F"
+      ]
+    },
+    {
+      "id": "SCIE-RISKCP-VOL-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "DL 220/2008 Art. 11.º n.º 3 — Local de Risco C+ Volume > 600 m³",
+      "description": "O local de risco C possui volume superior a 600 m³ ({fireSafety.riskCVolume} m³), pelo que é classificado como local de risco C+ (agravado) com exigências de isolamento acrescidas (EI 90 / REI 90, portas E 45 C).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskCVolume",
+          "operator": ">",
+          "value": 600
+        },
+        {
+          "field": "fireSafety.riskCIsolationClass",
+          "operator": "!=",
+          "value": "C+"
+        }
+      ],
+      "remediation": "Classificar o local como risco C+ (agravado) e garantir isolamento com paredes EI 90 / REI 90 e portas E 45 C. Deve situar-se, sempre que possível, ao nível do PR e na periferia do edifício. Dotá-lo de controlo de fumo. — n.º 3 do art.º 11.º do RJ e n.º 3 do art.º 21.º do RT.",
+      "enabled": true,
+      "tags": [
+        "local de risco C+",
+        "volume",
+        "600 m³",
+        "isolamento agravado"
+      ]
+    },
+    {
+      "id": "SCIE-CCF-WALLS-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 35.º — Resistência ao Fogo de Câmaras Corta-Fogo",
+      "description": "As paredes da câmara corta-fogo não garantem a classe de resistência ao fogo mínima: paredes sem função de suporte EI 60, pavimentos e paredes com função de suporte REI 60, portas E 30 C.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFireLobby",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.ccfWallFireRating",
+          "operator": "<",
+          "value": 60
+        }
+      ],
+      "remediation": "Garantir que a CCF possui: paredes sem função de suporte ≥ EI 60; pavimentos e paredes com função de suporte ≥ REI 60; portas ≥ E 30 C. — alíneas a), b) e c) do n.º 1 do art.º 35.º do RT.",
+      "enabled": true,
+      "tags": [
+        "câmara corta-fogo",
+        "EI 60",
+        "REI 60",
+        "E 30 C"
+      ]
+    },
+    {
+      "id": "SCIE-CCF-HEIGHT-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 63.º n.º 1 alínea c) — Altura Útil Mínima de CCF",
+      "description": "A altura útil da câmara corta-fogo ({fireSafety.ccfHeight} m) é inferior ao mínimo de 2 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFireLobby",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.ccfHeight",
+          "operator": "<",
+          "value": 2
+        }
+      ],
+      "remediation": "Garantir que a câmara corta-fogo tem uma altura útil não inferior a 2 m. — alínea c) do n.º 1 do art.º 63.º do RT.",
+      "enabled": true,
+      "tags": [
+        "câmara corta-fogo",
+        "altura",
+        "2 m"
+      ]
+    },
+    {
+      "id": "SCIE-CCF-LUX-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 114.º n.º 5 — Iluminação de Balizagem em CCF (5 lux)",
+      "description": "A câmara corta-fogo não dispõe de iluminação de balizagem ou circulação com valor mínimo de 5 lux medidos a 1 m do pavimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFireLobby",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.ccfLightingLux",
+          "operator": "<",
+          "value": 5
+        }
+      ],
+      "remediation": "Instalar iluminação de balizagem ou circulação na CCF garantindo um mínimo de 5 lux medidos a 1 m do pavimento. — alínea d) do n.º 5 do art.º 114.º do RT.",
+      "enabled": true,
+      "tags": [
+        "câmara corta-fogo",
+        "iluminação",
+        "balizagem",
+        "5 lux"
+      ]
+    },
+    {
+      "id": "SCIE-QUAD-HIGH-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 76.º n.º 2 — Protecção de Quadros Eléctricos > 115 kVA",
+      "description": "O quadro eléctrico com potência superior a 115 kVA, situado em local de risco B, D, E, F ou via de evacuação, não está embebido em alvenaria com porta E 30 ou em armário com classe de resistência ao fogo equivalente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.electricalPanelPower",
+          "operator": ">",
+          "value": 115
+        },
+        {
+          "field": "fireSafety.electricalPanelProtection",
+          "operator": "!=",
+          "value": "E30"
+        }
+      ],
+      "remediation": "Proteger os quadros eléctricos com potência superior a 115 kVA, situados em locais de risco B, D, E, F ou vias de evacuação: embebidos em alvenaria com porta E 30 ou encerrados em armários com classe de resistência ao fogo padrão equivalente. — n.º 2 do art.º 76.º do RT.",
+      "enabled": true,
+      "tags": [
+        "quadro eléctrico",
+        "115 kVA",
+        "E 30",
+        "protecção"
+      ]
+    },
+    {
+      "id": "SCIE-BAT-VENT-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 71.º n.º 1 — Ventilação de Baterias de Acumuladores > 1000 VAh",
+      "description": "O local com baterias de acumuladores de capacidade superior a 1000 VAh não dispõe de evacuação directa do ar para o exterior do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.batteryCapacity",
+          "operator": ">",
+          "value": 1000
+        },
+        {
+          "field": "fireSafety.batteryRoomHasExteriorVent",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Dotar o local que aloja baterias de acumuladores com capacidade superior a 1000 VAh de evacuação directa do ar para o exterior do edifício. — n.º 1 do art.º 71.º do RT.",
+      "enabled": true,
+      "tags": [
+        "baterias",
+        "acumuladores",
+        "1000 VAh",
+        "ventilação exterior"
+      ]
+    },
+    {
+      "id": "SCIE-TERM-ISOL-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 80.º n.º 3 e 4 — Isolamento de Centrais Térmicas por Potência",
+      "description": "A central térmica não cumpre as exigências de isolamento para a sua potência: 40-70 kW → local de risco C (EI 60); 70-2000 kW → local de risco C+ (EI 90); > 2000 kW → edifício isolado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantPower",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "fireSafety.thermalPlantIsolationAdequate",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Garantir isolamento da central térmica de acordo com a potência útil total: 40-70 kW → local de risco C (EI 60 / REI 60, porta E 30 C); 70-2000 kW → local de risco C+ (EI 90 / REI 90, porta E 45 C); > 2000 kW → edifício isolado (excepto UT XII). — n.º 3 e 4 do art.º 80.º do RT.",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "isolamento",
+        "potência",
+        "local de risco C"
+      ]
+    },
+    {
+      "id": "SCIE-TERM-FLASH-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 107.º n.º 6 — Proibição de Combustível com Ponto de Inflamação < 55 °C",
+      "description": "A central térmica utiliza como combustível um líquido inflamável com ponto de inflamação inferior a 55 °C. Este tipo de combustível é proibido em centrais térmicas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantFuelFlashPoint",
+          "operator": "<",
+          "value": 55
+        }
+      ],
+      "remediation": "Não é permitido o emprego, como combustível, de líquidos inflamáveis com ponto de inflamação inferior a 55 °C, nem o armazenamento de matérias inflamáveis na central térmica. — n.º 6 do art.º 107.º do RT.",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "ponto inflamação",
+        "55 °C",
+        "combustível"
+      ]
+    },
+    {
+      "id": "SCIE-TERM-EXTI-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 163.º n.º 6 — Extintores em Centrais Térmicas > 70 kW",
+      "description": "A central térmica com potência útil superior a 70 kW não está dotada dos meios adicionais de 1.ª intervenção: combustível sólido/líquido → recipiente 100 l areia + extintores 34B (2/queimador, max 4); combustível gasoso → extintor ABC 5A/34B.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantPower",
+          "operator": ">",
+          "value": 70
+        },
+        {
+          "field": "fireSafety.thermalPlantHasExtinguishers",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Instalar meios adicionais de primeira intervenção na central térmica > 70 kW: (a) combustível sólido ou líquido: recipiente com 100 l de areia e uma pá + extintores 34B, 2 por queimador (máximo 4); (b) combustível gasoso: extintor de pó químico ABC de eficácia 5A/34B. — n.º 6 do art.º 163.º do RT.",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "extintores",
+        "70 kW",
+        "34B"
+      ]
+    },
+    {
+      "id": "SCIE-COZ-ISOL-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 88.º n.º 1 — Cozinhas > 20 kW Devem Ser Isoladas",
+      "description": "Os aparelhos de confecção de alimentos com potência útil total superior a 20 kW não estão instalados em cozinha isolada. Obrigatório (excepto fogos de habitação).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.kitchenPower",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "fireSafety.kitchenIsIsolated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "!=",
+          "value": "residential_single"
+        }
+      ],
+      "remediation": "Instalar os aparelhos de confecção de alimentos com potência útil total superior a 20 kW em cozinhas isoladas, com excepção dos fogos de habitação. O isolamento deve cumprir as exigências de local de risco C (EI 60 / REI 60, porta E 30 C). — n.º 1 do art.º 88.º do RT.",
+      "enabled": true,
+      "tags": [
+        "cozinha",
+        "isolamento",
+        "20 kW",
+        "local de risco C"
+      ]
+    },
+    {
+      "id": "SCIE-COND-MATER-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 92.º n.º 1 — Condutas de Efluentes em Material A1",
+      "description": "As condutas de evacuação de efluentes de combustão não são construídas com materiais da classe A1 (incombustível). Obrigatório conforme n.º 1 do art.º 92.º do RT.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasCombustionExhaustDucts",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.exhaustDuctMaterial",
+          "operator": "!=",
+          "value": "A1"
+        }
+      ],
+      "remediation": "Construir as condutas de evacuação de efluentes de combustão com materiais da classe de reacção ao fogo A1, observando o disposto no art.º 31.º do RT. — n.º 1 do art.º 92.º do RT.",
+      "enabled": true,
+      "tags": [
+        "condutas",
+        "efluentes",
+        "A1",
+        "material"
+      ]
+    },
+    {
+      "id": "SCIE-COND-RESTRIC-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 92.º n.º 2 — Condutas não Devem Traversar Locais B/D/E/F",
+      "description": "As condutas de evacuação de efluentes de combustão têm percursos no interior de locais de risco B, D, E ou F, ou de locais de depósito/armazenamento de combustíveis. Proibido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.exhaustDuctsTraverseRiskBDEF",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Alterar o percurso das condutas de evacuação de efluentes de combustão para que não atravessem locais de risco B, D, E ou F, nem locais de depósito ou armazenamento de combustíveis. — n.º 2 do art.º 92.º do RT.",
+      "enabled": true,
+      "tags": [
+        "condutas",
+        "efluentes",
+        "percurso",
+        "locais de risco"
+      ]
+    },
+    {
+      "id": "SCIE-AVAC-SEGUR-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 95.º n.º 1 — Dispositivo Central de Segurança AVAC (Paragem a 120 °C)",
+      "description": "As instalações de ventilação e condicionamento de ar não estão dotadas de dispositivo de segurança que assegure automaticamente a paragem dos ventiladores e aparelhos de aquecimento quando a temperatura do ar na conduta ultrapasse 120 °C.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasHVAC",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.hvacHasSafetyDevice",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Instalar dispositivo central de segurança nas instalações de AVAC que assegure paragem automática dos ventiladores e aparelhos de aquecimento quando a temperatura na conduta ultrapasse 120 °C. Deve ser duplicado por dispositivo de accionamento manual, bem visível e sinalizado. — n.º 1 e 2 do art.º 95.º do RT.",
+      "enabled": true,
+      "tags": [
+        "AVAC",
+        "dispositivo segurança",
+        "120 °C",
+        "paragem automática"
+      ]
+    },
+    {
+      "id": "SCIE-AVAC-DUCTO-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 97.º — Material de Condutas de Distribuição de Ar",
+      "description": "As condutas de distribuição de ar não são em material A1 ou o isolamento térmico exterior não é, no mínimo, da classe B-s2,dO.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasHVAC",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.hvacDuctMaterial",
+          "operator": "!=",
+          "value": "A1"
+        }
+      ],
+      "remediation": "Garantir que as condutas de distribuição de ar são construídas com materiais da classe A1. O material de isolamento térmico aplicado na face exterior deve ser, no mínimo, da classe B-s2,dO. — n.º 1 e 3 do art.º 97.º do RT.",
+      "enabled": true,
+      "tags": [
+        "AVAC",
+        "condutas",
+        "A1",
+        "B-s2,dO"
+      ]
+    },
+    {
+      "id": "SCIE-AVAC-GRELHA-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 99.º — Grelhas de Bocas de Insuflação e Extracção (Malha ≤ 10 mm)",
+      "description": "As bocas de insuflação e extracção acessíveis ao público não estão protegidas por grelhas com malha de dimensões não superiores a 10 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "fireSafety.hasHVAC",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.hvacGrilleMeshSize",
+          "operator": ">",
+          "value": 10
+        }
+      ],
+      "remediation": "Proteger as bocas de insuflação e de extracção acessíveis ao público com grelhas de malha ≤ 10 mm ou outros elementos de eficácia semelhante contra a introdução de objectos estranhos nas condutas. — art.º 99.º do RT.",
+      "enabled": true,
+      "tags": [
+        "AVAC",
+        "bocas",
+        "grelha",
+        "10 mm"
+      ]
+    },
+    {
+      "id": "SCIE-FILTRO-CAIXA-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 98.º — Caixas de Filtros em Material A1 com Detector a Jusante",
+      "description": "As caixas que comportam os filtros de ar não são construídas com materiais da classe A1 ou não estão dotadas de detectores de fumo imediatamente a jusante.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasAirFilters",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.airFilterBoxIsA1",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Construir as caixas de filtros com materiais da classe A1 (excepto colas e juntas de estanquidade). Instalar detectores de fumo imediatamente a jusante de cada conjunto de filtros, que assegurem o corte de energia aos ventiladores e baterias de aquecimento. Afastar as caixas 0,2 m de materiais combustíveis. — n.º 2 e 4 do art.º 98.º do RT.",
+      "enabled": true,
+      "tags": [
+        "filtros ar",
+        "A1",
+        "detector fumo",
+        "0.2 m"
+      ]
+    },
+    {
+      "id": "SCIE-ELEVBOMB-CAIXA-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 104.º n.º 6 — Isolamento da Caixa do Ascensor Prioritário",
+      "description": "A caixa do ascensor prioritário para bombeiros não garante o isolamento mínimo: paredes EI ou REI 60, portas de patamar E 30 C.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFirefighterElevator",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.firefighterElevatorShaftRating",
+          "operator": "<",
+          "value": 60
+        }
+      ],
+      "remediation": "Garantir que a caixa do ascensor prioritário para bombeiros é independente, com paredes da classe EI ou REI 60 e portas de patamar E 30 C. — n.º 6 do art.º 104.º do RT.",
+      "enabled": true,
+      "tags": [
+        "ascensor bombeiros",
+        "caixa",
+        "EI 60",
+        "E 30 C"
+      ]
+    },
+    {
+      "id": "SCIE-ELEVBOMB-DET-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 105.º n.º 2 — Detectores no Ascensor Prioritário (70 °C + Fumo)",
+      "description": "O ascensor prioritário para bombeiros não está equipado com detector de temperatura (70 °C) por cima da verga da porta de patamar e/ou detector de fumo na casa das máquinas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFirefighterElevator",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.firefighterElevatorHasDetectors",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Equipar o ascensor prioritário com: (a) detector de temperatura regulado para 70 °C instalado por cima da verga da porta de patamar (excepto se acesso por CCF); (b) detector de fumo na casa das máquinas ou, na sua ausência, no topo da caixa. — alíneas a) e b) do n.º 2 do art.º 105.º do RT.",
+      "enabled": true,
+      "tags": [
+        "ascensor bombeiros",
+        "detector",
+        "70 °C",
+        "fumo"
+      ]
+    },
+    {
+      "id": "SCIE-DESF-VERT-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 160.º n.º 2 — Abertura Superior de Desenfumagem Vertical ≥ 1 m²",
+      "description": "A abertura superior da via vertical enclausurada (permanente ou exutor de fumo) tem área livre inferior a 1 m². Deve ter área livre ≥ 1 m².",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.verticalSmokeVentTopArea",
+          "operator": "<",
+          "value": 1
+        }
+      ],
+      "remediation": "Garantir que a abertura superior da via vertical (permanente ou exutor de fumo) tem uma área livre não inferior a 1 m². O somatório das áreas das aberturas inferiores deve ser, no mínimo, igual à da abertura superior. — n.º 2 e 4 do art.º 160.º do RT.",
+      "enabled": true,
+      "tags": [
+        "desenfumagem",
+        "via vertical",
+        "abertura superior",
+        "1 m²"
+      ]
+    },
+    {
+      "id": "SCIE-VERT-DEGR-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 65.º n.º 1 alínea b) — Número de Degraus por Lanço (3 a 25)",
+      "description": "O lanço de escada da via vertical de evacuação tem um número de degraus fora do intervalo regulamentar (mínimo 3, máximo 25).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "fireSafety.stairFlightSteps",
+          "operator": "not_in_range",
+          "value": [
+            3,
+            25
+          ]
+        }
+      ],
+      "remediation": "Dimensionar os lanços de escada com número de degraus compreendido entre 3 e 25. — alínea b) do n.º 1 do art.º 65.º do RT.",
+      "enabled": true,
+      "tags": [
+        "escadas",
+        "degraus",
+        "lanço",
+        "3-25"
+      ]
+    },
+    {
+      "id": "SCIE-HORIZ-PROT-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 25.º n.º 1 — Protecção Obrigatória de Vias Horizontais",
+      "description": "A via horizontal de evacuação com comprimento superior a 30 m (ou > 10 m em pisos acima de 28 m ou abaixo do PR) não está protegida.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.horizontalRouteLength",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "fireSafety.horizontalRouteIsProtected",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Proteger as vias horizontais de evacuação quando: (a) integradas em UTs de 3.ª/4.ª CR ou com comprimento > 30 m; (b) comprimento > 10 m em pisos acima de 28 m ou abaixo do PR; (c) caminhos de evacuação de locais de risco B sem vias alternativas; (d) caminhos de evacuação de locais de risco D. — n.º 1 do art.º 25.º do RT.",
+      "enabled": true,
+      "tags": [
+        "vias horizontais",
+        "protecção",
+        "30 m",
+        "evacuação"
+      ]
+    },
+    {
+      "id": "SCIE-TECTOFALSO-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 43.º n.º 1 — Reacção ao Fogo de Tecto Falso (≥ C-s2,dO)",
+      "description": "Os materiais constituintes dos tectos falsos não garantem a classe de reacção ao fogo mínima C-s2,dO.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasFalseCeiling",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.falseCeilingFireReaction",
+          "operator": "reaction_class_lt",
+          "value": "C-s2,dO"
+        }
+      ],
+      "remediation": "Garantir que os materiais dos tectos falsos possuem reacção ao fogo ≥ C-s2,dO. Os dispositivos de fixação e suspensão devem ser da classe A1. — n.º 1 e 3 do art.º 43.º do RT.",
+      "enabled": true,
+      "tags": [
+        "tecto falso",
+        "reacção ao fogo",
+        "C-s2,dO",
+        "A1"
+      ]
+    },
+    {
+      "id": "SCIE-DECOR-EVAC-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 45.º n.º 1 — Decoração em Vias de Evacuação (≤ 20% e ≥ B-s1,dO)",
+      "description": "Os elementos de decoração, informação ou publicidade suspensos em vias de evacuação ultrapassam 20% da área da parede ou tecto, ou não possuem reacção ao fogo ≥ B-s1,dO.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "fireSafety.evacuationRouteDecorArea",
+          "operator": ">",
+          "value": 20
+        }
+      ],
+      "remediation": "Limitar os elementos de informação, sinalização, decoração ou publicidade suspensos em vias de evacuação a ≤ 20% da área da parede ou tecto, garantindo reacção ao fogo ≥ B-s1,dO (ou C-s1,dO em locais de risco B). — n.º 1 e 2 do art.º 45.º do RT.",
+      "enabled": true,
+      "tags": [
+        "decoração",
+        "vias evacuação",
+        "20%",
+        "B-s1,dO"
+      ]
+    },
+    {
+      "id": "SCIE-EXAUST-TEMP-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 144.º n.º 3 — Resistência Térmica dos Ventiladores de Extracção de Fumo",
+      "description": "Os ventiladores de extracção de fumo não resistem à temperatura de 400 °C durante o período exigido: 1 hora (edifícios H ≤ 28 m) ou 2 horas (H > 28 m ou pisos enterrados).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasSmokeExtraction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.smokeExtractionFanRating",
+          "operator": "!=",
+          "value": "400C"
+        }
+      ],
+      "remediation": "Garantir que os ventiladores de extracção de fumo resistem, sem alterações sensíveis do regime de funcionamento, à passagem de fumo a 400 °C: durante 1 hora em edifícios com H ≤ 28 m; durante 2 horas em edifícios com H > 28 m ou em pisos enterrados. — n.º 3 do art.º 144.º do RT.",
+      "enabled": true,
+      "tags": [
+        "ventiladores",
+        "extracção fumo",
+        "400 °C",
+        "resistência térmica"
+      ]
+    },
+    {
+      "id": "SCIE-RESIST-CORTE-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 96.º n.º 3 — Corta-Circuito Térmico a 120 °C nas Baterias de Resistências",
+      "description": "As baterias de resistências eléctricas em circuito de ar forçado não estão equipadas com corta-circuitos térmicos a ≤ 0,15 m a jusante, que assegurem o corte quando a temperatura ultrapasse 120 °C.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasElectricHeatingBatteries",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.heatingBatteriesHasThermalCutout",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Instalar corta-circuitos térmicos imediatamente a jusante de cada bateria de resistências (distância máxima 0,15 m), que assegurem o corte de energia quando a temperatura do ar na conduta ultrapasse 120 °C. — n.º 3 do art.º 96.º do RT.",
+      "enabled": true,
+      "tags": [
+        "resistências eléctricas",
+        "corta-circuito",
+        "120 °C",
+        "0.15 m"
+      ]
+    },
+    {
+      "id": "SCIE-AVAC-SEPAR-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 97.º n.º 6 — Condutas de Locais B/D/E/F Não Devem Servir Locais de Risco C",
+      "description": "As condutas de ventilação que servem locais de risco B, D, E ou F também servem locais de risco C. Proibido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hvacDuctsSharedBDEFWithC",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Separar as condutas de ventilação de modo que as que servem locais de risco B, D, E ou F não sirvam locais de risco C. — n.º 6 do art.º 97.º do RT.",
+      "enabled": true,
+      "tags": [
+        "AVAC",
+        "condutas",
+        "separação",
+        "locais de risco C"
+      ]
+    },
+    {
+      "id": "SCIE-RISKA-CLASS-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RJ-SCIE Art. 10.º, n.º 1, alínea a) — Classificação local de risco A",
+      "description": "O local é classificado como risco A mas o efectivo excede 100 pessoas ({fireSafety.localOccupancy} pessoas) ou o efectivo de público excede 50 ({fireSafety.localPublicOccupancy} pessoas). Locais que ultrapassem estes limiares devem ser classificados como risco B.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "A"
+        },
+        {
+          "field": "fireSafety.localOccupancy",
+          "operator": ">",
+          "value": 100
+        }
+      ],
+      "remediation": "Reclassificar o local como risco B (efectivo > 100 pessoas) e aplicar os requisitos correspondentes de isolamento, evacuação e protecção.",
+      "enabled": true,
+      "tags": [
+        "local de risco",
+        "risco A",
+        "risco B",
+        "efectivo",
+        "classificação"
+      ]
+    },
+    {
+      "id": "SCIE-RISKA-CLASS-02",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RJ-SCIE Art. 10.º, n.º 1, alínea a) — Público em local de risco A",
+      "description": "O local é classificado como risco A mas o efectivo de público excede 50 pessoas ({fireSafety.localPublicOccupancy} pessoas). Locais com público > 50 devem ser classificados como risco B.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "A"
+        },
+        {
+          "field": "fireSafety.localPublicOccupancy",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "remediation": "Reclassificar o local como risco B (público > 50 pessoas) e aplicar os requisitos de protecção acrescidos.",
+      "enabled": true,
+      "tags": [
+        "local de risco",
+        "risco A",
+        "risco B",
+        "público",
+        "classificação"
+      ]
+    },
+    {
+      "id": "SCIE-RISKB-LUX-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 114.º, n.º 3 e 4 — Iluminação ambiente em local de risco B",
+      "description": "O local de risco B não dispõe de iluminação de ambiente com valor mínimo de 1 lux medido no pavimento ({fireSafety.riskbAmbientLux} lux). Obrigatório para locais de risco B.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "B"
+        },
+        {
+          "field": "fireSafety.riskbAmbientLux",
+          "operator": "<",
+          "value": 1
+        }
+      ],
+      "remediation": "Instalar aparelhos de iluminação de ambiente que garantam nível mínimo de 1 lux, tão uniforme quanto possível, medido no pavimento.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "risco B",
+        "1 lux",
+        "ambiente"
+      ]
+    },
+    {
+      "id": "SCIE-RISKC-LUX-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 114.º, n.º 3 e 4 — Iluminação ambiente em local de risco C",
+      "description": "O local de risco C não dispõe de iluminação de ambiente com valor mínimo de 1 lux medido no pavimento ({fireSafety.riskcAmbientLux} lux). Obrigatório para locais de risco C e C+.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "in",
+          "value": [
+            "C",
+            "C+"
+          ]
+        },
+        {
+          "field": "fireSafety.riskcAmbientLux",
+          "operator": "<",
+          "value": 1
+        }
+      ],
+      "remediation": "Instalar aparelhos de iluminação de ambiente que garantam nível mínimo de 1 lux, tão uniforme quanto possível, medido no pavimento.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "risco C",
+        "risco C+",
+        "1 lux",
+        "ambiente"
+      ]
+    },
+    {
+      "id": "SCIE-RISKE-LUX-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 114.º, n.º 3 e 4 — Iluminação ambiente em local de risco E",
+      "description": "O local de risco E (excepto quartos) não dispõe de iluminação de ambiente com valor mínimo de 1 lux medido no pavimento ({fireSafety.riskeAmbientLux} lux).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "E"
+        },
+        {
+          "field": "fireSafety.riskeAmbientLux",
+          "operator": "<",
+          "value": 1
+        }
+      ],
+      "remediation": "Instalar aparelhos de iluminação de ambiente (excepto nos quartos) com nível mínimo de 1 lux no pavimento. Nos espaços de dormida, os blocos autónomos devem ser do tipo permanente.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "risco E",
+        "1 lux",
+        "ambiente",
+        "dormida"
+      ]
+    },
+    {
+      "id": "SCIE-PARK-DUCTO-EI120",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 217.º, n.º 5 e 6 — Protecção de condutas em parques de estacionamento",
+      "description": "As condutas de líquidos inflamáveis ou de gás combustível no parque de estacionamento não estão protegidas em ducto com classificação EI 120 construído com materiais de reacção ao fogo A1.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasParkingGarage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.parkingDuctProtection",
+          "operator": "<",
+          "value": 120
+        }
+      ],
+      "remediation": "Proteger as condutas de líquidos inflamáveis e de gás combustível em ductos com classificação EI 120, construídos com materiais de reacção ao fogo A1. Os ductos devem ser ventilados nas condições previstas no RT.",
+      "enabled": true,
+      "tags": [
+        "parque",
+        "estacionamento",
+        "ducto",
+        "EI 120",
+        "A1",
+        "gás combustível"
+      ]
+    },
+    {
+      "id": "SCIE-PARK-GAS-BAN-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 217.º, n.º 7 — Interdição de condutas de gás em parques > 6000 m²",
+      "description": "O parque de estacionamento com área bruta superior a 6 000 m² ({fireSafety.parkingGrossArea} m²) possui condutas de gases combustíveis, o que é interdito mesmo com protecção em ductos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.parkingGrossArea",
+          "operator": ">",
+          "value": 6000
+        },
+        {
+          "field": "fireSafety.parkingHasGasDucts",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Remover todas as condutas de gases combustíveis do parque de estacionamento. Em parques com área bruta superior a 6 000 m², a sua existência é interdita mesmo que protegidas em ductos (art.º 217.º, n.º 7 do RT).",
+      "enabled": true,
+      "tags": [
+        "parque",
+        "estacionamento",
+        "gás combustível",
+        "interdição",
+        "6000 m²"
+      ]
+    },
+    {
+      "id": "SCIE-DUCTO-A1-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 32.º, n.º 1 — Material A1 para ductos > 0,2 m²",
+      "description": "Os ductos com secção superior a 0,2 m² não são construídos com materiais da classe A1. Exigência obrigatória para ductos de secção superior a 0,2 m².",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.ductSection",
+          "operator": ">",
+          "value": 0.2
+        },
+        {
+          "field": "fireSafety.ductMaterialClass",
+          "operator": "!=",
+          "value": "A1"
+        }
+      ],
+      "remediation": "Construir os ductos com secção superior a 0,2 m² utilizando materiais da classe de reacção ao fogo A1 (n.º 1 do art.º 32.º do RT).",
+      "enabled": true,
+      "tags": [
+        "ducto",
+        "A1",
+        "secção",
+        "material",
+        "reacção ao fogo"
+      ]
+    },
+    {
+      "id": "SCIE-DUCTO-GAS-DET-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 184.º, alínea b) — Detecção de gás em ductos",
+      "description": "Os ductos que contêm canalizações de gás combustível em edifício da 2.ª categoria de risco ou superior não estão dotados de sistema automático de detecção de gás combustível.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskCategory",
+          "operator": ">=",
+          "value": 2
+        },
+        {
+          "field": "fireSafety.hasGasDucts",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.ductGasDetection",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar sistema automático de detecção de gás combustível nos ductos que contenham canalizações de gás, conforme alínea b) do art.º 184.º do RT.",
+      "enabled": true,
+      "tags": [
+        "ducto",
+        "gás combustível",
+        "detecção",
+        "2.ª categoria"
+      ]
+    },
+    {
+      "id": "SCIE-RISKE-NOGAS-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 106.º, n.º 4, alínea c) — Interdição de combustíveis em local de risco E",
+      "description": "O local de risco E (dormida) contém líquidos ou gases combustíveis, o que é interdito em qualquer quantidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "E"
+        },
+        {
+          "field": "fireSafety.localHasCombustibles",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Remover todos os líquidos e gases combustíveis do local de risco E. É interdita a sua utilização ou depósito em qualquer quantidade (alínea c) do n.º 4 do art.º 106.º do RT).",
+      "enabled": true,
+      "tags": [
+        "risco E",
+        "dormida",
+        "combustíveis",
+        "interdição"
+      ]
+    },
+    {
+      "id": "SCIE-REPOST-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 45.º, n.º 4 — Reposteiros em vias de evacuação de locais C/E/F",
+      "description": "Existem reposteiros ou elementos suspensos transversalmente ao sentido da evacuação nas vias e saídas de locais de risco C, E ou F, o que é proibido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "in",
+          "value": [
+            "C",
+            "C+",
+            "E",
+            "F"
+          ]
+        },
+        {
+          "field": "fireSafety.hasSuspendedCurtains",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Remover todos os reposteiros e elementos suspensos transversalmente ao sentido da evacuação nas vias de evacuação e saídas de locais de risco C, E e F (n.º 4 do art.º 45.º do RT).",
+      "enabled": true,
+      "tags": [
+        "reposteiros",
+        "evacuação",
+        "risco C",
+        "risco E",
+        "risco F",
+        "elementos suspensos"
+      ]
+    },
+    {
+      "id": "SCIE-RISKC-COND-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 30.º, n.º 5 — Isolamento de condutas > 125 mm em locais de risco C",
+      "description": "As canalizações ou condutas com diâmetro nominal superior a 125 mm com percursos no interior de locais de risco C não estão dotadas de meios de isolamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "in",
+          "value": [
+            "C",
+            "C+"
+          ]
+        },
+        {
+          "field": "fireSafety.riskCPipeDiameter",
+          "operator": ">",
+          "value": 125
+        },
+        {
+          "field": "fireSafety.riskCPipeIsolation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Dotar de meios de isolamento as canalizações e condutas com diâmetro nominal superior a 125 mm (ou secção equivalente) nos percursos no interior de locais de risco C (n.º 5 do art.º 30.º do RT).",
+      "enabled": true,
+      "tags": [
+        "risco C",
+        "condutas",
+        "isolamento",
+        "125 mm"
+      ]
+    },
+    {
+      "id": "SCIE-CTTERM-2000KW-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 80.º, n.º 4 — Interdição de centrais térmicas > 2000 kW no interior",
+      "description": "A central térmica com potência útil total instalada superior a 2 000 kW ({fireSafety.thermalPlantPower} kW) encontra-se no interior do edifício, o que não é permitido (excepto UT XII exclusiva).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.thermalPlantPower",
+          "operator": ">",
+          "value": 2000
+        },
+        {
+          "field": "fireSafety.thermalPlantIndoor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "!=",
+          "value": "XII"
+        }
+      ],
+      "remediation": "Relocalizar a central térmica para o exterior do edifício. Centrais térmicas com potência útil total superior a 2 000 kW não são permitidas no interior de edifícios, excepto os afectos exclusivamente à UT XII (n.º 4 do art.º 80.º do RT).",
+      "enabled": true,
+      "tags": [
+        "central térmica",
+        "2000 kW",
+        "interdição",
+        "interior"
+      ]
+    },
+    {
+      "id": "SCIE-RISKB-DEPTH-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RJ-SCIE Art. 11.º, n.º 1, alínea b) — Profundidade máxima de locais de risco B",
+      "description": "O local de risco B acessível a público situa-se abaixo das saídas para o exterior com uma diferença de cota superior a 6 m ({fireSafety.riskBBelowExitDepth} m), o que não é permitido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "B"
+        },
+        {
+          "field": "fireSafety.riskBBelowExitDepth",
+          "operator": ">",
+          "value": 6
+        }
+      ],
+      "remediation": "Relocalizar o local de risco B para um nível em que a diferença de cota em relação às saídas para o exterior não exceda 6 m (n.º 1, alínea b) do art.º 11.º do RJ).",
+      "enabled": true,
+      "tags": [
+        "risco B",
+        "profundidade",
+        "6 m",
+        "subsolo",
+        "localização"
+      ]
+    },
+    {
+      "id": "SCIE-RISKE-LEVEL-01",
+      "regulationId": "dl-220-2008-scie",
+      "article": "RJ-SCIE Art. 11.º, n.º 4 — Locais de risco E ao nível ou acima da saída",
+      "description": "O local de risco E (dormida) situa-se abaixo do piso de saída para local seguro no exterior, o que não é permitido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.riskClassification",
+          "operator": "==",
+          "value": "E"
+        },
+        {
+          "field": "fireSafety.riskEBelowExit",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Relocalizar o local de risco E para o nível ou acima do piso de saída para local seguro no exterior (n.º 4 do art.º 11.º do RJ).",
+      "enabled": true,
+      "tags": [
+        "risco E",
+        "dormida",
+        "subsolo",
+        "localização",
+        "nível"
+      ]
+    },
+    {
+      "id": "SCIE-PATIO-SEP-DE-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 19.º, n.º 1, alínea e) — Separação EI 30 entre pátio e locais D/E",
+      "description": "A envolvente que separa locais de risco D ou E do pátio interior coberto fechado não possui resistência ao fogo padrão EI 30 ou superior.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasClosedPatio",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioSeparationDE",
+          "operator": "<",
+          "value": 30
+        }
+      ],
+      "remediation": "Garantir separação com resistência ao fogo padrão da classe EI 30 ou superior entre locais de risco D ou E e pátios interiores cobertos fechados (alínea e) do n.º 1 do art.º 19.º do RT).",
+      "enabled": true,
+      "tags": [
+        "pátio",
+        "coberto fechado",
+        "EI 30",
+        "risco D",
+        "risco E",
+        "separação"
+      ]
+    },
+    {
+      "id": "SCIE-PATIO-OBTUR-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 19.º, n.º 1, alínea d) — Obturação de vãos nos tectos de pátios",
+      "description": "Os elementos de obturação dos vãos praticados nos tectos de pátios interiores cobertos fechados para iluminação ou ventilação não são da classe B-s1,dO ou superior.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "fireSafety.hasClosedPatio",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioSkylight",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.patioSkylightClass",
+          "operator": "reaction_class_lt",
+          "value": "B-s1,dO"
+        }
+      ],
+      "remediation": "Utilizar produtos da classe B-s1,dO ou superior nos elementos de obturação dos vãos praticados nos tectos de pátios interiores cobertos fechados (alínea d) do n.º 1 do art.º 19.º do RT).",
+      "enabled": true,
+      "tags": [
+        "pátio",
+        "obturação",
+        "B-s1,dO",
+        "tecto",
+        "claraboia"
+      ]
+    },
+    {
+      "id": "SCIE-COND-COLECT-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 92.º, n.º 5 e 6 — Condutas colectivas de efluentes",
+      "description": "A conduta colectiva de evacuação de efluentes de combustão serve mais de 5 locais ({fireSafety.collectiveDuctConnections} ligações). Máximo de 5 ligações (ou 7 se exclusivamente aparelhos a gás tipo B).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.collectiveDuctConnections",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "fireSafety.collectiveDuctGasTypeBOnly",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "remediation": "Limitar o número de ligações à conduta colectiva a 5 (caso geral) ou 7 (se exclusivamente aparelhos a gás tipo B). Os ramais de ligação devem ter a altura máxima de um piso (n.º 5 e 6 do art.º 92.º do RT).",
+      "enabled": true,
+      "tags": [
+        "conduta colectiva",
+        "efluentes",
+        "combustão",
+        "ligações",
+        "gás tipo B"
+      ]
+    },
+    {
+      "id": "SCIE-FILTRO-UTA-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 98.º — Filtros em centrais de tratamento de ar > 10 000 m³/h",
+      "description": "A central de tratamento de ar com capacidade superior a 10 000 m³/h não cumpre os requisitos de proteção contra incêndio dos filtros: caixas A1, filtros D-s1,d2 (ou F se laváveis ≤0,5 g/m²/h), detector de fumo a jusante.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.airHandlingCapacity",
+          "operator": ">",
+          "value": 10000
+        },
+        {
+          "field": "fireSafety.filterFireProtection",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Garantir: (1) caixas de filtros em material A1 (excepto colas e juntas); (2) filtros de classe D-s1,d2 ou F se regeneráveis por lavagem com massa ≤0,5 g/m²/h; (3) detector de fumo imediatamente a jusante dos filtros que assegure corte de energia a ventiladores e baterias de aquecimento; (4) sinal de perigo junto ao acesso (art.º 98.º do RT).",
+      "enabled": true,
+      "tags": [
+        "filtro",
+        "UTA",
+        "central tratamento ar",
+        "10000 m³/h",
+        "A1",
+        "detector fumo"
+      ]
+    },
+    {
+      "id": "SCIE-CANTON-01",
+      "regulationId": "portaria-1532-2008-rtscie",
+      "article": "RT-SCIE Art. 135.º, n.º 4 — Painéis de cantonamento de fumo",
+      "description": "Os painéis de cantonamento de fumo não cumprem os requisitos mínimos: prolongamento ≥0,5 m abaixo do nível de captação, estabilidade ao fogo E 15, material de reacção ao fogo A2-s1,d1.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "fireSafety.hasSmokeCantonments",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "fireSafety.cantonmentCompliant",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Os painéis de cantonamento devem: (1) prolongar-se pelo menos 0,5 m abaixo do nível de captação do fumo; (2) possuir estabilidade ao fogo E 15; (3) ser construídos com materiais de classe de reacção ao fogo A2-s1,d1 (n.º 4 do art.º 135.º do RT).",
+      "enabled": true,
+      "tags": [
+        "cantonamento",
+        "fumo",
+        "E 15",
+        "A2-s1,d1",
+        "desenfumagem"
       ]
     }
   ]

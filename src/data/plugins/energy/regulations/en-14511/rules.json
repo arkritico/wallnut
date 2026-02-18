@@ -1,0 +1,117 @@
+{
+  "regulationRef": "en-14511-16147",
+  "description": "Regras EN 14511 e EN 16147 — Desempenho sazonal de bombas de calor: SCOP, SEER, SPF, classificação renovável, part-load, certificação Eurovent",
+  "extractedBy": "claude-regulatory-expansion-v3",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "ENE-SCOP-MINIMUM-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14825 (baseada em EN 14511) — SCOP Mínimo para Bombas de Calor",
+      "description": "O SCOP (Seasonal COP) da bomba de calor de aquecimento ({systems.heatPumpSCOP}) é inferior ao mínimo recomendado de 3.5, comprometendo a eficiência energética sazonal real.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true },
+        { "field": "systems.heatPumpSCOP", "operator": "<", "value": 3.5 }
+      ],
+      "currentValueTemplate": "SCOP = {systems.heatPumpSCOP}",
+      "requiredValue": "SCOP ≥ 3.5 (clima médio — Portugal continental) para classificação A+ Ecodesign",
+      "remediation": "Melhorar o SCOP da bomba de calor: (1) SCOP inclui desempenho a carga parcial (21%, 39%, 54%, 88%, 100%). (2) SCOP ≥ 4.6 = classe A+++ (Ecodesign). (3) SCOP 3.5-4.0 = classe A+ (mínimo recomendado). (4) Fatores que reduzem SCOP: ciclos de descongelação (icing), temperaturas de saída altas (> 45°C), dimensionamento errado. (5) Bombas de calor inverter: SCOP 15-25% superior a on/off. (6) Verificar ficha técnica EN 14825 do fabricante.",
+      "enabled": true,
+      "tags": ["SCOP", "bomba de calor", "sazonal", "EN 14825", "Ecodesign"]
+    },
+    {
+      "id": "ENE-SEER-MINIMUM-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14825 — SEER Mínimo para Sistemas de Arrefecimento",
+      "description": "O SEER (Seasonal EER) do sistema de arrefecimento ({systems.coolingSystemSEER}) é inferior ao mínimo recomendado de 5.6, resultando em consumo de energia excessivo no verão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.coolingSystemSEER", "operator": "<", "value": 5.6 }
+      ],
+      "currentValueTemplate": "SEER = {systems.coolingSystemSEER}",
+      "requiredValue": "SEER ≥ 5.6 (classe A, Ecodesign) — recomendado ≥ 6.1 (A+)",
+      "remediation": "Melhorar o SEER: (1) SEER ≥ 8.5 = A+++ (topo de gama). (2) SEER 6.1-8.5 = A+ a A++. (3) SEER < 5.6 = abaixo de classe A, não recomendado para nZEB. (4) Splits inverter modernos: SEER 6.0-9.0. (5) VRV/VRF: SEER 5.5-7.5 (melhor em partial load). (6) Chillers centrífugos: SEER 5.0-6.5. (7) Para Portugal (clima quente): SEER é mais relevante que SCOP — o arrefecimento domina em serviços.",
+      "enabled": true,
+      "tags": ["SEER", "arrefecimento", "sazonal", "Ecodesign", "classe"]
+    },
+    {
+      "id": "ENE-SPF-RENEWABLE-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14511 + Diretiva 2009/28/CE — SPF ≥ 2.5 para Classificação Renovável",
+      "description": "A bomba de calor não atinge o SPF (Seasonal Performance Factor) mínimo de 2.5, necessário para ser classificada como fonte parcialmente renovável conforme a Diretiva Europeia de Energias Renováveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true },
+        { "field": "systems.heatPumpSPF", "operator": "<", "value": 2.5 }
+      ],
+      "currentValueTemplate": "SPF = {systems.heatPumpSPF}",
+      "requiredValue": "SPF ≥ 2.5 para classificação como parcialmente renovável",
+      "remediation": "Garantir SPF ≥ 2.5: (1) SPF = energia útil total / energia elétrica consumida (anual). (2) Inclui: aquecimento + AQS + stand-by + back-up elétrico. (3) SPF < 2.5: bomba de calor não conta como renovável → não contribui para nZEB. (4) Fatores que reduzem SPF: resistência elétrica de backup frequente, ciclos curtos, sub-dimensionamento. (5) Para Portugal (clima ameno): SPF típico = 3.0-4.5 — facilmente superado. (6) Medir SPF real: contadores de calor (saída) + contador elétrico (entrada) durante 1 ano.",
+      "enabled": true,
+      "tags": ["SPF", "renovável", "2.5", "Diretiva 2009/28", "bomba de calor"]
+    },
+    {
+      "id": "ENE-HP-DHW-EN16147-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 16147 — COP de Bombas de Calor para AQS (Termodinâmicas)",
+      "description": "O COP da bomba de calor termodinâmica para AQS ({systems.dhwHeatPumpCOP}) é inferior a 2.5 conforme EN 16147, o que pode resultar em consumo de AQS superior ao de um esquentador a gás.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.dhwSystem", "operator": "==", "value": "heat_pump" },
+        { "field": "systems.dhwHeatPumpCOP", "operator": "<", "value": 2.5 }
+      ],
+      "currentValueTemplate": "COP AQS = {systems.dhwHeatPumpCOP}",
+      "requiredValue": "COP ≥ 2.5 (EN 16147, perfil L — residencial) para AQS por bomba de calor",
+      "remediation": "Garantir COP AQS ≥ 2.5: (1) EN 16147 define perfis de consumo: S (pequeno), M (médio), L (grande), XL (muito grande). (2) Perfil L: 11.7 kWh/dia, típico para T3-T4. (3) COP medido com θ_ar = 7/20°C e θ_água = 52°C. (4) Bombas de calor termodinâmicas modernas: COP 2.8-3.5 (perfil L). (5) Localização do equipamento: ar exterior ou ar interior (cave, garagem) afeta o COP. (6) Depósito isolado: ≥ 50 mm PU — perdas estáticas < 1.5 kWh/dia.",
+      "enabled": true,
+      "tags": ["COP", "AQS", "termodinâmica", "EN 16147", "perfil L"]
+    },
+    {
+      "id": "ENE-HP-PARTLOAD-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14511 — Desempenho a Carga Parcial (Part-Load)",
+      "description": "A bomba de calor não possui informação de desempenho a carga parcial conforme EN 14511, impedindo o cálculo fiável do SCOP/SEER e a seleção adequada do equipamento.",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true },
+        { "field": "systems.hasPartLoadData", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Dados de carga parcial (21%, 39%, 54%, 88%, 100%) conforme EN 14511/14825",
+      "remediation": "Obter dados de part-load do fabricante: (1) EN 14825 requer 4 pontos: 21%, 39%, 54%, 88% da capacidade nominal. (2) Bombas de calor inverter: COP a carga parcial tipicamente 20-40% superior ao COP nominal. (3) Bombas de calor on/off: COP a carga parcial inferior (ciclos curtos). (4) O SCOP é calculado ponderando os 4 pontos conforme distribuição climática. (5) Ficha técnica Eurovent: inclui SCOP e SEER certificados. (6) Software de seleção do fabricante: geralmente fornece part-load detalhado.",
+      "enabled": true,
+      "tags": ["carga parcial", "part-load", "EN 14511", "inverter", "on/off"]
+    },
+    {
+      "id": "ENE-HP-EUROVENT-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14511 + Eurovent — Certificação de Desempenho",
+      "description": "A bomba de calor não possui certificação Eurovent ou equivalente, o que pode significar que os valores de COP/SCOP declarados pelo fabricante não foram verificados por entidade independente.",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true },
+        { "field": "systems.hasEuroventCertification", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Certificação Eurovent ou equivalente para verificação independente de COP/SCOP",
+      "remediation": "Verificar certificação do equipamento: (1) Eurovent: programa de certificação independente para AVAC (www.eurovent-certification.com). (2) Keymark: certificação europeia para bombas de calor e coletores solares. (3) NF PAC: certificação francesa de bombas de calor. (4) EHPA Quality Label: etiqueta de qualidade europeia. (5) Sem certificação: valores de COP/SCOP declarados podem ser inflacionados em 10-20%. (6) Para projetos de certificação energética: usar preferencialmente equipamentos certificados Eurovent.",
+      "enabled": true,
+      "tags": ["Eurovent", "certificação", "COP", "SCOP", "independente"]
+    },
+    {
+      "id": "ENE-HP-SIZING-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14511 + EN 15450 — Dimensionamento Correto de Bombas de Calor",
+      "description": "A potência da bomba de calor deve ser dimensionada para cobrir pelo menos 80% das necessidades de aquecimento à temperatura de projeto (bivalência), com apoio elétrico para os picos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true },
+        { "field": "systems.heatPumpCoverageRatio", "operator": "<", "value": 0.8 }
+      ],
+      "currentValueTemplate": "Cobertura BC = {systems.heatPumpCoverageRatio}",
+      "requiredValue": "Cobertura ≥ 80% das necessidades de aquecimento pela bomba de calor (ponto de bivalência)",
+      "remediation": "Dimensionar corretamente a bomba de calor: (1) Ponto de bivalência: temperatura exterior à qual a BC atinge 100% da capacidade. (2) Bivalência recomendada: -2°C a 2°C para Portugal continental (I1). (3) Cobertura 80%: BC cobre 80% da energia anual, restante por apoio elétrico. (4) Sobredimensionamento: ciclos curtos, COP reduzido, custo desnecessário. (5) Subdimensionamento: excesso de apoio elétrico, SPF baixo, Ntc aumentado. (6) EN 15450: método de cálculo para dimensionamento de bombas de calor.",
+      "enabled": true,
+      "tags": ["dimensionamento", "bivalência", "cobertura", "EN 15450"]
+    }
+  ]
+}

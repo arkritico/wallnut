@@ -85,6 +85,7 @@ export async function executePipelineJob(
     includeCosts?: boolean;
     includeSchedule?: boolean;
     includeCompliance?: boolean;
+    ifcAnalyses?: unknown[];
   },
 ): Promise<void> {
   const store = getJobStore();
@@ -113,6 +114,7 @@ export async function executePipelineJob(
         includeCosts: options.includeCosts,
         includeSchedule: options.includeSchedule,
         includeCompliance: options.includeCompliance,
+        ifcAnalyses: options.ifcAnalyses as import("./ifc-specialty-analyzer").SpecialtyAnalysisResult[] | undefined,
         onProgress,
       },
     });

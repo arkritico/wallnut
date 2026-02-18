@@ -1,0 +1,83 @@
+{
+  "regulationRef": "portaria-379a-2015",
+  "description": "Regras Portaria 379-A/2015 — alterações à Portaria 349-B/2013: requisitos atualizados de U para edifícios novos, valores de referência de sistemas, requisitos de AQS",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "THERM-379A-CURTAINWALL-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Umáx Fachadas Cortina / Fachadas Envidraçadas",
+      "description": "O coeficiente de transmissão térmica da fachada cortina ({envelope.curtainWallUValue} W/(m².K)) excede o limite máximo de vãos envidraçados para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "envelope.curtainWallUValue", "operator": "lookup_gt", "value": null, "table": "max_u_windows", "keys": ["location.climateZoneWinter"] }
+      ],
+      "currentValueTemplate": "U fachada cortina = {envelope.curtainWallUValue} W/(m².K)",
+      "requiredValue": "Consultar limite de envidraçados: I1 ≤ 2.80 / I2 ≤ 2.40 / I3 ≤ 2.20 W/(m².K)",
+      "remediation": "A fachada cortina é classificada como vão envidraçado para efeitos de Umáx: (1) Vidro duplo com caixa de argon e baixa emissividade: Ug ≈ 1.0-1.3 W/(m².K). (2) Painéis opacos da fachada cortina: devem ser isolados (≥ 60 mm XPS/lã mineral). (3) Perfilaria com corte térmico: Uf ≈ 2.5-3.5 W/(m².K). (4) O U ponderado (painel + vidro + perfil) deve cumprir o limite. (5) O IFC identifica fachadas cortina (IfcCurtainWall) — extrair U automaticamente.",
+      "enabled": true,
+      "tags": ["fachada cortina", "valor-U", "envidraçados", "IFC"]
+    },
+    {
+      "id": "THERM-379A-SKYLIGHT-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Factor Solar de Claraboias e Envidraçados Horizontais",
+      "description": "O fator solar das claraboias/envidraçados horizontais ({envelope.skylightSolarFactor}) excede o limite máximo, pois os envidraçados horizontais recebem radiação solar muito superior aos verticais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "envelope.skylightSolarFactor", "operator": ">", "value": 0.25 }
+      ],
+      "currentValueTemplate": "g⊥ claraboia = {envelope.skylightSolarFactor}",
+      "requiredValue": "g⊥ ≤ 0.25 para envidraçados horizontais (claraboias) em todas as zonas",
+      "remediation": "Controlar os ganhos solares em claraboias: (1) Vidro de controlo solar: baixo fator-g com elevada transmissão luminosa. (2) Proteção solar exterior: lamelas, persianas exteriores, ou tela exterior. (3) Ventilação da claraboia: claraboia com abertura para ventilação natural no verão. (4) Reduzir área: manter proporção claraboia/pavimento ≤ 5%. (5) Claraboias tubulares: fator solar mais controlado e boa iluminação natural.",
+      "enabled": true,
+      "tags": ["claraboia", "fator solar", "horizontal", "sobreaquecimento"]
+    },
+    {
+      "id": "THERM-379A-AIRTIGHT-N50-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 + EN 13829 — Estanquidade ao Ar (Blower Door Test)",
+      "description": "A estanquidade ao ar do edifício não foi verificada por ensaio de pressurização (blower door test). Para edifícios com ventilação mecânica, a taxa de renovação de ar a 50 Pa (n50) deve ser ≤ 4 h⁻¹.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "envelope.n50Value", "operator": "not_exists", "value": null },
+        { "field": "envelope.ventilationType", "operator": "==", "value": "mechanical" }
+      ],
+      "requiredValue": "n50 ≤ 4 h⁻¹ para ventilação mecânica (≤ 1.0 h⁻¹ recomendado para nZEB)",
+      "remediation": "Realizar ensaio de estanquidade ao ar (blower door test EN 13829): (1) Requisito REH: n50 ≤ 4 h⁻¹ para edifícios com ventilação mecânica (se ensaiado, pode usar Rph real; caso contrário, Rph = 0.6). (2) Boas práticas nZEB: n50 ≤ 1.0 h⁻¹. (3) Passive House: n50 ≤ 0.6 h⁻¹. (4) Principais fugas: caixas de estore, caixilharia, passagens de tubagem, tomadas elétricas em paredes exteriores. (5) Custo do ensaio: ~300-500€ para moradia — retorno imediato em conforto e eficiência.",
+      "enabled": true,
+      "tags": ["estanquidade", "blower door", "n50", "infiltração", "EN 13829"]
+    },
+    {
+      "id": "THERM-379A-SHADING-OVERHANG-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 + Despacho 15793-K — Fatores de Sombreamento de Elementos Horizontais",
+      "description": "Os dispositivos de sombreamento fixos (palas horizontais) não foram considerados no cálculo do fator solar efetivo. As palas horizontais a Sul reduzem significativamente os ganhos solares no verão mantendo ganhos no inverno.",
+      "severity": "info",
+      "conditions": [
+        { "field": "envelope.hasFixedShading", "operator": "not_exists", "value": null },
+        { "field": "envelope.windowArea", "operator": ">", "value": 3 }
+      ],
+      "requiredValue": "Considerar Fs (fator de sombreamento por elementos horizontais e verticais) conforme Despacho 15793-K Tabela VI",
+      "remediation": "Incorporar sombreamento fixo no cálculo térmico: (1) Palas horizontais a Sul: ângulo ≥ 30° bloqueia sol de verão (altitude solar > 60°) e admite sol de inverno (altitude < 30°). (2) Fator de sombreamento Fh (horizontal): tabelado no Despacho 15793-K Tabela VI em função do ângulo e orientação. (3) Para Fh típico em pala a Sul: redução de 20-40% dos ganhos solares de verão. (4) Palas verticais (Fo): laterais nas orientações Este/Oeste. (5) O IFC pode identificar palas e calcular ângulos automaticamente a partir da geometria dos elementos (IfcSlab/IfcPlate com classificação de sombreamento).",
+      "enabled": true,
+      "tags": ["sombreamento", "pala", "fator solar", "Fh", "IFC"]
+    },
+    {
+      "id": "THERM-379A-AQS-SOLAR-CALC-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 + DL 118/2013 Art. 27 — Cálculo Solar Térmico (SCE.ER)",
+      "description": "O cálculo da contribuição do sistema solar térmico não foi realizado com a ferramenta SCE.ER (Solar térmico – Cálculos de Eficiência Regulamentar) ou programa equivalente validado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasSolarThermal", "operator": "==", "value": true },
+        { "field": "energy.hasSCEERCalculation", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Cálculo SCE.ER obrigatório para validação da contribuição solar",
+      "remediation": "Realizar cálculo SCE.ER para o sistema solar térmico: (1) Utilizar a ferramenta SCE.ER (disponível no portal SCE da ADENE). (2) Dados necessários: localização, orientação e inclinação dos coletores, área de captação, volume do depósito, tipo de coletor (certificação Solar Keymark). (3) O programa calcula: Esolar (contribuição anual de energia solar) e fração solar. (4) Regra: Esolar ≥ Qa × 0.50 (50% das necessidades de AQS cobertas por solar). (5) Se < 50%: justificar (sombreamento, orientação adversa, área de cobertura insuficiente) e compensar com outro renovável.",
+      "enabled": true,
+      "tags": ["solar térmico", "SCE.ER", "cálculo", "AQS", "ADENE"]
+    }
+  ]
+}

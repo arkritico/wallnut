@@ -1,0 +1,98 @@
+{
+  "regulationRef": "en-16798-1",
+  "description": "Regras EN 16798-1:2019 — parâmetros ambientais interiores: conforto térmico, qualidade do ar interior, categorias de ambiente I-IV, temperaturas operativas",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "THERM-COMFORT-HEAT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Tabela NA.2 — Temperatura Operativa Mínima de Aquecimento",
+      "description": "A temperatura operativa interior de projeto para aquecimento ({envelope.heatingSetpointTemp}°C) é inferior ao mínimo recomendado de 20°C para categoria II (edifícios residenciais novos) conforme EN 16798-1.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "envelope.heatingSetpointTemp", "operator": "<", "value": 20 }
+      ],
+      "currentValueTemplate": "Temperatura de aquecimento: {envelope.heatingSetpointTemp}°C",
+      "requiredValue": "≥ 20°C (Cat. II) / ≥ 21°C (Cat. I — idosos, crianças) / ≥ 18°C (Cat. III)",
+      "remediation": "Ajustar a temperatura operativa de aquecimento conforme EN 16798-1: (1) Categoria I (elevada expectativa — hospitais, lares): 21°C. (2) Categoria II (normal — habitação nova, escritórios): 20°C. (3) Categoria III (aceitável — edifícios existentes): 18°C. (4) Nota: o REH utiliza 18°C como temperatura interior convencional para cálculo de Nic, mas o conforto real exige 20°C. (5) Quartos de dormir: podem ter 1-2°C menos.",
+      "enabled": true,
+      "tags": ["conforto térmico", "aquecimento", "temperatura operativa", "EN 16798"]
+    },
+    {
+      "id": "THERM-COMFORT-COOL-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Tabela NA.2 — Temperatura Operativa Máxima de Arrefecimento",
+      "description": "A temperatura operativa interior de projeto para arrefecimento ({envelope.coolingSetpointTemp}°C) excede o máximo recomendado de 26°C para categoria II conforme EN 16798-1.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "envelope.coolingSetpointTemp", "operator": ">", "value": 26 }
+      ],
+      "currentValueTemplate": "Temperatura de arrefecimento: {envelope.coolingSetpointTemp}°C",
+      "requiredValue": "≤ 26°C (Cat. II) / ≤ 25.5°C (Cat. I) / ≤ 27°C (Cat. III)",
+      "remediation": "Ajustar a temperatura operativa de arrefecimento: (1) Categoria II (normal): 26°C. (2) Categoria I (elevada): 25.5°C. (3) O REH utiliza 25°C como referência para cálculo de Nvc. (4) Modelo adaptativo (edifícios sem arrefecimento mecânico): temperatura aceitável aumenta com a temperatura exterior média — permite até 28-29°C em dias quentes se a temperatura média dos últimos 7 dias é elevada. (5) Ventilação natural cruzada e inércia térmica forte: estratégias para manter conforto sem arrefecimento mecânico.",
+      "enabled": true,
+      "tags": ["conforto térmico", "arrefecimento", "temperatura operativa", "EN 16798"]
+    },
+    {
+      "id": "THERM-COMFORT-QAI-VENT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Tabela B.6 — Caudal de Ar Novo por Pessoa",
+      "description": "O caudal de ventilação por pessoa é inferior ao mínimo exigido pela EN 16798-1 para a categoria de ambiente interior aplicável, comprometendo a qualidade do ar interior.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "envelope.ventilationRatePerPerson", "operator": "<", "value": 7 }
+      ],
+      "currentValueTemplate": "Caudal: {envelope.ventilationRatePerPerson} L/(s.pessoa)",
+      "requiredValue": "≥ 7 L/(s.pessoa) Cat. II / ≥ 10 L/(s.pessoa) Cat. I / ≥ 4 L/(s.pessoa) Cat. III",
+      "remediation": "Garantir caudal de ar novo adequado conforme EN 16798-1: (1) Categoria II (habitação nova): 7 L/(s.pessoa) = 25.2 m³/(h.pessoa). (2) Categoria I (hospitais, lares): 10 L/(s.pessoa). (3) Método alternativo: por área — 0.7 L/(s.m²) Cat. II. (4) REH: Rph mínimo 0.4 h⁻¹ ≈ 4-5 L/(s.pessoa) para compartimento de 15 m² com 2.7 m altura e 2 ocupantes. (5) O IFC pode fornecer volumes dos compartimentos (IfcSpace) para cálculo automático.",
+      "enabled": true,
+      "tags": ["qualidade do ar", "ventilação", "caudal", "EN 16798", "QAI"]
+    },
+    {
+      "id": "THERM-COMFORT-CO2-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Tabela B.6 — Concentração de CO₂ Interior",
+      "description": "O sistema de ventilação não garante uma concentração de CO₂ interior abaixo de 800 ppm acima do exterior (950 ppm absoluto), nível recomendado para a categoria II de qualidade do ar interior.",
+      "severity": "info",
+      "conditions": [
+        { "field": "envelope.maxCO2Concentration", "operator": ">", "value": 950 }
+      ],
+      "currentValueTemplate": "CO₂ máximo: {envelope.maxCO2Concentration} ppm",
+      "requiredValue": "≤ 950 ppm (800 ppm acima do exterior) para Cat. II",
+      "remediation": "Controlar concentração de CO₂: (1) Cat. I: ≤ 550 ppm acima do exterior (≈ 800 ppm absoluto). (2) Cat. II: ≤ 800 ppm acima do exterior (≈ 950 ppm absoluto). (3) Sensor de CO₂ para controlo demand-controlled ventilation (DCV). (4) Para habitação: caudal de 7 L/(s.pessoa) mantém tipicamente CO₂ < 1000 ppm. (5) A monitorização de CO₂ em tempo real é recomendada para edifícios nZEB com ventilação mecânica.",
+      "enabled": true,
+      "tags": ["CO₂", "qualidade do ar", "ventilação", "DCV", "EN 16798"]
+    },
+    {
+      "id": "THERM-COMFORT-ASYMMETRY-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 / ISO 7730 — Assimetria de Temperatura Radiante",
+      "description": "A diferença de temperatura entre a superfície dos envidraçados e as paredes interiores pode exceder os limites de assimetria radiante (10°C para paredes frias, 5°C para tetos quentes), causando desconforto local.",
+      "severity": "info",
+      "conditions": [
+        { "field": "envelope.windowUValue", "operator": ">", "value": 2.50 },
+        { "field": "envelope.windowArea", "operator": ">", "value": 6 }
+      ],
+      "currentValueTemplate": "Uw = {envelope.windowUValue} W/(m².K), Área envidraçada = {envelope.windowArea} m²",
+      "requiredValue": "Assimetria radiante ≤ 10°C (parede fria) / ≤ 5°C (teto quente radiante)",
+      "remediation": "Reduzir assimetria de temperatura radiante junto a envidraçados: (1) Envidraçados com U baixo: vidro duplo low-E (temperatura superficial interior mais elevada). (2) Radiadores sob as janelas: contrariam o efeito de parede fria com convecção ascendente. (3) Para grandes envidraçados (> 6 m²): exigir U ≤ 1.8 W/(m².K) para manter assimetria < 10°C. (4) Piso radiante: distribui calor uniformemente, evitando assimetria vertical. (5) O IFC fornece a área total de envidraçados — envidraçados grandes com U elevado = risco de assimetria.",
+      "enabled": true,
+      "tags": ["conforto térmico", "assimetria radiante", "envidraçados", "ISO 7730"]
+    },
+    {
+      "id": "THERM-COMFORT-CATEGORY-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 §6.2 — Definição da Categoria de Ambiente Interior",
+      "description": "A categoria de ambiente interior (I a IV) não foi definida para o edifício, impossibilitando a determinação correta dos critérios de conforto térmico e qualidade do ar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "envelope.indoorEnvironmentCategory", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Definir categoria: I (elevada), II (normal — edifícios novos), III (aceitável), IV (tolerável)",
+      "remediation": "Definir a categoria de ambiente interior conforme EN 16798-1: (1) Categoria I: elevada expectativa — hospitais, quartos de bebés, idosos. PPD < 6%. (2) Categoria II: normal — edifícios residenciais e de serviços novos. PPD < 10%. (3) Categoria III: aceitável — edifícios existentes, reabilitação. PPD < 15%. (4) Categoria IV: tolerável — períodos limitados. PPD < 25%. (5) Para REH: a categoria II é implícita (20°C aquecimento, 25°C arrefecimento). (6) A categoria determina os limites de temperatura, humidade, velocidade do ar e concentração de poluentes.",
+      "enabled": true,
+      "tags": ["categoria", "ambiente interior", "conforto", "EN 16798", "PPD"]
+    }
+  ]
+}

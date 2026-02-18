@@ -54,6 +54,8 @@ export interface UnifiedPipelineInput {
     includeSchedule?: boolean;
     includeCompliance?: boolean;
     existingProject?: Partial<BuildingProject>;
+    /** Pre-parsed IFC analyses from client-side Web Worker. Skips server parse_ifc stage. */
+    ifcAnalyses?: SpecialtyAnalysisResult[];
     onProgress?: (progress: UnifiedProgress) => void;
   };
 }
@@ -73,6 +75,10 @@ export interface UnifiedPipelineResult {
   elementMapping?: ElementTaskMappingResult;
   cashFlow?: CashFlowResult;
   complianceExcel?: ArrayBuffer;
+  /** Raw IFC file bytes for 4D viewer (client-side only, not serialized to server) */
+  ifcFileData?: Uint8Array;
+  /** Original IFC file name */
+  ifcFileName?: string;
   warnings: string[];
   processingTimeMs: number;
 }
@@ -221,7 +227,26 @@ export async function runUnifiedPipeline(
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
 
-  if (classified.ifc.length > 0) {
+  if (opts.ifcAnalyses && opts.ifcAnalyses.length > 0) {
+    // Client already parsed IFC in the browser — use pre-parsed results
+    ifcAnalyses = opts.ifcAnalyses;
+    progress.reportPartial("parse_ifc", 0.5, "IFC pré-analisado no browser.");
+
+    try {
+      const { specialtyAnalysisToProjectFields } = await import("./ifc-enrichment");
+      const enrichment = specialtyAnalysisToProjectFields(ifcAnalyses);
+      for (const [key, value] of Object.entries(enrichment.fields)) {
+        setNestedField(project, key, value);
+      }
+      if (enrichment.report.populatedFields.length > 0) {
+        const fieldCount = enrichment.report.populatedFields.length;
+        warnings.push(`IFC enriqueceu ${fieldCount} campos do projeto.`);
+      }
+    } catch (err) {
+      warnings.push(`Erro ao enriquecer projeto com IFC: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  } else if (classified.ifc.length > 0) {
+    // Backward compatibility: server-side parsing for raw IFC files
     try {
       const { analyzeIfcSpecialty } = await import("./ifc-specialty-analyzer");
       const { specialtyAnalysisToProjectFields } = await import("./ifc-enrichment");

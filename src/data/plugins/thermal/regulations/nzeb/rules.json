@@ -1,0 +1,133 @@
+{
+  "regulationRef": "dl-101d-2020-nzeb",
+  "description": "Regras DL 101-D/2020 e Portaria 42/2019 — requisitos nZEB (Nearly Zero Energy Building), contribuição de renováveis, classe energética mínima, requisitos reforçados para edifícios públicos",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "THERM-NZEB-MANDATORY-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 Art. 3.º — Obrigatoriedade nZEB para Edifícios Novos",
+      "description": "O edifício novo não cumpre os requisitos de edifício com necessidades quase nulas de energia (nZEB), obrigatórios desde 31 de dezembro de 2020 para todos os edifícios novos (e desde 31-12-2018 para edifícios públicos). (Nota: verificação de conformidade principal no plugin 'energy' — SCE-NZEB-01.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "energy.isNZEB", "operator": "==", "value": false }
+      ],
+      "requiredValue": "nZEB obrigatório para todos os edifícios novos desde 31-12-2020",
+      "remediation": "Garantir conformidade nZEB: (1) Classe energética ≥ A para habitação (Ntc/Nt ≤ 0.50). (2) Contribuição significativa de energias renováveis (solar térmico + PV). (3) Envolvente com U valores abaixo das referências. (4) Sistemas de climatização eficientes (COP/EER ≥ valores de referência). (5) Para edifícios públicos: requisitos eram obrigatórios desde 2018.",
+      "enabled": true,
+      "tags": ["nZEB", "edifício novo", "obrigatório", "DL 101-D"]
+    },
+    {
+      "id": "THERM-NZEB-CLASS-A-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 + Portaria 349-B Art. 3.º — Classe Energética A para nZEB Residencial",
+      "description": "O rácio de energia primária (Ntc/Nt = {energy.ntcNtRatio}) é superior a 0.50, não atingindo a classe A exigida para edifícios nZEB residenciais. (Nota: verificação de conformidade principal no plugin 'energy' — SCE-NZEB-02.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "energy.ntcNtRatio", "operator": ">", "value": 0.50 }
+      ],
+      "currentValueTemplate": "Ntc/Nt = {energy.ntcNtRatio} (Classe {energy.energyClass})",
+      "requiredValue": "Ntc/Nt ≤ 0.50 (Classe A ou superior) para nZEB",
+      "remediation": "Para atingir classe A (Ntc/Nt ≤ 0.50): (1) Envolvente: U paredes ≤ referência, U coberturas ≤ referência, U janelas ≤ referência. (2) Renováveis: solar térmico para AQS (reduz Nac) + PV para autoconsumo (reduz Ntc). (3) Sistemas: bomba de calor para aquecimento (COP ≥ 3.5) e AQS (COP ≥ 2.5). (4) Ventilação mecânica com recuperação de calor ≥ 70%. (5) Estratégias passivas: orientação solar, sombreamento, inércia térmica forte.",
+      "enabled": true,
+      "tags": ["nZEB", "classe A", "Ntc/Nt", "energia primária"]
+    },
+    {
+      "id": "THERM-NZEB-RENEWABLE-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 Art. 4.º — Contribuição de Energias Renováveis",
+      "description": "O edifício nZEB não possui contribuição adequada de energias renováveis. A parcela renovável deve cobrir uma fração significativa das necessidades energéticas totais. (Nota: verificação de conformidade principal no plugin 'energy' — SCE-NZEB-04.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "energy.hasRenewableContribution", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Contribuição renovável obrigatória: solar térmico (AQS) + fotovoltaico (eletricidade)",
+      "remediation": "Implementar sistemas de energia renovável: (1) Solar térmico: obrigatório para AQS, mínimo 1.0 m²/ocupante (Portaria 349-B). (2) Fotovoltaico: autoconsumo — reduz diretamente Ntc (Fpu eletricidade = 2.5, cada kWh PV evitado vale 2.5 kWhEP). (3) Bomba de calor aerotérmica: considerada parcialmente renovável (parcela aerotérmica). (4) Biomassa: Fpu = 1.0, alternativa para aquecimento em zonas I3. (5) Geotermia: bomba de calor geotérmica para climas frios. (6) O contributo renovável é contabilizado como Eren e abatido no cálculo de Ntc.",
+      "enabled": true,
+      "tags": ["nZEB", "renováveis", "solar", "fotovoltaico", "biomassa"]
+    },
+    {
+      "id": "THERM-NZEB-ENVELOPE-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 + Despacho 15793-K — Envolvente de Elevado Desempenho para nZEB",
+      "description": "Os coeficientes U da envolvente excedem os valores de referência em mais de 25%, comprometendo a viabilidade de atingir o estatuto nZEB mesmo com sistemas eficientes e renováveis.",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "envelope.externalWallUValue", "operator": ">", "value": 0.45 },
+        { "field": "location.climateZoneWinter", "operator": "==", "value": "I1" }
+      ],
+      "currentValueTemplate": "U parede = {envelope.externalWallUValue} W/(m².K)",
+      "requiredValue": "U paredes próximo da referência (I1: 0.40, I2: 0.35, I3: 0.30) ou inferior para nZEB",
+      "remediation": "A envolvente é o primeiro pilar do nZEB — deve ter desempenho próximo ou superior à referência: (1) Paredes: ETICS com ≥ 80 mm (I1), ≥ 100 mm (I2/I3) — U ≈ 0.30-0.35 W/(m².K). (2) Cobertura: ≥ 100-120 mm isolamento — U ≈ 0.25-0.30 W/(m².K). (3) Janelas: vidro duplo low-E com árgon + caixilharia RPT — U ≈ 1.3-1.8 W/(m².K). (4) Pavimento: ≥ 60 mm isolamento sob laje — U ≈ 0.35 W/(m².K). (5) Pontes térmicas corrigidas: ETICS contínuo + corte térmico em vigas/pilares.",
+      "enabled": true,
+      "tags": ["nZEB", "envolvente", "isolamento", "desempenho"]
+    },
+    {
+      "id": "THERM-NZEB-PV-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 + DL 162/2019 — Autoconsumo Fotovoltaico para nZEB",
+      "description": "O edifício novo não dispõe de sistema fotovoltaico para autoconsumo, limitando a capacidade de atingir os requisitos nZEB. O PV é a forma mais eficaz de reduzir Ntc dado o Fpu elevado da eletricidade (2.5).",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "energy.hasPVSystem", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sistema PV recomendado para nZEB: mínimo 1.5-3.0 kWp para habitação unifamiliar",
+      "remediation": "Instalar sistema fotovoltaico de autoconsumo: (1) Dimensionamento típico: 1.5-3.0 kWp para moradia T3 (4-8 painéis de 400 Wp). (2) Orientação ideal: Sul, inclinação 30-35°. (3) Impacto no Ntc: cada kWh PV autoconsumo abate 2.5 kWhEP (Fpu eletricidade). (4) Regime de autoconsumo (DL 162/2019): sem necessidade de licença até 350 W; comunicação prévia até 30 kW. (5) Com bateria: aumenta taxa de autoconsumo para 60-80% (vs. 30-40% sem bateria). (6) Área necessária: ~2 m² por painel (1.7×1.0 m).",
+      "enabled": true,
+      "tags": ["nZEB", "fotovoltaico", "PV", "autoconsumo", "DL 162/2019"]
+    },
+    {
+      "id": "THERM-NZEB-PASSIVE-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 — Estratégias Passivas para nZEB",
+      "description": "O projeto não incorpora estratégias passivas de conforto térmico (orientação solar, sombreamento, ventilação natural, inércia térmica), que são o primeiro princípio do conceito nZEB antes de recorrer a sistemas ativos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "envelope.hasPassiveStrategies", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Incorporar estratégias passivas: orientação solar, sombreamento, ventilação natural, inércia térmica",
+      "remediation": "O nZEB segue a hierarquia: (1) Estratégias passivas → (2) Eficiência de sistemas → (3) Energias renováveis. Estratégias passivas a implementar: (1) Orientação: maximizar fachada Sul para ganhos solares de inverno. (2) Sombreamento: palas horizontais a Sul, verticais a Este/Oeste, estores exteriores reguláveis. (3) Ventilação natural cruzada: aberturas em fachadas opostas para arrefecimento noturno. (4) Inércia térmica forte: paredes e lajes em betão/alvenaria expostas (não revestidas com isolamento pelo interior). (5) Vegetação: árvores caducifólias a Sul (sombra no verão, sol no inverno).",
+      "enabled": true,
+      "tags": ["nZEB", "passivo", "orientação", "sombreamento", "ventilação natural"]
+    },
+    {
+      "id": "THERM-NZEB-PUBLIC-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 Art. 3.º n.2 — Requisitos Reforçados para Edifícios Públicos",
+      "description": "O edifício público novo ou de grande reabilitação não cumpre os requisitos nZEB reforçados que são obrigatórios desde 31 de dezembro de 2018 (2 anos antes dos privados).",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isPublic", "operator": "==", "value": true },
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "energy.isNZEB", "operator": "==", "value": false }
+      ],
+      "requiredValue": "nZEB obrigatório para edifícios públicos desde 31-12-2018",
+      "remediation": "Os edifícios públicos têm requisitos nZEB antecipados: (1) Obrigatório desde 31-12-2018 (vs. 31-12-2020 para privados). (2) Classe A ou superior para REH, IEEpr ≤ 0.75 × IEEref para RECS. (3) Devem servir de exemplo — considerar classe A+ como objetivo. (4) Publicação do certificado energético obrigatória em local visível. (5) Auditorias energéticas periódicas obrigatórias.",
+      "enabled": true,
+      "tags": ["nZEB", "edifício público", "requisitos reforçados"]
+    },
+    {
+      "id": "THERM-NZEB-REHAB-01",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 Art. 5.º — Grandes Reabilitações e Requisitos Mínimos",
+      "description": "A grande reabilitação (custo > 25% do valor do edifício ou intervenção em > 25% da envolvente) não cumpre os requisitos mínimos de desempenho energético aplicáveis a grandes intervenções.",
+      "severity": "info",
+      "conditions": [
+        { "field": "building.isMajorRehabilitation", "operator": "==", "value": true },
+        { "field": "energy.ntcNtRatio", "operator": ">", "value": 1.00 }
+      ],
+      "currentValueTemplate": "Ntc/Nt = {energy.ntcNtRatio} (Classe {energy.energyClass})",
+      "requiredValue": "Ntc/Nt ≤ 1.00 (Classe B- ou superior) para grandes reabilitações",
+      "remediation": "Grandes reabilitações devem atingir no mínimo classe B- (Ntc/Nt ≤ 1.00): (1) Aplicar valores U máximos (não é obrigatório atingir referência em reabilitação). (2) Substituir envidraçados por vidro duplo com caixilharia com RPT. (3) Isolar cobertura (medida mais custo-eficaz em reabilitação). (4) Instalar sistema de AQS eficiente. (5) Exceções: elementos com condicionantes patrimoniais (DGPC) podem ser isentos mas devem ser justificados.",
+      "enabled": true,
+      "tags": ["nZEB", "reabilitação", "grande intervenção", "classe B-"]
+    }
+  ]
+}

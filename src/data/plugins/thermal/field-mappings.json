@@ -1,7 +1,7 @@
 {
   "pluginId": "thermal",
   "version": "1.0.0",
-  "description": "Mapeamento de campos para regras REH (Regulamento de Desempenho Energético dos Edifícios de Habitação — Portaria 349-B/2013)",
+  "description": "Mapeamento de campos para regras térmicas: REH, Despacho 15793-K, EN ISO 13788, nZEB, EN 16798, EN ISO 10211, Portaria 379-A, RECS",
   "fields": [
     {
       "_group": "Dados Climáticos",
@@ -146,8 +146,14 @@
       "field": "envelope.externalDoorUValue",
       "label": "Coeficiente U da porta exterior",
       "type": "number",
-      "unit": "W/(m\u00b2.\u00b0C)",
-      "sources": ["form"],
+      "unit": "W/(m².°C)",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": "IsExternal=true",
+        "property": "ThermalTransmittance",
+        "pset": "Pset_DoorCommon"
+      },
       "description": "Coeficiente de transmissão térmica da porta exterior opaca"
     },
     {
@@ -181,8 +187,13 @@
       "field": "envelope.windowSolarFactor",
       "label": "Fator solar do vão envidraçado",
       "type": "number",
-      "sources": ["form"],
-      "description": "Fator solar global do vão envidraçado com proteção solar ativada (g\u22a5vi)"
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWindow",
+        "property": "SolarHeatGainCoefficient",
+        "pset": "Pset_WindowCommon"
+      },
+      "description": "Fator solar global do vão envidraçado com proteção solar ativada (g⊥vi)"
     },
     {
       "_group": "Vãos Envidraçados",
@@ -338,6 +349,458 @@
       "unit": "kWhEP/m\u00b2.ano",
       "sources": ["form"],
       "description": "Necessidades nominais globais anuais de energia primária do edifício"
+    },
+
+    {
+      "_group": "Eficiência de Sistemas (Despacho 15793-K)",
+      "field": "energy.heatingSystemEfficiency",
+      "label": "Eficiência do sistema de aquecimento",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Eficiência nominal do sistema de aquecimento principal (caldeira, bomba de calor COP×100, resistência)"
+    },
+    {
+      "_group": "Eficiência de Sistemas (Despacho 15793-K)",
+      "field": "energy.coolingSystemEER",
+      "label": "EER do sistema de arrefecimento",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rácio de eficiência energética (EER) do sistema de arrefecimento principal"
+    },
+    {
+      "_group": "Eficiência de Sistemas (Despacho 15793-K)",
+      "field": "energy.dhwSystemEfficiency",
+      "label": "Eficiência do sistema de AQS",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Eficiência nominal do sistema de preparação de AQS (esquentador, caldeira, bomba de calor)"
+    },
+    {
+      "_group": "Eficiência de Sistemas (Despacho 15793-K)",
+      "field": "envelope.btrValue",
+      "label": "Coeficiente de redução de perdas (btr)",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Coeficiente btr para espaços não úteis (ENU) conforme Despacho 15793-K Tabela III.1"
+    },
+
+    {
+      "_group": "Orientação e Ganhos Solares",
+      "field": "envelope.windowOrientation",
+      "label": "Orientação predominante dos envidraçados",
+      "type": "select",
+      "options": [
+        { "value": "N", "label": "Norte" },
+        { "value": "NE", "label": "Nordeste" },
+        { "value": "E", "label": "Este" },
+        { "value": "SE", "label": "Sudeste" },
+        { "value": "S", "label": "Sul" },
+        { "value": "SW", "label": "Sudoeste" },
+        { "value": "W", "label": "Oeste" },
+        { "value": "NW", "label": "Noroeste" }
+      ],
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcBuilding",
+        "property": "NorthAxis",
+        "pset": "Pset_BuildingCommon"
+      },
+      "description": "Orientação predominante dos vãos envidraçados — determina os fatores de orientação Xj para ganhos solares"
+    },
+    {
+      "_group": "Orientação e Ganhos Solares",
+      "field": "envelope.hasFixedShading",
+      "label": "Dispositivos de sombreamento fixos (palas)",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem dispositivos de sombreamento fixos (palas horizontais, verticais) que afetam os fatores Fh e Fo"
+    },
+    {
+      "_group": "Orientação e Ganhos Solares",
+      "field": "envelope.skylightSolarFactor",
+      "label": "Fator solar das claraboias",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Fator solar global dos envidraçados horizontais (claraboias) com proteção solar"
+    },
+    {
+      "_group": "Orientação e Ganhos Solares",
+      "field": "envelope.windowArea",
+      "label": "Área total de envidraçados",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWindow",
+        "property": "Area",
+        "pset": "Qto_WindowBaseQuantities"
+      },
+      "description": "Área total dos vãos envidraçados do edifício"
+    },
+    {
+      "_group": "Orientação e Ganhos Solares",
+      "field": "envelope.windowToFacadeRatio",
+      "label": "Razão envidraçado/fachada",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "description": "Percentagem de área envidraçada em relação à área total de fachada — calculável automaticamente do IFC"
+    },
+
+    {
+      "_group": "Higrotérmica / Condensações (EN ISO 13788)",
+      "field": "envelope.fRsi",
+      "label": "Fator de temperatura superficial (fRsi)",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Fator de temperatura superficial interior na zona corrente da envolvente — fRsi = 1 - U × Rsi"
+    },
+    {
+      "_group": "Higrotérmica / Condensações (EN ISO 13788)",
+      "field": "envelope.fRsiThermalBridge",
+      "label": "fRsi nas pontes térmicas",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Fator de temperatura superficial interior na zona de ponte térmica (valor mais desfavorável)"
+    },
+    {
+      "_group": "Higrotérmica / Condensações (EN ISO 13788)",
+      "field": "envelope.hasInterstitialCondensationCheck",
+      "label": "Verificação de condensações intersticiais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizada verificação de condensações intersticiais pelo método de Glaser"
+    },
+    {
+      "_group": "Higrotérmica / Condensações (EN ISO 13788)",
+      "field": "envelope.hasInteriorInsulation",
+      "label": "Isolamento pelo interior",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o isolamento térmico é aplicado pelo interior das paredes (risco de condensação)"
+    },
+    {
+      "_group": "Higrotérmica / Condensações (EN ISO 13788)",
+      "field": "envelope.hasVaporBarrier",
+      "label": "Barreira para-vapor instalada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe barreira para-vapor na face quente do isolamento interior"
+    },
+    {
+      "_group": "Higrotérmica / Condensações (EN ISO 13788)",
+      "field": "envelope.interiorRelativeHumidity",
+      "label": "Humidade relativa interior",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "defaults": { "_default": 50 },
+      "description": "Humidade relativa média do ar interior durante a estação de aquecimento"
+    },
+
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "energy.isNZEB",
+      "label": "Edifício nZEB",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício cumpre os requisitos de edifício com necessidades quase nulas de energia"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "energy.hasRenewableContribution",
+      "label": "Contribuição de renováveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui contribuição de energias renováveis (solar, PV, biomassa, aerotermia)"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "energy.hasPVSystem",
+      "label": "Sistema fotovoltaico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui sistema fotovoltaico para autoconsumo"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "envelope.hasPassiveStrategies",
+      "label": "Estratégias passivas implementadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foram implementadas estratégias passivas de conforto (orientação solar, sombreamento, ventilação natural, inércia)"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "building.isPublic",
+      "label": "Edifício público",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício é de propriedade/gestão pública (requisitos nZEB antecipados)"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "building.isMajorRehabilitation",
+      "label": "Grande reabilitação",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se é uma grande reabilitação (custo > 25% do valor do edifício ou > 25% da envolvente)"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "energy.ntcNtRatio",
+      "label": "Rácio Ntc/Nt",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rácio entre necessidades de energia primária e o limite regulamentar (injected pelo energy analyzer)"
+    },
+    {
+      "_group": "nZEB / Edifício Quase Zero",
+      "field": "energy.energyClass",
+      "label": "Classe energética",
+      "type": "select",
+      "options": [
+        { "value": "A+", "label": "A+" },
+        { "value": "A", "label": "A" },
+        { "value": "B", "label": "B" },
+        { "value": "B-", "label": "B-" },
+        { "value": "C", "label": "C" },
+        { "value": "D", "label": "D" },
+        { "value": "E", "label": "E" },
+        { "value": "F", "label": "F" }
+      ],
+      "sources": ["form"],
+      "description": "Classe energética do edifício (A+ a F) — determinada pelo rácio Ntc/Nt"
+    },
+
+    {
+      "_group": "Conforto Térmico (EN 16798-1)",
+      "field": "envelope.heatingSetpointTemp",
+      "label": "Temperatura de aquecimento (setpoint)",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "defaults": { "_default": 20 },
+      "description": "Temperatura operativa interior de projeto para a estação de aquecimento"
+    },
+    {
+      "_group": "Conforto Térmico (EN 16798-1)",
+      "field": "envelope.coolingSetpointTemp",
+      "label": "Temperatura de arrefecimento (setpoint)",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "defaults": { "_default": 25 },
+      "description": "Temperatura operativa interior de projeto para a estação de arrefecimento"
+    },
+    {
+      "_group": "Conforto Térmico (EN 16798-1)",
+      "field": "envelope.ventilationRatePerPerson",
+      "label": "Caudal de ar novo por pessoa",
+      "type": "number",
+      "unit": "L/(s.pessoa)",
+      "sources": ["form"],
+      "description": "Caudal de ar novo por pessoa para qualidade do ar interior"
+    },
+    {
+      "_group": "Conforto Térmico (EN 16798-1)",
+      "field": "envelope.maxCO2Concentration",
+      "label": "Concentração máxima de CO₂",
+      "type": "number",
+      "unit": "ppm",
+      "sources": ["form"],
+      "description": "Concentração máxima de CO₂ interior esperada (≤ 950 ppm para Cat. II)"
+    },
+    {
+      "_group": "Conforto Térmico (EN 16798-1)",
+      "field": "envelope.indoorEnvironmentCategory",
+      "label": "Categoria de ambiente interior",
+      "type": "select",
+      "options": [
+        { "value": "I", "label": "Cat. I — Elevada expectativa" },
+        { "value": "II", "label": "Cat. II — Normal (edifícios novos)" },
+        { "value": "III", "label": "Cat. III — Aceitável (existentes)" },
+        { "value": "IV", "label": "Cat. IV — Tolerável (limitada)" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "II" },
+      "description": "Categoria de ambiente interior conforme EN 16798-1"
+    },
+
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.hasETICS",
+      "label": "Sistema ETICS instalado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui sistema de isolamento térmico pelo exterior (ETICS)"
+    },
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.hasContinuousInsulation",
+      "label": "Isolamento contínuo (sem interrupções)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o isolamento pelo exterior é contínuo (sem interrupções em pilares, vigas, varandas)"
+    },
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.windowInstallationPsiValue",
+      "label": "ψ da ligação janela/parede",
+      "type": "number",
+      "unit": "W/(m.K)",
+      "sources": ["form"],
+      "description": "Coeficiente de transmissão térmica linear na ligação caixilharia/parede"
+    },
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.hasBalcony",
+      "label": "Edifício com varandas/consolas",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui varandas ou consolas em betão (ponte térmica significativa)"
+    },
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.hasBalconyThermalBreak",
+      "label": "Corte térmico nas varandas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as varandas possuem elemento de corte térmico (Schöck Isokorb ou similar)"
+    },
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.hasRollerShutterBoxInsulation",
+      "label": "Caixas de estore isoladas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as caixas de estore possuem isolamento térmico adequado"
+    },
+    {
+      "_group": "Pontes Térmicas Detalhadas (EN ISO 10211)",
+      "field": "envelope.thermalBridgeCalculationMethod",
+      "label": "Método de cálculo de pontes térmicas",
+      "type": "select",
+      "options": [
+        { "value": "default", "label": "Valores por defeito (Despacho 15793-K)" },
+        { "value": "catalog", "label": "Catálogo ITE 50 / catálogos validados" },
+        { "value": "numerical", "label": "Cálculo numérico EN ISO 10211" }
+      ],
+      "sources": ["form"],
+      "description": "Método utilizado para determinar os valores de ψ das pontes térmicas"
+    },
+
+    {
+      "_group": "Estanquidade ao Ar (Portaria 379-A)",
+      "field": "envelope.n50Value",
+      "label": "Taxa de renovação de ar a 50 Pa (n50)",
+      "type": "number",
+      "unit": "h⁻¹",
+      "sources": ["form"],
+      "description": "Resultado do ensaio de pressurização (blower door test) — taxa de renovação a 50 Pa"
+    },
+    {
+      "_group": "Estanquidade ao Ar (Portaria 379-A)",
+      "field": "envelope.curtainWallUValue",
+      "label": "Coeficiente U da fachada cortina",
+      "type": "number",
+      "unit": "W/(m².°C)",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcCurtainWall",
+        "property": "ThermalTransmittance",
+        "pset": "Pset_CurtainWallCommon"
+      },
+      "description": "Coeficiente de transmissão térmica ponderado da fachada cortina (vidro + painéis opacos + perfilaria)"
+    },
+    {
+      "_group": "Estanquidade ao Ar (Portaria 379-A)",
+      "field": "energy.hasSCEERCalculation",
+      "label": "Cálculo SCE.ER realizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o cálculo da contribuição solar térmica foi realizado com a ferramenta SCE.ER"
+    },
+
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.ieeActual",
+      "label": "IEE previsto (IEEpr)",
+      "type": "number",
+      "unit": "kWhEP/(m².ano)",
+      "sources": ["form"],
+      "description": "Indicador de Eficiência Energética previsto do edifício de serviços"
+    },
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.ieeReference",
+      "label": "IEE de referência (IEEref)",
+      "type": "number",
+      "unit": "kWhEP/(m².ano)",
+      "sources": ["form"],
+      "description": "Indicador de Eficiência Energética de referência para a tipologia do edifício"
+    },
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.lightingPowerDensity",
+      "label": "Densidade de potência de iluminação (DPIE)",
+      "type": "number",
+      "unit": "W/m²",
+      "sources": ["form"],
+      "description": "Potência de iluminação instalada por metro quadrado de área útil"
+    },
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.hasQAIMonitoring",
+      "label": "Monitorização de QAI implementada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe plano de monitorização da qualidade do ar interior (Portaria 353-A)"
+    },
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.hasElevatorEfficiency",
+      "label": "Elevadores com classificação energética",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os elevadores possuem classificação energética e medidas de eficiência"
+    },
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.hvacCOP",
+      "label": "COP do sistema AVAC",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Coeficiente de desempenho do sistema AVAC principal (aquecimento)"
+    },
+    {
+      "_group": "RECS — Edifícios de Comércio e Serviços",
+      "field": "energy.annualEnergyConsumptionTep",
+      "label": "Consumo energético anual",
+      "type": "number",
+      "unit": "tep",
+      "sources": ["form"],
+      "description": "Consumo energético anual total em toneladas equivalentes de petróleo (> 500 tep = CIE)"
     }
   ]
 }

@@ -40,6 +40,13 @@ import fireSafetyComputed from "../../data/plugins/fire-safety/computed-fields.j
 import thermalPlugin from "../../data/plugins/thermal/plugin.json";
 import thermalRegistry from "../../data/plugins/thermal/regulations/registry.json";
 import thermalRehRules from "../../data/plugins/thermal/regulations/reh/rules.json";
+import thermalDespacho15793kRules from "../../data/plugins/thermal/regulations/despacho-15793k/rules.json";
+import thermalEnIso13788Rules from "../../data/plugins/thermal/regulations/en-iso-13788/rules.json";
+import thermalNzebRules from "../../data/plugins/thermal/regulations/nzeb/rules.json";
+import thermalEn16798Rules from "../../data/plugins/thermal/regulations/en-16798/rules.json";
+import thermalEnIso10211Rules from "../../data/plugins/thermal/regulations/en-iso-10211/rules.json";
+import thermalPortaria379aRules from "../../data/plugins/thermal/regulations/portaria-379a/rules.json";
+import thermalRecsRules from "../../data/plugins/thermal/regulations/recs-thermal/rules.json";
 import thermalTables from "../../data/plugins/thermal/lookup-tables.json";
 import thermalComputed from "../../data/plugins/thermal/computed-fields.json";
 
@@ -107,6 +114,13 @@ import accessibilityComputed from "../../data/plugins/accessibility/computed-fie
 import energyPlugin from "../../data/plugins/energy/plugin.json";
 import energyRegistry from "../../data/plugins/energy/regulations/registry.json";
 import energySceRules from "../../data/plugins/energy/regulations/sce/rules.json";
+import energyDespacho15793iRules from "../../data/plugins/energy/regulations/despacho-15793i/rules.json";
+import energyDespacho15793eRules from "../../data/plugins/energy/regulations/despacho-15793e/rules.json";
+import energyEn15232Rules from "../../data/plugins/energy/regulations/en-15232/rules.json";
+import energyEn14511Rules from "../../data/plugins/energy/regulations/en-14511/rules.json";
+import energyPortaria349dRules from "../../data/plugins/energy/regulations/portaria-349d/rules.json";
+import energyDl68aRules from "../../data/plugins/energy/regulations/dl-68a-2015/rules.json";
+import energyPortaria42Rules from "../../data/plugins/energy/regulations/portaria-42-2019/rules.json";
 import energyTables from "../../data/plugins/energy/lookup-tables.json";
 import energyComputed from "../../data/plugins/energy/computed-fields.json";
 
@@ -246,7 +260,11 @@ export function loadFireSafetyPlugin(): SpecialtyPlugin {
 
 /** Load the built-in thermal plugin */
 export function loadThermalPlugin(): SpecialtyPlugin {
-  return loadCached("thermal", thermalPlugin, thermalRegistry, [thermalRehRules], thermalTables, thermalComputed);
+  return loadCached("thermal", thermalPlugin, thermalRegistry, [
+    thermalRehRules, thermalDespacho15793kRules, thermalEnIso13788Rules,
+    thermalNzebRules, thermalEn16798Rules, thermalEnIso10211Rules,
+    thermalPortaria379aRules, thermalRecsRules,
+  ], thermalTables, thermalComputed);
 }
 
 // ----------------------------------------------------------
@@ -302,7 +320,16 @@ export function loadAccessibilityPlugin(): SpecialtyPlugin {
 }
 
 export function loadEnergyPlugin(): SpecialtyPlugin {
-  return loadCached("energy", energyPlugin, energyRegistry, [energySceRules], energyTables, energyComputed);
+  return loadCached("energy", energyPlugin, energyRegistry, [
+    energySceRules,
+    energyDespacho15793iRules,
+    energyDespacho15793eRules,
+    energyEn15232Rules,
+    energyEn14511Rules,
+    energyPortaria349dRules,
+    energyDl68aRules,
+    energyPortaria42Rules,
+  ], energyTables, energyComputed);
 }
 
 export function loadElevatorsPlugin(): SpecialtyPlugin {

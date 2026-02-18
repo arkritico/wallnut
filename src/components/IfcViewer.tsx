@@ -19,6 +19,13 @@ import { Upload, Eye, Maximize2, Layers } from "lucide-react";
 // Types
 // ============================================================
 
+/** A highlight group: one color applied to a set of elements. */
+export interface PhaseHighlight {
+  color: string; // hex, e.g. "#dc2626"
+  opacity: number; // 0.8 = completed, 0.25 = in-progress
+  elements: Record<string, Set<number>>; // modelId → localIds
+}
+
 export interface IfcViewerProps {
   /** Optional IFC file data to load immediately */
   ifcData?: Uint8Array;
@@ -30,6 +37,10 @@ export interface IfcViewerProps {
   onModelLoaded?: (model: FragmentsModel) => void;
   /** External visibility map: modelId → Set of localIds to show (for 4D) */
   visibilityMap?: Record<string, Set<number>>;
+  /** Phase-based color highlights: each group tints its elements */
+  phaseHighlights?: PhaseHighlight[];
+  /** Selection highlights: rendered on top of phase highlights */
+  selectionHighlights?: PhaseHighlight[];
   /** CSS class for the container */
   className?: string;
 }
@@ -50,6 +61,8 @@ export default function IfcViewer({
   onElementSelect,
   onModelLoaded,
   visibilityMap,
+  phaseHighlights,
+  selectionHighlights,
   className = "",
 }: IfcViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -258,6 +271,50 @@ export default function IfcViewer({
 
     applyVisibility();
   }, [visibilityMap]);
+
+  // ── Apply phase color highlights + selection highlights (for 4D) ──
+  useEffect(() => {
+    const components = componentsRef.current;
+    const hasPhase = phaseHighlights && phaseHighlights.length > 0;
+    const hasSelection = selectionHighlights && selectionHighlights.length > 0;
+    if (!components || (!hasPhase && !hasSelection)) return;
+
+    const fragmentsManager = components.get(FragmentsManager);
+
+    async function applyHighlights() {
+      await fragmentsManager.resetHighlight();
+      // Phase highlights first (underneath)
+      if (phaseHighlights) {
+        for (const group of phaseHighlights) {
+          await fragmentsManager.highlight(
+            {
+              color: new THREE.Color(group.color),
+              opacity: group.opacity,
+              renderedFaces: 1 as unknown as RenderedFaces,
+              transparent: true,
+            },
+            group.elements,
+          );
+        }
+      }
+      // Selection highlights on top
+      if (selectionHighlights) {
+        for (const group of selectionHighlights) {
+          await fragmentsManager.highlight(
+            {
+              color: new THREE.Color(group.color),
+              opacity: group.opacity,
+              renderedFaces: 1 as unknown as RenderedFaces,
+              transparent: true,
+            },
+            group.elements,
+          );
+        }
+      }
+    }
+
+    applyHighlights();
+  }, [phaseHighlights, selectionHighlights]);
 
   // ── File upload handler ─────────────────────────────────────
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {

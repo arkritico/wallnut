@@ -475,6 +475,65 @@ export function specialtyAnalysisToProjectFields(
       const avgRoofU = Math.round((roofUValues.reduce((a, b) => a + b, 0) / roofUValues.length) * 100) / 100;
       record("envelope.roofUValue", avgRoofU, `U medio cobertura: ${avgRoofU} W/m2.K`, "high");
     }
+
+    // Floor/slab U-values from Pset_SlabCommon.ThermalTransmittance
+    const floorSlabs = slabs.filter(s =>
+      s.properties._isExternal === true ||
+      s.name.toLowerCase().includes("ext") ||
+      s.name.toLowerCase().includes("piso") ||
+      s.name.toLowerCase().includes("floor")
+    );
+    const floorUValues = (floorSlabs.length > 0 ? floorSlabs : slabs)
+      .map(s => (s.properties._thermalTransmittance ?? s.properties["ThermalTransmittance"]) as number | undefined)
+      .filter((v): v is number => v !== undefined && v > 0);
+    if (floorUValues.length > 0) {
+      const avgFloorU = Math.round((floorUValues.reduce((a, b) => a + b, 0) / floorUValues.length) * 100) / 100;
+      record("envelope.floorUValue", avgFloorU, `U medio pavimento: ${avgFloorU} W/m2.K (${floorUValues.length} lajes)`, "medium");
+    }
+
+    // External door U-values from Pset_DoorCommon.ThermalTransmittance
+    const doorUValues = (externalDoors.length > 0 ? externalDoors : doors)
+      .map(d => (d.properties._thermalTransmittance ?? d.properties["ThermalTransmittance"]) as number | undefined)
+      .filter((v): v is number => v !== undefined && v > 0);
+    if (doorUValues.length > 0) {
+      const avgDoorU = Math.round((doorUValues.reduce((a, b) => a + b, 0) / doorUValues.length) * 100) / 100;
+      record("envelope.externalDoorUValue", avgDoorU, `U medio portas exteriores: ${avgDoorU} W/m2.K`, "medium");
+    }
+
+    // Curtain wall U-values from IfcCurtainWall
+    const curtainWalls = getEntities(aq, "IFCCURTAINWALL");
+    if (curtainWalls.length > 0) {
+      const cwUValues = curtainWalls
+        .map(cw => (cw.properties._thermalTransmittance ?? cw.properties["ThermalTransmittance"]) as number | undefined)
+        .filter((v): v is number => v !== undefined && v > 0);
+      if (cwUValues.length > 0) {
+        const avgCwU = Math.round((cwUValues.reduce((a, b) => a + b, 0) / cwUValues.length) * 100) / 100;
+        record("envelope.curtainWallUValue", avgCwU, `U medio fachada cortina: ${avgCwU} W/m2.K`, "high");
+      }
+    }
+
+    // Window-to-facade ratio (automatic from IFC areas)
+    if (totalWindowArea > 0 && extWallArea > 0) {
+      const ratio = Math.round((totalWindowArea / extWallArea) * 100);
+      record("envelope.windowToFacadeRatio", ratio, `Racio envidracado/fachada: ${ratio}% (${totalWindowArea.toFixed(1)} m2 / ${extWallArea.toFixed(1)} m2)`, "medium");
+    }
+
+    // Number of storeys for thermal calculations
+    if (archAnalysis.summary.storeys && archAnalysis.summary.storeys.length > 0) {
+      record("numberOfFloors", archAnalysis.summary.storeys.length, `${archAnalysis.summary.storeys.length} pisos detetados`, "high");
+    }
+
+    // Detect balconies (slabs that project beyond the facade)
+    const balconySlabs = slabs.filter(s =>
+      s.name.toLowerCase().includes("varanda") ||
+      s.name.toLowerCase().includes("balcon") ||
+      s.name.toLowerCase().includes("terraço") ||
+      s.name.toLowerCase().includes("terraco") ||
+      s.name.toLowerCase().includes("loggia")
+    );
+    if (balconySlabs.length > 0) {
+      record("envelope.hasBalcony", true, `${balconySlabs.length} varandas/terracos detetados`, "high");
+    }
   }
 
   // ----------------------------------------------------------

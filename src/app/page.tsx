@@ -936,6 +936,8 @@ export default function Home() {
             <FourDViewer
               schedule={unifiedResult.schedule}
               elementMapping={unifiedResult.elementMapping}
+              ifcData={unifiedResult.ifcFileData}
+              ifcName={unifiedResult.ifcFileName}
               className="flex-1 min-h-[700px] border border-gray-200 rounded-xl overflow-hidden"
             />
           </div>

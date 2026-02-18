@@ -1,0 +1,151 @@
+{
+  "regulationRef": "recs-thermal",
+  "description": "Regras RECS (DL 118/2013 Parte B + Portaria 349-D/2013) — requisitos térmicos e energéticos para edifícios de comércio e serviços: IEE, iluminação, sistemas técnicos, GES, QAI",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "THERM-RECS-UMAX-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS (Portaria 349-D) + Despacho 15793-K — Umáx para Edifícios de Comércio e Serviços",
+      "description": "Os coeficientes de transmissão térmica da envolvente do edifício de comércio e serviços devem respeitar os mesmos valores máximos (Umáx) do REH por zona climática, conforme Despacho 15793-K/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "envelope.externalWallUValue", "operator": "lookup_gt", "value": null, "table": "max_u_walls", "keys": ["location.climateZoneWinter"] }
+      ],
+      "currentValueTemplate": "U paredes = {envelope.externalWallUValue} W/(m².K)",
+      "requiredValue": "Limites idênticos ao REH: I1 ≤ 0.50 / I2 ≤ 0.40 / I3 ≤ 0.35 W/(m².K)",
+      "remediation": "Os edifícios de comércio e serviços (RECS) devem cumprir os mesmos Umáx do REH: (1) Paredes exteriores: I1 ≤ 0.50, I2 ≤ 0.40, I3 ≤ 0.35. (2) Coberturas: I1 ≤ 0.40, I2 ≤ 0.35, I3 ≤ 0.30. (3) Pavimentos: I1 ≤ 0.50, I2 ≤ 0.40, I3 ≤ 0.35. (4) Envidraçados: I1 ≤ 2.80, I2 ≤ 2.40, I3 ≤ 2.20. (5) Embora o RECS utilize o IEE como métrica principal, os Umáx são requisitos prescritivos independentes.",
+      "enabled": true,
+      "tags": ["RECS", "Umáx", "comércio", "serviços", "envolvente"]
+    },
+    {
+      "id": "THERM-RECS-IEE-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS Art. 32.º — IEE Previsto vs. IEE de Referência",
+      "description": "O Indicador de Eficiência Energética previsto (IEEpr = {energy.ieeActual} kWhEP/(m².ano)) excede o IEE de referência (IEEref = {energy.ieeReference}), não cumprindo o requisito RECS. (Nota: verificação de conformidade principal no plugin 'energy' — SCE-IEE-01.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.ieeActual", "operator": "formula_gt", "value": "energy.ieeReference" }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEEpr ≤ IEEref (IEE de referência por tipologia)",
+      "remediation": "Reduzir o IEE previsto para cumprir o RECS: (1) O IEE agrega: aquecimento + arrefecimento + ventilação + iluminação + AQS + outros. (2) Iluminação (tipicamente 30-40% do IEE em escritórios): LED, controlo por presença/luminosidade, DPIE ≤ 10 W/m². (3) AVAC: bomba de calor eficiente, free-cooling, recuperação de calor. (4) Envolvente: além dos Umáx, minimizar ganhos solares com proteção exterior. (5) Renováveis: PV para autoconsumo — reduz diretamente IEEpr.",
+      "enabled": true,
+      "tags": ["RECS", "IEE", "energia primária", "referência"]
+    },
+    {
+      "id": "THERM-RECS-GES-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS Art. 33.º — Grande Edifício de Serviços (GES > 1000 m²)",
+      "description": "O edifício de serviços com área útil > 1000 m² é classificado como Grande Edifício de Serviços (GES), ficando sujeito a requisitos adicionais: plano de racionalização energética, auditorias, SGE, e QAI.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "usableFloorArea", "operator": ">", "value": 1000 }
+      ],
+      "currentValueTemplate": "Área útil = {usableFloorArea} m²",
+      "requiredValue": "GES (> 1000 m²): requisitos adicionais de auditoria, SGE, QAI",
+      "remediation": "Requisitos para GES (Grande Edifício de Serviços > 1000 m²): (1) Plano de Racionalização Energética (PRE) obrigatório. (2) Auditoria energética a cada 6 anos por PQ. (3) Sistema de Gestão de Energia (SGE): monitorização contínua de consumos. (4) Qualidade do Ar Interior (QAI): monitorização periódica conforme Portaria 353-A. (5) TIM (Técnico de Instalação e Manutenção): obrigatório TIM-III (> 100 kW). (6) O IFC pode fornecer a área útil total automaticamente (soma de IfcSpace.NetFloorArea).",
+      "enabled": true,
+      "tags": ["RECS", "GES", "auditoria", "SGE", "QAI", "1000 m²"]
+    },
+    {
+      "id": "THERM-RECS-LIGHTING-DPIE-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS Portaria 349-D + EN 12464-1 — Densidade de Potência de Iluminação (DPIE)",
+      "description": "A densidade de potência de iluminação efetiva (DPIE = {energy.lightingPowerDensity} W/m²) excede o valor máximo regulamentar para a tipologia do edifício. (Nota: verificação detalhada por tipologia no plugin 'energy' — SCE-ILUM-01..05.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.lightingPowerDensity", "operator": ">", "value": 12 }
+      ],
+      "currentValueTemplate": "DPIE = {energy.lightingPowerDensity} W/m²",
+      "requiredValue": "DPIE máximo: escritórios 10 W/m², escolas 12 W/m², comércio 15 W/m², hospitais 15 W/m²",
+      "remediation": "Reduzir a densidade de potência de iluminação: (1) Iluminação LED: eficácia luminosa 100-150 lm/W (vs. 50-80 lm/W fluorescente). (2) Controlo por presença: desligar em zonas desocupadas (redução 20-40%). (3) Aproveitamento de luz natural: controlo por luminosidade (daylight harvesting) — redução 30-60% junto a fachadas. (4) Luminárias eficientes: UGR < 19 para escritórios, refletores otimizados. (5) DPIE = Potência instalada / Área — inclui toda a iluminação interior.",
+      "enabled": true,
+      "tags": ["RECS", "iluminação", "DPIE", "LED", "eficiência"]
+    },
+    {
+      "id": "THERM-RECS-ENVELOPE-GLASS-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS + Despacho 15793-K — Percentagem de Área Envidraçada em Edifícios de Serviços",
+      "description": "A percentagem de área envidraçada em relação à área de fachada ({envelope.windowToFacadeRatio}%) é elevada (> 60%), podendo causar sobreaquecimento em edifícios de serviços mesmo com proteção solar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "envelope.windowToFacadeRatio", "operator": ">", "value": 60 }
+      ],
+      "currentValueTemplate": "Razão envidraçado/fachada = {envelope.windowToFacadeRatio}%",
+      "requiredValue": "Recomendado: 30-50% para equilíbrio entre iluminação natural e controlo solar",
+      "remediation": "Otimizar a razão envidraçado/fachada em edifícios de serviços: (1) 30-50%: boa iluminação natural com controlo solar viável. (2) > 60%: risco de sobreaquecimento, necessidade de proteção solar intensiva e vidro de controlo solar (g ≤ 0.25). (3) Vidro de baixo fator solar: vidro selectivo com Tvis alta / g baixo (seletividade > 2.0). (4) Proteção solar exterior motorizada: estores de lamelas exteriores com controlo automático. (5) O IFC fornece áreas de envidraçados (IfcWindow) e áreas de fachada (IfcWall exterior) para cálculo automático do rácio.",
+      "enabled": true,
+      "tags": ["RECS", "envidraçados", "fachada", "sobreaquecimento", "IFC"]
+    },
+    {
+      "id": "THERM-RECS-QAI-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS + Portaria 353-A/2013 — Qualidade do Ar Interior em Edifícios de Serviços",
+      "description": "O edifício de comércio e serviços não dispõe de plano de monitorização da qualidade do ar interior (QAI) conforme Portaria 353-A/2013, obrigatório para edifícios com sistemas de climatização. (Nota: verificação de conformidade principal no plugin 'energy' — SCE-QAI-01.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.hasQAIMonitoring", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Monitorização QAI conforme Portaria 353-A: CO₂ ≤ 1250 ppm, PM10 ≤ 50 μg/m³",
+      "remediation": "Implementar monitorização de QAI (Portaria 353-A/2013): (1) Parâmetros: CO₂ (≤ 1250 ppm), PM2.5 (≤ 25 μg/m³), PM10 (≤ 50 μg/m³), formaldeído (≤ 100 μg/m³), COV totais (≤ 600 μg/m³). (2) Frequência: monitorização anual para GES, bienal para PES (Pequeno Edifício de Serviços). (3) Empresa: técnico acreditado pelo IPAC. (4) Pontos de medição: 1 por cada 250 m² ou por cada zona climática distinta. (5) Ações corretivas: aumento de caudal de ar novo, melhoria de filtragem, eliminação de fontes de emissão.",
+      "enabled": true,
+      "tags": ["RECS", "QAI", "qualidade do ar", "Portaria 353-A", "monitorização"]
+    },
+    {
+      "id": "THERM-RECS-ELEVATOR-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS Art. 35.º — Eficiência Energética de Elevadores",
+      "description": "Os elevadores do edifício de serviços não possuem classificação energética (EN ISO 25745) e não incorporam medidas de eficiência obrigatórias pelo RECS.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.hasElevatorEfficiency", "operator": "not_exists", "value": null },
+        { "field": "numberOfFloors", "operator": ">", "value": 3 }
+      ],
+      "requiredValue": "Elevadores com classe ≥ B (EN ISO 25745) e modo stand-by",
+      "remediation": "Implementar medidas de eficiência energética em elevadores: (1) Acionamento com VFD (variador de frequência): redução de 30-40% vs. 2 velocidades. (2) Iluminação LED na cabina com desligamento automático. (3) Modo stand-by: desligar iluminação e ventilação após período de inatividade. (4) Regeneração de energia: freio regenerativo que devolve energia à rede (em edifícios altos). (5) Classificação EN ISO 25745: classe A a G, objetivo ≥ B. (6) O consumo de elevadores representa 5-10% do consumo total em edifícios de escritórios.",
+      "enabled": true,
+      "tags": ["RECS", "elevadores", "eficiência", "EN 25745", "stand-by"]
+    },
+    {
+      "id": "THERM-RECS-HVAC-EFFICIENCY-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS Portaria 349-D Art. 8.º — Eficiência Mínima de Sistemas AVAC em Edifícios de Serviços",
+      "description": "Os equipamentos AVAC instalados no edifício de serviços não atingem os valores mínimos de eficiência regulamentar: COP ≥ 2.0 para aquecimento, EER ≥ 2.0 para arrefecimento. (Nota: verificação detalhada por tipo de sistema no plugin 'energy'.)",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.hvacCOP", "operator": "<", "value": 2.0 }
+      ],
+      "currentValueTemplate": "COP do sistema AVAC = {energy.hvacCOP}",
+      "requiredValue": "COP ≥ 2.0 (aquecimento), EER ≥ 2.0 (arrefecimento) — valores mínimos RECS",
+      "remediation": "Atingir eficiência mínima AVAC para RECS: (1) COP mínimo: 2.0 (aquecimento) — qualquer bomba de calor moderna ultrapassa. (2) EER mínimo: 2.0 (arrefecimento) — mesmo splits básicos atingem EER 2.5-3.0. (3) Valores de referência (para Nt): COP 3.0, EER 3.0. (4) Para GES: considerar VRV/VRF (COP sazonal 4.0-5.0) ou chiller eficiente. (5) Sistemas com eficiência abaixo da referência aumentam o IEEpr e pioram a classe energética.",
+      "enabled": true,
+      "tags": ["RECS", "AVAC", "COP", "EER", "eficiência", "sistemas"]
+    },
+    {
+      "id": "THERM-RECS-SGCIE-01",
+      "regulationId": "recs-thermal",
+      "article": "RECS + DL 71/2008 (SGCIE) — Consumo Intensivo de Energia",
+      "description": "O edifício de serviços com consumo energético anual superior a 500 tep (toneladas equivalentes de petróleo) é um consumidor intensivo de energia (CIE), sujeito ao SGCIE e a auditorias obrigatórias.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.annualEnergyConsumptionTep", "operator": ">", "value": 500 }
+      ],
+      "currentValueTemplate": "Consumo anual = {energy.annualEnergyConsumptionTep} tep",
+      "requiredValue": "CIE (> 500 tep): auditoria SGCIE + ARCE + metas de redução",
+      "remediation": "Requisitos para Consumidores Intensivos de Energia (SGCIE): (1) Registo na ADENE como CIE. (2) Auditoria energética obrigatória a cada 6 anos (8 anos para < 1000 tep). (3) Plano de Racionalização (ARCE): metas de redução de consumo específico e intensidade carbónica. (4) Metas: redução de 6% da intensidade energética em 6 anos, 4% da intensidade carbónica. (5) Conversão: 1 tep ≈ 11630 kWh. 500 tep ≈ 5815 MWh/ano.",
+      "enabled": true,
+      "tags": ["RECS", "SGCIE", "CIE", "auditoria", "consumo intensivo"]
+    }
+  ]
+}

@@ -15,6 +15,9 @@ import { useI18n } from "@/lib/i18n";
 import type { UnifiedPipelineResult, UnifiedStage } from "@/lib/unified-pipeline";
 import type { BuildingProject } from "@/lib/types";
 import type { JobStatus } from "@/lib/job-store";
+import type { SpecialtyAnalysisResult } from "@/lib/ifc-specialty-analyzer";
+import type { ClientIfcProgress } from "@/lib/client-ifc-parser";
+import type { UploadProgress } from "@/lib/pipeline-file-upload";
 import {
   Upload,
   Loader2,
@@ -103,6 +106,9 @@ export default function UnifiedUpload({
   const [result, setResult] = useState<UnifiedPipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ifcBytesRef = useRef<{ data: Uint8Array; name: string } | null>(null);
+  const [ifcParsingProgress, setIfcParsingProgress] = useState<ClientIfcProgress | null>(null);
+  const [storageUploadProgress, setStorageUploadProgress] = useState<UploadProgress | null>(null);
 
   // Output toggles
   const [includeCosts, setIncludeCosts] = useState(true);
@@ -230,19 +236,112 @@ export default function UnifiedUpload({
     setError(null);
     setProgress(null);
     setResult(null);
+    setIfcParsingProgress(null);
+    setStorageUploadProgress(null);
 
     try {
-      // 1. Submit job
+      // 1. Separate IFC files from non-IFC files
+      const ifcFiles = files.filter((f) => f.name.toLowerCase().endsWith(".ifc"));
+      const nonIfcFiles = files.filter((f) => !f.name.toLowerCase().endsWith(".ifc"));
+
+      // 2. Parse IFC files client-side (avoids Vercel 4.5 MB body limit)
+      let ifcAnalyses: SpecialtyAnalysisResult[] | undefined;
+
+      if (ifcFiles.length > 0) {
+        const { parseIfcFilesClient } = await import("@/lib/client-ifc-parser");
+
+        // Preserve raw IFC bytes for 4D viewer
+        const firstIfc = ifcFiles[0];
+        const rawBuffer = await firstIfc.arrayBuffer();
+        ifcBytesRef.current = { data: new Uint8Array(rawBuffer), name: firstIfc.name };
+
+        const clientResult = await parseIfcFilesClient(ifcFiles, (p) => {
+          setIfcParsingProgress(p);
+        });
+
+        setIfcParsingProgress(null);
+
+        if (clientResult.errors.length > 0) {
+          for (const err of clientResult.errors) {
+            console.warn(`IFC parse failed for ${err.fileName}: ${err.error}`);
+          }
+        }
+
+        if (clientResult.analyses.length > 0) {
+          ifcAnalyses = clientResult.analyses;
+        } else if (ifcFiles.length > 0) {
+          // All IFC files failed client-side parsing
+          const totalIfcSize = ifcFiles.reduce((sum, f) => sum + f.size, 0);
+          if (totalIfcSize > 4 * 1024 * 1024) {
+            throw new Error(
+              lang === "pt"
+                ? "Análise IFC falhou no browser e o ficheiro é demasiado grande para enviar ao servidor."
+                : "Browser IFC analysis failed and the file is too large to upload to server.",
+            );
+          }
+          // Small enough to fall back to server-side parsing
+        }
+      }
+
+      // 3. Upload large non-IFC files to Supabase Storage (avoids Vercel 4.5 MB body limit)
+      const { uploadLargeFilesToStorage, LARGE_FILE_THRESHOLD } = await import("@/lib/pipeline-file-upload");
+
+      // Files to upload: non-IFC files + (IFC files that failed client parse and are small)
+      const filesToUpload = [...nonIfcFiles];
+      if (ifcFiles.length > 0 && !ifcAnalyses) {
+        // IFC parse failed — include small IFC files for server fallback
+        for (const file of ifcFiles) {
+          filesToUpload.push(file);
+        }
+      }
+
+      const uploadResult = await uploadLargeFilesToStorage(filesToUpload, (p) => {
+        setStorageUploadProgress(p);
+      });
+
+      setStorageUploadProgress(null);
+
+      if (uploadResult.errors.length > 0) {
+        const failedNames = uploadResult.errors.map((e) => e.fileName).join(", ");
+        console.warn("Storage upload errors:", uploadResult.errors);
+        throw new Error(
+          lang === "pt"
+            ? `Erro ao carregar ficheiros grandes: ${failedNames}. Tente novamente.`
+            : `Error uploading large files: ${failedNames}. Please try again.`,
+        );
+      }
+
+      // 4. Build FormData — only small files go as binary, large files via storage paths
       const formData = new FormData();
-      for (const file of files) {
+      for (const file of uploadResult.smallFiles) {
         formData.append("files", file);
       }
+
+      // Attach storage paths for large files
+      if (uploadResult.storagePaths.length > 0) {
+        formData.append("storagePaths", JSON.stringify(uploadResult.storagePaths));
+
+        // Log for debugging
+        const totalStorageSize = uploadResult.storagePaths.reduce((sum, p) => sum + p.fileSize, 0);
+        console.log(
+          `Uploaded ${uploadResult.storagePaths.length} large file(s) to Storage ` +
+          `(${(totalStorageSize / 1024 / 1024).toFixed(1)} MB total). ` +
+          `${uploadResult.smallFiles.length} small file(s) via FormData.`
+        );
+      }
+
       formData.append("options", JSON.stringify({
         includeCosts,
         includeSchedule,
         includeCompliance,
       }));
 
+      // 5. Attach pre-parsed IFC analyses as JSON
+      if (ifcAnalyses) {
+        formData.append("ifcAnalyses", JSON.stringify(ifcAnalyses));
+      }
+
+      // 6. Submit job
       const response = await fetch("/api/pipeline", { method: "POST", body: formData });
       const json = await response.json();
 
@@ -252,7 +351,7 @@ export default function UnifiedUpload({
 
       const jobId = json.jobId as string;
 
-      // 2. Poll for progress
+      // 6. Poll for progress
       pollRef.current = setInterval(async () => {
         try {
           const pollRes = await fetch(`/api/pipeline/${jobId}`);
@@ -276,6 +375,11 @@ export default function UnifiedUpload({
           if (status === "completed" && job.result) {
             stopPolling();
             const pipelineResult = deserializeResult(job.result);
+            // Attach raw IFC bytes for 4D viewer (client-side only)
+            if (ifcBytesRef.current) {
+              pipelineResult.ifcFileData = ifcBytesRef.current.data;
+              pipelineResult.ifcFileName = ifcBytesRef.current.name;
+            }
             setResult(pipelineResult);
             setIsProcessing(false);
           } else if (status === "failed") {
@@ -301,6 +405,7 @@ export default function UnifiedUpload({
             : "Error processing files.",
       );
       setIsProcessing(false);
+      setIfcParsingProgress(null);
     }
   }, [files, includeCosts, includeSchedule, includeCompliance, lang]);
 
@@ -311,6 +416,9 @@ export default function UnifiedUpload({
     setResult(null);
     setError(null);
     setFiles([]);
+    setIfcParsingProgress(null);
+    setStorageUploadProgress(null);
+    ifcBytesRef.current = null;
   }
 
   // ── Download helpers ──────────────────────────────────────
@@ -375,8 +483,19 @@ export default function UnifiedUpload({
                     </span>
                     <span className="text-sm text-gray-700 truncate">{file.name}</span>
                     <span className="text-xs text-gray-400">
-                      {(file.size / 1024).toFixed(0)} KB
+                      {file.size > 1024 * 1024
+                        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                        : `${(file.size / 1024).toFixed(0)} KB`}
                     </span>
+                    {file.size > 4 * 1024 * 1024 && (
+                      <span className="text-xs text-amber-500" title={
+                        lang === "pt"
+                          ? "Será carregado via armazenamento cloud"
+                          : "Will be uploaded via cloud storage"
+                      }>
+                        {lang === "pt" ? "via storage" : "via storage"}
+                      </span>
+                    )}
                   </div>
                   <button
                     onClick={(e) => {
@@ -474,9 +593,50 @@ export default function UnifiedUpload({
         <div>
           <h3 className="text-lg font-semibold text-gray-900">{txt.title}</h3>
           <p className="text-sm text-accent font-medium mt-1">
-            {progress?.message ?? txt.processing}
+            {ifcParsingProgress
+              ? (lang === "pt" ? "A analisar IFC no browser..." : "Parsing IFC in browser...")
+              : (progress?.message ?? txt.processing)}
           </p>
         </div>
+
+        {/* Client-side IFC parsing progress */}
+        {ifcParsingProgress && (
+          <div className="p-3 bg-purple-900/30 border border-purple-500/30 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-purple-300">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="font-medium">
+                {ifcParsingProgress.fileName}
+              </span>
+            </div>
+            <div className="text-xs text-purple-400 mt-1">
+              {ifcParsingProgress.phase === "reading"
+                ? (lang === "pt" ? "A ler ficheiro..." : "Reading file...")
+                : (lang === "pt" ? "A extrair quantidades e propriedades..." : "Extracting quantities and properties...")}
+              {ifcParsingProgress.totalFiles > 1 &&
+                ` (${ifcParsingProgress.fileIndex + 1}/${ifcParsingProgress.totalFiles})`}
+            </div>
+          </div>
+        )}
+
+        {storageUploadProgress && (
+          <div className="p-3 bg-blue-900/30 border border-blue-500/30 rounded-lg">
+            <div className="flex items-center gap-2 text-sm text-blue-300">
+              <Upload className="w-4 h-4 animate-pulse" />
+              <span className="font-medium">
+                {storageUploadProgress.fileName}
+              </span>
+            </div>
+            <div className="text-xs text-blue-400 mt-1">
+              {storageUploadProgress.phase === "uploading"
+                ? (lang === "pt" ? "A carregar ficheiro grande para armazenamento..." : "Uploading large file to storage...")
+                : storageUploadProgress.phase === "done"
+                  ? (lang === "pt" ? "Carregado com sucesso" : "Uploaded successfully")
+                  : (lang === "pt" ? "Erro no carregamento" : "Upload error")}
+              {storageUploadProgress.totalFiles > 1 &&
+                ` (${storageUploadProgress.fileIndex + 1}/${storageUploadProgress.totalFiles})`}
+            </div>
+          </div>
+        )}
 
         {/* Progress bar */}
         <div>

@@ -1,0 +1,98 @@
+{
+  "regulationRef": "dl-68a-2015",
+  "description": "Regras DL 68-A/2015 — Alterações ao DL 118/2013 (SCE): isenções atualizadas, obrigações do proprietário, requisitos municipais, penalidades, certificação em operação",
+  "extractedBy": "claude-regulatory-expansion-v3",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "ENE-68A-EXEMPTION-INDUSTRIAL-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 Art. 4.º — Isenção de Certificação para Edifícios Industriais",
+      "description": "Os edifícios industriais, agrícolas ou pecuários com necessidades de energia reduzidas (baixa densidade de ocupação, processo dominante) podem estar isentos de certificação SCE, mas devem verificar o enquadramento.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "==", "value": "industrial" }
+      ],
+      "requiredValue": "Verificar enquadramento de isenção SCE para edifícios industriais/agrícolas",
+      "remediation": "Isenções de certificação SCE (DL 68-A/2015): (1) Edifícios industriais com processo energético dominante (> 80% do consumo). (2) Edifícios agrícolas não residenciais com necessidades energéticas reduzidas. (3) Edifícios temporários (utilização < 2 anos). (4) Edifícios de culto/religiosos. (5) Monumentos e edifícios classificados. (6) Garagens, armazéns sem climatização. (7) A isenção deve ser verificada caso a caso — não é automática.",
+      "enabled": true,
+      "tags": ["isenção", "industrial", "agrícola", "SCE", "DL 68-A"]
+    },
+    {
+      "id": "ENE-68A-OWNER-OBLIGATION-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 Art. 14.º — Obrigação do Proprietário na Transação",
+      "description": "O proprietário não disponibilizou o certificado energético ao potencial comprador/arrendatário, conforme obrigatório desde a fase de publicidade do imóvel.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.transactionType", "operator": "in", "value": ["sale", "rental"] },
+        { "field": "energy.hasCertificate", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Certificado energético obrigatório na publicidade e transação de imóveis",
+      "remediation": "Obrigações do proprietário na transação: (1) Publicidade: a classe energética deve constar em todos os anúncios de venda/arrendamento. (2) Visita: o certificado deve estar disponível para consulta. (3) Escritura: cópia do certificado entregue ao novo proprietário/arrendatário. (4) Coima: 250€-3740€ (pessoa singular), 2500€-44890€ (pessoa coletiva). (5) Validade: o certificado deve estar em vigor (≤ 10 anos). (6) Responsabilidade: do proprietário (venda) ou do senhorio (arrendamento).",
+      "enabled": true,
+      "tags": ["proprietário", "transação", "publicidade", "coima", "certificado"]
+    },
+    {
+      "id": "ENE-68A-MUNICIPAL-PERMIT-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 Art. 13.º — Pré-Certificado para Licenciamento Municipal",
+      "description": "O pedido de licenciamento de construção ou grande reabilitação não inclui o pré-certificado energético emitido por perito qualificado, obrigatório para a câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "building.isNew", "operator": "==", "value": true },
+        { "field": "hasPreCertificate", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Pré-certificado energético obrigatório para licenciamento de construção",
+      "remediation": "Pré-certificado para licenciamento: (1) Obrigatório: junto com o projeto de especialidades (RJUE). (2) Conteúdo: classe energética prevista, valores U, sistemas propostos, contribuição renovável. (3) Emissão: perito qualificado (PQ) registado na ADENE. (4) Custo: 135-300€ (habitação unifamiliar). (5) A câmara municipal não pode emitir alvará sem pré-certificado. (6) Prazo: válido durante a vigência do processo de licenciamento.",
+      "enabled": true,
+      "tags": ["pré-certificado", "licenciamento", "câmara", "RJUE", "obrigatório"]
+    },
+    {
+      "id": "ENE-68A-FINAL-CERT-OCCUPATION-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 Art. 13.º — Certificado Final para Autorização de Utilização",
+      "description": "A obra concluída não possui certificado energético final, obrigatório para a emissão da autorização de utilização pela câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "projectPhase", "operator": "==", "value": "construction" },
+        { "field": "hasFinalCertificate", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Certificado energético final obrigatório para autorização de utilização",
+      "remediation": "Certificado final para utilização: (1) O PQ deve verificar que o construído corresponde ao projetado. (2) Verificações: U-valores reais (se acessíveis), sistemas instalados, coletores solares, PV. (3) Se classe pior que prevista: o PQ pode não emitir certificado favorável. (4) A câmara municipal não emite autorização de utilização sem certificado final. (5) Custo: 135-300€ (habitação unifamiliar). (6) O certificado final substitui o pré-certificado e tem validade de 10 anos.",
+      "enabled": true,
+      "tags": ["certificado final", "utilização", "obra", "câmara", "PQ"]
+    },
+    {
+      "id": "ENE-68A-GES-DISPLAY-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 Art. 15.º — Afixação do Certificado em GES",
+      "description": "O certificado energético não está afixado em local visível e acessível ao público no edifício de serviços, conforme obrigatório para edifícios públicos e GES.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.isGES", "operator": "==", "value": true },
+        { "field": "energy.hasCertificateDisplayed", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Certificado energético afixado em local visível e acessível ao público",
+      "remediation": "Afixação obrigatória do certificado: (1) GES (> 1000 m²): afixar na entrada principal em local visível. (2) Edifícios públicos: obrigatório independentemente da área. (3) Formato: etiqueta energética oficial da ADENE (formato A3 mínimo). (4) Conteúdo visível: classe energética, emissões CO₂, data de validade. (5) Coima por não afixação: 250-3740€ (singular), 2500-44890€ (coletiva).",
+      "enabled": true,
+      "tags": ["afixação", "GES", "público", "etiqueta", "coima"]
+    },
+    {
+      "id": "ENE-68A-EXISTING-BUILDING-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Requisitos para Edifícios Existentes em Operação",
+      "description": "O edifício existente em operação há mais de 10 anos não possui certificado energético atualizado, não cumprindo os requisitos do SCE para edifícios em exploração.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "projectPhase", "operator": "==", "value": "operation" },
+        { "field": "energy.certificateAgeYears", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "Idade do certificado = {energy.certificateAgeYears} anos",
+      "requiredValue": "Certificado energético válido (≤ 10 anos) para edifícios em operação",
+      "remediation": "Renovar o certificado energético: (1) Validade máxima: 10 anos para edifícios existentes. (2) GES: validade 6 anos (auditoria energética requerida). (3) Após expiração: certificado inválido para transações. (4) Atualização recomendada: após intervenções na envolvente ou nos sistemas. (5) Custo renovação: 135-300€ (habitação), 500-2000€ (serviços), 2000-10000€ (GES com auditoria).",
+      "enabled": true,
+      "tags": ["existente", "operação", "renovação", "10 anos", "validade"]
+    }
+  ]
+}

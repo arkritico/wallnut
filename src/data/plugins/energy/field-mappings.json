@@ -206,6 +206,196 @@
       "defaults": { "_default": false },
       "description": "Indica se existe TIM designado para manutenção dos sistemas técnicos do edifício"
     },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.Ntc",
+      "label": "Ntc — Necessidades globais de energia primária",
+      "type": "number",
+      "unit": "kWhEP/(m².ano)",
+      "sources": ["form", "computed"],
+      "description": "Necessidades nominais globais de energia primária do edifício (calculado pelo deep analyzer)"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.Nt",
+      "label": "Nt — Limite regulamentar de energia primária",
+      "type": "number",
+      "unit": "kWhEP/(m².ano)",
+      "sources": ["form", "computed"],
+      "description": "Valor limite regulamentar de energia primária para o edifício de referência"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.Nic",
+      "label": "Nic — Necessidades de aquecimento",
+      "type": "number",
+      "unit": "kWh/(m².ano)",
+      "sources": ["form", "computed"],
+      "description": "Necessidades nominais de energia útil para aquecimento"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.NicMax",
+      "label": "Ni — Limite de necessidades de aquecimento",
+      "type": "number",
+      "unit": "kWh/(m².ano)",
+      "sources": ["form", "computed"],
+      "description": "Valor máximo regulamentar para necessidades de aquecimento"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.fpuElectricity",
+      "label": "Fpu eletricidade",
+      "type": "number",
+      "sources": ["form"],
+      "defaults": { "_default": 2.5 },
+      "description": "Fator de conversão de energia primária para eletricidade da rede (Fpu = 2.5)"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.fpuGas",
+      "label": "Fpu gás natural/GPL",
+      "type": "number",
+      "sources": ["form"],
+      "defaults": { "_default": 1.0 },
+      "description": "Fator de conversão de energia primária para gás natural ou GPL (Fpu = 1.0)"
+    },
+
+    {
+      "_group": "Parâmetros de Cálculo REH",
+      "field": "energy.ventilationRph",
+      "label": "Taxa de renovação de ar (Rph)",
+      "type": "number",
+      "unit": "h⁻¹",
+      "sources": ["form"],
+      "description": "Taxa de renovação horária de ar — mínimo regulamentar 0.4 h⁻¹ para REH"
+    },
+    {
+      "_group": "Parâmetros de Cálculo REH",
+      "field": "energy.aqsConsumptionPerOccupant",
+      "label": "Consumo AQS por ocupante",
+      "type": "number",
+      "unit": "L/dia",
+      "sources": ["form"],
+      "defaults": { "_default": 40 },
+      "description": "Consumo diário de AQS por ocupante convencional (REH: 40 L/dia a 60°C)"
+    },
+    {
+      "_group": "Parâmetros de Cálculo REH",
+      "field": "energy.heatingSeasonMonths",
+      "label": "Duração da estação de aquecimento",
+      "type": "number",
+      "unit": "meses",
+      "sources": ["form"],
+      "description": "Duração da estação de aquecimento (M) conforme zona climática"
+    },
+    {
+      "_group": "Parâmetros de Cálculo REH",
+      "field": "energy.coolingSeasonMonths",
+      "label": "Duração da estação de arrefecimento",
+      "type": "number",
+      "unit": "meses",
+      "sources": ["form"],
+      "defaults": { "_default": 4 },
+      "description": "Duração da estação de arrefecimento — convenção: Junho a Setembro (4 meses)"
+    },
+    {
+      "_group": "Parâmetros de Cálculo REH",
+      "field": "energy.utilizationFactorHeating",
+      "label": "Fator de utilização de ganhos (aquecimento)",
+      "type": "number",
+      "sources": ["form", "computed"],
+      "description": "Fator de utilização dos ganhos térmicos na estação de aquecimento (ηi)"
+    },
+
+    {
+      "_group": "Automação e Monitorização",
+      "field": "systems.bacClass",
+      "label": "Classe BAC (EN 15232)",
+      "type": "select",
+      "options": [
+        { "value": "A", "label": "A — Alta eficiência" },
+        { "value": "B", "label": "B — Avançada" },
+        { "value": "C", "label": "C — Standard" },
+        { "value": "D", "label": "D — Sem automação" }
+      ],
+      "sources": ["form"],
+      "description": "Classe de automação e controlo do edifício conforme EN 15232 (A=melhor, D=pior)"
+    },
+    {
+      "_group": "Automação e Monitorização",
+      "field": "energy.hasSubMetering",
+      "label": "Sub-metering por uso final",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe contagem desagregada de energia por uso final (AVAC, iluminação, etc.)"
+    },
+    {
+      "_group": "Automação e Monitorização",
+      "field": "energy.hasBMS",
+      "label": "Sistema de gestão técnica (BMS/GTC)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de gestão técnica centralizada (BMS/GTC)"
+    },
+    {
+      "_group": "Automação e Monitorização",
+      "field": "energy.hasEnergyMonitoring",
+      "label": "Monitorização contínua de energia",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de monitorização contínua de consumos energéticos com alertas"
+    },
+    {
+      "_group": "Automação e Monitorização",
+      "field": "energy.hasCertificateDisplayed",
+      "label": "Certificado afixado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o certificado energético está afixado em local visível (obrigatório para GES e edifícios públicos)"
+    },
+
+    {
+      "_group": "Análise de Ciclo de Vida",
+      "field": "energy.hasCostOptimalAnalysis",
+      "label": "Análise de custo ótimo",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizada análise de custo ótimo de ciclo de vida (EN 15459)"
+    },
+    {
+      "_group": "Análise de Ciclo de Vida",
+      "field": "energy.hasPostOccupancyMonitoring",
+      "label": "Monitorização pós-ocupação",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe plano de monitorização pós-ocupação para verificação de desempenho nZEB"
+    },
+    {
+      "_group": "Análise de Ciclo de Vida",
+      "field": "energy.hasLCAAssessment",
+      "label": "Avaliação de ciclo de vida (LCA)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizada avaliação ambiental de ciclo de vida (EN 15978) — obrigatória a partir de 2030"
+    },
+
+    {
+      "_group": "Envolvente (energia)",
+      "field": "envelope.hasPassiveCooling",
+      "label": "Estratégias de arrefecimento passivo",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício incorpora estratégias de arrefecimento passivo (sombreamento, ventilação noturna, inércia)"
+    },
 
     {
       "_group": "Sistemas de Energia",
@@ -241,6 +431,175 @@
       ],
       "sources": ["form"],
       "description": "Tipo de sistema de preparação de águas quentes sanitárias (AQS)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.heatingEfficiency",
+      "label": "Eficiência do sistema de aquecimento",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rendimento nominal do sistema de aquecimento (η ou COP)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.coolingSystemCOP",
+      "label": "COP do sistema de arrefecimento",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Coeficiente de desempenho do sistema de arrefecimento (EER nominal)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.dhwEfficiency",
+      "label": "Eficiência do sistema de AQS",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rendimento nominal do sistema de preparação de AQS (η)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.heatPumpSCOP",
+      "label": "SCOP da bomba de calor",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Coeficiente de desempenho sazonal de aquecimento (SCOP) conforme EN 14825"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.coolingSystemSEER",
+      "label": "SEER do sistema de arrefecimento",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Eficiência energética sazonal de arrefecimento (SEER) conforme EN 14825"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.heatPumpSPF",
+      "label": "SPF da bomba de calor",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Fator de desempenho sazonal (SPF) — inclui auxiliares, para classificação renovável (Diretiva 2009/28/CE)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.heatPumpType",
+      "label": "Tipo de bomba de calor",
+      "type": "select",
+      "options": [
+        { "value": "air_water", "label": "Aerotérmica ar-água" },
+        { "value": "air_air", "label": "Aerotérmica ar-ar" },
+        { "value": "ground_water", "label": "Geotérmica solo-água" },
+        { "value": "water_water", "label": "Hidrotérmica água-água" }
+      ],
+      "sources": ["form"],
+      "description": "Tipo de fonte/sumidouro da bomba de calor"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasInverterCompressor",
+      "label": "Compressor inverter",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a bomba de calor/chiller possui compressor com tecnologia inverter (modulação contínua)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasBiomassHeating",
+      "label": "Aquecimento a biomassa",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de aquecimento a biomassa (pellets, lenha)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasPipeInsulation",
+      "label": "Isolamento de tubagens",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as tubagens de distribuição possuem isolamento térmico adequado (Portaria 349-D)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasDuctInsulation",
+      "label": "Isolamento de condutas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as condutas de ar climatizado possuem isolamento térmico adequado"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.fanSFP",
+      "label": "SFP dos ventiladores",
+      "type": "number",
+      "unit": "W/(l/s)",
+      "sources": ["form"],
+      "description": "Potência específica dos ventiladores (Specific Fan Power) — EN 13779"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasVariableSpeedPumps",
+      "label": "Bombas de velocidade variável",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as bombas de circulação AVAC são de velocidade variável (classe A Ecodesign)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.airFlowRate",
+      "label": "Caudal de ar novo",
+      "type": "number",
+      "unit": "m³/h",
+      "sources": ["form"],
+      "description": "Caudal de ar novo do sistema de ventilação mecânica"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasHeatRecovery",
+      "label": "Recuperador de calor",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o sistema de ventilação possui recuperação de calor do ar rejeitado"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasCentralDHW",
+      "label": "AQS centralizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui sistema centralizado de preparação de AQS"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasDHWRecirculation",
+      "label": "Recirculação de AQS",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe circuito de recirculação de AQS com isolamento e controlo de temperatura"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasFreeCooling",
+      "label": "Free-cooling / economizador",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o sistema AVAC incorpora economizador de ar (free-cooling)"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.chillerEER",
+      "label": "EER do chiller",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Eficiência energética nominal do chiller (Energy Efficiency Ratio)"
     },
 
     {
@@ -316,6 +675,49 @@
       "unit": "%",
       "sources": ["form"],
       "description": "Percentagem de energia solar na preparação de AQS (fração solar)"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "energy.renewableFraction",
+      "label": "Fração de energia renovável",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Percentagem de energia renovável no consumo total do edifício (requisito nZEB ≥ 50%)"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "energy.pvExportFraction",
+      "label": "Fração de exportação PV",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Fração da produção PV exportada para a rede (não autoconsumida)"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "energy.solarCollectorArea",
+      "label": "Área de coletores solares",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área de abertura dos coletores solares térmicos instalados"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "energy.solarThermalContribution",
+      "label": "Contribuição solar térmica (Esolar)",
+      "type": "number",
+      "unit": "kWh/ano",
+      "sources": ["form"],
+      "description": "Energia solar térmica captada (Esolar), calculada pelo programa SCE.ER da ADENE"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "energy.solarFractionAQS",
+      "label": "Fração solar AQS",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Fração solar para AQS (Esolar/Nac) — tipicamente 60-75% em Portugal"
     },
 
     {

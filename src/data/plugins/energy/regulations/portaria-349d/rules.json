@@ -1,0 +1,149 @@
+{
+  "regulationRef": "portaria-349d-2013",
+  "description": "Regras Portaria 349-D/2013 — Requisitos técnicos RECS para sistemas de edifícios de comércio e serviços: AVAC, distribuição, isolamento de tubagens, AQS centralizado, eficiência de ventiladores",
+  "extractedBy": "claude-regulatory-expansion-v3",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "ENE-349D-PIPE-INSULATION-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 7.º — Isolamento Térmico de Tubagens de Distribuição",
+      "description": "As tubagens de distribuição de água quente e fria não possuem isolamento térmico adequado, resultando em perdas de energia de distribuição que podem representar 15-30% do consumo do sistema.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.hasPipeInsulation", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Isolamento tubagens: ≥ 20 mm (DN ≤ 35), ≥ 30 mm (DN 35-100), ≥ 40 mm (DN > 100) com λ ≤ 0.040 W/(m.K)",
+      "remediation": "Isolar tubagens de distribuição: (1) Espessuras mínimas (λ = 0.040): DN ≤ 35 mm → 20 mm isolamento, DN 35-100 → 30 mm, DN > 100 → 40 mm. (2) Materiais: espuma elastomérica (flexível), lã mineral (alta temperatura), PIR (rígido). (3) Tubagens no exterior: isolamento com proteção mecânica e contra UV. (4) Válvulas e acessórios: isolar com caixas amovíveis. (5) Perdas sem isolamento: 20-40 W/m para água quente (60°C, DN50). (6) Com isolamento 30 mm: 5-8 W/m — redução de 75-80%.",
+      "enabled": true,
+      "tags": ["tubagens", "isolamento", "distribuição", "perdas", "RECS"]
+    },
+    {
+      "id": "ENE-349D-DUCT-INSULATION-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 7.º — Isolamento Térmico de Condutas de Ar",
+      "description": "As condutas de distribuição de ar climatizado não possuem isolamento térmico, resultando em ganhos/perdas de calor significativos quando atravessam espaços não climatizados.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.hasDuctInsulation", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Isolamento condutas: ≥ 25 mm (espaços interiores), ≥ 40 mm (exterior/não climatizado) com λ ≤ 0.040",
+      "remediation": "Isolar condutas de distribuição de ar: (1) Espaços interiores não climatizados: ≥ 25 mm lã mineral ou espuma. (2) Exterior ou tecto falso não climatizado: ≥ 40 mm. (3) Barreira de vapor: obrigatória em condutas de ar frio (evitar condensação). (4) Condutas flexíveis: já possuem isolamento de fábrica (verificar espessura). (5) Perdas típicas sem isolamento: 5-10% da energia transportada por cada 10 m de conduta em espaço não climatizado.",
+      "enabled": true,
+      "tags": ["condutas", "isolamento", "ar", "perdas", "barreira vapor"]
+    },
+    {
+      "id": "ENE-349D-FAN-EFFICIENCY-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 8.º — Eficiência de Ventiladores (SFP)",
+      "description": "A potência específica dos ventiladores (SFP — Specific Fan Power) do sistema de ventilação excede os limites recomendados, indicando ineficiência do sistema de distribuição de ar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.fanSFP", "operator": ">", "value": 2.0 }
+      ],
+      "currentValueTemplate": "SFP = {systems.fanSFP} W/(l/s)",
+      "requiredValue": "SFP ≤ 2.0 W/(l/s) para sistemas de ventilação mecânica (EN 13779 categoria SFP3)",
+      "remediation": "Reduzir o SFP: (1) SFP = Potência ventilador / Caudal de ar. (2) SFP ≤ 1.0 = excelente (SFP1). (3) SFP 1.0-2.0 = bom (SFP2-SFP3). (4) SFP > 2.5 = mau (SFP5). (5) Medidas: condutas com menor perda de carga (velocidade ≤ 5 m/s), filtros de baixa perda, ventiladores EC/PM. (6) VSD (variador de velocidade): obrigatório para ventiladores > 1.1 kW.",
+      "enabled": true,
+      "tags": ["SFP", "ventiladores", "eficiência", "ventilação", "VSD"]
+    },
+    {
+      "id": "ENE-349D-PUMP-EFFICIENCY-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 8.º — Eficiência de Bombas de Circulação",
+      "description": "As bombas de circulação do sistema AVAC não são de velocidade variável (classe A ou superior conforme Ecodesign), consumindo energia excessiva em carga parcial.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.hasVariableSpeedPumps", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Bombas de circulação classe A (Ecodesign) com controlo de velocidade variável",
+      "remediation": "Instalar bombas de circulação eficientes: (1) Regulamento Ecodesign (EU 641/2009): IEE ≤ 0.23 para circuladores autónomos. (2) Bombas ECM (Electronically Commutated Motor): consumo 50-80% inferior a bombas convencionais. (3) Controlo Δp variável: ajustar velocidade à carga térmica. (4) Dimensionamento: evitar sobredimensionamento (ponto de operação a 80-90% da capacidade). (5) Payback típico: 2-3 anos para retrofit de bomba convencional → ECM.",
+      "enabled": true,
+      "tags": ["bombas", "circulação", "ECM", "Ecodesign", "eficiência"]
+    },
+    {
+      "id": "ENE-349D-VSD-MANDATORY-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D + RECS — VSD Obrigatório para Motores > 5.5 kW",
+      "description": "Os motores de ventiladores e bombas com potência superior a 5.5 kW não possuem variador de velocidade (VSD/VFD), obrigatório em edifícios de serviços novos conforme RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "energy.installedPower", "operator": ">", "value": 5.5 },
+        { "field": "systems.hasVSD", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "VSD obrigatório para motores > 5.5 kW em sistemas AVAC (RECS)",
+      "remediation": "Instalar VSD em motores > 5.5 kW: (1) Poupança de energia: variação de velocidade segue lei cúbica (50% velocidade = 12.5% potência). (2) Aplicações: ventiladores de UTA, bombas de circulação, torres de arrefecimento. (3) Classe IE3 ou IE4 obrigatória (Ecodesign EU 2019/1781). (4) VSD com filtragem harmónica: reduzir THD < 5%. (5) Payback: 1-3 anos para equipamentos com > 2000 h/ano de funcionamento.",
+      "enabled": true,
+      "tags": ["VSD", "VFD", "motores", "5.5 kW", "obrigatório"]
+    },
+    {
+      "id": "ENE-349D-HEAT-RECOVERY-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 9.º — Recuperação de Calor Obrigatória",
+      "description": "O sistema de ventilação com caudal de ar novo superior a 2500 m³/h não possui recuperador de calor, desperdiçando energia significativa no ar rejeitado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.airFlowRate", "operator": ">", "value": 2500 },
+        { "field": "systems.hasHeatRecovery", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Caudal = {systems.airFlowRate} m³/h",
+      "requiredValue": "Recuperação de calor obrigatória para caudais > 2500 m³/h (η ≥ 50%)",
+      "remediation": "Instalar recuperador de calor: (1) Obrigatório: caudal ar novo > 2500 m³/h em RECS. (2) Eficiência mínima: η ≥ 50% (placas), recomendado η ≥ 70% (rotativo ou contra-corrente). (3) Tipos: placas (50-65%), rotativo (70-85%), run-around (45-55%), entálpico (55-75%). (4) Verificar: risco de contaminação cruzada (cozinhas, laboratórios) → usar run-around. (5) Poupança típica: 15-25 kWh/(m².ano) em escritórios. (6) Payback: 3-5 anos.",
+      "enabled": true,
+      "tags": ["recuperação calor", "ventilação", "2500 m³/h", "eficiência"]
+    },
+    {
+      "id": "ENE-349D-AQS-CENTRALIZED-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D — Sistemas Centralizados de AQS em Edifícios de Serviços",
+      "description": "O sistema centralizado de AQS do edifício de serviços não possui recirculação com isolamento adequado, resultando em tempos de espera longos e desperdício de água e energia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.hasCentralDHW", "operator": "==", "value": true },
+        { "field": "systems.hasDHWRecirculation", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Recirculação AQS com controlo de temperatura e isolamento de tubagens",
+      "remediation": "Otimizar sistema centralizado de AQS: (1) Recirculação: bomba com controlo de temperatura (55-60°C) e horário. (2) Isolamento tubagens recirculação: ≥ 20 mm elastomérico. (3) Depósito: isolamento ≥ 50 mm PU, perdas estáticas ≤ 1.5 kWh/dia para 200 L. (4) Anti-Legionella: T_depósito ≥ 60°C, choque térmico > 70°C periódico. (5) Para hotéis/hospitais: considerar sistema solar térmico + bomba de calor para AQS base.",
+      "enabled": true,
+      "tags": ["AQS", "centralizado", "recirculação", "isolamento", "Legionella"]
+    },
+    {
+      "id": "ENE-349D-FREE-COOLING-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 9.º — Free-Cooling em Sistemas AVAC de Serviços",
+      "description": "O sistema AVAC do edifício de serviços não incorpora economizador de ar (free-cooling), desperdiçando o potencial de arrefecimento gratuito quando a temperatura exterior é inferior à interior.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.hasFreeCooling", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Free-cooling (economizador) obrigatório em UTAs com potência de arrefecimento > 12 kW",
+      "remediation": "Implementar free-cooling: (1) Economizador de ar: registos motorizados que aumentam caudal de ar novo quando T_ext < T_int. (2) Free-cooling direto (ar): mais simples, eficaz quando T_ext < 18°C. (3) Free-cooling indireto (água): torre de arrefecimento + permutador, para chillers > 100 kW. (4) Horas de free-cooling em Portugal: 1500-2500 h/ano (Centro/Norte). (5) Poupança: 10-20% do consumo de arrefecimento anual. (6) Controlo: sonda de T/HR no exterior + comparação entálpica.",
+      "enabled": true,
+      "tags": ["free-cooling", "economizador", "arrefecimento", "ventilação", "AVAC"]
+    },
+    {
+      "id": "ENE-349D-CHILLER-EFF-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D Art. 8.º — Eficiência Mínima de Chillers",
+      "description": "O chiller instalado não atinge a eficiência mínima regulamentar, comprometendo a classe energética do edifício de serviços.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "systems.chillerEER", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "EER chiller = {systems.chillerEER}",
+      "requiredValue": "EER chiller ≥ 3.0 (mínimo) — recomendado ≥ 4.0 para classe A Eurovent",
+      "remediation": "Especificar chiller eficiente: (1) EER mínimo RECS: 3.0. (2) Eurovent classe A: EER ≥ 4.0. (3) Tipos: scroll (EER 3.0-3.5), parafuso (EER 3.5-4.5), centrífugo (EER 5.0-6.5). (4) Condensação a água (torre): EER 15-30% superior a ar. (5) IPLV (Integrated Part Load Value): mais representativo que EER nominal — considerar IPLV > 5.0. (6) Inversores: chillers com compressor inverter → melhor desempenho a carga parcial.",
+      "enabled": true,
+      "tags": ["chiller", "EER", "eficiência", "Eurovent", "IPLV"]
+    }
+  ]
+}

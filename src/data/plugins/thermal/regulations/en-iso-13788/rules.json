@@ -1,0 +1,99 @@
+{
+  "regulationRef": "en-iso-13788",
+  "description": "Regras EN ISO 13788 — verificação higrotérmica: condensações superficiais, condensações intersticiais, fator de temperatura superficial fRsi, risco de bolor",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "THERM-COND-FRSI-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 §5 — Fator de Temperatura Superficial Interior (fRsi)",
+      "description": "O fator de temperatura superficial interior (fRsi) da envolvente opaca é inferior ao valor mínimo exigido ({envelope.fRsiMin}), indicando risco de condensação superficial e desenvolvimento de bolor.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "envelope.fRsi", "operator": "<", "value": 0.75 }
+      ],
+      "currentValueTemplate": "fRsi = {envelope.fRsi}",
+      "requiredValue": "fRsi ≥ 0.75 para risco de bolor (HR superficial < 80%)",
+      "remediation": "O fator fRsi depende do coeficiente U e das condições interiores/exteriores. Melhorar fRsi: (1) Aumentar isolamento térmico (reduzir U) — fRsi = 1 - U × Rsi, onde Rsi = 0.25 m².K/W. (2) Para fRsi ≥ 0.75: U deve ser ≤ 1.0 W/(m².K) em condições típicas portuguesas. (3) Zonas críticas: ligações caixilharia/parede, cantos de paredes, zonas atrás de armários junto a paredes exteriores. (4) Ventilação adequada: manter HR interior ≤ 60% para reduzir exigência de fRsi.",
+      "enabled": true,
+      "tags": ["condensação", "fRsi", "bolor", "higrotérmica"]
+    },
+    {
+      "id": "THERM-COND-FRSI-PT-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 §5 — fRsi em Pontes Térmicas",
+      "description": "O fator de temperatura superficial nas pontes térmicas (fRsi,pt = {envelope.fRsiThermalBridge}) é inferior a 0.75, indicando risco elevado de condensação e bolor nas zonas de ponte térmica.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "envelope.fRsiThermalBridge", "operator": "<", "value": 0.75 }
+      ],
+      "currentValueTemplate": "fRsi,PT = {envelope.fRsiThermalBridge}",
+      "requiredValue": "fRsi,PT ≥ 0.75 (≥ 0.90 recomendado para pontes térmicas corrigidas)",
+      "remediation": "Corrigir pontes térmicas para evitar condensação: (1) Isolamento contínuo pelo exterior (ETICS): elimina a maioria das pontes térmicas lineares. (2) Elementos de corte térmico em pilares e vigas: Schöck Isokorb ou similar. (3) Caixilharia alinhada com o plano de isolamento. (4) Soleira com corte térmico na ligação fachada/pavimento. (5) Simular com software de análise 2D/3D (THERM, HTflux) para verificar fRsi nas zonas críticas.",
+      "enabled": true,
+      "tags": ["condensação", "fRsi", "pontes térmicas", "bolor"]
+    },
+    {
+      "id": "THERM-COND-INTERSTICIAL-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 §6 — Verificação de Condensações Intersticiais (Método de Glaser)",
+      "description": "Não foi realizada verificação de condensações intersticiais pelo método de Glaser conforme EN ISO 13788. Este método verifica se existe condensação entre camadas da parede durante a estação de aquecimento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "envelope.hasInterstitialCondensationCheck", "operator": "not_exists", "value": null },
+        { "field": "envelope.externalWallUValue", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Verificação pelo método de Glaser: condensação acumulada ≤ capacidade de evaporação no verão",
+      "remediation": "Realizar verificação de condensações intersticiais (método de Glaser): (1) Calcular perfil de temperatura em cada interface entre camadas. (2) Calcular perfil de pressão de saturação e pressão de vapor real. (3) Onde Pv > Psat: ocorre condensação intersticial. (4) Verificar: condensação acumulada no inverno ≤ evaporação no verão (balanço anual positivo). (5) Regra prática: barreira para-vapor (μd ≥ 100 m) na face quente do isolamento se Riso > 2/3 × Rtotal. (6) Paredes com ETICS: raramente têm condensação intersticial (isolamento pelo exterior). (7) Isolamento pelo interior: risco elevado — obrigatória barreira para-vapor ou membrana inteligente.",
+      "enabled": true,
+      "tags": ["condensação intersticial", "Glaser", "barreira para-vapor", "camadas"]
+    },
+    {
+      "id": "THERM-COND-VAPOR-BARRIER-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 §6 — Barreira Para-Vapor em Isolamento pelo Interior",
+      "description": "O edifício possui isolamento térmico pelo interior sem barreira para-vapor adequada, criando risco de condensação intersticial entre o isolamento e a parede exterior.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "envelope.hasInteriorInsulation", "operator": "==", "value": true },
+        { "field": "envelope.hasVaporBarrier", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Barreira para-vapor (μd ≥ 100 m) na face quente do isolamento interior",
+      "remediation": "Instalar barreira para-vapor quando o isolamento é pelo interior: (1) Membrana de polietileno (μd > 100 m) na face quente (interior) do isolamento. (2) Alternativa: membrana inteligente de humidade variável (μd 0.5-50 m conforme HR) — permite secagem bidirecional. (3) Selar todas as juntas e penetrações (tomadas, tubagens). (4) Gesso cartonado com barreira de alumínio (tipo vapor-check) é uma solução integrada. (5) ETICS (isolamento pelo exterior) é preferível pois elimina este problema.",
+      "enabled": true,
+      "tags": ["barreira para-vapor", "isolamento interior", "condensação", "membrana"]
+    },
+    {
+      "id": "THERM-COND-MOLD-RISK-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 §5 — Risco de Desenvolvimento de Bolor",
+      "description": "As condições de humidade relativa interior ({envelope.interiorRelativeHumidity}%) combinadas com os coeficientes U da envolvente criam risco de desenvolvimento de bolor nas superfícies interiores (HR superficial > 80% durante mais de 30 dias).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "envelope.interiorRelativeHumidity", "operator": ">", "value": 70 },
+        { "field": "envelope.externalWallUValue", "operator": ">", "value": 0.50 }
+      ],
+      "currentValueTemplate": "HR interior = {envelope.interiorRelativeHumidity}%, U parede = {envelope.externalWallUValue}",
+      "requiredValue": "HR superficial < 80% (mantida ≤ 30 dias/ano acima de 80%)",
+      "remediation": "Prevenir o desenvolvimento de bolor: (1) Reduzir HR interior para ≤ 60%: ventilação mínima de 0.6 h⁻¹, extração mecânica em cozinhas e casas de banho. (2) Aumentar temperatura superficial: melhorar isolamento (U < 0.40 W/(m².K)), corrigir pontes térmicas. (3) Zonas de risco: cantos de paredes exteriores, atrás de armários, paredes Norte sem isolamento. (4) Ventilação localizada: grelhas autorreguláveis ou VMC com recuperação de calor. (5) Em reabilitação: verificar se existe humidade ascensional ou infiltrações antes de isolar.",
+      "enabled": true,
+      "tags": ["bolor", "humidade", "risco", "superfície", "ventilação"]
+    },
+    {
+      "id": "THERM-COND-WINDOW-FRAME-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 §5 — Condensação no Caixilho e Vidro",
+      "description": "O coeficiente de transmissão térmica dos envidraçados ({envelope.windowUValue} W/(m².K)) é elevado, indicando risco de condensação na superfície do vidro e/ou no caixilho durante o inverno.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "envelope.windowUValue", "operator": ">", "value": 2.80 }
+      ],
+      "currentValueTemplate": "Uw = {envelope.windowUValue} W/(m².K)",
+      "requiredValue": "Uw ≤ 2.40 W/(m².K) para minimizar risco de condensação no vidro",
+      "remediation": "Reduzir condensação nos envidraçados: (1) Substituir vidro simples por vidro duplo (U vidro de 5.8 para 2.8 W/(m².K)). (2) Vidro duplo com baixa emissividade: U ≈ 1.1 W/(m².K). (3) Caixilharia com corte térmico: elimina a ponte térmica do perfil metálico. (4) Ventilação para reduzir HR interior. (5) Nota: alguma condensação nos vidros em manhãs frias é normal — o problema é condensação prolongada que causa bolores no caixilho e degradação da parede subjacente.",
+      "enabled": true,
+      "tags": ["condensação", "envidraçados", "vidro", "caixilho"]
+    }
+  ]
+}
