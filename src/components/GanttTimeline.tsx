@@ -19,6 +19,8 @@ export interface GanttTimelineProps {
   onBarSelect?: (taskUids: number[]) => void;
   /** Task UIDs currently selected (for visual ring on bars) */
   selectedTaskUids?: Set<number>;
+  /** Critical path task UIDs (shown with red accent) */
+  criticalPathUids?: Set<number>;
 }
 
 interface PhaseBar {
@@ -102,6 +104,7 @@ export default function GanttTimeline({
   onSeek,
   onBarSelect,
   selectedTaskUids,
+  criticalPathUids,
 }: GanttTimelineProps) {
   const ganttRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
@@ -194,6 +197,15 @@ export default function GanttTimeline({
     [selectedTaskUids],
   );
 
+  // Check if a bar is on the critical path
+  const isBarCritical = useCallback(
+    (bar: PhaseBar): boolean => {
+      if (!criticalPathUids || criticalPathUids.size === 0) return false;
+      return bar.tasks.some((t) => criticalPathUids.has(t.uid));
+    },
+    [criticalPathUids],
+  );
+
   // Hover handler
   const handleBarHover = useCallback(
     (e: React.MouseEvent, bar: PhaseBar) => {
@@ -248,6 +260,7 @@ export default function GanttTimeline({
             {/* Task bars */}
             {row.bars.map((bar, j) => {
               const selected = isBarSelected(bar);
+              const critical = isBarCritical(bar);
               return (
                 <div
                   key={j}
@@ -263,6 +276,7 @@ export default function GanttTimeline({
                     outlineOffset: 1,
                     boxShadow: selected ? "0 0 4px rgba(255,255,255,0.8)" : "none",
                     zIndex: selected ? 10 : undefined,
+                    borderBottom: critical ? "2px solid #ef4444" : "none",
                   }}
                   onClick={(e) => handleBarClick(e, bar)}
                   onMouseEnter={(e) => handleBarHover(e, bar)}

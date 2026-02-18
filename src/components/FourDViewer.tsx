@@ -42,13 +42,15 @@ interface VisualState {
   completedIds: Map<ConstructionPhase, Set<number>>;
   /** In-progress elements: phase color, ghosted */
   inProgressIds: Map<ConstructionPhase, Set<number>>;
+  /** Future elements: faint ghost preview */
+  futureIds: Set<number>;
 }
 
 /**
  * Determine which elements to show and their visual status.
  * - Task finished → completed (solid)
  * - Task started but not finished → in-progress (ghosted)
- * - Task not started → hidden
+ * - Task not started → ghost (faint wireframe preview)
  */
 function computeVisualState(
   modelId: string,
@@ -64,6 +66,7 @@ function computeVisualState(
   const allVisible = new Set<number>();
   const completedIds = new Map<ConstructionPhase, Set<number>>();
   const inProgressIds = new Map<ConstructionPhase, Set<number>>();
+  const futureIds = new Set<number>();
 
   const normFilter = storeyFilter ? normalizeStorey(storeyFilter) : null;
 
@@ -73,10 +76,8 @@ function computeVisualState(
 
     const taskStartMs = new Date(task.startDate).getTime();
     const taskFinishMs = new Date(task.finishDate).getTime();
-
-    if (currentMs < taskStartMs) continue; // not started
-
-    const isCompleted = currentMs >= taskFinishMs;
+    const notStarted = currentMs < taskStartMs;
+    const isCompleted = !notStarted && currentMs >= taskFinishMs;
 
     for (const id of localIds) {
       // Storey filter
@@ -91,6 +92,11 @@ function computeVisualState(
       }
 
       allVisible.add(id);
+
+      if (notStarted) {
+        futureIds.add(id);
+        continue;
+      }
 
       // Determine phase
       const links = localIdToLinks.get(id);
@@ -108,6 +114,7 @@ function computeVisualState(
     visibility: { [modelId]: allVisible },
     completedIds,
     inProgressIds,
+    futureIds,
   };
 }
 
@@ -129,6 +136,8 @@ export default function FourDViewer({
   const [storeyFilter, setStoreyFilter] = useState<string | null>(null);
   const [selectedLink, setSelectedLink] = useState<ElementTaskLink | null>(null);
   const [selectedTask, setSelectedTask] = useState<ScheduleTask | null>(null);
+  const [selectedTaskUids, setSelectedTaskUids] = useState<Set<number>>(new Set());
+  const [isolatedPhase, setIsolatedPhase] = useState<ConstructionPhase | null>(null);
   const modelRef = useRef<FragmentsModel | null>(null);
   const localIdToLinksRef = useRef<Map<number, ElementTaskLink[]>>(new Map());
 
@@ -158,6 +167,12 @@ export default function FourDViewer({
     for (const t of schedule.tasks) map.set(t.uid, t);
     return map;
   }, [schedule.tasks]);
+
+  // ── Critical path UIDs ──────────────────────────────────────
+  const criticalPathUids = useMemo(
+    () => new Set(schedule.criticalPath),
+    [schedule.criticalPath],
+  );
 
   // ── When model loads, bridge GUIDs → localIds ──────────────
   const handleModelLoaded = useCallback(
@@ -213,12 +228,13 @@ export default function FourDViewer({
     [guidToLinks],
   );
 
-  // ── Element selection handler ──────────────────────────────
+  // ── Element selection handler (3D → info panel + Gantt) ─────
   const handleElementSelect = useCallback(
     (localId: number | null, _modelId: string) => {
       if (localId == null) {
         setSelectedLink(null);
         setSelectedTask(null);
+        setSelectedTaskUids(new Set());
         return;
       }
       const links = localIdToLinksRef.current.get(localId);
@@ -226,13 +242,23 @@ export default function FourDViewer({
         const link = links[0];
         setSelectedLink(link);
         setSelectedTask(taskByUid.get(link.taskUid) ?? null);
+        setSelectedTaskUids(new Set([link.taskUid]));
       } else {
         setSelectedLink(null);
         setSelectedTask(null);
+        setSelectedTaskUids(new Set());
       }
     },
     [taskByUid],
   );
+
+  // ── Gantt bar selection handler (Gantt → 3D) ─────────────
+  const handleBarSelect = useCallback((taskUids: number[]) => {
+    setSelectedTaskUids(new Set(taskUids));
+    // Clear element-level selection when selecting from Gantt
+    setSelectedLink(null);
+    setSelectedTask(null);
+  }, []);
 
   // ── Compute visual state from timeline ──────────────────────
   const visualState = useMemo(() => {
@@ -247,15 +273,38 @@ export default function FourDViewer({
     );
   }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter]);
 
-  const visibilityMap = visualState?.visibility;
+  // ── Apply phase isolation filter ──────────────────────────────
+  const visibilityMap = useMemo(() => {
+    if (!visualState || !modelId) return visualState?.visibility;
+    if (!isolatedPhase) return visualState.visibility;
 
-  // ── Phase highlights: in-progress (ghosted) then completed (solid) ──
+    // When a phase is isolated, only show elements belonging to that phase
+    const isolatedIds = new Set<number>();
+    const completed = visualState.completedIds.get(isolatedPhase);
+    const inProgress = visualState.inProgressIds.get(isolatedPhase);
+    if (completed) completed.forEach((id) => isolatedIds.add(id));
+    if (inProgress) inProgress.forEach((id) => isolatedIds.add(id));
+    return { [modelId]: isolatedIds };
+  }, [visualState, modelId, isolatedPhase]);
+
+  // ── Phase highlights: ghost → in-progress → completed (layered) ──
   const phaseHighlights = useMemo((): PhaseHighlight[] | undefined => {
     if (!modelId || !visualState) return undefined;
     const highlights: PhaseHighlight[] = [];
 
-    // In-progress first (lower opacity, rendered underneath)
+    // Ghost future elements first (very faint, underneath everything)
+    // Skip ghosts when a phase is isolated
+    if (!isolatedPhase && visualState.futureIds.size > 0) {
+      highlights.push({
+        color: "#9ca3af", // gray-400
+        opacity: 0.08,
+        elements: { [modelId]: visualState.futureIds },
+      });
+    }
+
+    // In-progress second (lower opacity)
     for (const [phase, ids] of visualState.inProgressIds) {
+      if (isolatedPhase && phase !== isolatedPhase) continue;
       highlights.push({
         color: phaseColor(phase),
         opacity: 0.25,
@@ -263,8 +312,9 @@ export default function FourDViewer({
       });
     }
 
-    // Completed second (higher opacity, rendered on top)
+    // Completed last (higher opacity, rendered on top)
     for (const [phase, ids] of visualState.completedIds) {
+      if (isolatedPhase && phase !== isolatedPhase) continue;
       highlights.push({
         color: phaseColor(phase),
         opacity: 0.8,
@@ -273,7 +323,33 @@ export default function FourDViewer({
     }
 
     return highlights.length > 0 ? highlights : undefined;
-  }, [modelId, visualState]);
+  }, [modelId, visualState, isolatedPhase]);
+
+  // ── Selection highlights (white glow on selected task elements) ──
+  const selectedLocalIds = useMemo((): Set<number> => {
+    if (selectedTaskUids.size === 0) return new Set();
+    const ids = new Set<number>();
+    for (const uid of selectedTaskUids) {
+      const taskIds = taskLocalIds.get(uid);
+      if (taskIds) taskIds.forEach((id) => ids.add(id));
+    }
+    return ids;
+  }, [selectedTaskUids, taskLocalIds]);
+
+  const selectionHighlights = useMemo((): PhaseHighlight[] | undefined => {
+    if (selectedLocalIds.size === 0 || !modelId) return undefined;
+    return [{
+      color: "#ffffff",
+      opacity: 0.5,
+      elements: { [modelId]: selectedLocalIds },
+    }];
+  }, [selectedLocalIds, modelId]);
+
+  // ── Camera fly-to target (triggered by selection) ──────────
+  const flyToTarget = useMemo((): Record<string, Set<number>> | undefined => {
+    if (selectedLocalIds.size === 0 || !modelId) return undefined;
+    return { [modelId]: selectedLocalIds };
+  }, [selectedLocalIds, modelId]);
 
   // ── Legend data ─────────────────────────────────────────────
   const legendData = useMemo((): LegendPhase[] => {
@@ -314,6 +390,25 @@ export default function FourDViewer({
     return stats;
   }, [timelineState]);
 
+  // ── 3D coverage stats ─────────────────────────────────────
+  const coverageStats = useMemo(() => {
+    const allPhases = new Set<string>();
+    for (const t of schedule.tasks) {
+      if (!t.isSummary) allPhases.add(t.phase);
+    }
+    const mappedPhases = new Set<string>();
+    for (const link of elementMapping.links) {
+      mappedPhases.add(link.phase);
+    }
+    return { total: allPhases.size, mapped: mappedPhases.size };
+  }, [schedule.tasks, elementMapping.links]);
+
+  // Does the current timeline position have any 3D elements?
+  const currentPhasesHave3D = useMemo(() => {
+    if (!timelineState || timelineState.activeTasks.length === 0) return true;
+    return timelineState.activeTasks.some(task => taskLocalIds.has(task.uid));
+  }, [timelineState, taskLocalIds]);
+
   // ── Render ─────────────────────────────────────────────────
   return (
     <div className={`flex flex-col ${className}`}>
@@ -326,6 +421,8 @@ export default function FourDViewer({
           onElementSelect={handleElementSelect}
           visibilityMap={visibilityMap}
           phaseHighlights={phaseHighlights}
+          selectionHighlights={selectionHighlights}
+          flyToTarget={flyToTarget}
           className="h-full"
         />
 
@@ -343,11 +440,30 @@ export default function FourDViewer({
           onClose={() => {
             setSelectedLink(null);
             setSelectedTask(null);
+            setSelectedTaskUids(new Set());
           }}
         />
 
         {/* Phase legend (bottom-left) */}
-        <FourDLegend phases={legendData} />
+        <FourDLegend
+          phases={legendData}
+          isolatedPhase={isolatedPhase}
+          onPhaseClick={setIsolatedPhase}
+        />
+
+        {/* No-geometry overlay for phases without 3D */}
+        {!currentPhasesHave3D && timelineState && timelineState.activeTasks.length > 0 && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <div className="bg-gray-900/70 backdrop-blur-sm rounded-lg px-4 py-2.5 text-center">
+              <p className="text-white/90 text-xs font-medium">
+                Fase sem geometria 3D
+              </p>
+              <p className="text-white/50 text-[10px] mt-0.5">
+                Progresso no cronograma Gantt abaixo
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Info bar */}
@@ -370,12 +486,21 @@ export default function FourDViewer({
             </span>
           </>
         )}
+        {coverageStats.total > 0 && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span>{coverageStats.mapped}/{coverageStats.total} fases com 3D</span>
+          </>
+        )}
       </div>
 
       {/* Timeline controls */}
       <TimelinePlayer
         schedule={schedule}
         onStateChange={setTimelineState}
+        onBarSelect={handleBarSelect}
+        selectedTaskUids={selectedTaskUids}
+        criticalPathUids={criticalPathUids}
       />
     </div>
   );

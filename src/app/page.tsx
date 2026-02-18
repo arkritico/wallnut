@@ -47,6 +47,7 @@ import {
   Hammer,
   GitCompareArrows,
   BookOpen,
+  Play,
   Users,
 } from "lucide-react";
 
@@ -58,6 +59,8 @@ import type { ProjectRole } from "@/lib/collaboration";
 import { getUserRole } from "@/lib/collaboration";
 import { getAvailablePlugins } from "@/lib/plugins/loader";
 import type { SpecialtyPlugin, RegulationDocument, DeclarativeRule } from "@/lib/plugins/types";
+import { phaseColor } from "@/lib/phase-colors";
+import type { ConstructionPhase } from "@/lib/wbs-types";
 
 import UnifiedUpload from "@/components/UnifiedUpload";
 import type { UnifiedPipelineResult } from "@/lib/unified-pipeline";
@@ -744,16 +747,85 @@ export default function Home() {
         <main className="min-h-screen bg-gray-50">
           <AppHeader showEdit />
           <div className="max-w-5xl mx-auto px-4 py-8">
+            {/* 4D Simulation Hero Card */}
+            {unifiedResult?.schedule && unifiedResult.elementMapping && (
+              <div
+                className="mb-6 relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white cursor-pointer group hover:shadow-2xl transition-all"
+                onClick={() => setView("fourd")}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter") setView("fourd"); }}
+              >
+                <div className="relative z-10 p-6 flex items-start justify-between gap-6">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Clock className="w-5 h-5 text-accent flex-shrink-0" />
+                      <h3 className="text-lg font-bold tracking-tight">
+                        {lang === "pt" ? "Simulação 4D da Construção" : "4D Construction Simulation"}
+                      </h3>
+                    </div>
+                    <p className="text-gray-400 text-sm mb-3">
+                      {lang === "pt"
+                        ? "Reproduza a sequência construtiva sobre o modelo BIM"
+                        : "Play the construction sequence over the BIM model"}
+                    </p>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                      <span className="text-gray-400">
+                        <span className="text-white font-semibold">{Math.ceil(unifiedResult.schedule.totalDurationDays / 30)}</span>{" "}
+                        {lang === "pt" ? "meses" : "months"}
+                      </span>
+                      <span className="text-gray-400">
+                        <span className="text-white font-semibold">{unifiedResult.schedule.tasks.filter(t => !t.isSummary).length}</span>{" "}
+                        {lang === "pt" ? "tarefas" : "tasks"}
+                      </span>
+                      <span className="text-gray-400">
+                        <span className="text-white font-semibold">{unifiedResult.elementMapping.stats.mapped}</span>{" "}
+                        {lang === "pt" ? "elementos 3D" : "3D elements"}
+                      </span>
+                      <span className="text-gray-400">
+                        <span className="text-white font-semibold">{unifiedResult.schedule.totalCost.toLocaleString("pt-PT")}</span> &euro;
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 flex items-center gap-2 px-6 py-3 bg-accent rounded-lg shadow-lg shadow-accent/25 group-hover:bg-accent-hover transition-colors">
+                    <Play className="w-5 h-5" />
+                    <span className="font-semibold">{lang === "pt" ? "Abrir" : "Open"}</span>
+                  </div>
+                </div>
+                {/* Mini phase timeline bar */}
+                <div className="relative h-1.5 bg-gray-700/50">
+                  {(() => {
+                    const s = unifiedResult.schedule;
+                    const sMs = new Date(s.startDate).getTime();
+                    const tMs = new Date(s.finishDate).getTime() - sMs;
+                    if (tMs <= 0) return null;
+                    const pg = new Map<string, { s: number; e: number }>();
+                    for (const task of s.tasks) {
+                      if (task.isSummary) continue;
+                      const ts = new Date(task.startDate).getTime();
+                      const te = new Date(task.finishDate).getTime();
+                      const p = pg.get(task.phase);
+                      if (p) { p.s = Math.min(p.s, ts); p.e = Math.max(p.e, te); }
+                      else pg.set(task.phase, { s: ts, e: te });
+                    }
+                    return Array.from(pg.entries()).map(([phase, range]) => (
+                      <div
+                        key={phase}
+                        className="absolute h-full"
+                        style={{
+                          left: `${((range.s - sMs) / tMs) * 100}%`,
+                          width: `${Math.max(0.3, ((range.e - range.s) / tMs) * 100)}%`,
+                          backgroundColor: phaseColor(phase as ConstructionPhase),
+                          opacity: 0.85,
+                        }}
+                      />
+                    ));
+                  })()}
+                </div>
+              </div>
+            )}
+
             <div className="mb-4 flex justify-end gap-2">
-              {unifiedResult?.schedule && unifiedResult.elementMapping && (
-                <button
-                  onClick={() => setView("fourd")}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
-                >
-                  <Clock className="w-4 h-4" />
-                  {lang === "pt" ? "Simulação 4D" : "4D Simulation"}
-                </button>
-              )}
               {unifiedResult?.schedule && (
                 <button
                   onClick={() => setView("evm")}
@@ -922,7 +994,7 @@ export default function Home() {
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <button
-                  onClick={() => setView("unified")}
+                  onClick={() => setView("results")}
                   className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
                   <ChevronLeft className="w-4 h-4" />

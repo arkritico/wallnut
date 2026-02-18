@@ -13,7 +13,7 @@ import {
   FragmentsManager,
 } from "@thatopen/components";
 import type { FragmentsModel, RaycastResult, RenderedFaces } from "@thatopen/fragments";
-import { Upload, Eye, Maximize2, Layers } from "lucide-react";
+import { Upload, Eye, Maximize2, Layers, Camera } from "lucide-react";
 
 // ============================================================
 // Types
@@ -41,6 +41,8 @@ export interface IfcViewerProps {
   phaseHighlights?: PhaseHighlight[];
   /** Selection highlights: rendered on top of phase highlights */
   selectionHighlights?: PhaseHighlight[];
+  /** Elements to fly the camera to (modelId → localIds). Camera animates when this changes. */
+  flyToTarget?: Record<string, Set<number>>;
   /** CSS class for the container */
   className?: string;
 }
@@ -63,6 +65,7 @@ export default function IfcViewer({
   visibilityMap,
   phaseHighlights,
   selectionHighlights,
+  flyToTarget,
   className = "",
 }: IfcViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,8 +121,10 @@ export default function IfcViewer({
         const camera = new SimpleCamera(components);
         world.camera = camera;
 
-        // 5. Setup renderer
-        const renderer = new SimpleRenderer(components, container);
+        // 5. Setup renderer (preserveDrawingBuffer for screenshot export)
+        const renderer = new SimpleRenderer(components, container, {
+          preserveDrawingBuffer: true,
+        });
         world.renderer = renderer;
 
         // 6. Init components (starts animation loop)
@@ -316,6 +321,39 @@ export default function IfcViewer({
     applyHighlights();
   }, [phaseHighlights, selectionHighlights]);
 
+  // ── Camera fly-to target elements ──────────────────────────
+  useEffect(() => {
+    const world = worldRef.current;
+    if (!world || !flyToTarget) return;
+
+    const modelId = Object.keys(flyToTarget)[0];
+    if (!modelId) return;
+    const localIds = flyToTarget[modelId];
+    if (!localIds || localIds.size === 0) return;
+
+    const model = loadedModels.find((m) => m.model.modelId === modelId)?.model;
+    if (!model) return;
+
+    async function flyTo() {
+      try {
+        const box = await model!.getMergedBox(Array.from(localIds));
+        if (box.isEmpty()) return;
+        const camera = world!.camera as SimpleCamera;
+        await camera.controls.fitToBox(box, true, {
+          cover: false,
+          paddingLeft: 40,
+          paddingRight: 40,
+          paddingTop: 40,
+          paddingBottom: 40,
+        });
+      } catch {
+        // Silently ignore — element may not have geometry
+      }
+    }
+
+    flyTo();
+  }, [flyToTarget, loadedModels]);
+
   // ── File upload handler ─────────────────────────────────────
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -341,6 +379,22 @@ export default function IfcViewer({
     const hider = hiderRef.current;
     if (!hider) return;
     await hider.set(true);
+  }
+
+  function handleScreenshot() {
+    const world = worldRef.current;
+    if (!world) return;
+    const renderer = world.renderer as SimpleRenderer;
+    const gl = renderer.three as THREE.WebGLRenderer;
+    // Force a render to ensure current frame is captured
+    const scene = world.scene.three as THREE.Scene;
+    const cam = (world.camera as SimpleCamera).three as THREE.Camera;
+    gl.render(scene, cam);
+    const dataUrl = gl.domElement.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `4d-screenshot-${new Date().toISOString().split("T")[0]}.png`;
+    a.click();
   }
 
   // ── Render ──────────────────────────────────────────────────
@@ -384,6 +438,13 @@ export default function IfcViewer({
               title="Storeys"
             >
               <Layers className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleScreenshot}
+              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+              title="Screenshot (PNG)"
+            >
+              <Camera className="w-4 h-4" />
             </button>
             <div className="w-px h-5 bg-gray-200" />
             <span className="text-xs text-gray-400">

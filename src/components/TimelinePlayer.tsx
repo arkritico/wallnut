@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { Play, Pause, SkipForward, SkipBack } from "lucide-react";
+import { Play, Pause, SkipForward, SkipBack, Calendar } from "lucide-react";
 import type { ProjectSchedule, ScheduleTask } from "@/lib/wbs-types";
 import type { ConstructionPhase } from "@/lib/wbs-types";
 import { phaseColor, phaseLabel } from "@/lib/phase-colors";
@@ -37,6 +37,8 @@ export interface TimelinePlayerProps {
   onBarSelect?: (taskUids: number[]) => void;
   /** Task UIDs currently selected (for Gantt bar visual ring) */
   selectedTaskUids?: Set<number>;
+  /** Critical path task UIDs (red accent on Gantt bars) */
+  criticalPathUids?: Set<number>;
   className?: string;
 }
 
@@ -73,6 +75,7 @@ export default function TimelinePlayer({
   onStateChange,
   onBarSelect,
   selectedTaskUids,
+  criticalPathUids,
   className = "",
 }: TimelinePlayerProps) {
   const startMs = useMemo(() => toMs(schedule.startDate), [schedule.startDate]);
@@ -197,6 +200,7 @@ export default function TimelinePlayer({
           onSeek={handleSeek}
           onBarSelect={onBarSelect}
           selectedTaskUids={selectedTaskUids}
+          criticalPathUids={criticalPathUids}
         />
         <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
           <span>{formatPT(startMs)}</span>
@@ -240,13 +244,33 @@ export default function TimelinePlayer({
           {speed}x
         </button>
 
-        <div className="ml-auto text-right">
-          <p className="text-sm font-semibold text-gray-800">
-            {formatPT(currentMs)}
-          </p>
-          <p className="text-[10px] text-gray-400">
-            {timelineState.completedTasks}/{timelineState.totalTasks} tarefas
-          </p>
+        <div className="ml-auto flex items-center gap-2">
+          <div className="text-right">
+            <p className="text-sm font-semibold text-gray-800">
+              {formatPT(currentMs)}
+            </p>
+            <p className="text-[10px] text-gray-400">
+              {timelineState.completedTasks}/{timelineState.totalTasks} tarefas
+            </p>
+          </div>
+          <label className="relative cursor-pointer" title="Saltar para data">
+            <Calendar className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" />
+            <input
+              type="date"
+              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+              min={toIso(startMs)}
+              max={toIso(finishMs)}
+              value={toIso(currentMs)}
+              onChange={(e) => {
+                if (e.target.value) {
+                  const ms = new Date(e.target.value).getTime();
+                  if (ms >= startMs && ms <= finishMs) {
+                    handleSeek(ms);
+                  }
+                }
+              }}
+            />
+          </label>
         </div>
       </div>
 
