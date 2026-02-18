@@ -14615,6 +14615,2133 @@
         "impedancia",
         "436"
       ]
+    },
+    {
+      "id": "RTIEBT-ING-489",
+      "regulationId": "portaria-949a-2006",
+      "article": "512.1.1",
+      "description": "Tensão estipulada do cabo deve ser >= tensão nominal da instalação",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.cableRatedVoltage",
+          "operator": "<",
+          "value": "{electrical.installationNominalVoltage}"
+        }
+      ],
+      "remediation": "Substituir cabo por um com tensão estipulada >= tensão nominal da instalação (RTIEBT 512.1.1)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "cabos",
+        "tensao",
+        "512"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-490",
+      "regulationId": "portaria-949a-2006",
+      "article": "512.1.1",
+      "description": "Esquema IT com neutro distribuído: isolamento do equipamento fase-neutro deve suportar tensão fase-fase",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.earthingScheme",
+          "operator": "==",
+          "value": "IT"
+        },
+        {
+          "field": "electrical.hasDistributedNeutral",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.equipmentInsulationForPhaseToPhase",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Em esquema IT com neutro, equipamento entre fase-neutro deve ser isolado para tensão fase-fase (RTIEBT 512.1.1)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "it",
+        "isolamento",
+        "512"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-491",
+      "regulationId": "portaria-949a-2006",
+      "article": "512.2/Quadro 51A(BA)",
+      "description": "Locais acessíveis a crianças (BA2): equipamento deve ter IP >= IP3X e temperatura superficial <= 80°C",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.locationBA",
+          "operator": "==",
+          "value": "BA2"
+        },
+        {
+          "field": "electrical.equipmentIpRating",
+          "operator": "ordinal_lt",
+          "value": "IP3X",
+          "scale": [
+            "IP2X",
+            "IP3X",
+            "IP4X",
+            "IP5X",
+            "IP6X"
+          ]
+        }
+      ],
+      "remediation": "Instalar equipamento com IP >= IP3X em locais acessíveis a crianças (RTIEBT 512.2/Quadro 51A)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "criancas",
+        "ip",
+        "512"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-492",
+      "regulationId": "portaria-949a-2006",
+      "article": "512.2/Quadro 51A(BA)",
+      "description": "Locais acessíveis a crianças (BA2): interruptores e tomadas a >= 1,6m do pavimento",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.locationBA",
+          "operator": "==",
+          "value": "BA2"
+        },
+        {
+          "field": "electrical.switchSocketMountingHeight",
+          "operator": "<",
+          "value": 1600
+        }
+      ],
+      "remediation": "Instalar interruptores e tomadas a >= 1,6m do pavimento em locais com crianças (RTIEBT 512.2/Quadro 51A)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "criancas",
+        "altura",
+        "512"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-493",
+      "regulationId": "portaria-949a-2006",
+      "article": "512.2/Quadro 51A(BA)",
+      "description": "Locais com crianças: equipamento de aquecimento com superfície > 60°C não deve ser diretamente acessível",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.locationBA",
+          "operator": "==",
+          "value": "BA2"
+        },
+        {
+          "field": "electrical.heatingEquipmentSurfaceTemp",
+          "operator": ">",
+          "value": 60
+        },
+        {
+          "field": "electrical.heatingEquipmentAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Tornar inacessível equipamento de aquecimento com superfície > 60°C em locais com crianças (RTIEBT 512.2)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "criancas",
+        "aquecimento",
+        "512"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-494",
+      "regulationId": "portaria-949a-2006",
+      "article": "515.1",
+      "description": "Equipamento sobre superfície metálica: ligar superfície ao condutor PE",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.mountingSurfaceMetallic",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.mountingSurfaceBondedToPe",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Ligar superfície metálica de montagem ao condutor PE ou à ligação equipotencial (RTIEBT 515.1)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "pe",
+        "metalico",
+        "515"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-495",
+      "regulationId": "portaria-949a-2006",
+      "article": "515.1",
+      "description": "Equipamento sobre superfície combustível: separador de categoria FH1 obrigatório",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.mountingSurfaceCombustible",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.hasFH1Separator",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar separador isolante de categoria FH1 entre equipamento e superfície combustível (RTIEBT 515.1)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "incendio",
+        "materiais",
+        "515"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-496",
+      "regulationId": "portaria-949a-2006",
+      "article": "528.1",
+      "description": "Circuitos de domínios de tensão I e II não devem partilhar o mesmo sistema de canalização",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.mixedVoltageDomainWiring",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Separar circuitos de domínios de tensão diferentes ou isolar para a tensão mais elevada (RTIEBT 528.1)",
+      "enabled": true,
+      "tags": [
+        "canalizacoes",
+        "tensao",
+        "separacao",
+        "528"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-497",
+      "regulationId": "portaria-949a-2006",
+      "article": "528.2.3",
+      "description": "Distância mínima entre canalizações elétricas e não-elétricas: 30mm",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.electricalToNonElectricalSpacing",
+          "operator": "<",
+          "value": 30
+        }
+      ],
+      "remediation": "Manter distância >= 30mm entre canalizações elétricas e não-elétricas, ou usar ecrãs protetores (RTIEBT 528.2.3)",
+      "enabled": true,
+      "tags": [
+        "canalizacoes",
+        "distancia",
+        "528"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-498",
+      "regulationId": "portaria-949a-2006",
+      "article": "528.2.1",
+      "description": "Canalizações elétricas proibidas em condutas de extração de fumos, ventilação ou gases",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.wiringInSmokeExtractionDuct",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Remover canalização elétrica de conduta de extração de fumos/ventilação (RTIEBT 528.2.1)",
+      "enabled": true,
+      "tags": [
+        "canalizacoes",
+        "ventilacao",
+        "proibicao",
+        "528"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-499",
+      "regulationId": "portaria-949a-2006",
+      "article": "534.2.3.1(a)",
+      "description": "DPS em TT a jusante de DDR: Uc >= 1,5 x Uo",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.earthingScheme",
+          "operator": "==",
+          "value": "TT"
+        },
+        {
+          "field": "electrical.spdDownstreamOfRcd",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.spdUc",
+          "operator": "<",
+          "value": "{electrical.nominalPhaseVoltage * 1.5}"
+        }
+      ],
+      "remediation": "DPS a jusante de DDR em TT deve ter Uc >= 1,5 x Uo (RTIEBT 534.2.3.1a)",
+      "enabled": true,
+      "tags": [
+        "dps",
+        "sobretensoes",
+        "tt",
+        "534"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-500",
+      "regulationId": "portaria-949a-2006",
+      "article": "534.2.3.1(b)",
+      "description": "DPS em TN ou TT a montante de DDR: Uc >= 1,1 x Uo",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.earthingScheme",
+          "operator": "in",
+          "value": [
+            "TN",
+            "TN-S",
+            "TN-C-S"
+          ]
+        },
+        {
+          "field": "electrical.spdUc",
+          "operator": "<",
+          "value": "{electrical.nominalPhaseVoltage * 1.1}"
+        }
+      ],
+      "remediation": "DPS em TN deve ter Uc >= 1,1 x Uo (RTIEBT 534.2.3.1b)",
+      "enabled": true,
+      "tags": [
+        "dps",
+        "sobretensoes",
+        "tn",
+        "534"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-501",
+      "regulationId": "portaria-949a-2006",
+      "article": "534.2.3.4",
+      "description": "Corrente de descarga do DPS na origem >= 5kA (8/20us)",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.spdDischargeCurrent",
+          "operator": "<",
+          "value": 5
+        }
+      ],
+      "remediation": "DPS na origem deve ter corrente de descarga >= 5kA (8/20us) (RTIEBT 534.2.3.4)",
+      "enabled": true,
+      "tags": [
+        "dps",
+        "sobretensoes",
+        "corrente",
+        "534"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-502",
+      "regulationId": "portaria-949a-2006",
+      "article": "534.2.7",
+      "description": "DPS a jusante de DDR: DDR deve ser tipo S e suportar >= 3kA (8/20us)",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.spdDownstreamOfRcd",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.rcdTypeForSpd",
+          "operator": "!=",
+          "value": "S"
+        }
+      ],
+      "remediation": "DDR a montante do DPS deve ser tipo S com resistência >= 3kA (8/20us) (RTIEBT 534.2.7)",
+      "enabled": true,
+      "tags": [
+        "dps",
+        "ddr",
+        "tipo-s",
+        "534"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-503",
+      "regulationId": "portaria-949a-2006",
+      "article": "534.2.11",
+      "description": "Condutor de terra do DPS: mínimo 4mm2 (10mm2 com proteção contra descargas atmosféricas)",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.spdEarthConductorSection",
+          "operator": "<",
+          "value": 4
+        }
+      ],
+      "remediation": "Condutor de terra do DPS deve ter secção >= 4mm2 (>= 10mm2 com para-raios) (RTIEBT 534.2.11)",
+      "enabled": true,
+      "tags": [
+        "dps",
+        "terra",
+        "condutor",
+        "534"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-504",
+      "regulationId": "portaria-949a-2006",
+      "article": "536.2.1.1(b)",
+      "description": "Corrente de fuga através de polos abertos: <= 0,5mA/polo (novo)",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.disconnectorLeakageCurrent",
+          "operator": ">",
+          "value": 0.5
+        }
+      ],
+      "remediation": "Corrente de fuga do seccionador em aberto deve ser <= 0,5mA/polo (RTIEBT 536.2.1.1b)",
+      "enabled": true,
+      "tags": [
+        "seccionamento",
+        "fuga",
+        "536"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-505",
+      "regulationId": "portaria-949a-2006",
+      "article": "536.2.1.3",
+      "description": "Dispositivos semicondutores não podem ser usados para seccionamento",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.semiconductorUsedForIsolation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Substituir dispositivo semicondutor por seccionador mecânico (RTIEBT 536.2.1.3)",
+      "enabled": true,
+      "tags": [
+        "seccionamento",
+        "semicondutor",
+        "536"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-506",
+      "regulationId": "portaria-949a-2006",
+      "article": "536.4.4",
+      "description": "Comandos de corte de emergência devem ser VERMELHOS com fundo contrastante",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.emergencyButtonColor",
+          "operator": "!=",
+          "value": "red"
+        }
+      ],
+      "remediation": "Pintar comando de corte de emergência de VERMELHO sobre fundo contrastante (RTIEBT 536.4.4)",
+      "enabled": true,
+      "tags": [
+        "emergencia",
+        "cor",
+        "536"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-507",
+      "regulationId": "portaria-949a-2006",
+      "article": "536.5.3",
+      "description": "Seccionadores, fusíveis e conectores não devem ser usados para comando funcional",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.disconnectorUsedAsFunctionalSwitch",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Substituir seccionador/fusível por dispositivo de comando funcional adequado (RTIEBT 536.5.3)",
+      "enabled": true,
+      "tags": [
+        "comando",
+        "funcional",
+        "536"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-508",
+      "regulationId": "portaria-949a-2006",
+      "article": "542.2.2",
+      "description": "Profundidade de enterramento do elétrodo de terra: mínimo 0,80m",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.earthElectrodeBurialDepth",
+          "operator": "<",
+          "value": 0.8
+        }
+      ],
+      "remediation": "Enterrar elétrodo de terra a profundidade >= 0,80m da superfície do solo (RTIEBT 542.2.2)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "eletrodo",
+        "profundidade",
+        "542"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-509",
+      "regulationId": "portaria-949a-2006",
+      "article": "542.4.1",
+      "description": "Toda instalação deve ter terminal principal de terra",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.hasMainEarthingTerminal",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar terminal principal de terra ligando: condutores de terra, PE, equipotenciais e terra funcional (RTIEBT 542.4.1)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "terminal",
+        "542"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-510",
+      "regulationId": "portaria-949a-2006",
+      "article": "543.1.2/Quadro 54F",
+      "description": "Secção do condutor PE: SF <= 16mm2 -> SPE = SF",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.phaseConductorSection",
+          "operator": "<=",
+          "value": 16
+        },
+        {
+          "field": "electrical.peConductorSection",
+          "operator": "<",
+          "value": "{electrical.phaseConductorSection}"
+        }
+      ],
+      "remediation": "Secção do PE deve ser igual à secção da fase quando SF <= 16mm2 (RTIEBT 543.1.2/Quadro 54F)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "pe",
+        "seccao",
+        "543"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-511",
+      "regulationId": "portaria-949a-2006",
+      "article": "543.1.3",
+      "description": "Condutor PE separado (não parte do cabo): mínimo 2,5mm2 Cu (protegido) ou 4mm2 Cu (não protegido)",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.separatePeConductorSection",
+          "operator": "<",
+          "value": 2.5
+        }
+      ],
+      "remediation": "Condutor PE separado deve ter secção >= 2,5mm2 Cu (protegido mecanicamente) ou 4mm2 Cu (RTIEBT 543.1.3)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "pe",
+        "seccao-minima",
+        "543"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-512",
+      "regulationId": "portaria-949a-2006",
+      "article": "543.2.5",
+      "description": "Partes condutoras estranhas não devem ser usadas como condutores PEN",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.extraneousPartUsedAsPen",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Substituir parte condutora estranha por condutor PEN dedicado (RTIEBT 543.2.5)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "pen",
+        "proibicao",
+        "543"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-513",
+      "regulationId": "portaria-949a-2006",
+      "article": "543.3.5",
+      "description": "Massas não devem ser ligadas em série num circuito PE",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.massesInSeriesOnPe",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Ligar cada massa individualmente ao circuito PE (não em série) (RTIEBT 543.3.5)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "pe",
+        "topologia",
+        "543"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-514",
+      "regulationId": "portaria-949a-2006",
+      "article": "546.2.1",
+      "description": "Secção mínima do condutor PEN: 10mm2 Cu ou 16mm2 Al",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.penConductorSection",
+          "operator": "<",
+          "value": 10
+        }
+      ],
+      "remediation": "Condutor PEN deve ter secção >= 10mm2 Cu ou 16mm2 Al em instalações fixas (RTIEBT 546.2.1)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "pen",
+        "seccao",
+        "546"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-515",
+      "regulationId": "portaria-949a-2006",
+      "article": "546.2.3",
+      "description": "Após separação N/PE, não podem ser reconectados a jusante",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.nPeReconnectedDownstream",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "N e PE não podem ser reconectados após ponto de separação do PEN (RTIEBT 546.2.3)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "pen",
+        "separacao",
+        "546"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-516",
+      "regulationId": "portaria-949a-2006",
+      "article": "547.1.1",
+      "description": "Condutor de ligação equipotencial principal: >= metade da maior secção PE, mínimo 6mm2, máximo 25mm2 Cu",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.mainBondingConductorSection",
+          "operator": "<",
+          "value": 6
+        }
+      ],
+      "remediation": "Condutor equipotencial principal deve ter secção >= 6mm2 Cu (RTIEBT 547.1.1)",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "equipotencial",
+        "seccao",
+        "547"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-517",
+      "regulationId": "portaria-949a-2006",
+      "article": "551.4.4.2",
+      "description": "Gerador não fixo (TN/TT/IT): DDR com sensibilidade <= 30mA obrigatório",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.hasNonFixedGenerator",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.generatorRcdSensitivity",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "remediation": "Instalar DDR <= 30mA em instalação com gerador não fixo (RTIEBT 551.4.4.2)",
+      "enabled": true,
+      "tags": [
+        "geradores",
+        "ddr",
+        "551"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-518",
+      "regulationId": "portaria-949a-2006",
+      "article": "551.8.2.2",
+      "description": "Baterias com tensão nominal > 150V: piso isolante obrigatório",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.batteryNominalVoltage",
+          "operator": ">",
+          "value": 150
+        },
+        {
+          "field": "electrical.batteryRoomInsulatedFloor",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar piso isolante e antiderrapante na sala de baterias com tensão > 150V (RTIEBT 551.8.2.2)",
+      "enabled": true,
+      "tags": [
+        "baterias",
+        "piso",
+        "isolante",
+        "551"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-519",
+      "regulationId": "portaria-949a-2006",
+      "article": "553.2/Quadro 55A",
+      "description": "Motor monofásico em habitação: corrente de arranque máxima 45A pela rede pública",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.motorPhases",
+          "operator": "==",
+          "value": 1
+        },
+        {
+          "field": "electrical.motorStartingCurrent",
+          "operator": ">",
+          "value": 45
+        }
+      ],
+      "remediation": "Corrente de arranque de motor monofásico em habitação não pode exceder 45A (RTIEBT 553.2/Quadro 55A)",
+      "enabled": true,
+      "tags": [
+        "motores",
+        "arranque",
+        "residencial",
+        "553"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-520",
+      "regulationId": "portaria-949a-2006",
+      "article": "553.2/Quadro 55A",
+      "description": "Motor trifásico em habitação: corrente de arranque máxima 60A pela rede pública",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.motorPhases",
+          "operator": "==",
+          "value": 3
+        },
+        {
+          "field": "electrical.motorStartingCurrent",
+          "operator": ">",
+          "value": 60
+        }
+      ],
+      "remediation": "Corrente de arranque de motor trifásico em habitação não pode exceder 60A (RTIEBT 553.2/Quadro 55A)",
+      "enabled": true,
+      "tags": [
+        "motores",
+        "arranque",
+        "residencial",
+        "553"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-521",
+      "regulationId": "portaria-949a-2006",
+      "article": "553.2/Quadro 55GA",
+      "description": "Motor monofásico em habitação: potência máxima 1,4kW por arranque direto",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.motorPhases",
+          "operator": "==",
+          "value": 1
+        },
+        {
+          "field": "electrical.motorPower",
+          "operator": ">",
+          "value": 1.4
+        }
+      ],
+      "remediation": "Potência de motor monofásico em habitação não deve exceder 1,4kW por arranque direto (RTIEBT 553.2/Quadro 55GA)",
+      "enabled": true,
+      "tags": [
+        "motores",
+        "potencia",
+        "residencial",
+        "553"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-522",
+      "regulationId": "portaria-949a-2006",
+      "article": "555.5(a)",
+      "description": "Tomadas < 32A: altura mínima do centro dos alvéolos ao pavimento: 50mm",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.socketRatedCurrent",
+          "operator": "<",
+          "value": 32
+        },
+        {
+          "field": "electrical.socketMountingHeight",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "remediation": "Centro das tomadas < 32A deve estar a >= 50mm do pavimento acabado (RTIEBT 555.5a)",
+      "enabled": true,
+      "tags": [
+        "tomadas",
+        "altura",
+        "555"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-523",
+      "regulationId": "portaria-949a-2006",
+      "article": "555.5(b)",
+      "description": "Tomadas >= 32A: altura mínima do centro dos alvéolos ao pavimento: 120mm",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.socketRatedCurrent",
+          "operator": ">=",
+          "value": 32
+        },
+        {
+          "field": "electrical.socketMountingHeight",
+          "operator": "<",
+          "value": 120
+        }
+      ],
+      "remediation": "Centro das tomadas >= 32A deve estar a >= 120mm do pavimento acabado (RTIEBT 555.5b)",
+      "enabled": true,
+      "tags": [
+        "tomadas",
+        "altura",
+        "555"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-524",
+      "regulationId": "portaria-949a-2006",
+      "article": "555.7",
+      "description": "Tomadas de pavimento: proteção mínima IP24 e IK07",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.hasFloorSockets",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.floorSocketIpRating",
+          "operator": "ordinal_lt",
+          "value": "IP24",
+          "scale": [
+            "IP20",
+            "IP21",
+            "IP23",
+            "IP24",
+            "IP25",
+            "IP44",
+            "IP45",
+            "IP54",
+            "IP55",
+            "IP65",
+            "IP66",
+            "IP67",
+            "IP68"
+          ]
+        }
+      ],
+      "remediation": "Tomadas de pavimento devem ter proteção >= IP24 e IK07 (RTIEBT 555.7)",
+      "enabled": true,
+      "tags": [
+        "tomadas",
+        "pavimento",
+        "ip",
+        "555"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-525",
+      "regulationId": "portaria-949a-2006",
+      "article": "555.4",
+      "description": "Tomadas em locais BE3 (risco explosão): dispositivo de intertravamento obrigatório",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.locationClassification",
+          "operator": "==",
+          "value": "BE3"
+        },
+        {
+          "field": "electrical.socketHasInterlock",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar dispositivo de intertravamento nas tomadas em locais com risco de explosão (RTIEBT 555.4)",
+      "enabled": true,
+      "tags": [
+        "tomadas",
+        "explosao",
+        "be3",
+        "555"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-526",
+      "regulationId": "portaria-949a-2006",
+      "article": "558.3",
+      "description": "Distância mínima entre partes ativas de polaridades diferentes: 10mm",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.clearanceBetweenPolarities",
+          "operator": "<",
+          "value": 10
+        }
+      ],
+      "remediation": "Manter distância >= 10mm entre partes ativas de polaridades diferentes (RTIEBT 558.3)",
+      "enabled": true,
+      "tags": [
+        "quadros",
+        "distancia",
+        "558"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-527",
+      "regulationId": "portaria-949a-2006",
+      "article": "558.3",
+      "description": "Distância mínima entre partes ativas e partes condutoras (invólucros): 20mm",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.clearanceToEnclosure",
+          "operator": "<",
+          "value": 20
+        }
+      ],
+      "remediation": "Manter distância >= 20mm entre partes ativas e invólucro condutor (100mm se abertura 12-50mm) (RTIEBT 558.3)",
+      "enabled": true,
+      "tags": [
+        "quadros",
+        "distancia",
+        "involucrro",
+        "558"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-528",
+      "regulationId": "portaria-949a-2006",
+      "article": "559.1.1",
+      "description": "Caixa de ligação I < 32A: eixo a mínimo 50mm do pavimento",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.connectionBoxRatedCurrent",
+          "operator": "<",
+          "value": 32
+        },
+        {
+          "field": "electrical.connectionBoxMountingHeight",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "remediation": "Eixo da caixa de ligação (< 32A) deve estar a >= 50mm do pavimento (RTIEBT 559.1.1)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "caixa",
+        "altura",
+        "559"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-529",
+      "regulationId": "portaria-949a-2006",
+      "article": "559.1.1",
+      "description": "Caixa de ligação I >= 32A: eixo a mínimo 120mm do pavimento",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.connectionBoxRatedCurrent",
+          "operator": ">=",
+          "value": 32
+        },
+        {
+          "field": "electrical.connectionBoxMountingHeight",
+          "operator": "<",
+          "value": 120
+        }
+      ],
+      "remediation": "Eixo da caixa de ligação (>= 32A) deve estar a >= 120mm do pavimento (RTIEBT 559.1.1)",
+      "enabled": true,
+      "tags": [
+        "equipamento",
+        "caixa",
+        "altura",
+        "559"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-530",
+      "regulationId": "portaria-949a-2006",
+      "article": "559.2",
+      "description": "Luminárias portáteis: isolamento Classe II e IK >= IK07 obrigatórios",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.hasPortableLuminaires",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.portableLuminaireClassII",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Luminárias portáteis devem ter isolamento Classe II e proteção mecânica IK >= IK07 (RTIEBT 559.2)",
+      "enabled": true,
+      "tags": [
+        "luminarias",
+        "portatil",
+        "classe-ii",
+        "559"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-531",
+      "regulationId": "portaria-949a-2006",
+      "article": "559.2.2",
+      "description": "Casquilho Edison (rosca): contacto roscado ligado ao neutro",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.edisonSocketThreadToNeutral",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Ligar contacto roscado do casquilho Edison ao condutor neutro (RTIEBT 559.2.2)",
+      "enabled": true,
+      "tags": [
+        "luminarias",
+        "casquilho",
+        "neutro",
+        "559"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-532",
+      "regulationId": "portaria-949a-2006",
+      "article": "559.2.3",
+      "description": "Luminárias suspensas por condutores de alimentação: massa <= 0,5kg e local AD1/AD2",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.luminaireSuspendedByConductors",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.luminaireMass",
+          "operator": ">",
+          "value": 0.5
+        }
+      ],
+      "remediation": "Luminária suspensa por condutores não deve exceder 0,5kg (RTIEBT 559.2.3)",
+      "enabled": true,
+      "tags": [
+        "luminarias",
+        "suspensao",
+        "peso",
+        "559"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-533",
+      "regulationId": "portaria-949a-2006",
+      "article": "559.1.2",
+      "description": "Secção mínima dos condutores de cabos móveis: 0,75mm2",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.mobileCableConductorSection",
+          "operator": "<",
+          "value": 0.75
+        }
+      ],
+      "remediation": "Condutores de cabos móveis devem ter secção >= 0,75mm2 (RTIEBT 559.1.2)",
+      "enabled": true,
+      "tags": [
+        "cabos",
+        "movel",
+        "seccao",
+        "559"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-534",
+      "regulationId": "portaria-949a-2006",
+      "article": "562.4",
+      "description": "Duas alimentações independentes da rede pública não são permitidas como fontes de segurança",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySourceType",
+          "operator": "==",
+          "value": "dual_public_grid"
+        }
+      ],
+      "remediation": "Substituir dupla alimentação pública por fonte de segurança independente (gerador, UPS, bateria) (RTIEBT 562.4)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "fonte",
+        "562"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-535",
+      "regulationId": "portaria-949a-2006",
+      "article": "563.1",
+      "description": "Circuitos de segurança devem ser independentes de todos os outros circuitos",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetyCircuitsIndependent",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Garantir separação física dos circuitos de segurança (tubagens dedicadas, invólucros resistentes ao fogo) (RTIEBT 563.1)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "circuitos",
+        "independencia",
+        "563"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-536",
+      "regulationId": "portaria-949a-2006",
+      "article": "563.2",
+      "description": "Circuitos de segurança não devem atravessar locais BE3 (risco explosão); em BE2 necessitam resistência ao fogo",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetyCircuitTraversesBE3",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Circuitos de segurança nunca devem atravessar locais com risco de explosão (BE3) (RTIEBT 563.2)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "circuitos",
+        "be3",
+        "563"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-537",
+      "regulationId": "portaria-949a-2006",
+      "article": "564.1",
+      "description": "Lâmpadas de iluminação de segurança: tempo de arranque <= 15 segundos",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetyLightingStartupTime",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "remediation": "Substituir lâmpada de segurança por uma com tempo de arranque <= 15s (RTIEBT 564.1)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "iluminacao",
+        "arranque",
+        "564"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-538",
+      "regulationId": "portaria-949a-2006",
+      "article": "322.4",
+      "description": "Edifício residencial com altura >= 60m: classificação BD2 (grande altura) com regras reforçadas",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.buildingHeight",
+          "operator": ">=",
+          "value": 60
+        }
+      ],
+      "remediation": "Edifício residencial >= 60m é BD2: aplicar regras de segurança reforçadas para instalação elétrica (RTIEBT 322.4)",
+      "enabled": true,
+      "tags": [
+        "classificacao",
+        "edificio",
+        "bd2",
+        "residencial",
+        "322"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-539",
+      "regulationId": "portaria-949a-2006",
+      "article": "322.4",
+      "description": "Edifício não-residencial com altura >= 28m: classificação BD2 (grande altura) com regras reforçadas",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "!=",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.buildingHeight",
+          "operator": ">=",
+          "value": 28
+        }
+      ],
+      "remediation": "Edifício não-residencial >= 28m é BD2: aplicar regras de segurança reforçadas (RTIEBT 322.4)",
+      "enabled": true,
+      "tags": [
+        "classificacao",
+        "edificio",
+        "bd2",
+        "322"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-540",
+      "regulationId": "portaria-949a-2006",
+      "article": "322.1",
+      "description": "Locais BA2/BA3 (crianças/incapacitados): equipamento elétrico deve ser inacessível",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.locationBA",
+          "operator": "in",
+          "value": [
+            "BA2",
+            "BA3"
+          ]
+        },
+        {
+          "field": "electrical.equipmentAccessibleToVulnerable",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Tornar equipamento elétrico inacessível em locais com crianças (BA2) ou incapacitados (BA3) (RTIEBT 322.1)",
+      "enabled": true,
+      "tags": [
+        "classificacao",
+        "criancas",
+        "acessibilidade",
+        "322"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-541",
+      "regulationId": "portaria-949a-2006",
+      "article": "331.4",
+      "description": "Iluminação fluorescente trifásica com balastros baixa distorção: neutro dimensionado para >= 72% da corrente de fase",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.circuitType",
+          "operator": "==",
+          "value": "fluorescent_lighting"
+        },
+        {
+          "field": "electrical.circuitPhases",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "field": "electrical.ballastType",
+          "operator": "==",
+          "value": "low_distortion"
+        },
+        {
+          "field": "electrical.neutralSizingPercentOfPhase",
+          "operator": "<",
+          "value": 72
+        }
+      ],
+      "remediation": "Dimensionar neutro para >= 72% da corrente de fase em circuito fluorescente trifásico com balastros de baixa distorção (RTIEBT 331.4)",
+      "enabled": true,
+      "tags": [
+        "harmonicos",
+        "neutro",
+        "dimensionamento",
+        "331"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-542",
+      "regulationId": "portaria-949a-2006",
+      "article": "331.4",
+      "description": "Iluminação fluorescente trifásica com balastros padrão: neutro dimensionado para >= 95% da corrente de fase",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.circuitType",
+          "operator": "==",
+          "value": "fluorescent_lighting"
+        },
+        {
+          "field": "electrical.circuitPhases",
+          "operator": ">=",
+          "value": 3
+        },
+        {
+          "field": "electrical.ballastType",
+          "operator": "==",
+          "value": "standard"
+        },
+        {
+          "field": "electrical.neutralSizingPercentOfPhase",
+          "operator": "<",
+          "value": 95
+        }
+      ],
+      "remediation": "Dimensionar neutro para >= 95% da corrente de fase em circuito fluorescente trifásico com balastros padrão (RTIEBT 331.4)",
+      "enabled": true,
+      "tags": [
+        "harmonicos",
+        "neutro",
+        "dimensionamento",
+        "331"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-543",
+      "regulationId": "portaria-949a-2006",
+      "article": "352",
+      "description": "Alimentação de segurança 'sem interrupção': tempo de comutação = 0s",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySupplyClass",
+          "operator": "==",
+          "value": "sem_interrupcao"
+        },
+        {
+          "field": "electrical.safetySupplySwitchoverTime",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "remediation": "Alimentação de segurança 'sem interrupção' deve ter comutação contínua (0s) (RTIEBT 352)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "alimentacao",
+        "comutacao",
+        "352"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-544",
+      "regulationId": "portaria-949a-2006",
+      "article": "352",
+      "description": "Alimentação de segurança 'interrupção muito curta': comutação <= 0,15s",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySupplyClass",
+          "operator": "==",
+          "value": "interrupcao_muito_curta"
+        },
+        {
+          "field": "electrical.safetySupplySwitchoverTime",
+          "operator": ">",
+          "value": 0.15
+        }
+      ],
+      "remediation": "Alimentação 'interrupção muito curta' deve comutar em <= 0,15s (150ms) (RTIEBT 352)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "alimentacao",
+        "comutacao",
+        "352"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-545",
+      "regulationId": "portaria-949a-2006",
+      "article": "352",
+      "description": "Alimentação de segurança 'interrupção curta': comutação <= 0,5s",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySupplyClass",
+          "operator": "==",
+          "value": "interrupcao_curta"
+        },
+        {
+          "field": "electrical.safetySupplySwitchoverTime",
+          "operator": ">",
+          "value": 0.5
+        }
+      ],
+      "remediation": "Alimentação 'interrupção curta' deve comutar em <= 0,5s (500ms) (RTIEBT 352)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "alimentacao",
+        "comutacao",
+        "352"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-546",
+      "regulationId": "portaria-949a-2006",
+      "article": "352",
+      "description": "Alimentação de segurança 'interrupção média': comutação <= 15s",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySupplyClass",
+          "operator": "==",
+          "value": "interrupcao_media"
+        },
+        {
+          "field": "electrical.safetySupplySwitchoverTime",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "remediation": "Alimentação 'interrupção média' deve comutar em <= 15s (RTIEBT 352)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "alimentacao",
+        "comutacao",
+        "352"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-547",
+      "regulationId": "portaria-949a-2006",
+      "article": "353",
+      "description": "Fontes de segurança usadas também como socorro: mínimo 2 fontes independentes",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySourceUsedAsStandby",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.safetySourceCount",
+          "operator": "<",
+          "value": 2
+        }
+      ],
+      "remediation": "Quando fonte de segurança serve também como socorro, instalar >= 2 fontes independentes (RTIEBT 353)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "fontes",
+        "redundancia",
+        "353"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-548",
+      "regulationId": "portaria-949a-2006",
+      "article": "353",
+      "description": "Falha de fonte de segurança deve provocar deslastre automático dos circuitos não-segurança",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySourceUsedAsStandby",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.hasAutomaticLoadShedding",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar deslastre automático de circuitos não-segurança em caso de falha de fonte (RTIEBT 353)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "fontes",
+        "deslastre",
+        "353"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-549",
+      "regulationId": "portaria-949a-2006",
+      "article": "353",
+      "description": "Falha de fonte ou equipamento de segurança não deve afetar outras fontes/equipamentos",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.safetySourceFailureIsolation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Garantir isolamento de falha entre fontes e equipamentos de segurança (RTIEBT 353)",
+      "enabled": true,
+      "tags": [
+        "seguranca",
+        "fontes",
+        "isolamento",
+        "353"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-550",
+      "regulationId": "portaria-949a-2006",
+      "article": "361",
+      "description": "Instalações temporárias em locais BE2/BE3: nenhuma derrogação permitida",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.isTemporaryInstallation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.locationClassification",
+          "operator": "in",
+          "value": [
+            "BE2",
+            "BE3"
+          ]
+        },
+        {
+          "field": "electrical.hasDerogations",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Derrogações não são permitidas em instalações temporárias em locais BE2 (incêndio) ou BE3 (explosão) (RTIEBT 361)",
+      "enabled": true,
+      "tags": [
+        "temporario",
+        "derogacao",
+        "be2",
+        "be3",
+        "361"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-551",
+      "regulationId": "portaria-949a-2006",
+      "article": "361",
+      "description": "Instalações temporárias devem ter proteção contra sobreintensidades na origem",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.isTemporaryInstallation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.hasOriginOvercurrentProtection",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar proteção contra sobreintensidades na origem da instalação temporária (RTIEBT 361)",
+      "enabled": true,
+      "tags": [
+        "temporario",
+        "protecao",
+        "origem",
+        "361"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-552",
+      "regulationId": "portaria-949a-2006",
+      "article": "413.1.1.1",
+      "description": "Tensão limite convencional UL: <= 50V AC ou 120V DC em condições normais",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.contactVoltageLimitAC",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "remediation": "Tensão de contacto não deve exceder 50V AC em condições normais (RTIEBT 413.1.1.1)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "tensao-limite",
+        "413"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-553",
+      "regulationId": "portaria-949a-2006",
+      "article": "413.1.1.1/Quadro 41GA",
+      "description": "Tempo máximo de corte para tensão de contacto 220V AC: 0,17s",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.contactVoltage",
+          "operator": ">=",
+          "value": 220
+        },
+        {
+          "field": "electrical.disconnectionTime",
+          "operator": ">",
+          "value": 0.17
+        }
+      ],
+      "remediation": "Dispositivo de proteção deve cortar em <= 0,17s para tensão de contacto >= 220V AC (RTIEBT Quadro 41GA)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "tempo-corte",
+        "413"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-554",
+      "regulationId": "portaria-949a-2006",
+      "article": "413.1.1.1/Quadro 41GA",
+      "description": "Tempo máximo de corte para tensão de contacto 120V AC: 0,34s",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.contactVoltage",
+          "operator": ">=",
+          "value": 120
+        },
+        {
+          "field": "electrical.contactVoltage",
+          "operator": "<",
+          "value": 220
+        },
+        {
+          "field": "electrical.disconnectionTime",
+          "operator": ">",
+          "value": 0.34
+        }
+      ],
+      "remediation": "Dispositivo de proteção deve cortar em <= 0,34s para tensão de contacto 120-220V AC (RTIEBT Quadro 41GA)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "tempo-corte",
+        "413"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-555",
+      "regulationId": "portaria-949a-2006",
+      "article": "412.2.1",
+      "description": "Partes ativas protegidas por invólucros/barreiras: IP mínimo IP2X",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.enclosureIpRating",
+          "operator": "ordinal_lt",
+          "value": "IP2X",
+          "scale": [
+            "IP2X",
+            "IP3X",
+            "IP4X",
+            "IP5X",
+            "IP6X"
+          ]
+        }
+      ],
+      "remediation": "Invólucros e barreiras de partes ativas devem ter IP >= IP2X (RTIEBT 412.2.1)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "involucrro",
+        "ip",
+        "412"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-556",
+      "regulationId": "portaria-949a-2006",
+      "article": "412.2.2",
+      "description": "Superfícies superiores horizontais de barreiras acessíveis: IP mínimo IP4X",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.horizontalBarrierTopIpRating",
+          "operator": "ordinal_lt",
+          "value": "IP4X",
+          "scale": [
+            "IP2X",
+            "IP3X",
+            "IP4X",
+            "IP5X",
+            "IP6X"
+          ]
+        }
+      ],
+      "remediation": "Superfícies superiores horizontais acessíveis devem ter IP >= IP4X (RTIEBT 412.2.2)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "barreira",
+        "ip",
+        "412"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-557",
+      "regulationId": "portaria-949a-2006",
+      "article": "412.4.1",
+      "description": "Partes acessíveis a potenciais diferentes: distância mínima 2,50m",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.accessiblePartsDifferentPotentialDistance",
+          "operator": "<",
+          "value": 2.5
+        }
+      ],
+      "remediation": "Partes simultaneamente acessíveis a potenciais diferentes devem distar >= 2,50m (RTIEBT 412.4.1)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "distancia",
+        "acessibilidade",
+        "412"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-558",
+      "regulationId": "portaria-949a-2006",
+      "article": "412.5.1",
+      "description": "Proteção complementar por DDR: sensibilidade <= 30mA",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.complementaryRcdSensitivity",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "remediation": "Proteção complementar por DDR deve ter corrente diferencial <= 30mA (RTIEBT 412.5.1)",
+      "enabled": true,
+      "tags": [
+        "choques",
+        "ddr",
+        "complementar",
+        "412"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-559",
+      "regulationId": "portaria-949a-2006",
+      "article": "705.512.2",
+      "description": "Equipamento em estabelecimentos agrícolas/pecuários: IP mínimo IP44",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "agricultural"
+        },
+        {
+          "field": "electrical.equipmentIpRating",
+          "operator": "ordinal_lt",
+          "value": "IP44",
+          "scale": [
+            "IP20",
+            "IP21",
+            "IP23",
+            "IP24",
+            "IP25",
+            "IP44",
+            "IP45",
+            "IP54",
+            "IP55",
+            "IP65",
+            "IP66",
+            "IP67",
+            "IP68"
+          ]
+        }
+      ],
+      "remediation": "Equipamento em instalações agrícolas/pecuárias deve ter IP >= IP44 (RTIEBT 705.512.2)",
+      "enabled": true,
+      "tags": [
+        "agricola",
+        "ip",
+        "705"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-560",
+      "regulationId": "portaria-949a-2006",
+      "article": "705.413.1",
+      "description": "Locais com animais: tensão limite convencional <= 25V AC ou 60V DC",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.hasAnimalAreas",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.animalAreaContactVoltageAC",
+          "operator": ">",
+          "value": 25
+        }
+      ],
+      "remediation": "Tensão limite em locais com animais não deve exceder 25V AC ou 60V DC (RTIEBT 705.413.1)",
+      "enabled": true,
+      "tags": [
+        "agricola",
+        "animais",
+        "tensao",
+        "705"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-561",
+      "regulationId": "portaria-949a-2006",
+      "article": "705.422",
+      "description": "Proteção contra incêndio em instalações agrícolas: DDR <= 500mA",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "agricultural"
+        },
+        {
+          "field": "electrical.fireProtectionRcdSensitivity",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "remediation": "Proteção contra incêndio em instalação agrícola por DDR <= 500mA (RTIEBT 705.422)",
+      "enabled": true,
+      "tags": [
+        "agricola",
+        "incendio",
+        "ddr",
+        "705"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-562",
+      "regulationId": "portaria-949a-2006",
+      "article": "705.422",
+      "description": "Radiadores de aquecimento em locais com animais: distância >= 0,5m de animais e materiais combustíveis",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.animalHeaterDistance",
+          "operator": "<",
+          "value": 0.5
+        }
+      ],
+      "remediation": "Radiadores de aquecimento devem manter >= 0,5m de animais e materiais combustíveis (RTIEBT 705.422)",
+      "enabled": true,
+      "tags": [
+        "agricola",
+        "aquecimento",
+        "distancia",
+        "705"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-563",
+      "regulationId": "portaria-949a-2006",
+      "article": "705.412.5",
+      "description": "Tomadas em instalações agrícolas: DDR <= 30mA",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "agricultural"
+        },
+        {
+          "field": "electrical.outletRcdSensitivity",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "remediation": "Circuitos de tomadas em instalações agrícolas devem ter DDR <= 30mA (RTIEBT 705.412.5)",
+      "enabled": true,
+      "tags": [
+        "agricola",
+        "tomadas",
+        "ddr",
+        "705"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-564",
+      "regulationId": "portaria-949a-2006",
+      "article": "801.1.1.6",
+      "description": "Corrente estipulada mínima do dispositivo de corte geral: 16A",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.mainSwitchRatedCurrent",
+          "operator": "<",
+          "value": 16
+        }
+      ],
+      "remediation": "Dispositivo de corte geral deve ter corrente estipulada >= 16A (RTIEBT 801.1.1.6)",
+      "enabled": true,
+      "tags": [
+        "corte-geral",
+        "corrente",
+        "801"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-565",
+      "regulationId": "portaria-949a-2006",
+      "article": "801.2.1.1.5(c)",
+      "description": "Estabelecimentos recebendo público: cabos com tensão estipulada >= 300/500V",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.isPublicBuilding",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "electrical.cableRatedVoltage",
+          "operator": "<",
+          "value": 300
+        }
+      ],
+      "remediation": "Em estabelecimentos públicos, cabos devem ter tensão estipulada >= 300/500V (RTIEBT 801.2.1.1.5c)",
+      "enabled": true,
+      "tags": [
+        "publico",
+        "cabos",
+        "tensao",
+        "801"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-566",
+      "regulationId": "portaria-949a-2006",
+      "article": "801.5.11",
+      "description": "Órgãos de manobra dos quadros em habitação: entre 1,0m e 1,8m do piso",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.panelSwitchHeight",
+          "operator": "not_in_range",
+          "value": [
+            1.0,
+            1.8
+          ]
+        }
+      ],
+      "remediation": "Órgãos de manobra dos quadros devem estar entre 1,0m e 1,8m acima do piso (RTIEBT 801.5.11)",
+      "enabled": true,
+      "tags": [
+        "residencial",
+        "quadro",
+        "altura",
+        "801"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-567",
+      "regulationId": "portaria-949a-2006",
+      "article": "801.5.4.1",
+      "description": "Habitações: proteção contra incêndio por DDR <= 500mA",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.residentialFireRcdSensitivity",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "remediation": "Proteção contra incêndio em habitação por DDR <= 500mA (RTIEBT 801.5.4.1)",
+      "enabled": true,
+      "tags": [
+        "residencial",
+        "incendio",
+        "ddr",
+        "801"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-568",
+      "regulationId": "portaria-949a-2006",
+      "article": "801.5.6.4",
+      "description": "Tomadas em habitação <= 16A: devem ter obturadores",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "electrical.buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "electrical.residentialSocketsHaveShutters",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Tomadas em habitação com In <= 16A devem ser do tipo com obturadores (RTIEBT 801.5.6.4)",
+      "enabled": true,
+      "tags": [
+        "residencial",
+        "tomadas",
+        "obturadores",
+        "801"
+      ]
+    },
+    {
+      "id": "RTIEBT-ING-569",
+      "regulationId": "portaria-949a-2006",
+      "article": "801.2.1.1.2",
+      "description": "Derivações em locais com risco de incêndio: invólucro com resistência ao fogo >= 1h",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "electrical.locationClassification",
+          "operator": "==",
+          "value": "BE2"
+        },
+        {
+          "field": "electrical.junctionBoxFireResistanceHours",
+          "operator": "<",
+          "value": 1
+        }
+      ],
+      "remediation": "Derivações em locais BE2 devem estar em invólucro com resistência ao fogo >= 1h (RTIEBT 801.2.1.1.2)",
+      "enabled": true,
+      "tags": [
+        "publico",
+        "incendio",
+        "resistencia",
+        "801"
+      ]
     }
   ]
 }
