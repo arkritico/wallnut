@@ -24,17 +24,30 @@ CREATE INDEX IF NOT EXISTS idx_projects_updated_at ON public.projects(updated_at
 -- RLS policies
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own projects"
+CREATE POLICY "Users can view accessible projects"
   ON public.projects FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (
+    auth.uid() = user_id
+    OR EXISTS (
+      SELECT 1 FROM public.project_members pm
+      WHERE pm.project_id = id AND pm.user_id = auth.uid()
+    )
+  );
 
 CREATE POLICY "Users can insert own projects"
   ON public.projects FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Users can update own projects"
+CREATE POLICY "Users can update accessible projects"
   ON public.projects FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING (
+    auth.uid() = user_id
+    OR EXISTS (
+      SELECT 1 FROM public.project_members pm
+      WHERE pm.project_id = id AND pm.user_id = auth.uid()
+      AND pm.role IN ('owner', 'reviewer')
+    )
+  );
 
 CREATE POLICY "Users can delete own projects"
   ON public.projects FOR DELETE
@@ -94,3 +107,164 @@ CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON public.projects
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================
+-- Project members (collaboration / role-based sharing)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.project_members (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('owner', 'reviewer', 'viewer')),
+  invited_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(project_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_project_members_project_id ON public.project_members(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_members_user_id ON public.project_members(user_id);
+
+ALTER TABLE public.project_members ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Members can view project members"
+  ON public.project_members FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND (
+        p.user_id = auth.uid()
+        OR EXISTS (
+          SELECT 1 FROM public.project_members pm2
+          WHERE pm2.project_id = project_id AND pm2.user_id = auth.uid()
+        )
+      )
+    )
+  );
+
+CREATE POLICY "Owners can manage members"
+  ON public.project_members FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND p.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Owners can update members"
+  ON public.project_members FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND p.user_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Owners can remove members"
+  ON public.project_members FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND p.user_id = auth.uid()
+    )
+  );
+
+-- ============================================================
+-- Project comments (anchored to findings, tasks, articles)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.project_comments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  target_type TEXT CHECK (target_type IN ('finding', 'task', 'article', 'general')),
+  target_id TEXT,
+  resolved BOOLEAN NOT NULL DEFAULT FALSE,
+  resolved_by UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_project_comments_project_id ON public.project_comments(project_id);
+
+ALTER TABLE public.project_comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Members can view comments"
+  ON public.project_comments FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND (
+        p.user_id = auth.uid()
+        OR EXISTS (
+          SELECT 1 FROM public.project_members pm
+          WHERE pm.project_id = project_id AND pm.user_id = auth.uid()
+        )
+      )
+    )
+  );
+
+CREATE POLICY "Reviewers and owners can add comments"
+  ON public.project_comments FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND (
+        p.user_id = auth.uid()
+        OR EXISTS (
+          SELECT 1 FROM public.project_members pm
+          WHERE pm.project_id = project_id AND pm.user_id = auth.uid()
+          AND pm.role IN ('owner', 'reviewer')
+        )
+      )
+    )
+  );
+
+CREATE POLICY "Users can update own comments"
+  ON public.project_comments FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own comments"
+  ON public.project_comments FOR DELETE
+  USING (auth.uid() = user_id);
+
+CREATE TRIGGER set_comment_updated_at
+  BEFORE UPDATE ON public.project_comments
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- ============================================================
+-- Project history (change audit trail)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.project_history (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  action TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  diff_data JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_project_history_project_id ON public.project_history(project_id);
+
+ALTER TABLE public.project_history ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Members can view history"
+  ON public.project_history FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.projects p
+      WHERE p.id = project_id AND (
+        p.user_id = auth.uid()
+        OR EXISTS (
+          SELECT 1 FROM public.project_members pm
+          WHERE pm.project_id = project_id AND pm.user_id = auth.uid()
+        )
+      )
+    )
+  );
+
+CREATE POLICY "Authenticated users can insert history"
+  ON public.project_history FOR INSERT
+  WITH CHECK (auth.uid() = user_id);

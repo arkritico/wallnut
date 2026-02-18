@@ -17,6 +17,7 @@
 import type {
   RegulationDocument,
   DeclarativeRule,
+  RuleCondition,
   IngestionJob,
   SourceType,
   LegalForce,
@@ -177,9 +178,13 @@ export function createIngestionJob(
 // ----------------------------------------------------------
 
 /**
- * Instruction template for LLM-assisted rule extraction.
- * This can be sent to an LLM along with the regulation text
- * to extract structured rules.
+ * Basic instruction template for LLM-assisted rule extraction.
+ * @deprecated Use generateExtractionPrompt() from prompt-generator.ts instead.
+ * The new prompt generator creates per-sector prompts with:
+ * - All 28 operators (not just basic comparison)
+ * - Sector-specific fields from field-mappings.json
+ * - Existing rule examples for style guidance
+ * - Lookup table references
  */
 export const RULE_EXTRACTION_PROMPT = `
 Analisa o seguinte texto de regulamento português e extrai regras verificáveis.
@@ -242,19 +247,133 @@ Responde APENAS com JSON válido no formato:
 }
 `.trim();
 
+/** All valid operators supported by the rule engine */
+const ALL_VALID_OPERATORS = new Set([
+  // Direct comparison
+  ">", ">=", "<", "<=", "==", "!=",
+  // Existence
+  "exists", "not_exists",
+  // Set membership
+  "in", "not_in", "between", "not_in_range",
+  // Lookup table
+  "lookup_gt", "lookup_gte", "lookup_lt", "lookup_lte", "lookup_eq", "lookup_neq",
+  // Ordinal
+  "ordinal_lt", "ordinal_lte", "ordinal_gt", "ordinal_gte",
+  // Formula
+  "formula_gt", "formula_gte", "formula_lt", "formula_lte",
+  // Computed
+  "computed_lt", "computed_lte", "computed_gt", "computed_gte",
+  // Fire reaction class
+  "reaction_class_lt", "reaction_class_lte", "reaction_class_gt", "reaction_class_gte",
+]);
+
+/** Operators that require numeric values */
+const NUMERIC_VALUE_OPERATORS = new Set([">", ">=", "<", "<="]);
+/** Operators that require array values */
+const ARRAY_VALUE_OPERATORS = new Set(["in", "not_in", "between", "not_in_range"]);
+/** Operators that require a lookup table reference */
+const LOOKUP_OPERATORS = new Set(["lookup_gt", "lookup_gte", "lookup_lt", "lookup_lte", "lookup_eq", "lookup_neq"]);
+/** Operators that require an ordinal scale */
+const ORDINAL_OPERATORS = new Set(["ordinal_lt", "ordinal_lte", "ordinal_gt", "ordinal_gte"]);
+/** Operators that require a formula string as value */
+const FORMULA_OPERATORS = new Set(["formula_gt", "formula_gte", "formula_lt", "formula_lte"]);
+/** Operators that use the condition.formula field */
+const COMPUTED_OPERATORS = new Set(["computed_lt", "computed_lte", "computed_gt", "computed_gte"]);
+
 /**
- * Validate extracted rules against expected schema.
+ * Validate a single condition against the operator schema.
+ */
+function validateCondition(c: RuleCondition, index: number): string[] {
+  const errors: string[] = [];
+  const prefix = `conditions[${index}]`;
+
+  if (!c.field) errors.push(`${prefix}: missing field path`);
+  if (!c.operator) {
+    errors.push(`${prefix}: missing operator`);
+    return errors;
+  }
+  if (!ALL_VALID_OPERATORS.has(c.operator)) {
+    errors.push(`${prefix}: invalid operator "${c.operator}"`);
+    return errors;
+  }
+
+  // Type-check value based on operator
+  if (NUMERIC_VALUE_OPERATORS.has(c.operator)) {
+    if (typeof c.value !== "number") {
+      errors.push(`${prefix}: operator "${c.operator}" requires numeric value, got ${typeof c.value}`);
+    }
+  }
+
+  if (ARRAY_VALUE_OPERATORS.has(c.operator)) {
+    if (!Array.isArray(c.value)) {
+      errors.push(`${prefix}: operator "${c.operator}" requires array value`);
+    } else if ((c.operator === "between" || c.operator === "not_in_range") && c.value.length !== 2) {
+      errors.push(`${prefix}: operator "${c.operator}" requires array of exactly 2 elements [min, max]`);
+    }
+  }
+
+  if (LOOKUP_OPERATORS.has(c.operator)) {
+    if (!c.table) {
+      errors.push(`${prefix}: lookup operator "${c.operator}" requires "table" field`);
+    }
+  }
+
+  if (ORDINAL_OPERATORS.has(c.operator)) {
+    if (!c.scale || !Array.isArray(c.scale) || c.scale.length < 2) {
+      errors.push(`${prefix}: ordinal operator "${c.operator}" requires "scale" array with at least 2 elements`);
+    }
+  }
+
+  if (FORMULA_OPERATORS.has(c.operator)) {
+    if (typeof c.value !== "string" || !c.value.trim()) {
+      errors.push(`${prefix}: formula operator "${c.operator}" requires a formula string as value`);
+    }
+  }
+
+  if (COMPUTED_OPERATORS.has(c.operator)) {
+    const formula = (c as unknown as { formula?: string }).formula;
+    if (!formula || typeof formula !== "string") {
+      errors.push(`${prefix}: computed operator "${c.operator}" requires a "formula" field`);
+    }
+  }
+
+  return errors;
+}
+
+export interface ValidationOptions {
+  /** Set of valid field paths to check against (from field-mappings) */
+  validFields?: Set<string>;
+  /** Set of valid lookup table IDs */
+  validTables?: Set<string>;
+  /** Set of valid regulation IDs */
+  validRegulationIds?: Set<string>;
+}
+
+/**
+ * Validate extracted rules against the full schema.
  * Returns errors found in the rules.
+ *
+ * Enhanced validation includes:
+ * - All 28 operator types
+ * - Value type checking per operator
+ * - Lookup table reference validation
+ * - Ordinal scale validation
+ * - Formula expression validation
+ * - Field path validation (when validFields provided)
+ * - Duplicate detection
  */
 export function validateExtractedRules(
-  rules: DeclarativeRule[]
-): { ruleId: string; errors: string[] }[] {
-  const issues: { ruleId: string; errors: string[] }[] = [];
+  rules: DeclarativeRule[],
+  options?: ValidationOptions,
+): { ruleId: string; errors: string[]; warnings: string[] }[] {
+  const issues: { ruleId: string; errors: string[]; warnings: string[] }[] = [];
   const seenIds = new Set<string>();
 
   for (const rule of rules) {
     const errors: string[] = [];
+    const warnings: string[] = [];
 
+    // Required fields
     if (!rule.id) errors.push("Missing rule ID");
     if (seenIds.has(rule.id)) errors.push(`Duplicate rule ID: ${rule.id}`);
     seenIds.add(rule.id);
@@ -264,26 +383,63 @@ export function validateExtractedRules(
     if (!rule.description) errors.push("Missing description");
 
     if (!["critical", "warning", "info", "pass"].includes(rule.severity)) {
-      errors.push(`Invalid severity: ${rule.severity}`);
+      errors.push(`Invalid severity: "${rule.severity}"`);
     }
 
+    // Conditions validation
     if (!rule.conditions || rule.conditions.length === 0) {
       errors.push("No conditions defined");
     } else {
-      for (const c of rule.conditions) {
-        if (!c.field) errors.push("Condition missing field path");
-        if (!c.operator) errors.push("Condition missing operator");
-        const validOps = [">", ">=", "<", "<=", "==", "!=", "exists", "not_exists", "in", "not_in", "between"];
-        if (!validOps.includes(c.operator)) {
-          errors.push(`Invalid operator: ${c.operator}`);
+      for (let i = 0; i < rule.conditions.length; i++) {
+        errors.push(...validateCondition(rule.conditions[i], i));
+
+        // Field path validation
+        if (options?.validFields && rule.conditions[i].field) {
+          const field = rule.conditions[i].field;
+          if (!field.startsWith("computed.") && !options.validFields.has(field)) {
+            warnings.push(`conditions[${i}]: field "${field}" not found in field-mappings`);
+          }
         }
+
+        // Lookup table validation
+        if (options?.validTables && rule.conditions[i].table) {
+          if (!options.validTables.has(rule.conditions[i].table!)) {
+            warnings.push(`conditions[${i}]: table "${rule.conditions[i].table}" not found in lookup-tables`);
+          }
+        }
+      }
+    }
+
+    // Exclusions validation (same as conditions)
+    if (rule.exclusions) {
+      for (let i = 0; i < rule.exclusions.length; i++) {
+        const excErrors = validateCondition(rule.exclusions[i], i);
+        errors.push(...excErrors.map(e => e.replace("conditions[", "exclusions[")));
+      }
+    }
+
+    // Regulation ID validation
+    if (options?.validRegulationIds && rule.regulationId) {
+      if (!options.validRegulationIds.has(rule.regulationId)) {
+        warnings.push(`regulationId "${rule.regulationId}" not found in registry`);
       }
     }
 
     if (!rule.remediation) errors.push("Missing remediation guidance");
 
-    if (errors.length > 0) {
-      issues.push({ ruleId: rule.id, errors });
+    // Quality warnings
+    if (rule.description && rule.description.length < 10) {
+      warnings.push("Description is very short — consider adding more detail");
+    }
+    if (rule.tags && rule.tags.length === 0) {
+      warnings.push("No tags defined — consider adding relevant keywords");
+    }
+    if (rule.enabled === undefined) {
+      warnings.push("'enabled' field not set — will default to undefined (falsy)");
+    }
+
+    if (errors.length > 0 || warnings.length > 0) {
+      issues.push({ ruleId: rule.id, errors, warnings });
     }
   }
 

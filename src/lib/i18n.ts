@@ -205,6 +205,37 @@ export interface Translations {
   projectPlanning: string;
   additionalModules: string;
 
+  // Collaboration
+  collaboration: string;
+  members: string;
+  addMember: string;
+  removeMember: string;
+  roleOwner: string;
+  roleReviewer: string;
+  roleViewer: string;
+  inviteMemberEmail: string;
+  memberAdded: string;
+  memberRemoved: string;
+  comments: string;
+  addComment: string;
+  commentPlaceholder: string;
+  resolve: string;
+  resolved: string;
+  unresolve: string;
+  history: string;
+  changeHistory: string;
+  projectCreated: string;
+  projectUpdated: string;
+  projectAnalyzed: string;
+  memberInvited: string;
+  commentAdded: string;
+  sharedWith: string;
+  noComments: string;
+  noHistory: string;
+  allComments: string;
+  onlyUnresolved: string;
+  userNotFound: string;
+
   // Auth
   onlyWallnutEmails: string;
   twoFactorRequired: string;
@@ -220,6 +251,35 @@ export interface Translations {
   capScheduleDesc: string;
   capComplianceTitle: string;
   capComplianceDesc: string;
+
+  // Earned Value Management
+  evmTitle: string;
+  evmBaseline: string;
+  evmCaptureBaseline: string;
+  evmDataDate: string;
+  evmPlannedValue: string;
+  evmEarnedValue: string;
+  evmActualCost: string;
+  evmScheduleVariance: string;
+  evmCostVariance: string;
+  evmSpi: string;
+  evmCpi: string;
+  evmBac: string;
+  evmEac: string;
+  evmEtc: string;
+  evmVac: string;
+  evmTcpi: string;
+  evmHealth: string;
+  evmOnTrack: string;
+  evmAtRisk: string;
+  evmDelayed: string;
+  evmCompleted: string;
+  evmProjectedFinish: string;
+  evmSlippage: string;
+  evmSCurve: string;
+  evmTaskPerformance: string;
+  evmNoBaseline: string;
+  evmDays: string;
 
   // Common
   yes: string;
@@ -415,6 +475,36 @@ const pt: Translations = {
   projectPlanning: "Planeamento MS Project",
   additionalModules: "Módulos adicionais",
 
+  collaboration: "Colaboração",
+  members: "Membros",
+  addMember: "Adicionar Membro",
+  removeMember: "Remover Membro",
+  roleOwner: "Proprietário",
+  roleReviewer: "Revisor",
+  roleViewer: "Visualizador",
+  inviteMemberEmail: "Email do membro",
+  memberAdded: "Membro adicionado",
+  memberRemoved: "Membro removido",
+  comments: "Comentários",
+  addComment: "Adicionar comentário",
+  commentPlaceholder: "Escreva um comentário...",
+  resolve: "Resolver",
+  resolved: "Resolvido",
+  unresolve: "Reabrir",
+  history: "Histórico",
+  changeHistory: "Histórico de Alterações",
+  projectCreated: "Projeto criado",
+  projectUpdated: "Projeto atualizado",
+  projectAnalyzed: "Análise executada",
+  memberInvited: "Membro convidado",
+  commentAdded: "Comentário adicionado",
+  sharedWith: "Partilhado com",
+  noComments: "Sem comentários",
+  noHistory: "Sem histórico",
+  allComments: "Todos os comentários",
+  onlyUnresolved: "Apenas não resolvidos",
+  userNotFound: "Utilizador não encontrado",
+
   onlyWallnutEmails: "Apenas emails @wallnut.pt são permitidos.",
   twoFactorRequired: "Autenticação de 2 fatores obrigatória.",
 
@@ -428,6 +518,34 @@ const pt: Translations = {
   capScheduleDesc: "Ficheiro MS Project com feriados portugueses, custos por recurso CYPE e mão de obra dimensionada à realidade da obra. Pronto para execução.",
   capComplianceTitle: "Conformidade Regulamentar",
   capComplianceDesc: "1.964 regras em 18 especialidades. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocódigos, DL 163/2006 e regulamentação municipal — verificação automática.",
+
+  evmTitle: "Valor Ganho (EVM)",
+  evmBaseline: "Linha de Base",
+  evmCaptureBaseline: "Capturar Linha de Base",
+  evmDataDate: "Data de Referência",
+  evmPlannedValue: "Valor Planeado (PV)",
+  evmEarnedValue: "Valor Ganho (EV)",
+  evmActualCost: "Custo Real (AC)",
+  evmScheduleVariance: "Variação de Prazo (SV)",
+  evmCostVariance: "Variação de Custo (CV)",
+  evmSpi: "Índice de Prazo (SPI)",
+  evmCpi: "Índice de Custo (CPI)",
+  evmBac: "Orçamento Total (BAC)",
+  evmEac: "Estimativa na Conclusão (EAC)",
+  evmEtc: "Estimativa para Concluir (ETC)",
+  evmVac: "Variação na Conclusão (VAC)",
+  evmTcpi: "Índice para Concluir (TCPI)",
+  evmHealth: "Saúde do Projeto",
+  evmOnTrack: "No prazo",
+  evmAtRisk: "Em risco",
+  evmDelayed: "Atrasado",
+  evmCompleted: "Concluído",
+  evmProjectedFinish: "Conclusão Projetada",
+  evmSlippage: "Derrapagem",
+  evmSCurve: "Curva S",
+  evmTaskPerformance: "Desempenho por Tarefa",
+  evmNoBaseline: "Capture uma linha de base para ativar o EVM.",
+  evmDays: "dias",
 
   yes: "Sim",
   no: "Não",
@@ -622,6 +740,36 @@ const en: Translations = {
   projectPlanning: "MS Project Planning",
   additionalModules: "Additional modules",
 
+  collaboration: "Collaboration",
+  members: "Members",
+  addMember: "Add Member",
+  removeMember: "Remove Member",
+  roleOwner: "Owner",
+  roleReviewer: "Reviewer",
+  roleViewer: "Viewer",
+  inviteMemberEmail: "Member email",
+  memberAdded: "Member added",
+  memberRemoved: "Member removed",
+  comments: "Comments",
+  addComment: "Add comment",
+  commentPlaceholder: "Write a comment...",
+  resolve: "Resolve",
+  resolved: "Resolved",
+  unresolve: "Reopen",
+  history: "History",
+  changeHistory: "Change History",
+  projectCreated: "Project created",
+  projectUpdated: "Project updated",
+  projectAnalyzed: "Analysis performed",
+  memberInvited: "Member invited",
+  commentAdded: "Comment added",
+  sharedWith: "Shared with",
+  noComments: "No comments",
+  noHistory: "No history",
+  allComments: "All comments",
+  onlyUnresolved: "Only unresolved",
+  userNotFound: "User not found",
+
   onlyWallnutEmails: "Only @wallnut.pt emails are allowed.",
   twoFactorRequired: "Two-factor authentication required.",
 
@@ -635,6 +783,34 @@ const en: Translations = {
   capScheduleDesc: "MS Project file with Portuguese holidays, CYPE resource costs, and workforce sized to the project's reality. Ready for execution.",
   capComplianceTitle: "Regulatory Compliance",
   capComplianceDesc: "1,964 rules across 18 specialties. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocodes, DL 163/2006, and municipal regulations — automatically verified.",
+
+  evmTitle: "Earned Value (EVM)",
+  evmBaseline: "Baseline",
+  evmCaptureBaseline: "Capture Baseline",
+  evmDataDate: "Data Date",
+  evmPlannedValue: "Planned Value (PV)",
+  evmEarnedValue: "Earned Value (EV)",
+  evmActualCost: "Actual Cost (AC)",
+  evmScheduleVariance: "Schedule Variance (SV)",
+  evmCostVariance: "Cost Variance (CV)",
+  evmSpi: "Schedule Performance Index (SPI)",
+  evmCpi: "Cost Performance Index (CPI)",
+  evmBac: "Budget at Completion (BAC)",
+  evmEac: "Estimate at Completion (EAC)",
+  evmEtc: "Estimate to Complete (ETC)",
+  evmVac: "Variance at Completion (VAC)",
+  evmTcpi: "To-Complete Performance Index (TCPI)",
+  evmHealth: "Project Health",
+  evmOnTrack: "On track",
+  evmAtRisk: "At risk",
+  evmDelayed: "Delayed",
+  evmCompleted: "Completed",
+  evmProjectedFinish: "Projected Finish",
+  evmSlippage: "Slippage",
+  evmSCurve: "S-Curve",
+  evmTaskPerformance: "Task Performance",
+  evmNoBaseline: "Capture a baseline to enable EVM tracking.",
+  evmDays: "days",
 
   yes: "Yes",
   no: "No",

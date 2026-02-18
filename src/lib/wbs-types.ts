@@ -168,6 +168,8 @@ export interface ScheduleTask {
   outlineLevel: number;
   /** Percent complete (0 for planning) */
   percentComplete: number;
+  /** Physical percent complete (0-100); distinct from schedule % complete */
+  physicalPercentComplete?: number;
   /** Notes/remarks */
   notes?: string;
 }
@@ -176,13 +178,15 @@ export interface TaskResource {
   /** Resource name */
   name: string;
   /** Resource type */
-  type: "labor" | "material" | "machinery";
+  type: "labor" | "material" | "machinery" | "subcontractor";
   /** Number of units assigned */
   units: number;
   /** Cost per hour (labor/machinery) or per unit (material) */
   rate: number;
   /** Total hours for this assignment */
   hours: number;
+  /** For subcontractors: team size they bring (informational) */
+  teamSize?: number;
 }
 
 export type ConstructionPhase =
@@ -289,13 +293,15 @@ export interface CriticalChainData {
 export interface ProjectResource {
   uid: number;
   name: string;
-  type: "labor" | "material" | "machinery";
+  type: "labor" | "material" | "machinery" | "subcontractor";
   /** Standard rate (EUR/hour for labor, EUR/unit for material) */
   standardRate: number;
   /** Total assigned hours across all tasks */
   totalHours: number;
   /** Total cost */
   totalCost: number;
+  /** For subcontractor resources: how many workers they represent */
+  teamSize?: number;
 }
 
 // ============================================================

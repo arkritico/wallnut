@@ -15,6 +15,7 @@ import * as XLSX from 'xlsx';
 import type { WbsProject, ProjectSchedule, ScheduleTask } from "./wbs-types";
 import type { ProjectResources, MaterialResource, LaborResource, EquipmentResource } from "./resource-aggregator";
 import { formatCost } from "./cost-estimation";
+import type { CashFlowResult } from "./cashflow";
 
 // ============================================================
 // Export Options
@@ -236,73 +237,129 @@ function buildEquipmentSheet(equipment: EquipmentResource[]): XLSX.WorkSheet {
 
 function buildCashflowSheet(
   schedule: ProjectSchedule,
-  resources: ProjectResources
+  resources: ProjectResources,
+  cashFlow?: CashFlowResult,
 ): XLSX.WorkSheet {
-  // Group tasks by month
-  const monthlyData = new Map<string, { materials: number; labor: number; equipment: number; phase: string }>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows: any[][] = [];
 
-  for (const task of schedule.tasks) {
-    const startDate = new Date(task.startDate);
-    const month = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`;
+  if (cashFlow && cashFlow.periods.length > 0) {
+    // ── Enhanced: use pre-computed CashFlowResult ──
+    rows.push(
+      ["FLUXO DE CAIXA E CURVA S"],
+      [""],
+      ["Mês", "Fase Dominante", "Materiais (€)", "Mão de Obra (€)", "Equipamentos (€)", "Total Mês (€)", "Acumulado (€)", "% Acumulado", "Marco"],
+    );
 
-    if (!monthlyData.has(month)) {
-      monthlyData.set(month, { materials: 0, labor: 0, equipment: 0, phase: task.phase || "Geral" });
+    let accumulated = 0;
+    for (const period of cashFlow.periods) {
+      accumulated += period.total;
+      const pct = cashFlow.totalCost > 0
+        ? parseFloat(((accumulated / cashFlow.totalCost) * 100).toFixed(1))
+        : 0;
+
+      const milestone = cashFlow.milestones.find((m) => m.periodKey === period.key);
+
+      rows.push([
+        period.label,
+        period.dominantPhase,
+        parseFloat(period.materials.toFixed(2)),
+        parseFloat(period.labor.toFixed(2)),
+        parseFloat(period.equipment.toFixed(2)),
+        parseFloat(period.total.toFixed(2)),
+        parseFloat(accumulated.toFixed(2)),
+        pct,
+        milestone ? milestone.label : "",
+      ]);
     }
 
-    const data = monthlyData.get(month)!;
+    // Working capital section
+    rows.push(
+      [""],
+      ["CAPITAL DE GIRO"],
+      ["Exposição máxima", formatCost(cashFlow.workingCapital.maxExposure)],
+      ["Mês de pico", cashFlow.workingCapital.peakMonth],
+      ["Gasto mensal médio", formatCost(cashFlow.workingCapital.averageMonthlyBurn)],
+      ["Gasto mensal máximo", formatCost(cashFlow.workingCapital.peakMonthlySpend)],
+      ["Contingência", `${cashFlow.contingency.percent}% — ${cashFlow.contingency.rationale}`],
+      ["Capital recomendado", formatCost(cashFlow.workingCapital.recommendedWorkingCapital)],
+    );
 
-    // Distribute task cost across duration (simplified: assign to start month)
-    for (const resource of task.resources) {
-      const cost = resource.type === "labor"
-        ? resource.rate * resource.hours
-        : resource.rate * resource.units;
+    // Milestones section
+    rows.push(
+      [""],
+      ["MARCOS DE PAGAMENTO"],
+      ["#", "Data", "% Acumulado", "Valor (€)", "Descrição"],
+    );
 
-      if (resource.type === "material") {
-        data.materials += cost;
-      } else if (resource.type === "labor") {
-        data.labor += cost;
-      } else if (resource.type === "machinery") {
-        data.equipment += cost;
+    for (const m of cashFlow.milestones) {
+      rows.push([
+        m.number,
+        m.date,
+        parseFloat(m.cumulativePercent.toFixed(1)),
+        parseFloat(m.amount.toFixed(2)),
+        m.label,
+      ]);
+    }
+  } else {
+    // ── Fallback: naive grouping by start month ──
+    rows.push(
+      ["FLUXO DE CAIXA"],
+      [""],
+      ["Mês", "Fase Dominante", "Materiais (€)", "Mão de Obra (€)", "Equipamentos (€)", "Total Mês (€)", "Acumulado (€)"],
+    );
+
+    const monthlyData = new Map<string, { materials: number; labor: number; equipment: number; phase: string }>();
+
+    for (const task of schedule.tasks) {
+      const startDate = new Date(task.startDate);
+      const month = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`;
+
+      if (!monthlyData.has(month)) {
+        monthlyData.set(month, { materials: 0, labor: 0, equipment: 0, phase: task.phase || "Geral" });
+      }
+
+      const data = monthlyData.get(month)!;
+      for (const resource of task.resources) {
+        const cost = resource.type === "labor"
+          ? resource.rate * resource.hours
+          : resource.rate * resource.units;
+
+        if (resource.type === "material") data.materials += cost;
+        else if (resource.type === "labor" || resource.type === "subcontractor") data.labor += cost;
+        else if (resource.type === "machinery") data.equipment += cost;
       }
     }
-  }
 
-  // Build sheet rows
-  const rows: any[][] = [
-    ["FLUXO DE CAIXA"],
-    [""],
-    ["Mês", "Fase Dominante", "Materiais (€)", "Mão de Obra (€)", "Equipamentos (€)", "Total Mês (€)", "Acumulado (€)"],
-  ];
+    let accumulated = 0;
+    const sortedMonths = Array.from(monthlyData.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
-  let accumulated = 0;
-  const sortedMonths = Array.from(monthlyData.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-
-  for (const [month, costs] of sortedMonths) {
-    const total = costs.materials + costs.labor + costs.equipment;
-    accumulated += total;
-
-    rows.push([
-      month,
-      costs.phase,
-      parseFloat(costs.materials.toFixed(2)),
-      parseFloat(costs.labor.toFixed(2)),
-      parseFloat(costs.equipment.toFixed(2)),
-      parseFloat(total.toFixed(2)),
-      parseFloat(accumulated.toFixed(2)),
-    ]);
+    for (const [month, costs] of sortedMonths) {
+      const total = costs.materials + costs.labor + costs.equipment;
+      accumulated += total;
+      rows.push([
+        month, costs.phase,
+        parseFloat(costs.materials.toFixed(2)),
+        parseFloat(costs.labor.toFixed(2)),
+        parseFloat(costs.equipment.toFixed(2)),
+        parseFloat(total.toFixed(2)),
+        parseFloat(accumulated.toFixed(2)),
+      ]);
+    }
   }
 
   const sheet = XLSX.utils.aoa_to_sheet(rows);
 
-  // Set column widths
   sheet['!cols'] = [
-    { wch: 10 },  // Month
-    { wch: 25 },  // Phase
+    { wch: 12 },  // Month/label
+    { wch: 30 },  // Phase/description
     { wch: 15 },  // Materials
     { wch: 15 },  // Labor
     { wch: 15 },  // Equipment
     { wch: 15 },  // Total Month
     { wch: 15 },  // Accumulated
+    { wch: 12 },  // % Accumulated
+    { wch: 35 },  // Milestone
   ];
 
   return sheet;
@@ -397,7 +454,8 @@ export function generateBudgetExcel(
   project: WbsProject,
   schedule: ProjectSchedule,
   resources: ProjectResources,
-  options: BudgetExportOptions = {}
+  options: BudgetExportOptions = {},
+  cashFlow?: CashFlowResult,
 ): Buffer {
   const workbook = XLSX.utils.book_new();
 
@@ -418,7 +476,7 @@ export function generateBudgetExcel(
   XLSX.utils.book_append_sheet(workbook, equipmentSheet, "Equipamentos");
 
   // Sheet 5: Cashflow
-  const cashflowSheet = buildCashflowSheet(schedule, resources);
+  const cashflowSheet = buildCashflowSheet(schedule, resources, cashFlow);
   XLSX.utils.book_append_sheet(workbook, cashflowSheet, "Fluxo de Caixa");
 
   // Sheet 6: By Phase
@@ -436,9 +494,10 @@ export function downloadBudgetExcel(
   project: WbsProject,
   schedule: ProjectSchedule,
   resources: ProjectResources,
-  options: BudgetExportOptions = {}
+  options: BudgetExportOptions = {},
+  cashFlow?: CashFlowResult,
 ): void {
-  const buffer = generateBudgetExcel(project, schedule, resources, options);
+  const buffer = generateBudgetExcel(project, schedule, resources, options, cashFlow);
   // Convert Buffer to Uint8Array for browser compatibility
   const uint8Array = new Uint8Array(buffer);
   const blob = new Blob([uint8Array], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

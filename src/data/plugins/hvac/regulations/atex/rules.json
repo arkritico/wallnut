@@ -1,0 +1,68 @@
+{
+  "regulationRef": "atex-2014-34",
+  "description": "Regras ATEX (Diretiva 2014/34/EU + DL 236/2003) — classificação de zonas, equipamentos certificados, ventilação de casas de caldeiras a gás",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-ATEX-BOILERROOM-01",
+      "regulationId": "atex-2014-34",
+      "article": "ATEX / DL 236/2003 — Classificação de Zona em Casas de Caldeiras a Gás",
+      "description": "A casa de caldeiras a gás natural/GPL não possui classificação de zona ATEX conforme exigido pela Diretiva 1999/92/CE (DL 236/2003 em Portugal), nem documento de proteção contra explosões (DPCE).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasATEXClassification", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGasBoiler", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Classificação de zona ATEX e DPCE obrigatórios para casas de caldeiras a gás",
+      "remediation": "Elaborar classificação de zona ATEX para a casa de caldeiras: (1) Classificação típica: Zona 2 no volume envolvente do queimador e juntas de gás (probabilidade de atmosfera explosiva apenas em condições anormais). (2) Com ventilação adequada (natural permanente ou mecânica): extensão da Zona 2 pode ser reduzida a < 1 m do ponto de emissão. (3) Elaborar DPCE (Documento de Proteção Contra Explosões) com: identificação de fontes de emissão, classificação de zonas (planta e corte), medidas de prevenção e proteção. (4) Sinalização: placa 'EX' (triângulo amarelo) na entrada da zona classificada.",
+      "enabled": true,
+      "tags": ["ATEX", "caldeira", "gás", "zona", "explosão"]
+    },
+    {
+      "id": "HVAC-ATEX-EQUIP-01",
+      "regulationId": "atex-2014-34",
+      "article": "ATEX 2014/34/EU — Equipamentos Certificados em Zonas Classificadas",
+      "description": "Os equipamentos elétricos instalados nas zonas ATEX classificadas (casa de caldeiras, sala de geradores a gás) não possuem certificação ATEX adequada à categoria de zona.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasATEXCertifiedEquipment", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasATEXClassification", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Equipamentos certificados ATEX Cat. 3G (Zona 2) ou Cat. 2G (Zona 1)",
+      "remediation": "Garantir que todos os equipamentos elétricos em zonas classificadas possuem certificação ATEX: (1) Zona 2: equipamentos categoria 3G (proteção em funcionamento normal). Exemplos: motores IP55 sem superfícies > 200°C, luminárias estanques, interruptores em invólucro Ex nA. (2) Zona 1: equipamentos categoria 2G (proteção em funcionamento normal e avarias previsíveis). Exemplos: motores Ex d ou Ex e, detetores Ex ia. (3) Verificar: marcação Ex na placa do equipamento, certificado ATEX emitido por Organismo Notificado, grupo de gás (IIA para metano, IIA/IIB para GPL). (4) Cabos: tipo resistente à propagação de chama (IEC 60332) em zonas classificadas.",
+      "enabled": true,
+      "tags": ["ATEX", "certificação", "equipamento", "Ex", "zona"]
+    },
+    {
+      "id": "HVAC-ATEX-VENT-01",
+      "regulationId": "atex-2014-34",
+      "article": "ATEX / EN 60079-10-1 — Ventilação para Redução de Zonas ATEX",
+      "description": "A casa de caldeiras a gás não possui ventilação adequada para limitar a extensão e classificação das zonas ATEX, conforme EN 60079-10-1.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasBoilerRoomVentilation", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGasBoiler", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Ventilação permanente da casa de caldeiras conforme EN 60079-10-1 e regulamento de gás",
+      "remediation": "Garantir ventilação adequada da casa de caldeiras: (1) Ventilação natural: aberturas permanentes (não obturáveis) — admissão na parte inferior (≥ 200 cm²) + extração na parte superior (≥ 200 cm²), ou 5 cm² por kW de potência instalada (o maior valor). (2) Ventilação mecânica: se natural insuficiente, instalar extração mecânica com caudal ≥ 5 renovações/hora, com arranque automático pelo detetor de gás. (3) Impacto na classificação ATEX: ventilação 'adequada' (EN 60079-10-1) permite reduzir Zona 1 para Zona 2, ou eliminar Zona 2 (espaço 'não perigoso'). (4) Interbloqueio: ventilação deve estar operacional antes de permitir arranque do queimador.",
+      "enabled": true,
+      "tags": ["ATEX", "ventilação", "casa de caldeiras", "gás", "EN 60079"]
+    },
+    {
+      "id": "HVAC-ATEX-GASDETECT-01",
+      "regulationId": "atex-2014-34",
+      "article": "ATEX / EN 60079-29-1 — Deteção de Gás em Casas de Caldeiras",
+      "description": "A casa de caldeiras a gás não dispõe de sistema de deteção de gás combustível com alarme e corte automático da alimentação de gás.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasGasDetectionSystem", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGasBoiler", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Deteção de gás com alarme (10% LIE) e corte (25% LIE) obrigatória",
+      "remediation": "Instalar sistema de deteção de gás combustível: (1) Sensor: tipo catalítico ou infravermelho, certificado EN 60079-29-1, calibrado para gás natural (metano) ou GPL (propano/butano). (2) Localização: junto ao teto para gás natural (mais leve que ar), junto ao solo para GPL (mais pesado). Mínimo 1 detetor por 50 m². (3) Níveis de alarme: pré-alarme a 10% do LIE (sinalização visual/sonora), alarme a 25% do LIE (corte automático da electroválvula de gás + arranque de ventilação de emergência). (4) Central: painel de deteção de gás com saída para GTC e SADI. (5) Manutenção: calibração semestral com gás padrão, teste funcional mensal.",
+      "enabled": true,
+      "tags": ["ATEX", "deteção gás", "LIE", "caldeira", "electroválvula"]
+    }
+  ]
+}

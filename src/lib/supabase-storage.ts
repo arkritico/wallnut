@@ -7,6 +7,7 @@
 import { getSupabase, isSupabaseConfigured } from "./supabase";
 import type { BuildingProject, AnalysisResult } from "./types";
 import * as localStorage from "./storage";
+import { recordHistory } from "./collaboration";
 
 export interface CloudProject {
   id: string;
@@ -96,10 +97,10 @@ export async function getAllCloudProjects(): Promise<CloudProject[]> {
     updated_at: string;
   }
 
+  // RLS returns all accessible projects (owned + shared via project_members)
   const { data, error } = await sb
     .from("projects")
     .select("*")
-    .eq("user_id", user.id)
     .order("updated_at", { ascending: false });
 
   if (error) {
@@ -147,6 +148,9 @@ export async function saveCloudProject(project: CloudProject): Promise<void> {
     });
 
   if (error) throw error;
+
+  // Record change history
+  await recordHistory(project.id, "updated", "Projeto atualizado");
 }
 
 export async function deleteCloudProject(id: string): Promise<void> {
@@ -218,6 +222,17 @@ export async function createCloudProject(
   });
 
   if (error) throw error;
+
+  // Auto-add creator as owner member + record history
+  await sb.from("project_members").insert({
+    id: crypto.randomUUID(),
+    project_id: id,
+    user_id: user.id,
+    role: "owner",
+    created_at: now,
+  });
+  await recordHistory(id, "created", "Projeto criado");
+
   return cloudProject;
 }
 

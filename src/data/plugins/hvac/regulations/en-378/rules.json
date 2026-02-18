@@ -1,0 +1,118 @@
+{
+  "regulationRef": "en-378",
+  "description": "Regras EN 378 — Segurança de sistemas de refrigeração: cargas máximas, salas de máquinas, deteção de fugas, classificação de refrigerantes",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-REF-CHARGE-A1-01",
+      "regulationId": "en-378",
+      "article": "EN 378-1 §5.4 — Carga Máxima de Refrigerante A1 em Espaço Ocupado",
+      "description": "A carga de refrigerante do grupo A1 (R-410A, R-134a, R-32) no espaço ocupado excede o limite prático (PL) calculado conforme EN 378-1, podendo representar risco de asfixia em caso de fuga total.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantChargeKg", "operator": ">", "value": 0 },
+        { "field": "hvac.refrigerantSafetyClass", "operator": "==", "value": "A1" },
+        { "field": "hvac.hasRefrigerantChargeCheck", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.refrigerantChargeKg} kg de refrigerante {hvac.refrigerantType}",
+      "requiredValue": "Carga ≤ limite prático (PL) calculado conforme EN 378-1 Tabela C.1",
+      "remediation": "Verificar carga máxima admissível conforme EN 378-1: (1) Calcular limite prático (PL) = ATEL/ODL × volume do espaço. Para R-410A: PL = 0.44 kg/m³, para R-32: PL = 0.061 kg/m³ (inflamável A2L). (2) Se carga > PL: reduzir carga (circuito com menor volume), aumentar volume do espaço, instalar ventilação mecânica de emergência, ou relocalizar equipamento em sala de máquinas dedicada. (3) Para sistemas split com carga > PL: instalar detetor de refrigerante no espaço ocupado com alarme e ventilação de emergência.",
+      "enabled": true,
+      "tags": ["EN 378", "refrigerante", "carga", "segurança", "A1"]
+    },
+    {
+      "id": "HVAC-REF-CHARGE-A2L-01",
+      "regulationId": "en-378",
+      "article": "EN 378-1 §5.4 — Carga Máxima de Refrigerante A2L em Espaço Ocupado",
+      "description": "A carga de refrigerante do grupo A2L (R-32, R-454B, R-1234yf — ligeiramente inflamável) no espaço ocupado excede o limite prático mais restritivo aplicável a refrigerantes inflamáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantChargeKg", "operator": ">", "value": 0 },
+        { "field": "hvac.refrigerantSafetyClass", "operator": "==", "value": "A2L" },
+        { "field": "hvac.hasRefrigerantChargeCheck", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.refrigerantChargeKg} kg de refrigerante A2L",
+      "requiredValue": "Carga ≤ limite LFL conforme EN 378-1 (mais restritivo para A2L)",
+      "remediation": "Refrigerantes A2L são ligeiramente inflamáveis — limites de carga mais restritivos: (1) Para R-32: limite prático PL = 0.061 kg/m³ (muito inferior ao PL de R-410A). (2) Para R-454B: PL = 0.059 kg/m³. (3) Calcular carga máxima = PL × volume mínimo do espaço (considerando mobiliário que reduz volume livre). (4) Se carga excede PL: instalar deteção de refrigerante com corte automático do equipamento + ativação de ventilação de emergência. (5) Alternativa: relocalizar unidade exterior e utilizar circuito de água intermediário (chiller).",
+      "enabled": true,
+      "tags": ["EN 378", "refrigerante", "A2L", "inflamável", "carga"]
+    },
+    {
+      "id": "HVAC-REF-MACHROOM-01",
+      "regulationId": "en-378",
+      "article": "EN 378-3 §5 — Requisitos de Salas de Máquinas de Refrigeração",
+      "description": "A sala de máquinas de refrigeração não cumpre os requisitos da EN 378-3: ventilação mecânica de emergência, deteção de fugas, sinalização de segurança, acesso restrito.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasMachineryRoom", "operator": "==", "value": true },
+        { "field": "hvac.machineryRoomCompliance", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Sala de máquinas conforme EN 378-3 com ventilação, deteção e sinalização",
+      "remediation": "A sala de máquinas de refrigeração deve cumprir EN 378-3: (1) Ventilação: extração mecânica de emergência com caudal Q = 0.026 × G^(2/3) × 14 [m³/s] (G = carga total em kg), com admissão na zona baixa e extração na zona alta (para refrigerantes mais pesados que o ar). (2) Deteção: sensor de refrigerante calibrado para o tipo específico, com alarme a 50% do PL e corte + ventilação a 100% do PL. (3) Acesso: porta abrindo para fora, sinalização 'Sala de Máquinas — Acesso Restrito', iluminação de emergência. (4) Sem fontes de ignição para refrigerantes A2L/A3.",
+      "enabled": true,
+      "tags": ["EN 378", "sala de máquinas", "ventilação", "deteção", "segurança"]
+    },
+    {
+      "id": "HVAC-REF-DETECT-01",
+      "regulationId": "en-378",
+      "article": "EN 378-3 §5.14 — Sistema de Deteção de Fugas de Refrigerante",
+      "description": "A instalação de refrigeração com carga significativa não dispõe de sistema de deteção de fugas de refrigerante conforme EN 378-3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasRefrigerantDetection", "operator": "not_exists", "value": null },
+        { "field": "hvac.refrigerantChargeKg", "operator": ">", "value": 3 }
+      ],
+      "requiredValue": "Deteção de fugas obrigatória para cargas > 3 kg (ou > PL para o espaço)",
+      "remediation": "Instalar sistema de deteção de fugas de refrigerante: (1) Sensor: tipo infravermelho (NDIR) ou semicondutor, calibrado para o refrigerante específico. (2) Localização: na zona baixa para refrigerantes pesados (R-410A, R-134a), junto ao equipamento e nos pontos de potencial acumulação. (3) Níveis de alarme: pré-alarme a 25% PL (sinalização), alarme a 50% PL (ventilação de emergência), corte a 100% PL (desligamento do compressor). (4) Manutenção: calibração semestral, teste funcional mensal. (5) Para refrigerantes A2L/A3 (inflamáveis): deteção obrigatória independentemente da carga.",
+      "enabled": true,
+      "tags": ["EN 378", "deteção fugas", "refrigerante", "sensor", "alarme"]
+    },
+    {
+      "id": "HVAC-REF-RELIEF-01",
+      "regulationId": "en-378",
+      "article": "EN 378-2 §6.2.6 — Dispositivos de Alívio de Pressão",
+      "description": "O circuito frigorífico não possui dispositivos de alívio de pressão (válvulas de segurança ou discos de rutura) conforme exigido pela EN 378-2 para proteção contra sobrepressão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasRefrigerantReliefValve", "operator": "not_exists", "value": null },
+        { "field": "hvac.refrigerantChargeKg", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Válvula de segurança obrigatória no lado de alta pressão do circuito frigorífico",
+      "remediation": "Instalar dispositivos de alívio de pressão conforme EN 378-2: (1) Válvula de segurança no lado de alta pressão: pressão de disparo ≤ PS (pressão máxima admissível). (2) Para sistemas com carga > 100 kg: dupla válvula de segurança com válvula de comutação (para manutenção sem paragem). (3) A descarga deve ser canalizada para o exterior ou para um recipiente de recolha (nunca para espaço ocupado). (4) Discos de rutura: admitidos como proteção secundária (nunca como única proteção). (5) Verificação anual da válvula de segurança por entidade acreditada.",
+      "enabled": true,
+      "tags": ["EN 378", "válvula segurança", "pressão", "alívio", "sobrepressão"]
+    },
+    {
+      "id": "HVAC-REF-PIPING-01",
+      "regulationId": "en-378",
+      "article": "EN 378-2 §5.6 — Tubagem de Refrigerante em Espaços Ocupados",
+      "description": "Tubagem de refrigerante atravessa espaços ocupados sem proteção adequada (isolamento mecânico, sinalização, ventilação), contrariando as recomendações da EN 378-2.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasRefrigerantPipingInOccupied", "operator": "==", "value": true },
+        { "field": "hvac.hasRefrigerantPipingProtection", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Proteção mecânica e sinalização obrigatórias para tubagem em espaços ocupados",
+      "remediation": "Proteger tubagem de refrigerante em espaços ocupados: (1) Proteção mecânica: manga metálica ou calha técnica fechada para impedir danos acidentais. (2) Minimizar juntas: percurso contínuo (soldado) através dos espaços ocupados, sem uniões roscadas ou flangeadas. (3) Sinalização: identificação do tipo de refrigerante e direção do fluxo. (4) Ventilação: garantir ventilação adequada do espaço para diluição em caso de fuga. (5) Para refrigerantes A2L/A3: evitar percurso por espaços ocupados quando possível.",
+      "enabled": true,
+      "tags": ["EN 378", "tubagem", "refrigerante", "espaço ocupado", "proteção"]
+    },
+    {
+      "id": "HVAC-REF-GWP-PHASEDOWN-01",
+      "regulationId": "en-378",
+      "article": "EU 517/2014 + F-Gas Phase-Down — Refrigerantes de Alto GWP",
+      "description": "O sistema de refrigeração utiliza refrigerante com GWP (Global Warming Potential) elevado que será progressivamente eliminado conforme o calendário de phase-down do Regulamento F-Gas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.refrigerantGWP", "operator": ">", "value": 750 },
+        { "field": "hvac.refrigerantChargeKg", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "GWP = {hvac.refrigerantGWP}",
+      "requiredValue": "GWP ≤ 750 recomendado (phase-down F-Gas: redução de 79% até 2030)",
+      "remediation": "Planear transição para refrigerantes de baixo GWP conforme calendário F-Gas: (1) R-410A (GWP 2088) → R-32 (GWP 675) ou R-454B (GWP 466) para split/VRF. (2) R-404A (GWP 3922) → R-449A (GWP 1397) como retrofit, ou R-744 (CO₂, GWP 1) para novo equipamento. (3) R-134a (GWP 1430) → R-1234ze (GWP 7) ou R-513A (GWP 631) para chillers. (4) Proibições já em vigor: R-404A/R-507A em novo equipamento frigorífico comercial desde 2020. (5) A partir de 2025: proibição de manutenção com R-404A virgem em equipamentos > 40 tCO₂eq.",
+      "enabled": true,
+      "tags": ["F-Gas", "GWP", "phase-down", "refrigerante", "transição"]
+    }
+  ]
+}

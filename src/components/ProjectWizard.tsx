@@ -23,18 +23,20 @@ import {
   AlertCircle,
   Loader2,
   Box,
+  Upload,
 } from "lucide-react";
 
 interface ProjectWizardProps {
   onComplete: (project: BuildingProject) => void;
   onCancel: () => void;
+  onStartUnified?: () => void;
 }
 
 type WizardStep = "start" | "template" | "upload" | "upload-zip" | "basics" | "location" | "review";
 
 const STEPS: WizardStep[] = ["start", "template", "basics", "location", "review"];
 
-export default function ProjectWizard({ onComplete, onCancel }: ProjectWizardProps) {
+export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: ProjectWizardProps) {
   const { t, lang } = useI18n();
   const [step, setStep] = useState<WizardStep>("start");
   const [project, setProject] = useState<BuildingProject>(DEFAULT_PROJECT);
@@ -242,7 +244,29 @@ export default function ProjectWizard({ onComplete, onCancel }: ProjectWizardPro
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* ZIP upload option (primary) */}
+            {/* Unified multi-file upload (primary) */}
+            {onStartUnified && (
+              <button
+                onClick={onStartUnified}
+                className="p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-accent transition-colors text-left group md:col-span-2"
+              >
+                <div className="flex items-start gap-4">
+                  <Upload className="w-10 h-10 text-accent flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 group-hover:text-accent mb-1">
+                      {lang === "pt" ? "Carregar Ficheiros" : "Upload Files"}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {lang === "pt"
+                        ? "IFC, PDF ou Excel — gera automaticamente orçamento, cronograma e relatório de conformidade."
+                        : "IFC, PDF or Excel — auto-generates budget, schedule and compliance report."}
+                    </p>
+                  </div>
+                </div>
+              </button>
+            )}
+
+            {/* ZIP upload option */}
             <button
               onClick={() => setStep("upload-zip")}
               className="p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-emerald-400 transition-colors text-left group md:col-span-2"

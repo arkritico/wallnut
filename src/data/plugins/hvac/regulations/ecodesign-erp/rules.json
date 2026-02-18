@@ -1,0 +1,151 @@
+{
+  "regulationRef": "ecodesign-erp",
+  "description": "Regras Ecodesign/ErP — eficiência mínima de caldeiras, unidades de ventilação, bombas de calor, bombas circuladoras",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-ERP-BOILER-EFF-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 813/2013 — Eficiência Sazonal Mínima de Caldeiras",
+      "description": "A caldeira instalada não cumpre a eficiência sazonal mínima de aquecimento de 86% (ηs) exigida pelo Regulamento EU 813/2013 (Ecodesign para aquecedores).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.boilerSeasonalEfficiency", "operator": "<", "value": 86 },
+        { "field": "hvac.hasBoiler", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.boilerSeasonalEfficiency}% ηs",
+      "requiredValue": "≥ 86% eficiência sazonal (ηs) conforme EU 813/2013",
+      "remediation": "A caldeira não cumpre os requisitos mínimos Ecodesign. Desde 26/09/2015, caldeiras com ηs < 86% não podem ser colocadas no mercado EU. Substituir por: (1) Caldeira de condensação a gás (ηs típica: 92-98%), (2) Bomba de calor (ηs > 100%), (3) Sistema híbrido caldeira condensação + bomba de calor. Verificar etiqueta energética: classe A (ηs ≥ 90%) obrigatória para edifícios novos conforme RECS.",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "caldeira", "eficiência", "EU 813/2013"]
+    },
+    {
+      "id": "HVAC-ERP-BOILER-NOX-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 813/2013 — Limite de Emissões NOx de Caldeiras",
+      "description": "A caldeira excede o limite de emissões de NOx estabelecido pelo Regulamento Ecodesign: ≤ 56 mg/kWh para gás, ≤ 120 mg/kWh para combustível líquido.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.boilerNOxEmissions", "operator": ">", "value": 56 },
+        { "field": "hvac.boilerFuelType", "operator": "==", "value": "gas" }
+      ],
+      "currentValueTemplate": "{hvac.boilerNOxEmissions} mg/kWh NOx",
+      "requiredValue": "≤ 56 mg/kWh (gás) ou ≤ 120 mg/kWh (combustível líquido)",
+      "remediation": "A caldeira excede os limites de emissões NOx Ecodesign (em vigor desde 26/09/2018). Substituir queimador por modelo low-NOx ou ultra-low-NOx (< 30 mg/kWh). As caldeiras de condensação modernas cumprem tipicamente < 40 mg/kWh. Para caldeiras a gasóleo, o limite é 120 mg/kWh — considerar conversão para gás natural para reduzir emissões.",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "NOx", "emissões", "caldeira"]
+    },
+    {
+      "id": "HVAC-ERP-BOILER-NOX-02",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 813/2013 — Limite de Emissões NOx de Caldeiras a Combustível Líquido",
+      "description": "A caldeira a combustível líquido excede o limite de emissões de NOx de 120 mg/kWh estabelecido pelo Regulamento Ecodesign.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.boilerNOxEmissions", "operator": ">", "value": 120 },
+        { "field": "hvac.boilerFuelType", "operator": "==", "value": "oil" }
+      ],
+      "currentValueTemplate": "{hvac.boilerNOxEmissions} mg/kWh NOx",
+      "requiredValue": "≤ 120 mg/kWh para caldeiras a combustível líquido",
+      "remediation": "Substituir queimador por modelo conforme com Ecodesign. Considerar conversão para gás natural (limite mais restritivo de 56 mg/kWh mas tecnologia mais limpa) ou substituição por bomba de calor para eliminar emissões locais.",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "NOx", "emissões", "gasóleo"]
+    },
+    {
+      "id": "HVAC-ERP-VENT-SFP-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 1253/2014 — Potência Específica de Ventilador (SFP)",
+      "description": "A unidade de ventilação não cumpre a potência específica do ventilador (SFP) máxima exigida pelo Regulamento EU 1253/2014 para unidades de ventilação não residenciais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ventilationUnitSFP", "operator": ">", "value": 1.6 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "industrial"] }
+      ],
+      "currentValueTemplate": "{hvac.ventilationUnitSFP} W/(m³/h)",
+      "requiredValue": "SFP ≤ 1.6 W/(m³/h) para unidades não residenciais (Tier 2, desde 2018)",
+      "remediation": "A unidade de ventilação excede a SFP máxima Ecodesign. Soluções: (1) Substituir ventiladores por modelos EC (Electronically Commutated) com rendimento > 80%. (2) Otimizar rede de condutas para reduzir perda de carga (ΔP). (3) Instalar variador de frequência para operação a caudal variável. (4) Verificar dimensionamento: condutas subdimensionadas aumentam ΔP e SFP. Para unidades residenciais (UVR): SFP máximo de 1.2 W/(m³/h).",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "SFP", "ventilação", "EU 1253/2014"]
+    },
+    {
+      "id": "HVAC-ERP-VENT-RECOVERY-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 1253/2014 — Eficiência Mínima de Recuperação de Calor",
+      "description": "O recuperador de calor da unidade de ventilação não atinge a eficiência térmica mínima de 73% exigida pelo Regulamento EU 1253/2014 (Tier 2, desde 2018).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.heatRecoveryEfficiency", "operator": "<", "value": 73 },
+        { "field": "hvac.hasHeatRecovery", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.heatRecoveryEfficiency}%",
+      "requiredValue": "≥ 73% eficiência de recuperação térmica (Tier 2, EU 1253/2014)",
+      "remediation": "O recuperador de calor não cumpre Ecodesign. Opções de substituição: (1) Recuperador de placas de contra-corrente: eficiência 80-90%. (2) Recuperador rotativo (roda entálpica): eficiência 75-85% (atenção à transferência de odores). (3) Recuperador de tubos de calor (heat pipes): eficiência 50-65% — geralmente insuficiente para Ecodesign. Verificar também a estanquidade da secção de recuperação (fugas internas reduzem eficiência real).",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "recuperação calor", "eficiência", "EU 1253/2014"]
+    },
+    {
+      "id": "HVAC-ERP-HP-SCOP-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 2016/2281 — SCOP Mínimo de Bombas de Calor",
+      "description": "A bomba de calor não atinge o SCOP (Seasonal Coefficient of Performance) mínimo exigido pelo Regulamento Ecodesign para a zona climática aplicável.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.heatPumpSCOP", "operator": "<", "value": 2.5 },
+        { "field": "hvac.hasHeatPump", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "SCOP = {hvac.heatPumpSCOP}",
+      "requiredValue": "SCOP ≥ 2.5 (zona climática média — Portugal Continental)",
+      "remediation": "A bomba de calor não cumpre os requisitos mínimos Ecodesign. Substituir por modelo com SCOP ≥ 3.0 (classe A+) ou superior. Para Portugal (zona climática média/quente): bombas de calor ar-água com SCOP típico de 3.0-4.5, bombas de calor geotérmicas com SCOP 4.0-5.0. Verificar que o dimensionamento é adequado: sobredimensionamento reduz SCOP por funcionamento a carga parcial excessiva. Considerar sistema inverter para manter eficiência elevada a carga parcial.",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "SCOP", "bomba de calor", "eficiência"]
+    },
+    {
+      "id": "HVAC-ERP-AC-SEER-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 2016/2281 — SEER Mínimo de Sistemas de Arrefecimento",
+      "description": "O sistema de arrefecimento não atinge o SEER (Seasonal Energy Efficiency Ratio) mínimo exigido pelo Regulamento Ecodesign.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.coolingSEER", "operator": "<", "value": 3.6 },
+        { "field": "hvac.hasCoolingSystem", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "SEER = {hvac.coolingSEER}",
+      "requiredValue": "SEER ≥ 3.6 (Tier 2, Ecodesign) — recomendado ≥ 5.0 (classe A++)",
+      "remediation": "O sistema de arrefecimento não cumpre Ecodesign. Para novos equipamentos: (1) Split/multi-split inverter: SEER típico 5.0-8.0 (classe A++ a A+++). (2) Chiller ar-água scroll inverter: SEER 4.0-6.0. (3) Chiller água-água centrífugo: SEER 5.0-7.0. Para Portugal (clima quente), a eficiência em arrefecimento é particularmente importante. Verificar dimensionamento: equipamento sobredimensionado em > 20% perde eficiência significativa a carga parcial.",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "SEER", "arrefecimento", "eficiência"]
+    },
+    {
+      "id": "HVAC-ERP-PUMP-EEI-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 622/2012 — Índice de Eficiência Energética de Bombas Circuladoras",
+      "description": "As bombas circuladoras da instalação AVAC não cumprem o índice de eficiência energética (EEI) máximo de 0.23 exigido pelo Regulamento EU 622/2012.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.circulatorPumpEEI", "operator": ">", "value": 0.23 },
+        { "field": "hvac.hasCirculatorPumps", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "EEI = {hvac.circulatorPumpEEI}",
+      "requiredValue": "EEI ≤ 0.23 conforme EU 622/2012 (desde 2015)",
+      "remediation": "Substituir bombas circuladoras por modelos de alta eficiência: (1) Bombas com motor de ímanes permanentes (ECM): EEI típico 0.17-0.20. (2) Bombas com regulação eletrónica integrada (pressão constante ou proporcional): EEI típico 0.15-0.20. (3) Verificar dimensionamento: bomba sobredimensionada opera fora do ponto ótimo. (4) Bombas de rotor húmido: substituir por rotor seco com variador de frequência para caudais > 5 m³/h. O payback da substituição é tipicamente 2-3 anos devido à poupança energética.",
+      "enabled": true,
+      "tags": ["Ecodesign", "ErP", "bomba", "EEI", "EU 622/2012"]
+    },
+    {
+      "id": "HVAC-ERP-LABEL-01",
+      "regulationId": "ecodesign-erp",
+      "article": "EU 811/2013 + 812/2013 — Etiqueta Energética de Equipamentos AVAC",
+      "description": "Os equipamentos AVAC (caldeiras, bombas de calor, unidades de ar condicionado) não possuem etiqueta energética visível conforme exigido pelos Regulamentos Delegados da UE.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasEnergyLabel", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Etiqueta energética obrigatória e visível em todos os equipamentos AVAC",
+      "remediation": "Garantir que todos os equipamentos AVAC possuem etiqueta energética conforme regulamentação EU: (1) Caldeiras e bombas de calor até 70 kW: etiqueta de produto + etiqueta de sistema (package label). (2) Ar condicionado até 12 kW: etiqueta de produto com SEER e SCOP. (3) Unidades de ventilação residenciais: etiqueta com classe de eficiência energética. (4) A etiqueta deve estar visível no equipamento e incluída na documentação técnica. (5) O instalador deve fornecer a etiqueta de sistema (combinação geradores + regulação + solar).",
+      "enabled": true,
+      "tags": ["Ecodesign", "etiqueta energética", "ErP", "rotulagem"]
+    }
+  ]
+}

@@ -51,12 +51,29 @@ function predTypeCode(type: "FS" | "SS" | "FF" | "SF"): number {
 }
 
 /** Resource type code (0=Material, 1=Work, 2=Cost) */
-function resourceTypeCode(type: "labor" | "material" | "machinery"): number {
+function resourceTypeCode(type: "labor" | "material" | "machinery" | "subcontractor"): number {
   switch (type) {
-    case "labor": return 1;     // Work
-    case "material": return 0;  // Material
-    case "machinery": return 1; // Work (treated as labor in MS Project)
+    case "labor": return 1;          // Work resource
+    case "material": return 0;       // Material resource
+    case "machinery": return 2;      // Cost resource (rented equipment)
+    case "subcontractor": return 2;  // Cost resource (subcontract)
     default: return 1;
+  }
+}
+
+/**
+ * AccrueAt code for MS Project.
+ * 1 = Start (material: purchased/delivered upfront)
+ * 2 = Prorated (labor: accrues as work progresses)
+ * 3 = End (subcontractor/equipment: paid on completion)
+ */
+function accrueAtCode(type: "labor" | "material" | "machinery" | "subcontractor"): number {
+  switch (type) {
+    case "material": return 1;       // Start
+    case "labor": return 2;          // Prorated
+    case "machinery": return 3;      // End (rental invoiced on return)
+    case "subcontractor": return 3;  // End (paid on milestone completion)
+    default: return 2;
   }
 }
 
@@ -88,6 +105,26 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
   lines.push(`  <CurrencySymbolPosition>3</CurrencySymbolPosition>`);
   lines.push(`  <CurrencyDigits>2</CurrencyDigits>`);
   lines.push(`  <Author>Wallnut - Portuguese Building Analyzer</Author>`);
+
+  // Project notes: team summary + CCPM info
+  const teamNotes = `Gerado por Wallnut. ` +
+    `Equipa máx: ${schedule.teamSummary.maxWorkers} trabalhadores. ` +
+    `Média: ${schedule.teamSummary.averageWorkers}. ` +
+    `Total homens-hora: ${schedule.teamSummary.totalManHours}.` +
+    (schedule.criticalChain
+      ? ` CCPM Goldratt: buffer projeto ${schedule.criticalChain.projectBuffer.durationDays}d, ` +
+        `${schedule.criticalChain.feedingBuffers.length} feeding buffers.`
+      : "");
+  lines.push(`  <Notes>${escapeXml(teamNotes)}</Notes>`);
+
+  // Extended attribute definitions (custom fields)
+  lines.push(`  <ExtendedAttributes>`);
+  lines.push(`    <ExtendedAttribute>`);
+  lines.push(`      <FieldID>188743731</FieldID>`);
+  lines.push(`      <FieldName>Number1</FieldName>`);
+  lines.push(`      <Alias>Equipa (trabalhadores)</Alias>`);
+  lines.push(`    </ExtendedAttribute>`);
+  lines.push(`  </ExtendedAttributes>`);
 
   // Calendar (Portuguese standard work week)
   lines.push(`  <Calendars>`);
@@ -155,6 +192,8 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
   lines.push(`      <Finish>${formatDateTime(schedule.finishDate, "17:00:00")}</Finish>`);
   lines.push(`      <Duration>${formatDuration(schedule.totalDurationDays)}</Duration>`);
   lines.push(`      <FixedCost>${schedule.totalCost.toFixed(2)}</FixedCost>`);
+  lines.push(`      <PercentComplete>0</PercentComplete>`);
+  lines.push(`      <PhysicalPercentComplete>0</PhysicalPercentComplete>`);
   lines.push(`      <CalendarUID>1</CalendarUID>`);
   lines.push(`    </Task>`);
 
@@ -178,7 +217,19 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
     lines.push(`      <Work>${formatDuration(Math.ceil(task.durationHours / 8))}</Work>`);
     lines.push(`      <FixedCost>${task.cost.toFixed(2)}</FixedCost>`);
     lines.push(`      <PercentComplete>${task.percentComplete}</PercentComplete>`);
+    lines.push(`      <PhysicalPercentComplete>${task.physicalPercentComplete ?? task.percentComplete}</PhysicalPercentComplete>`);
     lines.push(`      <CalendarUID>1</CalendarUID>`);
+
+    // Team size as ExtendedAttribute (Number1)
+    const teamSize = task.resources
+      .filter(r => r.type === "labor" || r.type === "subcontractor")
+      .reduce((sum, r) => r.type === "subcontractor" ? sum + (r.teamSize ?? r.units) : sum + r.units, 0);
+    if (teamSize > 0) {
+      lines.push(`      <ExtendedAttribute>`);
+      lines.push(`        <FieldID>188743731</FieldID>`);
+      lines.push(`        <Value>${teamSize}</Value>`);
+      lines.push(`      </ExtendedAttribute>`);
+    }
 
     // Predecessors
     for (const pred of task.predecessors) {
@@ -221,10 +272,15 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
       lines.push(`      <Duration>${formatDuration(buffer.durationDays)}</Duration>`);
       lines.push(`      <DurationFormat>7</DurationFormat>`);
       lines.push(`      <PercentComplete>0</PercentComplete>`);
+      lines.push(`      <PhysicalPercentComplete>0</PhysicalPercentComplete>`);
       lines.push(`      <CalendarUID>1</CalendarUID>`);
       lines.push(`      <Notes>${escapeXml(
-        `Buffer CCPM (Goldratt). Tipo: ${buffer.type}. ` +
-        `Consumo: ${buffer.consumedPercent.toFixed(0)}%. Zona: ${buffer.zone}.`
+        `Buffer CCPM (Goldratt Critical Chain). ` +
+        `Tipo: ${buffer.type === "project" ? "Projeto" : "Alimentação"}. ` +
+        `Duração: ${buffer.durationDays} dias. ` +
+        `Consumo: ${buffer.consumedPercent.toFixed(0)}%. ` +
+        `Zona: ${buffer.zone === "green" ? "Verde (OK)" : buffer.zone === "yellow" ? "Amarelo (Atenção)" : "Vermelho (Crítico)"}. ` +
+        `Cadeia protegida: ${buffer.feedingChain.length} tarefas.`
       )}</Notes>`);
       // Link buffer to the task it follows
       if (buffer.feedingChain.length > 0) {
@@ -253,17 +309,28 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
   lines.push(`    </Resource>`);
 
   for (const res of schedule.resources) {
+    const msType = resourceTypeCode(res.type);
     lines.push(`    <Resource>`);
     lines.push(`      <UID>${res.uid}</UID>`);
     lines.push(`      <ID>${res.uid}</ID>`);
     lines.push(`      <Name>${escapeXml(res.name)}</Name>`);
-    lines.push(`      <Type>${resourceTypeCode(res.type)}</Type>`);
+    lines.push(`      <Type>${msType}</Type>`);
     lines.push(`      <IsNull>0</IsNull>`);
-    lines.push(`      <StandardRate>${res.standardRate.toFixed(2)}</StandardRate>`);
-    lines.push(`      <StandardRateFormat>${res.type === "material" ? "5" : "2"}</StandardRateFormat>`);
+    // Cost resources (Type 2) have no rate — only assignment-level cost
+    if (msType !== 2) {
+      lines.push(`      <StandardRate>${res.standardRate.toFixed(2)}</StandardRate>`);
+      lines.push(`      <StandardRateFormat>${res.type === "material" ? "5" : "2"}</StandardRateFormat>`);
+    }
+    lines.push(`      <AccrueAt>${accrueAtCode(res.type)}</AccrueAt>`);
     lines.push(`      <Cost>${res.totalCost.toFixed(2)}</Cost>`);
     if (res.type === "material") {
       lines.push(`      <MaterialLabel>un</MaterialLabel>`);
+    }
+    // Subcontractor: note the team size
+    if (res.type === "subcontractor" && res.teamSize) {
+      lines.push(`      <Notes>${escapeXml(
+        `Subempreiteiro. Equipa: ${res.teamSize} trabalhadores.`
+      )}</Notes>`);
     }
     lines.push(`      <CalendarUID>1</CalendarUID>`);
     lines.push(`    </Resource>`);
@@ -285,23 +352,43 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
       );
       if (!projRes) continue;
 
+      const msType = resourceTypeCode(res.type);
       assignmentUid++;
       lines.push(`    <Assignment>`);
       lines.push(`      <UID>${assignmentUid}</UID>`);
       lines.push(`      <TaskUID>${task.uid}</TaskUID>`);
       lines.push(`      <ResourceUID>${projRes.uid}</ResourceUID>`);
 
-      if (res.type === "labor" || res.type === "machinery") {
+      if (msType === 1) {
+        // Work resource (labor): units + work hours
         lines.push(`      <Units>${res.units}</Units>`);
         lines.push(`      <Work>${formatDuration(Math.ceil(res.hours / 8))}</Work>`);
-      } else {
-        // Material
+      } else if (msType === 0) {
+        // Material resource: units only (no work hours)
         lines.push(`      <Units>${res.units}</Units>`);
       }
+      // Cost resources (Type 2): no Units or Work — just Cost
 
       lines.push(`      <Start>${formatDateTime(task.startDate)}</Start>`);
       lines.push(`      <Finish>${formatDateTime(task.finishDate, "17:00:00")}</Finish>`);
-      lines.push(`      <Cost>${(res.type === "material" ? res.units * res.rate : res.hours * res.rate).toFixed(2)}</Cost>`);
+
+      // Cost calculation per type
+      let assignmentCost: number;
+      if (res.type === "labor") {
+        assignmentCost = res.hours * res.rate;
+      } else {
+        // material, machinery, subcontractor: units × rate
+        assignmentCost = res.units * res.rate;
+      }
+      lines.push(`      <Cost>${assignmentCost.toFixed(2)}</Cost>`);
+
+      // Subcontractor: note team size on assignment
+      if (res.type === "subcontractor" && res.teamSize) {
+        lines.push(`      <Notes>${escapeXml(
+          `Equipa subempreiteiro: ${res.teamSize} trabalhadores`
+        )}</Notes>`);
+      }
+
       lines.push(`    </Assignment>`);
     }
   }
@@ -360,6 +447,11 @@ export function generateScheduleSummary(schedule: ProjectSchedule): string {
   const laborRes = schedule.resources.filter(r => r.type === "labor");
   for (const r of laborRes) {
     lines.push(`  ${r.name}: ${r.totalHours.toFixed(0)}h (€${r.totalCost.toLocaleString("pt-PT")})`);
+  }
+  const subRes = schedule.resources.filter(r => r.type === "subcontractor");
+  for (const r of subRes) {
+    const team = r.teamSize ? ` [equipa: ${r.teamSize}]` : "";
+    lines.push(`  ${r.name}: €${r.totalCost.toLocaleString("pt-PT")}${team}`);
   }
 
   // Critical Chain summary

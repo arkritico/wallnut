@@ -1,7 +1,7 @@
 {
   "pluginId": "hvac",
-  "version": "1.0.0",
-  "description": "Mapeamento de campos para regras AVAC (RECS — DL 118/2013, Portaria 353-A/2013, DL 108/2018)",
+  "version": "2.0.0",
+  "description": "Mapeamento de campos para regras AVAC (RECS, Portaria 353-A/2013, DL 108/2018, F-Gas, NP 1037, EN 16798-1, DL 68-A/2015)",
   "fields": [
     {
       "_group": "Dados Gerais",
@@ -30,7 +30,14 @@
         { "value": "retail", "label": "Comércio a retalho" },
         { "value": "restaurant", "label": "Restauração" },
         { "value": "classroom", "label": "Sala de aula" },
-        { "value": "hospital", "label": "Hospitalar" }
+        { "value": "hospital", "label": "Hospitalar" },
+        { "value": "parking", "label": "Estacionamento" },
+        { "value": "laboratory", "label": "Laboratório" },
+        { "value": "server-room", "label": "Sala de servidores" },
+        { "value": "swimming-pool", "label": "Piscina coberta" },
+        { "value": "kitchen", "label": "Cozinha profissional" },
+        { "value": "atrium", "label": "Átrio / espaço aberto multi-piso" },
+        { "value": "machine-room", "label": "Sala de máquinas AVAC" }
       ],
       "sources": ["form"],
       "required": false,
@@ -55,6 +62,36 @@
       "sources": ["form"],
       "required": false,
       "description": "Número de ocupantes previsto para dimensionamento dos sistemas de ventilação e climatização"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "hvac.buildingFloorArea",
+      "label": "Área útil de pavimento",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form", "ifc"],
+      "required": false,
+      "description": "Área útil de pavimento do edifício para cálculo de densidades e caudais por m²"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "hvac.isNewEquipment",
+      "label": "Equipamento novo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se o equipamento AVAC é novo (sujeito a requisitos mais restritivos de GWP e eficiência)"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "hvac.isNewBuilding",
+      "label": "Edifício novo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se o edifício é novo ou existente (afeta requisitos de eficiência e ventilação)"
     },
 
     {
@@ -86,11 +123,30 @@
         { "value": "split", "label": "Split" },
         { "value": "multi-split", "label": "Multi-split" },
         { "value": "VRV", "label": "VRV / VRF" },
-        { "value": "central", "label": "Central (chiller)" }
+        { "value": "central", "label": "Central (chiller)" },
+        { "value": "air-to-air", "label": "Ar-ar" },
+        { "value": "air-to-water", "label": "Ar-água" },
+        { "value": "geothermal", "label": "Geotérmica" }
       ],
       "sources": ["form"],
       "required": false,
       "description": "Tipo de sistema de bomba de calor / unidade de climatização"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.heatingSystemType",
+      "label": "Tipo de sistema de aquecimento",
+      "type": "select",
+      "options": [
+        { "value": "heat-pump", "label": "Bomba de calor" },
+        { "value": "gas-boiler", "label": "Caldeira a gás" },
+        { "value": "electric-resistance", "label": "Resistência elétrica" },
+        { "value": "biomass", "label": "Biomassa" },
+        { "value": "district-heating", "label": "Aquecimento urbano" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de sistema de aquecimento principal do edifício"
     },
     {
       "_group": "Equipamentos de Climatização",
@@ -101,6 +157,33 @@
       "required": false,
       "defaults": { "_default": 3.0 },
       "description": "Coeficiente de desempenho em modo de aquecimento — mínimo regulamentar conforme RECS"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.copAirToAir",
+      "label": "COP bomba de calor ar-ar",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "COP específico de bomba de calor ar-ar — mínimo 3.5 conforme RECS"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.copAirToWater",
+      "label": "COP bomba de calor ar-água",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "COP específico de bomba de calor ar-água — mínimo 3.0 conforme RECS"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.copGeothermal",
+      "label": "COP bomba de calor geotérmica",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "COP específico de bomba de calor geotérmica — mínimo 4.0"
     },
     {
       "_group": "Equipamentos de Climatização",
@@ -124,14 +207,35 @@
     },
     {
       "_group": "Equipamentos de Climatização",
+      "field": "hvac.solarCollectorArea",
+      "label": "Área de coletores solares",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área de coletores solares térmicos instalados para AQS"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
       "field": "hvac.hotWaterStorageTemp",
       "label": "Temperatura de armazenamento de AQS",
       "type": "number",
-      "unit": "\u00b0C",
+      "unit": "°C",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 60 },
-      "description": "Temperatura de armazenamento de água quente sanitária — mínimo 60 \u00b0C para prevenção de Legionella"
+      "description": "Temperatura de armazenamento de água quente sanitária — mínimo 60 °C para prevenção de Legionella"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.hotWaterDistributionTemp",
+      "label": "Temperatura de distribuição de AQS",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 55 },
+      "description": "Temperatura de água quente na rede de distribuição — mínimo 50 °C para prevenção de Legionella"
     },
     {
       "_group": "Equipamentos de Climatização",
@@ -141,6 +245,65 @@
       "sources": ["form"],
       "required": false,
       "description": "GWP do fluido frigorigéneo utilizado — restrições conforme Regulamento F-Gas (UE) 517/2014"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.newEquipmentGWP",
+      "label": "GWP de novo equipamento",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "GWP do refrigerante de equipamento novo — máximo 750 desde 2025 (F-Gas)"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.refrigerantCO2eq",
+      "label": "Carga de refrigerante (tCO₂eq)",
+      "type": "number",
+      "unit": "tCO₂eq",
+      "sources": ["form"],
+      "required": false,
+      "description": "Carga total de refrigerante em toneladas de CO₂ equivalente para determinação de verificações de fugas"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.boilerPower",
+      "label": "Potência da caldeira",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência nominal da caldeira de aquecimento (se aplicável)"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.acPower",
+      "label": "Potência do sistema de AC",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência nominal do sistema de ar condicionado para determinação de inspeções obrigatórias"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.oversizingPercent",
+      "label": "Sobredimensionamento do sistema",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de sobredimensionamento do sistema AVAC relativamente às cargas térmicas calculadas"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.equipmentNoiseRating",
+      "label": "Nível de ruído dos equipamentos (NR)",
+      "type": "number",
+      "unit": "NR",
+      "sources": ["form"],
+      "required": false,
+      "description": "Nível de ruído do equipamento AVAC em NR (Noise Rating) conforme ISO 3741/BS 8233"
     },
 
     {
@@ -162,7 +325,8 @@
         { "value": "natural", "label": "Natural" },
         { "value": "mechanical_exhaust", "label": "Mecânica por extração" },
         { "value": "mechanical_supply", "label": "Mecânica por insuflação" },
-        { "value": "balanced", "label": "Equilibrada (insuflação + extração)" }
+        { "value": "balanced", "label": "Equilibrada (insuflação + extração)" },
+        { "value": "mixed", "label": "Mista (natural + mecânica)" }
       ],
       "sources": ["form"],
       "required": false,
@@ -173,10 +337,20 @@
       "field": "hvac.freshAirFlow",
       "label": "Caudal de ar novo",
       "type": "number",
-      "unit": "m\u00b3/h",
+      "unit": "m³/h",
       "sources": ["form"],
       "required": false,
-      "description": "Caudal mínimo de ar novo conforme Portaria 353-A/2013 (por pessoa e por m\u00b2)"
+      "description": "Caudal mínimo de ar novo conforme Portaria 353-A/2013 (por pessoa e por m²)"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.freshAirPercentage",
+      "label": "Percentagem de ar novo",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem mínima de ar novo no caudal total de insuflação"
     },
     {
       "_group": "Ventilação e Qualidade do Ar",
@@ -190,6 +364,16 @@
     },
     {
       "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.kitchenExtractionFlow",
+      "label": "Caudal de extração da cozinha",
+      "type": "number",
+      "unit": "m³/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de extração na cozinha — mínimo 60 m³/h (NP 1037-1 residencial)"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
       "field": "hvac.hasBathroomExtraction",
       "label": "Extração nas instalações sanitárias",
       "type": "boolean",
@@ -200,13 +384,32 @@
     },
     {
       "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.bathroomExtractionFlow",
+      "label": "Caudal de extração das IS",
+      "type": "number",
+      "unit": "m³/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de extração das instalações sanitárias — mínimo 45 m³/h (NP 1037-1)"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasAutoRegulatingGrilles",
+      "label": "Grelhas auto-reguláveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem grelhas auto-reguláveis de admissão de ar nos compartimentos principais (NP 1037-1)"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
       "field": "hvac.heatRecoveryEfficiency",
       "label": "Eficiência do recuperador de calor",
       "type": "number",
       "unit": "%",
       "sources": ["form"],
       "required": false,
-      "description": "Eficiência do recuperador de calor ar-ar — obrigatório para caudais > 10 000 m\u00b3/h conforme RECS"
+      "description": "Eficiência do recuperador de calor ar-ar — obrigatório para caudais > 10 000 m³/h conforme RECS"
     },
     {
       "_group": "Ventilação e Qualidade do Ar",
@@ -217,16 +420,142 @@
       "required": false,
       "description": "Classe de filtração dos filtros de ar na UTA (ex.: F7, M5) conforme EN ISO 16890"
     },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasReturnAirFilter",
+      "label": "Filtro no retorno de ar",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe filtro no retorno de ar para proteção do recuperador e equipamentos"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasOutdoorAirDamper",
+      "label": "Registo de ar exterior motorizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe registo motorizado na admissão de ar exterior com fecho automático à paragem"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasDCV",
+      "label": "Ventilação controlada por demanda (DCV)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema ajusta o caudal de ar novo em função da ocupação real (sondas CO₂)"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasFreeCooling",
+      "label": "Free-cooling / arrefecimento gratuito",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema permite arrefecimento gratuito quando a temperatura exterior o permite"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasNightPurge",
+      "label": "Ventilação noturna (night purge)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema permite ventilação noturna para pré-arrefecimento da massa térmica"
+    },
+
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.officeAirFlowPerPerson",
+      "label": "Caudal ar novo — escritórios",
+      "type": "number",
+      "unit": "m³/(h.pessoa)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de ar novo por pessoa em escritórios — mínimo 35 m³/(h.pessoa) (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.retailAirFlowPerPerson",
+      "label": "Caudal ar novo — comércio",
+      "type": "number",
+      "unit": "m³/(h.pessoa)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de ar novo por pessoa em espaços comerciais — mínimo 30 m³/(h.pessoa)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.restaurantAirFlowPerPerson",
+      "label": "Caudal ar novo — restauração",
+      "type": "number",
+      "unit": "m³/(h.pessoa)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de ar novo por pessoa em restauração — mínimo 50 m³/(h.pessoa)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.classroomAirFlowPerPerson",
+      "label": "Caudal ar novo — salas de aula",
+      "type": "number",
+      "unit": "m³/(h.pessoa)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de ar novo por pessoa em salas de aula — mínimo 30 m³/(h.pessoa)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.hospitalAirFlowPerPerson",
+      "label": "Caudal ar novo — hospitais",
+      "type": "number",
+      "unit": "m³/(h.pessoa)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de ar novo por pessoa em hospitais — mínimo 50 m³/(h.pessoa)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.parkingExtractionRate",
+      "label": "Caudal extração — estacionamento",
+      "type": "number",
+      "unit": "m³/(h.veículo)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de extração por lugar de estacionamento — mínimo 300 m³/(h.veículo) (SCIE / EN 13779)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.livingRoomSupplyFlow",
+      "label": "Caudal admissão — sala de estar",
+      "type": "number",
+      "unit": "m³/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de admissão de ar na sala de estar residencial (NP 1037-1)"
+    },
+    {
+      "_group": "Caudais por Tipo de Espaço",
+      "field": "hvac.laboratoryAirChanges",
+      "label": "Renovações de ar — laboratório",
+      "type": "number",
+      "unit": "h⁻¹",
+      "sources": ["form"],
+      "required": false,
+      "description": "Taxa de renovação de ar em laboratórios — mínimo 6-12 h⁻¹ conforme tipo de risco"
+    },
 
     {
       "_group": "Condutas e Distribuição",
       "field": "hvac.ductDeltaT",
       "label": "Diferença de temperatura nas condutas",
       "type": "number",
-      "unit": "\u00b0C",
+      "unit": "°C",
       "sources": ["form"],
       "required": false,
-      "description": "Diferença de temperatura admissível entre o interior da conduta e o ar ambiente para dimensionamento do isolamento"
+      "description": "Diferença de temperatura entre o interior da conduta e o ar ambiente para dimensionamento do isolamento"
     },
     {
       "_group": "Condutas e Distribuição",
@@ -237,6 +566,36 @@
       "sources": ["form"],
       "required": false,
       "description": "Espessura do isolamento térmico das condutas de AVAC conforme RECS"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.ductInsulThicknessLow",
+      "label": "Isolamento condutas (Δt < 20°C)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Espessura de isolamento para condutas com Δt < 20°C — mínimo 25 mm"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.ductInsulThicknessMed",
+      "label": "Isolamento condutas (Δt 20-40°C)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Espessura de isolamento para condutas com Δt 20-40°C — mínimo 40 mm"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.ductInsulThicknessHigh",
+      "label": "Isolamento condutas (Δt > 40°C)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Espessura de isolamento para condutas com Δt > 40°C — mínimo 50 mm"
     },
     {
       "_group": "Condutas e Distribuição",
@@ -254,38 +613,172 @@
       "defaults": { "_default": "B" },
       "description": "Classe de estanquidade das condutas conforme EN 1507 / EN 12237"
     },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.mainDuctVelocity",
+      "label": "Velocidade nas condutas principais",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "description": "Velocidade do ar nas condutas principais — máximo recomendado 8 m/s"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.branchDuctVelocity",
+      "label": "Velocidade nos ramais",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "description": "Velocidade do ar nos ramais de condutas — máximo recomendado 5 m/s"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.grilleVelocity",
+      "label": "Velocidade nas grelhas",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "description": "Velocidade frontal do ar nas grelhas — máximo recomendado 3 m/s"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.hasDuctCleaningAccess",
+      "label": "Portas de acesso para limpeza de condutas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as condutas possuem portas de acesso para limpeza e inspeção"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.insulationFireClass",
+      "label": "Classe de reação ao fogo do isolamento",
+      "type": "select",
+      "options": [
+        { "value": "A1", "label": "A1 — Incombustível" },
+        { "value": "A2", "label": "A2 — Quase incombustível" },
+        { "value": "B", "label": "B — Muito pouco combustível" },
+        { "value": "C", "label": "C — Pouco combustível" },
+        { "value": "D", "label": "D — Combustível" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Classe de reação ao fogo do isolamento das condutas conforme EN 13501-1"
+    },
 
     {
       "_group": "Qualidade do Ar Interior",
       "field": "hvac.hasCO2Monitoring",
-      "label": "Monitorização de CO\u2082",
+      "label": "Monitorização de CO₂",
       "type": "boolean",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": false },
-      "description": "Indica se existe sistema de monitorização contínua de CO\u2082 no edifício"
+      "description": "Indica se existe sistema de monitorização contínua de CO₂ no edifício"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.hasAirQualityControl",
+      "label": "Controlo de qualidade do ar interior",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de controlo e monitorização da QAI (CO₂, PM, COV)"
     },
     {
       "_group": "Qualidade do Ar Interior",
       "field": "hvac.co2Level",
-      "label": "Nível de CO\u2082",
+      "label": "Nível de CO₂",
       "type": "number",
       "unit": "ppm",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 1250 },
-      "description": "Concentração máxima de CO\u2082 interior — limiar de proteção 1250 ppm (Portaria 353-A/2013)"
+      "description": "Concentração máxima de CO₂ interior — limiar de proteção 1250 ppm (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.coLevel",
+      "label": "Nível de CO (monóxido de carbono)",
+      "type": "number",
+      "unit": "mg/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Concentração de monóxido de carbono interior — limite 10 mg/m³ (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.formaldehydeLevel",
+      "label": "Nível de formaldeído",
+      "type": "number",
+      "unit": "µg/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Concentração de formaldeído interior — limite 100 µg/m³ (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.tvocLevel",
+      "label": "Nível de COV totais",
+      "type": "number",
+      "unit": "µg/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Concentração de compostos orgânicos voláteis totais — limite 600 µg/m³ (Portaria 353-A/2013)"
     },
     {
       "_group": "Qualidade do Ar Interior",
       "field": "hvac.pm25Level",
       "label": "Nível de PM2,5",
       "type": "number",
-      "unit": "\u00b5g/m\u00b3",
+      "unit": "µg/m³",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 25 },
-      "description": "Concentração máxima de partículas finas PM2,5 — limiar de proteção 25 \u00b5g/m\u00b3"
+      "description": "Concentração de partículas finas PM2,5 — limiar de proteção 25 µg/m³"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.pm10Level",
+      "label": "Nível de PM10",
+      "type": "number",
+      "unit": "µg/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Concentração de partículas PM10 — limiar de proteção 50 µg/m³ (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.ozoneLevel",
+      "label": "Nível de ozono (O₃)",
+      "type": "number",
+      "unit": "µg/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Concentração de ozono interior — limite 200 µg/m³ (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.bacteriaCount",
+      "label": "Contagem de bactérias totais",
+      "type": "number",
+      "unit": "UFC/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Contagem de bactérias no ar interior — limite 500 UFC/m³ (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.fungiCount",
+      "label": "Contagem de fungos",
+      "type": "number",
+      "unit": "UFC/m³",
+      "sources": ["form"],
+      "required": false,
+      "description": "Contagem de fungos no ar interior — limite 500 UFC/m³ (Portaria 353-A/2013)"
     },
     {
       "_group": "Qualidade do Ar Interior",
@@ -313,11 +806,11 @@
       "field": "hvac.radonLevel",
       "label": "Nível de radão",
       "type": "number",
-      "unit": "Bq/m\u00b3",
+      "unit": "Bq/m³",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 300 },
-      "description": "Concentração de radão interior — limite de referência 300 Bq/m\u00b3 (DL 108/2018)"
+      "description": "Concentração de radão interior — limite de referência 300 Bq/m³ (DL 108/2018)"
     },
 
     {
@@ -325,22 +818,593 @@
       "field": "hvac.winterOperativeTemp",
       "label": "Temperatura operativa de inverno",
       "type": "number",
-      "unit": "\u00b0C",
+      "unit": "°C",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 20 },
-      "description": "Temperatura operativa interior mínima na estação de aquecimento (tipicamente 20 \u00b0C)"
+      "description": "Temperatura operativa interior mínima na estação de aquecimento (tipicamente 20 °C)"
     },
     {
       "_group": "Conforto Térmico",
       "field": "hvac.summerOperativeTemp",
       "label": "Temperatura operativa de verão",
       "type": "number",
-      "unit": "\u00b0C",
+      "unit": "°C",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 25 },
-      "description": "Temperatura operativa interior máxima na estação de arrefecimento (tipicamente 25 \u00b0C)"
+      "description": "Temperatura operativa interior máxima na estação de arrefecimento (tipicamente 25 °C)"
+    },
+    {
+      "_group": "Conforto Térmico",
+      "field": "hvac.indoorAirVelocity",
+      "label": "Velocidade do ar na zona ocupada",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "description": "Velocidade do ar na zona de ocupação — máx. 0.15 m/s (inverno) e 0.25 m/s (verão)"
+    },
+    {
+      "_group": "Conforto Térmico",
+      "field": "hvac.verticalTempGradient",
+      "label": "Gradiente vertical de temperatura",
+      "type": "number",
+      "unit": "°C/m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diferença de temperatura entre 0.1 m e 1.1 m de altura — máximo 3 °C/m (EN 16798-1 Cat. II)"
+    },
+
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasPipework",
+      "label": "Existência de tubagem AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema AVAC inclui tubagens de água quente e/ou fria"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.pipeInsulationThickness",
+      "label": "Espessura de isolamento das tubagens",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Espessura do isolamento térmico das tubagens — conforme diâmetro (RECS)"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.pumpType",
+      "label": "Tipo de bomba circuladora",
+      "type": "select",
+      "options": [
+        { "value": "fixed-speed", "label": "Velocidade fixa" },
+        { "value": "variable-speed", "label": "Velocidade variável (VFD)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de bomba circuladora — velocidade variável (VFD) obrigatória para potência > 0.75 kW"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.pumpPower",
+      "label": "Potência da bomba circuladora",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência elétrica da bomba circuladora do sistema hidráulico AVAC"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasBalancingValves",
+      "label": "Válvulas de equilíbrio",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem válvulas de equilíbrio hidráulico em todos os ramais"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasExpansionVessel",
+      "label": "Vaso de expansão",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe vaso de expansão no circuito hidráulico fechado"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasWaterTreatment",
+      "label": "Tratamento de água do circuito",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe tratamento de água do circuito fechado (anticorrosivo, biocida, anticongelante)"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasPressureRelief",
+      "label": "Válvula de segurança",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe válvula de segurança (alívio de pressão) no circuito pressurizado"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasCondensateDrain",
+      "label": "Drenagem de condensados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de drenagem de condensados com sifão nas unidades de climatização"
+    },
+    {
+      "_group": "Sistema Hidráulico",
+      "field": "hvac.hasCoolingTowerTreatment",
+      "label": "Tratamento torre de arrefecimento",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe programa de tratamento de água da torre de arrefecimento (Legionella)"
+    },
+
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasFireDampers",
+      "label": "Registos corta-fogo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem registos corta-fogo nas travessias de compartimentos corta-fogo"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.ductsPassFireWalls",
+      "label": "Condutas atravessam paredes corta-fogo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem condutas que atravessam paredes ou lajes de compartimentação corta-fogo"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasSmokeExtractionSystem",
+      "label": "Sistema de desenfumagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de desenfumagem mecânica ou natural"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.requiresSmokeExtraction",
+      "label": "Desenfumagem obrigatória",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o edifício requer sistema de desenfumagem conforme SCIE"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasHVACFireShutoff",
+      "label": "Corte AVAC em caso de incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema AVAC desliga automaticamente em caso de deteção de incêndio"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasReturnAirSmokeDetector",
+      "label": "Detetor de fumo na conduta de retorno",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem detetores de fumo tipo conduta instalados na conduta de retorno de ar"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasSupplyAirSmokeDetector",
+      "label": "Detetor de fumo na conduta de insuflação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem detetores de fumo tipo conduta instalados na conduta de insuflação"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.ductFireRating",
+      "label": "Classificação de resistência ao fogo das condutas",
+      "type": "select",
+      "options": [
+        { "value": "none", "label": "Sem classificação" },
+        { "value": "EI30", "label": "EI 30" },
+        { "value": "EI60", "label": "EI 60" },
+        { "value": "EI90", "label": "EI 90" },
+        { "value": "EI120", "label": "EI 120" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Classificação de resistência ao fogo das condutas AVAC que atravessam compartimentos corta-fogo"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasFireDamperTestRecord",
+      "label": "Registo de ensaio de registos corta-fogo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe registo documentado de ensaios funcionais periódicos dos registos corta-fogo"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasKitchenSuppression",
+      "label": "Extinção automática na hotte",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a hotte da cozinha profissional possui sistema de extinção automática integrado com AVAC"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.kitchenThermalPower",
+      "label": "Potência térmica da cozinha",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência térmica total dos equipamentos de cocção na cozinha profissional"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasStairPressurization",
+      "label": "Pressurização de escadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as vias de evacuação protegidas dispõem de pressurização mecânica conforme EN 12101-6"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.pressurizationDifferential",
+      "label": "Diferencial de pressão na via pressurizada",
+      "type": "number",
+      "unit": "Pa",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diferencial de pressão medido na via de evacuação pressurizada (portas fechadas)"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasPlenumSmokeBarriers",
+      "label": "Barreiras de fumo em plenums",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem barreiras corta-fumo nos plenums de retorno alinhadas com a compartimentação"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.usesPlenumReturn",
+      "label": "Retorno de ar por plenum",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o retorno de ar utiliza o plenum (teto falso ou pavimento técnico) como conduta"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasBackdraftDampers",
+      "label": "Registos anti-refluxo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem registos anti-refluxo nos ramais de zona para prevenir propagação de fumo"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.numberOfZones",
+      "label": "Número de zonas AVAC",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número de zonas independentes servidas pelo sistema AVAC"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasSmokeControlMaintenancePlan",
+      "label": "Plano de manutenção do controlo de fumo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe plano de manutenção preventiva para os sistemas de controlo de fumo"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasAtriumSmokeControl",
+      "label": "Controlo de fumo no átrio",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o átrio dispõe de sistema de controlo de fumo conforme EN 12101-5"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "hvac.hasEmergencyPowerForSmokeControl",
+      "label": "Alimentação de emergência para controlo de fumo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os sistemas de controlo de fumo possuem alimentação elétrica de emergência"
+    },
+    {
+      "_group": "Segurança Contra Incêndio",
+      "field": "building.height",
+      "label": "Altura do edifício",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form", "ifc"],
+      "required": false,
+      "description": "Altura do edifício acima do plano de referência (determinante para categoria de risco SCIE)"
+    },
+
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasMotorThermalProtection",
+      "label": "Proteção térmica de motores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os motores AVAC possuem relé de proteção térmica dimensionado"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasMotorRCD",
+      "label": "Proteção diferencial de motores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os circuitos de motores AVAC possuem proteção diferencial (RCD Tipo A ou B)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasSoftStart",
+      "label": "Arranque suave de motores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os motores AVAC de maior potência utilizam arranque suave (soft-starter, estrela-triângulo ou VFD)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.largestMotorPower",
+      "label": "Potência do maior motor AVAC",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência do maior motor AVAC instalado (para verificação de arranque)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasVFD",
+      "label": "Variadores de frequência (VFD)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem variadores de frequência nos equipamentos AVAC"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasHarmonicFilter",
+      "label": "Filtro de harmónicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem filtros de harmónicas (passivos ou ativos) nos circuitos com VFDs"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasEMCFilter",
+      "label": "Filtro EMC nos VFDs",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os VFDs possuem filtros EMC conforme IEC 61800-3"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasShieldedMotorCable",
+      "label": "Cabo blindado VFD-motor",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a cablagem entre VFD e motor utiliza cabo blindado com ligação 360°"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasVFDCableSeparation",
+      "label": "Separação de cabos VFD/controlo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe separação adequada (≥ 300 mm) entre cabos VFD e cabos de controlo"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.machineRoomIPRating",
+      "label": "Grau IP na sala de máquinas",
+      "type": "select",
+      "options": [
+        { "value": "IP20", "label": "IP20 (sem proteção)" },
+        { "value": "IP44", "label": "IP44" },
+        { "value": "IP54", "label": "IP54" },
+        { "value": "IP55", "label": "IP55" },
+        { "value": "IP66", "label": "IP66" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Grau de proteção IP dos equipamentos e quadros elétricos na sala de máquinas AVAC"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasRCDInHumidAreas",
+      "label": "RCD em zonas húmidas AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os circuitos em zonas húmidas AVAC possuem proteção diferencial 30 mA"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasWetAreas",
+      "label": "Zonas húmidas na instalação AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem zonas húmidas na instalação AVAC (salas de máquinas, torres, condensados)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasSELVControl",
+      "label": "Tensão SELV para controlo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os circuitos de controlo AVAC utilizam tensão de segurança SELV/PELV (≤ 24V)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasDuctEarthing",
+      "label": "Ligação à terra de condutas metálicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as condutas metálicas AVAC estão ligadas ao barramento de terra equipotencial"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasMetalDucts",
+      "label": "Condutas metálicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema AVAC utiliza condutas metálicas (aço galvanizado, alumínio)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasPipeEarthing",
+      "label": "Ligação à terra de tubagens metálicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as tubagens metálicas AVAC estão ligadas ao barramento de terra equipotencial"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasMetalPipes",
+      "label": "Tubagens metálicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema AVAC utiliza tubagens metálicas (cobre, aço)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasPowerFactorCorrection",
+      "label": "Compensação do fator de potência",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe compensação do fator de potência para os circuitos AVAC"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasSPDForControls",
+      "label": "SPD para controlo AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os controladores AVAC possuem descarregadores de sobretensão (SPD Tipo 3)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasUPSForBMS",
+      "label": "UPS para BMS/GTC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os controladores BMS/GTC possuem fonte de alimentação ininterrupta (UPS)"
+    },
+    {
+      "_group": "Instalação Elétrica AVAC",
+      "field": "hvac.hasElectricalInterlocks",
+      "label": "Encravamentos elétricos AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem encravamentos elétricos (interlocks) entre componentes AVAC interdependentes"
+    },
+
+    {
+      "_group": "Eficiência Energética",
+      "field": "hvac.hasEnergyMetering",
+      "label": "Contagem de energia por subsistema",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe contagem separada de energia para os sistemas AVAC"
+    },
+    {
+      "_group": "Eficiência Energética",
+      "field": "hvac.renewableEnergyFraction",
+      "label": "Fração de energia renovável AVAC",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de energia de fontes renováveis nos sistemas AVAC"
+    },
+    {
+      "_group": "Eficiência Energética",
+      "field": "hvac.hasEnergyAudit",
+      "label": "Auditoria energética",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada auditoria energética conforme DL 68-A/2015 (SGCIE)"
+    },
+    {
+      "_group": "Eficiência Energética",
+      "field": "hvac.hasZoning",
+      "label": "Zonamento térmico",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema AVAC permite controlo independente por zona térmica"
+    },
+    {
+      "_group": "Eficiência Energética",
+      "field": "hvac.hasTimerControl",
+      "label": "Controlo horário",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema AVAC possui controlo horário (horários de funcionamento, setback noturno)"
+    },
+    {
+      "_group": "Eficiência Energética",
+      "field": "hvac.hasBACS",
+      "label": "Sistema BACS",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe Building Automation and Control System conforme EN 15232"
     },
 
     {
@@ -362,6 +1426,632 @@
       "required": false,
       "defaults": { "_default": false },
       "description": "Indica se existe plano de manutenção preventiva dos sistemas AVAC conforme RECS"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasTIM",
+      "label": "Técnico TIM designado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe Técnico de Instalação e Manutenção (TIM) designado para o edifício"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasTIM3",
+      "label": "Técnico TIM III designado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe TIM de nível III designado para instalações > 250 kW"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasBoilerInspection",
+      "label": "Inspeção de caldeira válida",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a caldeira possui inspeção periódica válida conforme RECS"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasACInspection",
+      "label": "Inspeção de AC válida",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o sistema de ar condicionado possui inspeção periódica válida conforme RECS"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasLeakDetection",
+      "label": "Deteção de fugas de refrigerante",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de deteção automática de fugas de refrigerante (F-Gas)"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasRefrigerantLog",
+      "label": "Registo de refrigerante",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe livro de registo de intervenções e cargas de refrigerante (F-Gas)"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasCertifiedTechnician",
+      "label": "Técnico F-Gas certificado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os técnicos de manutenção possuem certificação F-Gas válida"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasCommissioning",
+      "label": "Comissionamento realizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizado comissionamento (Cx) dos sistemas AVAC"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasVibrationIsolation",
+      "label": "Isolamento anti-vibrático",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os equipamentos AVAC possuem apoios anti-vibráticos"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasFGasCompliance",
+      "label": "Conformidade F-Gas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe conformidade global com o Regulamento F-Gas (técnicos, registos, verificações)"
+    },
+
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.hasBoiler",
+      "label": "Caldeira instalada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe caldeira na instalação AVAC"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.boilerSeasonalEfficiency",
+      "label": "Eficiência sazonal da caldeira (ηs)",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Eficiência sazonal de aquecimento da caldeira conforme EN 15502"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.boilerNOxEmissions",
+      "label": "Emissões NOx da caldeira",
+      "type": "number",
+      "unit": "mg/kWh",
+      "sources": ["form"],
+      "required": false,
+      "description": "Emissões de óxidos de azoto da caldeira"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.boilerFuelType",
+      "label": "Combustível da caldeira",
+      "type": "select",
+      "options": [
+        { "value": "gas", "label": "Gás natural" },
+        { "value": "oil", "label": "Gasóleo / Combustível líquido" },
+        { "value": "pellets", "label": "Pellets / Biomassa" },
+        { "value": "electric", "label": "Elétrica" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de combustível da caldeira"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.ventilationUnitSFP",
+      "label": "Potência específica do ventilador (SFP)",
+      "type": "number",
+      "unit": "W/(m³/h)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência específica do ventilador da unidade de ventilação conforme EU 1253/2014"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.hasHeatPump",
+      "label": "Bomba de calor instalada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe bomba de calor na instalação AVAC"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.heatPumpSCOP",
+      "label": "SCOP da bomba de calor",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Coeficiente de desempenho sazonal em aquecimento (SCOP) da bomba de calor"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.hasCoolingSystem",
+      "label": "Sistema de arrefecimento instalado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de arrefecimento (chiller, split, VRF)"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.coolingSEER",
+      "label": "SEER do sistema de arrefecimento",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Rácio de eficiência energética sazonal em arrefecimento (SEER)"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.hasCirculatorPumps",
+      "label": "Bombas circuladoras instaladas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem bombas circuladoras na instalação AVAC"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.circulatorPumpEEI",
+      "label": "Índice de eficiência energética (EEI) das bombas",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Índice de eficiência energética das bombas circuladoras conforme EU 622/2012"
+    },
+    {
+      "_group": "Ecodesign / ErP",
+      "field": "hvac.hasEnergyLabel",
+      "label": "Etiqueta energética visível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os equipamentos AVAC possuem etiqueta energética conforme regulamentação EU"
+    },
+
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.refrigerantType",
+      "label": "Tipo de refrigerante",
+      "type": "text",
+      "sources": ["form"],
+      "required": false,
+      "description": "Designação do refrigerante (ex.: R-410A, R-32, R-134a, R-744)"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.refrigerantChargeKg",
+      "label": "Carga de refrigerante",
+      "type": "number",
+      "unit": "kg",
+      "sources": ["form"],
+      "required": false,
+      "description": "Carga total de refrigerante no circuito frigorífico"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.refrigerantSafetyClass",
+      "label": "Classe de segurança do refrigerante",
+      "type": "select",
+      "options": [
+        { "value": "A1", "label": "A1 (baixa toxicidade, não inflamável)" },
+        { "value": "A2L", "label": "A2L (baixa toxicidade, levemente inflamável)" },
+        { "value": "A2", "label": "A2 (baixa toxicidade, inflamável)" },
+        { "value": "A3", "label": "A3 (baixa toxicidade, altamente inflamável)" },
+        { "value": "B1", "label": "B1 (alta toxicidade, não inflamável)" },
+        { "value": "B2L", "label": "B2L (alta toxicidade, levemente inflamável)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Classe de segurança do refrigerante conforme EN 378/ISO 817"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.refrigerantGWP",
+      "label": "GWP do refrigerante",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potencial de aquecimento global (GWP) do refrigerante"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.hasRefrigerantChargeCheck",
+      "label": "Verificação de carga vs. limite",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi verificado que a carga de refrigerante está dentro do limite prático (PL) do espaço"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.hasMachineryRoom",
+      "label": "Sala de máquinas de refrigeração",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sala de máquinas dedicada para os equipamentos de refrigeração"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.machineryRoomCompliance",
+      "label": "Sala de máquinas conforme EN 378",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a sala de máquinas cumpre todos os requisitos da EN 378-3"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.hasRefrigerantDetection",
+      "label": "Deteção de fugas de refrigerante",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de deteção de fugas de refrigerante conforme EN 378-3"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.hasRefrigerantReliefValve",
+      "label": "Válvula de alívio no circuito frigorífico",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o circuito frigorífico possui válvulas de alívio de pressão conforme EN 378-2"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.hasRefrigerantPipingInOccupied",
+      "label": "Tubagem de refrigerante em espaço ocupado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe tubagem de refrigerante a atravessar espaços ocupados"
+    },
+    {
+      "_group": "Segurança de Refrigeração (EN 378)",
+      "field": "hvac.hasRefrigerantPipingProtection",
+      "label": "Proteção de tubagem em espaço ocupado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a tubagem de refrigerante em espaços ocupados tem proteção mecânica e sinalização"
+    },
+
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.hasExpansionVessel",
+      "label": "Vaso de expansão instalado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe vaso de expansão na instalação AVAC"
+    },
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.hasExpansionVesselCE",
+      "label": "Vaso de expansão com marcação CE",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os vasos de expansão possuem marcação CE conforme PED"
+    },
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.hasCertifiedSafetyValves",
+      "label": "Válvulas de segurança certificadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as válvulas de segurança são certificadas PED com dimensionamento verificado"
+    },
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.maxSystemPressure",
+      "label": "Pressão máxima do sistema",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "required": false,
+      "description": "Pressão máxima de serviço (PS) da instalação AVAC"
+    },
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.hasPressureEquipmentInspection",
+      "label": "Inspeção periódica de equipamentos sob pressão",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os equipamentos sob pressão foram inspecionados conforme DL 90/2010"
+    },
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.hasPipingClassification",
+      "label": "Classificação PED de tubagens",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as tubagens AVAC sob pressão foram classificadas conforme PED"
+    },
+    {
+      "_group": "Equipamentos sob Pressão (PED)",
+      "field": "hvac.hasPressureEquipmentDossier",
+      "label": "Dossiê técnico de equipamentos sob pressão",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe dossiê técnico completo para os equipamentos sob pressão"
+    },
+
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.hasExternalEquipment",
+      "label": "Equipamentos AVAC exteriores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem equipamentos AVAC instalados no exterior (rooftop, condensadores, chillers)"
+    },
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.externalEquipmentNoiseDayDb",
+      "label": "Ruído exterior diurno",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Nível de ruído LAeq dos equipamentos AVAC exteriores no período diurno"
+    },
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.externalEquipmentNoiseNightDb",
+      "label": "Ruído exterior noturno",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Nível de ruído LAeq dos equipamentos AVAC exteriores no período noturno"
+    },
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.noiseEmergenceDb",
+      "label": "Emergência sonora",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diferença entre LAeq com e sem funcionamento dos equipamentos AVAC"
+    },
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.hasDuctBreakoutControl",
+      "label": "Controlo de breakout de condutas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem medidas de controlo de ruído de breakout das condutas AVAC"
+    },
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.hasAntiVibrationMounts",
+      "label": "Apoios anti-vibráticos instalados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os equipamentos AVAC rotativos possuem apoios anti-vibráteis e bases inerciais"
+    },
+    {
+      "_group": "Acústica AVAC",
+      "field": "hvac.backgroundNoiseOfficeDb",
+      "label": "Ruído de fundo AVAC em escritórios",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "required": false,
+      "description": "Nível de ruído de fundo gerado pelo sistema AVAC em escritórios/espaços comerciais"
+    },
+
+    {
+      "_group": "Manutenção Obrigatória (Portaria 349-D)",
+      "field": "hvac.hasTIM",
+      "label": "Técnico de Instalação e Manutenção (TIM)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a instalação é mantida por um TIM qualificado conforme Portaria 349-D"
+    },
+    {
+      "_group": "Manutenção Obrigatória (Portaria 349-D)",
+      "field": "hvac.hasDocumentedMaintenancePlan",
+      "label": "Plano de manutenção preventiva documentado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe PMP documentado conforme Portaria 349-D"
+    },
+    {
+      "_group": "Manutenção Obrigatória (Portaria 349-D)",
+      "field": "hvac.filterReplacementCompliant",
+      "label": "Substituição de filtros conforme",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os filtros são substituídos com a periodicidade exigida pela Portaria 349-D"
+    },
+    {
+      "_group": "Manutenção Obrigatória (Portaria 349-D)",
+      "field": "hvac.lastInspectionDate",
+      "label": "Data da última inspeção periódica",
+      "type": "text",
+      "sources": ["form"],
+      "required": false,
+      "description": "Data da última inspeção periódica do sistema AVAC por PQ registado na ADENE"
+    },
+    {
+      "_group": "Manutenção Obrigatória (Portaria 349-D)",
+      "field": "hvac.hasMaintenanceLog",
+      "label": "Livro de registo de manutenção",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe livro de registo/ocorrências de manutenção AVAC"
+    },
+    {
+      "_group": "Manutenção Obrigatória (Portaria 349-D)",
+      "field": "hvac.hasEfficiencyMonitoring",
+      "label": "Monitorização de eficiência operacional",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe monitorização periódica do COP/EER real dos equipamentos AVAC"
+    },
+
+    {
+      "_group": "ATEX / Atmosferas Explosivas",
+      "field": "hvac.hasGasBoiler",
+      "label": "Caldeira a gás instalada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe caldeira a gás natural ou GPL na instalação"
+    },
+    {
+      "_group": "ATEX / Atmosferas Explosivas",
+      "field": "hvac.hasATEXClassification",
+      "label": "Classificação de zona ATEX",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada classificação de zonas ATEX para a casa de caldeiras/sala de geradores"
+    },
+    {
+      "_group": "ATEX / Atmosferas Explosivas",
+      "field": "hvac.hasATEXCertifiedEquipment",
+      "label": "Equipamentos certificados ATEX",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os equipamentos elétricos em zonas classificadas possuem certificação ATEX"
+    },
+    {
+      "_group": "ATEX / Atmosferas Explosivas",
+      "field": "hvac.hasBoilerRoomVentilation",
+      "label": "Ventilação da casa de caldeiras",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a casa de caldeiras possui ventilação adequada conforme EN 60079-10-1"
+    },
+    {
+      "_group": "ATEX / Atmosferas Explosivas",
+      "field": "hvac.hasGasDetectionSystem",
+      "label": "Sistema de deteção de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de deteção de gás combustível com alarme e corte automático"
+    },
+
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hasLegionellaRiskAssessment",
+      "label": "Avaliação de risco de Legionella",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada avaliação de risco de Legionella conforme DGS"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hasHotWaterSystem",
+      "label": "Sistema de AQS instalado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sistema de água quente sanitária na instalação"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hotWaterStorageTemp",
+      "label": "Temperatura de armazenamento AQS",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "required": false,
+      "description": "Temperatura da água no depósito de armazenamento de AQS"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hotWaterReturnTemp",
+      "label": "Temperatura de retorno da recirculação AQS",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "required": false,
+      "description": "Temperatura da água no ponto de retorno da recirculação de AQS"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hasLegionellaSamplingProgram",
+      "label": "Programa de amostragem de Legionella",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe programa de amostragem microbiológica periódica para Legionella"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hasWaterTreatmentPlan",
+      "label": "Plano de tratamento de água",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe plano de tratamento de água documentado com protocolo de desinfeção"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hasTemperatureMonitoringProgram",
+      "label": "Programa de monitorização de temperaturas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe programa de monitorização periódica de temperaturas na rede de AQS"
+    },
+    {
+      "_group": "Prevenção de Legionella (DGS)",
+      "field": "hvac.hasDeadLegsEliminated",
+      "label": "Troços mortos eliminados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os troços mortos (dead legs) na rede de água foram identificados e eliminados"
     }
   ]
 }

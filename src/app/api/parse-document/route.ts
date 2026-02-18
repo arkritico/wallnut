@@ -1,22 +1,25 @@
 import { NextResponse } from "next/server";
+import { withApiHandler } from "@/lib/api-error-handler";
+import { createLogger } from "@/lib/logger";
 
-const MAX_DOCUMENT_LENGTH = 50_000; // 50 KB of text
+const log = createLogger("parse-document");
+
+const MAX_DOCUMENT_LENGTH = 100_000; // 100 KB of text (supports chunked PDFs)
 const MAX_PROMPT_LENGTH = 4_000;
 
-export async function POST(request: Request) {
+export const POST = withApiHandler("parse-document", async (request) => {
+  let body: unknown;
   try {
-    let body: unknown;
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
-    }
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
+  }
 
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Corpo do pedido inválido." }, { status: 400 });
     }
 
-    const { documentText, prompt } = body as Record<string, unknown>;
+    const { documentText, prompt, pageRange, totalPages } = body as Record<string, unknown>;
 
     if (!documentText || typeof documentText !== "string") {
       return NextResponse.json({ error: "Campo 'documentText' é obrigatório." }, { status: 400 });
@@ -25,6 +28,11 @@ export async function POST(request: Request) {
     // Bound inputs to prevent token abuse
     const safeDocText = documentText.slice(0, MAX_DOCUMENT_LENGTH);
     const safePrompt = typeof prompt === "string" ? prompt.slice(0, MAX_PROMPT_LENGTH) : undefined;
+
+    // Chunk metadata (from pdf-splitter)
+    const chunkInfo = typeof pageRange === "string" && typeof totalPages === "number"
+      ? `\n\n[NOTA: Este texto corresponde às páginas ${pageRange} de ${totalPages} páginas totais do documento.]`
+      : "";
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -47,7 +55,7 @@ export async function POST(request: Request) {
         messages: [
           {
             role: "user",
-            content: safePrompt || buildDefaultPrompt(safeDocText),
+            content: (safePrompt || buildDefaultPrompt(safeDocText)) + chunkInfo,
           },
         ],
       }),
@@ -55,7 +63,7 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Anthropic API error [${response.status}]:`, errorText.slice(0, 500));
+      log.warn(`Anthropic API ${response.status}`, { body: errorText.slice(0, 500) });
       // Fallback to regex-based extraction
       const fallback = extractWithRegex(safeDocText);
       return NextResponse.json(fallback);
@@ -99,14 +107,7 @@ export async function POST(request: Request) {
     delete result.fields.warnings;
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error("Document parsing error:", error instanceof Error ? error.message : "unknown");
-    return NextResponse.json(
-      { error: "Falha ao analisar o documento. Tente novamente." },
-      { status: 500 },
-    );
-  }
-}
+}, { errorMessage: "Falha ao analisar o documento. Tente novamente." });
 
 function buildDefaultPrompt(text: string): string {
   return `Analise o seguinte documento de projeto de construção português e extraia todos os dados relevantes como JSON.

@@ -1,0 +1,83 @@
+{
+  "regulationRef": "ped-2014-68",
+  "description": "Regras PED (Diretiva de Equipamentos sob Pressão 2014/68/EU) — vasos de expansão, válvulas de segurança, inspeções periódicas",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-PED-VESSEL-01",
+      "regulationId": "ped-2014-68",
+      "article": "PED 2014/68/EU Art. 4.º — Marcação CE de Vasos de Expansão",
+      "description": "Os vasos de expansão da instalação AVAC (hidráulica e/ou frigorífica) não possuem marcação CE e declaração de conformidade conforme a Diretiva PED 2014/68/EU.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasExpansionVesselCE", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasExpansionVessel", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Marcação CE obrigatória para vasos com PS × V > 50 bar.L",
+      "remediation": "Verificar que todos os vasos de expansão possuem: (1) Marcação CE com número do Organismo Notificado (para categoria ≥ II). (2) Declaração de conformidade EU. (3) Placa de identificação com: fabricante, PS (pressão máxima), TS (temperatura máxima/mínima), volume, ano de fabrico, número de série. (4) Manual de instruções. Para vasos de categoria I (PS × V ≤ 200 bar.L): autocertificação do fabricante. Para categoria ≥ II: intervenção de Organismo Notificado obrigatória.",
+      "enabled": true,
+      "tags": ["PED", "vaso de expansão", "marcação CE", "pressão"]
+    },
+    {
+      "id": "HVAC-PED-SAFETY-VALVE-01",
+      "regulationId": "ped-2014-68",
+      "article": "PED 2014/68/EU + DL 90/2010 — Válvulas de Segurança Certificadas",
+      "description": "As válvulas de segurança da instalação AVAC não possuem certificação conforme PED e não foram dimensionadas para o caudal de descarga requerido.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCertifiedSafetyValves", "operator": "not_exists", "value": null },
+        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 0.5 }
+      ],
+      "requiredValue": "Válvulas de segurança certificadas PED com dimensionamento verificado",
+      "remediation": "Garantir que todas as válvulas de segurança AVAC cumprem PED: (1) Certificação: válvulas de segurança para equipamentos de categoria ≥ II devem ser certificadas por Organismo Notificado. (2) Dimensionamento: caudal de descarga ≥ potência da fonte de calor/pressão (caldeira, compressor). (3) Pressão de disparo: ≤ PS do equipamento protegido. (4) Descarga: canalizada para local seguro, sem redução de secção, sem válvula de seccionamento a montante. (5) Ensaio: verificação anual de funcionamento (elevação manual ou teste com pressão).",
+      "enabled": true,
+      "tags": ["PED", "válvula segurança", "certificação", "pressão"]
+    },
+    {
+      "id": "HVAC-PED-INSPECTION-01",
+      "regulationId": "ped-2014-68",
+      "article": "DL 90/2010 — Inspeção Periódica de Equipamentos sob Pressão",
+      "description": "Os equipamentos sob pressão da instalação AVAC (vasos de expansão, depósitos de inércia, reservatórios de AQS) não foram submetidos a inspeção periódica conforme DL 90/2010.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasPressureEquipmentInspection", "operator": "not_exists", "value": null },
+        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 0.5 }
+      ],
+      "requiredValue": "Inspeção periódica obrigatória conforme DL 90/2010 (intervalos conforme categoria)",
+      "remediation": "Implementar programa de inspeções periódicas conforme DL 90/2010: (1) Inspeção visual externa: anual para categoria ≥ III, bianual para categoria II. (2) Inspeção interna: cada 4 anos para categoria ≥ III (se acessível), substituída por ensaio não destrutivo (END) quando inacessível. (3) Prova hidráulica: cada 8 anos para categoria ≥ III (a 1.43× PS para água, 1.25× PS para vapor). (4) Registo: manter livro de registo do equipamento com datas, resultados e entidade inspetora. (5) Entidade: inspeções por Organismo de Inspeção acreditado pelo IPAC.",
+      "enabled": true,
+      "tags": ["PED", "inspeção", "DL 90/2010", "prova hidráulica", "periódica"]
+    },
+    {
+      "id": "HVAC-PED-PIPE-01",
+      "regulationId": "ped-2014-68",
+      "article": "PED 2014/68/EU Anexo II — Classificação de Tubagens sob Pressão AVAC",
+      "description": "As tubagens da instalação AVAC que operam a pressão ≥ 0.5 bar não foram classificadas conforme PED e não possuem documentação de conformidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasPipingClassification", "operator": "not_exists", "value": null },
+        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 3 }
+      ],
+      "requiredValue": "Classificação PED de tubagens com PS > 0.5 bar e DN > 25 mm",
+      "remediation": "Classificar tubagens AVAC conforme PED Anexo II: (1) Grupo de fluidos: Grupo 2 (água, glicol) para a maioria das instalações AVAC hidráulicas; Grupo 1 para circuitos frigoríficos (refrigerante). (2) Categoria: determinada pelo diagrama PS × DN (tipicamente categoria I ou II para instalações AVAC correntes). (3) Documentação: dossiê técnico com cálculo de espessuras, certificados de materiais, qualificações de soldadores (conforme EN ISO 9606-1 para aço, EN ISO 13585 para cobre), relatório de ensaios não destrutivos. (4) Para tubagens de categoria I: módulo A (controlo interno da produção).",
+      "enabled": true,
+      "tags": ["PED", "tubagem", "classificação", "pressão", "soldadura"]
+    },
+    {
+      "id": "HVAC-PED-DOCUMENTATION-01",
+      "regulationId": "ped-2014-68",
+      "article": "PED 2014/68/EU Art. 14.º — Dossiê Técnico de Equipamentos sob Pressão",
+      "description": "Não existe dossiê técnico completo para os equipamentos sob pressão da instalação AVAC, conforme exigido pela PED e DL 90/2010.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasPressureEquipmentDossier", "operator": "not_exists", "value": null },
+        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 0.5 }
+      ],
+      "requiredValue": "Dossiê técnico completo disponível para todos os equipamentos sob pressão",
+      "remediation": "Constituir dossiê técnico para cada equipamento sob pressão: (1) Declaração de conformidade CE. (2) Desenhos de fabrico e de conjunto. (3) Cálculos de dimensionamento (pressão, temperatura, espessuras). (4) Certificados de materiais (normas EN 10204 tipo 3.1/3.2). (5) Procedimentos e registos de soldadura. (6) Relatórios de ensaios não destrutivos (END). (7) Relatório de prova hidráulica de fábrica. (8) Manual de instruções (operação, manutenção, limites de utilização). (9) Registos de inspeções periódicas. Conservar por 10 anos após abate.",
+      "enabled": true,
+      "tags": ["PED", "dossiê técnico", "documentação", "conformidade"]
+    }
+  ]
+}

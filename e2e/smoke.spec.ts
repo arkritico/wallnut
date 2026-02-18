@@ -4,30 +4,31 @@ test.describe("Wallnut Smoke Tests", () => {
   test("landing page loads with correct title", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Wallnut/);
-    await expect(page.locator("h1")).toContainText("Wallnut");
+    // Hero headline is "Do projeto à obra." (PT) or "From project to site." (EN)
+    await expect(page.locator("h1")).toContainText(/Do projeto à obra|From project to site/);
   });
 
   test("landing page shows regulation badges", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("RGEU")).toBeVisible();
+    await expect(page.getByText("RGEU", { exact: true })).toBeVisible();
     await expect(page.getByText("SCIE + NT01-NT22")).toBeVisible();
-    await expect(page.getByText("REH")).toBeVisible();
+    await expect(page.getByText("REH", { exact: true })).toBeVisible();
   });
 
   test("can start new project wizard", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /Iniciar Análise|Start Analysis/ }).click();
-    // Should navigate to wizard
-    await expect(page.getByText(/Novo Projeto|New Project/)).toBeVisible();
+    // Wizard start step shows "Como deseja começar?" / "How would you like to start?"
+    await expect(page.getByText(/Como deseja começar|How would you like to start/)).toBeVisible();
   });
 
   test("can toggle language", async ({ page }) => {
     await page.goto("/");
-    // Default is Portuguese
-    await expect(page.getByText("Regulamentação Portuguesa")).toBeVisible();
-    // Switch to English
-    await page.getByRole("button", { name: "EN" }).click();
-    await expect(page.getByText("Portuguese Building Regulations")).toBeVisible();
+    // Default is Portuguese — hero text
+    await expect(page.getByText("Do projeto à obra.")).toBeVisible();
+    // Switch to English — click the language toggle button specifically
+    await page.locator("nav button", { hasText: "EN" }).click();
+    await expect(page.getByText("From project to site.")).toBeVisible();
   });
 
   test("can toggle dark mode", async ({ page }) => {
@@ -38,17 +39,14 @@ test.describe("Wallnut Smoke Tests", () => {
     await expect(page.locator("html")).toHaveClass(/dark/);
   });
 
-  test("wizard flow creates project and navigates to form", async ({ page }) => {
+  test("wizard shows template and blank options", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /Iniciar Análise|Start Analysis/ }).click();
 
-    // Fill wizard basics - click through to template step if there is one
-    // The wizard may have multiple steps, try to find and interact with form elements
-    // Fill project name if visible
-    const nameInput = page.locator("input[placeholder*='Moradia'], input[placeholder*='nome']").first();
-    if (await nameInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await nameInput.fill("Teste E2E - Moradia T3");
-    }
+    // Should show start options
+    await expect(page.getByText(/Usar Modelo|Use Template/)).toBeVisible();
+    await expect(page.getByText(/Começar do Zero|Start from Scratch/)).toBeVisible();
+    await expect(page.getByText(/Carregar Ficheiros|Upload Files/)).toBeVisible();
   });
 
   test("API analyze endpoint returns valid response", async ({ request }) => {
@@ -56,6 +54,7 @@ test.describe("Wallnut Smoke Tests", () => {
       data: {
         name: "E2E Test Project",
         buildingType: "residential",
+        isRehabilitation: false,
         location: {
           municipality: "Lisboa",
           district: "Lisboa",
@@ -68,7 +67,12 @@ test.describe("Wallnut Smoke Tests", () => {
         usableFloorArea: 120,
         numberOfFloors: 2,
         buildingHeight: 7,
-        isRehabilitation: false,
+        architecture: {}, structural: {}, fireSafety: {},
+        avac: {}, waterDrainage: {}, gas: {}, electrical: {},
+        telecommunications: {}, envelope: {}, systems: {},
+        acoustic: {}, accessibility: {}, elevators: {},
+        licensing: {}, waste: {}, localRegulations: {},
+        drawingQuality: {}, projectContext: {},
       },
     });
 

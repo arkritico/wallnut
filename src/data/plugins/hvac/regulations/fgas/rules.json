@@ -1,0 +1,86 @@
+{
+  "regulationRef": "eu-517-2014-fgas",
+  "description": "Regras detalhadas do Regulamento F-Gas (EU 517/2014) — verificações, certificação, registos, rotulagem",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-FGAS-CERT-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 Art. 10.º — Técnico Certificado F-Gas",
+      "description": "Os técnicos que intervêm no sistema de refrigeração não possuem certificação F-Gas válida, conforme exigido pelo Regulamento EU 517/2014.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCertifiedTechnician", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Técnicos com certificação F-Gas válida obrigatória",
+      "remediation": "Garantir que todos os técnicos que intervêm em circuitos frigoríficos possuem certificação F-Gas válida emitida por entidade acreditada. Manter cópias dos certificados no dossier técnico do edifício. A certificação deve ser renovada conforme periodicidade definida pela entidade certificadora.",
+      "enabled": true,
+      "tags": ["F-Gas", "certificação", "técnicos", "refrigerante"]
+    },
+    {
+      "id": "HVAC-FGAS-LOG-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 Art. 6.º — Registo de Refrigerante",
+      "description": "Não existe livro de registo de intervenções e cargas de refrigerante para o equipamento AVAC, conforme exigido pelo Regulamento F-Gas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasRefrigerantLog", "operator": "not_exists", "value": null },
+        { "field": "hvac.refrigerantCO2eq", "operator": ">=", "value": 5 }
+      ],
+      "requiredValue": "Registo obrigatório para equipamentos com ≥ 5 tCO₂eq",
+      "remediation": "Criar e manter livro de registo do equipamento com: tipo e quantidade de refrigerante, datas de intervenção, resultados de verificações de fugas, quantidades adicionadas ou recuperadas, identificação dos técnicos certificados. O registo deve ser mantido durante 5 anos após o abate do equipamento. Disponibilizar à autoridade competente quando solicitado.",
+      "enabled": true,
+      "tags": ["F-Gas", "registo", "refrigerante", "rastreabilidade"]
+    },
+    {
+      "id": "HVAC-FGAS-LEAK-5T",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 Art. 4.º — Verificação Anual de Fugas (5-50 tCO₂eq)",
+      "description": "O equipamento com carga de {hvac.refrigerantCO2eq} tCO₂eq (entre 5 e 50) requer verificação anual de fugas conforme EU 517/2014.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantCO2eq", "operator": ">=", "value": 5 },
+        { "field": "hvac.refrigerantCO2eq", "operator": "<", "value": 50 },
+        { "field": "hvac.hasLeakDetection", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.refrigerantCO2eq} tCO₂eq",
+      "requiredValue": "Verificação de fugas anual (semestral sem deteção automática)",
+      "remediation": "Agendar verificação de fugas anual por técnico certificado F-Gas. A instalação de sistema de deteção automática de fugas reduz a frequência para metade (bianual). Registar resultados no livro de registo do equipamento. Em caso de fuga detetada, reparar num prazo de 14 dias e verificar novamente 30 dias após a reparação.",
+      "enabled": true,
+      "tags": ["F-Gas", "fugas", "verificação", "5-50 tCO₂eq"]
+    },
+    {
+      "id": "HVAC-FGAS-LEAK-50T",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 Art. 4.º — Verificação Semestral de Fugas (50-500 tCO₂eq)",
+      "description": "O equipamento com carga de {hvac.refrigerantCO2eq} tCO₂eq (entre 50 e 500) requer verificação semestral de fugas conforme EU 517/2014.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantCO2eq", "operator": ">=", "value": 50 },
+        { "field": "hvac.refrigerantCO2eq", "operator": "<", "value": 500 },
+        { "field": "hvac.hasLeakDetection", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.refrigerantCO2eq} tCO₂eq",
+      "requiredValue": "Verificação de fugas semestral (trimestral sem deteção automática)",
+      "remediation": "Agendar verificação de fugas semestral por técnico certificado F-Gas. Deteção automática instalada reduz frequência para anual. Para cargas desta dimensão, a deteção automática é fortemente recomendada. Considerar monitorização contínua da pressão do circuito como indicador precoce de fugas.",
+      "enabled": true,
+      "tags": ["F-Gas", "fugas", "verificação", "50-500 tCO₂eq"]
+    },
+    {
+      "id": "HVAC-FGAS-LEAK-500T",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 Art. 4.º — Verificação Trimestral de Fugas (≥ 500 tCO₂eq)",
+      "description": "O equipamento com carga ≥ 500 tCO₂eq requer verificação trimestral de fugas e deteção automática obrigatória conforme EU 517/2014.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantCO2eq", "operator": ">=", "value": 500 }
+      ],
+      "requiredValue": "Verificação trimestral + deteção automática obrigatória",
+      "remediation": "Para cargas ≥ 500 tCO₂eq: verificação trimestral por técnico certificado E deteção automática de fugas são ambas obrigatórias. Com deteção automática, a frequência de verificação reduz-se para semestral. O sistema de deteção deve ser verificado anualmente para correto funcionamento.",
+      "enabled": true,
+      "tags": ["F-Gas", "fugas", "verificação", "≥500 tCO₂eq", "deteção automática"]
+    }
+  ]
+}

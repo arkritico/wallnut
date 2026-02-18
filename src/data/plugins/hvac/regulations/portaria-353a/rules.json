@@ -1,0 +1,101 @@
+{
+  "regulationRef": "portaria-353a-2013",
+  "description": "Regras detalhadas da Portaria 353-A/2013 — QAI, poluentes, auditorias, microbiologia",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-O3-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima de Ozono",
+      "description": "A concentração de ozono interior ({hvac.ozoneLevel} µg/m³) excede o limite máximo de 200 µg/m³ estabelecido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ozoneLevel", "operator": ">", "value": 200 }
+      ],
+      "currentValueTemplate": "{hvac.ozoneLevel} µg/m³",
+      "requiredValue": "≤ 200 µg/m³ (Portaria 353-A/2013)",
+      "remediation": "Identificar fontes de ozono: fotocopiadoras, impressoras laser, purificadores de ar com geração de ozono, lâmpadas UV. Afastar equipamentos geradores de ozono das zonas de permanência. Aumentar o caudal de ventilação. Substituir purificadores de ar com ionização/ozono por alternativas com filtros HEPA.",
+      "enabled": true,
+      "tags": ["ozono", "QAI", "Portaria 353-A", "saúde"]
+    },
+    {
+      "id": "HVAC-BACT-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Contagem Microbiológica (Bactérias)",
+      "description": "A contagem de bactérias totais no ar interior ({hvac.bacteriaCount} UFC/m³) excede o limiar de proteção de 500 UFC/m³ da Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.bacteriaCount", "operator": ">", "value": 500 }
+      ],
+      "currentValueTemplate": "{hvac.bacteriaCount} UFC/m³",
+      "requiredValue": "≤ 500 UFC/m³ (Portaria 353-A/2013)",
+      "remediation": "Verificar e substituir os filtros da UTA (M5 + F7 mínimo). Desinfetar condutas e equipamentos. Verificar tabuleiros de condensados (estagnação de água). Aumentar o caudal de ar novo. Considerar lâmpadas UV-C no interior da UTA para desinfeção do ar. Realizar análise microbiológica após intervenção para confirmar conformidade.",
+      "enabled": true,
+      "tags": ["bactérias", "microbiologia", "QAI", "Portaria 353-A"]
+    },
+    {
+      "id": "HVAC-FUNGI-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Contagem Microbiológica (Fungos)",
+      "description": "A contagem de fungos no ar interior ({hvac.fungiCount} UFC/m³) excede o limiar de proteção de 500 UFC/m³ da Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.fungiCount", "operator": ">", "value": 500 }
+      ],
+      "currentValueTemplate": "{hvac.fungiCount} UFC/m³",
+      "requiredValue": "≤ 500 UFC/m³ (Portaria 353-A/2013)",
+      "remediation": "Identificar e eliminar fontes de humidade e condensação. Verificar isolamento de condutas de arrefecimento (barreira de vapor). Limpar e desinfetar condutas e equipamentos. Manter humidade relativa < 70%. Substituir filtros de ar. Verificar tabuleiros de condensados e drenagem. Em casos graves, considerar descontaminação profissional das condutas.",
+      "enabled": true,
+      "tags": ["fungos", "microbiologia", "QAI", "humidade", "Portaria 353-A"]
+    },
+    {
+      "id": "HVAC-PARK-VENT-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 / SCIE — Ventilação de Estacionamentos",
+      "description": "O estacionamento coberto não dispõe de ventilação mecânica adequada. O caudal de extração ({hvac.parkingExtractionRate} m³/(h.veículo)) é inferior ao mínimo de 300 m³/(h.veículo).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.parkingExtractionRate", "operator": "<", "value": 300 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "parking" }
+      ],
+      "currentValueTemplate": "{hvac.parkingExtractionRate} m³/(h.veículo)",
+      "requiredValue": "≥ 300 m³/(h.veículo) para estacionamentos cobertos",
+      "remediation": "Instalar ou reforçar a ventilação mecânica do estacionamento com caudal mínimo de 300 m³/(h.veículo). Instalar deteção de CO com alarme a 50 ppm e corte a 200 ppm. Prever dois níveis de ventilação (normal e reforçado). Em estacionamentos com mais de 3 pisos enterrados, considerar ventilação por impulso (jet fans).",
+      "enabled": true,
+      "tags": ["estacionamento", "ventilação", "CO", "SCIE"]
+    },
+    {
+      "id": "HVAC-FRESHAIR-PCT-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Percentagem Mínima de Ar Novo",
+      "description": "A percentagem de ar novo no caudal total de insuflação ({hvac.freshAirPercentage}%) é inferior ao mínimo de 10% exigido pela Portaria 353-A/2013 para UTAs com recirculação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.freshAirPercentage", "operator": "<", "value": 10 },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.freshAirPercentage}% ar novo",
+      "requiredValue": "≥ 10% de ar novo no caudal total (mínimo absoluto)",
+      "remediation": "Aumentar a percentagem de ar novo no caudal total de insuflação. Verificar a posição do registo de ar novo e o correto funcionamento do atuador. Em UTAs com recirculação, garantir que o registo de ar novo mantém abertura mínima de 10%. Considerar DCV (ventilação controlada por demanda) com sondas de CO₂ para otimizar a mistura.",
+      "enabled": true,
+      "tags": ["ar novo", "recirculação", "UTA", "QAI"]
+    },
+    {
+      "id": "HVAC-LAB-ACH-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Renovações de Ar em Laboratórios",
+      "description": "A taxa de renovação de ar no laboratório ({hvac.laboratoryAirChanges} h⁻¹) é inferior ao mínimo de 6 h⁻¹ para laboratórios de risco baixo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.laboratoryAirChanges", "operator": "<", "value": 6 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "laboratory" }
+      ],
+      "currentValueTemplate": "{hvac.laboratoryAirChanges} h⁻¹",
+      "requiredValue": "≥ 6 h⁻¹ (risco baixo), ≥ 10 h⁻¹ (risco médio), ≥ 15 h⁻¹ (risco elevado)",
+      "remediation": "Aumentar o caudal de ventilação para garantir no mínimo 6 renovações por hora. Para laboratórios com hottes, o caudal de extração deve ser predominante (pressão negativa). Garantir 100% ar novo (sem recirculação) em laboratórios com agentes químicos ou biológicos. Dimensionar sistema de compensação de ar para equilibrar a extração das hottes.",
+      "enabled": true,
+      "tags": ["laboratório", "renovações de ar", "hotte", "QAI"]
+    }
+  ]
+}

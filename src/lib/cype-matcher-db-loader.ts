@@ -41,6 +41,14 @@ interface ScrapedCypeItem {
   }>;
   category: string;
   url: string;
+  typology?: string;
+  variants?: Array<{
+    variantId: string;
+    parameters: Record<string, string>;
+    description?: string;
+    unit?: string;
+    unitCost: number;
+  }>;
 }
 
 interface ScrapedDataFile {
@@ -51,6 +59,7 @@ interface ScrapedDataFile {
     source: string;
     version: string;
     region?: string;
+    typologyCounts?: Record<string, number>;
   };
   items: ScrapedCypeItem[];
 }
@@ -225,7 +234,7 @@ function loadScrapedData(filePath: string): ScrapedDataFile | null {
 /**
  * Convert scraped item to CypeWorkItem format
  */
-function convertToWorkItem(item: ScrapedCypeItem): CypeWorkItem {
+function convertToWorkItems(item: ScrapedCypeItem): CypeWorkItem[] {
   // Calculate breakdown costs
   let materials = 0;
   let labor = 0;
@@ -255,12 +264,13 @@ function convertToWorkItem(item: ScrapedCypeItem): CypeWorkItem {
   // Generate search patterns
   const patterns = generatePatterns(item.description, item.category, item.code);
 
-  // Determine if it's a rehab item
-  const isRehab = item.category.toLowerCase().includes('reabilita') ||
+  // Determine if it's a rehab item — typology-based (primary) or string-based (fallback)
+  const isRehab = item.typology === 'reabilitacao' ||
+                  item.category.toLowerCase().includes('reabilita') ||
                   item.description.toLowerCase().includes('reabilita') ||
                   item.category.toLowerCase().includes('demoliç');
 
-  return {
+  const base: CypeWorkItem = {
     code: item.code,
     description: item.description,
     chapter: item.category,
@@ -275,7 +285,33 @@ function convertToWorkItem(item: ScrapedCypeItem): CypeWorkItem {
     areas,
     patterns,
     detailedBreakdown: item.breakdown || [], // Preserve full breakdown for resource aggregation
+    typology: (item.typology as CypeWorkItem['typology']) || 'obra_nova',
   };
+
+  const result: CypeWorkItem[] = [base];
+
+  // Expand variants into separate work items
+  if (item.variants && item.variants.length > 0) {
+    for (const variant of item.variants) {
+      result.push({
+        ...base,
+        code: `${item.code}_${variant.variantId}`,
+        description: variant.description || `${item.description} [${variant.variantId}]`,
+        unit: variant.unit || base.unit,
+        unitCost: variant.unitCost,
+        breakdown: { ...base.breakdown }, // Variants may override later if scraped
+        patterns: [
+          ...patterns,
+          // Add variant-specific patterns from parameter values
+          ...Object.values(variant.parameters)
+            .filter(v => v.length >= 3)
+            .map(v => new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')),
+        ],
+      });
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -287,7 +323,7 @@ export function getCypeMatcherDatabase(): CypeWorkItem[] {
 
   if (scrapedData && scrapedData.items.length > 0) {
     logger.info(`Building matcher database from ${scrapedData.items.length} scraped items`);
-    const workItems = scrapedData.items.map(convertToWorkItem);
+    const workItems = scrapedData.items.flatMap(convertToWorkItems);
 
     logger.info('Matcher database built successfully', {
       totalItems: workItems.length,

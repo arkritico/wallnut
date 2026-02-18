@@ -71,6 +71,24 @@ import gasComputed from "../../data/plugins/gas/computed-fields.json";
 import hvacPlugin from "../../data/plugins/hvac/plugin.json";
 import hvacRegistry from "../../data/plugins/hvac/regulations/registry.json";
 import hvacRecsRules from "../../data/plugins/hvac/regulations/recs/rules.json";
+import hvacPortaria353aRules from "../../data/plugins/hvac/regulations/portaria-353a/rules.json";
+import hvacFgasRules from "../../data/plugins/hvac/regulations/fgas/rules.json";
+import hvacDl306Rules from "../../data/plugins/hvac/regulations/dl-306-2007/rules.json";
+import hvacEn16798Rules from "../../data/plugins/hvac/regulations/en-16798-1/rules.json";
+import hvacNp1037Rules from "../../data/plugins/hvac/regulations/np-1037-1/rules.json";
+import hvacPortaria349bRules from "../../data/plugins/hvac/regulations/portaria-349b/rules.json";
+import hvacDl68aRules from "../../data/plugins/hvac/regulations/dl-68a-2015/rules.json";
+import hvacEn15232Rules from "../../data/plugins/hvac/regulations/en-15232/rules.json";
+import hvacBestPracticesRules from "../../data/plugins/hvac/regulations/best-practices/rules.json";
+import hvacScieRules from "../../data/plugins/hvac/regulations/scie-hvac/rules.json";
+import hvacRtiebtRules from "../../data/plugins/hvac/regulations/rtiebt-hvac/rules.json";
+import hvacEcodesignRules from "../../data/plugins/hvac/regulations/ecodesign-erp/rules.json";
+import hvacEn378Rules from "../../data/plugins/hvac/regulations/en-378/rules.json";
+import hvacPedRules from "../../data/plugins/hvac/regulations/ped/rules.json";
+import hvacAcousticRules from "../../data/plugins/hvac/regulations/acoustic-hvac/rules.json";
+import hvacPortaria349dRules from "../../data/plugins/hvac/regulations/portaria-349d/rules.json";
+import hvacAtexRules from "../../data/plugins/hvac/regulations/atex/rules.json";
+import hvacDgsLegionellaRules from "../../data/plugins/hvac/regulations/dgs-legionella/rules.json";
 import hvacTables from "../../data/plugins/hvac/lookup-tables.json";
 import hvacComputed from "../../data/plugins/hvac/computed-fields.json";
 
@@ -252,7 +270,27 @@ export function loadGasPlugin(): SpecialtyPlugin {
 }
 
 export function loadHvacPlugin(): SpecialtyPlugin {
-  return loadCached("hvac", hvacPlugin, hvacRegistry, [hvacRecsRules], hvacTables, hvacComputed);
+  return loadCached("hvac", hvacPlugin, hvacRegistry, [
+    hvacRecsRules,
+    hvacPortaria353aRules,
+    hvacFgasRules,
+    hvacDl306Rules,
+    hvacEn16798Rules,
+    hvacNp1037Rules,
+    hvacPortaria349bRules,
+    hvacDl68aRules,
+    hvacEn15232Rules,
+    hvacBestPracticesRules,
+    hvacScieRules,
+    hvacRtiebtRules,
+    hvacEcodesignRules,
+    hvacEn378Rules,
+    hvacPedRules,
+    hvacAcousticRules,
+    hvacPortaria349dRules,
+    hvacAtexRules,
+    hvacDgsLegionellaRules,
+  ], hvacTables, hvacComputed);
 }
 
 export function loadTelecomPlugin(): SpecialtyPlugin {

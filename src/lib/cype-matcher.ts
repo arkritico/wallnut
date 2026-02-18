@@ -1025,6 +1025,9 @@ export function searchCype(query: string, limit = 10): { item: CypeWorkItem; sco
       score += jaccard(queryNgrams, itemNgrams) * 30;
       if (item.patterns.some(p => p.test(query))) score += 40;
       if (item.code.toLowerCase().includes(query.toLowerCase())) score += 50;
+      // Substring match: boost when query appears directly in description or chapter
+      const lowerDesc = item.description.toLowerCase() + " " + item.chapter.toLowerCase();
+      if (lowerDesc.includes(query.toLowerCase())) score += 30;
       return { item, score };
     })
     .filter(r => r.score > 10)

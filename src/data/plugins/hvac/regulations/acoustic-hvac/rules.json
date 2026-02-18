@@ -1,0 +1,102 @@
+{
+  "regulationRef": "acoustic-hvac",
+  "description": "Regras acústicas para instalações AVAC — DL 9/2007 (RGR), EN 12102, EN 16032, critérios NC/NR",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-NOISE-EXT-DAY-01",
+      "regulationId": "acoustic-hvac",
+      "article": "DL 9/2007 (RGR) Art. 13.º — Ruído Exterior Diurno de Equipamentos AVAC",
+      "description": "O ruído emitido pelos equipamentos AVAC exteriores (chillers, condensadores, unidades rooftop) excede o critério de exposição aplicável no período diurno conforme DL 9/2007 (Regulamento Geral do Ruído).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.externalEquipmentNoiseDayDb", "operator": ">", "value": 55 },
+        { "field": "hvac.hasExternalEquipment", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.externalEquipmentNoiseDayDb} dB(A) LAeq diurno",
+      "requiredValue": "≤ 55 dB(A) LAeq diurno em zona mista, ≤ 45 dB(A) em zona sensível",
+      "remediation": "Reduzir ruído dos equipamentos AVAC exteriores: (1) Barreiras acústicas: parede ou ecrã acústico com atenuação de 10-15 dB(A), altura ≥ 0.5 m acima do equipamento. (2) Silenciadores na descarga de ar dos condensadores: atenuação de 5-10 dB(A). (3) Bases anti-vibráteis: amortecedores de mola ou neopreno para reduzir transmissão estrutural. (4) Seleção de equipamento: especificar nível de potência sonora (Lw) máximo na consulta. (5) Orientação: direcionar descarga de ar para longe dos recetores sensíveis. (6) Funcionamento noturno: considerar modo silencioso ou redução de velocidade dos ventiladores.",
+      "enabled": true,
+      "tags": ["ruído", "RGR", "DL 9/2007", "exterior", "diurno"]
+    },
+    {
+      "id": "HVAC-NOISE-EXT-NIGHT-01",
+      "regulationId": "acoustic-hvac",
+      "article": "DL 9/2007 (RGR) Art. 13.º — Ruído Exterior Noturno de Equipamentos AVAC",
+      "description": "O ruído emitido pelos equipamentos AVAC exteriores no período noturno (23h-07h) excede o critério de exposição aplicável conforme DL 9/2007, sendo particularmente penalizante a componente tonal e impulsiva.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.externalEquipmentNoiseNightDb", "operator": ">", "value": 45 },
+        { "field": "hvac.hasExternalEquipment", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.externalEquipmentNoiseNightDb} dB(A) LAeq noturno",
+      "requiredValue": "≤ 45 dB(A) LAeq noturno em zona mista, ≤ 35 dB(A) em zona sensível",
+      "remediation": "O período noturno tem limites mais restritivos (tipicamente -10 dB vs. diurno): (1) Modo noturno automático: reduzir velocidade dos ventiladores de condensação (aceitar penalização de COP). (2) Silenciadores dissipativos: com atenuação de 15-20 dB em bandas de 250-2000 Hz. (3) Clausura acústica: invólucro em chapa perfurada com lã mineral interior. (4) Verificar componente tonal (tom puro): penalização de +3 dB conforme RGR — silenciar frequência dominante. (5) Programar desligamento noturno dos equipamentos não essenciais (chillers de free-cooling em vez de compressão mecânica).",
+      "enabled": true,
+      "tags": ["ruído", "RGR", "DL 9/2007", "exterior", "noturno"]
+    },
+    {
+      "id": "HVAC-NOISE-EMERGENCE-01",
+      "regulationId": "acoustic-hvac",
+      "article": "DL 9/2007 Art. 13.º n.1b — Critério de Incomodidade (Emergência Sonora)",
+      "description": "O funcionamento dos equipamentos AVAC provoca uma emergência sonora (diferença entre LAeq com e sem funcionamento) superior ao permitido pelo RGR, independentemente do nível absoluto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.noiseEmergenceDb", "operator": ">", "value": 5 },
+        { "field": "hvac.hasExternalEquipment", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.noiseEmergenceDb} dB(A) de emergência",
+      "requiredValue": "Emergência sonora ≤ 5 dB(A) diurno, ≤ 3 dB(A) noturno",
+      "remediation": "A emergência sonora mede o incremento causado pelo equipamento acima do ruído residual. Mesmo que o nível absoluto cumpra, a emergência pode ser excessiva em zonas muito silenciosas. Soluções: (1) Reduzir a emissão na fonte (silenciadores, clausura). (2) Aumentar distância: relocalizar equipamento para posição mais afastada dos recetores. (3) Verificar: emergência ≤ 5 dB(A) diurno, ≤ 3 dB(A) noturno (correção D do DL 9/2007). (4) Se existe componente tonal: penalização de +3 dB ao D calculado.",
+      "enabled": true,
+      "tags": ["ruído", "RGR", "emergência", "incomodidade", "DL 9/2007"]
+    },
+    {
+      "id": "HVAC-NOISE-DUCT-BREAKOUT-01",
+      "regulationId": "acoustic-hvac",
+      "article": "EN 12599 / RRAE — Ruído de Breakout de Condutas AVAC",
+      "description": "As condutas AVAC em percurso por espaços sensíveis (quartos, escritórios, salas de aula) geram ruído de breakout (radiação pelas paredes da conduta) que excede os critérios de conforto acústico.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasDuctBreakoutControl", "operator": "not_exists", "value": null },
+        { "field": "hvac.mainDuctVelocity", "operator": ">", "value": 8 }
+      ],
+      "requiredValue": "Breakout controlado: condutas revestidas ou de secção circular em espaços sensíveis",
+      "remediation": "Controlar ruído de breakout das condutas: (1) Reduzir velocidade do ar: ≤ 5 m/s em condutas sobre espaços sensíveis (quartos, auditórios), ≤ 8 m/s em escritórios. (2) Condutas circulares: 10-15 dB menos breakout que retangulares de mesma secção. (3) Revestimento exterior: manta de lã mineral de 50 mm + barreira de massa (chapa ou membrana) — atenuação de 15-25 dB. (4) Condutas de gesso cartonado acústico para tetos falsos visitáveis. (5) Evitar curvas, derivações e registos junto a espaços sensíveis (geram ruído aerodinâmico regenerado).",
+      "enabled": true,
+      "tags": ["ruído", "conduta", "breakout", "velocidade ar", "atenuação"]
+    },
+    {
+      "id": "HVAC-NOISE-VIBRATION-STRUCT-01",
+      "regulationId": "acoustic-hvac",
+      "article": "RRAE (DL 96/2008) / EN 12354-5 — Transmissão de Vibrações de Equipamentos AVAC",
+      "description": "Os equipamentos AVAC (compressores, ventiladores, bombas) transmitem vibrações à estrutura do edifício, gerando ruído de percussão nos espaços adjacentes que excede os limites do RRAE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasAntiVibrationMounts", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 5 }
+      ],
+      "requiredValue": "Isolamento anti-vibrátil obrigatório para equipamentos > 5 kW (frequência natural ≤ 1/3 da frequência perturbadora)",
+      "remediation": "Implementar isolamento anti-vibrátil em todos os equipamentos AVAC rotativos: (1) Bases inerciais: bloco de betão com massa ≥ 2× massa do equipamento, apoiado em molas de aço. (2) Amortecedores de mola: deflexão estática ≥ 25 mm para compressores (garantir f₀ ≤ 3 Hz vs. perturbação a 25-50 Hz). (3) Apoios de neopreno: aceitáveis para ventiladores a > 600 rpm. (4) Juntas flexíveis: instalar em todas as ligações de tubagem e condutas ao equipamento (compensadores de dilatação flexíveis). (5) Tubagem: suportes com borracha de isolamento, nunca fixação rígida em laje sobre espaço sensível.",
+      "enabled": true,
+      "tags": ["ruído", "vibração", "RRAE", "isolamento", "estrutura"]
+    },
+    {
+      "id": "HVAC-NOISE-NC-OFFICE-01",
+      "regulationId": "acoustic-hvac",
+      "article": "ASHRAE / EN 16032 — Critério NC para Escritórios",
+      "description": "O nível de ruído de fundo gerado pelo sistema AVAC em escritórios excede o critério NC-40 (ou NR-35), comprometendo a inteligibilidade da palavra e o conforto dos ocupantes.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.backgroundNoiseOfficeDb", "operator": ">", "value": 40 },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "commercial"] }
+      ],
+      "currentValueTemplate": "{hvac.backgroundNoiseOfficeDb} dB(A)",
+      "requiredValue": "≤ NC-40 / NR-35 (35-40 dB(A)) para escritórios open plan",
+      "remediation": "Reduzir ruído AVAC em escritórios para NC-40 ou inferior: (1) Silenciadores nas condutas: silenciador dissipativo retangular com 1.2 m de comprimento — atenuação de 15-25 dB(A). (2) Difusores de baixo ruído: velocidade no pescoço ≤ 2.5 m/s. (3) Plenum acústico: caixa de distribuição com revestimento absorvente. (4) Para escritórios privados/salas de reunião: NC-35 ou inferior — considerar difusores lineares de baixa velocidade. (5) Verificar ruído regenerado: curvas, derivações, registos de regulação geram ruído que pode anular a atenuação dos silenciadores.",
+      "enabled": true,
+      "tags": ["ruído", "NC", "escritório", "conforto", "silenciador"]
+    }
+  ]
+}

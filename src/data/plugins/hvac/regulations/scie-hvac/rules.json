@@ -1,0 +1,193 @@
+{
+  "regulationRef": "scie-hvac",
+  "description": "Regras SCIE aplicáveis a instalações AVAC — RT-SCIE (Portaria 1532/2008), DL 220/2008, NT ANPC",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-SMOKE-DETECT-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 92.º / NFPA 90A — Deteção de Fumo em Condutas de Retorno",
+      "description": "O sistema AVAC não dispõe de detetores de fumo nas condutas de retorno de ar, impedindo a deteção precoce de fumo recirculado e o acionamento automático dos registos corta-fogo e paragem da UTA.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasReturnAirSmokeDetector", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "industrial"] }
+      ],
+      "requiredValue": "Detetores de fumo obrigatórios nas condutas de retorno de ar (>2000 m³/h)",
+      "remediation": "Instalar detetores de fumo tipo conduta (duct smoke detectors) na conduta de retorno de ar, a montante da UTA. A deteção deve acionar: (1) paragem imediata do ventilador de retorno, (2) fecho dos registos corta-fogo na zona afetada, (3) sinalização no SADI (sistema automático de deteção de incêndio). Obrigatório para sistemas com caudal > 2000 m³/h (NFPA 90A §6.4). Prever acesso para manutenção e teste semestral dos detetores.",
+      "enabled": true,
+      "tags": ["SCIE", "fumo", "deteção", "conduta retorno", "UTA"]
+    },
+    {
+      "id": "HVAC-SMOKE-DETECT-02",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE / NFPA 90A — Deteção de Fumo em Condutas de Insuflação",
+      "description": "O sistema AVAC não dispõe de detetores de fumo na conduta de insuflação, a jusante da UTA, podendo insuflar fumo nos espaços ocupados em caso de incêndio externo à UTA.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSupplyAirSmokeDetector", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null },
+        { "field": "hvac.totalAirflow", "operator": ">=", "value": 7500 }
+      ],
+      "requiredValue": "Detetores de fumo recomendados na insuflação para sistemas ≥ 7500 m³/h",
+      "remediation": "Instalar detetores de fumo tipo conduta na conduta principal de insuflação, a jusante da UTA. Em caso de deteção positiva, o sistema deve parar a insuflação e fechar os registos motorizados de ar novo. Particularmente importante quando a tomada de ar novo está próxima de zonas de risco (garagens, cozinhas industriais, zonas técnicas).",
+      "enabled": true,
+      "tags": ["SCIE", "fumo", "deteção", "conduta insuflação"]
+    },
+    {
+      "id": "HVAC-DUCT-FIRERATING-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 87.º — Resistência ao Fogo de Condutas AVAC",
+      "description": "As condutas AVAC que atravessam compartimentos corta-fogo não possuem classificação de resistência ao fogo adequada (EI 30 mínimo, EI 60 para condutas em vias de evacuação).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ductFireRating", "operator": "not_exists", "value": null },
+        { "field": "hvac.ductsPassFireWalls", "operator": "==", "value": true }
+      ],
+      "requiredValue": "EI 30 mínimo (EI 60 em vias de evacuação, EI 90 em locais de risco D/F)",
+      "remediation": "Garantir que as condutas AVAC possuem classificação de resistência ao fogo conforme RT-SCIE: EI 30 para travessias de paredes/lajes entre compartimentos, EI 60 para condutas em ou junto a vias de evacuação protegidas, EI 90/EI 120 em locais de risco D (acolhimento) ou F (pisos subterrâneos). Soluções: condutas em chapa com revestimento projetado de lã de rocha, condutas pré-fabricadas em silicato de cálcio, ou proteção passiva com mantas intumescentes.",
+      "enabled": true,
+      "tags": ["SCIE", "condutas", "resistência ao fogo", "EI", "compartimentação"]
+    },
+    {
+      "id": "HVAC-DAMPER-TEST-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 202.º / EN 1366-2 — Ensaio e Manutenção de Registos Corta-Fogo",
+      "description": "Os registos corta-fogo (RCF) instalados nas condutas AVAC não dispõem de registo de ensaio funcional periódico conforme exigido pelo RT-SCIE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasFireDamperTestRecord", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasFireDampers", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Ensaio funcional semestral dos RCF com registo documentado",
+      "remediation": "Implementar programa de ensaio e manutenção dos registos corta-fogo: (1) Ensaio funcional semestral — verificar fecho completo, tempo de atuação < 60s, estanquidade visual. (2) Ensaio anual completo — teste com fusível térmico de sacrifício ou atuação elétrica, verificação de vedantes intumescentes. (3) Manter registo: data, resultado, técnico, número de série do RCF. Os RCF devem ser certificados EN 1366-2 com classificação EI-S (estanquidade ao fumo).",
+      "enabled": true,
+      "tags": ["SCIE", "registos corta-fogo", "manutenção", "ensaio", "EN 1366-2"]
+    },
+    {
+      "id": "HVAC-KITCHEN-SUPPRESSION-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 172.º — Extinção em Hottes de Cozinha Profissional",
+      "description": "A hotte da cozinha profissional não dispõe de sistema de extinção automática integrado com o sistema AVAC, conforme exigido para cozinhas com potência térmica instalada ≥ 20 kW.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasKitchenSuppression", "operator": "not_exists", "value": null },
+        { "field": "hvac.spaceType", "operator": "==", "value": "kitchen" },
+        { "field": "hvac.kitchenThermalPower", "operator": ">=", "value": 20 }
+      ],
+      "requiredValue": "Sistema de extinção automática na hotte com interligação AVAC obrigatória (≥ 20 kW)",
+      "remediation": "Instalar sistema de extinção automática na hotte (agente químico húmido tipo ANSUL ou equivalente). O sistema deve ser interligado ao AVAC: (1) Atuação da extinção → paragem imediata do ventilador de extração durante a descarga (evita dispersão do agente), (2) Fecho do registo de ar na conduta de extração, (3) Corte automático do gás/eletricidade aos equipamentos de cocção, (4) Após descarga, temporização de 60-120s antes de retomar extração a velocidade reduzida para evacuar vapores residuais.",
+      "enabled": true,
+      "tags": ["SCIE", "cozinha", "extinção", "hotte", "ANSUL"]
+    },
+    {
+      "id": "HVAC-PRESSURIZATION-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 68.º / EN 12101-6 — Pressurização de Vias de Evacuação",
+      "description": "As vias de evacuação protegidas (escadas enclausuradas, câmaras corta-fogo) não dispõem de sistema de pressurização mecânica conforme EN 12101-6, sendo obrigatória para edifícios com mais de 28 m de altura.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasStairPressurization", "operator": "not_exists", "value": null },
+        { "field": "building.height", "operator": ">", "value": 28 }
+      ],
+      "requiredValue": "Pressurização mecânica obrigatória para edifícios > 28 m (Cat. 3ª/4ª UT)",
+      "remediation": "Projetar sistema de pressurização conforme EN 12101-6: (1) Diferencial de pressão: 50 ± 10 Pa com todas as portas fechadas, (2) Velocidade do ar ≥ 0.75 m/s através de porta aberta (critério de contenção), (3) Força máxima de abertura de porta: 100 N (acessibilidade), (4) Ventilador dedicado com alimentação de emergência, (5) Bypass automático ou VFD para ajuste em função de portas abertas, (6) Admissão de ar fresco garantida (não recirculado). O sistema deve ser dimensionado para o cenário mais desfavorável (máximo de portas abertas simultaneamente).",
+      "enabled": true,
+      "tags": ["SCIE", "pressurização", "escada", "EN 12101-6", "evacuação"]
+    },
+    {
+      "id": "HVAC-PRESSURIZATION-DIFF-01",
+      "regulationId": "scie-hvac",
+      "article": "EN 12101-6 — Diferencial de Pressão em Vias Protegidas",
+      "description": "O diferencial de pressão medido na via de evacuação pressurizada ({hvac.pressurizationDifferential} Pa) está fora da gama aceitável de 40-60 Pa (portas fechadas).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.pressurizationDifferential", "operator": "not_in_range", "value": [40, 60] },
+        { "field": "hvac.hasStairPressurization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.pressurizationDifferential} Pa",
+      "requiredValue": "40-60 Pa com todas as portas fechadas (EN 12101-6)",
+      "remediation": "Ajustar o sistema de pressurização para manter 50 ± 10 Pa: (1) Se pressão < 40 Pa: verificar estanquidade da envolvente, aumentar caudal do ventilador, verificar registos de fuga. (2) Se pressão > 60 Pa: ajustar bypass, adicionar registos de alívio de sobrepressão, verificar que força de abertura de porta não excede 100 N. Instalar manómetro diferencial permanente para monitorização contínua. Reensaiar trimestralmente.",
+      "enabled": true,
+      "tags": ["SCIE", "pressurização", "diferencial", "EN 12101-6"]
+    },
+    {
+      "id": "HVAC-PLENUM-BARRIER-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 87.º — Barreiras de Fumo em Plenums AVAC",
+      "description": "O plenum de retorno de ar (teto falso ou pavimento técnico) não possui barreiras corta-fumo nos alinhamentos das paredes de compartimentação, permitindo a propagação horizontal de fumo entre compartimentos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasPlenumSmokeBarriers", "operator": "not_exists", "value": null },
+        { "field": "hvac.usesPlenumReturn", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Barreiras corta-fumo nos plenums alinhadas com compartimentação",
+      "remediation": "Instalar barreiras corta-fumo (smoke barriers) nos plenums de retorno de ar, alinhadas com as paredes de compartimentação corta-fogo do piso: (1) Material: chapa de aço ou painel de silicato de cálcio com classificação E 30-S mínima, (2) Selagem: mastique intumescente em todo o perímetro, (3) Altura: toda a secção livre do plenum, (4) Em alternativa: condutar o retorno de ar (eliminar plenum como via de retorno) com condutas classificadas conforme Art. 87.º.",
+      "enabled": true,
+      "tags": ["SCIE", "plenum", "barreira fumo", "compartimentação"]
+    },
+    {
+      "id": "HVAC-CROSSFLOW-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 87.º — Prevenção de Refluxo de Fumo em Condutas",
+      "description": "O sistema de condutas AVAC não possui registo motorizado anti-refluxo (backdraft dampers) nos ramais de zona, permitindo que fumo de uma zona contaminada se propague para zonas não afetadas através da rede de condutas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasBackdraftDampers", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null },
+        { "field": "hvac.numberOfZones", "operator": ">=", "value": 3 }
+      ],
+      "requiredValue": "Registos anti-refluxo em ramais de zona para sistemas multi-zona",
+      "remediation": "Instalar registos anti-refluxo (backdraft dampers ou non-return dampers) nos ramais de zona do sistema AVAC: (1) Tipo gravitacional: lâminas que fecham por gravidade quando o ventilador para (solução passiva), (2) Tipo motorizado: acionados pelo SADI para isolamento ativo da zona em incêndio. Em sistemas VAV, os registos de zona motorizados podem cumprir esta função se programados para fecho total em modo de emergência. Verificar que o fecho de uma zona não provoca sobrepressão excessiva nas restantes.",
+      "enabled": true,
+      "tags": ["SCIE", "anti-refluxo", "condutas", "multi-zona"]
+    },
+    {
+      "id": "HVAC-SMOKE-CONTROL-MAINT-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 202.º / 203.º — Manutenção de Sistemas de Controlo de Fumo",
+      "description": "O sistema de controlo de fumo (desenfumagem/pressurização) não dispõe de plano de manutenção preventiva e registo de ensaios funcionais conforme exigido pelo RT-SCIE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasSmokeControlMaintenancePlan", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasSmokeExtractionSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Plano de manutenção com ensaios semestrais e registo obrigatório",
+      "remediation": "Implementar plano de manutenção do sistema de controlo de fumo (RT-SCIE Art. 202.º-203.º): (1) Ensaio funcional semestral: arranque de ventiladores de desenfumagem, abertura de exutores, teste de pressurização, verificação de caudais. (2) Ensaio anual completo: teste com fumo frio (smoke test), medição de diferenciais de pressão, verificação de tempos de atuação. (3) Manutenção: limpeza de grelhas, lubrificação de mecanismos, verificação de alimentação de emergência. (4) Registo: manter livro de manutenção com datas, resultados e técnico responsável, disponível para inspeção da ANPC.",
+      "enabled": true,
+      "tags": ["SCIE", "manutenção", "desenfumagem", "pressurização", "ANPC"]
+    },
+    {
+      "id": "HVAC-ATRIUM-SMOKE-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 149.º / EN 12101-5 — Controlo de Fumo em Átrios",
+      "description": "O átrio com pé-direito superior a 2 pisos não dispõe de sistema de controlo de fumo dimensionado conforme EN 12101-5, com extração mecânica ou exutores naturais no topo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasAtriumSmokeControl", "operator": "not_exists", "value": null },
+        { "field": "hvac.spaceType", "operator": "==", "value": "atrium" }
+      ],
+      "requiredValue": "Sistema de controlo de fumo conforme EN 12101-5 obrigatório em átrios",
+      "remediation": "Projetar sistema de controlo de fumo para o átrio conforme EN 12101-5: (1) Extração no topo: exutores naturais (SHEV) com área ≥ 5% da planta do átrio, ou extração mecânica dimensionada por CFD. (2) Cortinas de cantão (smoke curtains/reservoirs) para limitar a camada de fumo. (3) Admissão de ar de compensação na base: grelhas ou portas automatizadas com área ≥ à de extração. (4) Objetivo: manter camada livre de fumo ≥ 2.5 m acima do piso mais elevado acessível ao público durante 60 minutos. (5) Em átrios com sprinklers, coordenar: os sprinklers arrefecem a camada de fumo mas podem causar colapso da estratificação.",
+      "enabled": true,
+      "tags": ["SCIE", "átrio", "controlo de fumo", "EN 12101-5", "exutores"]
+    },
+    {
+      "id": "HVAC-EMERGENCY-POWER-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 72.º — Alimentação de Emergência para Sistemas AVAC de Segurança",
+      "description": "Os sistemas AVAC de segurança (desenfumagem, pressurização) não dispõem de alimentação elétrica de emergência garantida, comprometendo o funcionamento em caso de falha da rede.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasEmergencyPowerForSmokeControl", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasSmokeExtractionSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Alimentação de emergência obrigatória para sistemas de controlo de fumo",
+      "remediation": "Garantir alimentação elétrica de emergência para todos os sistemas AVAC de segurança: (1) Ventiladores de desenfumagem: alimentação pelo grupo gerador de emergência com arranque automático em < 15 s. (2) Sistemas de pressurização: alimentação redundante (rede + gerador). (3) Registos corta-fogo motorizados: posição de segurança (fechado) por mola, alimentação apenas para manter aberto (fail-safe). (4) Cabos elétricos de alimentação: resistentes ao fogo (E 30 mínimo, E 90 recomendado), percurso protegido. (5) Quadro elétrico AVAC de segurança: dedicado, sinalizado, com comutação automática rede/gerador.",
+      "enabled": true,
+      "tags": ["SCIE", "alimentação emergência", "gerador", "desenfumagem", "cabos"]
+    }
+  ]
+}

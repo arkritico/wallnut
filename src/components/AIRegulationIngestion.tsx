@@ -11,8 +11,9 @@
  * 5. Rules are merged into correct specialty plugin
  */
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Sparkles, FileText, AlertCircle, CheckCircle2, Loader2, ChevronDown, ChevronUp, Upload, File } from "lucide-react";
+import { splitAndExtract, type ProgressCallback } from "@/lib/pdf-splitter";
 
 // ============================================================================
 // TYPES
@@ -74,39 +75,34 @@ export default function AIRegulationIngestion({
   const [regulationText, setRegulationText] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [isExtractingPDF, setIsExtractingPDF] = useState(false);
+  const [pdfProgress, setPdfProgress] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedRules, setExtractedRules] = useState<ValidatedRule[]>([]);
   const [expandedRules, setExpandedRules] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ============================================================================
-  // PDF TEXT EXTRACTION (Client-Side)
+  // PDF TEXT EXTRACTION (Client-Side with splitting for large documents)
   // ============================================================================
+
+  const handleProgress: ProgressCallback = useCallback((progress) => {
+    setPdfProgress(progress.message);
+  }, []);
 
   async function extractTextFromPDF(file: File): Promise<string> {
     try {
-      // Dynamic import to avoid SSR issues (PDF.js requires browser APIs)
-      const pdfjsLib = await import("pdfjs-dist");
-
-      // Configure worker (use local file instead of CDN to avoid CORS/network issues)
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.js/pdf.worker.min.mjs';
-
       const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const result = await splitAndExtract(arrayBuffer, {
+        onProgress: handleProgress,
+      });
 
-      let fullText = "";
-
-      // Extract text from each page
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items
-          .map((item: any) => item.str)
-          .join(" ");
-        fullText += pageText + "\n\n";
+      if (result.chunks > 1) {
+        console.log(
+          `PDF dividido em ${result.chunks} blocos (${result.totalPages} páginas total)`,
+        );
       }
 
-      return fullText.trim();
+      return result.text;
     } catch (error) {
       console.error("Error extracting PDF text:", error);
       throw new Error("Falha ao extrair texto do PDF. Tente colar o texto manualmente.");
@@ -404,7 +400,7 @@ export default function AIRegulationIngestion({
                 <p className="text-sm font-medium text-gray-900">{uploadedFile.name}</p>
                 <p className="text-xs text-gray-500">
                   {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                  {isExtractingPDF && " • Extraindo texto..."}
+                  {isExtractingPDF && ` • ${pdfProgress || "Extraindo texto..."}`}
                 </p>
               </div>
             </div>

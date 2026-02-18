@@ -12,6 +12,10 @@
  */
 
 import type { BuildingProject, Finding, RegulationArea } from "./types";
+import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
+// NOTE: cype-matcher-db-loader uses fs/winston — imported lazily to avoid
+// pulling Node.js modules into the client bundle (WbsSchedule.tsx imports formatCost).
+import { aggregateIfcQuantities, lookupIfcQuantity, type IfcQuantitySummary } from "./ifc-quantity-takeoff";
 
 // ============================================================
 // Types
@@ -52,6 +56,8 @@ export interface CypeWorkItem {
     total: number | null;
     type: 'material' | 'labor' | 'machinery';
   }>;
+  /** Source typology (obra_nova, reabilitacao, espacos_urbanos) */
+  typology?: "obra_nova" | "reabilitacao" | "espacos_urbanos";
 }
 
 export interface CostLineItem {
@@ -101,6 +107,17 @@ export interface CostSummary {
   locationFactor: number;
   /** Building type adjustment factor */
   typeFactor: number;
+  /** Contingency buffer */
+  contingency: {
+    percent: number;
+    amount: number;
+  };
+  /** Total cost range including contingency */
+  totalWithContingency: { min: number; max: number };
+  /** Number of line items where bulk discount was applied */
+  scaledLineItems: number;
+  /** How many items came from the full CYPE database (vs curated) */
+  databaseItemsUsed: number;
 }
 
 // ============================================================
@@ -116,7 +133,7 @@ export interface CostSummary {
  *   Z = Reabilitação energética, F = Fachadas, F = ETICS = ZFF
  *   I = Instalações, E = Elétricas, I = Interiores = IEI
  */
-const CYPE_DATABASE: CypeWorkItem[] = [
+const CURATED_ITEMS: CypeWorkItem[] = [
   // ─── FIRE SAFETY (IO) ──────────────────────────────────────
   {
     code: "IOD010", description: "Central de deteção de incêndio analógica",
@@ -669,6 +686,42 @@ const CYPE_DATABASE: CypeWorkItem[] = [
 ];
 
 // ============================================================
+// Merged Database (curated + full CYPE)
+// ============================================================
+
+let _mergedDb: CypeWorkItem[] | null = null;
+
+/**
+ * Get the cost estimation database, merging curated items (with hand-tuned
+ * regex patterns) and the full 2,049-item CYPE database from the scraper.
+ * Curated items appear first for preferential matching; full DB items
+ * that share a code with a curated item are skipped (curated version wins).
+ */
+function getCostDatabase(): CypeWorkItem[] {
+  if (_mergedDb) return _mergedDb;
+
+  const curatedCodes = new Set(CURATED_ITEMS.map(i => i.code));
+
+  // Lazy require to keep fs/winston out of client bundle
+  let fullDb: CypeWorkItem[] = [];
+  if (typeof window === "undefined") {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { getCypeMatcherDatabase } = require("./cype-matcher-db-loader") as { getCypeMatcherDatabase: () => CypeWorkItem[] };
+      fullDb = getCypeMatcherDatabase();
+    } catch {
+      // Client-side or module unavailable — use curated items only
+    }
+  }
+
+  // Full DB items that don't overlap with curated items
+  const additional = fullDb.filter(i => !curatedCodes.has(i.code));
+
+  _mergedDb = [...CURATED_ITEMS, ...additional];
+  return _mergedDb;
+}
+
+// ============================================================
 // Location Adjustment Factors (by district)
 // ============================================================
 
@@ -724,7 +777,16 @@ function estimateQuantity(
   item: CypeWorkItem,
   finding: Finding,
   project?: BuildingProject,
+  ifcQuantities?: IfcQuantitySummary | null,
 ): { quantity: number; source: "measured" | "estimated" | "minimum" } {
+  // Try IFC-measured quantities first (most accurate)
+  if (ifcQuantities) {
+    const ifcResult = lookupIfcQuantity(ifcQuantities, item);
+    if (ifcResult && ifcResult.quantity > 0) {
+      return ifcResult;
+    }
+  }
+
   if (!project) return { quantity: 1, source: "minimum" };
 
   const area = project.usableFloorArea || 100;
@@ -958,60 +1020,172 @@ const ARCHITECTURAL_KEYWORDS: RegExp[] = [
 ];
 
 /**
+ * Compute token similarity score between a finding text and a CYPE item.
+ * Returns a value 0-100 based on overlapping significant words.
+ */
+function tokenSimilarity(searchText: string, item: CypeWorkItem): number {
+  const textTokens = new Set(
+    searchText.toLowerCase().split(/[\s,.:;()\-/]+/).filter(w => w.length > 3)
+  );
+  const itemTokens = [
+    ...item.description.toLowerCase().split(/[\s,.:;()\-/]+/).filter(w => w.length > 3),
+    ...item.chapter.toLowerCase().split(/[\s>,:;()\-/]+/).filter(w => w.length > 3),
+  ];
+  if (itemTokens.length === 0) return 0;
+
+  let hits = 0;
+  for (const token of itemTokens) {
+    if (textTokens.has(token)) hits++;
+  }
+  return Math.round((hits / itemTokens.length) * 100);
+}
+
+/**
  * Match a finding to the most appropriate CYPE work item(s).
  *
- * Matching strategy:
- * 1. Pattern match: test the finding text against item regex patterns (primary)
- * 2. Area match: ensure the finding area matches one of the item's areas
- * 3. Keyword fallback: for structural/architectural areas, use domain-specific
- *    keyword lists when pattern matching is insufficient
+ * Matching strategy (scored):
+ * 1. Pattern match + area match → score 100 (curated items come first)
+ * 2. Pattern match only → score 80
+ * 3. Area match + token similarity → similarity score
+ * 4. Keyword fallback for structural/architectural → score based on word overlap
  *
- * Returns all matching items (caller should typically use the first/best match).
+ * Returns items sorted by score (best first).
  */
 export function matchFindingToCype(finding: Finding): CypeWorkItem[] {
   const searchText = `${finding.description} ${finding.regulation} ${finding.article ?? ""}`;
-  const matches: CypeWorkItem[] = [];
+  const scored: { item: CypeWorkItem; score: number }[] = [];
+  const db = getCostDatabase();
 
-  for (const item of CYPE_DATABASE) {
+  for (const item of db) {
     const areaMatch = item.areas.includes(finding.area);
     const patternMatch = item.patterns.some(p => p.test(searchText));
 
     if (patternMatch && areaMatch) {
-      matches.push(item);
+      scored.push({ item, score: 100 });
       continue;
     }
 
-    // Structural keyword fallback: if the finding is in the structural area
-    // and no exact pattern matched, try structural-specific keywords
-    if (finding.area === "structural" && item.areas.includes("structural") && !patternMatch) {
+    // Token similarity for area-matched items from the full DB
+    if (areaMatch) {
+      const sim = tokenSimilarity(searchText, item);
+      if (sim >= 25) {
+        scored.push({ item, score: sim });
+        continue;
+      }
+    }
+
+    // Structural keyword fallback
+    if (finding.area === "structural" && item.areas.includes("structural")) {
       const keywordMatch = STRUCTURAL_KEYWORDS.some(kw => kw.test(searchText));
       if (keywordMatch) {
-        // Score structural items by how well they match the finding text
         const descWords = item.description.toLowerCase().split(/\s+/);
         const textLower = searchText.toLowerCase();
         const wordOverlap = descWords.filter(w => w.length > 3 && textLower.includes(w)).length;
         if (wordOverlap > 0) {
-          matches.push(item);
+          scored.push({ item, score: 20 + wordOverlap * 10 });
         }
       }
     }
 
-    // Architectural keyword fallback: if the finding is in the architecture area
-    // and no exact pattern matched, try architectural-specific keywords
-    if (finding.area === "architecture" && item.areas.includes("architecture") && !patternMatch) {
+    // Architectural keyword fallback
+    if (finding.area === "architecture" && item.areas.includes("architecture")) {
       const keywordMatch = ARCHITECTURAL_KEYWORDS.some(kw => kw.test(searchText));
       if (keywordMatch) {
         const descWords = item.description.toLowerCase().split(/\s+/);
         const textLower = searchText.toLowerCase();
         const wordOverlap = descWords.filter(w => w.length > 3 && textLower.includes(w)).length;
         if (wordOverlap > 0) {
-          matches.push(item);
+          scored.push({ item, score: 20 + wordOverlap * 10 });
         }
       }
     }
   }
 
-  return matches;
+  // Sort by score descending, return items only
+  return scored.sort((a, b) => b.score - a.score).map(s => s.item);
+}
+
+// ============================================================
+// Scale Factors (bulk pricing discounts)
+// ============================================================
+
+/**
+ * Apply bulk pricing discount based on quantity.
+ * Large quantities get unit-cost reductions due to economies of scale.
+ *
+ * Thresholds (by unit type):
+ * - m2/m3: >200 units → 5%, >500 → 10%, >1000 → 15%
+ * - m:     >100 units → 5%, >300 → 10%, >600 → 15%
+ * - Ud:    >10 units  → 3%, >50 → 8%, >100 → 12%
+ * - Other: no discount
+ */
+function applyScaleFactor(unitCost: number, quantity: number, unit: string): { cost: number; scaled: boolean } {
+  let discount = 0;
+
+  if (unit === "m2" || unit === "m3") {
+    if (quantity > 1000) discount = 0.15;
+    else if (quantity > 500) discount = 0.10;
+    else if (quantity > 200) discount = 0.05;
+  } else if (unit === "m") {
+    if (quantity > 600) discount = 0.15;
+    else if (quantity > 300) discount = 0.10;
+    else if (quantity > 100) discount = 0.05;
+  } else if (unit === "Ud") {
+    if (quantity > 100) discount = 0.12;
+    else if (quantity > 50) discount = 0.08;
+    else if (quantity > 10) discount = 0.03;
+  }
+
+  return {
+    cost: unitCost * (1 - discount),
+    scaled: discount > 0,
+  };
+}
+
+// ============================================================
+// Contingency Buffers
+// ============================================================
+
+/**
+ * Calculate contingency percentage based on match confidence and project stage.
+ *
+ * - High-confidence matches with measured quantities: 5%
+ * - Medium-confidence or estimated quantities: 10%
+ * - Low-confidence or minimum quantities: 15%
+ *
+ * Project stage modifier:
+ * - "concept"/"design": +5%
+ * - "licensing"/"construction": +0%
+ * - No stage info: +3%
+ */
+function calculateContingency(
+  lineItems: CostLineItem[],
+  project?: BuildingProject,
+): { percent: number; amount: number } {
+  if (lineItems.length === 0) return { percent: 0, amount: 0 };
+
+  // Weighted average confidence
+  let totalCost = 0;
+  let weightedConfidence = 0;
+  for (const li of lineItems) {
+    const confScore = li.confidence === "high" ? 5 : li.confidence === "medium" ? 10 : 15;
+    weightedConfidence += confScore * li.adjustedCost;
+    totalCost += li.adjustedCost;
+  }
+  const basePercent = totalCost > 0 ? weightedConfidence / totalCost : 10;
+
+  // Project stage modifier
+  let stageModifier = 3; // default: unknown stage
+  const stage = (project as Record<string, unknown> | undefined)?.projectStage as string | undefined;
+  if (stage === "concept" || stage === "design") {
+    stageModifier = 5;
+  } else if (stage === "licensing" || stage === "construction") {
+    stageModifier = 0;
+  }
+
+  const percent = Math.round(basePercent + stageModifier);
+  const amount = Math.round(totalCost * percent / 100);
+  return { percent, amount };
 }
 
 // ============================================================
@@ -1021,11 +1195,23 @@ export function matchFindingToCype(finding: Finding): CypeWorkItem[] {
 /**
  * Estimate remediation costs using CYPE reference data.
  * Optionally uses project data for quantity estimation and parametric adjustments.
+ * Now uses full 2,049-item CYPE database with scale factors and contingency.
  */
-export function estimateCosts(findings: Finding[], project?: BuildingProject): CostSummary {
+export function estimateCosts(
+  findings: Finding[],
+  project?: BuildingProject,
+  ifcAnalyses?: SpecialtyAnalysisResult[],
+): CostSummary {
   const lineItems: CostLineItem[] = [];
   const estimates: CostEstimate[] = [];
   const nonCompliant = findings.filter(f => f.severity === "critical" || f.severity === "warning");
+  let scaledLineItems = 0;
+  let databaseItemsUsed = 0;
+
+  // Aggregate IFC quantities if available
+  const ifcQuantities = ifcAnalyses && ifcAnalyses.length > 0
+    ? aggregateIfcQuantities(ifcAnalyses)
+    : null;
 
   // Location and type adjustment factors
   const locationFactor = project?.location?.district
@@ -1036,18 +1222,31 @@ export function estimateCosts(findings: Finding[], project?: BuildingProject): C
     : 1.0;
   const combinedFactor = locationFactor * typeFactor;
 
+  // Track which curated codes we use vs full DB codes
+  const curatedCodes = new Set(CURATED_ITEMS.map(i => i.code));
+
   for (const finding of nonCompliant) {
     let matched = false;
 
-    // Try to match using the matchFindingToCype function (includes keyword fallback)
+    // Try to match using the matchFindingToCype function (curated first, then full DB)
     const matchedItems = matchFindingToCype(finding);
 
     if (matchedItems.length > 0) {
-      // Use the first (best) match
       const item = matchedItems[0];
-      const { quantity, source } = estimateQuantity(item, finding, project);
-      const baseCost = item.unitCost * quantity;
+      const { quantity, source } = estimateQuantity(item, finding, project, ifcQuantities);
+
+      // Apply bulk pricing discount
+      const { cost: scaledUnitCost, scaled } = applyScaleFactor(item.unitCost, quantity, item.unit);
+      if (scaled) scaledLineItems++;
+
+      // Track if item came from full DB (not curated)
+      if (!curatedCodes.has(item.code)) databaseItemsUsed++;
+
+      const baseCost = scaledUnitCost * quantity;
       const adjustedCost = Math.round(baseCost * combinedFactor);
+
+      // Scale breakdown proportionally if discount was applied
+      const costRatio = item.unitCost > 0 ? scaledUnitCost / item.unitCost : 1;
 
       const lineItem: CostLineItem = {
         findingId: finding.id,
@@ -1058,9 +1257,9 @@ export function estimateCosts(findings: Finding[], project?: BuildingProject): C
         totalCost: Math.round(baseCost),
         adjustedCost,
         breakdown: {
-          materials: Math.round(item.breakdown.materials * quantity * combinedFactor),
-          labor: Math.round(item.breakdown.labor * quantity * combinedFactor),
-          machinery: Math.round(item.breakdown.machinery * quantity * combinedFactor),
+          materials: Math.round(item.breakdown.materials * costRatio * quantity * combinedFactor),
+          labor: Math.round(item.breakdown.labor * costRatio * quantity * combinedFactor),
+          machinery: Math.round(item.breakdown.machinery * costRatio * quantity * combinedFactor),
         },
         confidence: source === "measured" ? "high" : source === "estimated" ? "medium" : "low",
       };
@@ -1074,7 +1273,7 @@ export function estimateCosts(findings: Finding[], project?: BuildingProject): C
         maxCost: Math.round(adjustedCost * 1.3),
         unit: item.unit,
         confidence: lineItem.confidence,
-        notes: `${item.code}: ${item.description} (${quantity.toFixed(1)} ${item.unit} × ${formatCost(item.unitCost)}/${item.unit})`,
+        notes: `${item.code}: ${item.description} (${quantity.toFixed(1)} ${item.unit} × ${formatCost(scaledUnitCost)}/${item.unit}${scaled ? " c/ desconto" : ""})`,
         lineItems: [lineItem],
         cypeCode: item.code,
       });
@@ -1096,6 +1295,9 @@ export function estimateCosts(findings: Finding[], project?: BuildingProject): C
     }
   }
 
+  // Contingency buffer
+  const contingency = calculateContingency(lineItems, project);
+
   // Aggregate by area
   const areaMap = new Map<RegulationArea, { minCost: number; maxCost: number; count: number }>();
   for (const est of estimates) {
@@ -1114,15 +1316,25 @@ export function estimateCosts(findings: Finding[], project?: BuildingProject): C
     }))
     .sort((a, b) => b.maxCost - a.maxCost);
 
+  const totalMinCost = estimates.reduce((sum, e) => sum + e.minCost, 0);
+  const totalMaxCost = estimates.reduce((sum, e) => sum + e.maxCost, 0);
+
   return {
     estimates,
-    totalMinCost: estimates.reduce((sum, e) => sum + e.minCost, 0),
-    totalMaxCost: estimates.reduce((sum, e) => sum + e.maxCost, 0),
+    totalMinCost,
+    totalMaxCost,
     byArea,
     currency: "EUR",
     lineItems,
     locationFactor,
     typeFactor,
+    contingency,
+    totalWithContingency: {
+      min: totalMinCost + Math.round(totalMinCost * contingency.percent / 100),
+      max: totalMaxCost + Math.round(totalMaxCost * contingency.percent / 100),
+    },
+    scaledLineItems,
+    databaseItemsUsed,
   };
 }
 

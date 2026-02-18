@@ -12,6 +12,14 @@ export interface ErrorContext {
   userId?: string;
   projectId?: string;
   metadata?: Record<string, unknown>;
+  /** Server-side request context (populated by API error handler) */
+  request?: {
+    method?: string;
+    path?: string;
+    ip?: string;
+    statusCode?: number;
+    durationMs?: number;
+  };
 }
 
 interface ErrorEntry {
@@ -123,11 +131,22 @@ async function sendToSentry(entry: ErrorEntry, dsn: string): Promise<void> {
       tags: {
         component: entry.context.component,
         action: entry.context.action,
+        ...(entry.context.request?.method && { "http.method": entry.context.request.method }),
+        ...(entry.context.request?.statusCode && { "http.status_code": String(entry.context.request.statusCode) }),
       },
-      extra: entry.context.metadata,
+      extra: {
+        ...entry.context.metadata,
+        ...(entry.context.request?.durationMs != null && { durationMs: entry.context.request.durationMs }),
+      },
       request: {
-        url: entry.url,
-        headers: { "User-Agent": entry.userAgent },
+        url: entry.context.request?.path ?? entry.url,
+        method: entry.context.request?.method,
+        headers: {
+          "User-Agent": entry.userAgent,
+        },
+        env: {
+          REMOTE_ADDR: entry.context.request?.ip,
+        },
       },
     });
 

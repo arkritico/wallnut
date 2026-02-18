@@ -47,15 +47,36 @@ import {
   Hammer,
   GitCompareArrows,
   BookOpen,
+  Users,
 } from "lucide-react";
 
 import CompareProjects from "@/components/CompareProjects";
 import IngestionDashboard from "@/components/IngestionDashboard";
 import IngestionPanel from "@/components/IngestionPanel";
+import CollaborationPanel from "@/components/CollaborationPanel";
+import type { ProjectRole } from "@/lib/collaboration";
+import { getUserRole } from "@/lib/collaboration";
 import { getAvailablePlugins } from "@/lib/plugins/loader";
 import type { SpecialtyPlugin, RegulationDocument, DeclarativeRule } from "@/lib/plugins/types";
 
-type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations";
+import UnifiedUpload from "@/components/UnifiedUpload";
+import type { UnifiedPipelineResult } from "@/lib/unified-pipeline";
+import dynamic from "next/dynamic";
+
+const IfcViewer = dynamic(() => import("@/components/IfcViewer"), {
+  ssr: false,
+  loading: () => <div className="flex-1 min-h-[600px] flex items-center justify-center text-gray-400">A carregar visualizador 3D...</div>,
+});
+const FourDViewer = dynamic(() => import("@/components/FourDViewer"), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar 4D...</div>,
+});
+const EvmDashboard = dynamic(() => import("@/components/EvmDashboard"), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar EVM...</div>,
+});
+
+type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations" | "unified" | "viewer" | "fourd" | "evm";
 
 const REGULATION_BADGES = [
   "Codigo Civil", "RGEU", "Eurocodigos EC0-EC8", "SCIE + NT01-NT22",
@@ -112,6 +133,23 @@ export default function Home() {
 
   // Regulation ingestion
   const [ingestionPluginId, setIngestionPluginId] = useState<string | null>(null);
+
+  // Unified pipeline exports (stored as blobs for download buttons)
+  const [unifiedResult, setUnifiedResult] = useState<UnifiedPipelineResult | null>(null);
+
+  // Collaboration
+  const [showCollab, setShowCollab] = useState(false);
+  const [currentUserRole, setCurrentUserRole] = useState<ProjectRole | null>(null);
+
+  // Fetch collaboration role when project changes
+  useEffect(() => {
+    if (currentProjectId && useCloud) {
+      getUserRole(currentProjectId).then(setCurrentUserRole);
+    } else {
+      setCurrentUserRole(null);
+    }
+    setShowCollab(false);
+  }, [currentProjectId, useCloud]);
 
   function toggleDarkMode() {
     const next = !darkMode;
@@ -319,7 +357,68 @@ export default function Home() {
     setResult(null);
     setCalculations(null);
     setFormTargetSection(undefined);
+    setUnifiedResult(null);
     setView("landing");
+  }
+
+  async function handleUnifiedComplete(pipelineResult: UnifiedPipelineResult) {
+    setUnifiedResult(pipelineResult);
+    setCurrentProject(pipelineResult.project);
+
+    const project = pipelineResult.project;
+    const analysisResult = pipelineResult.analysis ?? null;
+
+    if (analysisResult) {
+      setResult(analysisResult);
+      setCalculations(runAllCalculations(project));
+    }
+
+    // Persist to Supabase or localStorage (same pattern as handleAnalyze)
+    try {
+      saveCurrentProject(project);
+      if (currentProjectId) {
+        const existing = savedProjects.find(p => p.id === currentProjectId);
+        if (existing) {
+          const updated = {
+            ...existing,
+            name: project.name,
+            project,
+            lastAnalysis: analysisResult ?? undefined,
+            updatedAt: new Date().toISOString(),
+          };
+          if (useCloud) {
+            await saveCloudProject({
+              id: updated.id,
+              userId: authUser?.email || "local",
+              name: updated.name,
+              project: updated.project,
+              lastAnalysis: updated.lastAnalysis ?? null,
+              createdAt: updated.createdAt,
+              updatedAt: updated.updatedAt,
+            });
+          } else {
+            saveProject(updated);
+          }
+        }
+      } else if (project.name) {
+        if (useCloud) {
+          const cloud = await createCloudProject(project.name, project);
+          cloud.lastAnalysis = analysisResult;
+          await saveCloudProject(cloud);
+          setCurrentProjectId(cloud.id);
+        } else {
+          const saved = createSavedProject(project.name, project);
+          saved.lastAnalysis = analysisResult ?? undefined;
+          saveProject(saved);
+          setCurrentProjectId(saved.id);
+        }
+      }
+      await refreshProjects();
+    } catch (err) {
+      console.error("Failed to persist pipeline result:", err);
+    }
+
+    setView(analysisResult ? "results" : "form");
   }
 
   function handleBackToForm(targetSection?: string) {
@@ -467,14 +566,27 @@ export default function Home() {
 
           {/* Primary CTA */}
           <section className="max-w-4xl mx-auto px-6 py-16 text-center">
-            <button
-              onClick={handleNewProject}
-              className="inline-flex items-center gap-3 px-10 py-4 bg-accent text-white font-semibold rounded-lg hover:bg-accent-hover transition-colors text-lg"
-            >
-              {t.startAnalysis}
-              <ChevronRight className="w-5 h-5" />
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button
+                onClick={() => setView("unified")}
+                className="inline-flex items-center gap-3 px-10 py-4 bg-accent text-white font-semibold rounded-lg hover:bg-accent-hover transition-colors text-lg"
+              >
+                {lang === "pt" ? "Carregar Ficheiros" : "Upload Files"}
+                <ChevronRight className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleNewProject}
+                className="inline-flex items-center gap-3 px-10 py-4 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:border-accent hover:text-accent transition-colors text-lg"
+              >
+                {t.startAnalysis}
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
             <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-300">
+              <button onClick={() => setView("viewer")} className="hover:text-gray-500 transition-colors">
+                {lang === "pt" ? "Visualizador 3D" : "3D Viewer"}
+              </button>
+              <span className="text-gray-200">|</span>
               <button onClick={() => setView("wbs")} className="hover:text-gray-500 transition-colors">
                 WBS
               </button>
@@ -602,6 +714,7 @@ export default function Home() {
               <ProjectWizard
                 onComplete={handleWizardComplete}
                 onCancel={handleWizardCancel}
+                onStartUnified={() => setView("unified")}
               />
             </div>
           </div>
@@ -631,8 +744,57 @@ export default function Home() {
         <main className="min-h-screen bg-gray-50">
           <AppHeader showEdit />
           <div className="max-w-5xl mx-auto px-4 py-8">
-            <AnalysisResults result={result} calculations={calculations} project={currentProject ?? undefined} onReset={handleReset} onEditProject={handleBackToForm} />
+            <div className="mb-4 flex justify-end gap-2">
+              {unifiedResult?.schedule && unifiedResult.elementMapping && (
+                <button
+                  onClick={() => setView("fourd")}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors"
+                >
+                  <Clock className="w-4 h-4" />
+                  {lang === "pt" ? "Simulação 4D" : "4D Simulation"}
+                </button>
+              )}
+              {unifiedResult?.schedule && (
+                <button
+                  onClick={() => setView("evm")}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  <GitCompareArrows className="w-4 h-4" />
+                  {lang === "pt" ? "Valor Ganho (EVM)" : "Earned Value (EVM)"}
+                </button>
+              )}
+              {useCloud && currentProjectId && (
+                <button
+                  onClick={() => setShowCollab(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors"
+                >
+                  <Users className="w-4 h-4" />
+                  {t.collaboration}
+                </button>
+              )}
+            </div>
+            <AnalysisResults
+              result={result}
+              calculations={calculations}
+              project={currentProject ?? undefined}
+              onReset={handleReset}
+              onEditProject={handleBackToForm}
+              budgetExcel={unifiedResult?.budgetExcel}
+              msProjectXml={unifiedResult?.msProjectXml}
+              complianceExcel={unifiedResult?.complianceExcel}
+              projectId={currentProjectId ?? undefined}
+              userRole={currentUserRole}
+              ifcAnalyses={unifiedResult?.ifcAnalyses}
+            />
           </div>
+          {currentProjectId && (
+            <CollaborationPanel
+              projectId={currentProjectId}
+              userRole={currentUserRole}
+              isOpen={showCollab}
+              onClose={() => setShowCollab(false)}
+            />
+          )}
         </main>
       )}
 
@@ -725,6 +887,95 @@ export default function Home() {
                 />
               </div>
             )}
+          </div>
+        </main>
+      )}
+      {/* 3D IFC Viewer */}
+      {view === "viewer" && (
+        <main className="min-h-screen bg-gray-50 flex flex-col">
+          <AppHeader />
+          <div className="flex-1 max-w-7xl w-full mx-auto px-4 py-4 flex flex-col">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <button
+                  onClick={() => setView("landing")}
+                  className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  {t.back}
+                </button>
+                <h1 className="text-xl font-bold text-gray-900 mt-1">
+                  {lang === "pt" ? "Visualizador IFC" : "IFC Viewer"}
+                </h1>
+              </div>
+            </div>
+            <IfcViewer className="flex-1 min-h-[600px] border border-gray-200 rounded-xl" />
+          </div>
+        </main>
+      )}
+
+      {/* 4D Construction Timeline */}
+      {view === "fourd" && unifiedResult?.schedule && unifiedResult?.elementMapping && (
+        <main className="min-h-screen bg-gray-50 flex flex-col">
+          <AppHeader />
+          <div className="flex-1 max-w-7xl w-full mx-auto px-4 py-4 flex flex-col">
+            <div className="mb-3 flex items-center justify-between">
+              <div>
+                <button
+                  onClick={() => setView("unified")}
+                  className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  {t.back}
+                </button>
+                <h1 className="text-xl font-bold text-gray-900 mt-1">
+                  {lang === "pt" ? "Simulação 4D" : "4D Simulation"}
+                </h1>
+              </div>
+            </div>
+            <FourDViewer
+              schedule={unifiedResult.schedule}
+              elementMapping={unifiedResult.elementMapping}
+              className="flex-1 min-h-[700px] border border-gray-200 rounded-xl overflow-hidden"
+            />
+          </div>
+        </main>
+      )}
+
+      {/* Earned Value Management */}
+      {view === "evm" && unifiedResult?.schedule && (
+        <main className="min-h-screen bg-gray-50">
+          <AppHeader />
+          <div className="max-w-5xl mx-auto px-4 py-8">
+            <div className="mb-4">
+              <button
+                onClick={() => setView("results")}
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t.back}
+              </button>
+              <h1 className="text-xl font-bold text-gray-900 mt-1">
+                {lang === "pt" ? "Valor Ganho (EVM)" : "Earned Value Management"}
+              </h1>
+            </div>
+            <EvmDashboard schedule={unifiedResult.schedule} />
+          </div>
+        </main>
+      )}
+
+      {/* Unified Multi-File Pipeline */}
+      {view === "unified" && (
+        <main className="min-h-screen bg-gray-50">
+          <AppHeader />
+          <div className="max-w-3xl mx-auto px-4 py-8">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <UnifiedUpload
+                existingProject={currentProject ?? undefined}
+                onComplete={handleUnifiedComplete}
+                onCancel={() => setView("landing")}
+              />
+            </div>
           </div>
         </main>
       )}

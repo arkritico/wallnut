@@ -5,6 +5,7 @@
  */
 
 import type { BuildingProject } from "./types";
+import { splitAndExtract, needsSplitting, type ProgressCallback } from "./pdf-splitter";
 
 export interface ParsedProjectData {
   fields: Partial<BuildingProject>;
@@ -13,30 +14,30 @@ export interface ParsedProjectData {
   warnings: string[];
 }
 
+export interface ExtractTextOptions {
+  /** Progress callback for large PDF splitting/extraction */
+  onProgress?: ProgressCallback;
+  /** Max pages per chunk when splitting (default: 50) */
+  maxPagesPerChunk?: number;
+}
+
 /**
  * Extract text from a file (PDF, Excel, or plain text) — client-side.
+ *
+ * For large PDFs (>50 pages), automatically splits into chunks and extracts
+ * text in parallel for better performance. Page numbers are preserved.
  */
-export async function extractTextFromFile(file: File): Promise<string> {
+export async function extractTextFromFile(
+  file: File,
+  options?: ExtractTextOptions,
+): Promise<string> {
   if (file.type === "application/pdf") {
-    const pdfjs = await import("pdfjs-dist");
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-      "pdfjs-dist/build/pdf.worker.min.mjs",
-      import.meta.url,
-    ).toString();
-
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-    const pages: string[] = [];
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const text = content.items
-        .map((item: Record<string, unknown>) => ("str" in item ? (item.str as string) : ""))
-        .join(" ");
-      pages.push(text);
-    }
-    return pages.join("\n\n");
+    const result = await splitAndExtract(arrayBuffer, {
+      maxPagesPerChunk: options?.maxPagesPerChunk,
+      onProgress: options?.onProgress,
+    });
+    return result.text;
   }
 
   // Excel files

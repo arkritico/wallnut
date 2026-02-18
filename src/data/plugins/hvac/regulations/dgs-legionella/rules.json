@@ -1,0 +1,113 @@
+{
+  "regulationRef": "dgs-legionella",
+  "description": "Regras DGS (Direção-Geral da Saúde) para prevenção de Legionella — avaliação de risco, monitorização de temperaturas, amostragem, tratamento, formação",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-LEGIONELLA-RISK-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS Circular 14/DA / EN 15975-2 — Avaliação de Risco de Legionella",
+      "description": "Não foi realizada avaliação de risco de Legionella para a instalação AVAC e rede de água quente sanitária, conforme recomendado pela DGS e exigido para edifícios de risco (hospitais, hotéis, lares).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasLegionellaRiskAssessment", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Avaliação de risco de Legionella obrigatória para edifícios de risco",
+      "remediation": "Realizar avaliação de risco de Legionella conforme metodologia DGS: (1) Identificar fontes de risco: torres de arrefecimento, depósitos de AQS, redes de distribuição com troços mortos, chuveiros pouco utilizados, fontes decorativas, humidificadores. (2) Avaliar fatores de risco: temperatura da água (20-50°C = zona de proliferação), estagnação, biofilme, nutrientes (sedimentos, corrosão). (3) Classificar risco: baixo/médio/alto/muito alto. (4) Definir medidas de controlo: programa de temperaturas, desinfeção, limpeza, monitorização. (5) Reavaliação: anual ou após alterações na instalação. (6) Para edifícios de saúde: avaliação obrigatória conforme DGS Orientação 023/2014.",
+      "enabled": true,
+      "tags": ["Legionella", "DGS", "avaliação de risco", "água quente"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-TEMP-STORAGE-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / ECDC Guidelines — Temperatura de Armazenamento de AQS",
+      "description": "A temperatura de armazenamento da água quente sanitária ({hvac.hotWaterStorageTemp}°C) é inferior a 60°C, permitindo a proliferação de Legionella no depósito.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hotWaterStorageTemp", "operator": "<", "value": 60 }
+      ],
+      "currentValueTemplate": "{hvac.hotWaterStorageTemp}°C no depósito",
+      "requiredValue": "≥ 60°C no depósito de armazenamento de AQS",
+      "remediation": "Manter temperatura de armazenamento de AQS ≥ 60°C: (1) Regulação: termostato do depósito a 60-65°C (não exceder 70°C para evitar calcário). (2) Estratificação: verificar que a temperatura no fundo do depósito ≥ 60°C (sonda inferior). (3) Ciclo térmico semanal: elevar a 70°C durante 30 minutos para pasteurização. (4) Depósitos múltiplos em série: garantir que todos atingem ≥ 60°C (não apenas o primeiro). (5) Bombas de calor para AQS: verificar que atingem 60°C (algumas bombas de calor limitam a 55°C — necessário resistência de apoio).",
+      "enabled": true,
+      "tags": ["Legionella", "AQS", "temperatura", "armazenamento", "60°C"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-TEMP-RETURN-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / ECDC Guidelines — Temperatura de Retorno da Rede de AQS",
+      "description": "A temperatura de retorno da recirculação de água quente ({hvac.hotWaterReturnTemp}°C) é inferior a 50°C, indicando arrefecimento excessivo na rede de distribuição e risco de proliferação de Legionella.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hotWaterReturnTemp", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "{hvac.hotWaterReturnTemp}°C no retorno",
+      "requiredValue": "≥ 50°C na recirculação (≥ 55°C recomendado)",
+      "remediation": "Garantir temperatura de retorno ≥ 50°C na recirculação de AQS: (1) Verificar e equilibrar a rede de recirculação: válvulas de equilíbrio termostáticas em cada coluna. (2) Isolar tubagem: perdas térmicas excessivas reduzem a temperatura nos pontos mais distantes. (3) Bomba de recirculação: verificar caudal adequado (tipicamente 10-20% do caudal de ponta). (4) Funcionamento contínuo: a recirculação deve operar 24h (não desligar à noite). (5) Eliminar troços mortos (dead legs): tubagem > 3 m sem utilização regular é um foco de estagnação.",
+      "enabled": true,
+      "tags": ["Legionella", "AQS", "recirculação", "temperatura", "retorno"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-SAMPLING-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS Orientação 023/2014 — Programa de Amostragem de Legionella",
+      "description": "Não existe programa de amostragem microbiológica periódica para pesquisa de Legionella na rede de água e nos sistemas AVAC de risco (torres de arrefecimento, humidificadores).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasLegionellaSamplingProgram", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Amostragem semestral (trimestral para edifícios de saúde e torres de arrefecimento)",
+      "remediation": "Implementar programa de amostragem de Legionella: (1) Pontos de colheita: depósito de AQS (fundo), ponto de utilização mais distante, retorno de recirculação, torre de arrefecimento (bacia). (2) Frequência: semestral para edifícios de comércio/serviços, trimestral para hospitais/lares/hotéis e torres de arrefecimento. (3) Método: colheita conforme ISO 11731, análise em laboratório acreditado IPAC. (4) Limites: < 100 UFC/L (satisfatório), 100-1000 UFC/L (vigilância reforçada), > 1000 UFC/L (ação corretiva imediata), > 10000 UFC/L (encerramento e desinfeção). (5) Registo: manter resultados por 5 anos.",
+      "enabled": true,
+      "tags": ["Legionella", "amostragem", "DGS", "microbiologia", "ISO 11731"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-TREATMENT-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / DL 306/2007 — Plano de Tratamento de Água Anti-Legionella",
+      "description": "Não existe plano de tratamento da água documentado para prevenção de Legionella, incluindo programa de desinfeção, controlo de biofilme e tratamento anti-corrosão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasWaterTreatmentPlan", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasHotWaterSystem", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Plano de tratamento de água documentado com protocolo de desinfeção",
+      "remediation": "Elaborar plano de tratamento de água anti-Legionella: (1) Desinfeção contínua: cloro residual livre 0.2-0.5 mg/L nos pontos de utilização, OU dióxido de cloro 0.1-0.3 mg/L (mais eficaz contra biofilme). (2) Desinfeção de choque: hipercloração a 50 mg/L durante 1h (após contaminação confirmada), ou choque térmico a 70°C durante 30 min em todos os pontos. (3) Anti-incrustante: tratamento anti-calcário para manter eficiência dos permutadores. (4) Anti-corrosão: inibidor adequado ao material da tubagem (silicatos para cobre, fosfatos para aço). (5) Monitorização: pH, cloro residual, temperatura — registo semanal. (6) Responsável: técnico de tratamento de água designado.",
+      "enabled": true,
+      "tags": ["Legionella", "tratamento água", "desinfeção", "cloro", "biofilme"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-TEMP-MONITOR-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / ECDC Guidelines — Programa de Monitorização de Temperaturas",
+      "description": "Não existe programa de monitorização periódica de temperaturas na rede de AQS e nos sistemas de risco (torres de arrefecimento), impossibilitando a deteção precoce de condições favoráveis à proliferação de Legionella.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasTemperatureMonitoringProgram", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasHotWaterSystem", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Monitorização semanal de temperaturas em pontos críticos da rede de AQS",
+      "remediation": "Implementar programa de monitorização de temperaturas: (1) Frequência: semanal (mensal mínimo). (2) Pontos de medição: saída do depósito AQS, retorno de recirculação, ponto de utilização mais próximo, ponto mais distante, cada coluna montante. (3) Método: termómetro de contacto calibrado, medição após 1 minuto de escoamento. (4) Critérios: depósito ≥ 60°C, distribuição ≥ 55°C, retorno ≥ 50°C, ponto de utilização ≥ 50°C em 1 minuto. (5) Água fria: manter < 20°C (se > 25°C: risco significativo de Legionella). (6) Registar: data, ponto, temperatura, operador. Investigar qualquer desvio persistente.",
+      "enabled": true,
+      "tags": ["Legionella", "temperatura", "monitorização", "AQS", "programa"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-DEADLEG-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / EN 806-2 — Eliminação de Troços Mortos na Rede de Água",
+      "description": "A rede de distribuição de água possui troços mortos (dead legs) com comprimento superior a 3× o diâmetro da tubagem, criando zonas de estagnação favoráveis à proliferação de Legionella.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasDeadLegsEliminated", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasHotWaterSystem", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Troços mortos ≤ 3× diâmetro da tubagem (ou eliminados)",
+      "remediation": "Identificar e eliminar troços mortos na rede de água: (1) Levantamento: identificar todos os ramais sem utilização regular (equipamentos desativados, pontos de consumo encerrados, ligações futuras não utilizadas). (2) Eliminação: cortar e tamponar os troços mortos junto à tubagem principal. (3) Minimização: quando impossível eliminar, reduzir comprimento para ≤ 3× DN da tubagem. (4) Purga periódica: para troços que não podem ser eliminados, purgar semanalmente durante 5 minutos. (5) Fontes comuns: ligações de reserva em coletores, ramais de equipamentos removidos, derivações para futuras ampliações.",
+      "enabled": true,
+      "tags": ["Legionella", "troços mortos", "dead legs", "estagnação", "EN 806"]
+    }
+  ]
+}

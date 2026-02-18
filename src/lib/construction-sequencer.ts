@@ -27,6 +27,7 @@ import type {
 } from "./wbs-types";
 import { chapterToPhase, PRONIC_CHAPTERS } from "./wbs-types";
 import type { CypeMatch } from "./wbs-types";
+import { PHASE_OVERLAP_RULES } from "./phase-constraints";
 
 // ============================================================
 // Construction Phase Ordering & Dependencies
@@ -417,6 +418,15 @@ export function generateSchedule(
       if (depDate > phaseStart) phaseStart = depDate;
     }
 
+    // Enforce phase overlap rules (e.g., structure→waterproofing needs 7-day gap)
+    for (const rule of PHASE_OVERLAP_RULES) {
+      if (rule.canOverlap || rule.phase2 !== phase) continue;
+      const pred = phaseSchedule.get(rule.phase1);
+      if (!pred) continue;
+      const requiredStart = addWorkingDays(pred.finish, rule.minimumGap ?? 0);
+      if (requiredStart > phaseStart) phaseStart = requiredStart;
+    }
+
     const phaseFinish = addWorkingDays(phaseStart, duration.days);
     phaseSchedule.set(phase, { start: phaseStart, finish: phaseFinish });
   }
@@ -587,7 +597,9 @@ export function generateSchedule(
   for (const task of allTasks.filter(t => !t.isSummary)) {
     const start = parseDate(task.startDate);
     const weekKey = `${start.getFullYear()}-W${String(Math.ceil((start.getDate()) / 7)).padStart(2, "0")}`;
-    const workers = task.resources.filter(r => r.type === "labor").reduce((sum, r) => sum + r.units, 0);
+    const workers = task.resources
+      .filter(r => r.type === "labor" || r.type === "subcontractor")
+      .reduce((sum, r) => sum + (r.type === "subcontractor" ? (r.teamSize ?? r.units) : r.units), 0);
     weekWorkers.set(weekKey, (weekWorkers.get(weekKey) ?? 0) + workers);
   }
   let peakWeek = "";

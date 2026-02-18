@@ -1,0 +1,88 @@
+name: Update CYPE Prices Monthly
+
+on:
+  schedule:
+    # Run on 1st of every month at 2 AM UTC
+    - cron: "0 2 1 * *"
+  workflow_dispatch:
+    inputs:
+      chapters:
+        description: "Chapter codes to scrape (comma-separated, e.g. E,I,N). Leave empty for all."
+        required: false
+        default: ""
+      typology:
+        description: "Typology to scrape: obra_nova, reabilitacao, espacos_urbanos, all (default: all)"
+        required: false
+        default: "all"
+      validate:
+        description: "Run price validation after scraping"
+        required: false
+        default: "true"
+      with_variants:
+        description: "Scrape parametric variants with Playwright (slower, more items)"
+        required: false
+        default: "false"
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 480
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright (for variant scraping)
+        if: github.event.inputs.with_variants == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run CYPE Scraper
+        run: |
+          ARGS="--merge"
+
+          if [ "${{ github.event.inputs.validate }}" = "true" ] || [ -z "${{ github.event.inputs.validate }}" ]; then
+            ARGS="$ARGS --validate"
+          fi
+
+          if [ -n "${{ github.event.inputs.typology }}" ]; then
+            ARGS="$ARGS --typology ${{ github.event.inputs.typology }}"
+          fi
+
+          if [ -n "${{ github.event.inputs.chapters }}" ]; then
+            ARGS="$ARGS --chapters ${{ github.event.inputs.chapters }}"
+          fi
+
+          if [ "${{ github.event.inputs.with_variants }}" = "true" ]; then
+            ARGS="$ARGS --with-variants"
+          fi
+
+          echo "Running: npx tsx scripts/scrape-cype.ts $ARGS"
+          npx tsx scripts/scrape-cype.ts $ARGS
+
+      - name: Commit updated prices
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          DATE=$(date +%Y-%m-%d)
+
+          git add data/cype-full.json data/backups/ data/cype-categories.config.json
+          git diff --quiet --staged || git commit -m "chore: update CYPE prices — $DATE"
+          git push
+        continue-on-error: true
+
+      - name: Upload price database artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cype-prices-${{ github.run_number }}
+          path: data/cype-full.json
+          retention-days: 90

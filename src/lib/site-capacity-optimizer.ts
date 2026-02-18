@@ -10,7 +10,7 @@
  * - Equipment conflicts (only 1 crane available, etc.)
  *
  * Optimization strategies:
- * 1. Shift tasks to off-peak periods
+ * 1. Resource leveling (flatten labor histogram using float-based shifting)
  * 2. Split large tasks across time
  * 3. Sequence conflicting phases
  */
@@ -20,8 +20,13 @@ import type {
   ScheduleTask,
   ConstructionPhase,
 } from "./wbs-types";
-import type { ProjectResources, LaborResource } from "./resource-aggregator";
+import type { ProjectResources } from "./resource-aggregator";
 import { PHASE_ORDER } from "./construction-sequencer";
+import {
+  PHASE_OVERLAP_RULES,
+  getPhaseEquipment,
+  type PhaseOverlapRule,
+} from "./phase-constraints";
 
 // ============================================================
 // Interfaces
@@ -39,13 +44,7 @@ export interface EquipmentConflict {
   maxSimultaneous: number;
 }
 
-export interface PhaseOverlapRule {
-  phase1: ConstructionPhase;
-  phase2: ConstructionPhase;
-  canOverlap: boolean;
-  minimumGap?: number;        // Days
-  reason: string;
-}
+export type { PhaseOverlapRule } from "./phase-constraints";
 
 export interface OptimizedSchedule {
   originalSchedule: ProjectSchedule;
@@ -75,6 +74,7 @@ export interface CapacityPoint {
   workersCapacity: number;
   utilizationPercent: number;
   phases: { phase: ConstructionPhase; workers: number }[];
+  equipment?: { name: string; count: number; max: number }[];
   isBottleneck: boolean;
 }
 
@@ -94,156 +94,7 @@ export interface OptimizationSuggestion {
   estimatedImpact: string;
 }
 
-// ============================================================
-// Portuguese Construction Phase Overlap Rules (Comprehensive)
-// ============================================================
-
-const DEFAULT_OVERLAP_RULES: PhaseOverlapRule[] = [
-  // Structure phase
-  {
-    phase1: "structure",
-    phase2: "rough_in_electrical",
-    canOverlap: true,
-    reason: "Condutas elétricas podem ser embebidas durante betonagem",
-  },
-  {
-    phase1: "structure",
-    phase2: "rough_in_plumbing",
-    canOverlap: true,
-    reason: "Tubagens podem ser embebidas durante betonagem",
-  },
-  {
-    phase1: "structure",
-    phase2: "waterproofing",
-    canOverlap: false,
-    minimumGap: 7,
-    reason: "Betão deve curar antes de impermeabilizar (mínimo 7 dias)",
-  },
-
-  // Waterproofing
-  {
-    phase1: "waterproofing",
-    phase2: "external_finishes",
-    canOverlap: false,
-    minimumGap: 2,
-    reason: "Impermeabilização deve curar antes de revestir (mínimo 2 dias)",
-  },
-  {
-    phase1: "waterproofing",
-    phase2: "internal_finishes",
-    canOverlap: false,
-    minimumGap: 2,
-    reason: "Impermeabilização deve secar antes de acabamentos interiores",
-  },
-
-  // Internal finishes
-  {
-    phase1: "internal_finishes",
-    phase2: "painting",
-    canOverlap: false,
-    minimumGap: 3,
-    reason: "Estuque/reboco deve secar 3 dias antes de pintar",
-  },
-  {
-    phase1: "internal_finishes",
-    phase2: "flooring",
-    canOverlap: false,
-    minimumGap: 2,
-    reason: "Paredes devem estar rebocadas antes de assentar pavimentos",
-  },
-  {
-    phase1: "internal_finishes",
-    phase2: "carpentry",
-    canOverlap: true,
-    reason: "Carpintarias podem ser instaladas durante acabamentos",
-  },
-
-  // Painting
-  {
-    phase1: "painting",
-    phase2: "flooring",
-    canOverlap: false,
-    minimumGap: 1,
-    reason: "Pintura deve secar antes de assentar pavimentos (risco de manchas)",
-  },
-  {
-    phase1: "painting",
-    phase2: "carpentry",
-    canOverlap: false,
-    reason: "Pintura antes de carpintarias (para não sujar)",
-  },
-  {
-    phase1: "painting",
-    phase2: "electrical_fixtures",
-    canOverlap: true,
-    reason: "Aparelhagem pode ser instalada após pintura",
-  },
-
-  // Flooring
-  {
-    phase1: "flooring",
-    phase2: "carpentry",
-    canOverlap: true,
-    reason: "Áreas diferentes, sem risco de contaminação",
-  },
-  {
-    phase1: "flooring",
-    phase2: "plumbing_fixtures",
-    canOverlap: true,
-    reason: "Loiças sanitárias podem ser instaladas durante pavimentação",
-  },
-
-  // External works
-  {
-    phase1: "external_finishes",
-    phase2: "external_works",
-    canOverlap: true,
-    reason: "Arranjos exteriores podem começar durante acabamentos de fachada",
-  },
-
-  // Rough-in phases (can overlap with each other)
-  {
-    phase1: "rough_in_electrical",
-    phase2: "rough_in_plumbing",
-    canOverlap: true,
-    reason: "Instalações elétricas e canalizações em áreas diferentes",
-  },
-  {
-    phase1: "rough_in_electrical",
-    phase2: "rough_in_hvac",
-    canOverlap: true,
-    reason: "Elétrica e AVAC podem trabalhar em paralelo",
-  },
-  {
-    phase1: "rough_in_plumbing",
-    phase2: "rough_in_hvac",
-    canOverlap: true,
-    reason: "Canalizações e AVAC podem trabalhar em paralelo",
-  },
-
-  // Ceilings
-  {
-    phase1: "ceilings",
-    phase2: "painting",
-    canOverlap: false,
-    minimumGap: 1,
-    reason: "Tetos falsos devem estar completos antes de pintar",
-  },
-  {
-    phase1: "ceilings",
-    phase2: "electrical_fixtures",
-    canOverlap: true,
-    reason: "Luminárias podem ser instaladas após tetos falsos",
-  },
-
-  // Fire safety
-  {
-    phase1: "fire_safety",
-    phase2: "testing",
-    canOverlap: false,
-    reason: "Sistema de incêndio deve estar instalado antes de testar",
-  },
-];
+// Phase overlap rules imported from shared module (phase-constraints.ts)
 
 // ============================================================
 // Default Constraints
@@ -288,48 +139,240 @@ const DEFAULT_CONSTRAINTS: SiteCapacityConstraints = {
     { equipment: "concrete_pump", maxSimultaneous: 1 },
     { equipment: "scaffolding", maxSimultaneous: 2 },
   ],
-  phaseOverlapRules: DEFAULT_OVERLAP_RULES,
+  phaseOverlapRules: PHASE_OVERLAP_RULES,
 };
+
+// ============================================================
+// Date Helpers
+// ============================================================
+
+function toDateKey(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
+function addOneDay(isoDate: string): string {
+  const d = new Date(isoDate);
+  d.setDate(d.getDate() + 1);
+  return toDateKey(d);
+}
+
+// ============================================================
+// Worker & Equipment Tracking
+// ============================================================
+
+/**
+ * Sum actual labor units for a task (not just count of resource entries).
+ */
+function getTaskWorkerCount(task: ScheduleTask): number {
+  return Math.max(
+    1,
+    task.resources
+      .filter((r) => r.type === "labor" || r.type === "subcontractor")
+      .reduce((sum, r) => sum + (r.type === "subcontractor" ? (r.teamSize ?? r.units) : (r.units || 1)), 0),
+  );
+}
+
+/**
+ * Build daily worker histogram from task list.
+ * Returns a Map of dateKey → total labor units on that day.
+ */
+function buildDailyHistogram(tasks: ScheduleTask[]): Map<string, number> {
+  const histogram = new Map<string, number>();
+
+  for (const task of tasks) {
+    if (task.isSummary) continue;
+    const workers = getTaskWorkerCount(task);
+    const currentDate = new Date(task.startDate);
+    const taskEnd = new Date(task.finishDate);
+
+    while (currentDate <= taskEnd) {
+      const key = toDateKey(currentDate);
+      histogram.set(key, (histogram.get(key) ?? 0) + workers);
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  }
+
+  return histogram;
+}
+
+/**
+ * Find the day with the greatest worker overload.
+ * Returns the dateKey string, or null if no overloads.
+ */
+function findWorstOverloadDay(
+  histogram: Map<string, number>,
+  constraints: SiteCapacityConstraints,
+): string | null {
+  const capacity = constraints.maxWorkersPerFloor;
+  let worstDay: string | null = null;
+  let worstOverload = 0;
+
+  for (const [dateKey, workers] of histogram) {
+    const overload = workers - capacity;
+    if (overload > worstOverload) {
+      worstOverload = overload;
+      worstDay = dateKey;
+    }
+  }
+
+  return worstDay;
+}
+
+// ============================================================
+// Float Calculation
+// ============================================================
+
+interface TaskFloat {
+  uid: number;
+  totalFloat: number; // Days this task can slip without delaying project
+  isCritical: boolean;
+}
+
+/**
+ * Compute total float for each non-summary task.
+ *
+ * Float = min(successor_start) - task.finishDate.
+ * If no successors, float = projectEnd - task.finishDate.
+ */
+function computeTaskFloats(
+  tasks: ScheduleTask[],
+  criticalPath: number[],
+): Map<number, TaskFloat> {
+  const criticalSet = new Set(criticalPath);
+  const floatMap = new Map<number, TaskFloat>();
+
+  const nonSummaryTasks = tasks.filter((t) => !t.isSummary);
+  if (nonSummaryTasks.length === 0) return floatMap;
+
+  const projectEnd = Math.max(
+    ...nonSummaryTasks.map((t) => new Date(t.finishDate).getTime()),
+  );
+
+  // Build successor map: predUid → [successorUid, ...]
+  const successors = new Map<number, number[]>();
+  for (const task of nonSummaryTasks) {
+    for (const pred of task.predecessors) {
+      const list = successors.get(pred.uid) ?? [];
+      list.push(task.uid);
+      successors.set(pred.uid, list);
+    }
+  }
+
+  const taskMap = new Map(nonSummaryTasks.map((t) => [t.uid, t]));
+
+  for (const task of nonSummaryTasks) {
+    const taskEnd = new Date(task.finishDate).getTime();
+    const succs = successors.get(task.uid) ?? [];
+
+    let latestAllowable: number;
+    if (succs.length === 0) {
+      latestAllowable = projectEnd;
+    } else {
+      latestAllowable = Math.min(
+        ...succs.map((suid) => {
+          const s = taskMap.get(suid);
+          return s ? new Date(s.startDate).getTime() : projectEnd;
+        }),
+      );
+    }
+
+    const floatMs = latestAllowable - taskEnd;
+    const floatDays = Math.max(
+      0,
+      Math.floor(floatMs / (1000 * 60 * 60 * 24)),
+    );
+
+    floatMap.set(task.uid, {
+      uid: task.uid,
+      totalFloat: floatDays,
+      isCritical: criticalSet.has(task.uid) || floatDays === 0,
+    });
+  }
+
+  return floatMap;
+}
+
+// ============================================================
+// Predecessor Validation
+// ============================================================
+
+/**
+ * Check if shifting a task to newStart would violate predecessor constraints.
+ */
+function violatesPredecessors(
+  task: ScheduleTask,
+  newStart: string,
+  allTasks: ScheduleTask[],
+): boolean {
+  const taskMap = new Map(allTasks.map((t) => [t.uid, t]));
+  const newStartTime = new Date(newStart).getTime();
+
+  for (const pred of task.predecessors) {
+    const predTask = taskMap.get(pred.uid);
+    if (!predTask) continue;
+
+    if (pred.type === "FS") {
+      // Finish-to-Start: task must start after predecessor finishes + lag
+      const predEnd = new Date(predTask.finishDate).getTime();
+      const lagMs = (pred.lag ?? 0) * 24 * 60 * 60 * 1000;
+      if (newStartTime < predEnd + lagMs) return true;
+    } else if (pred.type === "SS") {
+      // Start-to-Start: task must start after predecessor starts + lag
+      const predStart = new Date(predTask.startDate).getTime();
+      const lagMs = (pred.lag ?? 0) * 24 * 60 * 60 * 1000;
+      if (newStartTime < predStart + lagMs) return true;
+    }
+  }
+
+  return false;
+}
 
 // ============================================================
 // Helper Functions
 // ============================================================
 
 /**
- * Build daily capacity timeline showing worker allocation.
+ * Build daily capacity timeline showing worker and equipment allocation.
  */
 function buildCapacityTimeline(
   schedule: ProjectSchedule,
-  resources: ProjectResources,
-  constraints: SiteCapacityConstraints
+  _resources: ProjectResources,
+  constraints: SiteCapacityConstraints,
 ): CapacityPoint[] {
   const timeline: CapacityPoint[] = [];
   const dailyWorkers = new Map<string, Map<ConstructionPhase, number>>();
+  const dailyEquipment = new Map<string, Map<string, number>>();
 
-  // Collect all dates
-  const startDate = new Date(schedule.startDate);
-  const endDate = new Date(schedule.finishDate);
-
-  // For each task, allocate workers across its duration
+  // For each task, allocate workers and equipment across its duration
   for (const task of schedule.tasks) {
+    if (task.isSummary) continue;
+
+    const workers = getTaskWorkerCount(task);
+    const phaseEquip = getPhaseEquipment(task.phase);
     const currentDate = new Date(task.startDate);
     const taskEnd = new Date(task.finishDate);
 
     while (currentDate <= taskEnd) {
-      const dateKey = currentDate.toISOString().split('T')[0];
+      const dateKey = toDateKey(currentDate);
 
+      // Track workers per phase per day
       if (!dailyWorkers.has(dateKey)) {
         dailyWorkers.set(dateKey, new Map());
       }
-
       const dayData = dailyWorkers.get(dateKey)!;
       const phase = task.phase || "cleanup";
+      dayData.set(phase, (dayData.get(phase) ?? 0) + workers);
 
-      // Estimate workers for this task (simplified)
-      const workersNeeded = Math.max(1, Math.min(task.resources.filter(r => r.type === "labor").length, 5));
-
-      const current = dayData.get(phase) || 0;
-      dayData.set(phase, current + workersNeeded);
+      // Track equipment per day
+      if (phaseEquip.length > 0) {
+        if (!dailyEquipment.has(dateKey)) {
+          dailyEquipment.set(dateKey, new Map());
+        }
+        const dayEquip = dailyEquipment.get(dateKey)!;
+        for (const eq of phaseEquip) {
+          dayEquip.set(eq, (dayEquip.get(eq) ?? 0) + 1);
+        }
+      }
 
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -337,16 +380,41 @@ function buildCapacityTimeline(
 
   // Build timeline points
   for (const [dateKey, phases] of dailyWorkers.entries()) {
-    const totalWorkers = Array.from(phases.values()).reduce((sum, w) => sum + w, 0);
+    const totalWorkers = Array.from(phases.values()).reduce(
+      (sum, w) => sum + w,
+      0,
+    );
     const capacity = constraints.maxWorkersPerFloor;
     const isBottleneck = totalWorkers > capacity;
+
+    // Build equipment data for this day
+    const dayEquip = dailyEquipment.get(dateKey);
+    let equipmentData: { name: string; count: number; max: number }[] | undefined;
+    if (dayEquip) {
+      equipmentData = [];
+      for (const conflict of constraints.equipmentConflicts) {
+        const count = dayEquip.get(conflict.equipment) ?? 0;
+        if (count > 0) {
+          equipmentData.push({
+            name: conflict.equipment,
+            count,
+            max: conflict.maxSimultaneous,
+          });
+        }
+      }
+      if (equipmentData.length === 0) equipmentData = undefined;
+    }
 
     timeline.push({
       date: new Date(dateKey),
       workersAllocated: totalWorkers,
       workersCapacity: capacity,
       utilizationPercent: (totalWorkers / capacity) * 100,
-      phases: Array.from(phases.entries()).map(([phase, workers]) => ({ phase, workers })),
+      phases: Array.from(phases.entries()).map(([p, w]) => ({
+        phase: p,
+        workers: w,
+      })),
+      equipment: equipmentData,
       isBottleneck,
     });
   }
@@ -355,12 +423,12 @@ function buildCapacityTimeline(
 }
 
 /**
- * Detect capacity violations and phase overlap conflicts.
+ * Detect capacity violations, equipment conflicts, and phase overlap conflicts.
  */
 function detectViolations(
   timeline: CapacityPoint[],
   schedule: ProjectSchedule,
-  constraints: SiteCapacityConstraints
+  constraints: SiteCapacityConstraints,
 ): Bottleneck[] {
   const bottlenecks: Bottleneck[] = [];
 
@@ -374,10 +442,25 @@ function detectViolations(
       bottlenecks.push({
         date: point.date,
         overload,
-        phases: point.phases.map(p => p.phase),
+        phases: point.phases.map((p) => p.phase),
         reason: `Sobrecarga de ${overload} trabalhadores (${point.workersAllocated}/${point.workersCapacity})`,
         severity,
       });
+    }
+
+    // Check equipment conflicts
+    if (point.equipment) {
+      for (const eq of point.equipment) {
+        if (eq.count > eq.max) {
+          bottlenecks.push({
+            date: point.date,
+            overload: eq.count - eq.max,
+            phases: point.phases.map((p) => p.phase),
+            reason: `Conflito de equipamento: ${eq.count} fases a usar ${eq.name} (máximo: ${eq.max})`,
+            severity: eq.count > eq.max + 1 ? "high" : "medium",
+          });
+        }
+      }
     }
   }
 
@@ -385,13 +468,15 @@ function detectViolations(
   for (const rule of constraints.phaseOverlapRules) {
     if (rule.canOverlap) continue;
 
-    // Find tasks in these phases
-    const phase1Tasks = schedule.tasks.filter(t => t.phase === rule.phase1);
-    const phase2Tasks = schedule.tasks.filter(t => t.phase === rule.phase2);
+    const phase1Tasks = schedule.tasks.filter(
+      (t) => t.phase === rule.phase1,
+    );
+    const phase2Tasks = schedule.tasks.filter(
+      (t) => t.phase === rule.phase2,
+    );
 
     for (const t1 of phase1Tasks) {
       for (const t2 of phase2Tasks) {
-        // Check if they overlap (accounting for minimum gap)
         const gap = rule.minimumGap || 0;
         const t1End = new Date(t1.finishDate);
         t1End.setDate(t1End.getDate() + gap);
@@ -421,7 +506,7 @@ function detectViolations(
  */
 function generateSuggestions(
   bottlenecks: Bottleneck[],
-  schedule: ProjectSchedule
+  _schedule: ProjectSchedule,
 ): OptimizationSuggestion[] {
   const suggestions: OptimizationSuggestion[] = [];
 
@@ -429,7 +514,8 @@ function generateSuggestions(
     suggestions.push({
       type: "resource",
       title: "Cronograma Otimizado",
-      description: "O cronograma está bem balanceado. Não foram detetados constrangimentos de capacidade.",
+      description:
+        "O cronograma está bem balanceado. Não foram detetados constrangimentos de capacidade.",
       affectedTasks: [],
       estimatedImpact: "Sem alterações necessárias",
     });
@@ -437,95 +523,169 @@ function generateSuggestions(
   }
 
   // Count high-severity bottlenecks
-  const highSeverity = bottlenecks.filter(b => b.severity === "high").length;
+  const highSeverity = bottlenecks.filter(
+    (b) => b.severity === "high",
+  ).length;
   if (highSeverity > 0) {
     suggestions.push({
       type: "resource",
       title: `${highSeverity} Sobrecargas Críticas Detetadas`,
-      description: "Recomenda-se aumentar a equipa ou dividir trabalhos em fases distintas para evitar congestionamento no estaleiro.",
+      description:
+        "Recomenda-se aumentar a equipa ou dividir trabalhos em fases distintas para evitar congestionamento no estaleiro.",
       affectedTasks: [],
       estimatedImpact: `Redução de ${highSeverity * 2}-${highSeverity * 3} dias`,
     });
   }
 
   // Phase conflict suggestions
-  const phaseConflicts = bottlenecks.filter(b => b.reason.includes("Conflito"));
+  const phaseConflicts = bottlenecks.filter((b) =>
+    b.reason.includes("Conflito de fases"),
+  );
   if (phaseConflicts.length > 0) {
     suggestions.push({
       type: "sequence",
       title: `${phaseConflicts.length} Conflitos de Fases`,
-      description: "Algumas fases não podem ocorrer em paralelo devido a requisitos técnicos (cura de betão, secagem, etc.).",
+      description:
+        "Algumas fases não podem ocorrer em paralelo devido a requisitos técnicos (cura de betão, secagem, etc.).",
       affectedTasks: [],
       estimatedImpact: `Ajuste de ${phaseConflicts.length * 1}-${phaseConflicts.length * 2} dias`,
+    });
+  }
+
+  // Equipment conflict suggestions
+  const equipmentConflicts = bottlenecks.filter((b) =>
+    b.reason.includes("Conflito de equipamento"),
+  );
+  if (equipmentConflicts.length > 0) {
+    suggestions.push({
+      type: "resource",
+      title: `${equipmentConflicts.length} Conflitos de Equipamento`,
+      description:
+        "Fases concorrentes necessitam do mesmo equipamento (grua, bomba de betão, andaimes). Recomenda-se resequenciar ou alugar equipamento adicional.",
+      affectedTasks: [],
+      estimatedImpact: `Possível atraso de ${equipmentConflicts.length * 2}-${equipmentConflicts.length * 5} dias sem intervenção`,
     });
   }
 
   return suggestions;
 }
 
+// ============================================================
+// Resource Leveling (replaces shiftTasksToOffPeak)
+// ============================================================
+
 /**
- * Shift tasks to off-peak periods (heuristic #1).
+ * Resource leveling: flatten the labor histogram by delaying
+ * non-critical tasks within their available float.
  *
- * Strategy: Find tasks running during bottlenecks and shift them forward
- * to periods with lower utilization.
+ * Greedy heuristic:
+ * 1. Build daily worker histogram
+ * 2. Find the day with the highest overload
+ * 3. Among tasks active on that day, pick the non-critical one with most float
+ * 4. Delay that task by 1 day (if float > 0 and predecessors respected)
+ * 5. Repeat until no overloads or max iterations reached
  */
-function shiftTasksToOffPeak(
+function levelResources(
   tasks: ScheduleTask[],
-  timeline: CapacityPoint[],
-  bottlenecks: Bottleneck[]
-): ScheduleTask[] {
-  if (bottlenecks.length === 0) return tasks;
+  criticalPath: number[],
+  constraints: SiteCapacityConstraints,
+  maxIterations: number = 200,
+): { tasks: ScheduleTask[]; adjustments: ScheduleAdjustment[] } {
+  const adjustments: ScheduleAdjustment[] = [];
+  const current = tasks.map((t) => ({ ...t }));
 
-  const shiftedTasks = [...tasks];
-  const bottleneckDates = new Set(bottlenecks.map(b => b.date.toISOString().split('T')[0]));
+  for (let iter = 0; iter < maxIterations; iter++) {
+    // 1. Build daily histogram
+    const histogram = buildDailyHistogram(current);
 
-  // Find tasks that can be shifted (not on critical path, not dependencies)
-  for (let i = 0; i < shiftedTasks.length; i++) {
-    const task = shiftedTasks[i];
-    if (task.isSummary) continue; // Don't shift summary tasks
+    // 2. Find worst overload day
+    const worstDay = findWorstOverloadDay(histogram, constraints);
+    if (!worstDay) break; // No overloads remain
 
-    const taskDateKey = task.startDate.split('T')[0];
+    // 3. Compute float for current state
+    const floatMap = computeTaskFloats(current, criticalPath);
 
-    // Check if task runs during a bottleneck
-    if (bottleneckDates.has(taskDateKey)) {
-      // Try to shift forward by 1-3 days to find off-peak period
-      for (let shiftDays = 1; shiftDays <= 3; shiftDays++) {
-        const newStart = new Date(task.startDate);
-        newStart.setDate(newStart.getDate() + shiftDays);
-        const newDateKey = newStart.toISOString().split('T')[0];
+    // 4. Among tasks active on worstDay, find the one with most float
+    const activeTasks = current.filter((t) => {
+      if (t.isSummary) return false;
+      const start = t.startDate.split("T")[0];
+      const end = t.finishDate.split("T")[0];
+      return start <= worstDay && end >= worstDay;
+    });
 
-        // Check if new date is off-peak (not a bottleneck)
-        if (!bottleneckDates.has(newDateKey)) {
-          // Shift this task
-          const newEnd = new Date(task.finishDate);
-          newEnd.setDate(newEnd.getDate() + shiftDays);
-
-          shiftedTasks[i] = {
-            ...task,
-            startDate: newStart.toISOString().split('T')[0],
-            finishDate: newEnd.toISOString().split('T')[0],
-          };
-          break;
-        }
+    let bestTask: ScheduleTask | null = null;
+    let bestFloat = -1;
+    for (const t of activeTasks) {
+      const f = floatMap.get(t.uid);
+      if (f && !f.isCritical && f.totalFloat > bestFloat) {
+        bestFloat = f.totalFloat;
+        bestTask = t;
       }
     }
+
+    if (!bestTask || bestFloat <= 0) break; // Cannot improve further
+
+    // 5. Delay task by 1 day
+    const idx = current.findIndex((t) => t.uid === bestTask!.uid);
+    if (idx === -1) break;
+
+    const newStart = addOneDay(current[idx].startDate);
+    const newEnd = addOneDay(current[idx].finishDate);
+
+    // Verify predecessor constraints before applying
+    if (violatesPredecessors(current[idx], newStart, current)) continue;
+
+    adjustments.push({
+      taskId: String(current[idx].uid),
+      taskName: current[idx].name,
+      oldStart: new Date(current[idx].startDate),
+      newStart: new Date(newStart),
+      oldEnd: new Date(current[idx].finishDate),
+      newEnd: new Date(newEnd),
+      reason: `Nivelamento de recursos: atrasar 1 dia para reduzir pico em ${worstDay}`,
+    });
+
+    current[idx] = {
+      ...current[idx],
+      startDate: newStart,
+      finishDate: newEnd,
+    };
   }
 
-  return shiftedTasks;
+  return { tasks: current, adjustments };
 }
 
+// ============================================================
+// Task Splitting (heuristic #2)
+// ============================================================
+
 /**
- * Split large tasks across time (heuristic #2).
+ * Split large tasks across time.
  *
  * Strategy: Find tasks with many workers (>8) and split them into
  * 2 sequential tasks with half the workers each, extending duration.
+ *
+ * UID strategy:
+ * - Part 1 keeps the original task UID (preserves predecessor references)
+ * - Part 2 gets a new UID with Part 1 as predecessor
+ * - Other tasks referencing the original UID as predecessor are remapped
+ *   to reference Part 2 (since Part 2 represents the task's completion)
+ *
+ * Cost is split proportionally between parts.
  */
 function splitLargeTasks(
   tasks: ScheduleTask[],
-  constraints: SiteCapacityConstraints
+  _constraints: SiteCapacityConstraints,
 ): ScheduleTask[] {
   const result: ScheduleTask[] = [];
-  const SPLIT_THRESHOLD = 8; // Split tasks with more than 8 workers
+  const SPLIT_THRESHOLD = 8;
+
+  // Find max UID to avoid collisions with new Part 2 UIDs
+  let nextUid = tasks.reduce((max, t) => Math.max(max, t.uid), 0) + 1;
+
+  // Track which original UIDs were split → Part 2 UID
+  // Successors of the original task should depend on Part 2 (completion)
+  const splitMap = new Map<number, number>(); // originalUid → part2Uid
 
   for (const task of tasks) {
     if (task.isSummary) {
@@ -533,42 +693,64 @@ function splitLargeTasks(
       continue;
     }
 
-    // Count workers in this task
-    const workerCount = task.resources.filter(r => r.type === "labor").reduce((sum, r) => sum + (r.units || 1), 0);
+    const workerCount = getTaskWorkerCount(task);
 
     if (workerCount > SPLIT_THRESHOLD) {
-      // Split into 2 sequential tasks
       const startDate = new Date(task.startDate);
       const endDate = new Date(task.finishDate);
-      const midpoint = new Date(startDate.getTime() + (endDate.getTime() - startDate.getTime()) / 2);
+      const midpoint = new Date(
+        startDate.getTime() +
+          (endDate.getTime() - startDate.getTime()) / 2,
+      );
+      const midpointISO = toDateKey(midpoint);
 
-      const midpointISO = midpoint.toISOString().split('T')[0];
+      const part2Uid = nextUid++;
+      splitMap.set(task.uid, part2Uid);
 
-      // First half
+      // Split cost proportionally by duration
+      const part1Days = Math.ceil(task.durationDays / 2);
+      const part2Days = Math.max(1, task.durationDays - part1Days);
+      const part1Ratio = task.durationDays > 0 ? part1Days / task.durationDays : 0.5;
+      const part2Ratio = 1 - part1Ratio;
+
+      // Part 1: keeps original UID (preserves incoming predecessor references)
       result.push({
         ...task,
-        uid: task.uid * 1000 + 1, // Generate unique UID for part 1
         name: `${task.name} (Parte 1)`,
         finishDate: midpointISO,
-        durationDays: Math.ceil(task.durationDays / 2),
+        durationDays: part1Days,
         durationHours: Math.ceil(task.durationHours / 2),
-        resources: task.resources.map(r => ({
+        cost: Math.round(task.cost * part1Ratio),
+        materialCost: Math.round(task.materialCost * part1Ratio),
+        resources: task.resources.map((r) => ({
           ...r,
-          units: r.type === "labor" ? Math.ceil((r.units || 1) / 2) : r.units,
+          units:
+            r.type === "labor" || r.type === "subcontractor"
+              ? Math.ceil((r.units || 1) / 2)
+              : r.units,
         })),
       });
 
-      // Second half
+      // Part 2: new UID, predecessor = Part 1 (original UID)
       result.push({
         ...task,
-        uid: task.uid * 1000 + 2, // Generate unique UID for part 2
+        uid: part2Uid,
         name: `${task.name} (Parte 2)`,
         startDate: midpointISO,
-        durationDays: Math.floor(task.durationDays / 2),
+        durationDays: part2Days,
         durationHours: Math.floor(task.durationHours / 2),
-        resources: task.resources.map(r => ({
+        cost: Math.round(task.cost * part2Ratio),
+        materialCost: Math.round(task.materialCost * part2Ratio),
+        predecessors: [
+          ...task.predecessors,
+          { uid: task.uid, type: "FS" as const },
+        ],
+        resources: task.resources.map((r) => ({
           ...r,
-          units: r.type === "labor" ? Math.floor((r.units || 1) / 2) : r.units,
+          units:
+            r.type === "labor" || r.type === "subcontractor"
+              ? Math.floor((r.units || 1) / 2)
+              : r.units,
         })),
       });
     } else {
@@ -576,49 +758,80 @@ function splitLargeTasks(
     }
   }
 
+  // Remap predecessor references: tasks that depended on a split task's
+  // original UID should now depend on Part 2's UID (the completion half)
+  if (splitMap.size > 0) {
+    for (const task of result) {
+      if (task.isSummary) continue;
+      let remapped = false;
+      const newPreds = task.predecessors.map((pred) => {
+        const part2Uid = splitMap.get(pred.uid);
+        // Don't remap Part 2's own reference to Part 1
+        if (part2Uid && task.uid !== part2Uid) {
+          remapped = true;
+          return { ...pred, uid: part2Uid };
+        }
+        return pred;
+      });
+      if (remapped) {
+        task.predecessors = newPreds;
+      }
+    }
+  }
+
   return result;
 }
 
+// ============================================================
+// Phase Sequencing (heuristic #3 — safety net)
+// ============================================================
+
 /**
- * Sequence conflicting phases (heuristic #3).
+ * Sequence conflicting phases.
  *
  * Strategy: Enforce phase overlap rules by adjusting task dates.
  * If two phases cannot overlap, ensure phase2 starts after phase1 ends + gap.
+ *
+ * Note: With overlap rules now integrated into initial sequencing,
+ * this function acts as a safety net catching any remaining violations.
  */
 function sequenceConflicts(
   tasks: ScheduleTask[],
-  rules: PhaseOverlapRule[]
+  rules: PhaseOverlapRule[],
 ): ScheduleTask[] {
   const adjustedTasks = [...tasks];
 
-  // Process each rule
   for (const rule of rules) {
-    if (rule.canOverlap) continue; // Skip rules that allow overlap
+    if (rule.canOverlap) continue;
 
-    // Find tasks in these phases
-    const phase1Tasks = adjustedTasks.filter(t => t.phase === rule.phase1 && !t.isSummary);
-    const phase2Tasks = adjustedTasks.filter(t => t.phase === rule.phase2 && !t.isSummary);
+    const phase1Tasks = adjustedTasks.filter(
+      (t) => t.phase === rule.phase1 && !t.isSummary,
+    );
+    const phase2Tasks = adjustedTasks.filter(
+      (t) => t.phase === rule.phase2 && !t.isSummary,
+    );
 
     if (phase1Tasks.length === 0 || phase2Tasks.length === 0) continue;
 
-    // Find latest end date of phase1
-    const phase1EndDates = phase1Tasks.map(t => new Date(t.finishDate).getTime());
+    const phase1EndDates = phase1Tasks.map((t) =>
+      new Date(t.finishDate).getTime(),
+    );
     const latestPhase1End = new Date(Math.max(...phase1EndDates));
 
-    // Calculate required start date for phase2 (phase1 end + gap)
     const minimumGap = rule.minimumGap || 0;
     const requiredPhase2Start = new Date(latestPhase1End);
-    requiredPhase2Start.setDate(requiredPhase2Start.getDate() + minimumGap);
+    requiredPhase2Start.setDate(
+      requiredPhase2Start.getDate() + minimumGap,
+    );
 
-    // Adjust phase2 tasks if they start too early
     for (let i = 0; i < adjustedTasks.length; i++) {
       const task = adjustedTasks[i];
       if (task.phase === rule.phase2 && !task.isSummary) {
         const taskStartDate = new Date(task.startDate);
         if (taskStartDate < requiredPhase2Start) {
-          // Shift this task to respect the rule
           const shiftDays = Math.ceil(
-            (requiredPhase2Start.getTime() - taskStartDate.getTime()) / (1000 * 60 * 60 * 24)
+            (requiredPhase2Start.getTime() - taskStartDate.getTime()) /
+              (1000 * 60 * 60 * 24),
           );
 
           const newStart = new Date(task.startDate);
@@ -629,8 +842,8 @@ function sequenceConflicts(
 
           adjustedTasks[i] = {
             ...task,
-            startDate: newStart.toISOString().split('T')[0],
-            finishDate: newEnd.toISOString().split('T')[0],
+            startDate: toDateKey(newStart),
+            finishDate: toDateKey(newEnd),
           };
         }
       }
@@ -652,30 +865,36 @@ function sequenceConflicts(
 export function optimizeSchedule(
   schedule: ProjectSchedule,
   resources: ProjectResources,
-  constraints: SiteCapacityConstraints = DEFAULT_CONSTRAINTS
+  constraints: SiteCapacityConstraints = DEFAULT_CONSTRAINTS,
 ): OptimizedSchedule {
-  // Phase 1: Build capacity timeline
+  // Phase 1: Build capacity timeline (workers + equipment)
   const timeline = buildCapacityTimeline(schedule, resources, constraints);
 
-  // Phase 2: Detect violations
+  // Phase 2: Detect violations (workers + equipment + overlaps)
   const bottlenecks = detectViolations(timeline, schedule, constraints);
 
-  // Phase 3: Apply optimization heuristics
+  // Phase 3: Apply optimization strategies
   let optimizedTasks = [...schedule.tasks];
-  const adjustments: ScheduleAdjustment[] = [];
+  let adjustments: ScheduleAdjustment[] = [];
 
   if (bottlenecks.length > 0) {
-    // Strategy 1: Shift tasks to off-peak
-    optimizedTasks = shiftTasksToOffPeak(optimizedTasks, timeline, bottlenecks);
+    // Strategy 1: Resource leveling (flatten labor histogram)
+    const leveled = levelResources(
+      optimizedTasks,
+      schedule.criticalPath,
+      constraints,
+    );
+    optimizedTasks = leveled.tasks;
+    adjustments = leveled.adjustments;
 
-    // Strategy 2: Split large tasks
+    // Strategy 2: Split large tasks (>8 workers)
     optimizedTasks = splitLargeTasks(optimizedTasks, constraints);
 
-    // Strategy 3: Sequence conflicts
-    optimizedTasks = sequenceConflicts(optimizedTasks, constraints.phaseOverlapRules);
-
-    // Record adjustments (for now, none in simplified version)
-    // Full implementation would track all task date changes
+    // Strategy 3: Sequence conflicts (safety net for remaining overlap violations)
+    optimizedTasks = sequenceConflicts(
+      optimizedTasks,
+      constraints.phaseOverlapRules,
+    );
   }
 
   // Phase 4: Generate suggestions
@@ -685,18 +904,23 @@ export function optimizeSchedule(
   const scheduleStartDate = new Date(schedule.startDate);
   const scheduleEndDate = new Date(schedule.finishDate);
   const originalDuration =
-    (scheduleEndDate.getTime() - scheduleStartDate.getTime()) / (1000 * 60 * 60 * 24);
+    (scheduleEndDate.getTime() - scheduleStartDate.getTime()) /
+    (1000 * 60 * 60 * 24);
 
   let optimizedEndDate = scheduleEndDate;
   if (optimizedTasks.length > 0) {
-    const endDates = optimizedTasks.map(t => new Date(t.finishDate).getTime());
+    const endDates = optimizedTasks.map((t) =>
+      new Date(t.finishDate).getTime(),
+    );
     optimizedEndDate = new Date(Math.max(...endDates));
   }
 
   const optimizedDuration =
-    (optimizedEndDate.getTime() - scheduleStartDate.getTime()) / (1000 * 60 * 60 * 24);
+    (optimizedEndDate.getTime() - scheduleStartDate.getTime()) /
+    (1000 * 60 * 60 * 24);
 
-  const efficiencyGain = ((originalDuration - optimizedDuration) / originalDuration) * 100;
+  const efficiencyGain =
+    ((originalDuration - optimizedDuration) / originalDuration) * 100;
 
   return {
     originalSchedule: schedule,
@@ -717,3 +941,11 @@ export function optimizeSchedule(
 export function getDefaultConstraints(): SiteCapacityConstraints {
   return { ...DEFAULT_CONSTRAINTS };
 }
+
+// Exported for testing
+export {
+  buildDailyHistogram,
+  computeTaskFloats,
+  getTaskWorkerCount,
+  type TaskFloat,
+};

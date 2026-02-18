@@ -1,0 +1,114 @@
+{
+  "regulationRef": "portaria-349d-2013",
+  "description": "Regras Portaria 349-D/2013 — manutenção obrigatória de sistemas técnicos AVAC, inspeções, TIM, eficiência operacional",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-MAINT-TIM-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Art. 5.º — Técnico de Instalação e Manutenção (TIM)",
+      "description": "A instalação AVAC não é mantida por um Técnico de Instalação e Manutenção (TIM) qualificado conforme exigido pela Portaria 349-D/2013 para edifícios de comércio e serviços.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasTIM", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "TIM qualificado obrigatório para edifícios de comércio e serviços com AVAC",
+      "remediation": "Contratar ou designar um Técnico de Instalação e Manutenção (TIM) conforme Portaria 349-D/2013: (1) TIM-II: para instalações com potência ≤ 100 kW (formação profissional ou curso TIM reconhecido pela DGEG). (2) TIM-III: para instalações > 100 kW (engenheiro/engenheiro técnico com formação específica). (3) O TIM é responsável por: plano de manutenção, registos de intervenção, controlo de condições interiores, gestão de consumos energéticos. (4) O nome do TIM deve constar no certificado energético do edifício (SCE).",
+      "enabled": true,
+      "tags": ["manutenção", "TIM", "Portaria 349-D", "qualificação"]
+    },
+    {
+      "id": "HVAC-MAINT-PLAN-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Art. 3.º — Plano de Manutenção Preventiva AVAC",
+      "description": "Não existe plano de manutenção preventiva (PMP) documentado para a instalação AVAC, conforme exigido pela Portaria 349-D/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasDocumentedMaintenancePlan", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Plano de manutenção preventiva documentado e atualizado",
+      "remediation": "Elaborar Plano de Manutenção Preventiva (PMP) conforme Portaria 349-D/2013 Anexo I: (1) Inventário de todos os equipamentos AVAC (marca, modelo, potência, ano, localização). (2) Periodicidade de cada operação de manutenção (conforme Anexo I da Portaria). (3) Registos de intervenção: data, técnico, operações realizadas, peças substituídas, medições. (4) Plano de substituição de filtros com calendário. (5) Controlo de consumos energéticos mensais. (6) Plano deve ser disponibilizado à ADENE em caso de inspeção ou auditoria SCE.",
+      "enabled": true,
+      "tags": ["manutenção", "PMP", "Portaria 349-D", "plano"]
+    },
+    {
+      "id": "HVAC-MAINT-FILTER-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Anexo I — Substituição de Filtros de Ar",
+      "description": "Os filtros de ar da UTA/UTAN não são substituídos com a periodicidade mínima exigida pela Portaria 349-D/2013 (semestral para filtros de ar novo, trimestral para pré-filtros).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.filterReplacementCompliant", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Pré-filtros: trimestral. Filtros finais: semestral. Filtros HEPA: anual.",
+      "remediation": "Implementar programa de substituição de filtros conforme Portaria 349-D: (1) Pré-filtros (G4/M5): substituição trimestral ou quando ΔP > 2× ΔP inicial. (2) Filtros finos (F7/F9): substituição semestral ou quando ΔP > 2× ΔP inicial. (3) Filtros HEPA (H13/H14): substituição anual ou conforme indicação do manómetro diferencial. (4) Registar: data de instalação/substituição, tipo e classe do filtro, ΔP medido. (5) Manter stock de filtros de substituição para garantir troca atempada. (6) Nunca lavar e reutilizar filtros de fibra sintética (eficiência degradada).",
+      "enabled": true,
+      "tags": ["manutenção", "filtros", "UTA", "Portaria 349-D", "substituição"]
+    },
+    {
+      "id": "HVAC-MAINT-INSP-SMALL-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Art. 7.º — Inspeção Periódica de Sistemas AVAC (≤ 25 kW)",
+      "description": "O sistema AVAC com potência ≤ 25 kW não foi submetido a inspeção periódica conforme Portaria 349-D/2013 (intervalo de 6 anos).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.lastInspectionDate", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": "<=", "value": 25 },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Inspeção periódica a cada 6 anos para sistemas ≤ 25 kW",
+      "remediation": "Agendar inspeção periódica do sistema AVAC conforme Portaria 349-D: (1) Inspeção a cada 6 anos por PQ (Perito Qualificado) registado na ADENE. (2) A inspeção abrange: verificação do estado dos equipamentos, eficiência energética, qualidade do ar interior, conformidade do plano de manutenção. (3) Resultado: relatório com classificação (conforme/não conforme) e recomendações. (4) O relatório é registado no sistema SCE. (5) Em caso de não conformidade: prazo de 3 meses para correção e reinspeção.",
+      "enabled": true,
+      "tags": ["manutenção", "inspeção", "Portaria 349-D", "PQ", "SCE"]
+    },
+    {
+      "id": "HVAC-MAINT-INSP-LARGE-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Art. 7.º — Inspeção Periódica de Sistemas AVAC (> 25 kW)",
+      "description": "O sistema AVAC com potência > 25 kW não foi submetido a inspeção periódica conforme Portaria 349-D/2013 (intervalo de 3 anos).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.lastInspectionDate", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 25 }
+      ],
+      "requiredValue": "Inspeção periódica a cada 3 anos para sistemas > 25 kW",
+      "remediation": "Agendar inspeção periódica do sistema AVAC conforme Portaria 349-D: (1) Inspeção a cada 3 anos por PQ registado na ADENE. (2) Inclui avaliação aprofundada: COP/EER dos geradores, SFP dos ventiladores, eficiência dos recuperadores, adequação do dimensionamento, análise de consumos vs. benchmarks. (3) Para potências > 100 kW: inspeção inclui adicionalmente simulação energética simplificada e análise de medidas de melhoria com viabilidade económica. (4) O PQ emite recomendações vinculativas para melhoria da eficiência energética.",
+      "enabled": true,
+      "tags": ["manutenção", "inspeção", "Portaria 349-D", "PQ", "> 25 kW"]
+    },
+    {
+      "id": "HVAC-MAINT-LOG-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Art. 4.º — Livro de Registo de Manutenção AVAC",
+      "description": "Não existe livro de registo de manutenção (livro de ocorrências) da instalação AVAC, conforme exigido pela Portaria 349-D/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasMaintenanceLog", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Livro de registo de manutenção obrigatório, disponível para inspeção",
+      "remediation": "Criar e manter livro de registo de manutenção AVAC: (1) Conteúdo obrigatório: data, descrição da intervenção, equipamento intervencionado, técnico responsável, peças/materiais utilizados, medições realizadas (temperaturas, pressões, caudais). (2) Registar: substituição de filtros, cargas/recargas de refrigerante, limpeza de permutadores, verificação de correias, lubrificações, calibrações de sensores. (3) Formato: pode ser digital (sistema CMMS/GMAO) ou físico (caderno paginado e assinado). (4) Conservação: mínimo 5 anos. (5) Disponibilizar ao PQ durante inspeções periódicas e à ADENE quando solicitado.",
+      "enabled": true,
+      "tags": ["manutenção", "registo", "livro", "Portaria 349-D", "GMAO"]
+    },
+    {
+      "id": "HVAC-MAINT-EFFICIENCY-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Anexo I — Monitorização de Eficiência Operacional",
+      "description": "Não existe monitorização periódica da eficiência operacional dos equipamentos AVAC (COP/EER real vs. nominal), impossibilitando a deteção de degradação de desempenho.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasEfficiencyMonitoring", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 25 }
+      ],
+      "requiredValue": "Monitorização trimestral de COP/EER para equipamentos > 25 kW",
+      "remediation": "Implementar monitorização de eficiência operacional: (1) COP/EER real: calcular a partir de medições de potência elétrica e energia térmica produzida (contadores de energia térmica). (2) Comparar com COP/EER nominal: degradação > 15% indica necessidade de manutenção corretiva. (3) Causas comuns de degradação: permutadores sujos (-10-20% COP), falta de refrigerante (-15% por cada 10% de subcarga), filtros colmatados (aumento de SFP). (4) Frequência: trimestral para equipamentos > 25 kW, mensal para > 100 kW. (5) Registar tendências: gráfico de COP vs. temperatura exterior para deteção precoce de anomalias.",
+      "enabled": true,
+      "tags": ["manutenção", "eficiência", "COP", "EER", "monitorização"]
+    }
+  ]
+}

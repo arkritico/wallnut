@@ -267,7 +267,7 @@ async function serverOcrPages(
   formData.append("pages", JSON.stringify(pageNumbers));
   formData.append("language", "por"); // Portuguese
 
-  const response = await fetch("/api/parse-document", {
+  const response = await fetch("/api/ocr", {
     method: "POST",
     body: formData,
   });

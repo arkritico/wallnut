@@ -1,0 +1,249 @@
+{
+  "regulationRef": "rtiebt-hvac",
+  "description": "Regras RTIEBT aplicáveis a instalações AVAC — proteção de motores, VFDs, cablagem, IP, ligação à terra, SELV",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-MOTOR-THERMAL-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 552 / IEC 60947-4-1 — Proteção Térmica de Motores AVAC",
+      "description": "Os motores AVAC (compressores, ventiladores, bombas) não dispõem de relé de proteção térmica (relé térmico) dimensionado para a corrente nominal do motor, conforme exigido pelo RTIEBT.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasMotorThermalProtection", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Relé térmico obrigatório para todos os motores AVAC (Ir = 1.0-1.05 × In motor)",
+      "remediation": "Instalar relé de proteção térmica (relé térmico bimetálico ou eletrónico) em todos os circuitos de motores AVAC: (1) Classe 10: ventiladores, bombas (arranque rápido < 10s), (2) Classe 20: compressores (arranque mais lento, até 20s), (3) Classe 30: motores com alta inércia. Ajustar corrente de regulação (Ir) entre 1.0× e 1.05× da corrente nominal do motor. Para motores com VFD, usar proteção térmica integrada no variador (modelo I²t ou PTC). Garantir proteção contra perda de fase (assimetria de correntes > 10%).",
+      "enabled": true,
+      "tags": ["RTIEBT", "motor", "proteção térmica", "relé térmico", "compressor"]
+    },
+    {
+      "id": "HVAC-MOTOR-GFD-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 531 / IEC 60364-5-53 — Proteção Diferencial de Motores AVAC",
+      "description": "Os circuitos de motores AVAC com potência superior a 3.7 kW não dispõem de proteção diferencial (RCD) adequada, comprometendo a segurança contra contactos indiretos e defeitos de isolamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasMotorRCD", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 3.7 }
+      ],
+      "requiredValue": "Proteção diferencial obrigatória para motores > 3.7 kW (RCD Tipo A ou B)",
+      "remediation": "Instalar proteção diferencial nos circuitos de motores AVAC: (1) Motores com arranque direto (DOL): RCD Tipo A (sensível a correntes AC e DC pulsante), IΔn = 300 mA para proteção contra incêndio, IΔn = 30 mA se acessível a pessoas não qualificadas. (2) Motores alimentados por VFD: obrigatório RCD Tipo B (sensível a correntes DC lisas geradas pelo estágio retificador do variador) ou RCD Tipo A + dispositivo RDC-DD. (3) Alternativa: esquema TN-S com proteção por corte automático (impedância de defeito < limite).",
+      "enabled": true,
+      "tags": ["RTIEBT", "motor", "RCD", "diferencial", "defeito à terra"]
+    },
+    {
+      "id": "HVAC-MOTOR-SOFTSTART-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 552.1 / EN 60947-4-2 — Arranque Suave de Motores AVAC",
+      "description": "Os motores AVAC com potência ≥ 11 kW utilizam arranque direto (DOL), provocando picos de corrente de arranque de 6-8× In que causam quedas de tensão na rede e perturbam outros equipamentos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSoftStart", "operator": "not_exists", "value": null },
+        { "field": "hvac.largestMotorPower", "operator": ">=", "value": 11 }
+      ],
+      "requiredValue": "Arranque suave (soft-starter ou VFD) recomendado para motores ≥ 11 kW",
+      "remediation": "Instalar dispositivo de arranque suave para motores AVAC ≥ 11 kW: (1) Soft-starter (arrancador suave): limita corrente de arranque a 2-4× In, adequado para ventiladores e bombas com binário quadrático. (2) Arranque estrela-triângulo: solução económica mas com transiente na comutação (aceitável para compressores com descarga). (3) VFD (variador de frequência): melhor opção quando se pretende também regulação de velocidade — elimina pico de arranque e permite eficiência energética. Verificar que a queda de tensão no ponto de ligação não excede 4% durante arranque.",
+      "enabled": true,
+      "tags": ["RTIEBT", "motor", "arranque suave", "soft-starter", "VFD"]
+    },
+    {
+      "id": "HVAC-VFD-HARMONICS-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "EN 61000-3-12 / RTIEBT Secção 523 — Distorção Harmónica de VFDs AVAC",
+      "description": "Os variadores de frequência (VFDs) instalados nos equipamentos AVAC geram correntes harmónicas que excedem os limites da EN 61000-3-12, degradando a qualidade de energia e podendo danificar equipamentos sensíveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVFD", "operator": "==", "value": true },
+        { "field": "hvac.hasHarmonicFilter", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "THDi < 48% (Rsce ≥ 33) ou < 25% (Rsce < 33) conforme EN 61000-3-12",
+      "remediation": "Mitigar distorção harmónica gerada pelos VFDs: (1) Bobina de linha (reactância AC 3-5%): reduz THDi de ~80% para ~35%, solução mais económica. (2) Bobina DC (reactância no barramento DC): reduz THDi para ~30%. (3) Filtro passivo LC sintonizado ao 5.º e 7.º harmónico: reduz THDi para < 10%. (4) Filtro ativo (AHF): reduz THDi para < 5%, solução mais eficaz mas mais cara. (5) VFD com retificador ativo (AFE/18-pulsos): THDi < 5% nativamente. Verificar relação Rsce (potência de curto-circuito / potência equipamento) para determinar limites aplicáveis.",
+      "enabled": true,
+      "tags": ["VFD", "harmónicas", "EN 61000-3-12", "qualidade energia", "THD"]
+    },
+    {
+      "id": "HVAC-VFD-EMC-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "IEC 61800-3 / Diretiva EMC 2014/30/EU — Filtros EMC para VFDs AVAC",
+      "description": "Os variadores de frequência AVAC não possuem filtros EMC (compatibilidade eletromagnética) conforme exigido pela IEC 61800-3 e pela Diretiva EMC 2014/30/EU, podendo causar interferências em equipamentos de comunicação e controlo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVFD", "operator": "==", "value": true },
+        { "field": "hvac.hasEMCFilter", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Filtro EMC categoria C2 (2.º ambiente) ou C1 (1.º ambiente, residencial)",
+      "remediation": "Instalar filtros EMC nos VFDs AVAC conforme IEC 61800-3: (1) Categoria C2 (instalação industrial): filtro RFI integrado ou externo, atenuação ≥ 40 dB (150 kHz-30 MHz). (2) Categoria C1 (ambiente residencial/comercial): filtro mais restritivo, emissões conformes EN 55011 Classe B. (3) Garantir ligação de terra do filtro EMC com cabo curto (< 200 mm) e secção ≥ 10 mm². (4) Para VFDs > 75 kW, considerar blindagem 360° na entrada de cabos ao quadro elétrico. O filtro deve estar montado o mais próximo possível do VFD.",
+      "enabled": true,
+      "tags": ["VFD", "EMC", "filtro", "IEC 61800-3", "interferência"]
+    },
+    {
+      "id": "HVAC-VFD-CABLE-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "IEC 61800-5-1 / RTIEBT — Cablagem Blindada para VFDs AVAC",
+      "description": "A cablagem entre os variadores de frequência e os motores AVAC não utiliza cabo blindado (com malha ou armadura), resultando em emissões radiadas excessivas e risco de interferência com sistemas de controlo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVFD", "operator": "==", "value": true },
+        { "field": "hvac.hasShieldedMotorCable", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Cabo blindado obrigatório entre VFD e motor (malha com cobertura ≥ 80%)",
+      "remediation": "Utilizar cabo blindado para a ligação VFD-motor: (1) Tipo: cabo com malha de cobre estanhado (cobertura ≥ 80%) ou cabo com armadura metálica. (2) Ligação da blindagem: ambas as extremidades — terra do VFD e terra do motor (ligação 360° com prensa-cabos EMC). (3) Comprimento máximo: verificar limite do fabricante do VFD (tipicamente 50-100 m sem filtro dU/dt). (4) Para cabos > 50 m: instalar filtro dU/dt ou bobina de saída para limitar sobretensões no motor (picos até 2× tensão DC bus). (5) Separação: mínimo 300 mm entre cabo motor VFD e cabos de sinal/controlo.",
+      "enabled": true,
+      "tags": ["VFD", "cabo blindado", "motor", "EMC", "blindagem"]
+    },
+    {
+      "id": "HVAC-VFD-SEPARATION-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "IEC 61800-3 / RTIEBT Secção 528 — Separação de Cabos VFD e Controlo",
+      "description": "Os cabos de saída dos variadores de frequência não estão separados dos cabos de sinal e controlo, violando a distância mínima de segregação e causando interferências nos sistemas de automação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVFD", "operator": "==", "value": true },
+        { "field": "hvac.hasVFDCableSeparation", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Separação ≥ 300 mm entre cabos VFD e cabos de controlo/sinal",
+      "remediation": "Garantir separação física entre cabos de potência dos VFDs e cabos de sinal: (1) Distância mínima: 300 mm em percurso paralelo sem separador metálico. (2) Com separador metálico (chapa perfurada ou calha metálica aterrada): separação pode ser reduzida a 50 mm. (3) Cruzamentos: sempre a 90° para minimizar acoplamento indutivo. (4) Utilizar caminhos de cabos (esteiras) separados: potência VFD, potência rede, sinal analógico, sinal digital/bus. (5) Cabos de sinal analógico (0-10V, 4-20 mA): usar par torcido blindado com blindagem ligada num só ponto.",
+      "enabled": true,
+      "tags": ["VFD", "separação cabos", "controlo", "EMC", "segregação"]
+    },
+    {
+      "id": "HVAC-IP-MACHINEROOM-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 512.2 / IEC 60529 — Grau de Proteção IP em Salas de Máquinas AVAC",
+      "description": "Os equipamentos e quadros elétricos na sala de máquinas AVAC não possuem grau de proteção IP adequado ao ambiente húmido (condensação, fugas de água, lavagens), expondo a instalação a risco de curto-circuito e eletrocução.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.machineRoomIPRating", "operator": "not_exists", "value": null },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["machine-room", "commercial", "industrial"] }
+      ],
+      "requiredValue": "IP54 mínimo para salas de máquinas AVAC (IP55 com risco de projeção de água)",
+      "remediation": "Garantir grau de proteção IP adequado na sala de máquinas AVAC: (1) Quadros elétricos e comando: mínimo IP54 (proteção contra poeiras e projeção de água). (2) Tomadas e interruptores: IP55 se instalados abaixo de 1.5 m ou junto a equipamentos com água. (3) Motores e acessórios junto a torres de arrefecimento: IP55 mínimo, IP66 se expostos a jatos de água diretos. (4) Equipamentos na zona de tabuleiros de condensados: IP55. (5) Equipamentos no exterior (rooftop): IP56 mínimo, com proteção UV para invólucros plásticos.",
+      "enabled": true,
+      "tags": ["RTIEBT", "IP", "sala de máquinas", "proteção", "humidade"]
+    },
+    {
+      "id": "HVAC-RCD-HUMID-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 531.2 — Proteção Diferencial em Zonas Húmidas AVAC",
+      "description": "Os circuitos elétricos em zonas húmidas da instalação AVAC (salas de máquinas, casa de bombas, zona de torres de arrefecimento) não possuem proteção diferencial de alta sensibilidade (30 mA).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasRCDInHumidAreas", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasWetAreas", "operator": "==", "value": true }
+      ],
+      "requiredValue": "RCD 30 mA para tomadas e equipamentos portáteis em zonas húmidas AVAC",
+      "remediation": "Instalar proteção diferencial de alta sensibilidade (IΔn ≤ 30 mA) em zonas húmidas AVAC: (1) Tomadas de uso geral em salas de máquinas: RCD 30 mA Tipo AC ou A. (2) Circuitos de bombas de condensados e bombas submersíveis: RCD 30 mA. (3) Circuitos de iluminação em casas de bombas: RCD 30 mA. (4) Circuitos de motores fixos em salas de máquinas: RCD 300 mA mínimo (proteção contra incêndio). (5) Verificar coordenação seletiva entre RCD a montante (300 mA, tipo S retardado) e a jusante (30 mA, instantâneo).",
+      "enabled": true,
+      "tags": ["RTIEBT", "RCD", "diferencial", "zona húmida", "30 mA"]
+    },
+    {
+      "id": "HVAC-SELV-CONTROL-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 411 / IEC 60364-4-41 — Tensão SELV para Controlo AVAC",
+      "description": "Os circuitos de controlo AVAC (termostatos, sondas de temperatura, sensores de pressão, atuadores de válvulas) não utilizam tensão de segurança SELV/PELV (≤ 24 V AC ou ≤ 60 V DC), expondo utilizadores e técnicos a riscos elétricos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSELVControl", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGTCSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "SELV ≤ 24 V AC ou PELV ≤ 60 V DC para circuitos de controlo acessíveis",
+      "remediation": "Implementar circuitos de controlo AVAC em SELV (Safety Extra Low Voltage) ou PELV (Protective Extra Low Voltage): (1) Termostatos de ambiente: alimentação 24 V AC via transformador de segurança (isolamento ≥ 4 kV). (2) Sondas de temperatura/humidade: alimentação 24 V DC. (3) Atuadores de válvulas e registos: 24 V AC ou 0-10 V DC. (4) Transformador de controlo: dimensionar para carga total + 20% margem, proteção fusível no primário e secundário. (5) Separação física: cablagem SELV em calha separada da cablagem de potência (RTIEBT Secção 528).",
+      "enabled": true,
+      "tags": ["RTIEBT", "SELV", "PELV", "controlo", "24V", "segurança"]
+    },
+    {
+      "id": "HVAC-EARTHING-DUCT-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 413 / IEC 60364-5-54 — Ligação Equipotencial de Condutas Metálicas",
+      "description": "As condutas metálicas do sistema AVAC não estão ligadas à rede de terra equipotencial do edifício, constituindo massas metálicas acessíveis não protegidas contra defeitos de isolamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasDuctEarthing", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasMetalDucts", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Ligação equipotencial de todas as condutas metálicas ao barramento de terra principal",
+      "remediation": "Garantir ligação equipotencial de todas as condutas metálicas AVAC ao barramento de terra principal (BTP) do edifício: (1) Condutor de equipotencialidade: secção mínima 6 mm² Cu (10 mm² se alumínio). (2) Pontos de ligação: início de cada troço principal, entrada em cada sala de máquinas, junto a cada UTA/recuperador. (3) Método: braçadeira de latão/inox com parafuso e porca de contacto (não usar abraçadeiras de plástico). (4) Continuidade: verificar continuidade elétrica nas juntas flangeadas (< 0.05 Ω); condutas flexíveis e isolamento térmico interrompem a continuidade — derivar com trança de cobre. (5) Registo: documentar pontos de ligação e valores de resistência medidos.",
+      "enabled": true,
+      "tags": ["RTIEBT", "terra", "equipotencial", "condutas metálicas", "bonding"]
+    },
+    {
+      "id": "HVAC-EARTHING-PIPE-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 413.1 — Ligação Equipotencial de Tubagens AVAC",
+      "description": "As tubagens metálicas do sistema AVAC (refrigerante, água gelada/quente, condensados) não estão ligadas à rede de terra equipotencial, podendo transportar potenciais perigosos em caso de defeito de isolamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasPipeEarthing", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasMetalPipes", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Ligação equipotencial de todas as tubagens metálicas AVAC ao BTP",
+      "remediation": "Ligar todas as tubagens metálicas AVAC ao barramento de terra principal: (1) Tubagens de refrigerante (cobre): braçadeira de cobre com condutor 6 mm² Cu ao BTP mais próximo. (2) Tubagens de água (aço/cobre): ligação equipotencial suplementar junto a válvulas e equipamentos. (3) Tubagem de gás (se aplicável): ligação equipotencial obrigatória antes e depois do contador. (4) Tubagens com isolamento térmico: a ligação deve ser feita na tubagem, sob o isolamento, com acesso para inspeção. (5) Juntas dielétricas (isolamento galvânico): quando instaladas, derivar cada troço separadamente à terra.",
+      "enabled": true,
+      "tags": ["RTIEBT", "terra", "equipotencial", "tubagens", "refrigerante"]
+    },
+    {
+      "id": "HVAC-PFC-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / DL 153/2014 — Compensação do Fator de Potência em Instalações AVAC",
+      "description": "A instalação AVAC com potência instalada significativa ({hvac.installedHVACPower} kW) apresenta fator de potência inferior a 0.93, resultando em energia reativa excessiva e penalizações na fatura elétrica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasPowerFactorCorrection", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "currentValueTemplate": "{hvac.installedHVACPower} kW instalados",
+      "requiredValue": "Fator de potência ≥ 0.93 (cos φ) conforme DL 153/2014",
+      "remediation": "Instalar compensação do fator de potência para a instalação AVAC: (1) Compensação global: bateria de condensadores automática no QGBT, dimensionada para cos φ ≥ 0.96 (margem acima do mínimo 0.93). (2) Compensação por grupo: condensadores fixos junto a motores > 30 kW (mais eficiente). (3) ATENÇÃO com VFDs: NÃO instalar condensadores no circuito de saída do VFD. Condensadores na entrada apenas se verificada ausência de ressonância com harmónicas do VFD (usar bateria anti-harmónica com reactâncias de dessintonização a 189 Hz). (4) Regulador: mínimo 6 estágios, com controlador de fator de potência tipo PFR.",
+      "enabled": true,
+      "tags": ["fator de potência", "condensadores", "energia reativa", "DL 153/2014"]
+    },
+    {
+      "id": "HVAC-SPD-CONTROL-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 534 / EN 61643-11 — Proteção contra Sobretensões em Sistemas de Controlo AVAC",
+      "description": "Os sistemas de controlo e automação AVAC (BMS, GTC, controladores DDC) não possuem descarregadores de sobretensão (SPD) Tipo 3, estando vulneráveis a sobretensões transitórias que podem destruir eletrónica sensível.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSPDForControls", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGTCSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "SPD Tipo 3 nos circuitos de alimentação e comunicação dos controladores AVAC",
+      "remediation": "Instalar proteção contra sobretensões nos sistemas de controlo AVAC: (1) SPD Tipo 3 (Uc ≤ 1.5 kV) na alimentação 230V de cada controlador DDC/PLC. (2) SPD para linhas de comunicação: BACnet/IP e Modbus TCP → SPD Ethernet (Cat 6), Modbus RS-485 → SPD para sinal D1. (3) Coordenação: garantir que SPD Tipo 2 existe no quadro a montante (coordenação Tipo 2 + Tipo 3). (4) Para equipamentos no exterior (sondas exteriores, estação meteorológica): SPD nos cabos de sinal com Up ≤ 0.5 kV. (5) Ligação de terra do SPD: cabo curto (< 500 mm) ao barramento de terra local.",
+      "enabled": true,
+      "tags": ["RTIEBT", "SPD", "sobretensão", "controlo", "BMS", "GTC"]
+    },
+    {
+      "id": "HVAC-UPS-BMS-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "EN 15232 / Boas Práticas — UPS para Sistemas de Automação AVAC",
+      "description": "Os controladores do sistema de gestão técnica (GTC/BMS) não dispõem de fonte de alimentação ininterrupta (UPS), perdendo dados e programação em caso de falha de energia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasUPSForBMS", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGTCSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "UPS com autonomia ≥ 15 minutos para controladores BMS/GTC",
+      "remediation": "Instalar UPS para os controladores do sistema de automação AVAC: (1) Tipo: UPS online (double-conversion) para proteção completa contra perturbações da rede. (2) Autonomia: ≥ 15 minutos para shutdown ordenado, ou ≥ 60 minutos se não houver grupo gerador. (3) Dimensionamento: somar consumo de todos os controladores DDC, servidor BMS, switch de rede, gateway de comunicação. (4) Monitorização: UPS com interface de rede (SNMP) para alarme de falha de rede/bateria no BMS. (5) Manutenção: teste de bateria trimestral automático, substituição de baterias a cada 3-5 anos.",
+      "enabled": true,
+      "tags": ["UPS", "BMS", "GTC", "autonomia", "alimentação ininterrupta"]
+    },
+    {
+      "id": "HVAC-INTERLOCK-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / EN 60204-1 — Encravamentos Elétricos entre Componentes AVAC",
+      "description": "O sistema AVAC não dispõe de encravamentos elétricos (interlocks) entre componentes interdependentes, permitindo sequências de operação perigosas (ex.: compressor sem ventilador de condensador, caldeira sem bomba de circulação).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasElectricalInterlocks", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Encravamentos elétricos obrigatórios entre componentes AVAC interdependentes",
+      "remediation": "Implementar encravamentos elétricos (interlocks) para sequências seguras de operação: (1) Compressor: encravamento com ventilador de condensador (não arrancar sem ventilador), pressostato de alta/baixa pressão, caudal de água no evaporador (flow switch). (2) Caldeira: encravamento com bomba de circulação, termostato de segurança (rearme manual), pressostato de água. (3) UTA: encravamento ventilador com registo de ar (não arrancar com registo fechado), proteção contra congelamento (termostato anti-frost). (4) Bomba de circulação: encravamento com válvula de seccionamento, pressostato diferencial. (5) Torre de arrefecimento: encravamento ventilador com bomba de condensados. Todos os encravamentos devem ser cablados (hardwired), não apenas por software.",
+      "enabled": true,
+      "tags": ["RTIEBT", "encravamento", "interlock", "segurança", "sequência"]
+    }
+  ]
+}

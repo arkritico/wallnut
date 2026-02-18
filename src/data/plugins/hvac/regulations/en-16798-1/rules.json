@@ -1,0 +1,85 @@
+{
+  "regulationRef": "en-16798-1",
+  "description": "Regras detalhadas EN 16798-1 — categorias de conforto, gradientes, correntes de ar",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-TEMP-INV-CAT1",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Cat. I — Temperatura Inverno (espaços sensíveis)",
+      "description": "A temperatura operativa de inverno ({hvac.winterOperativeTemp}°C) está abaixo de 21°C, não cumprindo a Categoria I (espaços para pessoas sensíveis: idosos, crianças, doentes).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.winterOperativeTemp", "operator": "<", "value": 21 },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["hospital", "classroom"] }
+      ],
+      "currentValueTemplate": "{hvac.winterOperativeTemp}°C",
+      "requiredValue": "≥ 21°C (EN 16798-1, Categoria I, inverno — espaços sensíveis)",
+      "remediation": "Ajustar o setpoint de aquecimento para ≥ 21°C em espaços com ocupantes sensíveis (hospitais, escolas, lares). Verificar dimensionamento do sistema de aquecimento. Considerar sistemas de emissão a baixa temperatura (piso radiante) para maior uniformidade de temperatura.",
+      "enabled": true,
+      "tags": ["temperatura", "conforto", "inverno", "EN 16798", "Categoria I", "sensível"]
+    },
+    {
+      "id": "HVAC-TEMP-VER-CAT1",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Cat. I — Temperatura Verão (espaços sensíveis)",
+      "description": "A temperatura operativa de verão ({hvac.summerOperativeTemp}°C) excede 25.5°C em espaço da Categoria I (ocupantes sensíveis).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.summerOperativeTemp", "operator": ">", "value": 25.5 },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["hospital", "classroom"] }
+      ],
+      "currentValueTemplate": "{hvac.summerOperativeTemp}°C",
+      "requiredValue": "≤ 25.5°C (EN 16798-1, Categoria I, verão)",
+      "remediation": "Ajustar o setpoint de arrefecimento para ≤ 25.5°C em espaços com ocupantes sensíveis. Reforçar proteções solares exteriores. Verificar capacidade do sistema de arrefecimento.",
+      "enabled": true,
+      "tags": ["temperatura", "conforto", "verão", "EN 16798", "Categoria I"]
+    },
+    {
+      "id": "HVAC-GRADIENT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Gradiente Vertical de Temperatura",
+      "description": "O gradiente vertical de temperatura ({hvac.verticalTempGradient} °C/m) excede o máximo de 3 °C/m entre 0.1 m e 1.1 m de altura, causando desconforto por assimetria térmica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.verticalTempGradient", "operator": ">", "value": 3 }
+      ],
+      "currentValueTemplate": "{hvac.verticalTempGradient} °C/m",
+      "requiredValue": "≤ 3 °C/m (EN 16798-1, Categoria II)",
+      "remediation": "Reduzir o gradiente vertical: utilizar difusores de insuflação com efeito Coanda (no teto), dimensionar corretamente os emissores térmicos (radiadores, ventiloconvectores). Evitar insuflação de ar frio diretamente na zona de ocupação ao nível do solo. Em espaços de pé direito elevado, considerar ventilação por deslocamento ou destratificadores.",
+      "enabled": true,
+      "tags": ["gradiente", "conforto", "EN 16798", "assimetria"]
+    },
+    {
+      "id": "HVAC-TEMP-INV-HIGH",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Sobreaquecimento de Inverno",
+      "description": "A temperatura operativa de inverno ({hvac.winterOperativeTemp}°C) excede 24°C, indicando sobreaquecimento e desperdício energético.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.winterOperativeTemp", "operator": ">", "value": 24 }
+      ],
+      "currentValueTemplate": "{hvac.winterOperativeTemp}°C",
+      "requiredValue": "20-22°C (EN 16798-1, Categoria II, inverno)",
+      "remediation": "Reduzir o setpoint de aquecimento para 20-22°C. Cada grau acima de 20°C representa ≈ 7% de aumento no consumo energético de aquecimento. Verificar se os termóstatos de zona estão corretamente calibrados e posicionados. Verificar se não existem fontes de calor internas excessivas (iluminação, equipamentos).",
+      "enabled": true,
+      "tags": ["temperatura", "sobreaquecimento", "eficiência", "EN 16798"]
+    },
+    {
+      "id": "HVAC-TEMP-VER-LOW",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Sobrearrefecimento de Verão",
+      "description": "A temperatura operativa de verão ({hvac.summerOperativeTemp}°C) é inferior a 23°C, indicando arrefecimento excessivo e desperdício energético.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.summerOperativeTemp", "operator": "<", "value": 23 }
+      ],
+      "currentValueTemplate": "{hvac.summerOperativeTemp}°C",
+      "requiredValue": "24-26°C (EN 16798-1, Categoria II, verão)",
+      "remediation": "Aumentar o setpoint de arrefecimento para 24-26°C. Setpoints abaixo de 23°C resultam em consumo energético excessivo e risco de desconforto por correntes de ar frio. Cada grau abaixo de 26°C representa ≈ 8% de aumento no consumo de arrefecimento. Implementar dead band de 2°C entre setpoints de aquecimento e arrefecimento.",
+      "enabled": true,
+      "tags": ["temperatura", "sobrearrefecimento", "eficiência", "EN 16798"]
+    }
+  ]
+}

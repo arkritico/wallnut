@@ -1,0 +1,54 @@
+{
+  "regulationRef": "dl-68a-2015",
+  "description": "Regras DL 68-A/2015 (SGCIE) — auditorias energéticas e planos de racionalização",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-AUDIT-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Auditoria Energética Obrigatória",
+      "description": "O edifício com consumo energético intensivo (> 500 tep/ano) não possui auditoria energética válida conforme DL 68-A/2015 (SGCIE).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasEnergyAudit", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 500 }
+      ],
+      "requiredValue": "Auditoria energética obrigatória para consumidores intensivos (> 500 tep/ano)",
+      "remediation": "Contratar auditoria energética por entidade reconhecida pela ADENE. A auditoria deve incluir: levantamento de equipamentos AVAC (potências, horas de funcionamento, estado de conservação), medições de consumos reais, análise de desempenho energético, identificação de medidas de melhoria e respetivo período de retorno. Elaborar Plano de Racionalização de Energia (PREn) com metas de redução. Periodicidade: 6 anos para consumidores > 500 tep/ano.",
+      "enabled": true,
+      "tags": ["auditoria energética", "SGCIE", "DL 68-A", "consumo intensivo"]
+    },
+    {
+      "id": "HVAC-RENEW-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Fração de Energia Renovável",
+      "description": "A fração de energia renovável nos sistemas AVAC ({hvac.renewableEnergyFraction}%) é inferior ao objetivo de 20% estabelecido nos planos de racionalização.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.renewableEnergyFraction", "operator": "<", "value": 20 },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 100 }
+      ],
+      "currentValueTemplate": "{hvac.renewableEnergyFraction}% energia renovável",
+      "requiredValue": "Objetivo: ≥ 20% de energia renovável nos sistemas AVAC",
+      "remediation": "Aumentar a fração de energia renovável: instalar painéis solares térmicos para AQS, bombas de calor aerotérmicas ou geotérmicas (reconhecidas como energia renovável pela EPBD), painéis fotovoltaicos para alimentação de equipamentos AVAC, ou sistema de biomassa para aquecimento. A combinação de bomba de calor (COP > 2.5) com energia fotovoltaica permite atingir frações elevadas de renovável.",
+      "enabled": true,
+      "tags": ["energia renovável", "SGCIE", "DL 68-A", "fotovoltaico", "solar"]
+    },
+    {
+      "id": "HVAC-RESIST-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Proibição de Aquecimento por Resistência Elétrica",
+      "description": "O sistema de aquecimento principal utiliza resistência elétrica, o que é energeticamente ineficiente (COP = 1.0) e contrário aos objetivos de eficiência do DL 68-A/2015. Deve ser substituído por bomba de calor (COP ≥ 3.0).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.heatingSystemType", "operator": "==", "value": "electric-resistance" },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 12 }
+      ],
+      "requiredValue": "Bomba de calor (COP ≥ 3.0) em substituição de resistência elétrica",
+      "remediation": "Substituir o aquecimento por resistência elétrica por bomba de calor: ar-ar (split/multi-split) com COP ≥ 3.5, ar-água (para sistemas hidráulicos) com COP ≥ 3.0, ou geotérmica com COP ≥ 4.0. A bomba de calor consome 3-4× menos energia que a resistência para a mesma potência de aquecimento. O retorno do investimento é tipicamente de 2-5 anos. Para potências < 12 kW, a substituição é recomendada mas não obrigatória.",
+      "enabled": true,
+      "tags": ["resistência elétrica", "bomba de calor", "eficiência", "DL 68-A"]
+    }
+  ]
+}

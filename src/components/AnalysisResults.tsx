@@ -47,6 +47,7 @@ import { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import type { RegulationArea } from "@/lib/types";
 import { useI18n } from "@/lib/i18n";
 import { estimateCosts, formatCost, type CostSummary, type CostLineItem } from "@/lib/cost-estimation";
+import type { SpecialtyAnalysisResult } from "@/lib/ifc-specialty-analyzer";
 import { generateChecklists, type Checklist } from "@/lib/checklist-generator";
 import { generateRemediationSummary, findingsToWbs } from "@/lib/findings-to-wbs";
 import { generateCoverageReport, type CoverageReport, type AreaCoverage } from "@/lib/plugins/coverage";
@@ -54,6 +55,8 @@ import { generateCoverageReport, type CoverageReport, type AreaCoverage } from "
 const AiAssistant = lazy(() => import("@/components/AiAssistant"));
 const ConsultationTimelineView = lazy(() => import("@/components/ConsultationTimelineView"));
 const VersionDiffView = lazy(() => import("@/components/VersionDiffView"));
+import CommentAnchor from "@/components/CommentAnchor";
+import { canPerformAction } from "@/lib/collaboration";
 
 interface AnalysisResultsProps {
   result: AnalysisResult;
@@ -62,6 +65,18 @@ interface AnalysisResultsProps {
   onReset: () => void;
   /** Navigate back to form, optionally targeting a specific section */
   onEditProject?: (targetSection?: string) => void;
+  /** Pre-generated budget Excel from unified pipeline */
+  budgetExcel?: ArrayBuffer;
+  /** Pre-generated MS Project XML from unified pipeline */
+  msProjectXml?: string;
+  /** Pre-generated compliance Excel from unified pipeline */
+  complianceExcel?: ArrayBuffer;
+  /** Cloud project ID for collaboration features */
+  projectId?: string;
+  /** Current user's role in the project */
+  userRole?: import("@/lib/collaboration").ProjectRole | null;
+  /** IFC analyses for measured quantity takeoff */
+  ifcAnalyses?: SpecialtyAnalysisResult[];
 }
 
 /** Map field namespace prefixes to ProjectForm section IDs */
@@ -118,7 +133,7 @@ function findDominantSection(missingFields: string[]): string | undefined {
   return best;
 }
 
-export default function AnalysisResults({ result, calculations, project, onReset, onEditProject }: AnalysisResultsProps) {
+export default function AnalysisResults({ result, calculations, project, onReset, onEditProject, budgetExcel, msProjectXml, complianceExcel, projectId, userRole, ifcAnalyses }: AnalysisResultsProps) {
   const { t, lang } = useI18n();
   const [expandedSection, setExpandedSection] = useState<string | null>("summary");
   const [isExporting, setIsExporting] = useState(false);
@@ -171,7 +186,7 @@ export default function AnalysisResults({ result, calculations, project, onReset
   }, []);
 
   // Cost estimation from findings + project data
-  const costSummary = useMemo(() => estimateCosts(result.findings, project), [result.findings, project]);
+  const costSummary = useMemo(() => estimateCosts(result.findings, project, ifcAnalyses), [result.findings, project, ifcAnalyses]);
   const [showCostDetails, setShowCostDetails] = useState(false);
 
   // Per-finding cost lookup for inline badges
@@ -669,7 +684,7 @@ export default function AnalysisResults({ result, calculations, project, onReset
 
         <div className="space-y-3">
           {sortFindings(filteredFindings).map(finding => (
-            <FindingCard key={finding.id} finding={finding} costEstimate={costLookup.get(finding.id)} />
+            <FindingCard key={finding.id} finding={finding} costEstimate={costLookup.get(finding.id)} projectId={projectId} userRole={userRole} />
           ))}
           {filteredFindings.length === 0 && (
             <p className="text-sm text-gray-500 text-center py-4">Nenhuma constatação nesta especialidade.</p>
@@ -1063,6 +1078,63 @@ export default function AnalysisResults({ result, calculations, project, onReset
           Nova Análise
         </button>
 
+        {/* Pipeline outputs (Budget, Schedule, Compliance) */}
+        {(budgetExcel || msProjectXml || complianceExcel) && (
+          <div className="flex flex-wrap gap-2">
+            {budgetExcel && (
+              <button
+                onClick={() => {
+                  const blob = new Blob([budgetExcel], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `orcamento_${result.projectName || "projeto"}.xlsx`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                {lang === "pt" ? "Orçamento" : "Budget"}
+              </button>
+            )}
+            {msProjectXml && (
+              <button
+                onClick={() => {
+                  const blob = new Blob([msProjectXml], { type: "application/xml" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `cronograma_${result.projectName || "projeto"}.xml`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                <Download className="w-4 h-4" />
+                {lang === "pt" ? "Cronograma" : "Schedule"}
+              </button>
+            )}
+            {complianceExcel && (
+              <button
+                onClick={() => {
+                  const blob = new Blob([complianceExcel], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `conformidade_${result.projectName || "projeto"}.xlsx`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                {lang === "pt" ? "Conformidade" : "Compliance"}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* PDF export with options popover */}
         <div className="relative">
           <button
@@ -1331,7 +1403,7 @@ function getSourceBadgeClass(source: string): string {
   return map[source] || "bg-gray-100 text-gray-700";
 }
 
-function FindingCard({ finding, costEstimate }: { finding: Finding; costEstimate?: { minCost: number; maxCost: number } }) {
+function FindingCard({ finding, costEstimate, projectId, userRole }: { finding: Finding; costEstimate?: { minCost: number; maxCost: number }; projectId?: string; userRole?: import("@/lib/collaboration").ProjectRole | null }) {
   const severityConfig: Record<Severity, { bg: string; icon: React.ReactNode; label: string }> = {
     critical: { bg: "bg-red-50 border-red-200", icon: <XCircle className="w-5 h-5 text-red-500 shrink-0" />, label: "Crítico" },
     warning: { bg: "bg-amber-50 border-amber-200", icon: <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />, label: "Aviso" },
@@ -1358,6 +1430,15 @@ function FindingCard({ finding, costEstimate }: { finding: Finding; costEstimate
             )}
             {finding.article && (
               <span className="text-xs text-gray-500">{finding.article}</span>
+            )}
+            {projectId && canPerformAction(userRole ?? null, "comment") && (
+              <CommentAnchor
+                projectId={projectId}
+                targetType="finding"
+                targetId={finding.id}
+                commentCount={0}
+                onCommentAdded={() => {}}
+              />
             )}
           </div>
           <p className="text-sm text-gray-800 mt-1">{finding.description}</p>

@@ -1,0 +1,134 @@
+{
+  "regulationRef": "portaria-349b-2013",
+  "description": "Regras Portaria 349-B/2013 — requisitos de conceção para sistemas técnicos AVAC em edifícios novos",
+  "extractedBy": "claude-regulatory-expansion-v2",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "HVAC-FC-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Free-cooling Obrigatório",
+      "description": "O sistema de climatização com potência ≥ 25 kW não dispõe de capacidade de free-cooling (arrefecimento gratuito) para aproveitamento das condições exteriores favoráveis, conforme Portaria 349-B/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasFreeCooling", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 25 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Free-cooling obrigatório para potência de arrefecimento ≥ 25 kW",
+      "remediation": "Implementar free-cooling no sistema AVAC: registo motorizado de ar exterior com controlo por entalpia (comparação ar exterior vs. retorno). Quando a temperatura/entalpia do ar exterior é inferior à do ar de retorno, o registo abre a 100% para arrefecimento gratuito sem utilização do compressor. Considerar economia de 15-30% no consumo de arrefecimento em clima português.",
+      "enabled": true,
+      "tags": ["free-cooling", "eficiência energética", "Portaria 349-B"]
+    },
+    {
+      "id": "HVAC-RECUP-02",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Recuperação de Calor (≥ 5000 m³/h)",
+      "description": "O sistema de ventilação com caudal ≥ 5000 m³/h em edifício novo não dispõe de recuperador de calor com eficiência mínima de 50%, conforme Portaria 349-B/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.freshAirFlow", "operator": ">=", "value": 5000 },
+        { "field": "hvac.heatRecoveryEfficiency", "operator": "<", "value": 50 },
+        { "field": "hvac.isNewBuilding", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Caudal: {hvac.freshAirFlow} m³/h, Eficiência: {hvac.heatRecoveryEfficiency}%",
+      "requiredValue": "Recuperador com eficiência ≥ 50% para caudais ≥ 5000 m³/h em edifícios novos",
+      "remediation": "Instalar recuperador de calor ar-ar com eficiência ≥ 50% (≥ 70% recomendado para edifícios novos). Tipos: placas (50-65%), rotativo (65-80%), permutador de calor de contra-corrente (75-90%). Prever bypass para free-cooling e limpeza dos filtros do recuperador. O recuperador deve incluir tabuleiro de condensados com drenagem.",
+      "enabled": true,
+      "tags": ["recuperação de calor", "Portaria 349-B", "edifício novo", "eficiência"]
+    },
+    {
+      "id": "HVAC-ZONE-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Zonamento Térmico Obrigatório",
+      "description": "O sistema AVAC do edifício de comércio/serviços não permite controlo independente por zona térmica, conforme requisitos de conceção da Portaria 349-B/2013.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasZoning", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 25 }
+      ],
+      "requiredValue": "Zonamento térmico obrigatório com controlo independente por zona",
+      "remediation": "Dividir o edifício em zonas térmicas com controlo independente. Cada zona deve ter: termóstato de zona, válvula de regulação (2 vias para VAV ou válvula de água), e possibilidade de ajustar o setpoint. Critérios de zonamento: orientação (N/S/E/O), tipo de ocupação, horário de funcionamento, cargas internas diferentes. Um sistema VRF com controlo individual por unidade interior cumpre este requisito.",
+      "enabled": true,
+      "tags": ["zonamento", "controlo", "Portaria 349-B", "eficiência"]
+    },
+    {
+      "id": "HVAC-TIMER-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Controlo Horário Obrigatório",
+      "description": "O sistema AVAC não dispõe de controlo horário (programação de horários de funcionamento e setback noturno), conforme Portaria 349-B/2013.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasTimerControl", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Controlo horário obrigatório com programação semanal",
+      "remediation": "Instalar programador horário semanal para o sistema AVAC. Funcionalidades mínimas: horário de arranque/paragem por dia da semana, setback noturno (redução de setpoint fora de horas de ocupação), arranque otimizado (cálculo do tempo de pré-aquecimento/arrefecimento). Para edifícios com GTC, programar os horários no sistema central. Considerar ocupancy scheduling com sensores de presença.",
+      "enabled": true,
+      "tags": ["controlo horário", "programação", "Portaria 349-B", "eficiência"]
+    },
+    {
+      "id": "HVAC-METER-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Contagem de Energia por Subsistema",
+      "description": "O edifício de comércio/serviços com potência instalada ≥ 100 kW não dispõe de contagem separada de energia para os sistemas AVAC, conforme Portaria 349-B/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasEnergyMetering", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 100 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Contagem de energia separada para AVAC (potência ≥ 100 kW)",
+      "remediation": "Instalar contadores de energia dedicados para os sistemas AVAC: contador de energia elétrica (chiller/bomba de calor, bombas, ventiladores), contador de energia térmica (circuito quente e frio) com caudalímetro e sondas de temperatura. Integrar os contadores no sistema GTC para registo histórico. Os dados de consumo devem ser disponibilizados ao gestor de energia para análise e otimização.",
+      "enabled": true,
+      "tags": ["contagem de energia", "AVAC", "Portaria 349-B", "GTC"]
+    },
+    {
+      "id": "HVAC-DAMPER-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Registo de Ar Exterior Motorizado",
+      "description": "O sistema de ventilação não dispõe de registo motorizado na admissão de ar exterior com fecho automático à paragem do ventilador.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasOutdoorAirDamper", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Registo motorizado de ar exterior com fecho automático à paragem",
+      "remediation": "Instalar registo motorizado (damper) na admissão de ar exterior com atuador spring-return (retorno por mola para posição fechada). O registo deve fechar automaticamente quando o ventilador para, evitando infiltrações de ar exterior não tratado. Posicionar antes dos filtros. Para sistemas com free-cooling, o registo deve ter modulação 0-100% com controlo por entalpia.",
+      "enabled": true,
+      "tags": ["registo", "ar exterior", "damper", "Portaria 349-B"]
+    },
+    {
+      "id": "HVAC-OVERSIZE-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Limite de Sobredimensionamento",
+      "description": "O sistema AVAC apresenta um sobredimensionamento de {hvac.oversizingPercent}%, superior ao máximo de 20% recomendado. O sobredimensionamento excessivo reduz a eficiência em carga parcial e aumenta o investimento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.oversizingPercent", "operator": ">", "value": 20 }
+      ],
+      "currentValueTemplate": "{hvac.oversizingPercent}% sobredimensionamento",
+      "requiredValue": "Sobredimensionamento ≤ 20% face às cargas térmicas calculadas",
+      "remediation": "Redimensionar o sistema AVAC com base em cálculo rigoroso de cargas térmicas (EN 12831 para aquecimento, ASHRAE ou EN 15255 para arrefecimento). Considerar fatores de simultaneidade, diversidade de cargas e perfil de ocupação. O sobredimensionamento excessivo (> 20%) resulta em: cycling frequente (desgaste de compressores), menor eficiência em carga parcial, custos de investimento superiores. Considerar sistemas modulares ou com compressores de velocidade variável.",
+      "enabled": true,
+      "tags": ["sobredimensionamento", "dimensionamento", "cargas térmicas", "eficiência"]
+    },
+    {
+      "id": "HVAC-NIGHTPURGE-01",
+      "regulationId": "portaria-349b-2013",
+      "article": "Portaria 349-B/2013 — Ventilação Noturna (Night Purge)",
+      "description": "O edifício de comércio/serviços não utiliza ventilação noturna (night purge) para pré-arrefecimento da massa térmica, perdendo potencial de poupança energética significativo no clima português.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasNightPurge", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 25 }
+      ],
+      "requiredValue": "Ventilação noturna recomendada em edifícios com massa térmica significativa",
+      "remediation": "Implementar ventilação noturna (night purge): utilizar o sistema de ventilação mecânica durante a noite (quando a temperatura exterior < temperatura interior - 2°C) para arrefecer a massa térmica do edifício. Reduz a carga de arrefecimento mecânico no dia seguinte em 20-40% no clima de Portugal. Requisitos: massa térmica exposta (lajes de betão sem teto falso), controlo automático com sondas de temperatura interior e exterior, horário de funcionamento noturno (tipicamente 22h-06h).",
+      "enabled": true,
+      "tags": ["ventilação noturna", "free-cooling", "massa térmica", "eficiência"]
+    }
+  ]
+}

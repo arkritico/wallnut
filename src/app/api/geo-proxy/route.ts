@@ -13,6 +13,10 @@
  */
 
 import { NextResponse } from "next/server";
+import { createLogger } from "@/lib/logger";
+import { captureError } from "@/lib/error-monitoring";
+
+const log = createLogger("geo-proxy");
 
 // Exact hostname set — no `.endsWith()` to prevent subdomain bypass
 const ALLOWED_HOSTS = new Set([
@@ -123,8 +127,18 @@ async function fetchWithLimits(
   } catch (error) {
     clearTimeout(timeout);
     if (error instanceof Error && error.name === "AbortError") {
+      log.warn("Upstream timeout", { url: url.slice(0, 200) });
       return NextResponse.json({ error: "Upstream request timed out" }, { status: 504 });
     }
+    log.error("Upstream fetch failed", {
+      url: url.slice(0, 200),
+      error: error instanceof Error ? error.message : String(error),
+    });
+    captureError(error, {
+      component: "api/geo-proxy",
+      action: "fetchWithLimits",
+      metadata: { url: url.slice(0, 200) },
+    });
     return NextResponse.json(
       { error: "Failed to fetch upstream resource" },
       { status: 502 },
