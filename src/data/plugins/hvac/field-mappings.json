@@ -1,0 +1,367 @@
+{
+  "pluginId": "hvac",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras AVAC (RECS — DL 118/2013, Portaria 353-A/2013, DL 108/2018)",
+  "fields": [
+    {
+      "_group": "Dados Gerais",
+      "field": "buildingType",
+      "label": "Tipo de edifício",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial / Serviços" },
+        { "value": "industrial", "label": "Industrial" },
+        { "value": "mixed", "label": "Uso misto" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Tipo de edifício para determinação das exigências AVAC aplicáveis"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "hvac.spaceType",
+      "label": "Tipo de espaço",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Residencial" },
+        { "value": "commercial", "label": "Comercial" },
+        { "value": "office", "label": "Escritório" },
+        { "value": "retail", "label": "Comércio a retalho" },
+        { "value": "restaurant", "label": "Restauração" },
+        { "value": "classroom", "label": "Sala de aula" },
+        { "value": "hospital", "label": "Hospitalar" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de espaço para determinação de caudais mínimos de ar novo e limites de QAI"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "hvac.hasHVACProject",
+      "label": "Existência de projeto AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe projeto de instalações AVAC elaborado por técnico responsável"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "hvac.occupancy",
+      "label": "Ocupação prevista",
+      "type": "number",
+      "unit": "pessoas",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número de ocupantes previsto para dimensionamento dos sistemas de ventilação e climatização"
+    },
+
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.installedHVACPower",
+      "label": "Potência AVAC instalada",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência total instalada dos sistemas de climatização (aquecimento + arrefecimento)"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.installedCoolingPower",
+      "label": "Potência de arrefecimento instalada",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência nominal de arrefecimento instalada nos equipamentos de climatização"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.heatPumpType",
+      "label": "Tipo de bomba de calor",
+      "type": "select",
+      "options": [
+        { "value": "split", "label": "Split" },
+        { "value": "multi-split", "label": "Multi-split" },
+        { "value": "VRV", "label": "VRV / VRF" },
+        { "value": "central", "label": "Central (chiller)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de sistema de bomba de calor / unidade de climatização"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.cop",
+      "label": "Coeficiente de desempenho (COP)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 3.0 },
+      "description": "Coeficiente de desempenho em modo de aquecimento — mínimo regulamentar conforme RECS"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.eer",
+      "label": "Índice de eficiência energética (EER)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 2.8 },
+      "description": "Índice de eficiência energética em modo de arrefecimento — mínimo regulamentar conforme RECS"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.hasSolarThermal",
+      "label": "Sistema solar térmico",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema solar térmico para preparação de águas quentes sanitárias"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.hotWaterStorageTemp",
+      "label": "Temperatura de armazenamento de AQS",
+      "type": "number",
+      "unit": "\u00b0C",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 60 },
+      "description": "Temperatura de armazenamento de água quente sanitária — mínimo 60 \u00b0C para prevenção de Legionella"
+    },
+    {
+      "_group": "Equipamentos de Climatização",
+      "field": "hvac.refrigerantGWP",
+      "label": "Potencial de aquecimento global do refrigerante (GWP)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "GWP do fluido frigorigéneo utilizado — restrições conforme Regulamento F-Gas (UE) 517/2014"
+    },
+
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasVentilationSystem",
+      "label": "Existência de sistema de ventilação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de ventilação mecânica ou mista no edifício"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.ventilationType",
+      "label": "Tipo de ventilação",
+      "type": "select",
+      "options": [
+        { "value": "natural", "label": "Natural" },
+        { "value": "mechanical_exhaust", "label": "Mecânica por extração" },
+        { "value": "mechanical_supply", "label": "Mecânica por insuflação" },
+        { "value": "balanced", "label": "Equilibrada (insuflação + extração)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de ventilação do edifício ou espaço — determina requisitos de caudais"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.freshAirFlow",
+      "label": "Caudal de ar novo",
+      "type": "number",
+      "unit": "m\u00b3/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal mínimo de ar novo conforme Portaria 353-A/2013 (por pessoa e por m\u00b2)"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasKitchenExtraction",
+      "label": "Extração na cozinha",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe extração mecânica ou natural na cozinha"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.hasBathroomExtraction",
+      "label": "Extração nas instalações sanitárias",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe extração mecânica ou natural nas instalações sanitárias"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.heatRecoveryEfficiency",
+      "label": "Eficiência do recuperador de calor",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Eficiência do recuperador de calor ar-ar — obrigatório para caudais > 10 000 m\u00b3/h conforme RECS"
+    },
+    {
+      "_group": "Ventilação e Qualidade do Ar",
+      "field": "hvac.filterClass",
+      "label": "Classe de filtração",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Classe de filtração dos filtros de ar na UTA (ex.: F7, M5) conforme EN ISO 16890"
+    },
+
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.ductDeltaT",
+      "label": "Diferença de temperatura nas condutas",
+      "type": "number",
+      "unit": "\u00b0C",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diferença de temperatura admissível entre o interior da conduta e o ar ambiente para dimensionamento do isolamento"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.ductInsulationThickness",
+      "label": "Espessura do isolamento das condutas",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Espessura do isolamento térmico das condutas de AVAC conforme RECS"
+    },
+    {
+      "_group": "Condutas e Distribuição",
+      "field": "hvac.ductLeakageClass",
+      "label": "Classe de estanquidade das condutas",
+      "type": "select",
+      "options": [
+        { "value": "A", "label": "Classe A" },
+        { "value": "B", "label": "Classe B" },
+        { "value": "C", "label": "Classe C" },
+        { "value": "D", "label": "Classe D" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "B" },
+      "description": "Classe de estanquidade das condutas conforme EN 1507 / EN 12237"
+    },
+
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.hasCO2Monitoring",
+      "label": "Monitorização de CO\u2082",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de monitorização contínua de CO\u2082 no edifício"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.co2Level",
+      "label": "Nível de CO\u2082",
+      "type": "number",
+      "unit": "ppm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1250 },
+      "description": "Concentração máxima de CO\u2082 interior — limiar de proteção 1250 ppm (Portaria 353-A/2013)"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.pm25Level",
+      "label": "Nível de PM2,5",
+      "type": "number",
+      "unit": "\u00b5g/m\u00b3",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 25 },
+      "description": "Concentração máxima de partículas finas PM2,5 — limiar de proteção 25 \u00b5g/m\u00b3"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.relativeHumidity",
+      "label": "Humidade relativa",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 50 },
+      "description": "Humidade relativa do ar interior — intervalo recomendado 30% a 70%"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.hasRadonProtection",
+      "label": "Proteção contra radão",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existem medidas de proteção contra radão conforme DL 108/2018"
+    },
+    {
+      "_group": "Qualidade do Ar Interior",
+      "field": "hvac.radonLevel",
+      "label": "Nível de radão",
+      "type": "number",
+      "unit": "Bq/m\u00b3",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 300 },
+      "description": "Concentração de radão interior — limite de referência 300 Bq/m\u00b3 (DL 108/2018)"
+    },
+
+    {
+      "_group": "Conforto Térmico",
+      "field": "hvac.winterOperativeTemp",
+      "label": "Temperatura operativa de inverno",
+      "type": "number",
+      "unit": "\u00b0C",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 20 },
+      "description": "Temperatura operativa interior mínima na estação de aquecimento (tipicamente 20 \u00b0C)"
+    },
+    {
+      "_group": "Conforto Térmico",
+      "field": "hvac.summerOperativeTemp",
+      "label": "Temperatura operativa de verão",
+      "type": "number",
+      "unit": "\u00b0C",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 25 },
+      "description": "Temperatura operativa interior máxima na estação de arrefecimento (tipicamente 25 \u00b0C)"
+    },
+
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasGTCSystem",
+      "label": "Sistema de gestão técnica centralizada (GTC)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de gestão técnica centralizada para monitorização e controlo dos equipamentos AVAC"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "hvac.hasMaintenancePlan",
+      "label": "Plano de manutenção AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe plano de manutenção preventiva dos sistemas AVAC conforme RECS"
+    }
+  ]
+}

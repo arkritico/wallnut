@@ -1207,3 +1207,278 @@ export const DRAWING_STANDARDS = {
     extraThick: 0.70,
   },
 } as const;
+
+// ============================================================
+// SCIE - LOOKUP TABLES for fire safety rules
+// (Portaria 1532/2008, RT-SCIE)
+// ============================================================
+
+/** Fire resistance minimum (REI minutes) by building type and risk category
+ *  Used by SCIE-REI-01, SCIE-REI-02 lookup rules */
+export const SCIE_FIRE_RESISTANCE_LOOKUP: Record<string, Record<string, number>> = {
+  "I-habitation": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "II-parking": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "III-office": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "IV-school": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "V-hospital": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "VI-entertainment": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "VII-hotel": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "VIII-commercial": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "IX-sport": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "X-museum": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "XI-library": { "1": 30, "2": 60, "3": 90, "4": 120 },
+  "XII-industrial": { "1": 30, "2": 60, "3": 90, "4": 120 },
+};
+
+/** Maximum compartment areas (m²) by risk category — Art. 17.º RT-SCIE */
+export const SCIE_MAX_COMPARTMENT_AREA: Record<string, number> = {
+  "1": 1600,
+  "2": 1600,
+  "3": 800,
+  "4": 800,
+};
+
+/** Fire door minimum ratings (EI minutes) by risk category */
+export const SCIE_FIRE_DOOR_RATING: Record<string, number> = {
+  "1": 15,
+  "2": 30,
+  "3": 45,
+  "4": 60,
+};
+
+/** Sprinkler requirement thresholds: required from this risk category */
+export const SCIE_SPRINKLER_REQUIRED_FROM: Record<string, number> = {
+  "I-habitation": 4,
+  "II-parking": 3,
+  "III-office": 3,
+  "IV-school": 3,
+  "V-hospital": 2,
+  "VI-entertainment": 3,
+  "VII-hotel": 3,
+  "VIII-commercial": 3,
+  "IX-sport": 3,
+  "X-museum": 3,
+  "XI-library": 3,
+  "XII-industrial": 3,
+};
+
+/** Cable fire rating requirements (cable classes per CPR EN 50575) */
+export const SCIE_CABLE_FIRE_RATING: Record<string, string> = {
+  "1": "Eca",
+  "2": "Cca-s1,d1,a1",
+  "3": "B2ca-s1,d1,a1",
+  "4": "B2ca-s1,d1,a1",
+};
+
+/** SCIE ordinal risk categories for ordinal_gte comparisons */
+export const SCIE_RISK_CATEGORY_ORDER = ["1", "2", "3", "4"] as const;
+
+// ============================================================
+// REH - EXTENDED LOOKUP TABLES for thermal rules
+// (Portaria 349-B/2013, Despacho 15793-K/2013)
+// ============================================================
+
+/** Reference U-values (Uref) by climate zone — Despacho 15793-K/2013
+ *  These are the reference values for energy calculation (not the maximum) */
+export const REH_REFERENCE_U_VALUES = {
+  externalWalls: { I1: 0.50, I2: 0.40, I3: 0.35 },
+  roofs: { I1: 0.40, I2: 0.35, I3: 0.30 },
+  floors: { I1: 0.40, I2: 0.35, I3: 0.30 },
+  windows: { I1: 2.80, I2: 2.40, I3: 2.20 },
+  interiorWallsHighBtr: { I1: 0.80, I2: 0.70, I3: 0.60 }, // btr ≥ 0.7
+  interiorWallsLowBtr: { I1: 2.00, I2: 2.00, I3: 1.90 },  // btr < 0.7
+  floorOverUnheated: { I1: 0.50, I2: 0.40, I3: 0.35 },
+  groundFloor: { I1: 0.50, I2: 0.40, I3: 0.35 },
+  externalDoors: { I1: 3.00, I2: 3.00, I3: 2.50 },
+} as const;
+
+/** Maximum solar factor (g-value) by orientation and summer climate zone
+ *  Portaria 349-B/2013, Tabela I.05 */
+export const REH_MAX_SOLAR_FACTOR_BY_ORIENTATION = {
+  south: { V1: 0.56, V2: 0.56, V3: 0.50 },
+  west: { V1: 0.56, V2: 0.56, V3: 0.50 },
+  east: { V1: 0.56, V2: 0.56, V3: 0.50 },
+  north: { V1: 0.65, V2: 0.65, V3: 0.60 },
+} as const;
+
+// ============================================================
+// SCIE - FIRE REACTION CLASSES (Euroclasses per EN 13501-1)
+// Ordinal ordering for reaction_class comparisons
+// ============================================================
+
+/** Euroclass ordering from best (A1) to worst (F) for reaction_class_lt operator */
+export const FIRE_REACTION_CLASS_ORDER = [
+  "A1", "A2-s1,d0", "A2-s2,d0", "A2-s3,d0",
+  "B-s1,d0", "B-s2,d0", "B-s3,d0",
+  "C-s1,d0", "C-s2,d0", "C-s3,d0",
+  "D-s1,d0", "D-s2,d0", "D-s3,d0",
+  "E", "F",
+] as const;
+
+/** Euroclass ordering for floorings (FL suffix) */
+export const FIRE_REACTION_CLASS_ORDER_FL = [
+  "A1FL", "A2FL-s1", "A2FL-s2",
+  "BFL-s1", "BFL-s2",
+  "CFL-s1", "CFL-s2",
+  "DFL-s1", "DFL-s2",
+  "EFL", "F",
+] as const;
+
+// ============================================================
+// ACOUSTIC - FORMULA PARAMETERS for reverberation time
+// (RRAE - DL 96/2008)
+// ============================================================
+
+/** Reverberation time formula coefficients T_max = K * V^(1/3)
+ *  Used by RRAE-ESC-REV, RRAE-HOSP-REV rules */
+export const ACOUSTIC_REVERBERATION_LIMITS = {
+  schools: { coefficient: 0.15, unit: "s" },
+  hospitals: { coefficient: 0.15, unit: "s" },
+  offices: { coefficient: 0.15, unit: "s" },
+  restaurants: { coefficient: 0.12, unit: "s" },
+} as const;
+
+// ============================================================
+// ITED - CABLE CATEGORY ORDINAL for ordinal comparisons
+// ============================================================
+
+/** Cable category ordering for ordinal_lt operator */
+export const ITED_CABLE_CATEGORY_ORDER = [
+  "5", "5e", "6", "6A", "7", "7A", "8", "8.1", "8.2",
+] as const;
+
+// ============================================================
+// STRUCTURAL - ADDITIONAL LOOKUP TABLES (Eurocodes)
+// ============================================================
+
+/** Exposure classes and minimum cover (mm) — EC2, NP EN 1992-1-1, Table 4.4N */
+export const STRUCTURAL_MIN_COVER: Record<string, number> = {
+  X0: 10,
+  XC1: 15,
+  XC2: 25,
+  "XC3/XC4": 30,
+  XD1: 35,
+  "XD2/XS1": 40,
+  "XD3/XS2/XS3": 45,
+};
+
+/** Live loads by occupancy category (kN/m²) — EC1, NP EN 1991-1-1, Table 6.2 */
+export const STRUCTURAL_LIVE_LOADS: Record<string, number> = {
+  A_residential: 2.0,
+  B_office: 3.0,
+  C1_assembly_tables: 3.0,
+  C2_assembly_fixed_seats: 4.0,
+  C3_assembly_no_obstacles: 5.0,
+  C4_sports: 5.0,
+  C5_crowds: 6.0,
+  D1_retail: 5.0,
+  D2_department_store: 5.0,
+  E1_storage: 7.5,
+  E2_industrial: 10.0,
+  F_vehicles_below_30kN: 2.5,
+  G_vehicles_30_160kN: 5.0,
+  H_roofs_not_accessible: 0.4,
+};
+
+/** Partial safety factors for actions — EC0, NP EN 1990 */
+export const STRUCTURAL_PARTIAL_FACTORS = {
+  permanent_unfavorable: 1.35,
+  permanent_favorable: 1.00,
+  variable_unfavorable: 1.50,
+  variable_favorable: 0.00,
+  accidental: 1.00,
+} as const;
+
+// ============================================================
+// WATER-DRAINAGE - LOOKUP TABLES for hydraulic rules
+// (RGSPPDADAR - DL 23/95)
+// ============================================================
+
+/** Minimum instantaneous flow rates by fixture type (L/s) — Art. 91.º */
+export const WATER_MIN_FLOW_RATES: Record<string, number> = {
+  "lavatório": 0.10,
+  "bidé": 0.10,
+  "banheira": 0.25,
+  "chuveiro": 0.15,
+  "autoclismo": 0.10,
+  "lava_louça": 0.20,
+  "máquina_roupa": 0.20,
+  "máquina_louça": 0.15,
+  "fluxómetro": 1.50,
+  "torneira_rega_15mm": 0.30,
+  "torneira_rega_20mm": 0.45,
+};
+
+/** Minimum drain pipe diameters by fixture (mm) — Art. 209.º */
+export const WATER_MIN_DRAIN_DN: Record<string, number> = {
+  "lavatório": 40,
+  "bidé": 40,
+  "banheira": 50,
+  "chuveiro": 50,
+  "sanita": 90,
+  "lava_louça": 50,
+  "máquina_roupa": 50,
+  "máquina_louça": 50,
+  "pavimento": 75,
+};
+
+/** Loading units (LU) by fixture — EN 12056-2 */
+export const WATER_LOADING_UNITS: Record<string, number> = {
+  "lavatório": 0.5,
+  "bidé": 0.5,
+  "banheira": 0.8,
+  "chuveiro": 0.6,
+  "sanita_autoclismo": 2.0,
+  "sanita_fluxómetro": 5.0,
+  "lava_louça": 0.8,
+  "máquina_roupa": 1.0,
+  "máquina_louça": 0.8,
+};
+
+/** Maximum filling ratio for collectors by slope */
+export const WATER_MAX_FILLING_RATIO: Record<string, number> = {
+  "1_percent": 0.50,
+  "2_percent": 0.60,
+  "4_percent": 0.65,
+};
+
+// ============================================================
+// GAS - ADDITIONAL LOOKUP TABLES (DL 521/99)
+// ============================================================
+
+/** Maximum gas pipe lengths without pressure drop compensation (m) by DN */
+export const GAS_MAX_PIPE_LENGTH: Record<string, number> = {
+  DN15: 10,
+  DN20: 20,
+  DN25: 35,
+  DN32: 60,
+  DN40: 100,
+};
+
+/** Gas appliance minimum ventilation requirements (cm²) — Portaria 361/98 */
+export const GAS_VENTILATION_REQUIREMENTS: Record<string, number> = {
+  type_A_open: 200,
+  type_B_flue: 150,
+  type_C_sealed: 0,
+  cooking_hob: 100,
+};
+
+// ============================================================
+// ELEVATOR - ADDITIONAL LOOKUP TABLES (DL 320/2002, EN 81-20)
+// ============================================================
+
+/** Minimum pit depth by nominal speed (m) — EN 81-20 */
+export const ELEVATOR_MIN_PIT_DEPTH: Record<string, number> = {
+  "0.63": 1.00,
+  "1.00": 1.20,
+  "1.60": 1.40,
+  "2.50": 1.60,
+};
+
+/** Minimum overhead clearance by nominal speed (m) — EN 81-20 */
+export const ELEVATOR_MIN_OVERHEAD: Record<string, number> = {
+  "0.63": 3.30,
+  "1.00": 3.50,
+  "1.60": 3.80,
+  "2.50": 4.20,
+};

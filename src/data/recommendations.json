@@ -1,0 +1,505 @@
+{
+  "recommendations": [
+    {
+      "id": "REC-THERMAL-WALL",
+      "area": "thermal",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "envelope.externalWallUValue", "operator": ">", "value": 0.50 }
+      ],
+      "conditionsByClimateZone": {
+        "I1": [{ "field": "envelope.externalWallUValue", "operator": ">", "value": 0.50 }],
+        "I2": [{ "field": "envelope.externalWallUValue", "operator": ">", "value": 0.40 }],
+        "I3": [{ "field": "envelope.externalWallUValue", "operator": ">", "value": 0.35 }]
+      },
+      "climateZoneField": "location.climateZoneWinter",
+      "title": "Reforco do isolamento termico das paredes",
+      "description": "Aplicar sistema ETICS (isolamento termico pelo exterior) ou isolamento na caixa-de-ar com espessura adequada para atingir U \u2264 {threshold} W/(m\u00b2.K). O ETICS e preferivel por corrigir simultaneamente as pontes termicas.",
+      "thresholdsByClimateZone": {
+        "I1": 0.50,
+        "I2": 0.40,
+        "I3": 0.35
+      },
+      "impact": "high",
+      "estimatedSavings": "Reducao de 15-25% nas necessidades de aquecimento",
+      "regulatoryBasis": "REH - Portaria 349-B/2013"
+    },
+    {
+      "id": "REC-THERMAL-ROOF",
+      "area": "thermal",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "envelope.roofUValue", "operator": ">", "value": 0.40 }
+      ],
+      "conditionsByClimateZone": {
+        "I1": [{ "field": "envelope.roofUValue", "operator": ">", "value": 0.40 }],
+        "I2": [{ "field": "envelope.roofUValue", "operator": ">", "value": 0.35 }],
+        "I3": [{ "field": "envelope.roofUValue", "operator": ">", "value": 0.30 }]
+      },
+      "climateZoneField": "location.climateZoneWinter",
+      "title": "Reforco do isolamento termico da cobertura",
+      "description": "Aplicar isolamento na cobertura (XPS, EPS ou la mineral) para atingir U \u2264 {threshold} W/(m\u00b2.K). Em coberturas planas, considerar isolamento invertido. Em coberturas inclinadas, isolar na esteira ou nas vertentes.",
+      "thresholdsByClimateZone": {
+        "I1": 0.40,
+        "I2": 0.35,
+        "I3": 0.30
+      },
+      "impact": "high",
+      "estimatedSavings": "Reducao de 10-20% nas necessidades de aquecimento",
+      "regulatoryBasis": "REH - Portaria 349-B/2013"
+    },
+    {
+      "id": "REC-THERMAL-WINDOW",
+      "area": "thermal",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "envelope.windowUValue", "operator": ">", "value": 2.80 }
+      ],
+      "conditionsByClimateZone": {
+        "I1": [{ "field": "envelope.windowUValue", "operator": ">", "value": 2.80 }],
+        "I2": [{ "field": "envelope.windowUValue", "operator": ">", "value": 2.40 }],
+        "I3": [{ "field": "envelope.windowUValue", "operator": ">", "value": 2.20 }]
+      },
+      "climateZoneField": "location.climateZoneWinter",
+      "title": "Substituicao de vaos envidracados",
+      "description": "Substituir as janelas por caixilharia com corte termico (aluminio com rotura termica ou PVC) e vidro duplo com caixa-de-ar \u2265 16mm para atingir U \u2264 {threshold} W/(m\u00b2.K).",
+      "thresholdsByClimateZone": {
+        "I1": 2.80,
+        "I2": 2.40,
+        "I3": 2.20
+      },
+      "impact": "high",
+      "estimatedSavings": "Reducao de 10-15% nas necessidades de aquecimento e melhoria do conforto acustico",
+      "regulatoryBasis": "REH - Portaria 349-B/2013"
+    },
+    {
+      "id": "REC-THERMAL-FRAME",
+      "area": "thermal",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "envelope.windowFrameType", "operator": "==", "value": "aluminum_no_break" }
+      ],
+      "title": "Upgrade de caixilharia",
+      "description": "A caixilharia de aluminio sem corte termico possui pontes termicas significativas. Substituir por caixilharia com rotura termica, PVC, ou madeira para melhorar significativamente o desempenho termico.",
+      "impact": "medium",
+      "regulatoryBasis": "REH - Boas praticas de construcao"
+    },
+    {
+      "id": "REC-THERMAL-HRV",
+      "area": "thermal",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "envelope.hasHRV", "operator": "==", "value": false },
+        { "field": "envelope.airChangesPerHour", "operator": "<", "value": 0.6 }
+      ],
+      "title": "Instalacao de ventilacao mecanica com recuperacao de calor",
+      "description": "Instalar sistema VMC (Ventilacao Mecanica Controlada) com recuperacao de calor (eficiencia \u2265 70%). Garante a qualidade do ar interior mantendo as perdas termicas controladas.",
+      "impact": "medium",
+      "estimatedSavings": "Reducao de 5-15% nas necessidades de aquecimento",
+      "regulatoryBasis": "REH - Qualidade do Ar Interior"
+    },
+    {
+      "id": "REC-ENERGY-HEATING",
+      "area": "energy",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "systems.heatingSystem", "operator": "==", "value": "electric_radiator" }
+      ],
+      "title": "Substituicao do sistema de aquecimento",
+      "description": "Substituir os radiadores eletricos por bomba de calor ar-agua ou ar-ar (COP \u2265 3.5). A poupanca energetica e significativa: uma bomba de calor consome ~3x menos energia para a mesma quantidade de calor produzido.",
+      "impact": "high",
+      "estimatedSavings": "Reducao de 60-70% no consumo de energia para aquecimento",
+      "regulatoryBasis": "SCE - DL 101-D/2020"
+    },
+    {
+      "id": "REC-ENERGY-DHW",
+      "area": "energy",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "systems.dhwSystem", "operator": "==", "value": "electric" }
+      ],
+      "title": "Substituicao do sistema de AQS",
+      "description": "Substituir o termoacumulador eletrico por bomba de calor termodinamica ou sistema solar termico com apoio. Uma bomba de calor para AQS (COP ~3) reduz o consumo de energia para aquecimento de aguas em ~65%.",
+      "impact": "high",
+      "estimatedSavings": "Reducao de 50-70% no consumo de energia para AQS",
+      "regulatoryBasis": "SCE - DL 101-D/2020"
+    },
+    {
+      "id": "REC-ENERGY-SOLAR-PV",
+      "area": "energy",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "systems.hasSolarPV", "operator": "==", "value": false }
+      ],
+      "title": "Instalacao de paineis solares fotovoltaicos",
+      "description": "Instalar sistema fotovoltaico para autoconsumo. Portugal tem excelente recurso solar (1400-1800 kWh/m\u00b2/ano). Um sistema de 1-2 kWp por fracao pode cobrir 30-50% do consumo eletrico.",
+      "impact": "medium",
+      "estimatedSavings": "Reducao de 30-50% na fatura eletrica",
+      "regulatoryBasis": "SCE - Contribuicao de Renovaveis"
+    },
+    {
+      "id": "REC-ENERGY-SOLAR-THERMAL",
+      "area": "energy",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "systems.hasSolarThermal", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "title": "Instalacao de coletores solares termicos",
+      "description": "Instalar painel solar termico para aquecimento de aguas sanitarias (AQS). Em Portugal, um sistema bem dimensionado pode cobrir 60-80% das necessidades anuais de AQS.",
+      "impact": "medium",
+      "estimatedSavings": "Reducao de 60-80% no consumo de energia para AQS",
+      "regulatoryBasis": "REH - Portaria 349-B/2013"
+    },
+    {
+      "id": "REC-FIRE-SAFETY",
+      "area": "fire_safety",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical"],
+      "title": "Revisao do projeto de seguranca contra incendio",
+      "description": "Existem nao conformidades criticas no projeto SCIE. Recomenda-se a revisao completa do projeto por tecnico especializado, incluindo: meios de evacuacao, sistemas de detecao/alarme, resistencia ao fogo dos elementos estruturais e meios de extincao.",
+      "impact": "high",
+      "regulatoryBasis": "SCIE - DL 224/2015, Portaria 1532/2008"
+    },
+    {
+      "id": "REC-ACCESSIBILITY",
+      "area": "accessibility",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical"],
+      "title": "Correcao das condicoes de acessibilidade",
+      "description": "O projeto apresenta incumprimentos ao DL 163/2006. E fundamental garantir o percurso acessivel desde a via publica, dimensoes adequadas de portas e corredores, e instalacoes sanitarias acessiveis.",
+      "impact": "high",
+      "regulatoryBasis": "DL 163/2006 - Acessibilidade"
+    },
+    {
+      "id": "REC-ELECTRICAL-RCD",
+      "area": "electrical",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "electrical.hasResidualCurrentDevice", "operator": "==", "value": false }
+      ],
+      "title": "Instalacao de protecao diferencial adequada",
+      "description": "Instalar disjuntores diferenciais de 30 mA (alta sensibilidade) em todos os circuitos de tomadas e zonas humidas. Considerar diferenciais do tipo A ou tipo B para protecao contra correntes de defeito continuas (inversores, VE).",
+      "impact": "high",
+      "regulatoryBasis": "RTIEBT - Seccao 531.2"
+    },
+    {
+      "id": "REC-ELECTRICAL-RCD-SENSITIVITY",
+      "area": "electrical",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "electrical.hasResidualCurrentDevice", "operator": "==", "value": true },
+        { "field": "electrical.rcdSensitivity", "operator": ">", "value": 30 }
+      ],
+      "title": "Instalacao de protecao diferencial adequada",
+      "description": "Instalar disjuntores diferenciais de 30 mA (alta sensibilidade) em todos os circuitos de tomadas e zonas humidas. Considerar diferenciais do tipo A ou tipo B para protecao contra correntes de defeito continuas (inversores, VE).",
+      "impact": "high",
+      "regulatoryBasis": "RTIEBT - Seccao 531.2"
+    },
+    {
+      "id": "REC-ELECTRICAL-SPD",
+      "area": "electrical",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "electrical.hasSurgeProtection", "operator": "==", "value": false }
+      ],
+      "title": "Instalacao de descarregador de sobretensoes (SPD)",
+      "description": "Instalar SPD Tipo 2 (ou Tipo 1+2 combinado em zonas com risco de descargas atmosfericas) no quadro eletrico principal. Protege equipamentos eletronicos sensiveis contra sobretensoes transitorias.",
+      "impact": "medium",
+      "regulatoryBasis": "RTIEBT - Seccao 534"
+    },
+    {
+      "id": "REC-ELECTRICAL-EV",
+      "area": "electrical",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "electrical.hasEVCharging", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "title": "Pre-instalacao para veiculo eletrico",
+      "description": "Prever pre-instalacao de circuito dedicado para carregamento de veiculo eletrico (minimo 3.7 kW). Incluir tubagem, cablagem dimensionada e protecao no quadro. O custo de pre-instalacao e muito inferior ao da instalacao posterior.",
+      "impact": "medium",
+      "regulatoryBasis": "DL 39/2010 - Mobilidade Eletrica"
+    },
+    {
+      "id": "REC-ELECTRICAL-PROJECT",
+      "area": "electrical",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Revisao do projeto eletrico por tecnico responsavel",
+      "description": "Garantir que o projeto eletrico e elaborado e assinado por tecnico responsavel (engenheiro eletrotecnico ou tecnico DGEG). O projeto deve incluir esquema unifilar, memoria descritiva, calculos de dimensionamento e verificacao de quedas de tensao.",
+      "impact": "high",
+      "regulatoryBasis": "RTIEBT - Portaria 949-A/2006"
+    },
+    {
+      "id": "REC-ITED-FIBER",
+      "area": "ited_itur",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "telecommunications.hasFiberOptic", "operator": "==", "value": false }
+      ],
+      "title": "Instalacao de fibra otica monomodo",
+      "description": "A 4a edicao do ITED exige fibra otica monomodo. Mesmo em reabilitacao, a instalacao de fibra e fortemente recomendada para preparar o edificio para servicos de banda larga de nova geracao (\u22651 Gbps).",
+      "impact": "high",
+      "regulatoryBasis": "ITED 4a Edicao - Portaria 264/2023"
+    },
+    {
+      "id": "REC-ITED-ATI",
+      "area": "ited_itur",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "telecommunications.hasATI", "operator": "==", "value": false }
+      ],
+      "title": "Instalacao de ATI em cada fracao",
+      "description": "Instalar Armario de Telecomunicacoes Individual (ATI) em cada fracao para centralizar a distribuicao de redes internas. O ATI deve ter dimensoes minimas de 30x50x12 cm e estar acessivel.",
+      "impact": "high",
+      "regulatoryBasis": "ITED - DL 123/2009"
+    },
+    {
+      "id": "REC-ITED-COPPER",
+      "area": "ited_itur",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "telecommunications.copperCableCategory", "operator": "in", "value": ["5e", "none"] }
+      ],
+      "title": "Upgrade de cablagem de par de cobre",
+      "description": "Utilizar cablagem UTP minimo Categoria 6 (de preferencia Cat. 6a) para suportar velocidades de 1-10 Gbps. A Cat. 5e limita a velocidade a 1 Gbps e distancias menores.",
+      "impact": "medium",
+      "regulatoryBasis": "ITED 4a Edicao"
+    },
+    {
+      "id": "REC-ITED-CERTIFICATION",
+      "area": "ited_itur",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Certificacao ITED por instalador credenciado",
+      "description": "A certificacao ITED e obrigatoria para obtencao da licenca de utilizacao. Contratar instalador com credenciacao ANACOM valida. O certificado ITED e emitido apos ensaios e verificacao da instalacao.",
+      "impact": "high",
+      "regulatoryBasis": "ITED - DL 123/2009"
+    },
+    {
+      "id": "REC-ACOUSTIC",
+      "area": "acoustic",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Projeto de condicionamento acustico",
+      "description": "Elaborar projeto de condicionamento acustico por tecnico competente. Deve verificar isolamento a sons aereos (paredes e lajes), sons de percussao (lajes com pavimento flutuante) e isolamento de fachada.",
+      "impact": "high",
+      "regulatoryBasis": "RRAE - DL 96/2008"
+    },
+    {
+      "id": "REC-GAS",
+      "area": "gas",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Revisao da instalacao de gas",
+      "description": "Garantir que a instalacao de gas e projetada e executada por instalador credenciado pela DGEG. Incluir ensaio de estanquidade, valvulas de emergencia, ventilacao adequada e detecao de gas.",
+      "impact": "high",
+      "regulatoryBasis": "DL 521/99"
+    },
+    {
+      "id": "REC-WATER-REVIEW",
+      "area": "water_drainage",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Revisao das redes de aguas e drenagem",
+      "description": "Garantir sistema separativo de drenagem, valvulas anti-retorno, ventilacao da rede e sifoes em todos os aparelhos. Utilizar materiais modernos (PPR, PEX, multicamada) para abastecimento.",
+      "impact": "high",
+      "regulatoryBasis": "DL 23/95 - RGSPPDADAR"
+    },
+    {
+      "id": "REC-WATER-REUSE",
+      "area": "water_drainage",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "conditions": [
+        { "field": "waterDrainage.hasWaterReuse", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "title": "Reutilizacao de aguas cinzentas/pluviais",
+      "description": "Considerar sistema de reutilizacao de aguas cinzentas ou recolha de aguas pluviais para rega e autoclismos. Pode reduzir o consumo de agua potavel em 30-40%.",
+      "impact": "medium",
+      "estimatedSavings": "Reducao de 30-40% no consumo de agua",
+      "regulatoryBasis": "Boas praticas de sustentabilidade"
+    },
+    {
+      "id": "REC-STRUCTURAL",
+      "area": "structural",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical"],
+      "title": "Projeto de estabilidade e estudo geotecnico",
+      "description": "Elaborar projeto de estabilidade conforme Eurocodigos e estudo geotecnico do terreno. Fundamental para a seguranca estrutural e dimensionamento das fundacoes, especialmente em zona sismica.",
+      "impact": "high",
+      "regulatoryBasis": "Eurocodigos EC0-EC8"
+    },
+    {
+      "id": "REC-ELEVATORS",
+      "area": "elevators",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Conformidade do ascensor",
+      "description": "Garantir marcacao CE, contrato de manutencao com empresa qualificada, inspecao periodica por entidade acreditada e comunicacao de emergencia 24h. A acessibilidade do ascensor deve cumprir o DL 163/2006.",
+      "impact": "high",
+      "regulatoryBasis": "DL 320/2002, EN 81-20"
+    },
+    {
+      "id": "REC-LICENSING",
+      "area": "licensing",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Regularizacao do licenciamento",
+      "description": "Garantir todos os instrumentos de licenciamento: projeto de arquitetura, projetos de especialidades, termos de responsabilidade, alvara de construcao e licenca de utilizacao. Consultar a camara municipal sobre o enquadramento legal da operacao.",
+      "impact": "high",
+      "regulatoryBasis": "RJUE - DL 555/99"
+    },
+    {
+      "id": "REC-WASTE",
+      "area": "waste",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Gestao de residuos de construcao",
+      "description": "Elaborar PPG (Plano de Prevencao e Gestao de RCD), garantir triagem em obra, transporte por operador licenciado e destino final em operador autorizado. Registar movimentos via e-GAR.",
+      "impact": "medium",
+      "regulatoryBasis": "DL 46/2008"
+    },
+    {
+      "id": "REC-ARCHITECTURE",
+      "area": "architecture",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Conformidade com Codigo Civil e RGEU",
+      "description": "Verificar conformidade do projeto de arquitetura com o Codigo Civil (vizinhanca, aberturas, estilicidio) e RGEU (dimensoes minimas, pe-direito, iluminacao natural, ventilacao). Estes sao requisitos de base para aprovacao cameraria.",
+      "impact": "high",
+      "regulatoryBasis": "Codigo Civil + RGEU"
+    },
+    {
+      "id": "REC-AVAC",
+      "area": "avac",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Projeto de AVAC e qualidade do ar",
+      "description": "Garantir projeto de AVAC com ventilacao adequada (extracao cozinha/WC, caudais de ar novo), controlo de qualidade do ar interior e plano de manutencao preventiva. Verificar conformidade com regulamento F-Gas para equipamentos com gases fluorados.",
+      "impact": "high",
+      "regulatoryBasis": "RECS/REH - DL 118/2013"
+    },
+    {
+      "id": "REC-ENERGY-CERT",
+      "area": "general",
+      "trigger": "always",
+      "title": "Certificacao energetica",
+      "description": "Garantir a obtencao do Certificado Energetico (CE) emitido por Perito Qualificado do SCE. A classe energetica influencia o valor de mercado do imovel e e obrigatoria para venda ou arrendamento.",
+      "impact": "medium",
+      "regulatoryBasis": "SCE - DL 101-D/2020"
+    },
+    {
+      "id": "REC-REHAB-TAX",
+      "area": "general",
+      "trigger": "condition",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true }
+      ],
+      "title": "Beneficios fiscais para reabilitacao",
+      "description": "Projetos de reabilitacao urbana podem beneficiar de IVA reduzido a 6%, isencao de IMI/IMT, e deducao em IRS. Verificar elegibilidade junto da Camara Municipal e enquadramento em ARU (Area de Reabilitacao Urbana).",
+      "impact": "medium"
+    },
+    {
+      "id": "REC-DRAWINGS",
+      "area": "drawings",
+      "trigger": "area_has_findings",
+      "triggerSeverity": ["critical", "warning"],
+      "title": "Melhorar qualidade das pecas desenhadas",
+      "description": "Rever as pecas desenhadas garantindo: escalas adequadas ao formato de impressao, legendas com simbologia em todas as folhas, carimbo normalizado, norte geografico, escala grafica e cotagem completa.",
+      "impact": "high",
+      "regulatoryBasis": "Portaria 701-H/2008, ISO 3098, ISO 128"
+    },
+    {
+      "id": "REC-WATER-UTILITY",
+      "area": "water_drainage",
+      "trigger": "condition",
+      "conditions": [
+        { "field": "localRegulations.waterUtilityProvider", "operator": "not_exists" }
+      ],
+      "title": "Identificar entidade gestora de aguas",
+      "description": "Identificar a entidade gestora de aguas e saneamento do municipio (EPAL, SIMAS, SIMAR, CARTAGUAS, etc.) e obter os regulamentos especificos para ligacao de ramais de agua e esgoto.",
+      "impact": "high",
+      "regulatoryBasis": "RGSPPDADAR / Regulamento municipal de aguas"
+    },
+    {
+      "id": "REC-ENTITY-CONSULTATION",
+      "area": "licensing",
+      "trigger": "condition",
+      "conditions": [
+        { "field": "localRegulations.consultedEntities", "operator": "empty_array" }
+      ],
+      "title": "Identificar entidades a consultar",
+      "description": "Para este projeto devem ser consultadas as seguintes entidades: {entities}. Identificar precocemente as consultas externas evita atrasos no licenciamento.",
+      "impact": "high",
+      "regulatoryBasis": "RJUE - DL 555/99, Art. 13.o",
+      "dynamicEntities": true,
+      "mandatoryEntities": ["Camara Municipal"],
+      "conditionalEntities": [
+        { "name": "ANPC / Protecao Civil", "field": "fireSafety.riskCategory", "operator": ">=", "value": "2" },
+        { "name": "DGPC / IGESPAR", "field": "licensing.isProtectedArea", "operator": "==", "value": true },
+        { "name": "Direcao Regional de Cultura", "field": "licensing.isProtectedArea", "operator": "==", "value": true },
+        { "name": "DGEG", "field": "electrical.contractedPower", "operator": ">", "value": 41.4 },
+        { "name": "DGEG", "field": "gas.hasGasInstallation", "operator": "==", "value": true }
+      ]
+    },
+    {
+      "id": "REC-PROCESS-TIMELINE",
+      "area": "licensing",
+      "trigger": "condition",
+      "conditions": [
+        { "field": "licensing.processType", "operator": "exists" }
+      ],
+      "title": "Prazo legal: {processLabel}",
+      "description": "Para o processo de {processLabel}, o prazo legal maximo para resposta e de {totalDays} dias uteis. Efeito do silencio: {silenceEffect}.",
+      "impact": "medium",
+      "regulatoryBasis": "RJUE - DL 555/99",
+      "dynamicTimeline": true,
+      "processTimelines": {
+        "pip": {
+          "label": "Informacao Previa (PIP)",
+          "totalMaxDays": 40,
+          "silenceEffect": "deferimento tacito (aprovacao implicita)"
+        },
+        "licensing": {
+          "label": "Licenciamento",
+          "totalMaxDays": 65,
+          "silenceEffect": "deferimento tacito (aprovacao implicita)"
+        },
+        "communication_prior": {
+          "label": "Comunicacao Previa",
+          "totalMaxDays": 20,
+          "silenceEffect": "pode iniciar obras"
+        },
+        "special_authorization": {
+          "label": "Autorizacao Especial",
+          "totalMaxDays": 60,
+          "silenceEffect": "deferimento tacito (aprovacao implicita)"
+        },
+        "utilization_license": {
+          "label": "Licenca de Utilizacao",
+          "totalMaxDays": 15,
+          "silenceEffect": "deferimento tacito (aprovacao implicita)"
+        }
+      }
+    }
+  ]
+}

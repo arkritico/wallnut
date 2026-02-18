@@ -1,0 +1,933 @@
+{
+  "regulationRef": "dl-46-2008",
+  "description": "Regras de gestão de RCD — DL 46/2008 (alterado por DL 73/2011), Portaria 417/2008, DL 102-D/2020 (RGGR) e legislação complementar",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "RCD-PPG-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º — Plano de Prevenção e Gestão (PPG)",
+      "description": "O PPG-RCD é obrigatório para todas as obras sujeitas a licenciamento ou comunicação prévia. Deve acompanhar o projeto de execução e ser aprovado antes do início da obra.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasPPG", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasPPG}",
+      "requiredValue": "PPG-RCD obrigatório",
+      "remediation": "Elaborar Plano de Prevenção e Gestão de RCD conforme Art. 10.º do DL 46/2008. Deve acompanhar o projeto para licenciamento urbanístico.",
+      "enabled": true,
+      "tags": ["PPG", "plano", "obrigatório", "licenciamento"]
+    },
+    {
+      "id": "RCD-PPG-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 2 — Conteúdo do PPG",
+      "description": "O PPG deve conter: caracterização da obra, metodologias de prevenção, estimativa de RCD por código LER, medidas de acondicionamento e triagem, e destino final previsto para cada fluxo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.ppgHasFullContent", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.ppgHasFullContent}",
+      "requiredValue": "PPG com conteúdo completo conforme Art. 10.º, n.º 2",
+      "remediation": "Completar o PPG com todos os elementos obrigatórios: 1) Caracterização sumária da obra; 2) Metodologias de prevenção de RCD incorporadas no projeto; 3) Estimativa de RCD a produzir, discriminada por código LER; 4) Referência a metodologias de acondicionamento e triagem em obra; 5) Destino final previsto para cada fluxo de RCD (operador licenciado identificado).",
+      "enabled": true,
+      "tags": ["PPG", "conteúdo", "Art. 10.º"]
+    },
+    {
+      "id": "RCD-PPG-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 3 — Prazo de submissão do PPG",
+      "description": "O PPG deve ser apresentado à câmara municipal juntamente com o requerimento de licenciamento ou comunicação prévia da obra.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.ppgSubmittedWithLicense", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.ppgSubmittedWithLicense}",
+      "requiredValue": "PPG submetido com pedido de licenciamento",
+      "remediation": "Submeter o PPG-RCD à câmara municipal conjuntamente com o requerimento de licenciamento ou comunicação prévia. A ausência do PPG pode levar à não admissão do pedido de licenciamento.",
+      "enabled": true,
+      "tags": ["PPG", "prazo", "câmara municipal", "submissão"]
+    },
+    {
+      "id": "RCD-LER-01",
+      "regulationId": "dl-46-2008",
+      "article": "Portaria 209/2004 — Classificação LER de RCD",
+      "description": "Os RCD devem ser classificados segundo os códigos LER do capítulo 17 (resíduos de construção e demolição). A classificação correta é obrigatória para transporte e destino final.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasLERClassification", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasLERClassification}",
+      "requiredValue": "Classificação LER 17 XX XX obrigatória",
+      "remediation": "Classificar todos os RCD segundo a Lista Europeia de Resíduos (LER), capítulo 17: 17 01 — betão, tijolos, cerâmicos; 17 02 — madeira, vidro, plástico; 17 03 — misturas betuminosas; 17 04 — metais; 17 05 — solos e rochas; 17 06 — materiais de isolamento (incl. amianto); 17 08 — gesso; 17 09 — outros RCD. Códigos com asterisco (*) indicam resíduos perigosos.",
+      "enabled": true,
+      "tags": ["LER", "classificação", "17 XX XX", "Portaria 209/2004"]
+    },
+    {
+      "id": "RCD-LER-02",
+      "regulationId": "dl-46-2008",
+      "article": "Portaria 209/2004 — Resíduos perigosos LER 17 06 05*",
+      "description": "Materiais contendo amianto devem ser classificados como LER 17 06 05* (materiais de construção contendo amianto) e geridos como resíduos perigosos, com circuito dedicado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasAsbestosLERClassification", "operator": "==", "value": false },
+        { "field": "waste.asbestosPresent", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasAsbestosLERClassification}",
+      "requiredValue": "Classificação LER 17 06 05* obrigatória para amianto",
+      "remediation": "Classificar materiais contendo amianto (MCA) como LER 17 06 05*. Estes resíduos perigosos exigem: embalagem dupla estanque; etiquetagem conforme legislação de amianto; transporte por operador licenciado para resíduos perigosos; destino final em aterro de resíduos perigosos autorizado.",
+      "enabled": true,
+      "tags": ["LER", "amianto", "17 06 05*", "perigoso"]
+    },
+    {
+      "id": "RCD-TRIAG-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º — Triagem obrigatória em obra",
+      "description": "A triagem de RCD em obra é obrigatória, devendo os resíduos ser separados por fluxos na origem: betão, metais, madeira, plásticos, vidro, resíduos perigosos e indiferenciados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasTriagem", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasTriagem}",
+      "requiredValue": "Triagem em obra obrigatória (Art. 8.º)",
+      "remediation": "Implementar sistema de triagem em obra com separação mínima nos seguintes fluxos: betão e argamassas (LER 17 01); metais ferrosos e não ferrosos (LER 17 04); madeira (LER 17 02 01); vidro (LER 17 02 02); plásticos (LER 17 02 03); resíduos perigosos (códigos com *); misturas de RCD (LER 17 09 04). Colocar contentores devidamente identificados e sinalizados.",
+      "enabled": true,
+      "tags": ["triagem", "separação", "fluxos", "Art. 8.º"]
+    },
+    {
+      "id": "RCD-TRIAG-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º, n.º 2 — Triagem impossível em obra",
+      "description": "Quando a triagem em obra não for possível por falta de espaço comprovada, os RCD devem ser encaminhados para operador de gestão licenciado que efetue a triagem.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasTriagem", "operator": "==", "value": false },
+        { "field": "waste.hasOffSiteSorting", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasOffSiteSorting}",
+      "requiredValue": "Triagem em operador licenciado se impossível em obra",
+      "remediation": "Caso a triagem em obra seja comprovadamente impossível (falta de espaço documentada), encaminhar os RCD misturados para operador de triagem licenciado. Justificar a impossibilidade de triagem em obra no PPG-RCD. O operador de triagem deve emitir certificado discriminando as quantidades separadas por código LER.",
+      "enabled": true,
+      "tags": ["triagem", "operador", "alternativa", "Art. 8.º"]
+    },
+    {
+      "id": "RCD-TRANSP-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º — Transporte de RCD por operador licenciado",
+      "description": "O transporte de RCD deve ser efetuado por transportador de resíduos devidamente licenciado pela APA, inscrito no SILiAmb.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasLicensedTransporter", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasLicensedTransporter}",
+      "requiredValue": "Transportador licenciado APA obrigatório",
+      "remediation": "Contratar transportador de resíduos licenciado pela APA e inscrito na plataforma SILiAmb. Verificar a validade do alvará de transporte antes de cada contratação. O transporte sem licença constitui contraordenação grave.",
+      "enabled": true,
+      "tags": ["transporte", "licenciado", "APA", "Art. 11.º"]
+    },
+    {
+      "id": "RCD-EGAR-01",
+      "regulationId": "dl-46-2008",
+      "article": "Portaria 145/2017 — Guia e-GAR obrigatória",
+      "description": "O transporte de RCD deve ser acompanhado de guia eletrónica de acompanhamento de resíduos (e-GAR), emitida na plataforma SILiAmb da APA, com identificação do produtor, transportador, destinatário, códigos LER e quantidades.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasEGAR", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasEGAR}",
+      "requiredValue": "e-GAR obrigatória por transporte (Portaria 145/2017)",
+      "remediation": "Emitir guia e-GAR na plataforma SILiAmb antes de cada transporte de RCD. Cada e-GAR deve conter: identificação do produtor (dono de obra ou empreiteiro); identificação do transportador licenciado; identificação do destinatário (operador licenciado); código LER de cada resíduo; quantidade estimada em toneladas; local de origem e destino. Conservar comprovativos durante 5 anos.",
+      "enabled": true,
+      "tags": ["e-GAR", "Portaria 145/2017", "SILiAmb", "transporte"]
+    },
+    {
+      "id": "RCD-EGAR-02",
+      "regulationId": "dl-46-2008",
+      "article": "Portaria 417/2008 — Modelos de guias de RCD",
+      "description": "As guias de acompanhamento de RCD devem seguir os modelos aprovados pela Portaria 417/2008: Modelo A (obras particulares e municipais) e Modelo B (obras particulares isentas de licença).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasCorrectGuideModel", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasCorrectGuideModel}",
+      "requiredValue": "Modelo de guia conforme Portaria 417/2008",
+      "remediation": "Utilizar os modelos de guias de RCD aprovados pela Portaria 417/2008: Modelo A — para obras sujeitas a licenciamento ou comunicação prévia; Modelo B — para obras particulares isentas de licença ou comunicação prévia. As guias físicas foram substituídas pela e-GAR eletrónica mas os campos de informação obrigatórios mantêm-se.",
+      "enabled": true,
+      "tags": ["Portaria 417/2008", "modelos", "guias", "registo"]
+    },
+    {
+      "id": "RCD-DEST-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 12.º — Destino final em operador licenciado",
+      "description": "Os RCD devem ter destino final em operador de gestão de resíduos licenciado pela APA, com alvará válido para as operações de gestão pretendidas (R ou D).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasLicensedDestination", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasLicensedDestination}",
+      "requiredValue": "Destino final licenciado obrigatório",
+      "remediation": "Encaminhar todos os RCD para operador de gestão de resíduos licenciado com alvará APA válido. Priorizar operações de valorização (R) sobre operações de eliminação (D). Verificar se o alvará cobre os códigos LER específicos dos resíduos a entregar. Deposição ilegal constitui crime ambiental (Lei 50/2006).",
+      "enabled": true,
+      "tags": ["destino", "licenciado", "operador", "APA"]
+    },
+    {
+      "id": "RCD-DEST-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º — Rastreabilidade de RCD",
+      "description": "Deve ser garantida a rastreabilidade completa dos RCD desde a produção em obra até ao destino final, com documentação que comprove cada etapa do circuito.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasFullTraceability", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasFullTraceability}",
+      "requiredValue": "Rastreabilidade completa de RCD obrigatória",
+      "remediation": "Implementar sistema de rastreabilidade de RCD: 1) Registo de produção em obra (quantidades por código LER); 2) Guias e-GAR para cada transporte; 3) Certificados de receção do operador de destino; 4) Comprovativos de valorização ou eliminação. Manter toda a documentação organizada e acessível durante mínimo 5 anos.",
+      "enabled": true,
+      "tags": ["rastreabilidade", "documentação", "circuito"]
+    },
+    {
+      "id": "RCD-REUT-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 6.º — Reutilização de solos e rochas não contaminados",
+      "description": "Os solos e rochas não contaminados (LER 17 05 04) resultantes de escavação podem ser reutilizados na própria obra ou noutra obra, dispensando o regime de gestão de resíduos, desde que o produtor comprove a sua não contaminação.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasSoilReuseAssessment", "operator": "not_exists", "value": null },
+        { "field": "waste.hasExcavationSoils", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasSoilReuseAssessment}",
+      "requiredValue": "Avaliação de reutilização de solos obrigatória",
+      "remediation": "Para reutilizar solos e rochas de escavação sem o regime de resíduos (Art. 6.º): 1) Realizar análise laboratorial para comprovar não contaminação; 2) Classificar como LER 17 05 04 (solos e rochas não contaminados); 3) Documentar a utilização prevista (aterros, enchimentos, modelação de terreno); 4) Se reutilizados noutra obra, celebrar acordo entre produtores e registar quantidades transferidas.",
+      "enabled": true,
+      "tags": ["reutilização", "solos", "rochas", "Art. 6.º", "LER 17 05 04"]
+    },
+    {
+      "id": "RCD-RECOBRA-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 7.º — Reciclagem em obra",
+      "description": "As operações de reciclagem de RCD em obra são permitidas mediante comunicação prévia à câmara municipal e cumprimento de condições ambientais específicas, nomeadamente controlo de poeiras e ruído.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasOnSiteRecyclingPermit", "operator": "not_exists", "value": null },
+        { "field": "waste.onSiteRecyclingPlanned", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasOnSiteRecyclingPermit}",
+      "requiredValue": "Comunicação prévia para reciclagem em obra",
+      "remediation": "Para efetuar reciclagem de RCD em obra (ex.: britagem de betão para agregados reciclados): 1) Comunicar previamente à câmara municipal a intenção de reciclar em obra; 2) Garantir controlo de emissão de poeiras (sistema de aspersão de água); 3) Cumprir limites de ruído (Regulamento Geral do Ruído); 4) Garantir que o material reciclado cumpre normas técnicas aplicáveis; 5) Registar quantidades recicladas no PPG-RCD.",
+      "enabled": true,
+      "tags": ["reciclagem", "obra", "Art. 7.º", "britagem"]
+    },
+    {
+      "id": "RCD-PERIG-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º — Identificação de resíduos perigosos",
+      "description": "A identificação e separação obrigatória de resíduos perigosos (amianto, tintas com chumbo, solventes, óleos, PCBs) deve ser documentada, com encaminhamento para operador licenciado para resíduos perigosos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasHazardousIdentification", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasHazardousIdentification}",
+      "requiredValue": "Identificação de resíduos perigosos obrigatória",
+      "remediation": "Identificar e segregar todos os resíduos perigosos: amianto (LER 17 06 05*); tintas e vernizes com solventes orgânicos (LER 08 01 11*); tintas com chumbo; óleos usados (LER 13 02); solventes (LER 14 06); PCBs em equipamentos elétricos (LER 16 02 09*); madeira tratada com CCA (LER 17 02 04*). Contratar operador licenciado para resíduos perigosos. Manter fichas de dados de segurança em obra.",
+      "enabled": true,
+      "tags": ["perigosos", "amianto", "solventes", "PCBs", "chumbo"]
+    },
+    {
+      "id": "RCD-PERIG-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Tintas com chumbo",
+      "description": "Tintas e revestimentos contendo chumbo, frequentes em edifícios anteriores a 1990, devem ser removidos com precauções especiais e classificados como resíduos perigosos (LER 08 01 11*).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasLeadPaintAssessment", "operator": "not_exists", "value": null },
+        { "field": "building.yearBuilt", "operator": "<", "value": 1990 }
+      ],
+      "currentValueTemplate": "{waste.hasLeadPaintAssessment}",
+      "requiredValue": "Avaliação de tintas com chumbo obrigatória (edifícios pré-1990)",
+      "remediation": "Em edifícios anteriores a 1990, realizar análise de tintas para deteção de chumbo. Se confirmada presença: remover por via húmida (proibido lixar a seco); utilizar EPI adequado (máscara FFP3, fato descartável); embalar em contentores estanques identificados; classificar como LER 08 01 11* (resíduos de tintas contendo solventes orgânicos perigosos); encaminhar para operador licenciado para resíduos perigosos.",
+      "enabled": true,
+      "tags": ["chumbo", "tintas", "perigoso", "pré-1990"]
+    },
+    {
+      "id": "RCD-PERIG-03",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — PCBs em equipamentos",
+      "description": "Equipamentos elétricos contendo PCBs (bifenilos policlorados), como transformadores e condensadores antigos, devem ser identificados, removidos e eliminados por operador licenciado conforme DL 277/99.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasPCBAssessment", "operator": "not_exists", "value": null },
+        { "field": "building.yearBuilt", "operator": "<", "value": 1987 }
+      ],
+      "currentValueTemplate": "{waste.hasPCBAssessment}",
+      "requiredValue": "Avaliação de PCBs obrigatória (edifícios pré-1987)",
+      "remediation": "Em edifícios anteriores a 1987, verificar a presença de PCBs em transformadores, condensadores e outros equipamentos elétricos. Se confirmada presença: remover por empresa especializada; classificar como LER 16 02 09* (transformadores contendo PCBs); encaminhar para operador autorizado para eliminação de PCBs (incineração em alta temperatura). Proibida a reutilização ou reciclagem de equipamentos contaminados com PCBs.",
+      "enabled": true,
+      "tags": ["PCBs", "perigoso", "equipamentos", "DL 277/99"]
+    },
+    {
+      "id": "RCD-AMIANTO-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 266/2007 — Levantamento de amianto",
+      "description": "O levantamento de materiais contendo amianto (MCA) é obrigatório antes de qualquer demolição ou reabilitação de edifícios construídos antes de 2005. A remoção deve ser executada por empresa licenciada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasAsbestosManagement", "operator": "not_exists", "value": null },
+        { "field": "isDemolition", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasAsbestosManagement}",
+      "requiredValue": "Levantamento de amianto obrigatório antes de demolição",
+      "remediation": "Contratar laboratório acreditado (IPAC) para levantamento de MCA. Se confirmada presença: contratar empresa licenciada para remoção conforme DL 266/2007; notificar ACT com mínimo 30 dias de antecedência; elaborar plano de trabalhos específico; garantir monitorização de fibras no ar durante remoção; embalar em dupla embalagem estanque identificada.",
+      "enabled": true,
+      "tags": ["amianto", "DL 266/2007", "ACT", "levantamento"]
+    },
+    {
+      "id": "RCD-AMIANTO-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 266/2007, Art. 8.º — Plano de trabalhos para amianto",
+      "description": "O plano de trabalhos para remoção de amianto deve ser submetido à ACT com 30 dias de antecedência, incluindo métodos de remoção, confinamento, monitorização e destino final dos resíduos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasAsbestosWorkPlan", "operator": "not_exists", "value": null },
+        { "field": "waste.asbestosPresent", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasAsbestosWorkPlan}",
+      "requiredValue": "Plano de trabalhos para amianto (notificação ACT 30 dias)",
+      "remediation": "Elaborar plano de trabalhos para remoção de amianto conforme DL 266/2007, Art. 8.º, incluindo: 1) Identificação e localização dos MCA; 2) Método de remoção (via húmida obrigatória); 3) Medidas de confinamento da área; 4) EPI obrigatórios (fato completo descartável, máscara FFP3 ou sistema de respiração autónoma); 5) Plano de monitorização de fibras no ar (limiar: 0,1 fibras/cm³); 6) Destino final: aterro de resíduos perigosos autorizado. Submeter à ACT com 30 dias de antecedência mínima.",
+      "enabled": true,
+      "tags": ["amianto", "plano de trabalhos", "ACT", "DL 266/2007"]
+    },
+    {
+      "id": "RCD-AMIANTO-03",
+      "regulationId": "dl-46-2008",
+      "article": "DL 266/2007 — Monitorização de fibras de amianto",
+      "description": "Durante a remoção de MCA, a concentração de fibras de amianto no ar deve ser monitorizada continuamente, não podendo exceder 0,1 fibras/cm³ no limite da zona de confinamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.asbestosFiberMonitoring", "operator": "==", "value": false },
+        { "field": "waste.asbestosPresent", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.asbestosFiberMonitoring}",
+      "requiredValue": "Monitorização contínua de fibras (≤ 0,1 fibras/cm³)",
+      "remediation": "Implementar monitorização contínua de fibras de amianto no ar durante todos os trabalhos de remoção de MCA. Contratar laboratório acreditado para medições por microscopia de contraste de fase (PCM) ou microscopia eletrónica de varrimento (SEM). Limite de exposição: 0,1 fibras/cm³ (média ponderada de 8 horas). Se excedido, suspender imediatamente os trabalhos e reforçar o confinamento.",
+      "enabled": true,
+      "tags": ["amianto", "monitorização", "fibras", "0.1 fibras/cm³"]
+    },
+    {
+      "id": "RCD-DEMSEL-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º — Demolição seletiva obrigatória",
+      "description": "A demolição seletiva é obrigatória antes da demolição geral do edifício, devendo os materiais reutilizáveis e recicláveis ser removidos previamente e separados por categorias.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasSelectiveDemolition", "operator": "not_exists", "value": null },
+        { "field": "isDemolition", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasSelectiveDemolition}",
+      "requiredValue": "Demolição seletiva obrigatória (Art. 9.º)",
+      "remediation": "Executar demolição seletiva antes da demolição mecânica geral, seguindo a ordem inversa da construção: 1) Remoção de resíduos perigosos (amianto, PCBs, tintas com chumbo); 2) Desmantelamento de equipamentos reutilizáveis; 3) Remoção de carpintarias e caixilharias; 4) Separação de metais; 5) Remoção de coberturas; 6) Demolição de alvenarias; 7) Demolição de estrutura. Documentar quantidades por código LER.",
+      "enabled": true,
+      "tags": ["demolição seletiva", "Art. 9.º", "separação"]
+    },
+    {
+      "id": "RCD-DEMSEL-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º — Auditoria prévia à demolição",
+      "description": "Antes de qualquer demolição, é obrigatória uma auditoria de materiais para inventariar materiais reutilizáveis, recicláveis e perigosos presentes no edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasPreDemolitionAudit", "operator": "not_exists", "value": null },
+        { "field": "isDemolition", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasPreDemolitionAudit}",
+      "requiredValue": "Auditoria prévia à demolição obrigatória",
+      "remediation": "Realizar auditoria prévia à demolição com inventário completo: 1) Levantamento de materiais perigosos (amianto, tintas com chumbo, PCBs, tanques subterrâneos); 2) Identificação de materiais reutilizáveis (madeiras, pedras, cerâmicos, metais, equipamentos); 3) Quantificação estimada por código LER; 4) Plano de desmontagem seletiva; 5) Identificação dos destinos por fluxo. O relatório de auditoria deve integrar o PPG-RCD.",
+      "enabled": true,
+      "tags": ["auditoria", "pré-demolição", "inventário", "Art. 9.º"]
+    },
+    {
+      "id": "RCD-RECICL-01",
+      "regulationId": "dl-46-2008",
+      "article": "Diretiva 2008/98/CE — Meta de reciclagem 70%",
+      "description": "A meta europeia de valorização de RCD é de 70% em peso, transposta para a legislação portuguesa. A taxa de reciclagem/valorização do projeto deve atingir ou superar esta meta.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.recyclingRate", "operator": "<", "value": 70 }
+      ],
+      "currentValueTemplate": "{waste.recyclingRate}%",
+      "requiredValue": "≥ 70% taxa de valorização de RCD",
+      "remediation": "Aumentar a taxa de valorização de RCD para atingir a meta europeia de 70%. Medidas: 1) Intensificar a triagem em obra para maximizar separação de fluxos valorizáveis; 2) Privilegiar a reutilização de materiais in situ; 3) Encaminhar betão para reciclagem como agregado; 4) Valorizar metais através de sucateiros licenciados; 5) Encaminhar madeira não contaminada para valorização energética ou reciclagem; 6) Reduzir fração de RCD indiferenciado para aterro.",
+      "enabled": true,
+      "tags": ["reciclagem", "meta", "70%", "Diretiva 2008/98/CE"]
+    },
+    {
+      "id": "RCD-RECICL-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 73/2011 — Hierarquia de gestão de resíduos",
+      "description": "A hierarquia de gestão de resíduos deve ser respeitada em todas as decisões: prevenção > reutilização > reciclagem > valorização energética > eliminação (aterro como último recurso).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.recyclingRate", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "{waste.recyclingRate}%",
+      "requiredValue": "≥ 50% taxa mínima de reutilização/reciclagem",
+      "remediation": "Documentar a aplicação da hierarquia de gestão de resíduos (DL 73/2011, Art. 7.º): 1) Prevenção — reduzir produção de RCD no projeto (pré-fabricação, modulação); 2) Reutilização — reutilizar materiais in situ; 3) Reciclagem — separar para reciclagem; 4) Valorização energética — madeiras não reutilizáveis; 5) Eliminação — aterro apenas como último recurso. Justificar desvios à hierarquia no PPG-RCD.",
+      "enabled": true,
+      "tags": ["hierarquia", "DL 73/2011", "prevenção", "reutilização"]
+    },
+    {
+      "id": "RCD-SIRER-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 178/2006 Art. 48.º — Registo no SIRER/SILiAmb",
+      "description": "Os produtores de RCD com produção superior a 10 toneladas/ano devem estar registados no SIRER (Sistema Integrado de Registo Eletrónico de Resíduos), atual módulo do SILiAmb, e submeter o MIRR anualmente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasSILiAmbRegistration", "operator": "not_exists", "value": null },
+        { "field": "waste.totalRCDTonnes", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "{waste.totalRCDTonnes} t",
+      "requiredValue": "Registo SILiAmb obrigatório (produção > 10 t/ano)",
+      "remediation": "Efetuar registo no SILiAmb (plataforma da APA) como produtor de resíduos. Obrigações: 1) Registo na plataforma com dados da entidade e estabelecimento; 2) Preenchimento anual do MIRR (Mapa Integrado de Registo de Resíduos) até 31 de março do ano seguinte; 3) Declaração de todas as quantidades de RCD produzidas, por código LER, transportador e operador de destino; 4) Manutenção de registos durante 5 anos.",
+      "enabled": true,
+      "tags": ["SIRER", "SILiAmb", "MIRR", "registo", "10 toneladas"]
+    },
+    {
+      "id": "RCD-SIRER-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 102-D/2020 Art. 45.º — MIRR anual",
+      "description": "O Mapa Integrado de Registo de Resíduos (MIRR) deve ser submetido anualmente na plataforma SILiAmb até 31 de março, com todas as quantidades de RCD produzidas e respetivos destinos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasMIRRSubmission", "operator": "==", "value": false },
+        { "field": "waste.totalRCDTonnes", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "{waste.hasMIRRSubmission}",
+      "requiredValue": "MIRR submetido até 31 de março",
+      "remediation": "Submeter o MIRR na plataforma SILiAmb até 31 de março do ano seguinte à produção de RCD. O MIRR deve discriminar: quantidades totais por código LER; identificação dos transportadores utilizados; identificação dos operadores de destino; operações de gestão (códigos R ou D). A não submissão constitui contraordenação.",
+      "enabled": true,
+      "tags": ["MIRR", "SILiAmb", "anual", "DL 102-D/2020"]
+    },
+    {
+      "id": "RCD-CAUCAO-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 12.º — Caução para gestão de RCD",
+      "description": "O dono da obra deve prestar caução para garantir a correta gestão dos RCD, cujo valor é fixado pela câmara municipal com base na estimativa do PPG-RCD. A caução é devolvida após comprovação da correta gestão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasCaucao", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasCaucao}",
+      "requiredValue": "Caução para gestão de RCD (Art. 12.º)",
+      "remediation": "Prestar caução para gestão de RCD junto da câmara municipal, conforme Art. 12.º do DL 46/2008. O valor da caução é fixado pela câmara com base na estimativa de RCD do PPG. A caução pode ser prestada por: depósito em dinheiro; garantia bancária; seguro-caução. A libertação da caução é feita mediante apresentação dos comprovativos de correta gestão (certificados de receção, e-GARs).",
+      "enabled": true,
+      "tags": ["caução", "Art. 12.º", "câmara municipal", "garantia"]
+    },
+    {
+      "id": "RCD-COIMAS-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º — Contraordenações e coimas",
+      "description": "O incumprimento das obrigações de gestão de RCD constitui contraordenação punível com coimas que podem atingir 37.500€ para pessoas singulares e 250.000€ para pessoas coletivas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasComplianceCheck", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasComplianceCheck}",
+      "requiredValue": "Verificação de conformidade legal recomendada",
+      "remediation": "Realizar verificação de conformidade legal para evitar contraordenações do Art. 14.º: Coimas até 37.500€ (pessoas singulares) e 250.000€ (pessoas coletivas). Infrações mais graves: deposição ilegal de RCD; ausência de PPG; transporte sem e-GAR; encaminhamento para operador não licenciado; não registo no SILiAmb; falsificação de documentos de gestão de resíduos. A deposição ilegal pode ainda configurar crime ambiental (Lei 50/2006).",
+      "enabled": true,
+      "tags": ["coimas", "contraordenações", "Art. 14.º", "fiscalização"]
+    },
+    {
+      "id": "RCD-CERT-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º — Certificado de receção de RCD",
+      "description": "O operador de gestão de resíduos deve emitir certificado de receção para cada entrega de RCD, discriminando códigos LER, quantidades recebidas e operação de gestão prevista.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasReceptionCertificates", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasReceptionCertificates}",
+      "requiredValue": "Certificados de receção obrigatórios",
+      "remediation": "Exigir certificado de receção ao operador de destino para cada entrega de RCD. O certificado deve conter: identificação do operador (nome, NIF, alvará APA); data de receção; identificação do produtor e obra de origem; código(s) LER dos resíduos recebidos; peso em toneladas (pesagem em báscula); operação de gestão prevista (código R ou D). Conservar certificados durante 5 anos para comprovação junto da câmara e APA.",
+      "enabled": true,
+      "tags": ["certificado", "receção", "operador", "Art. 11.º"]
+    },
+    {
+      "id": "RCD-QUANT-01",
+      "regulationId": "dl-46-2008",
+      "article": "Portaria 40/2014 — Estimativa quantificada de RCD",
+      "description": "A estimativa quantificada de RCD por categoria LER é obrigatória no projeto submetido a licenciamento. Deve indicar quantidades previstas em toneladas por tipo de resíduo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasWasteEstimate", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasWasteEstimate}",
+      "requiredValue": "Estimativa quantificada obrigatória (Portaria 40/2014)",
+      "remediation": "Elaborar estimativa quantificada de RCD por código LER e incluir no PPG-RCD. Valores de referência para estimativa: Construção nova: 50-120 kg/m² de área bruta; Reabilitação: 100-300 kg/m² de área intervencionada; Demolição: 800-1.500 kg/m² de área demolida. Discriminar por tipo: betão (17 01), metais (17 04), madeira (17 02 01), cerâmicos (17 01 03), misturas (17 09 04), perigosos (códigos *).",
+      "enabled": true,
+      "tags": ["estimativa", "quantificação", "LER", "Portaria 40/2014"]
+    },
+    {
+      "id": "RCD-QUANT-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Quantificação por tipologia de obra",
+      "description": "A produção estimada de RCD deve ser calculada por tipologia de obra (construção nova, reabilitação, demolição), utilizando valores de referência por m² de área de intervenção.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.rcdPerSqmEstimated", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.rcdPerSqmEstimated} kg/m²",
+      "requiredValue": "Estimativa kg/m² por tipologia de obra",
+      "remediation": "Calcular a estimativa de RCD usando valores de referência: Construção nova residencial: 50-80 kg/m²; Construção nova não residencial: 60-120 kg/m²; Reabilitação ligeira: 100-150 kg/m²; Reabilitação profunda: 200-350 kg/m²; Demolição total: 800-1.500 kg/m² (variável com tipologia construtiva). Composição típica em demolição: betão/argamassas 40-60%, cerâmicos 10-25%, madeira 5-15%, metais 5-10%, outros 5-15%.",
+      "enabled": true,
+      "tags": ["quantificação", "kg/m²", "tipologia", "estimativa"]
+    },
+    {
+      "id": "RCD-ARMAZ-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Armazenamento temporário em obra",
+      "description": "O armazenamento temporário de RCD em obra deve ser efetuado em contentores adequados, em zona delimitada e sinalizada, com proteção contra intempéries e contaminação do solo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasProperStorage", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasProperStorage}",
+      "requiredValue": "Armazenamento em contentores, delimitado e sinalizado",
+      "remediation": "Implementar zona de armazenamento temporário de RCD em obra com: 1) Contentores separados e identificados por fluxo/código LER; 2) Delimitação física da zona (vedação ou barreiras); 3) Sinalização visível com identificação dos resíduos; 4) Piso impermeabilizado para evitar contaminação do solo; 5) Cobertura ou lona para resíduos sensíveis à água; 6) Contentor fechado/estanque para resíduos perigosos; 7) Acesso para veículos de recolha.",
+      "enabled": true,
+      "tags": ["armazenamento", "contentores", "sinalização", "delimitação"]
+    },
+    {
+      "id": "RCD-ARMAZ-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 102-D/2020 Art. 7.º — Prazo máximo de armazenamento",
+      "description": "O armazenamento temporário de RCD em obra não deve exceder 3 meses para resíduos perigosos e 1 ano para resíduos não perigosos, contados desde a data de produção.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.storageTimeOnSiteDays", "operator": ">", "value": 365 }
+      ],
+      "currentValueTemplate": "{waste.storageTimeOnSiteDays} dias",
+      "requiredValue": "≤ 365 dias (não perigosos) / ≤ 90 dias (perigosos)",
+      "remediation": "Garantir o cumprimento dos prazos máximos de armazenamento temporário em obra: Resíduos não perigosos — máximo 1 ano (365 dias); Resíduos perigosos — máximo 3 meses (90 dias). Implementar sistema de rastreio de datas de produção dos resíduos. Agendar recolhas periódicas por operador licenciado para evitar excesso de prazo. O incumprimento constitui contraordenação.",
+      "enabled": true,
+      "tags": ["armazenamento", "prazo", "365 dias", "90 dias"]
+    },
+    {
+      "id": "RCD-ARMAZ-03",
+      "regulationId": "dl-46-2008",
+      "article": "DL 102-D/2020 — Armazenamento de resíduos perigosos",
+      "description": "O armazenamento temporário de resíduos perigosos em obra deve cumprir condições especiais: contentor estanque, identificação com simbologia de perigo, ficha de dados de segurança disponível, prazo máximo de 90 dias.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hazardousStorageCompliant", "operator": "==", "value": false },
+        { "field": "waste.hasHazardousWaste", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hazardousStorageCompliant}",
+      "requiredValue": "Armazenamento conforme para resíduos perigosos",
+      "remediation": "Cumprir requisitos de armazenamento de resíduos perigosos em obra: 1) Contentor estanque, resistente e em bom estado; 2) Identificação com código LER, simbologia de perigo (pictograma GHS) e designação; 3) Bacia de retenção para líquidos perigosos; 4) Ficha de dados de segurança acessível no local; 5) Separação de resíduos incompatíveis; 6) Prazo máximo de 90 dias; 7) Acesso restrito a pessoal autorizado.",
+      "enabled": true,
+      "tags": ["armazenamento", "perigosos", "estanque", "90 dias"]
+    },
+    {
+      "id": "RCD-BETAO-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de betão — reciclagem como agregado",
+      "description": "Os resíduos de betão (LER 17 01 01) devem ser prioritariamente reciclados como agregados reciclados, após britagem e crivagem, para utilização em camadas de pavimento, enchimentos ou novo betão (conforme EN 206 e LNEC E471/E473).",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.concreteRecyclingRate", "operator": "<", "value": 70 }
+      ],
+      "currentValueTemplate": "{waste.concreteRecyclingRate}%",
+      "requiredValue": "≥ 70% reciclagem de resíduos de betão",
+      "remediation": "Encaminhar resíduos de betão (LER 17 01 01) para central de reciclagem de inertes ou efetuar britagem em obra (se autorizado). Utilizações dos agregados reciclados de betão: 1) Sub-base e base de pavimentos rodoviários; 2) Enchimentos e regularizações; 3) Betão estrutural com incorporação parcial (conforme EN 206 e LNEC E471); 4) Betão não estrutural (até 100% de agregados reciclados). O agregado reciclado deve cumprir a norma NP EN 12620 ou NP EN 13242.",
+      "enabled": true,
+      "tags": ["betão", "reciclagem", "agregados", "LER 17 01 01", "EN 206"]
+    },
+    {
+      "id": "RCD-METAIS-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de metais ferrosos e não ferrosos",
+      "description": "Os resíduos metálicos (LER 17 04) — ferrosos (aço, ferro) e não ferrosos (alumínio, cobre, zinco) — devem ser separados em obra e encaminhados para reciclagem, com valorização económica significativa.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.metalRecyclingRate", "operator": "<", "value": 90 }
+      ],
+      "currentValueTemplate": "{waste.metalRecyclingRate}%",
+      "requiredValue": "≥ 90% reciclagem de metais",
+      "remediation": "Separar metais em obra por tipo: ferrosos (LER 17 04 05 — aço e ferro) e não ferrosos (LER 17 04 01 — cobre; 17 04 02 — alumínio; 17 04 04 — zinco; 17 04 07 — metais misturados). Encaminhar para sucateiro ou operador de reciclagem de metais licenciado. Os metais têm elevado valor de mercado e taxa de reciclagem potencial próxima de 100%. Excluir metais contaminados com substâncias perigosas (LER 17 04 09* ou 17 04 10*).",
+      "enabled": true,
+      "tags": ["metais", "ferrosos", "não ferrosos", "reciclagem", "LER 17 04"]
+    },
+    {
+      "id": "RCD-MADEIRA-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de madeira não contaminada",
+      "description": "A madeira não contaminada (LER 17 02 01) pode ser reutilizada, reciclada como matéria-prima para painéis de partículas, ou valorizada energeticamente em centrais de biomassa licenciadas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.woodRecyclingRate", "operator": "<", "value": 60 }
+      ],
+      "currentValueTemplate": "{waste.woodRecyclingRate}%",
+      "requiredValue": "≥ 60% valorização de madeira não contaminada",
+      "remediation": "Gerir madeira não contaminada (LER 17 02 01) pela hierarquia de resíduos: 1) Reutilização — cofragens, escoramentos, barrotes recuperados; 2) Reciclagem — encaminhar para produção de painéis de partículas (aglomerado) ou pasta de celulose; 3) Valorização energética — centrais de biomassa licenciadas. Nota: separar madeira tratada (CCA, creosoto) que é classificada como perigosa (LER 17 02 04*).",
+      "enabled": true,
+      "tags": ["madeira", "não contaminada", "reciclagem", "biomassa", "LER 17 02 01"]
+    },
+    {
+      "id": "RCD-MADEIRA-02",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de madeira contaminada",
+      "description": "A madeira tratada com produtos perigosos (CCA — arsénio/crómio/cobre, ou creosoto) é classificada como resíduo perigoso (LER 17 02 04*) e deve ser gerida por operador licenciado para resíduos perigosos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasTreatedWoodAssessment", "operator": "not_exists", "value": null },
+        { "field": "waste.hasTreatedWood", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasTreatedWoodAssessment}",
+      "requiredValue": "Avaliação e segregação de madeira contaminada",
+      "remediation": "Identificar e segregar madeira tratada com substâncias perigosas: madeira tratada com CCA (arsénio/crómio/cobre) — cor verde característica; madeira tratada com creosoto — cor escura, odor característico; madeira com tintas à base de chumbo. Classificar como LER 17 02 04* (madeira contaminada). Proibida a queima a céu aberto ou em centrais de biomassa convencionais. Encaminhar para operador licenciado para resíduos perigosos (incineração controlada ou aterro de perigosos).",
+      "enabled": true,
+      "tags": ["madeira", "contaminada", "CCA", "creosoto", "perigoso", "LER 17 02 04*"]
+    },
+    {
+      "id": "RCD-VIDRO-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de vidro e plásticos",
+      "description": "Os resíduos de vidro (LER 17 02 02) e plásticos (LER 17 02 03) devem ser separados em obra e encaminhados para reciclagem, evitando a sua deposição em aterro.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.glassPlasticRecyclingRate", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "{waste.glassPlasticRecyclingRate}%",
+      "requiredValue": "≥ 50% reciclagem de vidro e plásticos",
+      "remediation": "Separar em obra: Vidro (LER 17 02 02) — vidraças, espelhos, garrafas. Evitar contaminação com silicones e massas de vedação. Encaminhar para reciclagem de vidro plano ou de embalagem; Plásticos (LER 17 02 03) — tubagens PVC/PE/PP, filmes de embalagem, isolamentos EPS/XPS. Separar por tipo de plástico se possível. Encaminhar para operador de reciclagem de plásticos. Tubagens de PVC são particularmente recicláveis.",
+      "enabled": true,
+      "tags": ["vidro", "plásticos", "reciclagem", "LER 17 02 02", "LER 17 02 03"]
+    },
+    {
+      "id": "RCD-SOLOS-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 178/2006 — Solos contaminados — procedimentos especiais",
+      "description": "Solos com suspeita de contaminação (uso industrial anterior, depósito de resíduos, proximidade a postos de combustível) devem ser sujeitos a caracterização analítica antes de escavação e definição de destino.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasSoilContaminationAssessment", "operator": "not_exists", "value": null },
+        { "field": "waste.soilContaminationSuspected", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasSoilContaminationAssessment}",
+      "requiredValue": "Avaliação de contaminação de solos obrigatória",
+      "remediation": "Realizar estudo de caracterização de solos por laboratório acreditado (IPAC), conforme DL 178/2006: 1) Investigação do histórico do local (uso industrial, derrames, depósito de resíduos); 2) Amostragem de solos conforme ISO 10381; 3) Análise de parâmetros relevantes (metais pesados, hidrocarbonetos, HAPs, VOCs, PCBs); 4) Classificação: LER 17 05 03* (solos contaminados) ou LER 17 05 04 (solos não contaminados); 5) Se contaminados: elaborar plano de remediação e encaminhar para operador licenciado para tratamento ou aterro de perigosos.",
+      "enabled": true,
+      "tags": ["solos", "contaminação", "DL 178/2006", "LER 17 05"]
+    },
+    {
+      "id": "RCD-PRODUT-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 102-D/2020 Art. 23.º — Registo de produtores > 10 toneladas/ano",
+      "description": "Os produtores de resíduos com produção anual superior a 10 toneladas devem estar registados na plataforma SILiAmb e cumprir obrigações de reporte anual (MIRR).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.totalRCDTonnes", "operator": ">", "value": 10 },
+        { "field": "waste.isRegisteredProducer", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.totalRCDTonnes} t",
+      "requiredValue": "Registo obrigatório como produtor (> 10 t/ano)",
+      "remediation": "Efetuar registo como produtor de resíduos na plataforma SILiAmb da APA. O registo é obrigatório para produtores com mais de 10 toneladas de resíduos por ano. Obrigações associadas: 1) Registo atualizado na plataforma; 2) MIRR anual até 31 de março; 3) Manutenção de registos cronológicos; 4) Indicação de responsável técnico. A não inscrição constitui contraordenação punível com coima.",
+      "enabled": true,
+      "tags": ["registo", "produtor", "10 toneladas", "SILiAmb", "DL 102-D/2020"]
+    },
+    {
+      "id": "RCD-RESP-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 3.º — Responsabilidade do dono de obra",
+      "description": "O dono de obra é o responsável pela gestão dos RCD produzidos, podendo delegar a execução ao empreiteiro, mas mantendo a responsabilidade última pela correta gestão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasResponsibilityAssignment", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasResponsibilityAssignment}",
+      "requiredValue": "Responsabilidades definidas (dono de obra / empreiteiro)",
+      "remediation": "Definir contratualmente a repartição de responsabilidades de gestão de RCD: O dono de obra é responsável pela elaboração do PPG-RCD e pela prestação de caução; o empreiteiro é tipicamente responsável pela execução operacional (triagem, acondicionamento, transporte). Incluir no contrato de empreitada: cláusulas de gestão de RCD; obrigação de comprovativos de destino final; penalizações por incumprimento. O dono de obra mantém a responsabilidade última perante as autoridades (Art. 3.º).",
+      "enabled": true,
+      "tags": ["responsabilidade", "dono de obra", "empreiteiro", "Art. 3.º"]
+    },
+    {
+      "id": "RCD-RESP-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 3.º, n.º 3 — Responsabilidade do empreiteiro",
+      "description": "O empreiteiro é co-responsável pela gestão de RCD em obra, devendo garantir a triagem, acondicionamento correto e encaminhamento para operadores licenciados.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.contractHasRCDClauses", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.contractHasRCDClauses}",
+      "requiredValue": "Cláusulas de RCD no contrato de empreitada",
+      "remediation": "Incluir no contrato de empreitada cláusulas específicas de gestão de RCD: 1) Obrigação de cumprir o PPG-RCD; 2) Responsabilidade pela triagem e acondicionamento; 3) Contratação de transportadores e operadores licenciados; 4) Entrega de comprovativos de destino final ao dono de obra; 5) Registo mensal de quantidades por código LER; 6) Penalizações por incumprimento ou deposição ilegal; 7) Sub-empreiteiros devem cumprir as mesmas obrigações.",
+      "enabled": true,
+      "tags": ["empreiteiro", "contrato", "cláusulas", "responsabilidade"]
+    },
+    {
+      "id": "RCD-AGREC-01",
+      "regulationId": "dl-46-2008",
+      "article": "LNEC E471/E473, EN 206 — Incorporação de agregados reciclados",
+      "description": "A incorporação de agregados reciclados de betão em novo betão deve cumprir as especificações LNEC E471 (betão com agregados grossos reciclados) e E473, bem como a norma EN 206.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasRecycledAggregates", "operator": "==", "value": true },
+        { "field": "waste.recycledAggregateCompliant", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.recycledAggregateCompliant}",
+      "requiredValue": "Agregados reciclados conforme LNEC E471/EN 206",
+      "remediation": "A incorporação de agregados reciclados em betão deve cumprir: LNEC E471 — betão com agregados grossos reciclados de betão (substituição até 25% em classe C30/37 ou inferior); LNEC E473 — agregados reciclados grossos para betão hidráulico; EN 206 — especificação, desempenho, produção e conformidade do betão. Requisitos: densidade ≥ 2.100 kg/m³; absorção de água ≤ 7%; teor de contaminantes conforme NP EN 12620. A utilização em betão estrutural requer aprovação do projetista de estruturas.",
+      "enabled": true,
+      "tags": ["agregados reciclados", "LNEC E471", "LNEC E473", "EN 206", "betão"]
+    },
+    {
+      "id": "RCD-AGREC-02",
+      "regulationId": "dl-46-2008",
+      "article": "NP EN 13242 — Agregados reciclados para obras de engenharia civil",
+      "description": "Agregados reciclados de RCD para utilização em camadas de pavimento, enchimentos e terraplenagem devem cumprir a norma NP EN 13242, com ensaios de conformidade realizados por laboratório acreditado.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasRecycledAggregatesForCivil", "operator": "==", "value": true },
+        { "field": "waste.civilAggregateCompliant", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.civilAggregateCompliant}",
+      "requiredValue": "Agregados reciclados conforme NP EN 13242",
+      "remediation": "Agregados reciclados para obras de engenharia civil devem cumprir NP EN 13242: 1) Classificação granulométrica conforme requisitos do projeto; 2) Ensaios de conformidade: resistência à fragmentação (Los Angeles), forma, teor de finos, sulfatos solúveis; 3) Teor máximo de contaminantes (matéria orgânica, vidro, plástico, gesso); 4) Marcação CE quando aplicável. Aplicações: sub-base de pavimentos rodoviários; enchimentos de valas; terraplenagens; regularizações.",
+      "enabled": true,
+      "tags": ["agregados reciclados", "NP EN 13242", "pavimentos", "engenharia civil"]
+    },
+    {
+      "id": "RCD-RELFIN-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 5 — Relatório final de gestão de RCD",
+      "description": "No final da obra deve ser elaborado relatório final de gestão de RCD, comparando as quantidades efetivamente produzidas com as estimadas no PPG, e documentando os destinos finais de todos os resíduos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasFinalReport", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasFinalReport}",
+      "requiredValue": "Relatório final de gestão de RCD obrigatório",
+      "remediation": "Elaborar relatório final de gestão de RCD contendo: 1) Comparação entre quantidades estimadas (PPG) e efetivamente produzidas, por código LER; 2) Taxa de valorização alcançada; 3) Listagem completa de operadores utilizados (transportadores e destinos); 4) Cópias ou referências das guias e-GAR; 5) Certificados de receção dos operadores de destino; 6) Análise de desvios face ao PPG e justificação; 7) Indicadores de desempenho ambiental. Entregar à câmara municipal para libertação da caução.",
+      "enabled": true,
+      "tags": ["relatório final", "PPG", "encerramento", "caução"]
+    },
+    {
+      "id": "RCD-RGGR-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "DL 102-D/2020 Art. 6.º — Princípios gerais (RGGR)",
+      "description": "O Regime Geral de Gestão de Resíduos (DL 102-D/2020) estabelece princípios complementares ao DL 46/2008: autossuficiência, proximidade, responsabilidade alargada do produtor e poluidor-pagador.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasRGGRCompliance", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasRGGRCompliance}",
+      "requiredValue": "Conformidade com RGGR (DL 102-D/2020)",
+      "remediation": "Verificar conformidade com os princípios do RGGR (DL 102-D/2020): 1) Princípio da autossuficiência — encaminhar RCD preferencialmente para instalações nacionais; 2) Princípio da proximidade — utilizar o operador licenciado mais próximo (minimizar distância de transporte); 3) Responsabilidade alargada do produtor — responsabilidade do ciclo de vida dos materiais; 4) Princípio do poluidor-pagador — custos de gestão suportados pelo produtor de resíduos.",
+      "enabled": true,
+      "tags": ["RGGR", "DL 102-D/2020", "princípios", "proximidade"]
+    },
+    {
+      "id": "RCD-RGGR-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "DL 102-D/2020 Art. 21.º — Classificação de subproduto",
+      "description": "Materiais resultantes de obras podem ser classificados como subprodutos (não resíduos) se cumprirem os critérios do Art. 21.º: utilização certa, sem necessidade de processamento adicional para além da prática industrial normal, e sem impactes adversos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasByProductClassification", "operator": "==", "value": true },
+        { "field": "waste.byProductCriteriaVerified", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.byProductCriteriaVerified}",
+      "requiredValue": "Critérios de subproduto verificados (Art. 21.º DL 102-D/2020)",
+      "remediation": "Para classificar material de obra como subproduto (e não resíduo), verificar cumulativamente: 1) Existência de utilização certa e definida para o material; 2) O material pode ser utilizado diretamente sem processamento adicional para além da prática industrial normal; 3) O material é produzido como parte integrante do processo de construção/demolição; 4) A utilização é legal e não acarreta impactes adversos para o ambiente ou saúde. Exemplo: solos de escavação reutilizados noutra obra; elementos estruturais de aço desmontados e reutilizados.",
+      "enabled": true,
+      "tags": ["subproduto", "DL 102-D/2020", "não resíduo", "Art. 21.º"]
+    },
+    {
+      "id": "RCD-RGGR-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "DL 102-D/2020 Art. 22.º — Fim do estatuto de resíduo",
+      "description": "Os RCD podem perder o estatuto de resíduo (end-of-waste) quando submetidos a operação de valorização e cumprirem critérios específicos, nomeadamente agregados reciclados conformes com normas técnicas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasEndOfWasteStatus", "operator": "==", "value": true },
+        { "field": "waste.endOfWasteCriteriaVerified", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.endOfWasteCriteriaVerified}",
+      "requiredValue": "Critérios de fim de estatuto de resíduo verificados",
+      "remediation": "Para aplicar o fim do estatuto de resíduo (Art. 22.º DL 102-D/2020), os materiais devem: 1) Ter sido submetidos a operação de valorização (ex.: britagem e crivagem); 2) Ser habitualmente utilizados para fins específicos (ex.: agregados para construção); 3) Existir mercado ou procura; 4) Cumprir normas técnicas aplicáveis (NP EN 12620, NP EN 13242, LNEC E471); 5) Não acarretar impactes adversos para o ambiente ou saúde. O operador deve emitir declaração de conformidade.",
+      "enabled": true,
+      "tags": ["end-of-waste", "DL 102-D/2020", "valorização", "Art. 22.º"]
+    },
+    {
+      "id": "RCD-OBRA-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Gestão de RCD em obra ≥ 300 m²",
+      "description": "Em obras com área de intervenção igual ou superior a 300 m², é obrigatória a nomeação de um responsável pela gestão de RCD em obra e o registo mensal das quantidades produzidas por categoria.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasWasteManager", "operator": "not_exists", "value": null },
+        { "field": "waste.projectArea", "operator": ">=", "value": 300 }
+      ],
+      "currentValueTemplate": "{waste.projectArea} m²",
+      "requiredValue": "Responsável de RCD obrigatório (obras ≥ 300 m²)",
+      "remediation": "Nomear técnico responsável pela gestão de RCD em obra. Responsabilidades: supervisionar triagem e acondicionamento; manter registo mensal de quantidades por código LER; verificar licenciamento de transportadores e destinatários; arquivar guias e-GAR e comprovativos de entrega; reportar indicadores no relatório final de obra.",
+      "enabled": true,
+      "tags": ["responsável", "gestão", "300 m²", "registo mensal"]
+    },
+    {
+      "id": "RCD-FORM-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Formação de trabalhadores",
+      "description": "Os trabalhadores em obra devem receber formação sobre procedimentos de triagem e gestão de RCD, incluindo identificação de materiais perigosos e utilização correta dos contentores de separação.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasWorkerTraining", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasWorkerTraining}",
+      "requiredValue": "Formação em gestão de RCD para trabalhadores",
+      "remediation": "Ministrar formação a todos os trabalhadores em obra sobre: 1) Importância da separação de RCD e enquadramento legal; 2) Identificação dos contentores e respetivos fluxos de resíduos; 3) Identificação visual de materiais perigosos (amianto, tintas com chumbo, solventes); 4) Procedimentos de emergência em caso de contacto com materiais perigosos; 5) Regras de armazenamento temporário; 6) Proibição de queima de resíduos a céu aberto. Registar a formação (data, conteúdo, participantes).",
+      "enabled": true,
+      "tags": ["formação", "trabalhadores", "triagem", "sensibilização"]
+    },
+    {
+      "id": "RCD-GESSO-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de gesso (LER 17 08)",
+      "description": "Os resíduos de gesso (LER 17 08 02) devem ser separados dos restantes RCD inertes, pois a sua mistura contamina os agregados reciclados e pode gerar sulfato de hidrogénio em aterro.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasGypsumSeparation", "operator": "==", "value": false },
+        { "field": "waste.hasGypsumWaste", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasGypsumSeparation}",
+      "requiredValue": "Separação obrigatória de resíduos de gesso",
+      "remediation": "Separar resíduos de gesso (placas de gesso cartonado, estuques, gessos projetados) dos restantes RCD inertes: 1) Contentor dedicado para gesso (LER 17 08 02); 2) Não misturar com betão, cerâmicos ou tijolos (contamina agregados reciclados com sulfatos); 3) Encaminhar para operador de reciclagem de gesso (circuito de reciclagem Placo/Knauf ou equivalente); 4) Em aterro, o gesso deve ser depositado em célula separada (gera H₂S em contacto com matéria orgânica em condições anaeróbias).",
+      "enabled": true,
+      "tags": ["gesso", "LER 17 08", "separação", "sulfatos"]
+    },
+    {
+      "id": "RCD-BETUM-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de misturas betuminosas (LER 17 03)",
+      "description": "Resíduos de misturas betuminosas sem alcatrão (LER 17 03 02) são recicláveis em centrais betuminosas. Misturas contendo alcatrão (LER 17 03 01*) são resíduos perigosos e exigem circuito específico.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasBituminousAssessment", "operator": "not_exists", "value": null },
+        { "field": "waste.hasBituminousWaste", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasBituminousAssessment}",
+      "requiredValue": "Avaliação de misturas betuminosas (alcatrão vs betume)",
+      "remediation": "Avaliar misturas betuminosas para presença de alcatrão (HAPs): 1) Misturas com betume (LER 17 03 02) — não perigosas, recicláveis em centrais betuminosas a quente ou a frio; taxa de incorporação até 50%; 2) Misturas com alcatrão (LER 17 03 01*) — perigosas, contêm hidrocarbonetos aromáticos policíclicos (HAPs); proibida a reciclagem; encaminhar para aterro de resíduos perigosos ou tratamento térmico. Teste rápido: kit de deteção de HAPs em campo (spray PAK-Marker ou equivalente).",
+      "enabled": true,
+      "tags": ["betuminosas", "alcatrão", "LER 17 03", "HAPs", "reciclagem"]
+    },
+    {
+      "id": "RCD-ISOL-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de materiais de isolamento (LER 17 06)",
+      "description": "Materiais de isolamento sem amianto (LER 17 06 04) podem ser reciclados ou valorizados. Isolamentos contendo amianto (LER 17 06 05*) são resíduos perigosos com circuito dedicado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasInsulationAssessment", "operator": "not_exists", "value": null },
+        { "field": "waste.hasInsulationWaste", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{waste.hasInsulationAssessment}",
+      "requiredValue": "Avaliação de materiais de isolamento (amianto vs outros)",
+      "remediation": "Avaliar e classificar materiais de isolamento: 1) Lã de rocha / lã de vidro (LER 17 06 04) — não perigoso; reciclável em fábricas especializadas; 2) EPS / XPS (incluídos em LER 17 02 03 plásticos) — recicláveis; 3) Poliuretano (PUR) — valorização energética ou aterro; 4) Isolamentos contendo amianto (LER 17 06 05*) — perigoso! Seguir procedimentos de remoção de amianto (DL 266/2007). ATENÇÃO: edifícios pré-2005 podem conter isolamentos com amianto (fibrocimento, amianto projetado).",
+      "enabled": true,
+      "tags": ["isolamento", "LER 17 06", "amianto", "lã de rocha", "EPS"]
+    },
+    {
+      "id": "RCD-PORT417-01",
+      "regulationId": "dl-46-2008",
+      "article": "Portaria 417/2008, Art. 2.º — Registos de RCD",
+      "description": "A Portaria 417/2008 estabelece os modelos de registos e guias obrigatórios para a gestão de RCD: registo de dados de RCD, guia de acompanhamento modelo A e modelo B.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasPortaria417Records", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{waste.hasPortaria417Records}",
+      "requiredValue": "Registos conforme Portaria 417/2008",
+      "remediation": "Manter registos de gestão de RCD conforme modelos da Portaria 417/2008: 1) Registo de dados de RCD — preenchimento pelo produtor com dados da obra, quantidades por código LER e destino; 2) Guia modelo A — acompanha RCD de obras sujeitas a licenciamento; 3) Guia modelo B — acompanha RCD de obras particulares isentas. Os modelos físicos foram substituídos pela e-GAR eletrónica, mas os campos de informação obrigatórios mantêm-se inalterados.",
+      "enabled": true,
+      "tags": ["Portaria 417/2008", "registos", "guias", "modelo A", "modelo B"]
+    },
+    {
+      "id": "RCD-PREV-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º — Medidas de prevenção de RCD",
+      "description": "O PPG deve incluir medidas concretas de prevenção da produção de RCD na fase de projeto: modulação, pré-fabricação, corte em fábrica, e especificação de materiais com menor produção de resíduos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.hasPreventionMeasures", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasPreventionMeasures}",
+      "requiredValue": "Medidas de prevenção de RCD documentadas",
+      "remediation": "Incorporar medidas de prevenção de RCD no projeto: 1) Modulação dimensional para reduzir cortes e desperdícios; 2) Pré-fabricação em fábrica com corte otimizado; 3) Especificação de dimensões standard (tijolos, blocos, placas); 4) Utilização de sistemas construtivos desmontáveis; 5) Projeto para desconstrução futura (Design for Disassembly); 6) Quantificação rigorosa de materiais para evitar excessos de encomenda; 7) Reutilização de cofragens modulares. Documentar no PPG-RCD.",
+      "enabled": true,
+      "tags": ["prevenção", "projeto", "modulação", "pré-fabricação"]
+    },
+    {
+      "id": "RCD-QUEIMA-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 102-D/2020 Art. 86.º — Proibição de queima de RCD",
+      "description": "É proibida a queima de RCD a céu aberto em obra ou em qualquer local não licenciado. A queima ilegal constitui contraordenação ambiental grave, podendo configurar crime.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasOpenBurningControl", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasOpenBurningControl}",
+      "requiredValue": "Controlo e proibição de queima a céu aberto",
+      "remediation": "Garantir a proibição total de queima de RCD a céu aberto: 1) Afixar sinalização proibindo a queima de resíduos em obra; 2) Incluir proibição no regulamento interno de obra; 3) Formar trabalhadores sobre a proibição; 4) A valorização energética de resíduos só é permitida em instalações licenciadas para o efeito (DL 127/2013 — emissões industriais); 5) A queima ilegal é punível com coimas até 250.000€ (pessoas coletivas) e pode configurar crime de poluição (Art. 279.º do Código Penal).",
+      "enabled": true,
+      "tags": ["queima", "proibição", "crime ambiental", "DL 102-D/2020"]
+    },
+    {
+      "id": "RCD-DEPO-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º — Proibição de deposição ilegal",
+      "description": "É estritamente proibida a deposição de RCD em locais não licenciados (terrenos baldios, bermas de estradas, linhas de água). A deposição ilegal constitui crime ambiental.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "waste.hasIllegalDumpingControls", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasIllegalDumpingControls}",
+      "requiredValue": "Controlos contra deposição ilegal implementados",
+      "remediation": "Implementar medidas para prevenir a deposição ilegal de RCD: 1) Contratualizar destinos licenciados para todos os fluxos de resíduos; 2) Verificar a entrega efetiva nos destinos (certificados de receção com pesagem); 3) Cruzar quantidades produzidas com quantidades entregues em destino; 4) Manter guias e-GAR atualizadas; 5) Incluir penalizações por deposição ilegal no contrato de empreitada. A deposição ilegal pode resultar em: coimas (até 250.000€); obrigação de remoção e reposição ambiental; responsabilidade penal (Art. 279.º Código Penal).",
+      "enabled": true,
+      "tags": ["deposição ilegal", "crime", "Art. 14.º", "coimas"]
+    },
+    {
+      "id": "RCD-CERAM-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 46/2008 — Fileira de cerâmicos e alvenarias (LER 17 01 03)",
+      "description": "Os resíduos cerâmicos (tijolos, telhas, azulejos — LER 17 01 03) e misturas de betão/cerâmicos (LER 17 01 07) podem ser reciclados como agregados para enchimentos e sub-bases.",
+      "severity": "info",
+      "conditions": [
+        { "field": "waste.ceramicRecyclingRate", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "{waste.ceramicRecyclingRate}%",
+      "requiredValue": "≥ 50% reciclagem de cerâmicos",
+      "remediation": "Valorizar resíduos cerâmicos (LER 17 01 03): 1) Reutilização — tijolos e telhas inteiros para obras de reabilitação ou paisagismo; 2) Reciclagem — britagem para agregados reciclados mistos (sub-bases, enchimentos, regularizações); 3) Misturas betão/cerâmicos (LER 17 01 07) — podem ser recicladas conjuntamente como agregados inertes; 4) Garantir que cerâmicos não estão contaminados com gesso, amianto ou outras substâncias perigosas antes da reciclagem.",
+      "enabled": true,
+      "tags": ["cerâmicos", "tijolos", "telhas", "LER 17 01 03", "reciclagem"]
+    },
+    {
+      "id": "RCD-REGCRON-01",
+      "regulationId": "dl-46-2008",
+      "article": "DL 102-D/2020 Art. 44.º — Registos cronológicos de resíduos",
+      "description": "O produtor de RCD deve manter registos cronológicos atualizados da produção e gestão de resíduos, incluindo natureza, quantidade, origem, destino e datas, conservados durante 5 anos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "waste.hasChronologicalRecords", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{waste.hasChronologicalRecords}",
+      "requiredValue": "Registos cronológicos atualizados (conservar 5 anos)",
+      "remediation": "Manter registos cronológicos de resíduos atualizados conforme Art. 44.º do DL 102-D/2020: 1) Data de produção de cada lote de resíduos; 2) Código LER e designação; 3) Quantidade (toneladas ou m³); 4) Origem (fase de obra); 5) Data de expedição; 6) Transportador utilizado (com n.º de alvará); 7) Operador de destino (com n.º de alvará); 8) Referência da guia e-GAR. Conservar durante mínimo 5 anos. Formato digital aceite se garantida integridade e acessibilidade.",
+      "enabled": true,
+      "tags": ["registos", "cronológicos", "5 anos", "DL 102-D/2020"]
+    }
+  ]
+}

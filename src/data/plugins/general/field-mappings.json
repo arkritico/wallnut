@@ -1,0 +1,1638 @@
+{
+  "pluginId": "general",
+  "version": "1.0.0",
+  "fields": [
+    {
+      "field": "computed.totalDwellingArea",
+      "label": "Area total do fogo",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "sumByZone"
+      },
+      "required": true
+    },
+    {
+      "field": "computed.avgFloorHeight",
+      "label": "Pe-direito medio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "average"
+      },
+      "defaults": 2.7,
+      "required": true
+    },
+    {
+      "field": "computed.numBedrooms",
+      "label": "Numero de quartos",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Quarto" },
+        "transform": "count"
+      },
+      "required": true
+    },
+    {
+      "field": "computed.numBathrooms",
+      "label": "Numero de casas de banho",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "WC" },
+        "transform": "count"
+      },
+      "required": true
+    },
+    {
+      "field": "computed.numFullBathrooms",
+      "label": "Numero de casas de banho completas",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "WC", "hasBathtubOrShower": true },
+        "transform": "count"
+      }
+    },
+    {
+      "field": "computed.typology",
+      "label": "Tipologia do fogo",
+      "type": "select",
+      "options": ["T0", "T1", "T2", "T3", "T4", "T5", "T6"],
+      "sources": ["form"],
+      "defaults": "T2"
+    },
+    {
+      "field": "computed.floorsAboveGround",
+      "label": "Numero de pisos acima do solo",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcBuilding",
+        "propertySet": "Pset_BuildingCommon",
+        "propertyName": "NumberOfStoreys",
+        "transform": "parseInt"
+      },
+      "defaults": 1
+    },
+    {
+      "field": "computed.isMultifamily",
+      "label": "Edificio multifamiliar",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.windowToFloorRatio",
+      "label": "Racio entre area de envidracados e area do pavimento",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "computation": "envelope.windowArea / usableFloorArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.groundFloorElevation",
+      "label": "Cota do piso terreo em relacao ao terreno",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcBuildingStorey",
+        "attribute": "Elevation",
+        "filter": { "Name": "Piso 0" },
+        "transform": "parseFloat"
+      },
+      "defaults": 0.0
+    },
+    {
+      "field": "computed.livingRoomArea",
+      "label": "Area da sala de estar",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Sala" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "parseFloat"
+      },
+      "required": true
+    },
+    {
+      "field": "computed.livingRoomWidth",
+      "label": "Largura minima da sala de estar",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Sala" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.kitchenArea",
+      "label": "Area da cozinha",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Cozinha" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "parseFloat"
+      },
+      "required": true
+    },
+    {
+      "field": "computed.kitchenWidth",
+      "label": "Largura minima da cozinha",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Cozinha" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.bedroomArea",
+      "label": "Area do quarto (menor quarto)",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Quarto" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "min"
+      },
+      "required": true
+    },
+    {
+      "field": "computed.bedroomWidth",
+      "label": "Largura minima do quarto",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Quarto" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.mainBedroomArea",
+      "label": "Area do quarto principal",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Quarto Principal" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.mainBedroomWidth",
+      "label": "Largura minima do quarto principal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Quarto Principal" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.wcArea",
+      "label": "Area da casa de banho",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "WC" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.wcWidth",
+      "label": "Largura minima da casa de banho",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "WC" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.halfBathArea",
+      "label": "Area da casa de banho de servico",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "IS" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.halfBathWidth",
+      "label": "Largura minima da casa de banho de servico",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "IS" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.pantryArea",
+      "label": "Area da despensa",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Despensa" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.pantryWidth",
+      "label": "Largura minima da despensa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Despensa" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.storageArea",
+      "label": "Area do arrumo",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Arrumo" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "GrossFloorArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.storageHeight",
+      "label": "Pe-direito do arrumo",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Arrumo" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.roomDepthToHeightRatio",
+      "label": "Racio profundidade/pe-direito do compartimento",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "computation": "spaceDepth / spaceHeight",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.allBedroomsHaveNaturalLight",
+      "label": "Todos os quartos tem iluminacao natural",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.mainDoorWidth",
+      "label": "Largura da porta de entrada principal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "Tag": "PortaEntrada" },
+        "attribute": "OverallWidth",
+        "transform": "parseFloat"
+      },
+      "defaults": 0.9
+    },
+    {
+      "field": "computed.mainDoorHeight",
+      "label": "Altura da porta de entrada principal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "Tag": "PortaEntrada" },
+        "attribute": "OverallHeight",
+        "transform": "parseFloat"
+      },
+      "defaults": 2.0
+    },
+    {
+      "field": "computed.interiorDoorWidth",
+      "label": "Largura das portas interiores",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "IsExternal": false },
+        "attribute": "OverallWidth",
+        "transform": "min"
+      },
+      "defaults": 0.77
+    },
+    {
+      "field": "computed.wcDoorWidth",
+      "label": "Largura da porta da casa de banho",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "relatedSpace": "WC" },
+        "attribute": "OverallWidth",
+        "transform": "min"
+      },
+      "defaults": 0.7
+    },
+    {
+      "field": "computed.buildingEntryDoorWidth",
+      "label": "Largura da porta de entrada do edificio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "Tag": "PortaEdificio" },
+        "attribute": "OverallWidth",
+        "transform": "parseFloat"
+      },
+      "defaults": 1.1
+    },
+    {
+      "field": "computed.commonAreaDoorWidth",
+      "label": "Largura das portas das areas comuns",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "relatedSpace": "AreaComum" },
+        "attribute": "OverallWidth",
+        "transform": "min"
+      },
+      "defaults": 0.9
+    },
+    {
+      "field": "computed.emergencyExitWidth",
+      "label": "Largura da saida de emergencia",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "Tag": "SaidaEmergencia" },
+        "attribute": "OverallWidth",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.corridorWidth",
+      "label": "Largura do corredor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Corredor" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 1.1
+    },
+    {
+      "field": "computed.corridorLength",
+      "label": "Comprimento do corredor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Corredor" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Length",
+        "transform": "max"
+      }
+    },
+    {
+      "field": "computed.shortCorridorWidth",
+      "label": "Largura do corredor curto (< 1.5m)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Corredor", "maxLength": 1.5 },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.commonCorridorWidth",
+      "label": "Largura do corredor comum do edificio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Corredor Comum" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 1.2
+    },
+    {
+      "field": "computed.entryHallWidth",
+      "label": "Largura do hall de entrada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Hall" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.entryLandingDepth",
+      "label": "Profundidade do patamar de entrada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Patamar Entrada" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Length",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.exteriorWalkwayWidth",
+      "label": "Largura da galeria/passadico exterior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Galeria" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.maxDeadEndDistance",
+      "label": "Distancia maxima em impasse",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.stairWidth",
+      "label": "Largura da escada interior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "TreadLength",
+        "transform": "parseFloat"
+      },
+      "defaults": 0.9,
+      "required": true
+    },
+    {
+      "field": "computed.stairRiserHeight",
+      "label": "Altura do espelho da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "RiserHeight",
+        "transform": "parseFloat"
+      },
+      "defaults": 0.175
+    },
+    {
+      "field": "computed.stairTreadDepth",
+      "label": "Profundidade do cobertor da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "TreadLength",
+        "transform": "parseFloat"
+      },
+      "defaults": 0.28
+    },
+    {
+      "field": "computed.stairBlondelValue",
+      "label": "Valor da formula de Blondel (2h + g)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "computation": "2 * riserHeight + treadDepth",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.stairLandingDepth",
+      "label": "Profundidade do patamar da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "LandingLength",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.stairHasHandrail",
+      "label": "Escada tem corrimao",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRailing",
+        "filter": { "relatedTo": "IfcStair" },
+        "transform": "exists"
+      },
+      "defaults": true
+    },
+    {
+      "field": "computed.numSteps",
+      "label": "Numero de degraus consecutivos",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "NumberOfRiser",
+        "transform": "parseInt"
+      }
+    },
+    {
+      "field": "computed.consecutiveSteps",
+      "label": "Numero maximo de degraus por lanco",
+      "type": "number",
+      "unit": null,
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "NumberOfRiser",
+        "transform": "max"
+      }
+    },
+    {
+      "field": "computed.commonStairWidth",
+      "label": "Largura da escada comum do edificio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "filter": { "relatedSpace": "AreaComum" },
+        "propertySet": "Qto_StairFlightBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 1.1
+    },
+    {
+      "field": "computed.commonStairRiserHeight",
+      "label": "Altura do espelho da escada comum",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "filter": { "relatedSpace": "AreaComum" },
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "RiserHeight",
+        "transform": "parseFloat"
+      },
+      "defaults": 0.168
+    },
+    {
+      "field": "computed.commonStairTreadDepth",
+      "label": "Profundidade do cobertor da escada comum",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "filter": { "relatedSpace": "AreaComum" },
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "TreadLength",
+        "transform": "parseFloat"
+      },
+      "defaults": 0.28
+    },
+    {
+      "field": "computed.commonStairBlondel",
+      "label": "Formula de Blondel da escada comum",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "computation": "2 * commonStairRiserHeight + commonStairTreadDepth",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.commonStairLandingDepth",
+      "label": "Profundidade do patamar da escada comum",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "filter": { "relatedSpace": "AreaComum" },
+        "propertySet": "Pset_StairFlightCommon",
+        "propertyName": "LandingLength",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.commonStairHasHandrailsBothSides",
+      "label": "Escada comum tem corrimao em ambos os lados",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.publicStairWidth",
+      "label": "Largura da escada de uso publico",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "filter": { "relatedSpace": "Publico" },
+        "propertySet": "Qto_StairFlightBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.stairLiveLoad",
+      "label": "Sobrecarga nas escadas",
+      "type": "number",
+      "unit": "kN/m2",
+      "sources": ["form"],
+      "defaults": 3.0
+    },
+    {
+      "field": "computed.accessRampSlope",
+      "label": "Inclinacao da rampa de acesso",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRamp",
+        "propertySet": "Pset_RampCommon",
+        "propertyName": "Slope",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.accessibleRampSlope",
+      "label": "Inclinacao da rampa acessivel",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRamp",
+        "filter": { "accessible": true },
+        "propertySet": "Pset_RampCommon",
+        "propertyName": "Slope",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.guardRailHeight",
+      "label": "Altura da guarda exterior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRailing",
+        "filter": { "IsExternal": true },
+        "propertySet": "Pset_RailingCommon",
+        "propertyName": "Height",
+        "transform": "min"
+      },
+      "defaults": 1.1
+    },
+    {
+      "field": "computed.guardRailSpacing",
+      "label": "Espacamento entre elementos verticais da guarda",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRailing",
+        "propertySet": "Pset_RailingCommon",
+        "propertyName": "BarSpacing",
+        "transform": "max"
+      }
+    },
+    {
+      "field": "computed.interiorGuardRailHeight",
+      "label": "Altura da guarda interior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRailing",
+        "filter": { "IsExternal": false },
+        "propertySet": "Pset_RailingCommon",
+        "propertyName": "Height",
+        "transform": "min"
+      },
+      "defaults": 0.9
+    },
+    {
+      "field": "computed.hasElevator",
+      "label": "Edificio possui elevador",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcTransportElement",
+        "filter": { "PredefinedType": "ELEVATOR" },
+        "transform": "exists"
+      },
+      "defaults": false
+    },
+    {
+      "field": "computed.elevatorCabinArea",
+      "label": "Area da cabine do elevador",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcTransportElement",
+        "filter": { "PredefinedType": "ELEVATOR" },
+        "propertySet": "Pset_TransportElementCommon",
+        "propertyName": "CabinArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.balconyDepth",
+      "label": "Profundidade da varanda",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSlab",
+        "filter": { "PredefinedType": "LANDING", "IsExternal": true },
+        "propertySet": "Qto_SlabBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.balconyHasWaterproofing",
+      "label": "Varanda possui impermeabilizacao",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.balconyLiveLoad",
+      "label": "Sobrecarga na varanda",
+      "type": "number",
+      "unit": "kN/m2",
+      "sources": ["form"],
+      "defaults": 3.0
+    },
+    {
+      "field": "computed.wcHasImpermeableFloor",
+      "label": "Casa de banho tem pavimento impermeavel",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.wcHasVentilation",
+      "label": "Casa de banho tem ventilacao",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.wcTileHeight",
+      "label": "Altura do revestimento ceramico na casa de banho",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": 1.5
+    },
+    {
+      "field": "computed.hasBathtub",
+      "label": "Casa de banho tem banheira",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSanitaryTerminal",
+        "filter": { "PredefinedType": "BATH" },
+        "transform": "exists"
+      }
+    },
+    {
+      "field": "computed.kitchenHasExhaust",
+      "label": "Cozinha tem exaustao",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.kitchenHasNaturalLight",
+      "label": "Cozinha tem iluminacao natural",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.kitchenHasImpermeableFloor",
+      "label": "Cozinha tem pavimento impermeavel",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.kitchenTileHeight",
+      "label": "Altura do revestimento ceramico na cozinha",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": 1.5
+    },
+    {
+      "field": "computed.garageHeight",
+      "label": "Pe-direito da garagem",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Garagem" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      },
+      "defaults": 2.2
+    },
+    {
+      "field": "computed.garageRampSlope",
+      "label": "Inclinacao da rampa da garagem",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRamp",
+        "filter": { "relatedSpace": "Garagem" },
+        "propertySet": "Pset_RampCommon",
+        "propertyName": "Slope",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.garageRampWidth",
+      "label": "Largura da rampa da garagem",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRamp",
+        "filter": { "relatedSpace": "Garagem" },
+        "propertySet": "Qto_RampBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.garageAisleWidth",
+      "label": "Largura do corredor de circulacao da garagem",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Circulacao Garagem" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.garageVentilationArea",
+      "label": "Area de ventilacao da garagem",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.garageFireResistance",
+      "label": "Resistencia ao fogo da garagem",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.parkingSpaceWidth",
+      "label": "Largura do lugar de estacionamento",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Estacionamento" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 2.5
+    },
+    {
+      "field": "computed.parkingSpaceLength",
+      "label": "Comprimento do lugar de estacionamento",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Estacionamento" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Length",
+        "transform": "min"
+      },
+      "defaults": 5.0
+    },
+    {
+      "field": "computed.basementHeight",
+      "label": "Pe-direito da cave",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Cave" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.basementHasNaturalVentilation",
+      "label": "Cave tem ventilacao natural",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.basementIsWaterproof",
+      "label": "Cave e impermeavel",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.basementUsedAsHabitation",
+      "label": "Cave utilizada como habitacao",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.atticHeight",
+      "label": "Pe-direito do sotao",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Sotao" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.nonHabitableHeight",
+      "label": "Pe-direito de compartimento nao habitavel",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "OccupancyType": "NonHabitable" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.roofType",
+      "label": "Tipo de cobertura",
+      "type": "select",
+      "options": ["plana", "inclinada", "mista"],
+      "sources": ["form"],
+      "defaults": "inclinada"
+    },
+    {
+      "field": "computed.roofSlopePercent",
+      "label": "Inclinacao da cobertura",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRoof",
+        "propertySet": "Pset_RoofCommon",
+        "propertyName": "Slope",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.flatRoofSlopePercent",
+      "label": "Inclinacao da cobertura plana (pendente)",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcRoof",
+        "filter": { "PredefinedType": "FLAT_ROOF" },
+        "propertySet": "Pset_RoofCommon",
+        "propertyName": "Slope",
+        "transform": "parseFloat"
+      },
+      "defaults": 2.0
+    },
+    {
+      "field": "computed.roofHasThermalInsulation",
+      "label": "Cobertura possui isolamento termico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.roofHasMaintenanceAccess",
+      "label": "Cobertura tem acesso para manutencao",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.yardDepth",
+      "label": "Profundidade do logradouro",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "LongName": "Logradouro" },
+        "propertySet": "Qto_SpaceBaseQuantities",
+        "propertyName": "Length",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.yardHasDrainage",
+      "label": "Logradouro tem drenagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.permeableYardRatio",
+      "label": "Racio de area permeavel do logradouro",
+      "type": "number",
+      "unit": null,
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.frontFenceHeight",
+      "label": "Altura da vedacao frontal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "Tag": "Vedacao", "IsExternal": true },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.frontFenceTransparency",
+      "label": "Transparencia da vedacao frontal",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.frontWallHeight",
+      "label": "Altura do muro frontal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "Tag": "MuroFrontal", "IsExternal": true },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.sideWallHeight",
+      "label": "Altura do muro lateral",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "Tag": "MuroLateral", "IsExternal": true },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.hasWaterAndSewage",
+      "label": "Edificio possui rede de agua e esgotos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasElectricalInstallation",
+      "label": "Edificio possui instalacao eletrica",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasCommonElectricalPanel",
+      "label": "Edificio possui quadro eletrico comum",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.hasIndividualWaterMeter",
+      "label": "Fogo possui contador de agua individual",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasNaturalVentilation",
+      "label": "Compartimentos tem ventilacao natural",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasCrossVentilation",
+      "label": "Fogo possui ventilacao transversal",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasWaterproofing",
+      "label": "Edificio possui impermeabilizacao adequada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasThermalInsulation",
+      "label": "Edificio possui isolamento termico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasAcousticInsulation",
+      "label": "Edificio possui isolamento acustico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.hasGasAppliances",
+      "label": "Fogo possui aparelhos a gas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.gasRoomVentArea",
+      "label": "Area de ventilacao do compartimento com gas",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.chimneyHeightAboveRidge",
+      "label": "Altura da chamine acima da cumeeira",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcChimney",
+        "propertySet": "Pset_ChimneyCommon",
+        "propertyName": "HeightAboveRidge",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.flueIsFireResistant",
+      "label": "Condutas de fumos sao resistentes ao fogo",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.flueSectionArea",
+      "label": "Area da seccao da conduta de fumos",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcChimney",
+        "propertySet": "Pset_ChimneyCommon",
+        "propertyName": "CrossSectionArea",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.hasCanteen",
+      "label": "Edificio possui cantina/refeitorio",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.hasChangingRooms",
+      "label": "Edificio possui vestiarios",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": false
+    },
+    {
+      "field": "computed.commercialFloorHeight",
+      "label": "Pe-direito do espaco comercial",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "OccupancyType": "Commercial" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      },
+      "defaults": 3.0
+    },
+    {
+      "field": "computed.commercialBasementHeight",
+      "label": "Pe-direito da cave comercial",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "OccupancyType": "Commercial", "isBelowGround": true },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.commercialExitWidth",
+      "label": "Largura da saida do espaco comercial",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": { "relatedSpace": "Commercial", "IsExternal": true },
+        "attribute": "OverallWidth",
+        "transform": "min"
+      }
+    },
+    {
+      "field": "computed.commercialLuxLevel",
+      "label": "Nivel de iluminancia do espaco comercial",
+      "type": "number",
+      "unit": "lux",
+      "sources": ["form"],
+      "defaults": 300
+    },
+    {
+      "field": "computed.commercialVentilationRate",
+      "label": "Taxa de ventilacao do espaco comercial",
+      "type": "number",
+      "unit": "m3/h",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.commercialWcRatio",
+      "label": "Racio de instalacoes sanitarias comerciais (WC por ocupante)",
+      "type": "number",
+      "unit": null,
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.industrialHeight",
+      "label": "Pe-direito do espaco industrial",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "OccupancyType": "Industrial" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.industrialVentilationRate",
+      "label": "Taxa de ventilacao do espaco industrial",
+      "type": "number",
+      "unit": "m3/h",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.industrialLiveLoad",
+      "label": "Sobrecarga do pavimento industrial",
+      "type": "number",
+      "unit": "kN/m2",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.industrialExitWidthPerOccupant",
+      "label": "Largura de saida por ocupante no espaco industrial",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.industrialWorkersPerWc",
+      "label": "Numero de trabalhadores por instalacao sanitaria industrial",
+      "type": "number",
+      "unit": null,
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.numWorkers",
+      "label": "Numero de trabalhadores",
+      "type": "number",
+      "unit": null,
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.warehouseHeight",
+      "label": "Pe-direito do armazem",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": { "OccupancyType": "Warehouse" },
+        "propertySet": "Pset_SpaceCommon",
+        "propertyName": "Height",
+        "transform": "parseFloat"
+      }
+    },
+    {
+      "field": "computed.warehouseLiveLoad",
+      "label": "Sobrecarga do pavimento do armazem",
+      "type": "number",
+      "unit": "kN/m2",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.warehouseVentRatio",
+      "label": "Racio de ventilacao do armazem",
+      "type": "number",
+      "unit": null,
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.facadeSoundInsulation",
+      "label": "Isolamento sonoro da fachada",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.interDwellingSoundInsulation",
+      "label": "Isolamento sonoro entre fogos",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.impactSoundLevel",
+      "label": "Nivel de ruido de percussao",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.floorHasSoundInsulation",
+      "label": "Pavimento possui isolamento acustico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": true
+    },
+    {
+      "field": "computed.floorLiveLoad",
+      "label": "Sobrecarga do pavimento",
+      "type": "number",
+      "unit": "kN/m2",
+      "sources": ["form"],
+      "defaults": 2.0
+    },
+    {
+      "field": "computed.floorDeflectionRatio",
+      "label": "Racio de flecha do pavimento (L/deformacao)",
+      "type": "number",
+      "unit": null,
+      "sources": ["form"]
+    },
+    {
+      "field": "computed.extWallThickness",
+      "label": "Espessura da parede exterior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "IsExternal": true },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 0.3
+    },
+    {
+      "field": "computed.extWallMaterial",
+      "label": "Material da parede exterior",
+      "type": "select",
+      "options": ["alvenaria_tijolo", "alvenaria_bloco", "betao_armado", "pedra", "madeira", "metalica", "painel_sandwich", "outro"],
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "IsExternal": true },
+        "attribute": "Material",
+        "transform": "parseString"
+      },
+      "defaults": "alvenaria_tijolo"
+    },
+    {
+      "field": "computed.interiorPartitionThickness",
+      "label": "Espessura da parede divisoria interior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "IsExternal": false, "PredefinedType": "PARTITIONING" },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 0.11
+    },
+    {
+      "field": "computed.partitionWallThickness",
+      "label": "Espessura da parede de separacao entre fogos",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "IsExternal": false, "PredefinedType": "SOLIDWALL" },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Width",
+        "transform": "min"
+      },
+      "defaults": 0.15
+    },
+    {
+      "field": "computed.boundaryWallThickness",
+      "label": "Espessura do muro de vedacao/divisorio do lote",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWall",
+        "filter": { "Tag": "MuroDivisorio", "IsExternal": true },
+        "propertySet": "Qto_WallBaseQuantities",
+        "propertyName": "Width",
+        "transform": "parseFloat"
+      }
+    }
+  ]
+}

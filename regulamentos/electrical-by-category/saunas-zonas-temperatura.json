@@ -1,0 +1,58 @@
+{
+  "category": "Saunas - Zonas temperatura",
+  "rules": [
+    {
+      "id": "ELEC_R127",
+      "reference": "RTIEBT Secção 703.512.2",
+      "category": "Instalações Elétricas",
+      "subcategory": "Saunas - Zonas temperatura",
+      "rule_text": "Zonas de temperatura em saunas: Zona 3 e 4 equipamentos devem suportar 125°C",
+      "parameters": {
+        "zones": {
+          "zona_1": "apenas radiadores",
+          "zona_2": "sem restrição calor",
+          "zona_3": {
+            "min_temp_C": 125
+          },
+          "zona_4": {
+            "min_temp_C": 125,
+            "allowed": "iluminação + comando radiadores"
+          }
+        },
+        "unit": "°C"
+      },
+      "validation_type": "formula",
+      "severity": "mandatory",
+      "formula": "IF zona_3_or_4 THEN equip_temp_rating >= 125",
+      "lookup_tables": {
+        "zones": {
+          "zona_1": "apenas radiadores",
+          "zona_2": "sem restrição calor",
+          "zona_3": {
+            "min_temp_C": 125
+          },
+          "zona_4": {
+            "min_temp_C": 125,
+            "allowed": "iluminação + comando radiadores"
+          }
+        },
+        "unit": "°C"
+      },
+      "error_message": "Equipamento na zona 3/4 da sauna não suporta 125°C (703.512.2)",
+      "success_message": "✓ Conforme: Saunas - Zonas temperatura",
+      "source": {
+        "regulation": "RTIEBT",
+        "article": "RTIEBT Secção 703.512.2",
+        "version": "3.0",
+        "date": "2026-02-15"
+      },
+      "metadata": {
+        "complexity": "complex",
+        "requires_calculation": true,
+        "application_scope": [
+          "Geral"
+        ]
+      }
+    }
+  ]
+}

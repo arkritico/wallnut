@@ -1,0 +1,419 @@
+{
+  "pluginId": "acoustic",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras de acústica (RRAE - DL 96/2008, NP EN ISO 16283, NP EN ISO 717)",
+  "fields": [
+    {
+      "_group": "Classificação",
+      "field": "buildingType",
+      "label": "Tipo de edifício",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial / Serviços" },
+        { "value": "mixed", "label": "Uso misto" },
+        { "value": "industrial", "label": "Industrial / Armazém" },
+        { "value": "educational", "label": "Escolar / Educacional" },
+        { "value": "healthcare", "label": "Hospitalar / Saúde" }
+      ],
+      "sources": ["form"],
+      "required": true
+    },
+    {
+      "_group": "Classificação",
+      "field": "numberOfDwellings",
+      "label": "Número de fogos",
+      "type": "number",
+      "sources": ["form"],
+      "required": true,
+      "description": "Número total de fogos ou frações autónomas no edifício"
+    },
+    {
+      "_group": "Classificação",
+      "field": "acoustic.buildingLocation",
+      "label": "Localização do edifício",
+      "type": "select",
+      "options": [
+        { "value": "urban", "label": "Zona urbana" },
+        { "value": "rural", "label": "Zona rural" },
+        { "value": "mixed", "label": "Zona mista" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Classificação acústica da zona onde se localiza o edifício, influencia os requisitos de isolamento de fachada"
+    },
+    {
+      "_group": "Classificação",
+      "field": "acoustic.roomType",
+      "label": "Tipo de compartimento",
+      "type": "select",
+      "options": [
+        { "value": "bedroom", "label": "Quarto" },
+        { "value": "living", "label": "Sala de estar" },
+        { "value": "kitchen", "label": "Cozinha" },
+        { "value": "bathroom", "label": "Instalação sanitária" },
+        { "value": "office", "label": "Escritório" },
+        { "value": "classroom", "label": "Sala de aula" },
+        { "value": "treatment", "label": "Sala de tratamento" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de compartimento recetor para determinação dos requisitos acústicos aplicáveis"
+    },
+    {
+      "_group": "Classificação",
+      "field": "acoustic.roomVolume",
+      "label": "Volume do compartimento",
+      "type": "number",
+      "unit": "m³",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "property": "GrossVolume",
+        "pset": "Qto_SpaceBaseQuantities"
+      },
+      "description": "Volume do compartimento recetor, necessário para cálculo do tempo de reverberação"
+    },
+    {
+      "_group": "Classificação",
+      "field": "acoustic.hasAdjacentGarage",
+      "label": "Garagem adjacente",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui garagem adjacente ou integrada, requerendo isolamento acústico reforçado"
+    },
+    {
+      "_group": "Classificação",
+      "field": "acoustic.hasNoiseSource",
+      "label": "Existência de fonte de ruído próxima",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem fontes de ruído significativas na envolvente (vias rodoviárias, ferroviárias, indústrias)"
+    },
+
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.facadeInsulationValue",
+      "label": "Isolamento sonoro de fachada (D2m,nT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": 28, "_default": 28 },
+      "description": "Índice de isolamento sonoro a sons de condução aérea da fachada, D2m,nT,w, conforme RRAE"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.airborneInsulationValue",
+      "label": "Isolamento sonoro a sons aéreos entre fogos (DnT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": 50, "_default": 50 },
+      "description": "Índice de isolamento sonoro a sons de condução aérea entre fogos, DnT,w, conforme RRAE"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.airborneInsulationCommonAreas",
+      "label": "Isolamento sonoro a sons aéreos de zonas comuns (DnT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": 48, "_default": 48 },
+      "description": "Índice de isolamento sonoro a sons de condução aérea entre zonas comuns e fogos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.impactInsulationValue",
+      "label": "Isolamento sonoro a sons de percussão (L'nT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": 60, "_default": 60 },
+      "description": "Nível sonoro de percussão padronizado, L'nT,w, conforme RRAE (valor máximo permitido)"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.airborneInsulationCommercial",
+      "label": "Isolamento sonoro de espaços comerciais (DnT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "mixed": 58, "_default": 55 },
+      "description": "Índice de isolamento sonoro a sons aéreos entre espaços comerciais e fogos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.airborneInsulationTechnical",
+      "label": "Isolamento sonoro de zonas técnicas (DnT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "_default": 55 },
+      "description": "Índice de isolamento sonoro a sons aéreos entre locais técnicos (casa de máquinas, AVAC) e fogos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.airborneInsulationGarage",
+      "label": "Isolamento sonoro de garagem (DnT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "_default": 50 },
+      "description": "Índice de isolamento sonoro a sons aéreos entre garagens coletivas e fogos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.hasAirborneInsulation",
+      "label": "Verificação de isolamento a sons aéreos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizado ensaio ou cálculo de verificação do isolamento a sons aéreos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.hasImpactInsulation",
+      "label": "Verificação de isolamento a sons de percussão",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizado ensaio ou cálculo de verificação do isolamento a sons de percussão"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.hasFacadeInsulation",
+      "label": "Verificação de isolamento de fachada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizado ensaio ou cálculo de verificação do isolamento sonoro da fachada"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.impactInsulationCommercial",
+      "label": "Isolamento a percussão de espaços comerciais (L'nT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "_default": 50 },
+      "description": "Nível sonoro de percussão padronizado entre espaços comerciais e fogos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.impactInsulationGarage",
+      "label": "Isolamento a percussão de garagem (L'nT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "_default": 50 },
+      "description": "Nível sonoro de percussão padronizado entre garagens coletivas e fogos"
+    },
+    {
+      "_group": "Isolamento Sonoro",
+      "field": "acoustic.airborneInsulationGym",
+      "label": "Isolamento sonoro de ginásios (DnT,w)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "_default": 58 },
+      "description": "Índice de isolamento sonoro a sons aéreos entre ginásios ou espaços de atividades ruidosas e fogos"
+    },
+
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.equipmentNoiseBedroom",
+      "label": "Nível de ruído de equipamentos em quartos (LAr,nT)",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "defaults": { "residential": 27, "_default": 27 },
+      "description": "Nível de avaliação do ruído de equipamentos coletivos medido em quartos, LAr,nT"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.equipmentNoiseLevel",
+      "label": "Nível de ruído de equipamentos (LAr,nT)",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "defaults": { "residential": 32, "_default": 32 },
+      "description": "Nível de avaliação do ruído de funcionamento de equipamentos coletivos em compartimentos habitáveis"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.equipmentNoiseLiving",
+      "label": "Nível de ruído de equipamentos em salas (LAr,nT)",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "defaults": { "residential": 32, "_default": 32 },
+      "description": "Nível de avaliação do ruído de equipamentos coletivos medido em salas de estar"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.equipmentNoiseKitchenWC",
+      "label": "Nível de ruído de equipamentos em cozinhas e IS (LAr,nT)",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "defaults": { "residential": 40, "_default": 40 },
+      "description": "Nível de avaliação do ruído de equipamentos em cozinhas e instalações sanitárias"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.equipmentNoiseOffice",
+      "label": "Nível de ruído de equipamentos em escritórios (LAr,nT)",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "defaults": { "_default": 35 },
+      "description": "Nível de avaliação do ruído de equipamentos coletivos em escritórios"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.equipmentNoiseTreatment",
+      "label": "Nível de ruído de equipamentos em salas de tratamento (LAr,nT)",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "defaults": { "healthcare": 30, "_default": 35 },
+      "description": "Nível de avaliação do ruído de equipamentos em salas de tratamento ou consulta"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.hasEquipmentNoiseControl",
+      "label": "Controlo de ruído de equipamentos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foram adotadas medidas de controlo de ruído dos equipamentos coletivos (AVAC, elevadores, bombas)"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.hasTechnicalRooms",
+      "label": "Existência de locais técnicos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem locais técnicos (casa de máquinas, central AVAC) adjacentes a fogos"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.hasVibrationIsolation",
+      "label": "Isolamento de vibrações",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os equipamentos coletivos possuem sistemas de isolamento antivibratório"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.hasPlumbingNoiseControl",
+      "label": "Controlo de ruído de canalizações",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foram adotadas medidas de controlo do ruído transmitido por canalizações e esgotos"
+    },
+    {
+      "_group": "Ruído de Equipamentos",
+      "field": "acoustic.hasCollectiveEquipment",
+      "label": "Existência de equipamentos coletivos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem equipamentos coletivos no edifício (elevadores, bombas, AVAC centralizado)"
+    },
+
+    {
+      "_group": "Ruído Ambiente",
+      "field": "acoustic.ambientNoiseLden",
+      "label": "Indicador de ruído diurno-entardecer-noturno (Lden)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "description": "Indicador de ruído Lden na zona de implantação, conforme mapa de ruído municipal"
+    },
+    {
+      "_group": "Ruído Ambiente",
+      "field": "acoustic.ambientNoiseLn",
+      "label": "Indicador de ruído noturno (Ln)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "description": "Indicador de ruído noturno Ln na zona de implantação, conforme mapa de ruído municipal"
+    },
+    {
+      "_group": "Ruído Ambiente",
+      "field": "acoustic.emergentNoiseDaytime",
+      "label": "Ruído emergente diurno",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "description": "Componente tonal ou impulsiva do ruído emergente no período diurno"
+    },
+    {
+      "_group": "Ruído Ambiente",
+      "field": "acoustic.emergentNoiseNighttime",
+      "label": "Ruído emergente noturno",
+      "type": "number",
+      "unit": "dB(A)",
+      "sources": ["form"],
+      "description": "Componente tonal ou impulsiva do ruído emergente no período noturno"
+    },
+    {
+      "_group": "Ruído Ambiente",
+      "field": "acoustic.noiseMapConsulted",
+      "label": "Mapa de ruído consultado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi consultado o mapa de ruído municipal para determinação dos requisitos de isolamento de fachada"
+    },
+
+    {
+      "_group": "Projeto Acústico",
+      "field": "acoustic.hasAcousticProject",
+      "label": "Existência de projeto acústico",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se existe projeto de condicionamento acústico, obrigatório conforme RRAE"
+    },
+    {
+      "_group": "Projeto Acústico",
+      "field": "acoustic.reverberationTime",
+      "label": "Tempo de reverberação (T)",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "defaults": { "educational": 0.6, "healthcare": 0.6, "_default": 0.8 },
+      "description": "Tempo de reverberação T do compartimento, conforme requisitos do RRAE para o uso"
+    },
+    {
+      "_group": "Projeto Acústico",
+      "field": "project.hasConstructionPhase",
+      "label": "Obra em fase de construção",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a obra se encontra em fase de construção, para avaliação de ruído de estaleiro"
+    },
+    {
+      "_group": "Projeto Acústico",
+      "field": "project.requiresLicensing",
+      "label": "Operação urbanística sujeita a licenciamento",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Indica se a operação urbanística requer licenciamento, implicando conformidade acústica obrigatória"
+    }
+  ]
+}

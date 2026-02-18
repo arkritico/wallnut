@@ -1,0 +1,48 @@
+{
+  "category": "Secção PE - Tabela simplificada",
+  "rules": [
+    {
+      "id": "ELEC_R019",
+      "reference": "RTIEBT Secção 543.1.2 - Quadro 54A",
+      "category": "Instalações Elétricas",
+      "subcategory": "Secção PE - Tabela simplificada",
+      "rule_text": "Secção mínima do PE em função da secção dos condutores de fase",
+      "parameters": {
+        "lookup_table": {
+          "S_fase<=16": "S_pe=S_fase",
+          "16<S_fase<=35": "S_pe=16",
+          "S_fase>35": "S_pe=S_fase/2"
+        },
+        "unit": "mm²",
+        "note": "Alternativa à fórmula quando os condutores PE e fase são do mesmo material"
+      },
+      "validation_type": "formula",
+      "severity": "mandatory",
+      "formula": "IF S_fase<=16 THEN S_pe>=S_fase; IF 16<S_fase<=35 THEN S_pe>=16; IF S_fase>35 THEN S_pe>=S_fase/2",
+      "lookup_tables": {
+        "lookup_table": {
+          "S_fase<=16": "S_pe=S_fase",
+          "16<S_fase<=35": "S_pe=16",
+          "S_fase>35": "S_pe=S_fase/2"
+        },
+        "unit": "mm²",
+        "note": "Alternativa à fórmula quando os condutores PE e fase são do mesmo material"
+      },
+      "error_message": "Secção do PE não conforme com Quadro 54A (543.1.2)",
+      "success_message": "✓ Conforme: Secção PE - Tabela simplificada",
+      "source": {
+        "regulation": "RTIEBT",
+        "article": "RTIEBT Secção 543.1.2 - Quadro 54A",
+        "version": "3.0",
+        "date": "2026-02-15"
+      },
+      "metadata": {
+        "complexity": "complex",
+        "requires_calculation": true,
+        "application_scope": [
+          "Geral"
+        ]
+      }
+    }
+  ]
+}

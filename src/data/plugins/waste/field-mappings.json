@@ -1,0 +1,427 @@
+{
+  "pluginId": "waste",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras de gestao de residuos de construcao e demolicao (RCD - DL 46/2008)",
+  "fields": [
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "waste.totalRCDTonnes",
+      "label": "Quantidade total de RCD estimada",
+      "type": "number",
+      "unit": "t",
+      "sources": ["form"],
+      "required": true,
+      "description": "Quantidade total estimada de residuos de construcao e demolicao em toneladas"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "waste.projectArea",
+      "label": "Area do projeto",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "description": "Area bruta de construcao do projeto para estimativa de producao de RCD"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "waste.rcdPerSqmEstimated",
+      "label": "Producao estimada de RCD por m2",
+      "type": "number",
+      "unit": "kg/m2",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 120 },
+      "description": "Estimativa de producao de RCD por metro quadrado de area de construcao"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "waste.hasWasteEstimate",
+      "label": "Estimativa de RCD elaborada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborada a estimativa de producao de RCD conforme DL 46/2008"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "isDemolition",
+      "label": "Operacao de demolicao",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se a operacao inclui trabalhos de demolicao"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "building.yearBuilt",
+      "label": "Ano de construcao do edificio",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Ano de construcao original do edificio (relevante para identificacao de materiais perigosos)"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "waste.isRegisteredProducer",
+      "label": "Produtor de RCD registado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o produtor de RCD esta registado conforme exigido pelo DL 46/2008"
+    },
+    {
+      "_group": "Dados Gerais RCD",
+      "field": "waste.hasResponsibilityAssignment",
+      "label": "Atribuicao de responsabilidades definida",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foram definidas as responsabilidades pela gestao dos RCD em obra"
+    },
+
+    {
+      "_group": "Plano de Prevencao e Gestao",
+      "field": "waste.hasPPG",
+      "label": "Plano de Prevencao e Gestao de RCD (PPG)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se foi elaborado o Plano de Prevencao e Gestao de RCD conforme Art. 10.o do DL 46/2008"
+    },
+    {
+      "_group": "Plano de Prevencao e Gestao",
+      "field": "waste.ppgHasFullContent",
+      "label": "PPG com conteudo completo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o PPG contem todos os elementos exigidos (caracterizacao, metodologias, estimativas, destinos)"
+    },
+    {
+      "_group": "Plano de Prevencao e Gestao",
+      "field": "waste.recyclingRate",
+      "label": "Taxa de reciclagem/valorizacao prevista",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 70 },
+      "description": "Percentagem de RCD a encaminhar para reciclagem ou valorizacao (minimo 70% - Portaria 115/2011)"
+    },
+
+    {
+      "_group": "Classificacao e Triagem",
+      "field": "waste.hasLERClassification",
+      "label": "Classificacao LER dos residuos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os RCD estao classificados segundo a Lista Europeia de Residuos (codigo LER capitulo 17)"
+    },
+    {
+      "_group": "Classificacao e Triagem",
+      "field": "waste.hasTriagem",
+      "label": "Triagem de RCD em obra",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se e efetuada triagem (separacao) dos RCD por fluxo/tipo em obra (Art. 9.o DL 46/2008)"
+    },
+    {
+      "_group": "Classificacao e Triagem",
+      "field": "waste.hasOffSiteSorting",
+      "label": "Triagem em operador licenciado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os RCD nao triados em obra sao encaminhados para operador de triagem licenciado"
+    },
+    {
+      "_group": "Classificacao e Triagem",
+      "field": "waste.hasProperStorage",
+      "label": "Armazenamento adequado dos RCD",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os RCD sao armazenados em condicoes adequadas (contentores, baias, coberturas)"
+    },
+    {
+      "_group": "Classificacao e Triagem",
+      "field": "waste.storageTimeOnSiteDays",
+      "label": "Tempo de armazenamento em obra",
+      "type": "number",
+      "unit": "dias",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 30 },
+      "description": "Tempo maximo de armazenamento dos RCD em obra antes da remocao"
+    },
+
+    {
+      "_group": "Transporte e Destino",
+      "field": "waste.hasLicensedTransporter",
+      "label": "Transportador licenciado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o transporte dos RCD e efetuado por operador com licenca de transporte de residuos"
+    },
+    {
+      "_group": "Transporte e Destino",
+      "field": "waste.hasEGAR",
+      "label": "Guias eletronicas de acompanhamento de residuos (e-GAR)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se sao emitidas guias eletronicas de acompanhamento de residuos (e-GAR) conforme DL 102-D/2020"
+    },
+    {
+      "_group": "Transporte e Destino",
+      "field": "waste.hasCorrectGuideModel",
+      "label": "Modelo de guia correto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se e utilizado o modelo correto de guia de acompanhamento de RCD"
+    },
+    {
+      "_group": "Transporte e Destino",
+      "field": "waste.hasLicensedDestination",
+      "label": "Destino final licenciado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os RCD sao encaminhados para operador de gestao de residuos licenciado"
+    },
+    {
+      "_group": "Transporte e Destino",
+      "field": "waste.hasFullTraceability",
+      "label": "Rastreabilidade completa dos RCD",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe rastreabilidade completa dos RCD desde a producao ate ao destino final"
+    },
+    {
+      "_group": "Transporte e Destino",
+      "field": "waste.hasReceptionCertificates",
+      "label": "Certificados de rececao obtidos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foram obtidos os certificados de rececao dos RCD emitidos pelos operadores de destino"
+    },
+
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.asbestosPresent",
+      "label": "Presenca de amianto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se foram identificados materiais contendo amianto no edificio"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasAsbestosLERClassification",
+      "label": "Classificacao LER do amianto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os residuos contendo amianto estao classificados com o codigo LER correto (17 06 05*)"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasAsbestosManagement",
+      "label": "Plano de gestao de amianto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe plano de gestao de amianto conforme legislacao aplicavel (DL 266/2007)"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasAsbestosWorkPlan",
+      "label": "Plano de trabalhos com amianto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborado o plano de trabalhos para remocao de materiais contendo amianto"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.asbestosFiberMonitoring",
+      "label": "Monitorizacao de fibras de amianto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se e realizada monitorizacao de fibras de amianto no ar durante os trabalhos de remocao"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasHazardousIdentification",
+      "label": "Identificacao de residuos perigosos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada a identificacao e inventariacao de todos os residuos perigosos"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasLeadPaintAssessment",
+      "label": "Avaliacao de tintas com chumbo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi avaliada a presenca de tintas contendo chumbo no edificio"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasPCBAssessment",
+      "label": "Avaliacao de PCB (bifenilos policlorados)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi avaliada a presenca de equipamentos ou materiais contendo PCB"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasSoilReuseAssessment",
+      "label": "Avaliacao de reutilizacao de solos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi avaliada a possibilidade de reutilizacao dos solos e rochas de escavacao"
+    },
+    {
+      "_group": "Materiais Perigosos",
+      "field": "waste.hasExcavationSoils",
+      "label": "Solos e rochas de escavacao",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a obra gera solos e rochas provenientes de escavacao"
+    },
+
+    {
+      "_group": "Reciclagem e Valorizacao",
+      "field": "waste.concreteRecyclingRate",
+      "label": "Taxa de reciclagem de betao",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de residuos de betao encaminhados para reciclagem"
+    },
+    {
+      "_group": "Reciclagem e Valorizacao",
+      "field": "waste.metalRecyclingRate",
+      "label": "Taxa de reciclagem de metais",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de residuos metalicos encaminhados para reciclagem"
+    },
+    {
+      "_group": "Reciclagem e Valorizacao",
+      "field": "waste.woodRecyclingRate",
+      "label": "Taxa de reciclagem de madeira",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de residuos de madeira encaminhados para reciclagem ou valorizacao energetica"
+    },
+    {
+      "_group": "Reciclagem e Valorizacao",
+      "field": "waste.glassPlasticRecyclingRate",
+      "label": "Taxa de reciclagem de vidro e plastico",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de residuos de vidro e plastico encaminhados para reciclagem"
+    },
+    {
+      "_group": "Reciclagem e Valorizacao",
+      "field": "waste.hasOnSiteRecyclingPermit",
+      "label": "Autorizacao de reciclagem em obra",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se foi obtida autorizacao para reciclagem ou reutilizacao de RCD em obra"
+    },
+
+    {
+      "_group": "Registos e Documentacao",
+      "field": "waste.hasSILiAmbRegistration",
+      "label": "Registo no SILiAmb",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o produtor de RCD esta registado no Sistema Integrado de Licenciamento do Ambiente (SILiAmb)"
+    },
+    {
+      "_group": "Registos e Documentacao",
+      "field": "waste.hasMIRRSubmission",
+      "label": "MIRR submetido",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi submetido o Mapa Integrado de Registo de Residuos (MIRR) anual conforme DL 102-D/2020"
+    },
+    {
+      "_group": "Registos e Documentacao",
+      "field": "waste.hasCaucao",
+      "label": "Caucao prestada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi prestada caucao para garantir a correta gestao dos RCD (Art. 12.o DL 46/2008)"
+    },
+    {
+      "_group": "Registos e Documentacao",
+      "field": "waste.hasComplianceCheck",
+      "label": "Verificacao de conformidade realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada verificacao de conformidade da gestao de RCD em obra"
+    },
+    {
+      "_group": "Registos e Documentacao",
+      "field": "waste.hasFinalReport",
+      "label": "Relatorio final de gestao de RCD",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborado o relatorio final de gestao de RCD com balanco das quantidades produzidas e destinos"
+    },
+
+    {
+      "_group": "Demolicao",
+      "field": "waste.hasPreDemolitionAudit",
+      "label": "Auditoria pre-demolicao realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada auditoria pre-demolicao para identificacao e quantificacao de materiais"
+    },
+    {
+      "_group": "Demolicao",
+      "field": "waste.hasSelectiveDemolition",
+      "label": "Demolicao seletiva prevista",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se esta prevista demolicao seletiva para maximizar a separacao e valorizacao de materiais"
+    }
+  ]
+}

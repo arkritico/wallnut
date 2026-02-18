@@ -1,0 +1,1684 @@
+{
+  "regulationRef": "dl-163-2006",
+  "description": "Regras de acessibilidade extraídas do DL 163/2006 — Regime da acessibilidade aos edifícios e estabelecimentos que recebem público, via pública e edifícios habitacionais",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "ACESS-ENT-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.1 / Art. 2.º — Percurso Acessível",
+      "description": "O edifício não possui entrada acessível. É obrigatório pelo menos um percurso acessível desde a via pública (Art. 2.º, n.º 1 do DL 163/2006).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.hasAccessibleEntrance", "operator": "not_exists", "value": null }
+      ],
+      "remediation": "Garantir pelo menos um percurso acessível desde a via pública até à entrada principal, sem degraus isolados, com largura mínima de 1.20m.",
+      "requiredValue": "Entrada acessível obrigatória",
+      "enabled": true,
+      "tags": ["entrada", "percurso", "acessível"]
+    },
+    {
+      "id": "ACESS-PERCURSO-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.2 — Piso Tátil de Alerta",
+      "description": "Os percursos acessíveis devem dispor de piso tátil de alerta antes de obstáculos e mudanças de direção (Secção 4.2 das Normas Técnicas).",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.hasTactileWarningPaving", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Sem piso tátil de alerta instalado",
+      "requiredValue": "Piso tátil de alerta obrigatório antes de obstáculos, mudanças de direção, início e fim de rampas e escadas",
+      "remediation": "Instalar piso tátil de alerta (textura diferenciada de botões truncados) antes de obstáculos, mudanças de direção, e no início e fim de rampas e escadas. O piso tátil deve ter uma profundidade entre 0.40m e 0.60m e contraste cromático com o piso envolvente.",
+      "enabled": true,
+      "tags": ["percurso", "piso tátil", "alerta", "orientação"]
+    },
+    {
+      "id": "ACESS-PERCURSO-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Percurso Acessível (Inclinação transversal)",
+      "description": "A inclinação transversal do percurso acessível ({accessibility.pathCrossSlope}%) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.pathCrossSlope", "operator": ">", "value": 2 }
+      ],
+      "currentValueTemplate": "{accessibility.pathCrossSlope}%",
+      "requiredValue": "≤ 2% (inclinação transversal); piso firme, estável e contínuo",
+      "remediation": "Corrigir o pavimento do percurso acessível para que a inclinação transversal não exceda 2%. O piso deve ser firme, estável, contínuo e antiderrapante. Evitar juntas abertas superiores a 0.005m e ressaltos superiores a 0.002m.",
+      "enabled": true,
+      "tags": ["percurso", "pavimento", "inclinação", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-PERCURSO-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2.1 — Percurso Acessível (Largura livre)",
+      "description": "A largura livre do percurso acessível ({accessibility.pathWidth}m) é inferior ao mínimo regulamentar de 1.20m (Secção 2.2.1).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.pathWidth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{accessibility.pathWidth} m",
+      "requiredValue": "≥ 1.20 m (geral); ≥ 1.50 m em mudanças de direção",
+      "remediation": "Alargar o percurso acessível para largura mínima de 1.20m. Em zonas de mudança de direção, a largura deve ser no mínimo 1.50m para permitir a rotação de cadeira de rodas.",
+      "enabled": true,
+      "tags": ["percurso", "largura", "acessível"]
+    },
+    {
+      "id": "ACESS-PERCURSO-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2.3 — Percurso Acessível (Mudança de direção)",
+      "description": "A zona de mudança de direção do percurso acessível ({accessibility.pathTurningWidth}m) é inferior ao mínimo regulamentar de 1.50m × 1.50m (Secção 2.2.3).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.pathTurningWidth", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "{accessibility.pathTurningWidth} m",
+      "requiredValue": "Zona livre ≥ 1.50 m × 1.50 m em mudanças de direção (Secção 2.2.3)",
+      "remediation": "Em zonas de mudança de direção no percurso acessível, garantir zona livre de 1.50m × 1.50m para permitir a rotação completa de uma cadeira de rodas (Secção 2.2.3).",
+      "enabled": true,
+      "tags": ["percurso", "largura", "mudança direção", "rotação"]
+    },
+    {
+      "id": "ACESS-PERCURSO-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Percurso Acessível (Coeficiente de atrito)",
+      "description": "O coeficiente de atrito do pavimento do percurso acessível ({accessibility.pathFrictionCoefficient}) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.pathFrictionCoefficient", "operator": "<", "value": 0.4 }
+      ],
+      "currentValueTemplate": "Coeficiente de atrito: {accessibility.pathFrictionCoefficient}",
+      "requiredValue": "Coeficiente de atrito ≥ 0.4",
+      "remediation": "Aplicar pavimento com coeficiente de atrito igual ou superior a 0.4, tanto em condições secas como húmidas. Utilizar materiais antiderrapantes certificados. Evitar superfícies polidas ou reflectantes.",
+      "enabled": true,
+      "tags": ["percurso", "pavimento", "atrito", "antiderrapante"]
+    },
+    {
+      "id": "ACESS-PERCURSO-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Percurso Acessível (Grelhas)",
+      "description": "A abertura das grelhas no percurso acessível ({accessibility.grateOpeningWidth}m) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.grateOpeningWidth", "operator": ">", "value": 0.02 }
+      ],
+      "currentValueTemplate": "{accessibility.grateOpeningWidth} m",
+      "requiredValue": "Abertura ≤ 0.02 m, perpendicular ao sentido do percurso",
+      "remediation": "Substituir ou reorientar as grelhas no percurso acessível para que as aberturas não excedam 0.02m. As barras das grelhas devem ser dispostas perpendicularmente ao sentido dominante do percurso para evitar a retenção de bengalas ou rodas.",
+      "enabled": true,
+      "tags": ["percurso", "grelhas", "abertura", "segurança"]
+    },
+    {
+      "id": "ACESS-PERCURSO-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Passagem Pedonal",
+      "description": "A largura da passagem pedonal ({accessibility.pedestrianCrossingWidth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.pedestrianCrossingWidth", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "{accessibility.pedestrianCrossingWidth} m",
+      "requiredValue": "≥ 1.50 m; rebaixamento total nos lancis",
+      "remediation": "Alargar a passagem pedonal para largura mínima de 1.50m. Os lancis de passeio devem ser rebaixados ao nível da via no alinhamento das passagens pedonais, garantindo transição suave e sem ressaltos.",
+      "enabled": true,
+      "tags": ["percurso", "passagem pedonal", "lancis", "rebaixamento"]
+    },
+    {
+      "id": "ACESS-PERCURSO-08",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Percurso Acessível (Piso)",
+      "description": "O piso do percurso acessível não é firme, estável, contínuo ou apresenta superfície reflectante.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.pathSurfaceCompliant", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Piso não conforme",
+      "requiredValue": "Piso firme, estável, contínuo e não reflectante",
+      "remediation": "O pavimento do percurso acessível deve ser firme, estável, contínuo e não reflectante. Eliminar juntas abertas, ressaltos, materiais soltos ou brilhantes. Garantir que o material mantém as propriedades antiderrapantes em condições de humidade.",
+      "enabled": true,
+      "tags": ["percurso", "piso", "firme", "estável", "contínuo"]
+    },
+    {
+      "id": "ACESS-ATRIO-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Átrios (Dimensões mínimas)",
+      "description": "O átrio principal não cumpre as dimensões mínimas de 1.50m × 1.50m livres de obstáculos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.lobbyMinDimension", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "{accessibility.lobbyMinDimension} m (menor dimensão)",
+      "requiredValue": "≥ 1.50 m × 1.50 m (livre de obstáculos)",
+      "remediation": "O átrio principal deve ter dimensões mínimas de 1.50m × 1.50m livre de obstáculos, para permitir a manobra de cadeiras de rodas. Remover ou relocalizar mobiliário ou equipamentos que reduzam o espaço livre.",
+      "enabled": true,
+      "tags": ["átrio", "dimensões", "manobra", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-CORR-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2.1 — Corredores (Largura livre mínima)",
+      "description": "A largura livre mínima dos corredores ({accessibility.corridorWidths}m) é inferior ao mínimo regulamentar de 1.20m (Secção 2.2.1).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.corridorWidths", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{accessibility.corridorWidths} m",
+      "requiredValue": "≥ 1.20 m",
+      "remediation": "Alargar corredores para largura mínima de 1.20m. Em zonas de manobra de cadeiras de rodas, prever largura de 1.50m.",
+      "enabled": true,
+      "tags": ["corredores", "largura", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-CORR-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2.3 — Corredores (Largura em zona de rotação)",
+      "description": "A largura do corredor na zona de rotação ({accessibility.corridorTurningWidth}m) é inferior ao mínimo de 1.50m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.corridorTurningWidth", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "{accessibility.corridorTurningWidth} m",
+      "requiredValue": "≥ 1.50 m (em zonas de rotação)",
+      "remediation": "Nas zonas de rotação dos corredores (mudanças de direção, cruzamentos), garantir largura mínima de 1.50m para permitir a rotação completa de uma cadeira de rodas.",
+      "enabled": true,
+      "tags": ["corredores", "largura", "rotação", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-CORR-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Corredores (Recuo de portas)",
+      "description": "O recuo das portas em relação ao corredor ({accessibility.doorRecessDepth}m) é inferior ao mínimo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.doorRecessDepth", "operator": "<", "value": 0.30 }
+      ],
+      "currentValueTemplate": "{accessibility.doorRecessDepth} m",
+      "requiredValue": "≥ 0.30 m (recuo de portas em corredores)",
+      "remediation": "As portas que abrem para o interior de corredores devem estar recuadas pelo menos 0.30m em relação ao plano da parede do corredor, para não constituírem obstáculo à circulação.",
+      "enabled": true,
+      "tags": ["corredores", "portas", "recuo", "obstáculo"]
+    },
+    {
+      "id": "ACESS-CORR-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Objectos Salientes (Projecção ≤ 0.70m)",
+      "description": "Objectos salientes com projecção superior a 0.10m a uma altura inferior a 0.70m constituem risco de tropeço.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.protrudingObjectLow", "operator": ">", "value": 0.10 }
+      ],
+      "currentValueTemplate": "Projecção de {accessibility.protrudingObjectLow} m a h ≤ 0.70 m",
+      "requiredValue": "Projecção ≤ 0.10 m para objectos montados a h ≤ 0.70 m",
+      "remediation": "Os objectos salientes montados na parede a uma altura igual ou inferior a 0.70m não devem ter projecção superior a 0.10m. Caso contrário, devem ser protegidos com sinalização tátil no pavimento ou reposicionados.",
+      "enabled": true,
+      "tags": ["corredores", "objectos salientes", "projecção", "tropeço"]
+    },
+    {
+      "id": "ACESS-CORR-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2 — Objectos Salientes (Sinalização tátil)",
+      "description": "Objectos salientes com projecção superior a 0.10m não possuem sinalização tátil no pavimento.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.protrudingObjectHasTactile", "operator": "==", "value": false },
+        { "field": "accessibility.hasProtrudingObjects", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Objectos salientes sem sinalização tátil",
+      "requiredValue": "Sinalização tátil obrigatória junto a objectos salientes com projecção > 0.10 m",
+      "remediation": "Instalar sinalização tátil de alerta no pavimento junto a objectos salientes com projecção superior a 0.10m, para alerta de pessoas com deficiência visual. A faixa tátil deve ter largura mínima de 0.40m.",
+      "enabled": true,
+      "tags": ["corredores", "objectos salientes", "sinalização tátil", "deficiência visual"]
+    },
+    {
+      "id": "ACESS-PORTA-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6.1 — Portas (Abertura útil acessível)",
+      "description": "A largura mínima das portas ({accessibility.doorWidths}m) é inferior ao exigido para acessibilidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorWidths", "operator": "<", "value": 0.87 }
+      ],
+      "currentValueTemplate": "{accessibility.doorWidths} m",
+      "requiredValue": "≥ 0.87 m (portas acessíveis); ≥ 0.77 m (outras portas)",
+      "remediation": "Alargar portas para largura mínima de 0.87m nas portas acessíveis. As restantes portas devem ter abertura útil mínima de 0.77m. Portas de correr são preferíveis em espaços reduzidos.",
+      "enabled": true,
+      "tags": ["portas", "largura", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-PORTA-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas (Força de abertura)",
+      "description": "A força de abertura das portas interiores ({accessibility.doorOpeningForce} N) excede o máximo regulamentar para acessibilidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorOpeningForce", "operator": ">", "value": 22 }
+      ],
+      "currentValueTemplate": "{accessibility.doorOpeningForce} N",
+      "requiredValue": "≤ 22 N (portas interiores); ≤ 35 N (portas de entrada)",
+      "remediation": "Ajustar os fechos e molas das portas interiores para que a força de abertura não exceda 22 N. Para portas de entrada do edifício, o limite máximo é 35 N. Considerar a instalação de sistemas automáticos de abertura.",
+      "enabled": true,
+      "tags": ["portas", "força", "abertura", "PMR"]
+    },
+    {
+      "id": "ACESS-PORTA-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas (Espaço lateral)",
+      "description": "O espaço livre lateral do lado do puxador ({accessibility.doorClearance}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorClearance", "operator": "<", "value": 0.30 }
+      ],
+      "currentValueTemplate": "{accessibility.doorClearance} m",
+      "requiredValue": "≥ 0.30 m (lado do puxador)",
+      "remediation": "Garantir um espaço livre lateral mínimo de 0.30m do lado do puxador em portas de batente, para permitir a aproximação e manobra de cadeiras de rodas. Reposicionar a porta ou alargar o vão se necessário.",
+      "enabled": true,
+      "tags": ["portas", "espaço lateral", "puxador", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-PORTA-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas Automáticas (Tempo de abertura)",
+      "description": "O tempo de abertura das portas automáticas ({accessibility.doorAutoOpenTime}s) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorAutoOpenTime", "operator": "<", "value": 3 }
+      ],
+      "currentValueTemplate": "{accessibility.doorAutoOpenTime} s",
+      "requiredValue": "≥ 3 s (tempo mínimo de abertura)",
+      "remediation": "Ajustar o temporizador das portas automáticas para que permaneçam abertas durante, no mínimo, 3 segundos. Garantir que o sensor de presença cobre uma área adequada para pessoas com mobilidade reduzida.",
+      "enabled": true,
+      "tags": ["portas", "automáticas", "temporizador", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-PORTA-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas (Altura mínima)",
+      "description": "A altura livre das portas ({accessibility.doorHeight}m) é inferior ao mínimo regulamentar de 2.00m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorHeight", "operator": "<", "value": 2.00 }
+      ],
+      "currentValueTemplate": "{accessibility.doorHeight} m",
+      "requiredValue": "≥ 2.00 m",
+      "remediation": "As portas devem ter uma altura livre mínima de 2.00m. Substituir ou modificar as portas que não cumprem esta exigência.",
+      "enabled": true,
+      "tags": ["portas", "altura", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-PORTA-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas (Espaço entre portas sequenciais)",
+      "description": "O espaço livre entre portas sequenciais ({accessibility.doorSequentialClearance}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorSequentialClearance", "operator": "<", "value": 0.60 }
+      ],
+      "currentValueTemplate": "{accessibility.doorSequentialClearance} m",
+      "requiredValue": "≥ 0.60 m entre portas sequenciais",
+      "remediation": "Garantir um espaço livre mínimo de 0.60m entre portas sequenciais (porta dupla, câmara corta-fogo, etc.) para permitir a passagem segura de uma cadeira de rodas com ambas as portas abertas.",
+      "enabled": true,
+      "tags": ["portas", "sequenciais", "espaço", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-PORTA-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6.6 — Portas (Puxadores / Maçanetas)",
+      "description": "Os puxadores das portas não são do tipo alavanca ou não estão à altura regulamentar ({accessibility.doorHandleHeight}m).",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.doorHandleHeight", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.doorHandleHeight} m",
+      "requiredValue": "Tipo alavanca; h = 0.80–1.10 m; contraste cromático",
+      "remediation": "Instalar puxadores do tipo alavanca em todas as portas acessíveis, a uma altura entre 0.80m e 1.10m. Os puxadores devem ter contraste cromático com a porta para facilitar a identificação por pessoas com baixa visão.",
+      "enabled": true,
+      "tags": ["portas", "puxadores", "alavanca", "contraste"]
+    },
+    {
+      "id": "ACESS-PORTA-08",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6.6 — Portas (Maçaneta – altura máxima)",
+      "description": "A altura dos puxadores das portas ({accessibility.doorHandleHeight}m) excede o máximo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.doorHandleHeight", "operator": ">", "value": 1.10 }
+      ],
+      "currentValueTemplate": "{accessibility.doorHandleHeight} m",
+      "requiredValue": "h = 0.80–1.10 m",
+      "remediation": "Reposicionar os puxadores das portas para uma altura entre 0.80m e 1.10m do piso acabado. Esta altura garante acessibilidade a utilizadores de cadeiras de rodas e pessoas de baixa estatura.",
+      "enabled": true,
+      "tags": ["portas", "puxadores", "altura", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-PORTA-09",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas (Força de abertura – entrada)",
+      "description": "A força de abertura da porta de entrada ({accessibility.entryDoorOpeningForce} N) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.entryDoorOpeningForce", "operator": ">", "value": 35 }
+      ],
+      "currentValueTemplate": "{accessibility.entryDoorOpeningForce} N",
+      "requiredValue": "≤ 35 N (portas de entrada)",
+      "remediation": "Ajustar os fechos e molas da porta de entrada para que a força de abertura não exceda 35 N. Se a porta for demasiado pesada, considerar a instalação de sistema de abertura automática ou semi-automática.",
+      "enabled": true,
+      "tags": ["portas", "entrada", "força", "abertura"]
+    },
+    {
+      "id": "ACESS-PORTA-10",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6 — Portas Automáticas (Sensor)",
+      "description": "As portas automáticas devem possuir sensor que cubra a largura total da abertura.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.doorAutoSensorFullWidth", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sensor não cobre largura total",
+      "requiredValue": "Sensor de presença cobrindo largura total da porta",
+      "remediation": "Instalar ou ajustar o sensor de presença das portas automáticas para que cubra a largura total da abertura, garantindo detecção de utilizadores que se aproximem de qualquer ângulo, incluindo cadeiras de rodas e carrinhos de criança.",
+      "enabled": true,
+      "tags": ["portas", "automáticas", "sensor", "segurança"]
+    },
+    {
+      "id": "ACESS-PORTA-11",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.6.1 — Portas (Largura mínima geral)",
+      "description": "A largura de abertura útil da porta ({accessibility.doorWidthGeneral}m) é inferior ao mínimo geral de 0.77m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.doorWidthGeneral", "operator": "<", "value": 0.77 }
+      ],
+      "currentValueTemplate": "{accessibility.doorWidthGeneral} m",
+      "requiredValue": "≥ 0.77 m (portas em geral)",
+      "remediation": "As portas em geral devem ter abertura útil mínima de 0.77m. Alargar o vão de porta ou substituir por porta mais larga.",
+      "enabled": true,
+      "tags": ["portas", "largura", "geral"]
+    },
+    {
+      "id": "ACESS-ESCAD-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Corrimãos bilaterais)",
+      "description": "As escadas devem ter corrimãos de ambos os lados em edifícios com mais de 1 piso.",
+      "severity": "info",
+      "conditions": [
+        { "field": "numberOfFloors", "operator": ">", "value": 1 }
+      ],
+      "remediation": "Instalar corrimãos de ambos os lados das escadas, a uma altura entre 0.85m e 0.90m, prolongando-se 0.30m além do primeiro e último degrau.",
+      "requiredValue": "Corrimãos bilaterais, h=0.85-0.90m",
+      "enabled": true,
+      "tags": ["escadas", "corrimãos", "segurança"]
+    },
+    {
+      "id": "ACESS-ESCAD-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Espelho – edifícios públicos)",
+      "description": "A altura do espelho dos degraus ({accessibility.stairRiserHeight}m) excede o máximo regulamentar para edifícios de utilização pública.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairRiserHeight", "operator": ">", "value": 0.175 },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "{accessibility.stairRiserHeight} m",
+      "requiredValue": "Espelho ≤ 0.175 m (edifícios públicos)",
+      "remediation": "Redimensionar os degraus para que a altura do espelho não exceda 0.175m em edifícios de utilização pública. Respeitar a fórmula de Blondel: 0.60m ≤ 2h + g ≤ 0.64m.",
+      "enabled": true,
+      "tags": ["escadas", "degraus", "espelho", "públicos"]
+    },
+    {
+      "id": "ACESS-ESCAD-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Faixas antiderrapantes)",
+      "description": "Os degraus das escadas devem possuir faixas antiderrapantes no focinho com contraste visual.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.stairHasNonSlipStrips", "operator": "==", "value": false },
+        { "field": "numberOfFloors", "operator": ">", "value": 1 }
+      ],
+      "currentValueTemplate": "Sem faixas antiderrapantes nos degraus",
+      "requiredValue": "Faixas antiderrapantes obrigatórias; largura ≥ 0.02 m; contraste visual",
+      "remediation": "Aplicar faixas antiderrapantes no focinho de todos os degraus, com largura mínima de 0.02m e em cor contrastante com o restante piso do degrau. Garantir que o material antiderrapante mantém as suas propriedades ao longo do tempo e em condições de humidade.",
+      "enabled": true,
+      "tags": ["escadas", "antiderrapante", "focinho", "contraste"]
+    },
+    {
+      "id": "ACESS-ESCAD-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Largura – edifícios públicos)",
+      "description": "A largura das escadas ({accessibility.stairWidth}m) é inferior ao mínimo regulamentar para edifícios de utilização pública.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairWidth", "operator": "<", "value": 1.20 },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "{accessibility.stairWidth} m",
+      "requiredValue": "≥ 1.20 m (edifícios públicos)",
+      "remediation": "Alargar as escadas para largura mínima de 1.20m em edifícios de utilização pública. Esta largura permite a passagem simultânea de duas pessoas e a utilização de ambos os corrimãos.",
+      "enabled": true,
+      "tags": ["escadas", "largura", "públicos"]
+    },
+    {
+      "id": "ACESS-ESCAD-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Largura – habitação)",
+      "description": "A largura das escadas ({accessibility.stairWidth}m) é inferior ao mínimo regulamentar para edifícios de habitação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairWidth", "operator": "<", "value": 0.90 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "{accessibility.stairWidth} m",
+      "requiredValue": "≥ 0.90 m (habitação)",
+      "remediation": "Alargar as escadas para largura mínima de 0.90m em edifícios de habitação.",
+      "enabled": true,
+      "tags": ["escadas", "largura", "habitação"]
+    },
+    {
+      "id": "ACESS-ESCAD-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Espelho – habitação)",
+      "description": "A altura do espelho dos degraus ({accessibility.stairRiserHeight}m) excede o máximo regulamentar para edifícios de habitação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairRiserHeight", "operator": ">", "value": 0.19 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "{accessibility.stairRiserHeight} m",
+      "requiredValue": "Espelho ≤ 0.19 m (habitação)",
+      "remediation": "Redimensionar os degraus para que a altura do espelho não exceda 0.19m em edifícios de habitação. Respeitar a fórmula de Blondel: 0.60m ≤ 2h + g ≤ 0.64m.",
+      "enabled": true,
+      "tags": ["escadas", "degraus", "espelho", "habitação"]
+    },
+    {
+      "id": "ACESS-ESCAD-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Cobertor – edifícios públicos)",
+      "description": "A profundidade do cobertor dos degraus ({accessibility.stairTreadDepth}m) é inferior ao mínimo regulamentar para edifícios públicos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairTreadDepth", "operator": "<", "value": 0.28 },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "{accessibility.stairTreadDepth} m",
+      "requiredValue": "Cobertor ≥ 0.28 m (edifícios públicos)",
+      "remediation": "Redimensionar os degraus para que o cobertor (profundidade) seja no mínimo 0.28m em edifícios de utilização pública. Respeitar a fórmula de Blondel: 0.60m ≤ 2h + g ≤ 0.64m.",
+      "enabled": true,
+      "tags": ["escadas", "degraus", "cobertor", "públicos"]
+    },
+    {
+      "id": "ACESS-ESCAD-08",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Cobertor – habitação)",
+      "description": "A profundidade do cobertor dos degraus ({accessibility.stairTreadDepth}m) é inferior ao mínimo regulamentar para habitação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairTreadDepth", "operator": "<", "value": 0.25 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "{accessibility.stairTreadDepth} m",
+      "requiredValue": "Cobertor ≥ 0.25 m (habitação)",
+      "remediation": "Redimensionar os degraus para que o cobertor (profundidade) seja no mínimo 0.25m em edifícios de habitação. Respeitar a fórmula de Blondel: 0.60m ≤ 2h + g ≤ 0.64m.",
+      "enabled": true,
+      "tags": ["escadas", "degraus", "cobertor", "habitação"]
+    },
+    {
+      "id": "ACESS-ESCAD-09",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Fórmula de Blondel)",
+      "description": "A relação entre espelho e cobertor dos degraus não satisfaz a fórmula de Blondel (2h+g={accessibility.stairBlondelValue}m).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairBlondelValue", "operator": "<", "value": 0.60 }
+      ],
+      "currentValueTemplate": "2h + g = {accessibility.stairBlondelValue} m",
+      "requiredValue": "0.60 m ≤ 2h + g ≤ 0.64 m (Fórmula de Blondel)",
+      "remediation": "Redimensionar os degraus de forma a que a soma do dobro do espelho mais o cobertor (2h + g) esteja entre 0.60m e 0.64m. Esta relação garante conforto e segurança na utilização das escadas.",
+      "enabled": true,
+      "tags": ["escadas", "Blondel", "espelho", "cobertor", "conforto"]
+    },
+    {
+      "id": "ACESS-ESCAD-10",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Fórmula de Blondel – limite superior)",
+      "description": "A relação entre espelho e cobertor dos degraus excede o limite superior da fórmula de Blondel (2h+g={accessibility.stairBlondelValue}m).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairBlondelValue", "operator": ">", "value": 0.64 }
+      ],
+      "currentValueTemplate": "2h + g = {accessibility.stairBlondelValue} m",
+      "requiredValue": "0.60 m ≤ 2h + g ≤ 0.64 m (Fórmula de Blondel)",
+      "remediation": "Redimensionar os degraus de forma a que a soma do dobro do espelho mais o cobertor (2h + g) não exceda 0.64m. Um valor excessivo indica cobertor demasiado profundo ou espelho demasiado alto.",
+      "enabled": true,
+      "tags": ["escadas", "Blondel", "espelho", "cobertor"]
+    },
+    {
+      "id": "ACESS-ESCAD-11",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Espelhos fechados)",
+      "description": "Os degraus das escadas devem ter espelhos fechados (sem aberturas).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairRisersClosed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Espelhos abertos (vazados)",
+      "requiredValue": "Espelhos fechados (sem aberturas)",
+      "remediation": "Os degraus das escadas devem possuir espelhos fechados, sem aberturas verticais entre cobertores. Espelhos vazados constituem risco de tropeço e insegurança para pessoas com deficiência visual ou mobilidade reduzida.",
+      "enabled": true,
+      "tags": ["escadas", "espelhos", "fechados", "segurança"]
+    },
+    {
+      "id": "ACESS-ESCAD-12",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Corrimão – segundo nível)",
+      "description": "As escadas em edifícios de utilização pública devem ter segundo corrimão a h=0.70m.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.stairHasSecondHandrail", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Sem segundo corrimão a h = 0.70 m",
+      "requiredValue": "Segundo corrimão a h = 0.70 m (edifícios públicos)",
+      "remediation": "Instalar um segundo corrimão a uma altura de 0.70m em ambos os lados das escadas, destinado a crianças e pessoas de baixa estatura. O segundo corrimão deve ser contínuo e acompanhar o corrimão principal.",
+      "enabled": true,
+      "tags": ["escadas", "corrimão", "segundo nível", "crianças"]
+    },
+    {
+      "id": "ACESS-ESCAD-13",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Prolongamento de corrimãos)",
+      "description": "Os corrimãos das escadas devem prolongar-se pelo menos 0.30m além do primeiro e último degrau.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.stairHandrailExtension", "operator": "<", "value": 0.30 }
+      ],
+      "currentValueTemplate": "Prolongamento: {accessibility.stairHandrailExtension} m",
+      "requiredValue": "Prolongamento ≥ 0.30 m além do primeiro e último degrau",
+      "remediation": "Prolongar os corrimãos pelo menos 0.30m além do primeiro e último degrau do lanço de escadas. As extremidades devem ser arredondadas ou voltadas para a parede, sem constituir obstáculo à circulação.",
+      "enabled": true,
+      "tags": ["escadas", "corrimãos", "prolongamento", "segurança"]
+    },
+    {
+      "id": "ACESS-ESCAD-14",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.4 — Escadas (Patamares)",
+      "description": "O comprimento do patamar intermédio das escadas ({accessibility.stairLandingLength}m) é inferior ao comprimento do lanço.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.stairLandingLength", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{accessibility.stairLandingLength} m",
+      "requiredValue": "Comprimento ≥ lanço da escada; largura ≥ largura da escada",
+      "remediation": "Os patamares intermédios das escadas devem ter comprimento igual ou superior ao do lanço e largura igual ou superior à largura da escada. O comprimento mínimo é geralmente 1.20m.",
+      "enabled": true,
+      "tags": ["escadas", "patamares", "comprimento", "largura"]
+    },
+    {
+      "id": "ACESS-RAMPA-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.1 — Rampas (Inclinação máxima)",
+      "description": "A inclinação da rampa ({accessibility.rampGradient}%) excede o máximo regulamentar absoluto de 8% (Secção 2.5.1).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampGradient", "operator": ">", "value": 8 }
+      ],
+      "currentValueTemplate": "{accessibility.rampGradient}%",
+      "requiredValue": "≤ 6% (extensão > 6 m); ≤ 8% (extensão ≤ 2 m) — Secção 2.5.1",
+      "remediation": "Reduzir a inclinação da rampa conforme Secção 2.5.1: máximo 6% para rampas com extensão superior a 6m; máximo 8% para rampas com extensão até 2m. Prever patamares de repouso com comprimento ≥ 1.50m a cada 6m de rampa (Secção 2.5.3).",
+      "enabled": true,
+      "tags": ["rampa", "inclinação", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-RAMPA-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.3 — Rampas (Patamares de repouso)",
+      "description": "O intervalo entre patamares de repouso na rampa ({accessibility.rampRestingInterval}m) excede o máximo regulamentar de 6m (Secção 2.5.3).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampRestingInterval", "operator": ">", "value": 6 }
+      ],
+      "currentValueTemplate": "{accessibility.rampRestingInterval} m",
+      "requiredValue": "Patamar ≥ 1.50 m de comprimento a cada 6 m de rampa (Secção 2.5.3)",
+      "remediation": "Intercalar patamares de repouso horizontais com comprimento mínimo de 1.50m a cada 6m de rampa (Secção 2.5.3). Os patamares devem ter a mesma largura da rampa e ser horizontais.",
+      "enabled": true,
+      "tags": ["rampa", "patamares", "repouso", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-RAMPA-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.5 — Rampas (Guardas e corrimãos)",
+      "description": "As rampas com desnível superior a 0.10m devem possuir guardas laterais e corrimãos (Secção 2.5.5).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampHasHandrails", "operator": "==", "value": false },
+        { "field": "accessibility.rampLevelDifference", "operator": ">", "value": 0.10 }
+      ],
+      "currentValueTemplate": "Desnível {accessibility.rampLevelDifference} m, sem corrimãos",
+      "requiredValue": "Corrimãos obrigatórios para desníveis > 0.10 m; h = 0.85–0.90 m",
+      "remediation": "Instalar guardas e corrimãos contínuos em ambos os lados da rampa, a uma altura entre 0.85m e 0.90m. Os corrimãos devem prolongar-se pelo menos 0.30m além do início e do fim da rampa, com extremidades arredondadas ou voltadas para a parede.",
+      "enabled": true,
+      "tags": ["rampa", "guardas", "corrimãos", "segurança"]
+    },
+    {
+      "id": "ACESS-RAMPA-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.2 — Rampas (Largura mínima)",
+      "description": "A largura da rampa ({accessibility.rampWidth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampWidth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{accessibility.rampWidth} m",
+      "requiredValue": "≥ 1.20 m (Secção 2.5.2)",
+      "remediation": "Alargar a rampa para largura mínima de 1.20m (Secção 2.5.2).",
+      "enabled": true,
+      "tags": ["rampa", "largura", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-RAMPA-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5 — Rampas (Inclinação transversal ≤ 2%)",
+      "description": "A inclinação transversal da rampa ({accessibility.rampCrossSlope}%) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampCrossSlope", "operator": ">", "value": 2 }
+      ],
+      "currentValueTemplate": "{accessibility.rampCrossSlope}%",
+      "requiredValue": "≤ 2% (inclinação transversal)",
+      "remediation": "Corrigir a inclinação transversal da rampa para não exceder 2%. Uma inclinação transversal excessiva dificulta a utilização por cadeiras de rodas e pode causar desequilíbrio.",
+      "enabled": true,
+      "tags": ["rampa", "inclinação transversal", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-RAMPA-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.5 — Rampas (Rebordo lateral)",
+      "description": "A altura do rebordo lateral da rampa ({accessibility.rampEdgeHeight}m) é inferior ao mínimo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.rampEdgeHeight", "operator": "<", "value": 0.05 }
+      ],
+      "currentValueTemplate": "{accessibility.rampEdgeHeight} m",
+      "requiredValue": "≥ 0.05 m de altura",
+      "remediation": "Instalar rebordos laterais com altura mínima de 0.05m em ambos os lados da rampa, para impedir que as rodas de cadeiras de rodas saiam da superfície da rampa.",
+      "enabled": true,
+      "tags": ["rampa", "rebordo", "lateral", "segurança"]
+    },
+    {
+      "id": "ACESS-RAMPA-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.1 — Rampas (Inclinação ≤ 6% para extensão > 6 m)",
+      "description": "A rampa com extensão de {accessibility.rampLength}m e inclinação de {accessibility.rampGradient}% excede o máximo de 6% para extensões superiores a 6m (Secção 2.5.1).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampGradient", "operator": ">", "value": 6 },
+        { "field": "accessibility.rampLength", "operator": ">", "value": 6 }
+      ],
+      "currentValueTemplate": "{accessibility.rampGradient}% para {accessibility.rampLength} m",
+      "requiredValue": "≤ 6% para rampas com extensão > 6 m (Secção 2.5.1)",
+      "remediation": "Rampas com extensão superior a 6m devem ter inclinação máxima de 6% (Secção 2.5.1). Reduzir a inclinação ou encurtar a rampa inserindo patamares de repouso com comprimento ≥ 1.50m (Secção 2.5.3).",
+      "enabled": true,
+      "tags": ["rampa", "inclinação", "comprimento", "6%"]
+    },
+    {
+      "id": "ACESS-RAMPA-08",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.5 — Rampas (Prolongamento de corrimãos)",
+      "description": "Os corrimãos da rampa devem prolongar-se pelo menos 0.30m na base e no topo.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.rampHandrailExtension", "operator": "<", "value": 0.30 }
+      ],
+      "currentValueTemplate": "Prolongamento: {accessibility.rampHandrailExtension} m",
+      "requiredValue": "Prolongamento ≥ 0.30 m na base e no topo",
+      "remediation": "Prolongar os corrimãos pelo menos 0.30m além do início e do fim da rampa, em ambos os lados. As extremidades devem ser arredondadas ou voltadas para a parede.",
+      "enabled": true,
+      "tags": ["rampa", "corrimãos", "prolongamento"]
+    },
+    {
+      "id": "ACESS-RAMPA-09",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.5 — Rampas (Guarda – altura mínima)",
+      "description": "A altura da guarda lateral da rampa ({accessibility.rampGuardHeight}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampGuardHeight", "operator": "<", "value": 0.90 },
+        { "field": "accessibility.rampLevelDifference", "operator": ">", "value": 0.10 }
+      ],
+      "currentValueTemplate": "{accessibility.rampGuardHeight} m",
+      "requiredValue": "≥ 0.90 m (guarda lateral obrigatória se desnível > 0.10 m)",
+      "remediation": "As guardas laterais das rampas devem ter altura mínima de 0.90m quando o desnível adjacente for superior a 0.10m.",
+      "enabled": true,
+      "tags": ["rampa", "guarda", "altura", "segurança"]
+    },
+    {
+      "id": "ACESS-ELEV-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 / 3.1 — Ascensores (Obrigatoriedade – edifícios novos)",
+      "description": "A instalação de ascensor é obrigatória neste edifício ({numberOfFloors} pisos).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.hasElevator", "operator": "not_exists", "value": null },
+        { "field": "numberOfFloors", "operator": ">=", "value": 4 },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{numberOfFloors} pisos, sem ascensor",
+      "requiredValue": "Ascensor obrigatório em edifícios novos ≥ 4 pisos",
+      "remediation": "Instalar pelo menos um ascensor acessível (Secção 3.1). Cabina mínima: 1.10m × 1.40m (Secção 2.7.1), porta ≥ 0.90m (Secção 2.7.2). Sinalização em Braille e sonora obrigatória (Secção 2.7.5).",
+      "enabled": true,
+      "tags": ["ascensor", "obrigatório", "pisos"]
+    },
+    {
+      "id": "ACESS-ELEV-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 / 3.1 — Ascensores (Obrigatoriedade – reabilitação)",
+      "description": "A instalação de ascensor é obrigatória neste edifício existente ({numberOfFloors} pisos).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.hasElevator", "operator": "not_exists", "value": null },
+        { "field": "numberOfFloors", "operator": ">=", "value": 5 },
+        { "field": "isRehabilitation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{numberOfFloors} pisos (reabilitação), sem ascensor",
+      "requiredValue": "Ascensor obrigatório em edifícios existentes ≥ 5 pisos",
+      "remediation": "Instalar ascensor acessível. Para edifícios existentes, o limiar é ≥ 5 pisos.",
+      "enabled": true,
+      "tags": ["ascensor", "reabilitação", "pisos"]
+    },
+    {
+      "id": "ACESS-ELEV-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Ascensores (Botões de chamada)",
+      "description": "A altura dos botões de chamada do ascensor ({accessibility.elevatorCallButtonHeight}m) não está dentro do intervalo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.elevatorCallButtonHeight", "operator": ">", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorCallButtonHeight} m",
+      "requiredValue": "0.90 m – 1.20 m; com sinalização tátil e Braille",
+      "remediation": "Reposicionar os botões de chamada do ascensor para uma altura entre 0.90m e 1.20m do piso. Os botões devem ter sinalização tátil e informação em Braille. Garantir um espaço livre de aproximação frontal com dimensões mínimas de 1.20m × 0.75m.",
+      "enabled": true,
+      "tags": ["ascensor", "botões", "Braille", "tátil"]
+    },
+    {
+      "id": "ACESS-ELEV-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Ascensores (Botões – altura mínima)",
+      "description": "A altura dos botões de chamada do ascensor ({accessibility.elevatorCallButtonHeight}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.elevatorCallButtonHeight", "operator": "<", "value": 0.90 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorCallButtonHeight} m",
+      "requiredValue": "0.90 m – 1.20 m",
+      "remediation": "Reposicionar os botões de chamada do ascensor para uma altura mínima de 0.90m do piso.",
+      "enabled": true,
+      "tags": ["ascensor", "botões", "altura mínima"]
+    },
+    {
+      "id": "ACESS-ELEV-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7.1 — Ascensores (Dimensões da cabina)",
+      "description": "As dimensões da cabina do ascensor ({accessibility.elevatorCabinWidth}m × {accessibility.elevatorCabinDepth}m) são inferiores ao mínimo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.elevatorCabinWidth", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorCabinWidth} m × {accessibility.elevatorCabinDepth} m",
+      "requiredValue": "≥ 1.10 m × 1.40 m (mínimo)",
+      "remediation": "A cabina do ascensor acessível deve ter dimensões mínimas de 1.10m de largura por 1.40m de profundidade, para permitir a entrada e manobra de uma cadeira de rodas.",
+      "enabled": true,
+      "tags": ["ascensor", "cabina", "dimensões", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-ELEV-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7.1 — Ascensores (Profundidade da cabina)",
+      "description": "A profundidade da cabina do ascensor ({accessibility.elevatorCabinDepth}m) é inferior ao mínimo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.elevatorCabinDepth", "operator": "<", "value": 1.40 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorCabinDepth} m",
+      "requiredValue": "≥ 1.40 m (profundidade mínima)",
+      "remediation": "A profundidade da cabina deve ser no mínimo 1.40m para permitir a entrada de uma cadeira de rodas e o seu acompanhante.",
+      "enabled": true,
+      "tags": ["ascensor", "cabina", "profundidade"]
+    },
+    {
+      "id": "ACESS-ELEV-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7.2 — Ascensores (Porta da cabina)",
+      "description": "A largura da porta do ascensor ({accessibility.elevatorDoorWidth}m) é inferior ao mínimo regulamentar de 0.90m (Secção 2.7.2).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.elevatorDoorWidth", "operator": "<", "value": 0.90 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorDoorWidth} m",
+      "requiredValue": "≥ 0.90 m (Secção 2.7.2)",
+      "remediation": "A porta do ascensor acessível deve ter largura mínima de 0.90m (Secção 2.7.2) para permitir a entrada de uma cadeira de rodas. Substituir a porta ou alargar o vão.",
+      "enabled": true,
+      "tags": ["ascensor", "porta", "largura"]
+    },
+    {
+      "id": "ACESS-ELEV-08",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Ascensores (Patim frontal)",
+      "description": "O patim frente ao ascensor ({accessibility.elevatorLandingWidth}m × {accessibility.elevatorLandingDepth}m) é inferior às dimensões mínimas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.elevatorLandingWidth", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorLandingWidth} m × {accessibility.elevatorLandingDepth} m",
+      "requiredValue": "≥ 1.50 m × 1.50 m frente ao ascensor",
+      "remediation": "O patim frontal ao ascensor deve ter dimensões mínimas de 1.50m × 1.50m, livre de obstáculos, para permitir a manobra de cadeiras de rodas durante a espera e embarque.",
+      "enabled": true,
+      "tags": ["ascensor", "patim", "dimensões", "manobra"]
+    },
+    {
+      "id": "ACESS-ELEV-09",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Ascensores (Tempo de abertura de portas)",
+      "description": "O tempo de abertura das portas do ascensor em paragem ({accessibility.elevatorDoorOpenTime}s) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.elevatorDoorOpenTime", "operator": "<", "value": 8 }
+      ],
+      "currentValueTemplate": "{accessibility.elevatorDoorOpenTime} s",
+      "requiredValue": "≥ 8 s (tempo de abertura em paragem)",
+      "remediation": "Ajustar o temporizador das portas do ascensor para que permaneçam abertas durante pelo menos 8 segundos em cada paragem, permitindo tempo suficiente para a entrada e saída de pessoas com mobilidade reduzida.",
+      "enabled": true,
+      "tags": ["ascensor", "portas", "temporizador", "PMR"]
+    },
+    {
+      "id": "ACESS-ELEV-10",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Ascensores (Indicador visual de piso)",
+      "description": "O ascensor não possui indicador visual de piso.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.elevatorHasFloorIndicator", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem indicador visual de piso",
+      "requiredValue": "Indicador visual de piso obrigatório",
+      "remediation": "Instalar indicador visual de piso no interior da cabina e nos patamares de acesso, com numeração em algarismos de dimensão adequada e boa legibilidade.",
+      "enabled": true,
+      "tags": ["ascensor", "indicador", "visual", "piso"]
+    },
+    {
+      "id": "ACESS-ELEV-11",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7.5 — Ascensores (Sinal sonoro de chegada)",
+      "description": "O ascensor não possui sinal sonoro de chegada ao piso.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.elevatorHasArrivalChime", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem sinal sonoro de chegada",
+      "requiredValue": "Sinal sonoro de chegada obrigatório",
+      "remediation": "Instalar sinal sonoro que indique a chegada do ascensor ao piso solicitado e anuncie o sentido de deslocação (subida/descida), para orientação de pessoas com deficiência visual.",
+      "enabled": true,
+      "tags": ["ascensor", "sinal sonoro", "chegada", "deficiência visual"]
+    },
+    {
+      "id": "ACESS-ELEV-12",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7.5 — Ascensores (Braille e relevo nos botões)",
+      "description": "Os botões do ascensor não possuem informação em Braille e relevo.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.elevatorButtonsBraille", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Botões sem Braille e relevo",
+      "requiredValue": "Braille e relevo obrigatórios em todos os botões",
+      "remediation": "Todos os botões do ascensor (interiores e exteriores) devem possuir informação em Braille e em relevo, para utilização por pessoas com deficiência visual. A informação em Braille deve ser colocada à esquerda ou abaixo do botão correspondente.",
+      "enabled": true,
+      "tags": ["ascensor", "Braille", "relevo", "botões", "deficiência visual"]
+    },
+    {
+      "id": "ACESS-ELEV-13",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Ascensores (Espelho na parede do fundo)",
+      "description": "O ascensor não possui espelho na parede do fundo da cabina.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.elevatorHasRearMirror", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem espelho na parede do fundo",
+      "requiredValue": "Espelho obrigatório na parede oposta à porta",
+      "remediation": "Instalar espelho na parede do fundo da cabina (oposta à porta), para que utilizadores de cadeiras de rodas possam observar os obstáculos atrás de si e facilitar a manobra de saída.",
+      "enabled": true,
+      "tags": ["ascensor", "espelho", "cabina", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-PLAT-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Plataformas Elevatórias (Vertical – dimensões)",
+      "description": "As dimensões da plataforma elevatória vertical ({accessibility.liftPlatformWidth}m × {accessibility.liftPlatformDepth}m) são inferiores ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.liftPlatformWidth", "operator": "<", "value": 0.75 }
+      ],
+      "currentValueTemplate": "{accessibility.liftPlatformWidth} m × {accessibility.liftPlatformDepth} m",
+      "requiredValue": "≥ 0.75 m × 1.00 m (plataforma vertical)",
+      "remediation": "A plataforma elevatória vertical deve ter dimensões mínimas de 0.75m de largura por 1.00m de profundidade.",
+      "enabled": true,
+      "tags": ["plataforma elevatória", "vertical", "dimensões"]
+    },
+    {
+      "id": "ACESS-PLAT-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Plataformas Elevatórias (Vertical – profundidade)",
+      "description": "A profundidade da plataforma elevatória vertical ({accessibility.liftPlatformDepth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.liftPlatformDepth", "operator": "<", "value": 1.00 }
+      ],
+      "currentValueTemplate": "{accessibility.liftPlatformDepth} m",
+      "requiredValue": "≥ 1.00 m (profundidade mínima – vertical)",
+      "remediation": "A profundidade da plataforma elevatória vertical deve ser no mínimo 1.00m.",
+      "enabled": true,
+      "tags": ["plataforma elevatória", "vertical", "profundidade"]
+    },
+    {
+      "id": "ACESS-PLAT-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Plataformas Elevatórias (Inclinada – dimensões)",
+      "description": "As dimensões da plataforma elevatória inclinada ({accessibility.inclinedLiftWidth}m × {accessibility.inclinedLiftDepth}m) são inferiores ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.inclinedLiftWidth", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.inclinedLiftWidth} m × {accessibility.inclinedLiftDepth} m",
+      "requiredValue": "≥ 0.80 m × 1.25 m (plataforma inclinada)",
+      "remediation": "A plataforma elevatória inclinada deve ter dimensões mínimas de 0.80m de largura por 1.25m de profundidade.",
+      "enabled": true,
+      "tags": ["plataforma elevatória", "inclinada", "dimensões"]
+    },
+    {
+      "id": "ACESS-PLAT-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Plataformas Elevatórias (Vertical – velocidade)",
+      "description": "A velocidade da plataforma elevatória vertical ({accessibility.liftSpeed} m/s) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.liftSpeed", "operator": ">", "value": 0.15 }
+      ],
+      "currentValueTemplate": "{accessibility.liftSpeed} m/s",
+      "requiredValue": "≤ 0.15 m/s (plataforma vertical)",
+      "remediation": "Ajustar a velocidade da plataforma elevatória vertical para não exceder 0.15 m/s, garantindo segurança e conforto do utilizador.",
+      "enabled": true,
+      "tags": ["plataforma elevatória", "vertical", "velocidade"]
+    },
+    {
+      "id": "ACESS-PLAT-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.7 — Plataformas Elevatórias (Inclinada – velocidade)",
+      "description": "A velocidade da plataforma elevatória inclinada ({accessibility.inclinedLiftSpeed} m/s) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.inclinedLiftSpeed", "operator": ">", "value": 0.10 }
+      ],
+      "currentValueTemplate": "{accessibility.inclinedLiftSpeed} m/s",
+      "requiredValue": "≤ 0.10 m/s (plataforma inclinada)",
+      "remediation": "Ajustar a velocidade da plataforma elevatória inclinada para não exceder 0.10 m/s, garantindo segurança e conforto do utilizador.",
+      "enabled": true,
+      "tags": ["plataforma elevatória", "inclinada", "velocidade"]
+    },
+    {
+      "id": "ACESS-ESTAC-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.8 / 3.2 — Estacionamento (Obrigatoriedade)",
+      "description": "O projeto não prevê lugares de estacionamento acessíveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.hasAccessibleParking", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "remediation": "Prever pelo menos 1 lugar acessível por cada 50 lugares (mínimo 1). Dimensões mínimas: 3.50m × 5.00m com corredor lateral.",
+      "requiredValue": "≥ 1 lugar acessível por 50 lugares",
+      "enabled": true,
+      "tags": ["estacionamento", "acessível", "PMR"]
+    },
+    {
+      "id": "ACESS-ESTAC-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.8.1 — Estacionamento (Dimensões – largura)",
+      "description": "A largura do lugar de estacionamento acessível ({accessibility.parkingSpaceWidth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.parkingSpaceWidth", "operator": "<", "value": 3.50 }
+      ],
+      "currentValueTemplate": "{accessibility.parkingSpaceWidth} m × {accessibility.parkingSpaceLength} m",
+      "requiredValue": "≥ 3.50 m × 5.00 m; faixa lateral ≥ 1.00 m",
+      "remediation": "Os lugares de estacionamento acessíveis devem ter dimensões mínimas de 3.50m de largura por 5.00m de comprimento, incluindo uma faixa lateral de acesso com pelo menos 1.00m de largura. Esta faixa deve ser demarcada no pavimento e estar ao mesmo nível que o lugar de estacionamento.",
+      "enabled": true,
+      "tags": ["estacionamento", "dimensões", "faixa lateral", "PMR"]
+    },
+    {
+      "id": "ACESS-ESTAC-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.8.1 — Estacionamento (Dimensões – comprimento)",
+      "description": "O comprimento do lugar de estacionamento acessível ({accessibility.parkingSpaceLength}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.parkingSpaceLength", "operator": "<", "value": 5.00 }
+      ],
+      "currentValueTemplate": "{accessibility.parkingSpaceLength} m",
+      "requiredValue": "≥ 5.00 m (comprimento mínimo)",
+      "remediation": "O comprimento do lugar de estacionamento acessível deve ser no mínimo 5.00m.",
+      "enabled": true,
+      "tags": ["estacionamento", "dimensões", "comprimento"]
+    },
+    {
+      "id": "ACESS-ESTAC-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.8 — Estacionamento (Corredor lateral)",
+      "description": "A largura do corredor lateral de acesso ao lugar de estacionamento acessível ({accessibility.parkingAislWidth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.parkingAislWidth", "operator": "<", "value": 1.00 }
+      ],
+      "currentValueTemplate": "{accessibility.parkingAislWidth} m",
+      "requiredValue": "≥ 1.00 m (corredor lateral de acesso)",
+      "remediation": "O corredor lateral de acesso ao lugar de estacionamento acessível deve ter largura mínima de 1.00m, demarcado no pavimento e ao mesmo nível do lugar.",
+      "enabled": true,
+      "tags": ["estacionamento", "corredor lateral", "acesso"]
+    },
+    {
+      "id": "ACESS-ESTAC-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.8 — Estacionamento (Sinalização)",
+      "description": "Os lugares de estacionamento acessíveis devem possuir sinalização com símbolo internacional de acessibilidade e pavimento com cor contrastante.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.parkingHasSignage", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem sinalização adequada",
+      "requiredValue": "Símbolo internacional de acessibilidade; pavimento com cor contrastante",
+      "remediation": "Sinalizar os lugares de estacionamento acessíveis com o símbolo internacional de acessibilidade, visível tanto na vertical (placa) como na horizontal (pavimento). Aplicar cor contrastante no pavimento do lugar para facilitar a sua identificação.",
+      "enabled": true,
+      "tags": ["estacionamento", "sinalização", "símbolo", "contraste"]
+    },
+    {
+      "id": "ACESS-ESTAC-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.8 — Estacionamento (Quantidade – hospitais)",
+      "description": "Hospitais devem prever pelo menos 2 lugares acessíveis por cada 50 lugares de estacionamento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.accessibleParkingCount", "operator": "<", "value": 2 },
+        { "field": "buildingType", "operator": "==", "value": "hospital" }
+      ],
+      "currentValueTemplate": "{accessibility.accessibleParkingCount} lugares acessíveis",
+      "requiredValue": "≥ 2 lugares acessíveis por cada 50 lugares (hospitais)",
+      "remediation": "Em hospitais e equipamentos de saúde, prever pelo menos 2 lugares de estacionamento acessíveis por cada 50 lugares (mínimo de 2). Garantir percurso acessível desde os lugares até à entrada principal.",
+      "enabled": true,
+      "tags": ["estacionamento", "hospitais", "quantidade", "PMR"]
+    },
+    {
+      "id": "ACESS-WC-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Obrigatoriedade)",
+      "description": "O projeto não prevê instalação sanitária acessível.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.hasAccessibleWC", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "remediation": "Instalar pelo menos uma IS acessível: área mínima de rotação ⌀1.50m, sanita com barras de apoio, lavatório acessível, porta a abrir para fora.",
+      "requiredValue": "IS acessível obrigatória em edifícios públicos",
+      "enabled": true,
+      "tags": ["WC", "acessível", "PMR"]
+    },
+    {
+      "id": "ACESS-WC-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.2 — Instalações Sanitárias (Dimensões mínimas)",
+      "description": "A área da instalação sanitária acessível ({accessibility.wcArea} m²) é inferior às dimensões mínimas regulamentares.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.wcArea", "operator": "<", "value": 2.88 }
+      ],
+      "currentValueTemplate": "{accessibility.wcArea} m²",
+      "requiredValue": "≥ 2.88 m² (1.60 m × 1.80 m mínimo)",
+      "remediation": "A instalação sanitária acessível deve ter dimensões mínimas de 1.60m × 1.80m (2.88 m²) e prever um espaço de rotação com diâmetro mínimo de 1.50m, livre de obstáculos. Reconfigurar a compartimentação se necessário.",
+      "enabled": true,
+      "tags": ["WC", "dimensões", "área", "PMR"]
+    },
+    {
+      "id": "ACESS-WC-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.7 — Instalações Sanitárias (Barras de apoio – altura mínima)",
+      "description": "A altura das barras de apoio na IS acessível ({accessibility.grabBarHeight}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.grabBarHeight", "operator": "<", "value": 0.70 }
+      ],
+      "currentValueTemplate": "{accessibility.grabBarHeight} m",
+      "requiredValue": "0.70 m – 0.75 m; comprimento ≥ 0.60 m; rebatíveis do lado da transferência",
+      "remediation": "Instalar barras de apoio horizontais a uma altura entre 0.70m e 0.75m. As barras devem ter comprimento mínimo de 0.60m, ser rebatíveis do lado da transferência e fixas do lado da parede. Garantir capacidade de carga mínima de 1.5 kN.",
+      "enabled": true,
+      "tags": ["WC", "barras de apoio", "PMR", "transferência"]
+    },
+    {
+      "id": "ACESS-WC-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.10 — Instalações Sanitárias (Lavatório – bordo superior)",
+      "description": "A altura do bordo superior do lavatório acessível ({accessibility.washbasinHeight}m) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.washbasinHeight", "operator": ">", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.washbasinHeight} m",
+      "requiredValue": "Bordo superior ≤ 0.80 m; espaço livre inferior h ≥ 0.65 m",
+      "remediation": "Instalar o lavatório com o bordo superior a uma altura máxima de 0.80m do piso. Garantir espaço livre inferior com altura mínima de 0.65m para permitir a aproximação frontal de cadeira de rodas. Utilizar sifão embutido ou deslocado para a parede.",
+      "enabled": true,
+      "tags": ["WC", "lavatório", "altura", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-WC-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.5 — Instalações Sanitárias (Sanita – altura)",
+      "description": "A altura do assento da sanita ({accessibility.toiletSeatHeight}m) não está dentro do intervalo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.toiletSeatHeight", "operator": "<", "value": 0.45 }
+      ],
+      "currentValueTemplate": "{accessibility.toiletSeatHeight} m",
+      "requiredValue": "0.45 m – 0.50 m",
+      "remediation": "A altura do assento da sanita deve estar entre 0.45m e 0.50m do piso acabado, para facilitar a transferência a partir de uma cadeira de rodas. Instalar sanita suspensa ou de altura ajustável se necessário.",
+      "enabled": true,
+      "tags": ["WC", "sanita", "altura", "transferência"]
+    },
+    {
+      "id": "ACESS-WC-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.5 — Instalações Sanitárias (Sanita – altura máxima)",
+      "description": "A altura do assento da sanita ({accessibility.toiletSeatHeight}m) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.toiletSeatHeight", "operator": ">", "value": 0.50 }
+      ],
+      "currentValueTemplate": "{accessibility.toiletSeatHeight} m",
+      "requiredValue": "0.45 m – 0.50 m",
+      "remediation": "Reduzir a altura do assento da sanita para o intervalo de 0.45m a 0.50m. Uma sanita demasiado alta dificulta a transferência de e para a cadeira de rodas.",
+      "enabled": true,
+      "tags": ["WC", "sanita", "altura máxima"]
+    },
+    {
+      "id": "ACESS-WC-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.5 — Instalações Sanitárias (Sanita – distância lateral à parede)",
+      "description": "A distância lateral da sanita à parede ({accessibility.toiletWallDistance}m) não está dentro do intervalo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.toiletWallDistance", "operator": "<", "value": 0.75 }
+      ],
+      "currentValueTemplate": "{accessibility.toiletWallDistance} m",
+      "requiredValue": "0.75 m – 0.80 m (distância do eixo da sanita à parede lateral)",
+      "remediation": "Posicionar a sanita de modo a que a distância lateral entre o eixo da sanita e a parede mais próxima esteja entre 0.75m e 0.80m, para permitir a transferência lateral a partir de uma cadeira de rodas.",
+      "enabled": true,
+      "tags": ["WC", "sanita", "distância", "parede", "transferência"]
+    },
+    {
+      "id": "ACESS-WC-08",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.7 — Instalações Sanitárias (Barras de apoio – altura máxima)",
+      "description": "A altura das barras de apoio ({accessibility.grabBarHeight}m) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.grabBarHeight", "operator": ">", "value": 0.75 }
+      ],
+      "currentValueTemplate": "{accessibility.grabBarHeight} m",
+      "requiredValue": "0.70 m – 0.75 m",
+      "remediation": "Reposicionar as barras de apoio para uma altura entre 0.70m e 0.75m do piso acabado.",
+      "enabled": true,
+      "tags": ["WC", "barras de apoio", "altura máxima"]
+    },
+    {
+      "id": "ACESS-WC-09",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.7 — Instalações Sanitárias (Barras de apoio – comprimento)",
+      "description": "O comprimento das barras de apoio ({accessibility.grabBarLength}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.grabBarLength", "operator": "<", "value": 0.60 }
+      ],
+      "currentValueTemplate": "{accessibility.grabBarLength} m",
+      "requiredValue": "≥ 0.60 m",
+      "remediation": "As barras de apoio devem ter comprimento mínimo de 0.60m. A barra do lado da transferência deve ser rebatível e a do lado da parede deve ser fixa.",
+      "enabled": true,
+      "tags": ["WC", "barras de apoio", "comprimento"]
+    },
+    {
+      "id": "ACESS-WC-10",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.10 — Instalações Sanitárias (Lavatório – espaço inferior)",
+      "description": "O espaço livre inferior do lavatório ({accessibility.washbasinClearanceHeight}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.washbasinClearanceHeight", "operator": "<", "value": 0.65 }
+      ],
+      "currentValueTemplate": "{accessibility.washbasinClearanceHeight} m",
+      "requiredValue": "≥ 0.65 m (espaço livre inferior)",
+      "remediation": "Garantir espaço livre inferior ao lavatório com altura mínima de 0.65m para aproximação frontal de cadeira de rodas. Utilizar sifão embutido ou deslocado para a parede para maximizar o espaço disponível.",
+      "enabled": true,
+      "tags": ["WC", "lavatório", "espaço inferior", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-WC-11",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.10 — Instalações Sanitárias (Lavatório – profundidade)",
+      "description": "A profundidade do espaço livre inferior do lavatório ({accessibility.washbasinClearanceDepth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.washbasinClearanceDepth", "operator": "<", "value": 0.50 }
+      ],
+      "currentValueTemplate": "{accessibility.washbasinClearanceDepth} m",
+      "requiredValue": "≥ 0.50 m (profundidade do espaço livre inferior)",
+      "remediation": "Garantir uma profundidade mínima de 0.50m no espaço livre inferior ao lavatório para permitir a aproximação frontal adequada de uma cadeira de rodas.",
+      "enabled": true,
+      "tags": ["WC", "lavatório", "profundidade", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-WC-12",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Espelho)",
+      "description": "A base do espelho na IS acessível ({accessibility.mirrorBaseHeight}m) está acima do máximo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.mirrorBaseHeight", "operator": ">", "value": 0.90 }
+      ],
+      "currentValueTemplate": "Base do espelho a {accessibility.mirrorBaseHeight} m",
+      "requiredValue": "Base ≤ 0.90 m; inclinável ou com altura total visível",
+      "remediation": "O espelho deve ter a base inferior a uma altura máxima de 0.90m do piso, ou ser inclinável, para permitir a utilização por pessoas sentadas em cadeira de rodas. Alternativamente, instalar espelho de corpo inteiro com base ao nível do piso.",
+      "enabled": true,
+      "tags": ["WC", "espelho", "altura", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-WC-13",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Acessórios – altura)",
+      "description": "A altura dos acessórios na IS acessível ({accessibility.wcAccessoryHeight}m) não está dentro do intervalo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.wcAccessoryHeight", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.wcAccessoryHeight} m",
+      "requiredValue": "0.80 m – 1.10 m; contraste cromático",
+      "remediation": "Instalar todos os acessórios da IS acessível (dispensadores de sabão, toalhas, secadores de mãos) a uma altura entre 0.80m e 1.10m do piso. Os acessórios devem ter contraste cromático com a parede envolvente.",
+      "enabled": true,
+      "tags": ["WC", "acessórios", "altura", "contraste"]
+    },
+    {
+      "id": "ACESS-WC-14",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Acessórios – altura máxima)",
+      "description": "A altura dos acessórios na IS acessível ({accessibility.wcAccessoryHeight}m) excede o máximo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.wcAccessoryHeight", "operator": ">", "value": 1.10 }
+      ],
+      "currentValueTemplate": "{accessibility.wcAccessoryHeight} m",
+      "requiredValue": "0.80 m – 1.10 m",
+      "remediation": "Reposicionar os acessórios da IS acessível para uma altura máxima de 1.10m do piso.",
+      "enabled": true,
+      "tags": ["WC", "acessórios", "altura máxima"]
+    },
+    {
+      "id": "ACESS-WC-15",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Porta – largura)",
+      "description": "A largura da porta da IS acessível ({accessibility.wcDoorWidth}m) é inferior ao mínimo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.wcDoorWidth", "operator": "<", "value": 0.87 }
+      ],
+      "currentValueTemplate": "{accessibility.wcDoorWidth} m",
+      "requiredValue": "≥ 0.87 m",
+      "remediation": "A porta da IS acessível deve ter abertura útil mínima de 0.87m. Alargar o vão de porta ou substituir por porta de correr se necessário.",
+      "enabled": true,
+      "tags": ["WC", "porta", "largura", "acessível"]
+    },
+    {
+      "id": "ACESS-WC-16",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Porta – sentido de abertura)",
+      "description": "A porta da IS acessível deve abrir para fora ou ser de correr.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.wcDoorOpensOutward", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Porta abre para dentro",
+      "requiredValue": "Porta abre para fora ou é de correr",
+      "remediation": "A porta da IS acessível deve abrir para fora do compartimento ou ser de correr, para não reduzir o espaço interior de manobra e para permitir socorro em caso de emergência.",
+      "enabled": true,
+      "tags": ["WC", "porta", "abertura", "fora", "emergência"]
+    },
+    {
+      "id": "ACESS-WC-17",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9 — Instalações Sanitárias (Trinco desbloqueável)",
+      "description": "O trinco da porta da IS acessível deve ser desbloqueável pelo exterior em caso de emergência.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.wcDoorUnlockableFromOutside", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Trinco não desbloqueável pelo exterior",
+      "requiredValue": "Trinco desbloqueável pelo exterior em emergência",
+      "remediation": "Instalar trinco que possa ser desbloqueado pelo exterior em caso de emergência. O trinco deve ser operável com uma mão e sem necessidade de rodar o pulso (tipo alavanca ou similar).",
+      "enabled": true,
+      "tags": ["WC", "porta", "trinco", "emergência", "desbloqueável"]
+    },
+    {
+      "id": "ACESS-WC-18",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.9.3 — Instalações Sanitárias (Zona de rotação)",
+      "description": "O espaço de rotação livre na IS acessível ({accessibility.wcTurningDiameter}m) é inferior ao mínimo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.wcTurningDiameter", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "⌀ {accessibility.wcTurningDiameter} m",
+      "requiredValue": "⌀ ≥ 1.50 m (livre de obstáculos)",
+      "remediation": "Garantir um espaço de rotação com diâmetro mínimo de 1.50m, livre de obstáculos, no interior da IS acessível. Este espaço deve permitir a rotação completa de uma cadeira de rodas.",
+      "enabled": true,
+      "tags": ["WC", "rotação", "diâmetro", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-BALCAO-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.1 — Balcões de Atendimento (Altura)",
+      "description": "A altura do balcão de atendimento ({accessibility.counterHeight}m) excede o máximo regulamentar para acessibilidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.counterHeight", "operator": ">", "value": 0.85 }
+      ],
+      "currentValueTemplate": "{accessibility.counterHeight} m",
+      "requiredValue": "≤ 0.85 m; extensão acessível ≥ 0.80 m; espaço livre inferior",
+      "remediation": "Prever pelo menos uma secção do balcão de atendimento com altura máxima de 0.85m e extensão mínima de 0.80m. Garantir espaço livre inferior (profundidade ≥ 0.30m, altura ≥ 0.65m) para aproximação frontal de cadeira de rodas.",
+      "enabled": true,
+      "tags": ["balcão", "atendimento", "altura", "PMR"]
+    },
+    {
+      "id": "ACESS-BALCAO-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.1 — Balcões de Atendimento (Extensão acessível)",
+      "description": "A extensão da secção acessível do balcão de atendimento ({accessibility.counterAccessibleLength}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.counterAccessibleLength", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.counterAccessibleLength} m",
+      "requiredValue": "≥ 0.80 m (extensão acessível)",
+      "remediation": "A secção acessível do balcão de atendimento deve ter extensão mínima de 0.80m, para permitir o atendimento confortável de pessoas em cadeira de rodas.",
+      "enabled": true,
+      "tags": ["balcão", "extensão", "acessível"]
+    },
+    {
+      "id": "ACESS-BALCAO-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.1 — Balcões de Atendimento (Espaço inferior)",
+      "description": "O balcão de atendimento acessível não possui espaço livre inferior adequado para aproximação de cadeira de rodas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.counterHasKneeSpace", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem espaço inferior para cadeira de rodas",
+      "requiredValue": "Espaço inferior com h ≥ 0.65 m e profundidade adequada",
+      "remediation": "Garantir espaço livre inferior na secção acessível do balcão com altura mínima de 0.65m, para permitir a aproximação frontal de cadeira de rodas.",
+      "enabled": true,
+      "tags": ["balcão", "espaço inferior", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-MESA-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.2 — Mesas e Superfícies de Trabalho (Altura mínima)",
+      "description": "A altura das mesas/superfícies de trabalho ({accessibility.tableHeight}m) é inferior ao mínimo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.tableHeight", "operator": "<", "value": 0.70 }
+      ],
+      "currentValueTemplate": "{accessibility.tableHeight} m",
+      "requiredValue": "0.70 m – 0.80 m; espaço inferior h ≥ 0.65 m",
+      "remediation": "As mesas e superfícies de trabalho acessíveis devem ter altura entre 0.70m e 0.80m. Garantir espaço livre inferior com altura mínima de 0.65m para aproximação de cadeira de rodas.",
+      "enabled": true,
+      "tags": ["mesa", "superfície", "altura", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-MESA-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.2 — Mesas e Superfícies de Trabalho (Altura máxima)",
+      "description": "A altura das mesas/superfícies de trabalho ({accessibility.tableHeight}m) excede o máximo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.tableHeight", "operator": ">", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.tableHeight} m",
+      "requiredValue": "0.70 m – 0.80 m",
+      "remediation": "Reduzir a altura das mesas/superfícies de trabalho para o intervalo de 0.70m a 0.80m, garantindo acessibilidade a utilizadores de cadeiras de rodas.",
+      "enabled": true,
+      "tags": ["mesa", "superfície", "altura máxima"]
+    },
+    {
+      "id": "ACESS-MESA-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.2 — Mesas e Superfícies de Trabalho (Espaço inferior)",
+      "description": "O espaço livre inferior das mesas ({accessibility.tableKneeSpace}m) é inferior ao mínimo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.tableKneeSpace", "operator": "<", "value": 0.65 }
+      ],
+      "currentValueTemplate": "{accessibility.tableKneeSpace} m",
+      "requiredValue": "≥ 0.65 m (espaço livre inferior)",
+      "remediation": "Garantir espaço livre inferior às mesas com altura mínima de 0.65m para aproximação de cadeira de rodas.",
+      "enabled": true,
+      "tags": ["mesa", "espaço inferior", "cadeira de rodas"]
+    },
+    {
+      "id": "ACESS-TEATRO-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.3 — Lugares Reservados para PMR (Quantidade)",
+      "description": "O número de lugares reservados para pessoas com mobilidade reduzida é insuficiente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.reservedSeats", "operator": "<", "value": 2 },
+        { "field": "accessibility.venueCapacity", "operator": "<=", "value": 500 }
+      ],
+      "currentValueTemplate": "{accessibility.reservedSeats} lugares reservados para {accessibility.venueCapacity} lugares totais",
+      "requiredValue": "≥ 2 lugares PMR (até 500 lugares); +1 por cada 250 lugares adicionais",
+      "remediation": "Em salas com capacidade até 500 lugares, prever no mínimo 2 lugares reservados para pessoas com mobilidade reduzida. Para capacidades superiores, acrescentar 1 lugar por cada 250 lugares adicionais. Os lugares devem estar localizados junto a percursos acessíveis, com dimensões mínimas de 0.80m × 1.20m.",
+      "enabled": true,
+      "tags": ["teatro", "lugares", "PMR", "reservados"]
+    },
+    {
+      "id": "ACESS-TEATRO-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.3 — Lugares Reservados para PMR (Dimensões)",
+      "description": "As dimensões do lugar reservado para PMR ({accessibility.reservedSeatWidth}m × {accessibility.reservedSeatDepth}m) são inferiores ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.reservedSeatWidth", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{accessibility.reservedSeatWidth} m × {accessibility.reservedSeatDepth} m",
+      "requiredValue": "≥ 0.80 m × 1.20 m + espaço para acompanhante adjacente",
+      "remediation": "Cada lugar reservado para PMR deve ter dimensões mínimas de 0.80m de largura por 1.20m de profundidade. Prever espaço adjacente para acompanhante. Os lugares devem estar localizados junto a percursos acessíveis e oferecer visibilidade adequada.",
+      "enabled": true,
+      "tags": ["teatro", "lugares", "dimensões", "PMR"]
+    },
+    {
+      "id": "ACESS-TEATRO-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.3 — Lugares Reservados para PMR (Profundidade)",
+      "description": "A profundidade do lugar reservado para PMR ({accessibility.reservedSeatDepth}m) é inferior ao mínimo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.reservedSeatDepth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{accessibility.reservedSeatDepth} m",
+      "requiredValue": "≥ 1.20 m (profundidade mínima)",
+      "remediation": "A profundidade do lugar reservado para PMR deve ser no mínimo 1.20m para acomodar uma cadeira de rodas.",
+      "enabled": true,
+      "tags": ["teatro", "lugares", "profundidade", "PMR"]
+    },
+    {
+      "id": "ACESS-SINAL-01",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.1 — Símbolo Internacional de Acessibilidade",
+      "description": "Os percursos e espaços acessíveis devem estar sinalizados com o símbolo internacional de acessibilidade.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.hasAccessibilitySymbol", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Sem símbolo internacional de acessibilidade",
+      "requiredValue": "Símbolo internacional de acessibilidade nos percursos e espaços acessíveis",
+      "remediation": "Instalar o símbolo internacional de acessibilidade (SIA) em todos os percursos, entradas, estacionamentos, instalações sanitárias e espaços acessíveis. O símbolo deve ser de dimensão adequada e com contraste cromático suficiente para fácil identificação.",
+      "enabled": true,
+      "tags": ["sinalização", "símbolo", "acessibilidade", "internacional"]
+    },
+    {
+      "id": "ACESS-SINAL-02",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.2 — Sinalização Visual e Tátil",
+      "description": "Os percursos acessíveis devem dispor de sinalização visual e tátil adequada.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.hasVisualTactileSignage", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "exclusions": [
+        { "field": "numberOfDwellings", "operator": "<=", "value": 4 }
+      ],
+      "currentValueTemplate": "Sem sinalização visual e tátil adequada",
+      "requiredValue": "Sinalização visual e tátil nos percursos; faixas guia no piso; Braille em portas e botões",
+      "remediation": "Instalar sinalização visual e tátil nos percursos acessíveis, incluindo faixas guia no pavimento e informação em Braille nos pisos e portas. As faixas guia devem ter textura e cor diferenciadas do pavimento envolvente.",
+      "enabled": true,
+      "tags": ["sinalização", "visual", "tátil", "Braille", "faixas guia"]
+    },
+    {
+      "id": "ACESS-SINAL-03",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.2 — Braille em Portas e Botões",
+      "description": "As portas dos compartimentos e os botões de comando devem possuir informação em Braille.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.hasBrailleOnDoorsAndButtons", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Sem Braille em portas e botões",
+      "requiredValue": "Informação em Braille em portas de compartimentos e botões de comando",
+      "remediation": "Instalar informação em Braille nas portas dos compartimentos (identificação do espaço) e nos botões de comando (ascensores, interruptores). O Braille deve ser colocado à esquerda ou abaixo do elemento correspondente.",
+      "enabled": true,
+      "tags": ["sinalização", "Braille", "portas", "botões", "deficiência visual"]
+    },
+    {
+      "id": "ACESS-SINAL-04",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.3 — Piso Tátil de Alerta (Largura)",
+      "description": "A largura do piso tátil de alerta ({accessibility.tactileAlertWidth}m) é inferior ao mínimo regulamentar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.tactileAlertWidth", "operator": "<", "value": 0.40 }
+      ],
+      "currentValueTemplate": "{accessibility.tactileAlertWidth} m",
+      "requiredValue": "≥ 0.40 m de largura antes de obstáculos e mudanças",
+      "remediation": "O piso tátil de alerta deve ter largura mínima de 0.40m e ser instalado antes de obstáculos, mudanças de nível, início e fim de escadas e rampas. Deve ter contraste cromático com o pavimento envolvente.",
+      "enabled": true,
+      "tags": ["sinalização", "piso tátil", "alerta", "largura"]
+    },
+    {
+      "id": "ACESS-SINAL-05",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.2 — Faixas Guia no Piso",
+      "description": "Os percursos acessíveis em edifícios públicos devem dispor de faixas guia no pavimento para orientação de pessoas com deficiência visual.",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.hasGuidingStrips", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Sem faixas guia no pavimento",
+      "requiredValue": "Faixas guia contínuas nos percursos acessíveis principais",
+      "remediation": "Instalar faixas guia no pavimento dos percursos acessíveis principais, com textura de barras longitudinais diferenciada do pavimento envolvente. As faixas guia devem ser contínuas e conduzir aos principais pontos de interesse (recepção, escadas, ascensores, IS).",
+      "enabled": true,
+      "tags": ["sinalização", "faixas guia", "pavimento", "deficiência visual"]
+    },
+    {
+      "id": "ACESS-PERCURSO-09",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.2.2 — Percurso Acessível (Altura livre mínima)",
+      "description": "A altura livre do percurso acessível ({accessibility.pathClearHeight}m) é inferior ao mínimo regulamentar de 2.00m (Secção 2.2.2).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "accessibility.pathClearHeight", "operator": "<", "value": 2.00 }
+      ],
+      "currentValueTemplate": "{accessibility.pathClearHeight} m",
+      "requiredValue": "≥ 2.00 m (Secção 2.2.2)",
+      "remediation": "Garantir uma altura livre mínima de 2.00m em todo o percurso acessível (Secção 2.2.2). Remover ou elevar quaisquer obstáculos suspensos, tubagens, sinalética ou elementos estruturais que reduzam a altura livre abaixo de 2.00m.",
+      "enabled": true,
+      "tags": ["percurso", "altura livre", "2.00m", "acessibilidade"]
+    },
+    {
+      "id": "ACESS-ESTAC-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 3.2 — Estacionamento Residencial (Proporção de lugares acessíveis)",
+      "description": "Edifícios residenciais devem prever pelo menos 1 lugar de estacionamento acessível por cada 50 lugares (mínimo 1) conforme Secção 3.2.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.hasAccessibleParking", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "remediation": "Em edifícios residenciais, prever pelo menos 1 lugar de estacionamento acessível por cada 50 lugares (mínimo de 1), conforme Secção 3.2. Dimensões mínimas: 3.50m × 5.00m (Secção 2.8.1), com faixa lateral de acesso ≥ 1.00m.",
+      "requiredValue": "≥ 1 lugar acessível por cada 50 lugares, mínimo 1 (Secção 3.2)",
+      "enabled": true,
+      "tags": ["estacionamento", "residencial", "proporção", "PMR"]
+    },
+    {
+      "id": "ACESS-SINAL-06",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.3 — Contraste Tátil em Mudanças de Nível",
+      "description": "As mudanças de nível no percurso acessível devem possuir contraste tátil no pavimento para alerta de pessoas com deficiência visual (Secção 4.3).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.hasLevelChangeTactileContrast", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem contraste tátil nas mudanças de nível",
+      "requiredValue": "Contraste tátil obrigatório em todas as mudanças de nível (Secção 4.3)",
+      "remediation": "Instalar pavimento tátil de alerta (textura de botões truncados) no início e fim de rampas, escadas e em qualquer mudança de nível do percurso acessível. O piso tátil deve ter profundidade entre 0.40m e 0.60m e contraste cromático com o pavimento envolvente (Secção 4.3).",
+      "enabled": true,
+      "tags": ["sinalização", "contraste tátil", "mudança de nível", "alerta"]
+    },
+    {
+      "id": "ACESS-RAMPA-10",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 2.5.1 — Rampas (Inclinação ≤ 8% para extensão ≤ 2 m)",
+      "description": "A rampa com extensão até 2m e inclinação de {accessibility.rampGradient}% pode ter inclinação máxima de 8% (Secção 2.5.1).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "accessibility.rampGradient", "operator": ">", "value": 8 },
+        { "field": "accessibility.rampLength", "operator": "<=", "value": 2 }
+      ],
+      "currentValueTemplate": "{accessibility.rampGradient}% para {accessibility.rampLength} m",
+      "requiredValue": "≤ 8% para rampas com extensão ≤ 2 m (Secção 2.5.1)",
+      "remediation": "Mesmo para rampas curtas (extensão ≤ 2m), a inclinação máxima admissível é 8% (Secção 2.5.1). Reduzir a inclinação para cumprir este limite.",
+      "enabled": true,
+      "tags": ["rampa", "inclinação", "curta", "8%"]
+    },
+    {
+      "id": "ACESS-SINAL-07",
+      "regulationId": "dl-163-2006",
+      "article": "Secção 4.2 — Pavimento Tátil Direcional (Percursos exteriores)",
+      "description": "Os percursos acessíveis exteriores devem dispor de pavimento tátil direcional para orientação de pessoas com deficiência visual (Secção 4.2).",
+      "severity": "info",
+      "conditions": [
+        { "field": "accessibility.hasDirectionalTactilePaving", "operator": "==", "value": false },
+        { "field": "accessibility.hasExteriorPaths", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sem pavimento tátil direcional nos percursos exteriores",
+      "requiredValue": "Pavimento tátil direcional obrigatório em percursos exteriores (Secção 4.2)",
+      "remediation": "Instalar pavimento tátil direcional (textura de barras longitudinais) nos percursos acessíveis exteriores, desde a via pública até à entrada principal do edifício. O pavimento direcional deve ter largura mínima de 0.30m e contraste cromático com o pavimento envolvente (Secção 4.2).",
+      "enabled": true,
+      "tags": ["sinalização", "pavimento tátil", "direcional", "exterior"]
+    }
+  ]
+}

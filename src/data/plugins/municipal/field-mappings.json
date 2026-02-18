@@ -1,0 +1,577 @@
+{
+  "pluginId": "municipal",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras municipais e PDM (Plano Diretor Municipal)",
+  "fields": [
+    {
+      "_group": "Classificacao e Uso do Solo",
+      "field": "municipal.soilClassification",
+      "label": "Classificacao do solo",
+      "type": "select",
+      "options": [
+        { "value": "urban", "label": "Solo urbano" },
+        { "value": "rural", "label": "Solo rustico" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Classificacao do solo conforme o PDM vigente"
+    },
+    {
+      "_group": "Classificacao e Uso do Solo",
+      "field": "municipal.urbanSoilCategory",
+      "label": "Categoria de solo urbano",
+      "type": "select",
+      "options": [
+        { "value": "urbanized", "label": "Solo urbanizado" },
+        { "value": "urbanizable", "label": "Solo urbanizavel" },
+        { "value": "industrial", "label": "Solo industrial" },
+        { "value": "tourism", "label": "Solo turistico" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Subcategoria do solo urbano conforme a planta de ordenamento do PDM"
+    },
+    {
+      "_group": "Classificacao e Uso do Solo",
+      "field": "municipal.proposedUse",
+      "label": "Uso proposto",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial" },
+        { "value": "mixed", "label": "Uso misto" },
+        { "value": "industrial", "label": "Industrial" },
+        { "value": "services", "label": "Servicos" },
+        { "value": "tourism", "label": "Turismo" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Uso pretendido para o edificio ou fracao"
+    },
+    {
+      "_group": "Classificacao e Uso do Solo",
+      "field": "municipal.allowedUses",
+      "label": "Usos permitidos no local",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Usos admitidos pelo PDM para a parcela ou zona onde se localiza o imovel"
+    },
+    {
+      "_group": "Classificacao e Uso do Solo",
+      "field": "municipal.forbiddenUses",
+      "label": "Usos interditos no local",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Usos expressamente interditos pelo PDM para a parcela ou zona"
+    },
+
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.buildingUseIndex",
+      "label": "Indice de utilizacao proposto",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indice de utilizacao do solo proposto (racio entre area bruta de construcao e area do terreno)"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.buildingUseIndexMax",
+      "label": "Indice de utilizacao maximo (PDM)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indice de utilizacao maximo admitido pelo PDM para a zona"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.implantationIndex",
+      "label": "Indice de implantacao proposto",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indice de implantacao proposto (racio entre area de implantacao e area do terreno)"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.implantationIndexMax",
+      "label": "Indice de implantacao maximo (PDM)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indice de implantacao maximo admitido pelo PDM para a zona"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.maxHeight",
+      "label": "Altura maxima admitida (cercea)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Altura maxima do edificio (cercea) admitida pelo PDM"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.proposedHeight",
+      "label": "Altura proposta do edificio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "description": "Altura total proposta do edificio (cercea)"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.maxFloorsAbove",
+      "label": "Numero maximo de pisos acima do solo",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero maximo de pisos acima da cota de soleira admitido pelo PDM"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.proposedFloorsAbove",
+      "label": "Pisos acima do solo propostos",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "description": "Numero de pisos acima da cota de soleira propostos no projeto"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.maxFloorsBelow",
+      "label": "Numero maximo de pisos abaixo do solo",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero maximo de pisos abaixo da cota de soleira admitido pelo PDM"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.proposedFloorsBelow",
+      "label": "Pisos abaixo do solo propostos",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "description": "Numero de pisos abaixo da cota de soleira (caves) propostos no projeto"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.permeabilityIndex",
+      "label": "Indice de permeabilidade proposto",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indice de permeabilidade proposto (racio entre area permeavel e area total do lote)"
+    },
+    {
+      "_group": "Indices Urbanisticos",
+      "field": "municipal.permeabilityIndexMin",
+      "label": "Indice de permeabilidade minimo (PDM)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indice de permeabilidade minimo exigido pelo PDM para a zona"
+    },
+
+    {
+      "_group": "Afastamentos",
+      "field": "municipal.frontSetback",
+      "label": "Afastamento frontal proposto",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distancia proposta entre o alinhamento da fachada principal e o limite frontal do lote"
+    },
+    {
+      "_group": "Afastamentos",
+      "field": "municipal.frontSetbackMin",
+      "label": "Afastamento frontal minimo (PDM)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Afastamento frontal minimo exigido pelo PDM ou regulamento municipal"
+    },
+    {
+      "_group": "Afastamentos",
+      "field": "municipal.sideSetback",
+      "label": "Afastamento lateral proposto",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distancia proposta entre a fachada lateral e o limite lateral do lote"
+    },
+    {
+      "_group": "Afastamentos",
+      "field": "municipal.sideSetbackMin",
+      "label": "Afastamento lateral minimo (PDM)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Afastamento lateral minimo exigido pelo PDM ou regulamento municipal"
+    },
+    {
+      "_group": "Afastamentos",
+      "field": "municipal.rearSetback",
+      "label": "Afastamento posterior proposto",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distancia proposta entre a fachada posterior e o limite traseiro do lote"
+    },
+    {
+      "_group": "Afastamentos",
+      "field": "municipal.rearSetbackMin",
+      "label": "Afastamento posterior minimo (PDM)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Afastamento posterior minimo exigido pelo PDM ou regulamento municipal"
+    },
+
+    {
+      "_group": "Loteamento",
+      "field": "municipal.lotArea",
+      "label": "Area do lote",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Area total do lote onde se insere o projeto"
+    },
+    {
+      "_group": "Loteamento",
+      "field": "municipal.lotAreaMin",
+      "label": "Area minima do lote (PDM)",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Area minima do lote exigida pelo PDM para a tipologia proposta"
+    },
+    {
+      "_group": "Loteamento",
+      "field": "municipal.lotFrontage",
+      "label": "Frente do lote",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Largura da frente do lote confinante com a via publica"
+    },
+    {
+      "_group": "Loteamento",
+      "field": "municipal.lotFrontageMin",
+      "label": "Frente minima do lote (PDM)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Largura minima da frente do lote exigida pelo PDM"
+    },
+
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInRAN",
+      "label": "Localizacao em RAN (Reserva Agricola Nacional)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em area de Reserva Agricola Nacional"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInREN",
+      "label": "Localizacao em REN (Reserva Ecologica Nacional)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em area de Reserva Ecologica Nacional"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.distanceToWaterDomain",
+      "label": "Distancia ao dominio hidrico publico",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distancia do edificio ao limite do dominio hidrico publico (margem de rio, ribeira, lago)"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.waterDomainBufferMin",
+      "label": "Faixa de protecao ao dominio hidrico minima",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Largura minima da faixa de protecao ao dominio hidrico publico (Lei 54/2005)"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInRoadEasement",
+      "label": "Localizacao em servidao rodoviaria",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno esta sujeito a servidao non aedificandi rodoviaria"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInRailEasement",
+      "label": "Localizacao em servidao ferroviaria",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno esta sujeito a servidao non aedificandi ferroviaria"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInAeronauticEasement",
+      "label": "Localizacao em servidao aeronautica",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno esta sujeito a servidao aeronautica"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInMilitaryEasement",
+      "label": "Localizacao em servidao militar",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno esta sujeito a servidao militar"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInHeritageProtectionZone",
+      "label": "Localizacao em zona de protecao patrimonial",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em zona de protecao de imovel classificado ou em vias de classificacao"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInFloodZone",
+      "label": "Localizacao em zona inundavel",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em zona sujeita a risco de inundacao"
+    },
+    {
+      "_group": "Servidoes e Condicionantes",
+      "field": "municipal.isInGeotechnicalRiskArea",
+      "label": "Localizacao em zona de risco geotecnico",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em zona identificada com risco geotecnico (deslizamentos, erosao)"
+    },
+
+    {
+      "_group": "Estacionamento",
+      "field": "municipal.parkingSpacesPerUnit",
+      "label": "Lugares de estacionamento por fracao (proposto)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero de lugares de estacionamento propostos por fracao ou fogo"
+    },
+    {
+      "_group": "Estacionamento",
+      "field": "municipal.parkingSpacesPerUnitMin",
+      "label": "Lugares de estacionamento por fracao (minimo PDM)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "residential": 1 },
+      "description": "Numero minimo de lugares de estacionamento por fracao exigido pelo PDM"
+    },
+    {
+      "_group": "Estacionamento",
+      "field": "municipal.commercialParkingRatio",
+      "label": "Racio de estacionamento comercial (proposto)",
+      "type": "number",
+      "unit": "lugares/m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Racio de lugares de estacionamento por m2 de area comercial proposto"
+    },
+    {
+      "_group": "Estacionamento",
+      "field": "municipal.commercialParkingRatioMin",
+      "label": "Racio de estacionamento comercial (minimo PDM)",
+      "type": "number",
+      "unit": "lugares/m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Racio minimo de lugares de estacionamento por m2 de area comercial exigido pelo PDM"
+    },
+    {
+      "_group": "Estacionamento",
+      "field": "municipal.accessibleParkingSpaces",
+      "label": "Lugares de estacionamento acessiveis (proposto)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero de lugares de estacionamento reservados para pessoas com mobilidade condicionada"
+    },
+    {
+      "_group": "Estacionamento",
+      "field": "municipal.accessibleParkingSpacesMin",
+      "label": "Lugares de estacionamento acessiveis (minimo)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero minimo de lugares acessiveis exigido pelo DL 163/2006"
+    },
+
+    {
+      "_group": "Espacos Exteriores",
+      "field": "municipal.backyardArea",
+      "label": "Area de logradouro proposta",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Area de logradouro proposta no projeto"
+    },
+    {
+      "_group": "Espacos Exteriores",
+      "field": "municipal.backyardAreaMin",
+      "label": "Area de logradouro minima (PDM)",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Area minima de logradouro exigida pelo PDM"
+    },
+    {
+      "_group": "Espacos Exteriores",
+      "field": "municipal.collectiveGreenArea",
+      "label": "Area verde coletiva proposta",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Area de espaco verde de utilizacao coletiva proposta no projeto de loteamento"
+    },
+    {
+      "_group": "Espacos Exteriores",
+      "field": "municipal.collectiveGreenAreaMin",
+      "label": "Area verde coletiva minima (PDM)",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Area minima de espaco verde de utilizacao coletiva exigida pelo PDM"
+    },
+    {
+      "_group": "Espacos Exteriores",
+      "field": "municipal.backyardPermeableRatio",
+      "label": "Percentagem permeavel do logradouro (proposta)",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem de area permeavel no logradouro proposta no projeto"
+    },
+    {
+      "_group": "Espacos Exteriores",
+      "field": "municipal.backyardPermeableRatioMin",
+      "label": "Percentagem permeavel do logradouro (minima PDM)",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Percentagem minima de area permeavel no logradouro exigida pelo PDM"
+    },
+
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.hasPublicWaterConnection",
+      "label": "Ligacao a rede publica de agua",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o edificio esta ligado a rede publica de abastecimento de agua"
+    },
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.publicWaterNetworkAvailable",
+      "label": "Rede publica de agua disponivel",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe rede publica de abastecimento de agua junto ao lote"
+    },
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.hasPublicSewerConnection",
+      "label": "Ligacao a rede publica de esgotos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o edificio esta ligado a rede publica de drenagem de aguas residuais"
+    },
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.publicSewerNetworkAvailable",
+      "label": "Rede publica de esgotos disponivel",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe rede publica de drenagem de aguas residuais junto ao lote"
+    },
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.hasElectricalConnection",
+      "label": "Ligacao a rede eletrica",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o edificio esta ligado a rede publica de distribuicao de energia eletrica"
+    },
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.electricalNetworkAvailable",
+      "label": "Rede eletrica disponivel",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe rede publica de distribuicao de energia eletrica junto ao lote"
+    },
+    {
+      "_group": "Infraestruturas",
+      "field": "municipal.hasITEDConnection",
+      "label": "Ligacao ITED (telecomunicacoes)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o edificio possui infraestrutura de telecomunicacoes conforme ITED (DL 123/2009)"
+    }
+  ]
+}

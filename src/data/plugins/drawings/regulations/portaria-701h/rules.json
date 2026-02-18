@@ -1,0 +1,833 @@
+{
+  "regulationRef": "portaria-701h-2008",
+  "description": "Regras de qualidade das peças desenhadas extraídas da Portaria 701-H/2008, ISO 128, ISO 3098, NP EN ISO 7518, NP EN ISO 7519, ISO 216 e NP 49",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "DRW-LOC-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Planta de localização",
+      "description": "O projeto deve incluir planta de localização a escala adequada (1:1000 a 1:25000), identificando o terreno no contexto urbano ou rural.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasLocationPlan", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasLocationPlan}",
+      "requiredValue": "Planta de localização obrigatória",
+      "remediation": "Incluir planta de localização a escala entre 1:1000 e 1:25000, com indicação clara do terreno, arruamentos e referências geográficas envolventes.",
+      "enabled": true,
+      "tags": ["planta", "localização", "escala", "portaria-701h"]
+    },
+    {
+      "id": "DRW-LOC-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escala da planta de localização",
+      "description": "A planta de localização deve ter escala entre 1:1000 e 1:25000 conforme a dimensão do empreendimento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.locationPlanScale", "operator": ">", "value": 25000 }
+      ],
+      "currentValueTemplate": "1:{drawings.locationPlanScale}",
+      "requiredValue": "<= 1:25000",
+      "remediation": "Ajustar a escala da planta de localização para um valor entre 1:1000 e 1:25000. Para áreas urbanas, recomenda-se 1:1000 a 1:5000.",
+      "enabled": true,
+      "tags": ["escala", "localização", "portaria-701h"]
+    },
+    {
+      "id": "DRW-IMP-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Planta de implantação",
+      "description": "O projeto deve incluir planta de implantação a escala adequada (1:200 a 1:500), com a posição do edifício no lote.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasImplantationPlan", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasImplantationPlan}",
+      "requiredValue": "Planta de implantação obrigatória",
+      "remediation": "Incluir planta de implantação a escala 1:200 ou 1:500, com limites do lote, edifício, acessos, alinhamentos e cotas de implantação.",
+      "enabled": true,
+      "tags": ["planta", "implantação", "escala", "portaria-701h"]
+    },
+    {
+      "id": "DRW-IMP-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escala da planta de implantação",
+      "description": "A planta de implantação deve ter escala entre 1:200 e 1:500.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.implantationPlanScale", "operator": ">", "value": 500 }
+      ],
+      "currentValueTemplate": "1:{drawings.implantationPlanScale}",
+      "requiredValue": "<= 1:500",
+      "remediation": "Ajustar a escala da planta de implantação para um valor entre 1:200 e 1:500, garantindo legibilidade das cotas e limites do lote.",
+      "enabled": true,
+      "tags": ["escala", "implantação", "portaria-701h"]
+    },
+    {
+      "id": "DRW-PISOS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Plantas de pisos",
+      "description": "O projeto deve incluir plantas de todos os pisos distintos a escala 1:50 ou 1:100.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasFloorPlans", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasFloorPlans}",
+      "requiredValue": "Plantas de todos os pisos obrigatórias",
+      "remediation": "Incluir plantas de todos os pisos distintos (cave, r/c, pisos tipo, cobertura) a escala 1:50 (projeto de execução) ou 1:100 (estudo prévio/anteprojeto).",
+      "enabled": true,
+      "tags": ["planta", "pisos", "escala", "portaria-701h"]
+    },
+    {
+      "id": "DRW-PISOS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escala das plantas de pisos",
+      "description": "As plantas de pisos devem ter escala 1:50 ou 1:100 conforme a fase do projeto.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.floorPlanScale", "operator": ">", "value": 100 }
+      ],
+      "currentValueTemplate": "1:{drawings.floorPlanScale}",
+      "requiredValue": "<= 1:100",
+      "remediation": "Utilizar escala 1:100 para estudo prévio e anteprojeto, e escala 1:50 para projeto de execução. Escalas superiores a 1:100 não são admissíveis.",
+      "enabled": true,
+      "tags": ["escala", "pisos", "plantas", "portaria-701h"]
+    },
+    {
+      "id": "DRW-CORTES-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Cortes",
+      "description": "O projeto deve incluir no mínimo 2 cortes perpendiculares entre si, a escala 1:50 ou 1:100.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasSections", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasSections}",
+      "requiredValue": "Mínimo 2 cortes perpendiculares obrigatórios",
+      "remediation": "Incluir pelo menos 2 cortes perpendiculares (longitudinal e transversal) a escala 1:50 ou 1:100, com indicação de pés-direitos, cotas de nível e elementos estruturais.",
+      "enabled": true,
+      "tags": ["cortes", "secções", "escala", "portaria-701h"]
+    },
+    {
+      "id": "DRW-CORTES-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Número mínimo de cortes",
+      "description": "Devem existir pelo menos 2 cortes perpendiculares entre si para caracterizar o edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.sectionCount", "operator": "<", "value": 2 }
+      ],
+      "currentValueTemplate": "{drawings.sectionCount} cortes",
+      "requiredValue": ">= 2 cortes",
+      "remediation": "Adicionar cortes em falta. O projeto requer no mínimo um corte longitudinal e um transversal, passando por zonas representativas (escadas, elevadores, desníveis).",
+      "enabled": true,
+      "tags": ["cortes", "quantidade", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ALC-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Alçados",
+      "description": "O projeto deve incluir todos os alçados visíveis do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasElevations", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasElevations}",
+      "requiredValue": "Todos os alçados visíveis obrigatórios",
+      "remediation": "Incluir todos os alçados visíveis do edifício (frente, tardoz, laterais), a escala 1:50 ou 1:100, com indicação de materiais de revestimento e cotas de nível.",
+      "enabled": true,
+      "tags": ["alçados", "fachadas", "portaria-701h"]
+    },
+    {
+      "id": "DRW-DET-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Desenhos de pormenor",
+      "description": "O projeto de execução deve incluir desenhos de pormenor/detalhe a escala 1:5 a 1:20.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasDetails", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasDetails}",
+      "requiredValue": "Detalhes construtivos obrigatórios no projeto de execução",
+      "remediation": "Incluir pormenores construtivos a escala 1:5, 1:10 ou 1:20 para: ligações estruturais, impermeabilizações, caixilharias, remates, juntas e elementos singulares.",
+      "enabled": true,
+      "tags": ["detalhes", "pormenores", "escala", "portaria-701h"]
+    },
+    {
+      "id": "DRW-DET-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escala dos desenhos de pormenor",
+      "description": "Os desenhos de pormenor devem utilizar escalas entre 1:5 e 1:20.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.detailScale", "operator": ">", "value": 20 }
+      ],
+      "currentValueTemplate": "1:{drawings.detailScale}",
+      "requiredValue": "<= 1:20",
+      "remediation": "Ajustar a escala dos pormenores para 1:5, 1:10 ou 1:20. Pormenores a escalas superiores a 1:20 não permitem a leitura adequada dos elementos construtivos.",
+      "enabled": true,
+      "tags": ["escala", "detalhes", "pormenores", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ACAB-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Mapa de acabamentos",
+      "description": "O projeto de execução deve incluir mapa de acabamentos com descrição de todos os materiais de revestimento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasFinishesSchedule", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasFinishesSchedule}",
+      "requiredValue": "Mapa de acabamentos obrigatório",
+      "remediation": "Incluir mapa de acabamentos discriminando: pavimentos, paredes, tetos, rodapés e soleiras, por compartimento, com referência a materiais, cores e marcas de referência.",
+      "enabled": true,
+      "tags": ["acabamentos", "mapa", "materiais", "portaria-701h"]
+    },
+    {
+      "id": "DRW-VAOS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Mapa de vãos",
+      "description": "O projeto de execução deve incluir mapa de vãos (portas e janelas) com dimensões e características.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasOpeningsSchedule", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasOpeningsSchedule}",
+      "requiredValue": "Mapa de vãos obrigatório",
+      "remediation": "Incluir mapa de vãos com: tipo (porta/janela), dimensões (largura x altura), material, tipo de abertura, vidro, ferragens e referência no desenho.",
+      "enabled": true,
+      "tags": ["vãos", "mapa", "portas", "janelas", "portaria-701h"]
+    },
+    {
+      "id": "DRW-FASE-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 3.o -- Programa preliminar",
+      "description": "O programa preliminar deve incluir as peças escritas com objetivos, características e condicionamentos do projeto.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasPreliminaryProgram", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasPreliminaryProgram}",
+      "requiredValue": "Programa preliminar obrigatório",
+      "remediation": "Elaborar programa preliminar com: objetivos da obra, características funcionais, condicionamentos financeiros e de prazo, exigências de qualidade e regulamentação aplicável.",
+      "enabled": true,
+      "tags": ["fase", "programa-preliminar", "peças-escritas", "portaria-701h"]
+    },
+    {
+      "id": "DRW-FASE-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 4.o -- Estudo prévio",
+      "description": "O estudo prévio deve incluir peças escritas e desenhadas que permitam ao dono da obra apreciar as soluções propostas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasPreliminaryStudy", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasPreliminaryStudy}",
+      "requiredValue": "Estudo prévio com peças escritas e desenhadas",
+      "remediation": "Elaborar estudo prévio com: memória descritiva, plantas a 1:200/1:500, cortes e alçados esquemáticos, e estimativa de custo.",
+      "enabled": true,
+      "tags": ["fase", "estudo-prévio", "portaria-701h"]
+    },
+    {
+      "id": "DRW-FASE-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 5.o -- Anteprojeto",
+      "description": "O anteprojeto deve desenvolver as soluções aprovadas no estudo prévio, com peças escritas e desenhadas mais detalhadas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasPreliminaryDesign", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasPreliminaryDesign}",
+      "requiredValue": "Anteprojeto com peças escritas e desenhadas",
+      "remediation": "Elaborar anteprojeto com: memória descritiva e justificativa, plantas 1:100, cortes 1:100, alçados 1:100, estimativa orçamental e conformidade regulamentar.",
+      "enabled": true,
+      "tags": ["fase", "anteprojeto", "portaria-701h"]
+    },
+    {
+      "id": "DRW-FASE-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.o -- Projeto de execução",
+      "description": "O projeto de execução deve conter todas as peças escritas e desenhadas necessárias à boa execução da obra.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasExecutionProject", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasExecutionProject}",
+      "requiredValue": "Projeto de execução completo obrigatório",
+      "remediation": "O projeto de execução deve incluir: memória descritiva, cálculos, peças desenhadas a 1:50, pormenores, mapas de acabamentos e vãos, caderno de encargos, medições e orçamento.",
+      "enabled": true,
+      "tags": ["fase", "projeto-execução", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ESCALA-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escalas regulamentares",
+      "description": "As escalas dos desenhos devem ser adequadas ao tipo de peça desenhada e fase de projeto.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasCorrectScaleForPhase", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasCorrectScaleForPhase}",
+      "requiredValue": "Escalas regulamentares por tipo de desenho",
+      "remediation": "Utilizar escalas adequadas: localização 1:1000-1:25000, implantação 1:200-1:500, plantas 1:50-1:100, cortes 1:50-1:100, detalhes 1:5-1:20.",
+      "enabled": true,
+      "tags": ["escalas", "regulamentar", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ESCALAGRAF-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escala gráfica",
+      "description": "Todos os desenhos devem incluir escala gráfica (barra de escala) além da indicação numérica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasScaleBar", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasScaleBar}",
+      "requiredValue": "Escala gráfica em todos os desenhos",
+      "remediation": "Incluir barra de escala gráfica em todos os desenhos, permitindo verificação da escala após impressão, redução ou ampliação.",
+      "enabled": true,
+      "tags": ["escala", "gráfica", "barra", "portaria-701h"]
+    },
+    {
+      "id": "DRW-LINHAS-01",
+      "regulationId": "iso-128",
+      "article": "ISO 128 -- Espessuras de linha normalizadas",
+      "description": "As espessuras de linha devem seguir a série normalizada ISO 128: 0.18, 0.25, 0.35, 0.50, 0.70 mm.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.lineWeightMin", "operator": "<", "value": 0.18 }
+      ],
+      "currentValueTemplate": "{drawings.lineWeightMin} mm",
+      "requiredValue": ">= 0.18 mm",
+      "remediation": "Utilizar apenas espessuras da série normalizada: 0.18mm (cotagem, hachuras), 0.25mm (linhas auxiliares), 0.35mm (contornos gerais), 0.50mm (paredes), 0.70mm (contornos cortados).",
+      "enabled": true,
+      "tags": ["linhas", "espessuras", "iso-128"]
+    },
+    {
+      "id": "DRW-LINHAS-02",
+      "regulationId": "iso-128",
+      "article": "ISO 128 -- Hierarquia visual de linhas",
+      "description": "As espessuras de linha devem respeitar a hierarquia visual: elementos cortados mais espessos que elementos em vista.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasConsistentLineWeights", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasConsistentLineWeights}",
+      "requiredValue": "Hierarquia de espessuras consistente",
+      "remediation": "Aplicar hierarquia: cortados 0.70mm, paredes em vista 0.50mm, contornos gerais 0.35mm, mobiliário 0.25mm, cotagem e texto 0.18mm. A relação entre espessuras deve ser 1:sqrt(2).",
+      "enabled": true,
+      "tags": ["linhas", "hierarquia", "espessuras", "iso-128"]
+    },
+    {
+      "id": "DRW-LINHAS-03",
+      "regulationId": "iso-128",
+      "article": "ISO 128 -- Tipos de linha",
+      "description": "Os tipos de linha devem seguir as convenções da ISO 128: contínua (contornos visíveis), tracejada (arestas ocultas), traço-ponto (eixos).",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasStandardLineTypes", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasStandardLineTypes}",
+      "requiredValue": "Tipos de linha normalizados ISO 128",
+      "remediation": "Utilizar: linha contínua grossa para contornos cortados, contínua fina para contornos visíveis, tracejada para arestas ocultas, traço-ponto para eixos de simetria.",
+      "enabled": true,
+      "tags": ["linhas", "tipos", "iso-128"]
+    },
+    {
+      "id": "DRW-FONTES-01",
+      "regulationId": "iso-3098",
+      "article": "ISO 3098 -- Escrita técnica",
+      "description": "Os tipos e tamanhos de letra devem ser consistentes e seguir a ISO 3098. Altura mínima de texto: 2.5mm.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.textHeightMin", "operator": "<", "value": 2.5 }
+      ],
+      "currentValueTemplate": "{drawings.textHeightMin} mm",
+      "requiredValue": ">= 2.5 mm",
+      "remediation": "Utilizar altura mínima de texto de 2.5mm (quando impresso). Para títulos e legendas, recomenda-se 3.5mm ou superior. Utilizar fontes técnicas normalizadas (tipo B vertical ou inclinada a 15 graus).",
+      "enabled": true,
+      "tags": ["fontes", "texto", "altura", "iso-3098"]
+    },
+    {
+      "id": "DRW-FONTES-02",
+      "regulationId": "iso-3098",
+      "article": "ISO 3098 -- Altura mínima para títulos",
+      "description": "Os títulos e identificação de compartimentos devem ter altura mínima de 3.5mm quando impressos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.titleTextHeight", "operator": "<", "value": 3.5 }
+      ],
+      "currentValueTemplate": "{drawings.titleTextHeight} mm",
+      "requiredValue": ">= 3.5 mm",
+      "remediation": "Aumentar a altura do texto de títulos para no mínimo 3.5mm. Para títulos principais, recomenda-se 5mm ou 7mm conforme a hierarquia de informação.",
+      "enabled": true,
+      "tags": ["fontes", "títulos", "altura", "iso-3098"]
+    },
+    {
+      "id": "DRW-FONTES-03",
+      "regulationId": "iso-3098",
+      "article": "ISO 3098 -- Legibilidade do texto",
+      "description": "O texto deve manter legibilidade quando impresso na escala definida, com espaçamento adequado entre caracteres.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasReadableTextAtScale", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasReadableTextAtScale}",
+      "requiredValue": "Texto legível a escala de impressão",
+      "remediation": "Verificar que anotações, cotas e legendas são legíveis no formato de impressão previsto. Espaçamento entre linhas deve ser no mínimo 1.4 vezes a altura do carácter.",
+      "enabled": true,
+      "tags": ["fontes", "legibilidade", "escala", "iso-3098"]
+    },
+    {
+      "id": "DRW-COTAS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Cotagem obrigatória",
+      "description": "As peças desenhadas devem incluir cotagem completa: cotas parciais, cotas totais e cotas de nível.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasDimensioning", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasDimensioning}",
+      "requiredValue": "Cotagem completa obrigatória",
+      "remediation": "Incluir cotagem completa com: cotas parciais (entre eixos e entre paramentos), cotas totais (dimensões globais), cotas de nível (altimetria referida a cota 0.00) e cotas acumuladas.",
+      "enabled": true,
+      "tags": ["cotagem", "cotas", "dimensões", "portaria-701h"]
+    },
+    {
+      "id": "DRW-COTAS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Cotas de nível",
+      "description": "As plantas e cortes devem incluir cotas de nível (altimétricas) referidas a uma referência fixa.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasLevelDimensions", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasLevelDimensions}",
+      "requiredValue": "Cotas de nível obrigatórias",
+      "remediation": "Incluir cotas de nível em plantas e cortes, referenciadas a cota 0.00 (geralmente soleira de entrada). Indicar cotas de pavimento acabado, pavimento estrutural e cobertura.",
+      "enabled": true,
+      "tags": ["cotagem", "nível", "altimetria", "portaria-701h"]
+    },
+    {
+      "id": "DRW-COTAS-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Cotas parciais e totais",
+      "description": "As plantas devem incluir cadeias de cotas parciais e cotas totais em ambas as direções.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasPartialAndTotalDimensions", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasPartialAndTotalDimensions}",
+      "requiredValue": "Cotas parciais e totais em ambas as direções",
+      "remediation": "Incluir cadeias de cotagem com: cotas parciais (compartimentos individuais), cotas entre eixos estruturais e cotas totais exteriores, em ambas as direções ortogonais.",
+      "enabled": true,
+      "tags": ["cotagem", "parciais", "totais", "portaria-701h"]
+    },
+    {
+      "id": "DRW-NORTE-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Orientação norte",
+      "description": "Todas as plantas devem incluir indicação do norte geográfico para orientação do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasNorthOrientation", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasNorthOrientation}",
+      "requiredValue": "Norte geográfico obrigatório em todas as plantas",
+      "remediation": "Incluir seta de norte geográfico em todas as plantas (localização, implantação e pisos). A orientação deve ser consistente entre todas as folhas do projeto.",
+      "enabled": true,
+      "tags": ["norte", "orientação", "planta", "portaria-701h"]
+    },
+    {
+      "id": "DRW-CARIMBO-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Carimbo/legenda obrigatório",
+      "description": "Todas as folhas de desenho devem ter carimbo (quadro de legenda) com identificação completa do projeto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasTitleBlock", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasTitleBlock}",
+      "requiredValue": "Carimbo obrigatório em todas as folhas",
+      "remediation": "Incluir carimbo normalizado com: nome do projeto, dono de obra, projetista (nome e número de inscrição na ordem), especialidade, escala, data, número do desenho e índice de revisão.",
+      "enabled": true,
+      "tags": ["carimbo", "legenda", "identificação", "portaria-701h"]
+    },
+    {
+      "id": "DRW-CARIMBO-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Conteúdo mínimo do carimbo",
+      "description": "O carimbo deve conter no mínimo: projetista, escala, data e número do desenho.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.titleBlockHasDesigner", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.titleBlockHasDesigner}",
+      "requiredValue": "Projetista identificado no carimbo",
+      "remediation": "O carimbo deve incluir obrigatoriamente: nome e inscrição do projetista na Ordem dos Engenheiros ou Arquitectos, escala do desenho, data de emissão e número sequencial do desenho.",
+      "enabled": true,
+      "tags": ["carimbo", "projetista", "escala", "data", "portaria-701h"]
+    },
+    {
+      "id": "DRW-CARIMBO-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Escala indicada no carimbo",
+      "description": "O carimbo deve indicar a escala do desenho, correspondente a escala real utilizada.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.titleBlockHasScale", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.titleBlockHasScale}",
+      "requiredValue": "Escala indicada no carimbo",
+      "remediation": "Incluir a indicação da escala no carimbo. Se o desenho contiver várias escalas, indicar 'Várias' e identificar cada escala junto ao respetivo desenho.",
+      "enabled": true,
+      "tags": ["carimbo", "escala", "portaria-701h"]
+    },
+    {
+      "id": "DRW-SIMB-SCIE-01",
+      "regulationId": "nt04-en-iso-7010",
+      "article": "NT04 / EN ISO 7010 -- Simbologia SCIE",
+      "description": "As plantas de segurança contra incêndio devem utilizar simbologia normalizada conforme NT04 da ANPC e EN ISO 7010.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasSCIESymbology", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasSCIESymbology}",
+      "requiredValue": "Simbologia SCIE normalizada obrigatória",
+      "remediation": "Utilizar simbologia normalizada da NT04/ANPC e EN ISO 7010 para: extintores, bocas de incêndio, sprinklers, detetores, botoneiras, caminhos de evacuação e saídas de emergência.",
+      "enabled": true,
+      "tags": ["simbologia", "SCIE", "incêndio", "segurança", "iso-7010"]
+    },
+    {
+      "id": "DRW-SIMB-ELET-01",
+      "regulationId": "iec-60617",
+      "article": "IEC 60617 -- Simbologia elétrica",
+      "description": "Os desenhos de instalações elétricas devem utilizar simbologia normalizada IEC 60617.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasElectricalSymbology", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasElectricalSymbology}",
+      "requiredValue": "Simbologia elétrica IEC 60617",
+      "remediation": "Utilizar símbolos IEC 60617 para: tomadas, interruptores, quadros elétricos, luminárias, circuitos, proteções e equipamentos. Incluir legenda de símbolos em cada folha.",
+      "enabled": true,
+      "tags": ["simbologia", "elétrica", "iec-60617"]
+    },
+    {
+      "id": "DRW-SIMB-AVAC-01",
+      "regulationId": "np-en-iso-7519",
+      "article": "NP EN ISO 7519 -- Simbologia AVAC",
+      "description": "Os desenhos de instalações AVAC devem utilizar simbologia normalizada conforme NP EN ISO 7519.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasHVACSymbology", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasHVACSymbology}",
+      "requiredValue": "Simbologia AVAC normalizada",
+      "remediation": "Utilizar símbolos normalizados NP EN ISO 7519 para: condutas, difusores, grelhas, unidades de tratamento de ar, chillers, caldeiras e equipamentos AVAC.",
+      "enabled": true,
+      "tags": ["simbologia", "AVAC", "climatização", "iso-7519"]
+    },
+    {
+      "id": "DRW-SIMB-HIDR-01",
+      "regulationId": "np-en-iso-6412",
+      "article": "NP EN ISO 6412 -- Simbologia hidráulica",
+      "description": "Os desenhos de instalações hidráulicas devem utilizar simbologia normalizada conforme NP EN ISO 6412.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasHydraulicSymbology", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasHydraulicSymbology}",
+      "requiredValue": "Simbologia hidráulica normalizada",
+      "remediation": "Utilizar símbolos normalizados NP EN ISO 6412 para: tubagens de água, esgotos, válvulas, bombas, reservatórios e acessórios. Distinguir redes por cores ou tipos de linha.",
+      "enabled": true,
+      "tags": ["simbologia", "hidráulica", "canalizações", "iso-6412"]
+    },
+    {
+      "id": "DRW-SIMB-ACESS-01",
+      "regulationId": "iso-7001",
+      "article": "ISO 7001 -- Simbologia de acessibilidade",
+      "description": "As plantas devem incluir simbologia de acessibilidade normalizada conforme ISO 7001.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasAccessibilitySymbology", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasAccessibilitySymbology}",
+      "requiredValue": "Simbologia de acessibilidade ISO 7001",
+      "remediation": "Utilizar símbolos ISO 7001 para: percursos acessíveis, instalações sanitárias adaptadas, elevadores acessíveis, rampas, lugares de estacionamento reservados e sinalética inclusiva.",
+      "enabled": true,
+      "tags": ["simbologia", "acessibilidade", "iso-7001"]
+    },
+    {
+      "id": "DRW-SIMB-LEG-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Legenda de simbologia",
+      "description": "Cada folha de desenho com simbologia deve conter a respetiva legenda explicativa dos símbolos utilizados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasSymbolLegend", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasSymbolLegend}",
+      "requiredValue": "Legenda de símbolos em todas as folhas",
+      "remediation": "Incluir legenda visível em todas as folhas onde simbologia é utilizada, com descrição clara de cada símbolo, tipo de linha e convenção gráfica adotada.",
+      "enabled": true,
+      "tags": ["legenda", "simbologia", "folha", "portaria-701h"]
+    },
+    {
+      "id": "DRW-PAPEL-01",
+      "regulationId": "iso-216",
+      "article": "ISO 216 -- Formatos de papel normalizados",
+      "description": "Os desenhos devem utilizar formatos de papel normalizados da série A (A0 a A4) conforme ISO 216.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasStandardPaperFormat", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasStandardPaperFormat}",
+      "requiredValue": "Formatos ISO 216 (A0-A4)",
+      "remediation": "Utilizar apenas formatos normalizados: A0 (841x1189mm), A1 (594x841mm), A2 (420x594mm), A3 (297x420mm), A4 (210x297mm). Formatos alongados permissíveis conforme ISO 216.",
+      "enabled": true,
+      "tags": ["papel", "formato", "iso-216"]
+    },
+    {
+      "id": "DRW-MARGENS-01",
+      "regulationId": "iso-5457",
+      "article": "ISO 5457 -- Margens mínimas",
+      "description": "As folhas de desenho devem respeitar as margens mínimas obrigatórias: 20mm a esquerda (para arquivo) e 10mm nas restantes.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasMinimumMargins", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasMinimumMargins}",
+      "requiredValue": "Margens mínimas: 20mm esq., 10mm restantes",
+      "remediation": "Respeitar margens mínimas: 20mm na margem esquerda (margem de arquivo/furação) e 10mm nas margens superior, inferior e direita. Para formatos A0 e A1, margem de arquivo pode ser 25mm.",
+      "enabled": true,
+      "tags": ["margens", "formato", "arquivo", "iso-5457"]
+    },
+    {
+      "id": "DRW-DOBR-01",
+      "regulationId": "np-49",
+      "article": "NP 49 -- Dobragem de desenhos",
+      "description": "Os desenhos em formato superior a A4 devem ser dobrados para formato A4 conforme NP 49.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasFoldingMarks", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasFoldingMarks}",
+      "requiredValue": "Marcas de dobragem conforme NP 49",
+      "remediation": "Incluir marcas de dobragem nos desenhos de formato superior a A4, seguindo o método de dobragem da NP 49. O carimbo deve ficar visível após dobragem (canto inferior direito).",
+      "enabled": true,
+      "tags": ["dobragem", "formato", "np-49"]
+    },
+    {
+      "id": "DRW-NUM-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Numeração sequencial de desenhos",
+      "description": "Os desenhos devem ter numeração sequencial sistemática, com identificação da especialidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasSequentialNumbering", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasSequentialNumbering}",
+      "requiredValue": "Numeração sequencial obrigatória",
+      "remediation": "Numerar os desenhos sequencialmente por especialidade: ARQ-01, ARQ-02 (Arquitectura), EST-01 (Estruturas), ITED-01 (Telecomunicações), AVAC-01 (Climatização), etc.",
+      "enabled": true,
+      "tags": ["numeração", "sequencial", "organização", "portaria-701h"]
+    },
+    {
+      "id": "DRW-REV-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Controlo de revisões",
+      "description": "Os desenhos devem incluir controlo de revisões/emissões com identificação da versão, data e descrição das alterações.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasRevisionControl", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasRevisionControl}",
+      "requiredValue": "Quadro de revisões obrigatório",
+      "remediation": "Incluir quadro de revisões no carimbo com: índice de revisão (Rev.0, Rev.1, ...), data da revisão, descrição sumária das alterações e responsável pela alteração.",
+      "enabled": true,
+      "tags": ["revisões", "versões", "controlo", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ESP-COORD-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 9.o -- Coordenação de especialidades",
+      "description": "As plantas de especialidades devem ser coordenadas entre si, com base na mesma planta de arquitectura.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasSpecialtyCoordination", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasSpecialtyCoordination}",
+      "requiredValue": "Coordenação entre especialidades obrigatória",
+      "remediation": "Garantir coordenação entre todas as especialidades: estruturas, águas e esgotos, eletricidade, ITED, gás, AVAC e SCIE devem ser baseadas na mesma planta de arquitectura e verificadas contra interferências.",
+      "enabled": true,
+      "tags": ["especialidades", "coordenação", "compatibilização", "portaria-701h"]
+    },
+    {
+      "id": "DRW-SEG-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Plantas de segurança/emergência",
+      "description": "O projeto SCIE deve incluir plantas de segurança com caminhos de evacuação, saídas de emergência e meios de combate a incêndio.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasFireSafetyPlans", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasFireSafetyPlans}",
+      "requiredValue": "Plantas de segurança SCIE obrigatórias",
+      "remediation": "Incluir plantas de segurança por piso com: caminhos de evacuação, saídas de emergência (largura cotada), localização de extintores, BIA, detetores, botoneiras e pontos de encontro.",
+      "enabled": true,
+      "tags": ["segurança", "incêndio", "SCIE", "evacuação", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ACESS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Plantas de acessibilidade",
+      "description": "O projeto deve incluir plantas de acessibilidade demonstrando conformidade com o DL 163/2006.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasAccessibilityPlans", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasAccessibilityPlans}",
+      "requiredValue": "Plantas de acessibilidade obrigatórias",
+      "remediation": "Incluir plantas de acessibilidade com: percursos acessíveis (largura >= 1.20m), rampas (inclinação cotada), IS adaptadas (dimensões cotadas), elevadores acessíveis e estacionamento reservado.",
+      "enabled": true,
+      "tags": ["acessibilidade", "mobilidade", "inclusão", "portaria-701h"]
+    },
+    {
+      "id": "DRW-MED-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 7.o -- Mapa de quantidades e medições",
+      "description": "O projeto de execução deve incluir mapas de quantidades (medições) detalhados por artigo do caderno de encargos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasBOQ", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasBOQ}",
+      "requiredValue": "Mapa de quantidades obrigatório",
+      "remediation": "Incluir mapa de quantidades (Bill of Quantities) com: descrição dos trabalhos, unidades de medida, quantidades medidas e referências às peças desenhadas.",
+      "enabled": true,
+      "tags": ["medições", "quantidades", "mapa", "portaria-701h"]
+    },
+    {
+      "id": "DRW-CE-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 7.o -- Caderno de encargos",
+      "description": "O projeto de execução deve incluir caderno de encargos com condições técnicas especiais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasSpecifications", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasSpecifications}",
+      "requiredValue": "Caderno de encargos obrigatório",
+      "remediation": "Incluir caderno de encargos com condições técnicas especiais: descrição dos trabalhos, materiais a aplicar, normas de execução, ensaios e critérios de aceitação/rejeição.",
+      "enabled": true,
+      "tags": ["caderno-encargos", "condições-técnicas", "especificações", "portaria-701h"]
+    },
+    {
+      "id": "DRW-ORC-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 7.o -- Orçamento estimativo",
+      "description": "O projeto de execução deve incluir orçamento estimativo baseado nas medições detalhadas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.hasBudgetEstimate", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasBudgetEstimate}",
+      "requiredValue": "Orçamento estimativo obrigatório",
+      "remediation": "Incluir orçamento estimativo detalhado com: preços unitários por artigo, subtotais por capítulo, total geral e indicação da data de referência dos preços.",
+      "enabled": true,
+      "tags": ["orçamento", "estimativa", "custos", "portaria-701h"]
+    },
+    {
+      "id": "DRW-PLAN-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 8.o -- Plano de trabalhos",
+      "description": "O projeto de execução deve incluir plano de trabalhos com programação das atividades de construção.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasWorkPlan", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasWorkPlan}",
+      "requiredValue": "Plano de trabalhos obrigatório no projeto de execução",
+      "remediation": "Incluir plano de trabalhos com: lista de atividades, durações estimadas, sequência de execução, caminho crítico e cronograma financeiro associado.",
+      "enabled": true,
+      "tags": ["plano-trabalhos", "programação", "cronograma", "portaria-701h"]
+    },
+    {
+      "id": "DRW-REPR-01",
+      "regulationId": "np-en-iso-7518",
+      "article": "NP EN ISO 7518 -- Representação de elementos de construção",
+      "description": "A representação de elementos construtivos (paredes, portas, janelas, escadas) deve seguir a NP EN ISO 7518.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasStandardBuildingRepresentation", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasStandardBuildingRepresentation}",
+      "requiredValue": "Representação conforme NP EN ISO 7518",
+      "remediation": "Representar elementos construtivos conforme NP EN ISO 7518: paredes com hachura de material, portas com arco de abertura, janelas com representação em planta e alçado normalizadas, escadas com seta de subida.",
+      "enabled": true,
+      "tags": ["representação", "elementos", "construção", "iso-7518"]
+    },
+    {
+      "id": "DRW-REPR-02",
+      "regulationId": "np-en-iso-7519",
+      "article": "NP EN ISO 7519 -- Princípios gerais de representação",
+      "description": "Os desenhos de construção devem seguir os princípios gerais de representação da NP EN ISO 7519.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasStandardDrawingPrinciples", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasStandardDrawingPrinciples}",
+      "requiredValue": "Princípios NP EN ISO 7519",
+      "remediation": "Seguir princípios NP EN ISO 7519: convenções de corte (plano horizontal a 1.20m do pavimento), projeção ortogonal, vista de cima para plantas, indicação de planos de corte nas plantas.",
+      "enabled": true,
+      "tags": ["representação", "princípios", "convenções", "iso-7519"]
+    },
+    {
+      "id": "DRW-HACH-01",
+      "regulationId": "iso-128",
+      "article": "ISO 128 -- Hachuras de materiais",
+      "description": "Os elementos cortados devem apresentar hachuras identificativas do material conforme ISO 128.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.hasMaterialHatching", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasMaterialHatching}",
+      "requiredValue": "Hachuras de materiais conforme ISO 128",
+      "remediation": "Aplicar hachuras normalizadas: betão (pontilhado), alvenaria (linhas diagonais cruzadas), madeira (veio), aço (linhas diagonais), isolamento (ondulado), terreno (pontilhado irregular).",
+      "enabled": true,
+      "tags": ["hachuras", "materiais", "representação", "iso-128"]
+    },
+    {
+      "id": "DRW-COB-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Planta de cobertura",
+      "description": "O projeto deve incluir planta de cobertura com indicação de pendentes, caleiras, tubos de queda e materiais.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasRoofPlan", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasRoofPlan}",
+      "requiredValue": "Planta de cobertura obrigatória",
+      "remediation": "Incluir planta de cobertura com: setas de pendente (inclinação em percentagem), caleiras, tubos de queda, platibandas, claraboias, chaminés e materiais de revestimento.",
+      "enabled": true,
+      "tags": ["cobertura", "planta", "pendentes", "portaria-701h"]
+    },
+    {
+      "id": "DRW-AREAS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o -- Mapa de áreas",
+      "description": "O projeto deve incluir mapa de áreas com cálculo de áreas brutas, úteis e de implantação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.hasAreaSchedule", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{drawings.hasAreaSchedule}",
+      "requiredValue": "Mapa de áreas obrigatório",
+      "remediation": "Incluir mapa de áreas com: área de implantação, área bruta de construção, área útil por compartimento e por piso, área de logradouro e índices urbanísticos (COS, CAS).",
+      "enabled": true,
+      "tags": ["áreas", "mapa", "índices", "portaria-701h"]
+    }
+  ]
+}

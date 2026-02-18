@@ -1,0 +1,556 @@
+{
+  "regulationRef": "pdm-generic",
+  "description": "Verificações genéricas de conformidade com Planos Directores Municipais (PDM) — parâmetros urbanísticos, classificação do solo, condicionantes, servidões, estacionamento, espaços verdes e infraestruturas. Base legal: RJIGT (DL 80/2015).",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "PDM-IU-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Índice de Utilização do Solo",
+      "description": "O índice de utilização do solo (Iu) — rácio entre a área bruta de construção e a área do terreno — deve ser definido e não pode exceder o limite fixado no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.buildingUseIndex", "operator": ">", "value": 0 },
+        { "field": "municipal.buildingUseIndexMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.buildingUseIndex}",
+      "requiredValue": "Iu ≤ limite PDM (municipal.buildingUseIndexMax)",
+      "remediation": "Reduzir a área bruta de construção de modo a que o índice de utilização (Iu = ABC / área do terreno) não exceda o valor máximo fixado no PDM para a categoria de solo em causa.",
+      "enabled": true,
+      "tags": ["índice-utilização", "Iu", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-II-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Índice de Implantação",
+      "description": "O índice de implantação (Ii) — rácio entre a área de implantação do edifício e a área do terreno — deve respeitar o limite máximo definido no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.implantationIndex", "operator": ">", "value": 0 },
+        { "field": "municipal.implantationIndexMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.implantationIndex}",
+      "requiredValue": "Ii ≤ limite PDM (municipal.implantationIndexMax)",
+      "remediation": "Reduzir a área de implantação do edifício para que o índice de implantação (Ii = área de implantação / área do terreno) cumpra o máximo fixado no PDM.",
+      "enabled": true,
+      "tags": ["índice-implantação", "Ii", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-CERCEA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Cércea Máxima",
+      "description": "A cércea (altura máxima do edifício medida na fachada) não pode exceder o valor máximo definido no PDM para o local.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.maxHeight", "operator": "exists", "value": null },
+        { "field": "municipal.proposedHeight", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "{municipal.proposedHeight} m",
+      "requiredValue": "Altura ≤ cércea máxima PDM ({municipal.maxHeight} m)",
+      "remediation": "Reduzir a altura do edifício (cércea) para não exceder o limite máximo definido no PDM. Considerar reduzir o número de pisos ou a altura entre pisos.",
+      "enabled": true,
+      "tags": ["cércea", "altura", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-PISOS-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Número Máximo de Pisos Acima da Cota de Soleira",
+      "description": "O número de pisos acima da cota de soleira não pode exceder o máximo definido no PDM para a categoria de solo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.maxFloorsAbove", "operator": "exists", "value": null },
+        { "field": "municipal.proposedFloorsAbove", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "{municipal.proposedFloorsAbove} pisos acima da soleira",
+      "requiredValue": "Pisos acima da soleira ≤ {municipal.maxFloorsAbove}",
+      "remediation": "Reduzir o número de pisos acima da cota de soleira para cumprir o limite fixado no PDM.",
+      "enabled": true,
+      "tags": ["pisos", "cota-soleira", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-PISOS-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Número Máximo de Pisos Abaixo da Cota de Soleira",
+      "description": "O número de pisos abaixo da cota de soleira (caves) não pode exceder o máximo definido no PDM.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.maxFloorsBelow", "operator": "exists", "value": null },
+        { "field": "municipal.proposedFloorsBelow", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "{municipal.proposedFloorsBelow} pisos abaixo da soleira",
+      "requiredValue": "Pisos abaixo da soleira ≤ {municipal.maxFloorsBelow}",
+      "remediation": "Reduzir o número de pisos enterrados (caves) para respeitar o limite definido no PDM. Ponderar soluções alternativas de estacionamento ou armazenamento.",
+      "enabled": true,
+      "tags": ["pisos", "caves", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-PERM-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Índice de Permeabilidade Mínimo",
+      "description": "O índice de permeabilidade (percentagem de área permeável em relação à área total do terreno) deve respeitar o mínimo definido no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.permeabilityIndex", "operator": "exists", "value": null },
+        { "field": "municipal.permeabilityIndexMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.permeabilityIndex} %",
+      "requiredValue": "Permeabilidade ≥ {municipal.permeabilityIndexMin} %",
+      "remediation": "Aumentar a área permeável do lote (ex.: reduzir área impermeabilizada, utilizar pavimentos permeáveis, aumentar áreas ajardinadas) de modo a cumprir o índice de permeabilidade mínimo do PDM.",
+      "enabled": true,
+      "tags": ["permeabilidade", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-AFR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Afastamento Frontal à Via Pública",
+      "description": "O afastamento frontal do edifício à via pública deve respeitar a distância mínima definida no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.frontSetback", "operator": "exists", "value": null },
+        { "field": "municipal.frontSetbackMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.frontSetback} m",
+      "requiredValue": "Afastamento frontal ≥ {municipal.frontSetbackMin} m",
+      "remediation": "Recuar a fachada principal do edifício para garantir o afastamento mínimo à via pública exigido pelo PDM.",
+      "enabled": true,
+      "tags": ["afastamento", "frontal", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-ALT-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Afastamento Lateral Mínimo",
+      "description": "O afastamento lateral do edifício aos limites do lote deve respeitar a distância mínima definida no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.sideSetback", "operator": "exists", "value": null },
+        { "field": "municipal.sideSetbackMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.sideSetback} m",
+      "requiredValue": "Afastamento lateral ≥ {municipal.sideSetbackMin} m",
+      "remediation": "Ajustar a implantação do edifício para garantir o afastamento lateral mínimo aos limites do lote conforme definido no PDM.",
+      "enabled": true,
+      "tags": ["afastamento", "lateral", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-APO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Afastamento Posterior Mínimo",
+      "description": "O afastamento posterior do edifício ao limite tardoz do lote deve respeitar a distância mínima definida no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.rearSetback", "operator": "exists", "value": null },
+        { "field": "municipal.rearSetbackMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.rearSetback} m",
+      "requiredValue": "Afastamento posterior ≥ {municipal.rearSetbackMin} m",
+      "remediation": "Recuar o edifício em relação ao limite tardoz do lote para cumprir o afastamento posterior mínimo exigido pelo PDM.",
+      "enabled": true,
+      "tags": ["afastamento", "posterior", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-LOTE-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Área Mínima de Lote",
+      "description": "A área do lote para construção deve ser igual ou superior à área mínima de lote definida no PDM para a categoria de solo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.lotArea", "operator": "exists", "value": null },
+        { "field": "municipal.lotAreaMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.lotArea} m²",
+      "requiredValue": "Área de lote ≥ {municipal.lotAreaMin} m²",
+      "remediation": "O lote não cumpre a área mínima exigida pelo PDM. Considerar o emparcelamento com parcela contígua ou reformular a operação urbanística.",
+      "enabled": true,
+      "tags": ["lote", "área-mínima", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-LOTE-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Frente Mínima de Lote",
+      "description": "A frente do lote (largura confrontante com a via pública) deve ser igual ou superior à frente mínima definida no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.lotFrontage", "operator": "exists", "value": null },
+        { "field": "municipal.lotFrontageMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.lotFrontage} m",
+      "requiredValue": "Frente de lote ≥ {municipal.lotFrontageMin} m",
+      "remediation": "O lote não cumpre a frente mínima exigida pelo PDM. Considerar o emparcelamento com parcela contígua ou reformular a geometria do loteamento.",
+      "enabled": true,
+      "tags": ["lote", "frente-mínima", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-SOLO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Classificação do Solo (Urbano vs Rústico)",
+      "description": "Verificar que o terreno está classificado como solo urbano na planta de ordenamento do PDM. A edificação em solo rústico está sujeita a restrições muito severas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.soilClassification", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.soilClassification}",
+      "requiredValue": "Solo classificado como urbano para operações urbanísticas correntes",
+      "remediation": "Se o solo está classificado como rústico, a operação urbanística pretendida pode ser inviável salvo exceções legais específicas (ex.: edificação para exploração agrícola, turismo em espaço rural). Consultar os serviços de urbanismo do município.",
+      "enabled": true,
+      "tags": ["classificação-solo", "solo-urbano", "solo-rústico", "PDM"]
+    },
+    {
+      "id": "PDM-SOLO-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Categoria de Solo Urbano",
+      "description": "Verificar a categoria de solo urbano atribuída ao terreno na planta de ordenamento do PDM (espaços centrais, espaços residenciais, espaços de atividades económicas, espaços verdes, etc.).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.urbanSoilCategory", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.urbanSoilCategory}",
+      "requiredValue": "Categoria de solo urbano identificada (centrais, residenciais, atividades económicas, verdes, etc.)",
+      "remediation": "Confirmar a categoria de solo urbano na planta de ordenamento do PDM e verificar que os parâmetros urbanísticos aplicados são os correspondentes à categoria correta.",
+      "enabled": true,
+      "tags": ["categoria-solo", "solo-urbano", "ordenamento", "PDM"]
+    },
+    {
+      "id": "PDM-USO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Usos Compatíveis com a Categoria de Solo",
+      "description": "A utilização proposta para o edifício deve ser compatível com os usos admitidos no PDM para a categoria de solo urbano do local.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.proposedUse", "operator": "exists", "value": null },
+        { "field": "municipal.allowedUses", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.proposedUse}",
+      "requiredValue": "Uso proposto incluído na lista de usos admitidos para a categoria de solo",
+      "remediation": "Alterar a utilização proposta para um uso compatível com a categoria de solo definida no PDM, ou requerer uma alteração ao alvará/licença de utilização.",
+      "enabled": true,
+      "tags": ["usos-compatíveis", "utilização", "PDM"]
+    },
+    {
+      "id": "PDM-USO-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Usos Incompatíveis (Interditos)",
+      "description": "A utilização proposta não pode constar da lista de usos interditos para a categoria de solo do local, conforme definido no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.proposedUse", "operator": "exists", "value": null },
+        { "field": "municipal.forbiddenUses", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.proposedUse}",
+      "requiredValue": "Uso proposto NÃO incluído na lista de usos interditos",
+      "remediation": "A utilização pretendida é expressamente interdita pelo PDM para esta categoria de solo. Reformular o programa funcional do edifício ou procurar localização alternativa.",
+      "enabled": true,
+      "tags": ["usos-interditos", "utilização", "PDM"]
+    },
+    {
+      "id": "PDM-RAN-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Reserva Agrícola Nacional (RAN)",
+      "description": "O terreno não pode estar integrado na Reserva Agrícola Nacional (RAN). A construção em solo RAN é proibida salvo exceções legais muito restritas (DL 73/2009).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInRAN", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno integrado na RAN: {municipal.isInRAN}",
+      "requiredValue": "Terreno NÃO integrado na RAN (isInRAN = false)",
+      "remediation": "Terreno abrangido pela RAN — a operação urbanística é proibida. Verificar se se enquadra numa das utilizações não agrícolas permitidas pelo artigo 22.º do DL 73/2009 e obter parecer favorável da DRAP competente.",
+      "enabled": true,
+      "tags": ["RAN", "condicionantes", "servidões", "PDM"]
+    },
+    {
+      "id": "PDM-REN-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Reserva Ecológica Nacional (REN)",
+      "description": "O terreno não pode estar integrado na Reserva Ecológica Nacional (REN). A construção em solo REN é proibida salvo exceções legais muito restritas (DL 166/2008).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInREN", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno integrado na REN: {municipal.isInREN}",
+      "requiredValue": "Terreno NÃO integrado na REN (isInREN = false)",
+      "remediation": "Terreno abrangido pela REN — a operação urbanística é proibida. Verificar se se enquadra nas ações compatíveis ou isentas previstas no DL 166/2008 (alterado pelo DL 124/2019) e obter parecer da CCDR competente.",
+      "enabled": true,
+      "tags": ["REN", "condicionantes", "servidões", "PDM"]
+    },
+    {
+      "id": "PDM-DHP-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Domínio Hídrico Público",
+      "description": "O edifício deve respeitar a faixa de proteção ao domínio hídrico público (cursos de água, albufeiras, lagoas, estuários e faixa costeira) conforme a Lei da Água (Lei 58/2005) e regulamentação do PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToWaterDomain", "operator": "exists", "value": null },
+        { "field": "municipal.waterDomainBufferMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToWaterDomain} m ao domínio hídrico",
+      "requiredValue": "Distância ao domínio hídrico ≥ {municipal.waterDomainBufferMin} m",
+      "remediation": "O edifício encontra-se dentro da faixa de proteção ao domínio hídrico público. Recuar a implantação para fora da zona non-aedificandi ou obter autorização de utilização dos recursos hídricos junto da APA/ARH competente.",
+      "enabled": true,
+      "tags": ["domínio-hídrico", "faixa-proteção", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-SROD-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Servidões Rodoviárias",
+      "description": "O edifício deve respeitar as faixas non-aedificandi associadas a servidões rodoviárias (estradas nacionais, regionais, municipais e autoestradas) conforme o Estatuto das Estradas da Rede Rodoviária Nacional (Lei 34/2015).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInRoadEasement", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em servidão rodoviária: {municipal.isInRoadEasement}",
+      "requiredValue": "Terreno fora da faixa non-aedificandi rodoviária (isInRoadEasement = false)",
+      "remediation": "O edifício encontra-se na faixa de servidão non-aedificandi rodoviária. Recuar a implantação para fora da zona de proteção ou obter autorização da Infraestruturas de Portugal / câmara municipal, conforme a classificação da via.",
+      "enabled": true,
+      "tags": ["servidão-rodoviária", "non-aedificandi", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-SFER-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Servidões Ferroviárias",
+      "description": "O edifício deve respeitar as faixas non-aedificandi associadas a servidões ferroviárias conforme o DL 276/2003.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInRailEasement", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em servidão ferroviária: {municipal.isInRailEasement}",
+      "requiredValue": "Terreno fora da faixa non-aedificandi ferroviária (isInRailEasement = false)",
+      "remediation": "O edifício encontra-se na faixa de servidão ferroviária. Recuar a implantação para fora da zona de proteção (tipicamente 10 a 20 m) ou obter autorização do IMTT / Infraestruturas de Portugal.",
+      "enabled": true,
+      "tags": ["servidão-ferroviária", "non-aedificandi", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-SAER-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Servidões Aeronáuticas",
+      "description": "O edifício deve respeitar as restrições de altura e implantação decorrentes de servidões aeronáuticas na proximidade de aeródromos e aeroportos (DL 45 987/1964 e legislação complementar).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInAeronauticEasement", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em servidão aeronáutica: {municipal.isInAeronauticEasement}",
+      "requiredValue": "Terreno fora da servidão aeronáutica ou em conformidade com as restrições de altura",
+      "remediation": "O edifício encontra-se em zona de servidão aeronáutica. Verificar os limites de altura aplicáveis e obter parecer favorável da ANAC (Autoridade Nacional de Aviação Civil).",
+      "enabled": true,
+      "tags": ["servidão-aeronáutica", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-SMIL-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Servidões Militares",
+      "description": "O edifício deve respeitar as restrições decorrentes de servidões militares (Lei 2078/1955 e legislação complementar), caso o terreno se encontre na proximidade de instalações militares.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInMilitaryEasement", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em servidão militar: {municipal.isInMilitaryEasement}",
+      "requiredValue": "Terreno fora da servidão militar ou em conformidade com as restrições aplicáveis",
+      "remediation": "O terreno encontra-se em zona de servidão militar. Obter parecer favorável do Ministério da Defesa Nacional antes de prosseguir com a operação urbanística.",
+      "enabled": true,
+      "tags": ["servidão-militar", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-ZPIC-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Zonas de Proteção a Imóveis Classificados",
+      "description": "O edifício deve respeitar as zonas de proteção (ZP) e zonas especiais de proteção (ZEP) a imóveis classificados como Monumento Nacional, Imóvel de Interesse Público ou Imóvel de Interesse Municipal, conforme a Lei 107/2001 e DL 309/2009.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInHeritageProtectionZone", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em zona de proteção a imóvel classificado: {municipal.isInHeritageProtectionZone}",
+      "requiredValue": "Conformidade com restrições da zona de proteção patrimonial",
+      "remediation": "O edifício encontra-se em zona de proteção a imóvel classificado. É obrigatório obter parecer favorável da DGPC (Direção-Geral do Património Cultural) ou da DRC competente antes da emissão de licença ou admissão de comunicação prévia.",
+      "enabled": true,
+      "tags": ["zona-proteção", "património", "imóvel-classificado", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-INUN-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Zonas Inundáveis / Leitos de Cheia",
+      "description": "O edifício não deve estar localizado em zona inundável ou leito de cheia identificado na planta de condicionantes do PDM. A construção nestas zonas representa risco elevado para pessoas e bens.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInFloodZone", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em zona inundável: {municipal.isInFloodZone}",
+      "requiredValue": "Terreno NÃO localizado em zona inundável (isInFloodZone = false)",
+      "remediation": "O terreno encontra-se em zona inundável / leito de cheia. A edificação está condicionada ou proibida. Verificar a classificação de risco na carta de zonas inundáveis e obter parecer da APA. Considerar medidas de mitigação de cheias ou localização alternativa.",
+      "enabled": true,
+      "tags": ["zona-inundável", "cheias", "risco", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-GEOT-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Áreas de Risco Geotécnico",
+      "description": "O edifício deve ter em conta a classificação de risco geotécnico do local, conforme identificado na planta de condicionantes do PDM (instabilidade de vertentes, erosão, subsidência, etc.).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInGeotechnicalRiskArea", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Terreno em área de risco geotécnico: {municipal.isInGeotechnicalRiskArea}",
+      "requiredValue": "Terreno fora de área de risco geotécnico ou com estudo geotécnico validado",
+      "remediation": "O terreno encontra-se em área de risco geotécnico. É necessário realizar estudo geológico-geotécnico que demonstre a viabilidade da construção e definir as medidas de estabilização necessárias, a submeter à câmara municipal.",
+      "enabled": true,
+      "tags": ["risco-geotécnico", "geologia", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-EST-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Estacionamento Residencial (Lugares por Fogo)",
+      "description": "O número de lugares de estacionamento por fogo (habitação) deve ser igual ou superior ao mínimo definido no PDM. Tipicamente 1 lugar por fogo, podendo variar consoante a tipologia (T0/T1: 1 lugar; T2+: 1,5 ou 2 lugares).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.parkingSpacesPerUnit", "operator": "exists", "value": null },
+        { "field": "municipal.parkingSpacesPerUnitMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.parkingSpacesPerUnit} lugares/fogo",
+      "requiredValue": "Estacionamento ≥ {municipal.parkingSpacesPerUnitMin} lugares/fogo",
+      "remediation": "O número de lugares de estacionamento por fogo é insuficiente face ao mínimo exigido pelo PDM. Aumentar a área de estacionamento ou reduzir o número de fogos.",
+      "enabled": true,
+      "tags": ["estacionamento", "residencial", "fogos", "PDM"]
+    },
+    {
+      "id": "PDM-EST-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Estacionamento para Comércio e Serviços",
+      "description": "O número de lugares de estacionamento para usos de comércio e serviços deve respeitar o rácio mínimo definido no PDM (tipicamente expresso em lugares por m² de área bruta de construção).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.commercialParkingRatio", "operator": "exists", "value": null },
+        { "field": "municipal.commercialParkingRatioMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.commercialParkingRatio} lugares/m²",
+      "requiredValue": "Estacionamento comércio/serviços ≥ {municipal.commercialParkingRatioMin} lugares/m²",
+      "remediation": "O estacionamento para comércio/serviços é insuficiente. Aumentar o número de lugares de estacionamento afetos a esta utilização, ou reduzir a área bruta de comércio/serviços.",
+      "enabled": true,
+      "tags": ["estacionamento", "comércio", "serviços", "PDM"]
+    },
+    {
+      "id": "PDM-EST-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Estacionamento para Pessoas com Mobilidade Reduzida",
+      "description": "Deve ser garantido o número mínimo de lugares de estacionamento reservados a pessoas com mobilidade reduzida, conforme o DL 163/2006 (acessibilidades) e o PDM. Tipicamente, pelo menos 1 lugar por cada 20 lugares totais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.accessibleParkingSpaces", "operator": "exists", "value": null },
+        { "field": "municipal.accessibleParkingSpacesMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.accessibleParkingSpaces} lugares PMR",
+      "requiredValue": "Lugares PMR ≥ {municipal.accessibleParkingSpacesMin}",
+      "remediation": "Número insuficiente de lugares de estacionamento reservados a pessoas com mobilidade reduzida. Converter lugares existentes em lugares PMR com as dimensões regulamentares (mín. 2,50 × 5,00 m com faixa lateral de 1,00 m).",
+      "enabled": true,
+      "tags": ["estacionamento", "acessibilidade", "mobilidade-reduzida", "PDM"]
+    },
+    {
+      "id": "PDM-LOG-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Área de Logradouro Mínima",
+      "description": "A área de logradouro (espaço exterior do lote não ocupado pelo edifício) deve respeitar o mínimo definido no PDM.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.backyardArea", "operator": "exists", "value": null },
+        { "field": "municipal.backyardAreaMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.backyardArea} m²",
+      "requiredValue": "Área de logradouro ≥ {municipal.backyardAreaMin} m²",
+      "remediation": "A área de logradouro é inferior ao mínimo exigido. Reduzir a área de implantação do edifício ou rever a configuração da operação urbanística para garantir o logradouro mínimo.",
+      "enabled": true,
+      "tags": ["logradouro", "espaços-exteriores", "PDM"]
+    },
+    {
+      "id": "PDM-EVUC-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Espaços Verdes de Utilização Coletiva",
+      "description": "As operações de loteamento devem prever a cedência de áreas para espaços verdes de utilização coletiva conforme os parâmetros de dimensionamento do PDM (tipicamente definidos em m² por fogo ou por habitante).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.collectiveGreenArea", "operator": "exists", "value": null },
+        { "field": "municipal.collectiveGreenAreaMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.collectiveGreenArea} m²",
+      "requiredValue": "Espaços verdes coletivos ≥ {municipal.collectiveGreenAreaMin} m²",
+      "remediation": "A área prevista para espaços verdes de utilização coletiva é insuficiente. Aumentar as áreas de cedência para espaços verdes ou compensar em numerário conforme previsto no regulamento municipal.",
+      "enabled": true,
+      "tags": ["espaços-verdes", "utilização-coletiva", "cedências", "PDM"]
+    },
+    {
+      "id": "PDM-PERML-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Área Permeável do Logradouro",
+      "description": "A percentagem de área permeável no logradouro deve respeitar o mínimo definido no PDM, contribuindo para a gestão sustentável das águas pluviais.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.backyardPermeableRatio", "operator": "exists", "value": null },
+        { "field": "municipal.backyardPermeableRatioMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.backyardPermeableRatio} %",
+      "requiredValue": "Permeabilidade logradouro ≥ {municipal.backyardPermeableRatioMin} %",
+      "remediation": "A área permeável do logradouro é insuficiente. Reduzir pavimentos impermeáveis no logradouro, utilizar pavimentos drenantes e aumentar áreas ajardinadas.",
+      "enabled": true,
+      "tags": ["permeabilidade", "logradouro", "espaços-exteriores", "PDM"]
+    },
+    {
+      "id": "PDM-AGUA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Ligação à Rede Pública de Abastecimento de Água",
+      "description": "O edifício deve ser obrigatoriamente ligado à rede pública de abastecimento de água quando esta existir ou estiver disponível no arruamento confrontante (DL 555/99, art. 43.º e regulamento municipal).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasPublicWaterConnection", "operator": "==", "value": false },
+        { "field": "municipal.publicWaterNetworkAvailable", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Ligação à rede de água: {municipal.hasPublicWaterConnection}",
+      "requiredValue": "Ligação obrigatória à rede pública de abastecimento de água (hasPublicWaterConnection = true)",
+      "remediation": "Existindo rede pública de abastecimento de água no arruamento, a ligação é obrigatória. Incluir no projeto o ramal de ligação à rede pública e obter parecer favorável da entidade gestora.",
+      "enabled": true,
+      "tags": ["infraestruturas", "abastecimento-água", "rede-pública", "PDM"]
+    },
+    {
+      "id": "PDM-SANEA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Ligação à Rede Pública de Saneamento",
+      "description": "O edifício deve ser obrigatoriamente ligado à rede pública de drenagem de águas residuais (saneamento) quando esta existir ou estiver disponível no arruamento confrontante.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasPublicSewerConnection", "operator": "==", "value": false },
+        { "field": "municipal.publicSewerNetworkAvailable", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Ligação à rede de saneamento: {municipal.hasPublicSewerConnection}",
+      "requiredValue": "Ligação obrigatória à rede pública de saneamento (hasPublicSewerConnection = true)",
+      "remediation": "Existindo rede pública de saneamento no arruamento, a ligação é obrigatória. Incluir no projeto o ramal de ligação à rede pública de águas residuais e obter parecer favorável da entidade gestora.",
+      "enabled": true,
+      "tags": ["infraestruturas", "saneamento", "rede-pública", "PDM"]
+    },
+    {
+      "id": "PDM-ELET-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Ligação à Rede Elétrica",
+      "description": "O edifício deve ser obrigatoriamente ligado à rede pública de distribuição de energia elétrica, conforme regulamentação em vigor e RTIEBT.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasElectricalConnection", "operator": "==", "value": false },
+        { "field": "municipal.electricalNetworkAvailable", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Ligação à rede elétrica: {municipal.hasElectricalConnection}",
+      "requiredValue": "Ligação obrigatória à rede elétrica (hasElectricalConnection = true)",
+      "remediation": "É obrigatório assegurar a ligação à rede pública de distribuição de energia elétrica. Incluir no projeto as instalações elétricas conforme o RTIEBT e obter parecer da E-Redes (ou operador de rede de distribuição local).",
+      "enabled": true,
+      "tags": ["infraestruturas", "eletricidade", "rede-pública", "PDM"]
+    },
+    {
+      "id": "PDM-ITED-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Ligação à Rede de Telecomunicações (ITED)",
+      "description": "O edifício deve dispor de infraestruturas de telecomunicações (ITED) conforme o DL 123/2009 (Manual ITED), assegurando a ligação à rede pública de telecomunicações.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasITEDConnection", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Infraestrutura ITED: {municipal.hasITEDConnection}",
+      "requiredValue": "Infraestrutura ITED obrigatória (hasITEDConnection = true)",
+      "remediation": "O edifício deve incluir infraestruturas de telecomunicações em edifícios (ITED) conforme o DL 123/2009. Incluir projeto ITED elaborado por projetista habilitado pela ANACOM.",
+      "enabled": true,
+      "tags": ["infraestruturas", "telecomunicações", "ITED", "PDM"]
+    }
+  ]
+}

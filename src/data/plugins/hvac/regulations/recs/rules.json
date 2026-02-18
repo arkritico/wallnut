@@ -1,0 +1,987 @@
+{
+  "regulationRef": "dl-118-2013-recs",
+  "description": "Regras de conformidade AVAC extraídas do RECS, Portaria 353-A/2013, DL 108/2018, DL 306/2007, EN 16798-1, NP 1037 e F-Gas EU 517/2014",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "AVAC-PROJ-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "Projeto AVAC",
+      "description": "Edifícios de comércio e serviços requerem projeto de AVAC elaborado por engenheiro mecânico ou eletrotécnico.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasHVACProject", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "remediation": "Contratar engenheiro mecânico ou eletrotécnico para elaboração de projeto AVAC. Deve incluir cálculos de cargas térmicas, dimensionamento de equipamentos e rede de condutas.",
+      "requiredValue": "Projeto AVAC obrigatório para comércio/serviços",
+      "enabled": true,
+      "tags": ["projeto", "AVAC", "comercial"]
+    },
+    {
+      "id": "AVAC-COZ-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "Extração de Cozinha — RGEU / REH",
+      "description": "A cozinha deve ter sistema de extração mecânica com caudal mínimo para remoção de vapores e odores.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasKitchenExtraction", "operator": "not_exists", "value": null }
+      ],
+      "remediation": "Instalar extração mecânica na cozinha com caudal mínimo de 180 m³/h. Prever conduta de extração independente até à cobertura.",
+      "requiredValue": "Extração mecânica ≥ 180 m³/h",
+      "enabled": true,
+      "tags": ["cozinha", "extração", "ventilação"]
+    },
+    {
+      "id": "AVAC-WC-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "Extração de Instalações Sanitárias — RGEU / REH",
+      "description": "As instalações sanitárias devem ter extração mecânica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasBathroomExtraction", "operator": "not_exists", "value": null }
+      ],
+      "remediation": "Instalar extração mecânica nas instalações sanitárias com caudal mínimo de 90 m³/h.",
+      "requiredValue": "Extração mecânica ≥ 90 m³/h",
+      "enabled": true,
+      "tags": ["WC", "extração", "ventilação"]
+    },
+    {
+      "id": "AVAC-VENTMEC-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Ventilação Mecânica — Portaria 353-A/2013",
+      "description": "Edifícios de comércio e serviços devem ter sistema de ventilação mecânica.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasVentilationSystem", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "remediation": "Instalar sistema de ventilação mecânica garantindo caudais mínimos de ar novo por pessoa (escritórios: 35 m³/(h.pessoa)).",
+      "requiredValue": "Ventilação mecânica com caudais conforme Portaria 353-A",
+      "enabled": true,
+      "tags": ["ventilação mecânica", "caudal", "ar novo"]
+    },
+    {
+      "id": "AVAC-QAI-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Qualidade do Ar Interior (QAI) — Portaria 353-A/2013",
+      "description": "O RECS exige monitorização da qualidade do ar interior em edifícios de comércio e serviços.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasAirQualityControl", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "remediation": "Instalar monitorização de QAI: CO₂ máx. 1250 ppm, PM2.5 máx. 25 μg/m³, TVOC máx. 600 μg/m³. Prever sensores e ajuste automático de caudal.",
+      "requiredValue": "CO₂ ≤ 1250 ppm, PM2.5 ≤ 25 μg/m³",
+      "enabled": true,
+      "tags": ["QAI", "CO2", "PM2.5", "monitorização"]
+    },
+    {
+      "id": "AVAC-RADON-01",
+      "regulationId": "dl-108-2018-radon",
+      "article": "Proteção contra Radão — DL 108/2018",
+      "description": "O DL 108/2018 estabelece o nível de referência de 300 Bq/m³ para concentração de radão em edifícios.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasRadonProtection", "operator": "not_exists", "value": null }
+      ],
+      "remediation": "Em zonas de risco (granito, xisto), prever medidas de mitigação: ventilação do solo (caixa-de-ar ventilada), membrana anti-radão, ventilação reforçada no piso térreo.",
+      "requiredValue": "≤ 300 Bq/m³ (nível de referência)",
+      "enabled": true,
+      "tags": ["radão", "saúde", "granito"]
+    },
+    {
+      "id": "AVAC-MANUT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "Plano de Manutenção — RECS",
+      "description": "Edifícios de comércio e serviços com potência > 25 kW requerem plano de manutenção preventiva.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasMaintenancePlan", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "remediation": "Elaborar Plano de Manutenção Preventiva (PMP) e designar técnico responsável pelo STE. Qualificação mínima: TIM III (RECS).",
+      "requiredValue": "PMP obrigatório para potência > 25 kW",
+      "enabled": true,
+      "tags": ["manutenção", "PMP", "TIM", "STE"]
+    },
+    {
+      "id": "AVAC-FGAS-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "Gases Fluorados — EU 517/2014",
+      "description": "Equipamentos de refrigeração e AC com gases fluorados requerem técnicos certificados e verificações de fugas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasFGasCompliance", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+      ],
+      "remediation": "Garantir: técnicos certificados F-Gas, verificações de fugas periódicas, registo de intervenções, cumprimento dos limites de GWP dos refrigerantes.",
+      "requiredValue": "Conformidade F-Gas obrigatória",
+      "enabled": true,
+      "tags": ["F-Gas", "refrigerante", "fugas", "GWP"]
+    },
+    {
+      "id": "AVAC-VENTNAT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "Ventilação Natural — REH",
+      "description": "O sistema de ventilação é exclusivamente natural. Garantir admissão de ar pelas fachadas e extração por condutas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.ventilationType", "operator": "==", "value": "natural" },
+        { "field": "buildingType", "operator": "not_in", "value": ["commercial", "mixed"] }
+      ],
+      "remediation": "Garantir admissão de ar pelas fachadas principais (grelhas auto-reguláveis) e extração por condutas nas cozinhas e WC. Caudal mínimo: 0.6 h⁻¹.",
+      "requiredValue": "Ventilação natural com ≥ 0.6 h⁻¹",
+      "enabled": true,
+      "tags": ["ventilação natural", "residencial"]
+    },
+    {
+      "id": "HVAC-FILT-01",
+      "regulationId": "recs-portaria-353a",
+      "article": "RECS / Portaria 353-A/2013 — Filtração de Ar em UTAs",
+      "description": "As Unidades de Tratamento de Ar (UTAs) devem possuir classe mínima de filtração: pré-filtro M5 e filtro final F7, conforme Portaria 353-A/2013. A classe de filtro instalada ({hvac.filterClass}) é insuficiente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.filterClass", "operator": "<", "value": "F7" },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.filterClass}",
+      "requiredValue": "≥ M5 (pré-filtro) + F7 (filtro final)",
+      "remediation": "Substituir ou adicionar filtros nas UTAs para garantir classe mínima M5 (pré-filtro) e F7 (filtro final). Em ambientes hospitalares ou laboratoriais, considerar filtros HEPA (H13/H14). Verificar perda de carga e compatibilidade com o ventilador.",
+      "enabled": true,
+      "tags": ["filtração", "UTA", "QAI", "filtros"]
+    },
+    {
+      "id": "HVAC-RECUP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Recuperação de Calor Obrigatória",
+      "description": "O RECS exige recuperação de calor quando o caudal de ar novo é ≥ 10.000 m³/h. A eficiência mínima do recuperador deve ser de 50%. O caudal atual ({hvac.freshAirFlow} m³/h) ultrapassa o limiar sem recuperação de calor instalada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.freshAirFlow", "operator": ">=", "value": 10000 },
+        { "field": "hvac.heatRecoveryEfficiency", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "{hvac.freshAirFlow} m³/h, eficiência recuperação: {hvac.heatRecoveryEfficiency}%",
+      "requiredValue": "Recuperador de calor obrigatório com eficiência ≥ 50% (caudal ≥ 10.000 m³/h)",
+      "remediation": "Instalar recuperador de calor ar-ar (fluxos cruzados, rotativos ou de placas) com eficiência mínima de 50%. Para edifícios novos, recomenda-se eficiência ≥ 70%. Verificar compatibilidade com o sistema de condutas existente e prever bypass para free-cooling.",
+      "enabled": true,
+      "tags": ["recuperação de calor", "eficiência energética", "UTA", "caudal"]
+    },
+    {
+      "id": "HVAC-RUIDO-01",
+      "regulationId": "recs-portaria-353a",
+      "article": "RECS / Portaria 353-A/2013 — Ruído de Equipamentos AVAC",
+      "description": "O nível de ruído dos equipamentos AVAC ({hvac.equipmentNoiseRating} NR) excede o limite regulamentar para o tipo de espaço. Limites: NR 35 em escritórios, NR 30 em salas de reuniões, NR 25 em hospitais/bibliotecas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.equipmentNoiseRating", "operator": ">", "value": 35 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hospital", "school"] }
+      ],
+      "currentValueTemplate": "{hvac.equipmentNoiseRating} NR",
+      "requiredValue": "≤ NR 35 (escritórios), ≤ NR 30 (reuniões), ≤ NR 25 (hospitais)",
+      "remediation": "Reduzir o ruído dos equipamentos AVAC: instalar atenuadores acústicos nas condutas, utilizar apoios anti-vibráticos, revestir condutas com isolamento acústico, e verificar velocidades do ar nas grelhas (máx. 2.5 m/s em zonas ocupadas). Considerar reposicionamento de equipamentos ruidosos para zonas técnicas isoladas.",
+      "enabled": true,
+      "tags": ["ruído", "acústica", "NR", "conforto"]
+    },
+    {
+      "id": "HVAC-ISOL-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Isolamento Térmico de Condutas (Espessura Detalhada)",
+      "description": "A espessura do isolamento térmico das condutas ({hvac.ductInsulationThickness} mm) é insuficiente para a diferença de temperatura existente. Espessuras mínimas: ≥ 25 mm (Δt < 20°C), ≥ 40 mm (Δt 20-40°C), ≥ 50 mm (Δt > 40°C).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ductInsulationThickness", "operator": "<", "value": 25 }
+      ],
+      "currentValueTemplate": "{hvac.ductInsulationThickness} mm",
+      "requiredValue": "≥ 25 mm (Δt<20°C), ≥ 40 mm (Δt 20-40°C), ≥ 50 mm (Δt>40°C)",
+      "remediation": "Aplicar isolamento térmico nas condutas de acordo com a diferença de temperatura: lã mineral ou elastomérico com espessura mínima de 25 mm para Δt < 20°C, 40 mm para Δt entre 20-40°C, e 50 mm para Δt > 40°C. Incluir barreira de vapor no isolamento de condutas de arrefecimento para evitar condensações.",
+      "enabled": true,
+      "tags": ["isolamento", "condutas", "eficiência energética", "condensação"]
+    },
+    {
+      "id": "HVAC-ESTANQ-01",
+      "regulationId": "recs-portaria-353a",
+      "article": "RECS / EN 12237 — Estanquidade de Condutas",
+      "description": "A classe de estanquidade das condutas ({hvac.ductLeakageClass}) não cumpre o requisito mínimo de Classe B conforme EN 12237. Fugas máximas admissíveis: 0.009 × p^0.65 L/(s·m²) a 400 Pa.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ductLeakageClass", "operator": "<", "value": "B" }
+      ],
+      "currentValueTemplate": "Classe {hvac.ductLeakageClass}",
+      "requiredValue": "≥ Classe B (EN 12237) — 0.009 × p^0.65 L/(s·m²) a 400 Pa",
+      "remediation": "Garantir estanquidade mínima de Classe B nas condutas: utilizar juntas vedantes em todas as ligações, aplicar mástique ou fita de alumínio nas junções, e realizar ensaio de estanquidade conforme EN 12237. Para sistemas de alta pressão (>1000 Pa), exigir Classe C.",
+      "enabled": true,
+      "tags": ["estanquidade", "condutas", "EN 12237", "fugas"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-01",
+      "regulationId": "dl-306-2007",
+      "article": "DL 306/2007 — Prevenção de Legionella",
+      "description": "A temperatura de armazenamento de água quente ({hvac.hotWaterStorageTemp}°C) é inferior ao mínimo de 60°C para prevenção de Legionella. A distribuição deve manter-se ≥ 50°C conforme DL 306/2007.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hotWaterStorageTemp", "operator": "<", "value": 60 }
+      ],
+      "currentValueTemplate": "Armazenamento: {hvac.hotWaterStorageTemp}°C, Distribuição: {hvac.hotWaterDistributionTemp}°C",
+      "requiredValue": "Armazenamento ≥ 60°C, Distribuição ≥ 50°C",
+      "remediation": "Ajustar o setpoint do termoacumulador para ≥ 60°C. Garantir que a temperatura na rede de distribuição não desce abaixo de 50°C em nenhum ponto (instalar válvulas de recirculação). Implementar programa de choque térmico periódico (70°C durante 30 min) nos depósitos e rede. Prever análises microbiológicas anuais.",
+      "enabled": true,
+      "tags": ["Legionella", "AQS", "saúde pública", "temperatura"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-02",
+      "regulationId": "dl-306-2007",
+      "article": "DL 306/2007 — Temperatura de Distribuição AQS",
+      "description": "A temperatura de distribuição de água quente ({hvac.hotWaterDistributionTemp}°C) é inferior ao mínimo de 50°C para prevenção de Legionella nos pontos terminais da rede.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hotWaterDistributionTemp", "operator": "<", "value": 50 },
+        { "field": "hvac.hotWaterStorageTemp", "operator": ">=", "value": 60 }
+      ],
+      "currentValueTemplate": "{hvac.hotWaterDistributionTemp}°C na distribuição",
+      "requiredValue": "≥ 50°C em todos os pontos de distribuição",
+      "remediation": "Instalar ou reparar o sistema de recirculação de AQS para garantir ≥ 50°C em todos os pontos terminais. Isolar as tubagens de distribuição. Verificar se existem troços mortos (dead legs) superiores a 3 litros e eliminá-los. Considerar válvulas termostáticas nos pontos de utilização.",
+      "enabled": true,
+      "tags": ["Legionella", "AQS", "distribuição", "recirculação"]
+    },
+    {
+      "id": "HVAC-GES-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS Art. 14.º — Sistema de Gestão Técnica Centralizada (SGTC)",
+      "description": "O edifício possui potência instalada de climatização ({hvac.installedCoolingPower} kW) ≥ 100 kW, sendo obrigatório Sistema de Gestão Técnica Centralizada (SGTC) conforme Art. 14.º do RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 100 },
+        { "field": "hvac.hasGTCSystem", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedCoolingPower} kW instalados, sem SGTC",
+      "requiredValue": "SGTC obrigatório para potência instalada ≥ 100 kW",
+      "remediation": "Instalar Sistema de Gestão Técnica Centralizada (SGTC/BMS) que permita: monitorização e controlo de todos os equipamentos AVAC, registo de consumos energéticos, gestão de horários de funcionamento, alarmes de avaria, e otimização de setpoints. O sistema deve ser compatível com protocolo BACnet ou Modbus.",
+      "enabled": true,
+      "tags": ["SGTC", "BMS", "gestão técnica", "automação"]
+    },
+    {
+      "id": "HVAC-EER-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Eficiência Mínima de Arrefecimento (EER)",
+      "description": "O EER do sistema de arrefecimento ({hvac.eer}) é inferior ao mínimo regulamentar. Edifícios novos: EER ≥ 3.0; edifícios existentes: EER ≥ 2.8.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.eer", "operator": "<", "value": 3.0 },
+        { "field": "hvac.installedCoolingPower", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "EER = {hvac.eer}",
+      "requiredValue": "≥ 3.0 (edifício novo), ≥ 2.8 (edifício existente)",
+      "remediation": "Substituir o equipamento de arrefecimento por um com EER ≥ 3.0 (edifícios novos) ou ≥ 2.8 (edifícios existentes). Considerar chillers com compressores de velocidade variável (inverter), condensação a água ou sistemas VRF de alta eficiência. Verificar também o SEER (eficiência sazonal) para uma avaliação mais representativa.",
+      "enabled": true,
+      "tags": ["EER", "eficiência", "arrefecimento", "chiller"]
+    },
+    {
+      "id": "HVAC-COP-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — COP Mínimo por Tipo de Bomba de Calor",
+      "description": "O COP do sistema de aquecimento ({hvac.cop}) é inferior ao mínimo regulamentar para o tipo de equipamento. Mínimos: ar-água COP ≥ 3.0, ar-ar COP ≥ 3.5, geotérmica COP ≥ 4.0.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.cop", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "COP = {hvac.cop}",
+      "requiredValue": "≥ 3.0 (ar-água), ≥ 3.5 (ar-ar), ≥ 4.0 (geotérmica)",
+      "remediation": "Substituir o equipamento de aquecimento por bomba de calor com COP adequado ao tipo: ar-água ≥ 3.0, ar-ar ≥ 3.5, geotérmica ≥ 4.0. Para edifícios novos, privilegiar bombas de calor com fluido R-290 (propano) ou R-32 de baixo GWP. Verificar também o SCOP (COP sazonal) para avaliação mais precisa.",
+      "enabled": true,
+      "tags": ["COP", "bomba de calor", "aquecimento", "eficiência"]
+    },
+    {
+      "id": "HVAC-SOLAR-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Painéis Solares Térmicos para AQS",
+      "description": "O edifício de serviços não dispõe de painéis solares térmicos para preparação de AQS. O RECS exige, quando aplicável, a instalação de 1.0 m² de coletor solar por ocupante equivalente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSolarThermal", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hotel", "hospital", "school"] }
+      ],
+      "currentValueTemplate": "Sem sistema solar térmico instalado",
+      "requiredValue": "≥ 1.0 m² de coletor solar por ocupante equivalente",
+      "remediation": "Instalar sistema solar térmico para preparação de AQS com área de coletores ≥ 1.0 m²/ocupante equivalente. Orientação preferencial: Sul (±15°), inclinação ≈ latitude local (38-42° em Portugal continental). Prever depósito de acumulação com capacidade de 50-80 L/m² de coletor. Caso a instalação seja técnica ou economicamente inviável, apresentar justificação ao perito qualificado do SCE.",
+      "enabled": true,
+      "tags": ["solar térmico", "AQS", "energia renovável", "SCE"]
+    },
+    {
+      "id": "HVAC-QAI-02",
+      "regulationId": "recs-portaria-353a",
+      "article": "RECS / Portaria 353-A/2013 — Monitorização CO₂ Obrigatória",
+      "description": "Espaços com ocupação superior a 100 pessoas devem possuir sondas de CO₂ para monitorização contínua da qualidade do ar interior. O espaço tem ocupação de {hvac.occupancy} pessoas sem monitorização de CO₂.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.occupancy", "operator": ">", "value": 100 },
+        { "field": "hvac.hasCO2Monitoring", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.occupancy} ocupantes, sem sondas CO₂",
+      "requiredValue": "Sondas de CO₂ obrigatórias para ocupação > 100 pessoas",
+      "remediation": "Instalar sondas de CO₂ (NDIR — infravermelhos não dispersivos) nos espaços com ocupação > 100 pessoas. Posicionar as sondas na zona de respiração (1.1-1.7 m de altura), afastadas de portas e janelas. Ligar as sondas ao sistema de gestão técnica para controlo automático do caudal de ar novo (ventilação DCV — Demand Controlled Ventilation). Limite de CO₂: ≤ 1250 ppm.",
+      "enabled": true,
+      "tags": ["CO2", "monitorização", "QAI", "DCV", "sondas"]
+    },
+    {
+      "id": "HVAC-REFRIG-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 (F-Gas) — Limite de GWP para Refrigerantes",
+      "description": "O fluido frigorigéneo utilizado tem um GWP de {hvac.refrigerantGWP}, superior ao limite máximo de 750 imposto pelo Regulamento EU 517/2014 para novos equipamentos a partir de 2025. Os refrigerantes R-404A (GWP 3922) e R-507A (GWP 3985) estão proibidos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantGWP", "operator": ">", "value": 750 }
+      ],
+      "currentValueTemplate": "GWP = {hvac.refrigerantGWP}",
+      "requiredValue": "GWP ≤ 750 (novos equipamentos 2025+); R-404A e R-507A proibidos",
+      "remediation": "Substituir o fluido frigorigéneo por alternativa com GWP ≤ 750: R-32 (GWP 675), R-290 propano (GWP 3), R-1234yf (GWP 4), R-1234ze (GWP 7), ou R-454B (GWP 466). Para equipamentos existentes, planear a transição até ao fim de vida útil. Manter registos de fugas e consumos de refrigerante conforme exigido pelo Regulamento F-Gas.",
+      "enabled": true,
+      "tags": ["refrigerante", "GWP", "F-Gas", "R-32", "R-290"]
+    },
+
+    {
+      "id": "HVAC-VENT-RES-01",
+      "regulationId": "np-1037-1",
+      "article": "NP 1037-1 — Caudal de Admissão Residencial (Sala)",
+      "description": "Em edifícios residenciais, a admissão de ar nos compartimentos principais (salas, quartos) deve ser assegurada por grelhas auto-reguláveis nas fachadas ou caixilharias, conforme NP 1037-1. O caudal de admissão atual ({hvac.livingRoomSupplyFlow} m³/h) é insuficiente ou as grelhas auto-reguláveis não estão instaladas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasAutoRegulatingGrilles", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["residential", "multifamily"] }
+      ],
+      "currentValueTemplate": "Sem grelhas auto-reguláveis instaladas",
+      "requiredValue": "Grelhas auto-reguláveis obrigatórias nos compartimentos principais (NP 1037-1)",
+      "remediation": "Instalar grelhas auto-reguláveis de admissão de ar nos compartimentos principais (salas e quartos). As grelhas devem ser integradas na caixilharia ou na fachada, dimensionadas para o caudal mínimo de ventilação do compartimento. O caudal mínimo de admissão depende da área do compartimento e do número de ocupantes. Garantir que o diferencial de pressão permite o fluxo de ar dos compartimentos principais para os compartimentos de serviço (cozinha, WC).",
+      "enabled": true,
+      "tags": ["ventilação natural", "residencial", "grelhas", "NP 1037", "admissão"]
+    },
+    {
+      "id": "HVAC-VENT-RES-02",
+      "regulationId": "np-1037-1",
+      "article": "NP 1037-1 — Extração Cozinha Residencial",
+      "description": "A extração de ar na cozinha residencial deve garantir um caudal mínimo de 60 m³/h conforme NP 1037-1. O caudal de extração atual ({hvac.kitchenExtractionFlow} m³/h) é insuficiente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.kitchenExtractionFlow", "operator": "<", "value": 60 },
+        { "field": "buildingType", "operator": "in", "value": ["residential", "multifamily"] }
+      ],
+      "currentValueTemplate": "{hvac.kitchenExtractionFlow} m³/h",
+      "requiredValue": "≥ 60 m³/h (extração cozinha residencial — NP 1037-1)",
+      "remediation": "Garantir caudal de extração ≥ 60 m³/h na cozinha residencial. Em ventilação natural, prever conduta de extração vertical com secção adequada e abertura no topo com chapéu estático ou eólico. Em ventilação mecânica, instalar extractor com caudal regulável ≥ 60 m³/h. Prever também extração adicional pelo exaustor (180 m³/h) para funcionamento durante a confeção.",
+      "enabled": true,
+      "tags": ["cozinha", "extração", "residencial", "NP 1037", "ventilação"]
+    },
+    {
+      "id": "HVAC-VENT-RES-03",
+      "regulationId": "np-1037-1",
+      "article": "NP 1037-1 — Extração Instalações Sanitárias Residenciais",
+      "description": "A extração de ar nas instalações sanitárias residenciais deve garantir um caudal mínimo de 45 m³/h conforme NP 1037-1. O caudal de extração atual ({hvac.bathroomExtractionFlow} m³/h) é insuficiente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.bathroomExtractionFlow", "operator": "<", "value": 45 },
+        { "field": "buildingType", "operator": "in", "value": ["residential", "multifamily"] }
+      ],
+      "currentValueTemplate": "{hvac.bathroomExtractionFlow} m³/h",
+      "requiredValue": "≥ 45 m³/h (extração IS residencial — NP 1037-1)",
+      "remediation": "Garantir caudal de extração ≥ 45 m³/h nas instalações sanitárias. Prever conduta de extração vertical individual ou coletiva com secção mínima adequada. Instalar grelha de extração na parte superior da parede ou no teto. Em edifícios existentes sem conduta, considerar extractor mecânico temporizado com ligação ao interruptor de iluminação.",
+      "enabled": true,
+      "tags": ["WC", "extração", "residencial", "NP 1037", "ventilação"]
+    },
+    {
+      "id": "HVAC-VENT-ESC-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Caudal Ar Novo Escritórios",
+      "description": "O caudal de ar novo por pessoa em escritórios ({hvac.officeAirFlowPerPerson} m³/(h.pessoa)) é inferior ao mínimo de 35 m³/(h.pessoa) exigido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.officeAirFlowPerPerson", "operator": "<", "value": 35 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "office" }
+      ],
+      "currentValueTemplate": "{hvac.officeAirFlowPerPerson} m³/(h.pessoa)",
+      "requiredValue": "≥ 35 m³/(h.pessoa) para escritórios (Portaria 353-A/2013)",
+      "remediation": "Dimensionar o sistema de ventilação para fornecer ≥ 35 m³/(h.pessoa) de ar novo em escritórios. Considerar a densidade de ocupação de projeto (tipicamente 10-12 m²/pessoa em open-space). Verificar que a UTA ou UTAN tem capacidade de caudal suficiente. Implementar controlo DCV com sondas de CO₂ para otimizar o caudal em função da ocupação real.",
+      "enabled": true,
+      "tags": ["ar novo", "escritórios", "caudal", "Portaria 353-A", "ventilação"]
+    },
+    {
+      "id": "HVAC-VENT-COM-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Caudal Ar Novo Comércio",
+      "description": "O caudal de ar novo por pessoa em espaços comerciais ({hvac.retailAirFlowPerPerson} m³/(h.pessoa)) é inferior ao mínimo de 30 m³/(h.pessoa) exigido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.retailAirFlowPerPerson", "operator": "<", "value": 30 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "retail" }
+      ],
+      "currentValueTemplate": "{hvac.retailAirFlowPerPerson} m³/(h.pessoa)",
+      "requiredValue": "≥ 30 m³/(h.pessoa) para comércio (Portaria 353-A/2013)",
+      "remediation": "Dimensionar o sistema de ventilação para fornecer ≥ 30 m³/(h.pessoa) de ar novo em espaços comerciais. Considerar os picos de ocupação (tipicamente 5-7 m²/pessoa em comércio). Prever modulação de caudal para ajustar o ar novo em função da ocupação real. Verificar que o sistema de climatização tem capacidade para tratar o caudal de ar novo necessário.",
+      "enabled": true,
+      "tags": ["ar novo", "comércio", "caudal", "Portaria 353-A", "ventilação"]
+    },
+    {
+      "id": "HVAC-VENT-REST-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Caudal Ar Novo Restauração",
+      "description": "O caudal de ar novo por pessoa em espaços de restauração ({hvac.restaurantAirFlowPerPerson} m³/(h.pessoa)) é inferior ao mínimo de 50 m³/(h.pessoa) exigido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.restaurantAirFlowPerPerson", "operator": "<", "value": 50 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "restaurant" }
+      ],
+      "currentValueTemplate": "{hvac.restaurantAirFlowPerPerson} m³/(h.pessoa)",
+      "requiredValue": "≥ 50 m³/(h.pessoa) para restauração (Portaria 353-A/2013)",
+      "remediation": "Dimensionar o sistema de ventilação para fornecer ≥ 50 m³/(h.pessoa) de ar novo em espaços de restauração. A zona de cozinha requer extração adicional independente. Considerar a separação de zona de fumadores (se aplicável) com pressão negativa. Prever sistema de compensação de ar para equilibrar a extração da hotte da cozinha. Densidade de ocupação típica: 1.5-2.0 m²/pessoa.",
+      "enabled": true,
+      "tags": ["ar novo", "restauração", "caudal", "Portaria 353-A", "ventilação"]
+    },
+    {
+      "id": "HVAC-VENT-ESC-02",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Caudal Ar Novo Salas de Aula",
+      "description": "O caudal de ar novo por pessoa em salas de aula ({hvac.classroomAirFlowPerPerson} m³/(h.pessoa)) é inferior ao mínimo de 30 m³/(h.pessoa) exigido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.classroomAirFlowPerPerson", "operator": "<", "value": 30 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "classroom" }
+      ],
+      "currentValueTemplate": "{hvac.classroomAirFlowPerPerson} m³/(h.pessoa)",
+      "requiredValue": "≥ 30 m³/(h.pessoa) para salas de aula (Portaria 353-A/2013)",
+      "remediation": "Dimensionar o sistema de ventilação para fornecer ≥ 30 m³/(h.pessoa) de ar novo em salas de aula. Considerar a ocupação típica de 2.0-2.5 m²/aluno. Instalar sondas de CO₂ para monitorização contínua e controlo DCV. Em escolas existentes sem ventilação mecânica, considerar unidades de ventilação descentralizadas com recuperação de calor por sala.",
+      "enabled": true,
+      "tags": ["ar novo", "escola", "salas de aula", "caudal", "Portaria 353-A"]
+    },
+    {
+      "id": "HVAC-VENT-HOSP-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Caudal Ar Novo Hospitais",
+      "description": "O caudal de ar novo por pessoa em espaços hospitalares ({hvac.hospitalAirFlowPerPerson} m³/(h.pessoa)) é inferior ao mínimo de 50 m³/(h.pessoa) exigido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hospitalAirFlowPerPerson", "operator": "<", "value": 50 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "hospital" }
+      ],
+      "currentValueTemplate": "{hvac.hospitalAirFlowPerPerson} m³/(h.pessoa)",
+      "requiredValue": "≥ 50 m³/(h.pessoa) para hospitais (Portaria 353-A/2013)",
+      "remediation": "Dimensionar o sistema de ventilação para fornecer ≥ 50 m³/(h.pessoa) de ar novo em espaços hospitalares. Zonas críticas (blocos operatórios, UCI) requerem caudais superiores e filtração HEPA (H13/H14). Garantir cascata de pressões (positiva em zonas limpas, negativa em zonas contaminadas). Prever 100% ar novo (sem recirculação) em zonas de isolamento.",
+      "enabled": true,
+      "tags": ["ar novo", "hospital", "caudal", "Portaria 353-A", "ventilação", "HEPA"]
+    },
+    {
+      "id": "HVAC-CO2-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima CO₂",
+      "description": "A concentração de CO₂ interior ({hvac.co2Level} ppm) excede o limite máximo de 1250 ppm estabelecido pela Portaria 353-A/2013 para a qualidade do ar interior.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.co2Level", "operator": ">", "value": 1250 }
+      ],
+      "currentValueTemplate": "{hvac.co2Level} ppm",
+      "requiredValue": "≤ 1250 ppm (Portaria 353-A/2013)",
+      "remediation": "Aumentar o caudal de ar novo para reduzir a concentração de CO₂ abaixo de 1250 ppm. Verificar o correto funcionamento do sistema de ventilação (filtros, correias, ventiladores). Instalar sondas de CO₂ com controlo DCV para modulação automática do caudal. Verificar se as grelhas de insuflação e retorno não estão obstruídas. Em último caso, reduzir a densidade de ocupação do espaço.",
+      "enabled": true,
+      "tags": ["CO2", "QAI", "Portaria 353-A", "ventilação", "saúde"]
+    },
+    {
+      "id": "HVAC-CO-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima CO",
+      "description": "A concentração de monóxido de carbono interior ({hvac.coLevel} mg/m³) excede o limite máximo de 10 mg/m³ estabelecido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.coLevel", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "{hvac.coLevel} mg/m³",
+      "requiredValue": "≤ 10 mg/m³ (Portaria 353-A/2013)",
+      "remediation": "Identificar e eliminar a fonte de CO interior (equipamentos de combustão, garagens adjacentes, entrada de ar poluído). Verificar a estanquidade das condutas de evacuação de gases de combustão. Instalar detetores de CO com alarme nas zonas de risco. Verificar que as tomadas de ar novo não estão próximas de fontes de emissão (escape de veículos, chaminés). Em garagens, garantir ventilação mecânica com deteção de CO.",
+      "enabled": true,
+      "tags": ["CO", "monóxido de carbono", "QAI", "Portaria 353-A", "segurança"]
+    },
+    {
+      "id": "HVAC-FORM-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima Formaldeído",
+      "description": "A concentração de formaldeído interior ({hvac.formaldehydeLevel} μg/m³) excede o limite máximo de 100 μg/m³ estabelecido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.formaldehydeLevel", "operator": ">", "value": 100 }
+      ],
+      "currentValueTemplate": "{hvac.formaldehydeLevel} μg/m³",
+      "requiredValue": "≤ 100 μg/m³ (Portaria 353-A/2013)",
+      "remediation": "Identificar as fontes de formaldeído: painéis de aglomerado, MDF, tintas, vernizes, mobiliário novo, produtos de limpeza. Aumentar a ventilação com ar novo. Substituir materiais emissores por alternativas com baixa emissão (classe E1 ou inferior). Aguardar período de desgasificação de materiais novos (mínimo 4 semanas com ventilação reforçada). Considerar purificadores de ar com filtros de carvão ativado.",
+      "enabled": true,
+      "tags": ["formaldeído", "QAI", "Portaria 353-A", "saúde", "COV"]
+    },
+    {
+      "id": "HVAC-PM25-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima PM2.5",
+      "description": "A concentração de partículas finas PM2.5 interior ({hvac.pm25Level} μg/m³) excede o limite máximo de 25 μg/m³ estabelecido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.pm25Level", "operator": ">", "value": 25 }
+      ],
+      "currentValueTemplate": "{hvac.pm25Level} μg/m³",
+      "requiredValue": "≤ 25 μg/m³ (Portaria 353-A/2013)",
+      "remediation": "Melhorar a filtração do ar: verificar e substituir filtros das UTAs (mínimo F7 para partículas finas). Verificar a estanquidade das condutas para evitar infiltração de ar não filtrado. Identificar fontes internas de partículas (impressoras laser, obras, processos industriais). Em zonas urbanas com elevada poluição exterior, considerar filtros F9 ou HEPA na admissão de ar. Instalar sensores de PM2.5 para monitorização contínua.",
+      "enabled": true,
+      "tags": ["PM2.5", "partículas", "QAI", "Portaria 353-A", "filtração"]
+    },
+    {
+      "id": "HVAC-PM10-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima PM10",
+      "description": "A concentração de partículas PM10 interior ({hvac.pm10Level} μg/m³) excede o limite máximo de 50 μg/m³ estabelecido pela Portaria 353-A/2013.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.pm10Level", "operator": ">", "value": 50 }
+      ],
+      "currentValueTemplate": "{hvac.pm10Level} μg/m³",
+      "requiredValue": "≤ 50 μg/m³ (Portaria 353-A/2013)",
+      "remediation": "Verificar e substituir os pré-filtros (mínimo M5) e filtros finais das UTAs. Garantir limpeza regular das condutas e grelhas. Identificar fontes internas de partículas grossas (obras, movimentação de materiais). Verificar a vedação de portas e janelas em zonas com elevada poluição exterior. Implementar programa de limpeza com aspiração HEPA em vez de varrimento a seco.",
+      "enabled": true,
+      "tags": ["PM10", "partículas", "QAI", "Portaria 353-A", "filtração"]
+    },
+    {
+      "id": "HVAC-COV-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 Anexo — Concentração Máxima COV Totais",
+      "description": "A concentração de compostos orgânicos voláteis totais (COV) interior ({hvac.tvocLevel} μg/m³) excede o limite máximo de 600 μg/m³ estabelecido pela Portaria 353-A/2013.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.tvocLevel", "operator": ">", "value": 600 }
+      ],
+      "currentValueTemplate": "{hvac.tvocLevel} μg/m³",
+      "requiredValue": "≤ 600 μg/m³ (Portaria 353-A/2013)",
+      "remediation": "Identificar e eliminar as fontes de COV: tintas, vernizes, adesivos, produtos de limpeza, mobiliário novo, carpetes, materiais de construção recentes. Aumentar o caudal de ar novo. Substituir produtos de limpeza por alternativas de baixa emissão. Utilizar materiais de construção e acabamentos com certificação de baixa emissão (ex: Indoor Air Comfort Gold, Blue Angel). Instalar sensores de COV para monitorização contínua.",
+      "enabled": true,
+      "tags": ["COV", "TVOC", "QAI", "Portaria 353-A", "saúde"]
+    },
+    {
+      "id": "HVAC-RADON-01",
+      "regulationId": "dl-108-2018-radon",
+      "article": "DL 108/2018 — Concentração Máxima de Radão",
+      "description": "A concentração de radão interior ({hvac.radonLevel} Bq/m³) excede o nível de referência de 300 Bq/m³ estabelecido pelo DL 108/2018, transpondo a Diretiva 2013/59/Euratom.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.radonLevel", "operator": ">", "value": 300 }
+      ],
+      "currentValueTemplate": "{hvac.radonLevel} Bq/m³",
+      "requiredValue": "≤ 300 Bq/m³ (DL 108/2018)",
+      "remediation": "Implementar medidas de mitigação de radão: instalar sistema de despressurização do solo (SSD — Sub-Slab Depressurization) com ventilador, selar fissuras e juntas na laje do piso térreo, aplicar membrana anti-radão, reforçar a ventilação do piso térreo, e instalar caixa-de-ar ventilada sob a laje. Realizar nova medição após 3 meses para verificar a eficácia. Em zonas graníticas do norte de Portugal, a medição de radão deve ser obrigatória.",
+      "enabled": true,
+      "tags": ["radão", "DL 108/2018", "QAI", "saúde", "mitigação"]
+    },
+    {
+      "id": "HVAC-TEMP-INV-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Temperatura Operativa de Inverno",
+      "description": "A temperatura operativa interior de inverno ({hvac.winterOperativeTemp}°C) está fora do intervalo de conforto de 20-22°C definido pela EN 16798-1 (Categoria II — edifícios novos e renovados).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.winterOperativeTemp", "operator": "<", "value": 20 }
+      ],
+      "currentValueTemplate": "{hvac.winterOperativeTemp}°C",
+      "requiredValue": "20-22°C (EN 16798-1, Categoria II, inverno)",
+      "remediation": "Ajustar o setpoint de aquecimento para 20-22°C na estação de aquecimento. Verificar o correto dimensionamento do sistema de aquecimento (cargas térmicas). Garantir que o isolamento térmico da envolvente é adequado. Verificar a existência de pontes térmicas. Em edifícios existentes, considerar reforço do isolamento e substituição de caixilharias. Evitar setpoints abaixo de 20°C para conforto dos ocupantes.",
+      "enabled": true,
+      "tags": ["temperatura", "conforto", "inverno", "EN 16798", "aquecimento"]
+    },
+    {
+      "id": "HVAC-TEMP-VER-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Temperatura Operativa de Verão",
+      "description": "A temperatura operativa interior de verão ({hvac.summerOperativeTemp}°C) está fora do intervalo de conforto de 24-26°C definido pela EN 16798-1 (Categoria II — edifícios novos e renovados).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.summerOperativeTemp", "operator": ">", "value": 26 }
+      ],
+      "currentValueTemplate": "{hvac.summerOperativeTemp}°C",
+      "requiredValue": "24-26°C (EN 16798-1, Categoria II, verão)",
+      "remediation": "Ajustar o setpoint de arrefecimento para 24-26°C na estação de arrefecimento. Verificar o dimensionamento do sistema de arrefecimento. Implementar medidas passivas de redução de ganhos solares: proteções solares exteriores (estores, palas), vidros de controlo solar, ventilação noturna (free-cooling). Verificar a existência de envidraçados sem proteção solar orientados a Poente ou Sul.",
+      "enabled": true,
+      "tags": ["temperatura", "conforto", "verão", "EN 16798", "arrefecimento"]
+    },
+    {
+      "id": "HVAC-HR-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Humidade Relativa Interior",
+      "description": "A humidade relativa interior ({hvac.relativeHumidity}%) está fora do intervalo aceitável de 30-70% definido pela EN 16798-1. Valores abaixo de 30% causam desconforto (secura), acima de 70% favorecem bolores e condensações.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.relativeHumidity", "operator": "<", "value": 30 }
+      ],
+      "currentValueTemplate": "{hvac.relativeHumidity}%",
+      "requiredValue": "30-70% (EN 16798-1)",
+      "remediation": "Se a humidade for inferior a 30%: instalar humidificador (vapor, adiabático ou ultrassónico) na UTA ou no espaço. Se superior a 70%: aumentar a ventilação, instalar desumidificador, verificar infiltrações de água e pontes térmicas com condensação. Instalar sensores de humidade relativa para monitorização contínua e controlo automático. Em edifícios com UTA, integrar controlo de humidade no sistema de gestão técnica.",
+      "enabled": true,
+      "tags": ["humidade", "conforto", "EN 16798", "QAI", "condensação"]
+    },
+    {
+      "id": "HVAC-HR-02",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Humidade Relativa Excessiva",
+      "description": "A humidade relativa interior ({hvac.relativeHumidity}%) excede 70%, favorecendo o desenvolvimento de bolores, ácaros e condensações superficiais conforme EN 16798-1.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.relativeHumidity", "operator": ">", "value": 70 }
+      ],
+      "currentValueTemplate": "{hvac.relativeHumidity}%",
+      "requiredValue": "30-70% (EN 16798-1)",
+      "remediation": "Aumentar a taxa de renovação de ar. Verificar e reparar infiltrações de água. Instalar desumidificador se necessário. Eliminar pontes térmicas que causam condensação superficial. Garantir ventilação adequada em zonas húmidas (cozinhas, IS). Considerar sistemas de ventilação mecânica controlada (VMC) com desumidificação integrada.",
+      "enabled": true,
+      "tags": ["humidade", "conforto", "EN 16798", "bolores", "condensação"]
+    },
+    {
+      "id": "HVAC-VAR-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Velocidade do Ar Interior",
+      "description": "A velocidade do ar na zona ocupada ({hvac.indoorAirVelocity} m/s) excede os limites de conforto: ≤ 0.15 m/s no inverno e ≤ 0.25 m/s no verão conforme EN 16798-1 (Categoria II).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.indoorAirVelocity", "operator": ">", "value": 0.25 }
+      ],
+      "currentValueTemplate": "{hvac.indoorAirVelocity} m/s",
+      "requiredValue": "≤ 0.15 m/s (inverno), ≤ 0.25 m/s (verão) — EN 16798-1 Cat. II",
+      "remediation": "Reduzir a velocidade do ar na zona ocupada: reposicionar ou redimensionar os difusores de insuflação, utilizar difusores de alta indução (efeito Coanda), ajustar o caudal de insuflação, e garantir que os difusores estão orientados para evitar correntes de ar diretas nos ocupantes. A zona ocupada é definida como 0.1-1.8 m de altura, a 0.6 m das paredes exteriores e a 0.3 m das paredes interiores.",
+      "enabled": true,
+      "tags": ["velocidade ar", "conforto", "EN 16798", "difusores", "correntes de ar"]
+    },
+    {
+      "id": "HVAC-DUCT-VEL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Velocidade em Condutas Principais",
+      "description": "A velocidade do ar nas condutas principais ({hvac.mainDuctVelocity} m/s) excede o limite recomendado de 8 m/s, causando ruído excessivo, perdas de carga elevadas e vibrações.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.mainDuctVelocity", "operator": ">", "value": 8 }
+      ],
+      "currentValueTemplate": "{hvac.mainDuctVelocity} m/s",
+      "requiredValue": "≤ 8 m/s (condutas principais)",
+      "remediation": "Redimensionar as condutas principais para reduzir a velocidade do ar abaixo de 8 m/s. Aumentar a secção das condutas ou dividir o caudal por condutas paralelas. Velocidades recomendadas: 5-8 m/s em condutas principais, 3-5 m/s em ramais, 2-3 m/s em grelhas. Verificar o nível de ruído gerado (NR) após o redimensionamento.",
+      "enabled": true,
+      "tags": ["condutas", "velocidade", "dimensionamento", "ruído"]
+    },
+    {
+      "id": "HVAC-DUCT-VEL-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Velocidade em Ramais de Condutas",
+      "description": "A velocidade do ar nos ramais de condutas ({hvac.branchDuctVelocity} m/s) excede o limite recomendado de 5 m/s, podendo gerar ruído perceptível nas zonas ocupadas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.branchDuctVelocity", "operator": ">", "value": 5 }
+      ],
+      "currentValueTemplate": "{hvac.branchDuctVelocity} m/s",
+      "requiredValue": "≤ 5 m/s (ramais de condutas)",
+      "remediation": "Redimensionar os ramais de condutas para velocidade ≤ 5 m/s. Utilizar transições suaves (ângulo ≤ 15°) nas reduções de secção. Evitar curvas apertadas (raio mínimo ≥ 1.5× dimensão da conduta). Instalar atenuadores acústicos antes das grelhas de insuflação em zonas sensíveis ao ruído.",
+      "enabled": true,
+      "tags": ["condutas", "ramais", "velocidade", "dimensionamento", "ruído"]
+    },
+    {
+      "id": "HVAC-DUCT-VEL-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Velocidade nas Grelhas",
+      "description": "A velocidade do ar nas grelhas de insuflação/retorno ({hvac.grilleVelocity} m/s) excede o limite recomendado de 3 m/s, causando desconforto por correntes de ar e ruído audível.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.grilleVelocity", "operator": ">", "value": 3 }
+      ],
+      "currentValueTemplate": "{hvac.grilleVelocity} m/s",
+      "requiredValue": "≤ 3 m/s (grelhas de insuflação e retorno)",
+      "remediation": "Redimensionar as grelhas para velocidade frontal ≤ 3 m/s (em zonas ocupadas, preferível ≤ 2.5 m/s). Aumentar a área efetiva das grelhas ou adicionar grelhas adicionais. Utilizar difusores de alta indução para zonas com requisitos de baixo ruído. Verificar o nível de potência sonora (Lw) das grelhas no catálogo do fabricante para o caudal de operação.",
+      "enabled": true,
+      "tags": ["grelhas", "velocidade", "conforto", "ruído", "difusores"]
+    },
+    {
+      "id": "HVAC-DUCT-ISOL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Isolamento Condutas Δt < 20°C",
+      "description": "O isolamento térmico das condutas com diferença de temperatura inferior a 20°C ({hvac.ductInsulThicknessLow} mm) é inferior ao mínimo de 25 mm.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ductInsulThicknessLow", "operator": "<", "value": 25 },
+        { "field": "hvac.ductDeltaT", "operator": "<", "value": 20 }
+      ],
+      "currentValueTemplate": "{hvac.ductInsulThicknessLow} mm (Δt < 20°C)",
+      "requiredValue": "≥ 25 mm para Δt < 20°C",
+      "remediation": "Aplicar isolamento térmico com espessura mínima de 25 mm (lã mineral λ ≤ 0.040 W/(m·K) ou elastomérico λ ≤ 0.036 W/(m·K)) em todas as condutas com diferença de temperatura inferior a 20°C. Incluir barreira de vapor em condutas de arrefecimento. Isolar também os acessórios (curvas, tês, registos).",
+      "enabled": true,
+      "tags": ["isolamento", "condutas", "eficiência energética", "espessura"]
+    },
+    {
+      "id": "HVAC-DUCT-ISOL-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Isolamento Condutas Δt 20-40°C",
+      "description": "O isolamento térmico das condutas com diferença de temperatura entre 20°C e 40°C ({hvac.ductInsulThicknessMed} mm) é inferior ao mínimo de 40 mm.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ductInsulThicknessMed", "operator": "<", "value": 40 },
+        { "field": "hvac.ductDeltaT", "operator": ">=", "value": 20 },
+        { "field": "hvac.ductDeltaT", "operator": "<=", "value": 40 }
+      ],
+      "currentValueTemplate": "{hvac.ductInsulThicknessMed} mm (Δt 20-40°C)",
+      "requiredValue": "≥ 40 mm para Δt 20-40°C",
+      "remediation": "Aplicar isolamento térmico com espessura mínima de 40 mm em condutas com diferença de temperatura entre 20°C e 40°C. Utilizar lã mineral de alta densidade (≥ 40 kg/m³) ou elastomérico com revestimento adequado. Garantir continuidade do isolamento em todas as junções e acessórios. Proteger o isolamento exterior com chapa de alumínio ou revestimento PVC em condutas expostas à intempérie.",
+      "enabled": true,
+      "tags": ["isolamento", "condutas", "eficiência energética", "espessura"]
+    },
+    {
+      "id": "HVAC-DUCT-ISOL-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Isolamento Condutas Δt > 40°C",
+      "description": "O isolamento térmico das condutas com diferença de temperatura superior a 40°C ({hvac.ductInsulThicknessHigh} mm) é inferior ao mínimo de 50 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ductInsulThicknessHigh", "operator": "<", "value": 50 },
+        { "field": "hvac.ductDeltaT", "operator": ">", "value": 40 }
+      ],
+      "currentValueTemplate": "{hvac.ductInsulThicknessHigh} mm (Δt > 40°C)",
+      "requiredValue": "≥ 50 mm para Δt > 40°C",
+      "remediation": "Aplicar isolamento térmico com espessura mínima de 50 mm em condutas com diferença de temperatura superior a 40°C. Utilizar lã mineral de rocha resistente a altas temperaturas (até 250°C). Em condutas de extração de fumos ou gases quentes, utilizar isolamento com classificação de reação ao fogo A1 (incombustível). Prever juntas de dilatação para compensar movimentos térmicos.",
+      "enabled": true,
+      "tags": ["isolamento", "condutas", "eficiência energética", "alta temperatura"]
+    },
+    {
+      "id": "HVAC-COP-AR-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — COP Mínimo Bomba de Calor Ar-Ar",
+      "description": "O COP da bomba de calor ar-ar ({hvac.copAirToAir}) é inferior ao mínimo regulamentar de 3.5 para equipamentos novos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.copAirToAir", "operator": "<", "value": 3.5 },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "air-to-air" }
+      ],
+      "currentValueTemplate": "COP = {hvac.copAirToAir}",
+      "requiredValue": "COP ≥ 3.5 (bomba de calor ar-ar)",
+      "remediation": "Substituir a bomba de calor ar-ar por equipamento com COP ≥ 3.5 (condições nominais EN 14511). Privilegiar equipamentos com tecnologia inverter (compressor de velocidade variável) e com classificação energética A++ ou superior. Verificar também o SCOP (COP sazonal conforme EN 14825) para uma avaliação mais representativa do desempenho anual. Considerar equipamentos com refrigerante R-32 ou R-290 de baixo GWP.",
+      "enabled": true,
+      "tags": ["COP", "bomba de calor", "ar-ar", "eficiência", "inverter"]
+    },
+    {
+      "id": "HVAC-COP-AGUA-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — COP Mínimo Bomba de Calor Ar-Água",
+      "description": "O COP da bomba de calor ar-água ({hvac.copAirToWater}) é inferior ao mínimo regulamentar de 3.0 para equipamentos novos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.copAirToWater", "operator": "<", "value": 3.0 },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "air-to-water" }
+      ],
+      "currentValueTemplate": "COP = {hvac.copAirToWater}",
+      "requiredValue": "COP ≥ 3.0 (bomba de calor ar-água)",
+      "remediation": "Substituir a bomba de calor ar-água por equipamento com COP ≥ 3.0 (condições nominais: ar 7°C / água 35°C conforme EN 14511). Para otimizar o COP, dimensionar o sistema de emissão para baixa temperatura (piso radiante 35°C, ventiloconvectores 45°C). Verificar o SCOP sazonal. Para AQS, considerar bomba de calor termodinâmica dedicada com COP ≥ 2.5.",
+      "enabled": true,
+      "tags": ["COP", "bomba de calor", "ar-água", "eficiência", "piso radiante"]
+    },
+    {
+      "id": "HVAC-COP-GEO-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — COP Mínimo Bomba de Calor Geotérmica",
+      "description": "O COP da bomba de calor geotérmica ({hvac.copGeothermal}) é inferior ao mínimo de 4.0 expectável para este tipo de sistema.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.copGeothermal", "operator": "<", "value": 4.0 },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "geothermal" }
+      ],
+      "currentValueTemplate": "COP = {hvac.copGeothermal}",
+      "requiredValue": "COP ≥ 4.0 (bomba de calor geotérmica)",
+      "remediation": "Verificar o dimensionamento do campo de sondas geotérmicas (comprimento insuficiente reduz o COP). Confirmar as propriedades térmicas do solo (condutividade térmica via teste TRT). O COP ≥ 4.0 é atingível com temperatura de fonte ≥ 10°C e sistema de emissão a baixa temperatura (35-40°C). Verificar o estado do fluido de circulação (concentração de glicol, caudal). Considerar sistema geotérmico reversível para aquecimento e arrefecimento passivo (geocooling).",
+      "enabled": true,
+      "tags": ["COP", "bomba de calor", "geotérmica", "eficiência", "sondas"]
+    },
+    {
+      "id": "HVAC-TIM-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS Art. 14.º — TIM II Obrigatório (25-250 kW)",
+      "description": "O edifício possui potência instalada de climatização ({hvac.installedHVACPower} kW) entre 25 e 250 kW, sendo obrigatória a designação de Técnico de Instalação e Manutenção de nível II (TIM II) conforme Art. 14.º do RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 25 },
+        { "field": "hvac.installedHVACPower", "operator": "<=", "value": 250 },
+        { "field": "hvac.hasTIM", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedHVACPower} kW, sem TIM designado",
+      "requiredValue": "TIM II obrigatório para potência 25-250 kW",
+      "remediation": "Designar um Técnico de Instalação e Manutenção de nível II (TIM II) para o edifício. O TIM II deve possuir certificação válida pela DGEG e ser responsável pela manutenção preventiva e corretiva dos sistemas de climatização. Elaborar contrato de manutenção com empresa certificada que disponha de TIM II. Registar a designação no STE (Sistema Técnico do Edifício).",
+      "enabled": true,
+      "tags": ["TIM", "manutenção", "RECS", "técnico", "certificação"]
+    },
+    {
+      "id": "HVAC-TIM-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS Art. 14.º — TIM III Obrigatório (> 250 kW)",
+      "description": "O edifício possui potência instalada de climatização ({hvac.installedHVACPower} kW) superior a 250 kW, sendo obrigatória a designação de Técnico de Instalação e Manutenção de nível III (TIM III) conforme Art. 14.º do RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 250 },
+        { "field": "hvac.hasTIM3", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedHVACPower} kW, sem TIM III designado",
+      "requiredValue": "TIM III obrigatório para potência > 250 kW",
+      "remediation": "Designar um Técnico de Instalação e Manutenção de nível III (TIM III) para o edifício. O TIM III tem qualificações superiores ao TIM II e é obrigatório para instalações de grande porte. Deve supervisionar toda a operação e manutenção dos sistemas AVAC, incluindo: plano de manutenção preventiva, gestão energética, registos de intervenções, e relatórios periódicos ao proprietário.",
+      "enabled": true,
+      "tags": ["TIM", "manutenção", "RECS", "técnico", "grande porte"]
+    },
+    {
+      "id": "HVAC-GTC-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS Art. 14.º — GTC Obrigatória (≥ 100 kW)",
+      "description": "O edifício possui potência instalada de climatização ({hvac.installedHVACPower} kW) igual ou superior a 100 kW, sendo obrigatória a instalação de Gestão Técnica Centralizada (GTC) conforme RECS Art. 14.º.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 100 },
+        { "field": "hvac.hasGTCSystem", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedHVACPower} kW, sem GTC instalada",
+      "requiredValue": "GTC obrigatória para potência instalada ≥ 100 kW",
+      "remediation": "Instalar sistema de Gestão Técnica Centralizada (GTC/BMS) com as seguintes funcionalidades mínimas: monitorização de temperaturas, humidades, pressões e caudais; controlo de todos os equipamentos AVAC; gestão de horários de funcionamento; contagem de energia térmica e elétrica; alarmes de avaria e desvio de setpoints; registo histórico de dados (mínimo 3 anos). Protocolo de comunicação: BACnet IP ou Modbus TCP.",
+      "enabled": true,
+      "tags": ["GTC", "BMS", "automação", "RECS", "gestão técnica"]
+    },
+    {
+      "id": "HVAC-INSP-CALD-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Inspeção Periódica de Caldeiras",
+      "description": "A caldeira do edifício ({hvac.boilerPower} kW) não possui inspeção periódica válida. Frequência obrigatória: 6 anos (20-100 kW), 3 anos (> 100 kW) conforme RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.boilerPower", "operator": ">=", "value": 20 },
+        { "field": "hvac.hasBoilerInspection", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Caldeira {hvac.boilerPower} kW, sem inspeção válida",
+      "requiredValue": "Inspeção a cada 6 anos (20-100 kW) ou 3 anos (> 100 kW)",
+      "remediation": "Agendar inspeção da caldeira por perito qualificado do SCE. Para caldeiras de 20-100 kW, a inspeção é obrigatória a cada 6 anos. Para caldeiras > 100 kW, a cada 3 anos. A inspeção inclui: verificação da eficiência de combustão, análise de gases de escape, verificação de segurança, estado do queimador e permutador, e emissão de relatório com classificação energética. Manter registos atualizados no STE.",
+      "enabled": true,
+      "tags": ["caldeira", "inspeção", "RECS", "SCE", "eficiência"]
+    },
+    {
+      "id": "HVAC-INSP-AC-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Inspeção Periódica de Sistemas AC",
+      "description": "O sistema de ar condicionado ({hvac.acPower} kW) não possui inspeção periódica válida. Frequência obrigatória: 6 anos (12-100 kW), 3 anos (> 100 kW) conforme RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.acPower", "operator": ">=", "value": 12 },
+        { "field": "hvac.hasACInspection", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Sistema AC {hvac.acPower} kW, sem inspeção válida",
+      "requiredValue": "Inspeção a cada 6 anos (12-100 kW) ou 3 anos (> 100 kW)",
+      "remediation": "Agendar inspeção do sistema de ar condicionado por perito qualificado do SCE. Para sistemas de 12-100 kW, a inspeção é obrigatória a cada 6 anos. Para sistemas > 100 kW, a cada 3 anos. A inspeção inclui: verificação da eficiência energética (EER/COP), estado dos filtros, estanquidade do circuito frigorífico, carga de refrigerante, estado dos permutadores, e verificação do sistema de controlo. O relatório deve incluir recomendações de melhoria.",
+      "enabled": true,
+      "tags": ["ar condicionado", "inspeção", "RECS", "SCE", "eficiência"]
+    },
+    {
+      "id": "HVAC-CO2-MON-01",
+      "regulationId": "recs-portaria-353a",
+      "article": "Portaria 353-A/2013 — Monitorização CO₂ Obrigatória (> 100 ocupantes)",
+      "description": "O espaço com ocupação superior a 100 pessoas ({hvac.occupancy} ocupantes) não dispõe de monitorização contínua de CO₂ conforme exigido pela Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.occupancy", "operator": ">", "value": 100 },
+        { "field": "hvac.hasCO2Monitoring", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.occupancy} ocupantes, sem monitorização CO₂",
+      "requiredValue": "Monitorização CO₂ obrigatória para ocupação > 100 pessoas",
+      "remediation": "Instalar sondas de CO₂ do tipo NDIR (infravermelhos não dispersivos) com precisão ± 50 ppm. Posicionar na zona de respiração (1.1-1.7 m), afastadas ≥ 2 m de portas, janelas e difusores. Ligação ao sistema GTC para registo contínuo e controlo DCV (Demand Controlled Ventilation). Calibração anual obrigatória. Setpoint de alarme: 1000 ppm (aviso), 1250 ppm (alarme). Mínimo 1 sonda por 500 m² ou por zona de ventilação independente.",
+      "enabled": true,
+      "tags": ["CO2", "monitorização", "sondas", "NDIR", "DCV", "QAI"]
+    },
+    {
+      "id": "HVAC-FGAS-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 — GWP Máximo para Novos Equipamentos (2025+)",
+      "description": "O fluido frigorigéneo do novo equipamento tem GWP de {hvac.newEquipmentGWP}, superior ao limite máximo de 750 imposto pelo Regulamento EU 517/2014 para equipamentos novos a partir de 2025.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.newEquipmentGWP", "operator": ">", "value": 750 },
+        { "field": "hvac.isNewEquipment", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "GWP = {hvac.newEquipmentGWP} (equipamento novo)",
+      "requiredValue": "GWP ≤ 750 para novos equipamentos (EU 517/2014, desde 2025)",
+      "remediation": "Selecionar equipamento novo com refrigerante de GWP ≤ 750. Opções recomendadas: R-32 (GWP 675) para splits e VRF, R-290 propano (GWP 3) para chillers pequenos e bombas de calor, R-1234ze (GWP 7) para chillers centrífugos, R-454B (GWP 466) como substituto drop-in do R-410A, R-513A (GWP 631) para chillers. Os refrigerantes R-410A (GWP 2088), R-404A (GWP 3922) e R-134a (GWP 1430) estão proibidos em novos equipamentos.",
+      "enabled": true,
+      "tags": ["F-Gas", "GWP", "refrigerante", "2025", "novos equipamentos"]
+    },
+    {
+      "id": "HVAC-FGAS-02",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 — Deteção de Fugas Obrigatória (≥ 5 tCO₂eq)",
+      "description": "O equipamento contém carga de refrigerante equivalente a {hvac.refrigerantCO2eq} tCO₂eq (≥ 5 tCO₂eq), sendo obrigatória a instalação de sistema de deteção de fugas conforme EU 517/2014.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantCO2eq", "operator": ">=", "value": 5 },
+        { "field": "hvac.hasLeakDetection", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.refrigerantCO2eq} tCO₂eq, sem deteção de fugas",
+      "requiredValue": "Deteção de fugas obrigatória para ≥ 5 tCO₂eq (EU 517/2014)",
+      "remediation": "Instalar sistema de deteção automática de fugas de refrigerante com alarme. Frequência de verificação de fugas: anual (5-50 tCO₂eq), semestral (50-500 tCO₂eq), trimestral (> 500 tCO₂eq). A deteção automática reduz a frequência para metade. Registar todas as intervenções e quantidades de refrigerante no registo do equipamento. Técnicos de manutenção devem possuir certificação F-Gas válida. Prever plano de substituição do refrigerante se GWP > 2500 (proibição desde 2020 para cargas ≥ 40 tCO₂eq).",
+      "enabled": true,
+      "tags": ["F-Gas", "fugas", "deteção", "refrigerante", "tCO2eq"]
+    },
+    {
+      "id": "HVAC-PIPE-ISOL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Isolamento Térmico de Tubagens",
+      "description": "As tubagens de água quente e/ou fria do sistema AVAC ({hvac.pipeInsulationThickness} mm) não possuem isolamento térmico adequado, resultando em perdas de energia e risco de condensação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.pipeInsulationThickness", "operator": "<", "value": 20 },
+        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.pipeInsulationThickness} mm",
+      "requiredValue": "Espessura mínima conforme diâmetro: DN15-25: 20mm, DN32-50: 30mm, DN65-100: 40mm, >DN100: 50mm",
+      "remediation": "Aplicar isolamento térmico em todas as tubagens do sistema AVAC conforme o diâmetro: DN15-25 → 20 mm, DN32-50 → 30 mm, DN65-100 → 40 mm, >DN100 → 50 mm. Utilizar elastomérico (λ ≤ 0.036 W/(m·K)) para tubagens de água fria (com barreira de vapor integrada) e lã mineral ou elastomérico para água quente. Isolar também válvulas, flanges e acessórios.",
+      "enabled": true,
+      "tags": ["isolamento", "tubagens", "eficiência energética", "condensação"]
+    },
+    {
+      "id": "HVAC-INCENDIO-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / SCIE — Registos Corta-Fogo em Condutas",
+      "description": "As condutas AVAC que atravessam compartimentos corta-fogo não possuem registos corta-fogo (RCF) instalados, comprometendo a compartimentação contra incêndio.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasFireDampers", "operator": "not_exists", "value": null },
+        { "field": "hvac.ductsPassFireWalls", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Condutas sem registos corta-fogo nas travessias",
+      "requiredValue": "RCF obrigatórios em todas as travessias de compartimentos corta-fogo",
+      "remediation": "Instalar registos corta-fogo (RCF) em todas as condutas que atravessam paredes e lajes de compartimentação corta-fogo. A resistência ao fogo do RCF deve ser igual ou superior à do elemento atravessado (EI 60, EI 90, EI 120 conforme aplicável). Os RCF devem ser certificados conforme EN 15650 e testados conforme EN 1366-2. Prever sistema de acionamento automático (fusível térmico e/ou motor com ligação à central de deteção de incêndio). Manutenção e teste obrigatório semestral.",
+      "enabled": true,
+      "tags": ["incêndio", "registos corta-fogo", "SCIE", "condutas", "segurança"]
+    },
+    {
+      "id": "HVAC-DESENFUMAGEM-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / SCIE — Sistema de Desenfumagem",
+      "description": "O edifício não dispõe de sistema de desenfumagem nos espaços que o exigem (vias de evacuação, estacionamentos, pisos enterrados), conforme o Regulamento de Segurança Contra Incêndio.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasSmokeExtractionSystem", "operator": "not_exists", "value": null },
+        { "field": "hvac.requiresSmokeExtraction", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sem sistema de desenfumagem",
+      "requiredValue": "Sistema de desenfumagem obrigatório (SCIE)",
+      "remediation": "Instalar sistema de desenfumagem mecânica ou natural conforme o Regulamento SCIE. Para estacionamentos: extração ≥ 600 m³/(h·veículo) com deteção de CO. Para vias de evacuação: sobrepressão 20-80 Pa nas vias protegidas. Para átrios e grandes espaços: extração de fumos com admissão compensatória na base. Os ventiladores de desenfumagem devem resistir a 400°C/2h (F400-120). Prever interface com a central de deteção de incêndio para ativação automática.",
+      "enabled": true,
+      "tags": ["desenfumagem", "SCIE", "incêndio", "evacuação", "estacionamento"]
+    },
+    {
+      "id": "HVAC-BOMBAS-VV-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Bombas Circuladoras com Variação de Velocidade",
+      "description": "As bombas circuladoras do sistema AVAC ({hvac.pumpType}) não possuem variação de velocidade, resultando em consumo energético excessivo em carga parcial.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.pumpType", "operator": "==", "value": "fixed-speed" },
+        { "field": "hvac.pumpPower", "operator": ">", "value": 0.75 }
+      ],
+      "currentValueTemplate": "Bombas de velocidade fixa ({hvac.pumpPower} kW)",
+      "requiredValue": "Bombas circuladoras com variação de velocidade (VFD) para potência > 0.75 kW",
+      "remediation": "Instalar variadores de frequência (VFD) nas bombas circuladoras com potência > 0.75 kW. O controlo deve ser por pressão diferencial variável no coletor ou no ponto mais desfavorável. Em sistemas de caudal variável (com válvulas de 2 vias), o VFD reduz o consumo em 50-70% face a velocidade fixa. Garantir que as bombas possuem classificação de eficiência IE3 ou IE4 conforme o Regulamento EU 547/2012.",
+      "enabled": true,
+      "tags": ["bombas", "VFD", "eficiência energética", "caudal variável"]
+    }
+  ]
+}
