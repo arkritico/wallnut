@@ -40,6 +40,42 @@ function createCompliantProject(): BuildingProject {
       hasNaturalLight: true,
       hasCrossVentilation: true,
       ceilingHeight: 2.7,
+      isMultifamily: false,
+      // Salubridade (RGEU Arts. 31-40)
+      hasWaterSupply: true,
+      hasDrainage: true,
+      hasPluvialDrainage: true,
+      hasMoistureProtection: true,
+      hasAdequateThermalComfort: true,
+      hasCommonAreaLighting: true,
+      hasWasteStorage: true,
+      hasElectricalInstallation: true,
+      hasPestProtection: true,
+      hasMinimumInsolation: true,
+      // Coberturas e Garagens (RGEU Arts. 50-58)
+      hasAccessibleTerrace: false,
+      hasGarage: false,
+      hasCommercialFloor: false,
+      // Conservação
+      hasTechnicalMaintenance: true,
+      // Ficha Técnica (Portaria 216-B/2008)
+      hasTechnicalSheet: true,
+      hasMaterialsDescription: true,
+      hasEquipmentDescription: true,
+      hasAreaSchedule: true,
+      hasWarrantyInfo: true,
+      hasFinishesDescription: true,
+      // Qualidade Habitacional (DL 177/2001)
+      hasFireSafetyIntegration: true,
+      hasNP1037Compliance: true,
+      hasAdequateCommonAreas: true,
+      hasResourceEfficiency: true,
+      // Vizinhança (Código Civil)
+      hasPublicRoadAccess: true,
+      hasFireInsurance: true,
+      // Licenciamento (DL 10/2024)
+      hasDigitalSubmission: true,
+      hasMunicipalNotification: true,
     },
     structural: {
       structuralSystem: "frame",
@@ -81,6 +117,61 @@ function createCompliantProject(): BuildingProject {
       beamMinWidth: 250,
       waterTableDetermined: true,
       investigationDepthAdequate: true,
+      // EC1 actions on structures
+      liveLoad: 2.0,
+      concentratedLoad: 2.0,
+      guardrailHorizontalLoad: 0.5,
+      barrierHorizontalLoad: 0.4,
+      partitionSurcharge: 0.8,
+      partitionWeight: 1.0,
+      partitionEquivLoad: 0.5,
+      stairsLiveLoad: 3.0,
+      roofLiveLoad: 0.4,
+      concreteDensity: 25,
+      steelDensity: 78.5,
+      masonryDensity: 14,
+      snowLoad: 0.3,
+      windSpeed: 27,
+      altitude: 100,
+      barrierForce: 150,
+      barrierForceHeight: 375,
+      axleLoad: 26,
+      vehicleGrossWeight: 30,
+      alphaA: 0.65,
+      dynamicCoefficient: 1.4,
+      forkliftHorizontalRatio: 0.3,
+      rampBarrierFactor: 0.5,
+      balconyParapetLoad: 5,
+      // EC1 procedural checks
+      hasImposedLoadsClassified: true,
+      hasSelfWeightClassified: true,
+      hasBallastClassified: true,
+      hasEarthLoadClassified: true,
+      hasWaterContentVariation: true,
+      hasDynamicAnalysis: true,
+      hasSelfWeightAsSingleAction: true,
+      hasFutureCoatingsConsidered: true,
+      hasMostCriticalLoadCase: true,
+      hasIndependentActions: true,
+      hasRoofHSimultaneous: false,
+      hasPsiAlphaNExclusive: true,
+      hasSingleCharacteristicValue: true,
+      hasPartitionsAsImposed: true,
+      hasFreeActionPlacement: true,
+      hasSeparateConcentratedCheck: true,
+      hasConcentratedAnyPoint: true,
+      hasForkliftLoads: true,
+      hasMultipleCategoryCheck: true,
+      hasMaxStorageLoad: true,
+      hasRoofSeparateChecks: true,
+      hasMeanAsCharacteristic: true,
+      hasWaterLevelConsidered: true,
+      hasAlphaNVerification: true,
+      hasThicknessDeviation: true,
+      hasCableWeightDeviation: true,
+      hasVerification: true,
+      hasLoadReductionFactor: true,
+      hasAreaReductionFactor: true,
     },
     fireSafety: {
       utilizationType: "I",
@@ -592,7 +683,7 @@ describe("E2E: Default project analysis", async () => {
     // SCE- = energy deep analyzer, SCIE-CALC- / SCIE- = fire safety deep analyzer
     // *-SKIPPED = engine skipped (missing data), *-UNAVAIL = engine crashed
     for (const id of ids) {
-      expect(id).toMatch(/^(PF-|PDM-|PASS-|RTIEBT_|RTIEBT-|PLUMB_|plumbing-|SCE-|SCIE-CALC-|SCIE-|RGSPPDADAR-)/);
+      expect(id).toMatch(/^(PF-|PDM-|PASS-|NA-|RTIEBT_|RTIEBT-|PLUMB_|plumbing-|SCE-|SCIE-CALC-|SCIE-|RGSPPDADAR-)/);
     }
   });
 
