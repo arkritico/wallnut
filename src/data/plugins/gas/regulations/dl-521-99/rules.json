@@ -1,0 +1,1086 @@
+{
+  "regulationRef": "dl-521-99",
+  "description": "Regras de conformidade extraídas do DL 521/99, Portaria 361/98, NP 1037-1/2 e EN 1775 -- Instalações de gás em edifícios",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "GAS-PROJ-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 15.o -- Projeto de Gás",
+      "description": "A instalação de gás requer projeto aprovado pela DGEG, elaborado por técnico credenciado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasGasProject", "operator": "not_exists", "value": null },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "remediation": "Contratar técnico credenciado pela DGEG para elaboração e submissão de projeto de gás. O projeto é obrigatório para instalações com gás canalizado.",
+      "requiredValue": "Projeto de gás aprovado pela DGEG",
+      "enabled": true,
+      "tags": ["projeto", "DGEG", "obrigatório"]
+    },
+    {
+      "id": "GAS-DET-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 16.o -- Deteção de Gás (Gás Natural Interior)",
+      "description": "Em instalações interiores de gás natural, é obrigatória a instalação de detetor de gás com corte automático. Para gás natural, o detetor deve ser colocado na parte superior da parede, a menos de 0,30 m do teto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasGasDetector", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "natural_gas" },
+        { "field": "gas.installationLocation", "operator": "==", "value": "interior" }
+      ],
+      "remediation": "Instalar detetor de gás natural na parte superior da parede (a menos de 0,30 m do teto) nos compartimentos com aparelhos a gás. O detetor deve estar ligado a eletroválvula de corte automático do fornecimento de gás.",
+      "requiredValue": "Detetor de gás natural obrigatório em instalações interiores",
+      "enabled": true,
+      "tags": ["detetor", "segurança", "fuga", "gas natural", "obrigatório"]
+    },
+    {
+      "id": "GAS-DET-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 16.o -- Deteção de Gás (GPL)",
+      "description": "Recomenda-se a instalação de detetor de GPL nos locais com aparelhos a gás. Para GPL, o detetor deve ser colocado na parte inferior da parede, a menos de 0,30 m do pavimento, dado que o GPL é mais pesado que o ar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.hasGasDetector", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "in", "value": ["lpg_piped", "lpg_bottle"] }
+      ],
+      "remediation": "Instalar detetor de GPL na parte inferior da parede (a menos de 0,30 m do pavimento) nos compartimentos com aparelhos a gás. Deve ter corte automático em caso de fuga.",
+      "requiredValue": "Detetor de GPL recomendado",
+      "enabled": true,
+      "tags": ["detetor", "segurança", "fuga", "GPL"]
+    },
+    {
+      "id": "GAS-VALV-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 12.o / Portaria 361/98 Art. 11.o -- Válvula de Corte Geral",
+      "description": "A instalação deve prever válvula de corte geral na entrada do edifício/fração. O diâmetro nominal da válvula deve ser igual ou superior ao do ramal de alimentação. A válvula deve ser acessível e devidamente sinalizada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasEmergencyValve", "operator": "not_exists", "value": null },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "remediation": "Instalar válvula de corte geral acessível na entrada da fração. O DN da válvula deve ser >= DN do ramal. Sinalizar a válvula com placa indicativa conforme NP 182. Permite corte rápido do abastecimento em caso de fuga ou emergência.",
+      "requiredValue": "Válvula de corte geral obrigatória; DN >= ramal; acessível; sinalizada",
+      "enabled": true,
+      "tags": ["válvula", "emergência", "corte", "geral", "sinalizada"]
+    },
+    {
+      "id": "GAS-VALV-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 12.o -- Válvula de Corte por Aparelho",
+      "description": "Cada aparelho a gás deve dispor de válvula de corte individual, instalada a montante e em local acessível e visível, permitindo o isolamento do aparelho sem interromper o fornecimento aos restantes.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasIndividualValves", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "Válvulas individuais: {gas.hasIndividualValves}",
+      "requiredValue": "Válvula de corte individual por aparelho; acessível; visível",
+      "remediation": "Instalar válvula de corte individual (de esfera ou macho) a montante de cada aparelho a gás, em local visível e de fácil acesso. A válvula deve situar-se a menos de 1,50 m do aparelho e a uma altura entre 0,60 m e 1,80 m do pavimento.",
+      "enabled": true,
+      "tags": ["válvula", "corte", "aparelho", "individual", "isolamento"]
+    },
+    {
+      "id": "GAS-VALV-03",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 12.o-A -- Válvula de Segurança com Detetor",
+      "description": "Em instalações com gás natural canalizado, deve existir sistema de segurança composto por detetor de gás ligado a eletroválvula de corte automático. A eletroválvula deve fechar em menos de 30 segundos após deteção de fuga.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasSafetyValveWithDetector", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "natural_gas" }
+      ],
+      "requiredValue": "Detetor de gás+ eletroválvula de corte automático (< 30s)",
+      "remediation": "Instalar sistema integrado de segurança: detetor de gás catalítico ou semiconductor ligado a eletroválvula normalmente aberta (NA). A eletroválvula deve ser instalada no ramal de entrada e cortar o fornecimento automaticamente após deteção de concentração de gás >= 10% do LIE (Limite Inferior de Explosividade).",
+      "enabled": true,
+      "tags": ["válvula", "segurança", "detetor", "eletroválvula", "automático"]
+    },
+    {
+      "id": "GAS-VENT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 20.o -- Ventilação Geral",
+      "description": "Os locais com aparelhos a gás devem ter ventilação adequada conforme NP 1037-1 (natural) ou NP 1037-2 (mecânica). A ventilação deve assegurar o ar necessário a combustão e a renovação do ar do compartimento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasVentilation", "operator": "not_exists", "value": null },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "remediation": "Prever sistema de ventilação conforme NP 1037-1 (natural) ou NP 1037-2 (mecânica) nos compartimentos com aparelhos a gás. Devem existir aberturas permanentes de admissão e exaustão de ar.",
+      "requiredValue": "Ventilação conforme NP 1037-1 ou NP 1037-2",
+      "enabled": true,
+      "tags": ["ventilação", "combustão", "segurança"]
+    },
+    {
+      "id": "GAS-VENT-02",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-1 Sec. 5.2 -- Ventilação Permanente Inferior (Tipo A)",
+      "description": "Os compartimentos com aparelhos a gás tipo A (sem conduta de evacuação, ex: fogão) devem possuir abertura permanente inferior com área mínima de 100 cm2 para admissão de ar de combustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.ventilationAreaLower", "operator": "<", "value": 100 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "==", "value": "type_A" }
+      ],
+      "currentValueTemplate": "{gas.ventilationAreaLower} cm2",
+      "requiredValue": ">= 100 cm2 (aparelhos tipo A)",
+      "remediation": "Instalar grelha de ventilação permanente na parte inferior da parede exterior ou porta do compartimento, com área livre mínima de 100 cm2. A grelha não deve ser obturável e deve comunicar diretamente com o exterior. Bordo inferior a <= 0,30 m do pavimento.",
+      "enabled": true,
+      "tags": ["ventilação", "inferior", "grelha", "NP 1037-1", "tipo A"]
+    },
+    {
+      "id": "GAS-VENT-03",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-1 Sec. 5.2 -- Ventilação Permanente Inferior (Tipo B)",
+      "description": "Os compartimentos com aparelhos a gás tipo B (circuito aberto com conduta, ex: esquentador, caldeira) devem possuir abertura permanente inferior com área mínima de 150 cm2 para admissão de ar de combustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.ventilationAreaLower", "operator": "<", "value": 150 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "==", "value": "type_B" }
+      ],
+      "currentValueTemplate": "{gas.ventilationAreaLower} cm2",
+      "requiredValue": ">= 150 cm2 (aparelhos tipo B)",
+      "remediation": "Instalar grelha de ventilação permanente na parte inferior da parede exterior ou porta do compartimento, com área livre mínima de 150 cm2 para aparelhos tipo B. A grelha não deve ser obturável e deve comunicar diretamente com o exterior. Bordo inferior a <= 0,30 m do pavimento.",
+      "enabled": true,
+      "tags": ["ventilação", "inferior", "grelha", "NP 1037-1", "tipo B", "combustão"]
+    },
+    {
+      "id": "GAS-VENT-04",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-1 Sec. 5.3 -- Ventilação Permanente Superior (Cozinhas)",
+      "description": "As cozinhas com aparelhos a gás devem possuir abertura permanente superior com área mínima de 100 cm2 para evacuação do ar viciado e produtos de combustão residuais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.ventilationAreaUpper", "operator": "<", "value": 100 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.roomType", "operator": "==", "value": "kitchen" }
+      ],
+      "currentValueTemplate": "{gas.ventilationAreaUpper} cm2",
+      "requiredValue": ">= 100 cm2 em cozinhas",
+      "remediation": "Instalar grelha de ventilação permanente na parte superior da parede exterior ou ligada a conduta de exaustão, com área livre mínima de 100 cm2. Deve situar-se a uma altura >= 1,80 m do pavimento. Obrigatória em cozinhas com aparelhos a gás.",
+      "enabled": true,
+      "tags": ["ventilação", "superior", "grelha", "NP 1037-1", "cozinha"]
+    },
+    {
+      "id": "GAS-VENT-05",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-1 Sec. 6.1 -- Caudal de Ar para Combustão (Tipo B)",
+      "description": "Para aparelhos tipo B (circuito aberto com conduta), o caudal de ar de combustão deve ser no mínimo 1,8 m3/h por kW de potência instalada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.airFlowRatePerKW", "operator": "<", "value": 1.8 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "==", "value": "type_B" }
+      ],
+      "currentValueTemplate": "{gas.airFlowRatePerKW} m3/h por kW",
+      "requiredValue": ">= 1,8 m3/h por kW de potência instalada",
+      "remediation": "Aumentar a área das aberturas de ventilação ou instalar sistema de admissão de ar complementar para garantir o caudal mínimo de 1,8 m3/h por kW de potência instalada. Ex: para esquentador de 24 kW, caudal mínimo = 43,2 m3/h.",
+      "enabled": true,
+      "tags": ["ventilação", "caudal", "combustão", "NP 1037-1", "tipo B", "kW"]
+    },
+    {
+      "id": "GAS-VENT-06",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-1 Sec. 6.2 -- Renovação de Ar em Cozinhas",
+      "description": "As cozinhas com aparelhos a gás devem ter uma taxa de renovação de ar mínima de 2 volumes por hora (2 vol/h) para garantir a diluição adequada dos produtos de combustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.airRenewalRate", "operator": "<", "value": 2 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.roomType", "operator": "==", "value": "kitchen" }
+      ],
+      "currentValueTemplate": "{gas.airRenewalRate} vol/h",
+      "requiredValue": ">= 2 vol/h em cozinhas com gas",
+      "remediation": "Garantir taxa de renovação de ar >= 2 vol/h na cozinha. Ex: para cozinha de 20 m3, caudal mínimo de renovação = 40 m3/h. Pode ser assegurado por ventilação natural (aberturas permanentes dimensionadas) ou mecânica (extrator). Verificar que a admissão e exaustão são adequadas.",
+      "enabled": true,
+      "tags": ["ventilação", "renovação", "cozinha", "NP 1037-1", "vol/h"]
+    },
+    {
+      "id": "GAS-VENT-07",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-2 Sec. 4.1 -- Caudal de Extração Mecanica (Cozinha Mínimo)",
+      "description": "Quando a ventilação é mecânica, o caudal mínimo de extração em cozinhas e de 60 m3/h.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.mechanicalExtractionRate", "operator": "<", "value": 60 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.ventilationType", "operator": "==", "value": "mechanical" },
+        { "field": "gas.roomType", "operator": "==", "value": "kitchen" }
+      ],
+      "currentValueTemplate": "{gas.mechanicalExtractionRate} m3/h",
+      "requiredValue": ">= 60 m3/h (mínimo cozinha)",
+      "remediation": "Instalar ou ajustar o sistema de extração mecânica para garantir caudal mínimo de 60 m3/h na cozinha. Verificar o dimensionamento do extrator e das condutas. O caudal deve ser medido na grelha de extração com anemómetro.",
+      "enabled": true,
+      "tags": ["ventilação", "mecânica", "extração", "NP 1037-2", "cozinha", "caudal"]
+    },
+    {
+      "id": "GAS-VENT-08",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-2 Sec. 4.1 -- Caudal de Extração Mecanica (Cozinha com Placa a Gas)",
+      "description": "Em cozinhas com placa/fogão a gás, o caudal mínimo de extração mecânica e de 180 m3/h para evacuação adequada dos produtos de combustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.mechanicalExtractionRate", "operator": "<", "value": 180 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.ventilationType", "operator": "==", "value": "mechanical" },
+        { "field": "gas.hasGasCooktop", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{gas.mechanicalExtractionRate} m3/h",
+      "requiredValue": ">= 180 m3/h (cozinha com placa a gas)",
+      "remediation": "Aumentar o caudal de extração mecânica para >= 180 m3/h na cozinha com placa/fogão a gás. Instalar exaustor de potência adequada sobre a placa. Garantir a compensação do ar extraído com admissão suficiente para evitar depressão excessiva no compartimento.",
+      "enabled": true,
+      "tags": ["ventilação", "mecânica", "extração", "NP 1037-2", "fogão", "placa", "180"]
+    },
+    {
+      "id": "GAS-VENT-09",
+      "regulationId": "dl-521-99",
+      "article": "NP 1037-2 Sec. 4.3 -- Velocidade Máxima em Condutas de Ventilação",
+      "description": "A velocidade do ar nas condutas de ventilação mecânica não deve exceder 4 m/s para limitar o ruído e as perdas de carga.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.ductAirVelocity", "operator": ">", "value": 4 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.ventilationType", "operator": "==", "value": "mechanical" }
+      ],
+      "currentValueTemplate": "{gas.ductAirVelocity} m/s",
+      "requiredValue": "<= 4 m/s nas condutas",
+      "remediation": "Aumentar a secção das condutas de ventilação para reduzir a velocidade do ar abaixo de 4 m/s. Velocidades excessivas provocam ruído incomodativo e perdas de carga que reduzem a eficiência do sistema. Redimensionar as condutas considerando o caudal necessário e a velocidade máxima admissível.",
+      "enabled": true,
+      "tags": ["ventilação", "mecânica", "velocidade", "NP 1037-2", "conduta", "ruído"]
+    },
+    {
+      "id": "GAS-CHAM-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 21.o -- Evacuação de Produtos de Combustão",
+      "description": "Os aparelhos a gás do tipo B e C requerem sistema de exaustão/chaminé. A secção da conduta deve ser igual ou superior ao diâmetro da saída do aparelho e nunca inferior a DN 80 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasFlueSystem", "operator": "not_exists", "value": null },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "in", "value": ["type_B", "type_C"] }
+      ],
+      "remediation": "Instalar chaminé/conduta de exaustão para evacuação dos produtos de combustão. A secção da conduta deve ser >= diâmetro da saída do aparelho e nunca < DN 80 mm. A ausência de exaustão pode causar intoxicação por CO.",
+      "requiredValue": "Sistema de exaustão obrigatório; secção >= saída aparelho; mínimo DN 80 mm",
+      "enabled": true,
+      "tags": ["chaminé", "exaustão", "CO", "DN 80"]
+    },
+    {
+      "id": "GAS-CHAM-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 33.o -- Secção Mínima da Chaminé",
+      "description": "A secção da conduta de exaustão/chaminé nunca deve ser inferior a DN 80 mm, independentemente do diâmetro de saída do aparelho.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flueDiameter", "operator": "<", "value": 80 },
+        { "field": "gas.hasFlueSystem", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flueDiameter} mm",
+      "requiredValue": ">= DN 80 mm (mínimo absoluto)",
+      "remediation": "Substituir a conduta de exaustão por uma com diâmetro mínimo de DN 80 mm. Condutas subdimensionadas provocam restrição do fluxo, acumulação de produtos de combustão e risco de intoxicação por CO. A secção deve ser >= ao diâmetro da saída do aparelho.",
+      "enabled": true,
+      "tags": ["chaminé", "secção", "DN 80", "diâmetro", "mínimo"]
+    },
+    {
+      "id": "GAS-CHAM-03",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 33.o -- Tiragem da Chaminé",
+      "description": "A chaminé de evacuação de produtos de combustão deve garantir uma tiragem mínima de 3 Pa na base. A altura mínima da conduta, desde a grelha de ligação ao remate, deve ser de 2,50 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flueDraftPressure", "operator": "<", "value": 3 },
+        { "field": "gas.hasFlueSystem", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flueDraftPressure} Pa (tiragem) / {gas.flueHeight} m (altura)",
+      "requiredValue": ">= 3 Pa (tiragem) / >= 2,50 m (altura)",
+      "remediation": "Verificar e corrigir a tiragem da chaminé. A tiragem insuficiente pode resultar de: altura insuficiente da conduta (mínimo 2,50 m), remate inadequado, obstruções internas ou secção insuficiente. Instalar extrator estático no remate se necessário. A tiragem deve ser medida com deprimómetro na base da chaminé.",
+      "enabled": true,
+      "tags": ["chaminé", "tiragem", "altura", "depressão", "exaustão"]
+    },
+    {
+      "id": "GAS-CHAM-04",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 35.o -- Altura Mínima da Conduta de Exaustao",
+      "description": "A conduta de exaustão deve ter uma altura mínima de 2,50 m desde a ligação ao aparelho até ao remate, para garantir tiragem natural adequada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flueHeight", "operator": "<", "value": 2.50 },
+        { "field": "gas.hasFlueSystem", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flueHeight} m",
+      "requiredValue": ">= 2,50 m do aparelho ao remate",
+      "remediation": "Prolongar a conduta de exaustão para atingir a altura mínima de 2,50 m entre a ligação ao aparelho e o remate da chaminé. Se não for possível atingir esta altura, considerar a instalação de sistema de tiragem forçada (ventilador de exaustão) ou a relocalização do aparelho.",
+      "enabled": true,
+      "tags": ["chaminé", "altura", "conduta", "2.50m", "tiragem"]
+    },
+    {
+      "id": "GAS-CHAM-05",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 35.o -- Remate da Chaminé Acima da Cumeeira",
+      "description": "O remate da chaminé deve estar a uma altura mínima de 0,40 m acima da cumeeira do telhado para evitar a reentrada de gases de combustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flueHeightAboveRidge", "operator": "<", "value": 0.40 },
+        { "field": "gas.hasFlueSystem", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flueHeightAboveRidge} m acima da cumeeira",
+      "requiredValue": ">= 0,40 m acima da cumeeira",
+      "remediation": "Prolongar o remate da chaminé para que ultrapasse a cumeeira do telhado em pelo menos 0,40 m. Um remate abaixo da cumeeira cria zona de depressão que pode inverter a tiragem e provocar a reentrada de gases de combustão no edifício.",
+      "enabled": true,
+      "tags": ["chaminé", "remate", "cumeeira", "altura", "0.40m"]
+    },
+    {
+      "id": "GAS-CHAM-06",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 35.o -- Remate da Chaminé Distância a Obstáculos",
+      "description": "O remate da chaminé deve distar no mínimo 0,60 m de qualquer obstáculo (muro, parede, edifício adjacente) que possa prejudicar a dispersão dos gases de combustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flueDistanceToObstacle", "operator": "<", "value": 0.60 },
+        { "field": "gas.hasFlueSystem", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flueDistanceToObstacle} m",
+      "requiredValue": ">= 0,60 m de qualquer obstáculo",
+      "remediation": "Reposicionar ou prolongar a conduta de exaustão para garantir uma distância mínima de 0,60 m a qualquer obstáculo (muro, platibanda, edifício adjacente, antena, etc.). Obstáculos próximos criam turbulência que impede a dispersão adequada dos gases de combustão.",
+      "enabled": true,
+      "tags": ["chaminé", "remate", "obstáculo", "distância", "0.60m"]
+    },
+    {
+      "id": "GAS-CHAM-07",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 21.o / Portaria 361/98 Art. 35.o -- Distância da Chaminé a Vaos",
+      "description": "O remate da chaminé ou conduta de exaustão deve distar no mínimo 0,40 m de janelas e portas e 0,60 m de entradas de ar de ventilação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flueDistanceToWindow", "operator": "<", "value": 0.40 },
+        { "field": "gas.hasFlueSystem", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flueDistanceToWindow} m",
+      "requiredValue": ">= 0,40 m (janelas/portas) / >= 0,60 m (entradas de ar)",
+      "remediation": "Reposicionar ou prolongar a conduta de exaustão para garantir uma distância mínima de 0,40 m a janelas e portas e 0,60 m a aberturas de admissão de ar. A proximidade excessiva permite a reentrada de gases de combustão no edifício.",
+      "enabled": true,
+      "tags": ["chaminé", "exaustão", "distância", "janela", "ventilação"]
+    },
+    {
+      "id": "GAS-PRESS-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 40.o -- Ensaio de Estanquidade (Instalações Novas)",
+      "description": "Antes da colocação em serviço de uma instalação nova, a rede de gás deve ser sujeita a ensaio de estanquidade a uma pressão de 150 mbar durante 15 minutos, sem qualquer queda de pressão registada no manómetro.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.testPressure", "operator": "<", "value": 150 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.installationType", "operator": "==", "value": "new" }
+      ],
+      "currentValueTemplate": "{gas.testPressure} mbar",
+      "requiredValue": ">= 150 mbar durante 15 min sem queda (instalações novas)",
+      "remediation": "Realizar ensaio de estanquidade a 150 mbar durante 15 minutos com ar comprimido ou azoto (N2). Nunca utilizar gás combustível para o ensaio. Se houver queda de pressão, localizar e reparar todas as fugas antes de colocar em serviço. O ensaio deve ser registado e certificado pelo instalador credenciado.",
+      "enabled": true,
+      "tags": ["estanquidade", "pressão", "ensaio", "novo", "150 mbar"]
+    },
+    {
+      "id": "GAS-PRESS-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 41.o -- Ensaio de Estanquidade (Instalações Existentes)",
+      "description": "Na revisão de instalações existentes, o ensaio de estanquidade deve ser realizado a uma pressão de 50 mbar durante 15 minutos, sem qualquer queda de pressão registada no manómetro.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.testPressure", "operator": "<", "value": 50 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.installationType", "operator": "==", "value": "existing" }
+      ],
+      "currentValueTemplate": "{gas.testPressure} mbar",
+      "requiredValue": ">= 50 mbar durante 15 min sem queda (instalações existentes)",
+      "remediation": "Repetir o ensaio de estanquidade a pressão regulamentar de 50 mbar durante 15 minutos. Se houver queda de pressão, localizar e reparar a fuga antes de colocar a instalação em serviço. O ensaio deve ser realizado com ar ou azoto (nunca com gás combustível).",
+      "enabled": true,
+      "tags": ["estanquidade", "pressão", "ensaio", "revisão", "existente", "50 mbar"]
+    },
+    {
+      "id": "GAS-MAT-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 14.o -- Materiais Aprovados para Tubagens de Gás",
+      "description": "As tubagens de gás devem ser em materiais aprovados: cobre conforme EN 1057, aço conforme EN 10255, polietileno (PE) conforme EN 1555 apenas para exterior enterrado, ou multicamada aprovado. É proibido o uso de PVC, PE ou qualquer material plástico em instalações interiores.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.pipesMaterial", "operator": "not_in", "value": ["copper", "steel", "polyethylene", "multilayer", "none"] },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "Material: {gas.pipesMaterial}",
+      "requiredValue": "Cobre (EN 1057), aço(EN 10255), PE (EN 1555 exterior enterrado) ou multicamada",
+      "remediation": "Utilizar materiais aprovados: cobre (EN 1057) para interior e exterior, aço(EN 10255) para interior, polietileno PE 100 SDR 11 (EN 1555) exclusivamente para trocos exteriores enterrados, ou multicamada aprovado para interior. Nunca utilizar PVC, PE ou plásticos em instalações interiores.",
+      "enabled": true,
+      "tags": ["tubagem", "material", "aprovado", "EN 1057", "EN 10255", "EN 1555"]
+    },
+    {
+      "id": "GAS-MAT-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 14.o -- Proibição de PVC e Plasticos em Interior",
+      "description": "É terminantemente proibida a utilização de PVC, polietileno (PE) ou quaisquer materiais plásticos em tubagens de gás no interior de edifícios. O PE é permitido exclusivamente no exterior enterrado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.interiorPipeMaterial", "operator": "in", "value": ["pvc", "PVC", "plastic", "polyethylene", "PE", "polypropylene", "PP"] },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "Material interior: {gas.interiorPipeMaterial}",
+      "requiredValue": "Cobre ou aço(interior); PVC/PE/plásticos proibidos no interior",
+      "remediation": "Substituir IMEDIATAMENTE qualquer tubagem em PVC, PE ou material plástico no interior do edifício. As tubagens interiores devem ser exclusivamente em cobre (EN 1057) ou aço(EN 10255). O polietileno e apenas permitido no exterior enterrado a profundidade >= 0,60 m. Materiais plásticos no interior representam risco grave de fuga e incêndio.",
+      "enabled": true,
+      "tags": ["tubagem", "material", "PVC", "proibido", "interior", "plástico"]
+    },
+    {
+      "id": "GAS-MAT-03",
+      "regulationId": "dl-521-99",
+      "article": "EN 1775 Sec. 5 / Portaria 361/98 Art. 14.o -- Tubagens de Cobre (EN 1057)",
+      "description": "As tubagens de cobre para gás devem cumprir a norma EN 1057 (cobre desoxidado com fósforo, Cu-DHP). As ligações devem ser por soldadura forte (brasagem com temperatura >= 450C) ou por acessórios de compressão aprovados para gás.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.copperPipeStandard", "operator": "!=", "value": "EN_1057" },
+        { "field": "gas.pipesMaterial", "operator": "==", "value": "copper" },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Norma cobre: {gas.copperPipeStandard}",
+      "requiredValue": "Cobre conforme EN 1057 (Cu-DHP); soldadura forte >= 450C",
+      "remediation": "Utilizar tubagem de cobre certificada EN 1057 (Cu-DHP desoxidado com fósforo). As ligações devem ser por soldadura forte (brasagem capilar com liga de prata ou fosfo-cobre, temperatura >= 450C). A soldadura fraca (estanho) NAO e permitida para gás. Acessórios de compressão devem ter certificação específica para gás.",
+      "enabled": true,
+      "tags": ["cobre", "EN 1057", "soldadura", "brasagem", "material"]
+    },
+    {
+      "id": "GAS-MAT-04",
+      "regulationId": "dl-521-99",
+      "article": "EN 1775 Sec. 5 / Portaria 361/98 Art. 14.o -- Tubagens de Aço(EN 10255)",
+      "description": "As tubagens de aço para gás devem cumprir a norma EN 10255. As ligações devem ser roscadas (com vedante aprovado para gas) ou soldadas. O aço deve ser galvanizado no exterior para proteção contra corrosão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.steelPipeStandard", "operator": "!=", "value": "EN_10255" },
+        { "field": "gas.pipesMaterial", "operator": "==", "value": "steel" },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Norma aco: {gas.steelPipeStandard}",
+      "requiredValue": "Aço conforme EN 10255; galvanizado no exterior",
+      "remediation": "Utilizar tubagem de aço certificada EN 10255. As ligações roscadas devem utilizar vedante aprovado para gás (fita PTFE amarela ou pasta anaeróbica específica). A tubagem de aço no exterior deve ser galvanizada e protegida contra corrosão. Verificar a certificação dos acessórios.",
+      "enabled": true,
+      "tags": ["aco", "EN 10255", "roscada", "galvanizado", "material"]
+    },
+    {
+      "id": "GAS-MAT-05",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 14.o / EN 1555 -- Polietileno Exterior Enterrado",
+      "description": "As tubagens de polietileno (PE) para gás são permitidas exclusivamente no exterior enterrado, a profundidade mínima de 0,60 m, conforme EN 1555. Devem ser PE 100 SDR 11 com banda de sinalização amarela.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.peInstallation", "operator": "==", "value": "interior" },
+        { "field": "gas.pipesMaterial", "operator": "==", "value": "polyethylene" },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "PE instalado em: {gas.peInstallation}",
+      "requiredValue": "PE (EN 1555) apenas exterior enterrado; profundidade >= 0,60 m",
+      "remediation": "O polietileno NAO pode ser utilizado no interior de edifícios. Se existir PE no interior, substituir por cobre (EN 1057) ou aço(EN 10255). No exterior enterrado, a profundidade mínima e 0,60 m, com banda de sinalização amarela a 0,30 m acima da tubagem. Utilizar PE 100 SDR 11 conforme EN 1555.",
+      "enabled": true,
+      "tags": ["polietileno", "PE", "EN 1555", "enterrado", "exterior", "0.60m"]
+    },
+    {
+      "id": "GAS-COND-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 13.o -- Diâmetro Mínimo Ramal Exterior (Gás Natural)",
+      "description": "O ramal exterior de gás natural deve ter diâmetro nominal mínimo de DN 32 mm para garantir caudal e pressão adequados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.exteriorPipeDiameter", "operator": "<", "value": 32 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "natural_gas" },
+        { "field": "gas.pipeLocation", "operator": "==", "value": "exterior" }
+      ],
+      "currentValueTemplate": "{gas.exteriorPipeDiameter} mm",
+      "requiredValue": ">= DN 32 mm (ramal exterior gás natural)",
+      "remediation": "Substituir o ramal exterior por tubagem com diâmetro nominal mínimo de DN 32 mm para gás natural. O subdimensionamento do ramal exterior provoca perda de carga excessiva e pressão insuficiente nos aparelhos.",
+      "enabled": true,
+      "tags": ["canalização", "diâmetro", "ramal", "exterior", "DN 32", "gas natural"]
+    },
+    {
+      "id": "GAS-COND-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 13.o -- Diâmetro Mínimo Ramal Interior (Gás Natural)",
+      "description": "O ramal interior de gás natural deve ter diâmetro nominal mínimo de DN 20 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.interiorPipeDiameter", "operator": "<", "value": 20 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "natural_gas" }
+      ],
+      "currentValueTemplate": "{gas.interiorPipeDiameter} mm",
+      "requiredValue": ">= DN 20 mm (ramal interior gás natural)",
+      "remediation": "Substituir a canalização interior por tubagem com diâmetro nominal mínimo de DN 20 mm para gás natural. O subdimensionamento provoca perda de carga excessiva e mau funcionamento dos aparelhos.",
+      "enabled": true,
+      "tags": ["canalização", "diâmetro", "tubagem", "ramal", "interior", "DN 20", "gas natural"]
+    },
+    {
+      "id": "GAS-COND-03",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 13.o -- Diâmetro Mínimo Ramal Interior (GPL)",
+      "description": "O ramal interior de GPL canalizado deve ter diâmetro nominal mínimo de DN 15 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.interiorPipeDiameter", "operator": "<", "value": 15 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "in", "value": ["lpg_piped", "lpg_bottle"] }
+      ],
+      "currentValueTemplate": "{gas.interiorPipeDiameter} mm",
+      "requiredValue": ">= DN 15 mm (ramal interior GPL)",
+      "remediation": "Substituir a canalização interior por tubagem com diâmetro nominal mínimo de DN 15 mm para GPL canalizado. O subdimensionamento provoca perda de carga excessiva e mau funcionamento dos aparelhos.",
+      "enabled": true,
+      "tags": ["canalização", "diâmetro", "tubagem", "ramal", "interior", "DN 15", "GPL"]
+    },
+    {
+      "id": "GAS-DIST-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 18.o -- Distância Tubagens Gás / Outras Canalizações (Perpendicular)",
+      "description": "A distância mínima entre tubagens de gás e outras canalizações (água, eletricidade, telecomunicações) em cruzamento perpendicular deve ser de 30 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.distanceToPipesCrossing", "operator": "<", "value": 30 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.distanceToPipesCrossing} mm",
+      "requiredValue": ">= 30 mm (cruzamento perpendicular)",
+      "remediation": "Reposicionar as tubagens para garantir afastamento mínimo de 30 mm em cruzamento perpendicular. Caso não seja possível, instalar manga ou calha de proteção entre as canalizações.",
+      "enabled": true,
+      "tags": ["distância", "cruzamento", "perpendicular", "30mm", "canalização"]
+    },
+    {
+      "id": "GAS-DIST-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 18.o -- Distância Tubagens Gás / Outras Canalizações (Paralelo sem Separação)",
+      "description": "A distância mínima entre tubagens de gás e outras canalizações em percurso paralelo sem separação física deve ser de 50 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.distanceToPipesParallel", "operator": "<", "value": 50 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" },
+        { "field": "gas.hasPhysicalSeparation", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "{gas.distanceToPipesParallel} mm",
+      "requiredValue": ">= 50 mm (paralelo sem separação física)",
+      "remediation": "Reposicionar as tubagens para garantir afastamento mínimo de 50 mm em percurso paralelo. Em alternativa, instalar separador físico (manga ou calha isolante) entre as canalizações, caso em que a distância pode ser reduzida.",
+      "enabled": true,
+      "tags": ["distância", "paralelo", "50mm", "canalização", "afastamento"]
+    },
+    {
+      "id": "GAS-DIST-03",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 18.o -- Distância Tubagens Gás / Outras Canalizações (Paralelo com Separação)",
+      "description": "Em percurso paralelo com separação física (manga, calha, divisória), a distância mínima entre tubagens de gás e outras canalizações é de 100 mm referida ao separador.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.distanceToPipesParallelWithSep", "operator": "<", "value": 100 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" },
+        { "field": "gas.hasPhysicalSeparation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{gas.distanceToPipesParallelWithSep} mm",
+      "requiredValue": ">= 100 mm (paralelo com separação física)",
+      "remediation": "Garantir afastamento mínimo de 100 mm entre o separador físico e as canalizações adjacentes. O separador deve ser em material não combustível e permitir a ventilação do espaço entre tubagens.",
+      "enabled": true,
+      "tags": ["distância", "paralelo", "separação", "100mm", "canalização"]
+    },
+    {
+      "id": "GAS-DIST-04",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 18.o -- Distância Tubagens Gás / Equipamentos Elétricos",
+      "description": "A distância mínima entre tubagens de gás e equipamentos elétricos (tomadas, interruptores, caixas de derivação) deve ser de 30 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.distanceToElectricalEquipment", "operator": "<", "value": 30 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.distanceToElectricalEquipment} mm",
+      "requiredValue": ">= 30 mm de equipamentos elétricos",
+      "remediation": "Reposicionar as tubagens de gás ou os equipamentos elétricos para garantir afastamento mínimo de 30 mm. Em locais com risco de acumulação de gás, considerar afastamentos superiores e utilização de equipamento elétrico antideflagrante.",
+      "enabled": true,
+      "tags": ["distância", "elétrica", "30mm", "tomada", "interruptor"]
+    },
+    {
+      "id": "GAS-DIST-05",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 18.o -- Distância Tubagens Gás / Quadros Elétricos",
+      "description": "A distância mínima entre tubagens de gás e quadros elétricos deve ser de 200 mm, dado o risco acrescido de arco elétrico e ignição.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.distanceToElectricalPanel", "operator": "<", "value": 200 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.distanceToElectricalPanel} mm",
+      "requiredValue": ">= 200 mm de quadros elétricos",
+      "remediation": "Reposicionar as tubagens de gás ou o quadro elétrico para garantir afastamento mínimo de 200 mm. Os quadros elétricos representam risco acrescido de arco elétrico e ignição em caso de fuga de gás. Se o afastamento não for possível, instalar proteção física entre a tubagem e o quadro.",
+      "enabled": true,
+      "tags": ["distância", "quadro elétrico", "200mm", "ignição", "segurança"]
+    },
+    {
+      "id": "GAS-DIST-06",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 22.o -- Distância Aparelhos Gás / Materiais Combustíveis",
+      "description": "A distância mínima entre aparelhos a gás(esquentador, caldeira) e materiais combustíveis (madeira, cortinas, têxteis, móveis) deve ser de 200 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.distanceToCombustibles", "operator": "<", "value": 200 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.distanceToCombustibles} mm",
+      "requiredValue": ">= 200 mm de materiais combustíveis",
+      "remediation": "Afastar os materiais combustíveis (móveis, cortinas, madeira, papel, têxteis) pelo menos 200 mm dos aparelhos a gás. Em alternativa, instalar proteção térmica (placa de material M0 não combustível) entre o aparelho e o material combustível. A radiação térmica dos aparelhos pode inflamar materiais próximos.",
+      "enabled": true,
+      "tags": ["distância", "combustível", "200mm", "esquentador", "caldeira", "segurança"]
+    },
+    {
+      "id": "GAS-VOL-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 25.o -- Volume Mínimo Compartimento (Tipo B)",
+      "description": "O compartimento onde se instalam aparelhos a gás tipo B (circuito aberto com conduta, ex: esquentador, caldeira) deve ter volume mínimo de 8 m3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.roomVolume", "operator": "<", "value": 8 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "==", "value": "type_B" }
+      ],
+      "currentValueTemplate": "{gas.roomVolume} m3",
+      "requiredValue": ">= 8 m3 (aparelhos tipo B)",
+      "remediation": "O compartimento não possui volume suficiente para a instalação do aparelho a gás tipo B. O volume mínimo é de 8 m3 para esquentadores e caldeiras de circuito aberto. Considerar a relocalização do aparelho para compartimento maior ou a abertura permanente para compartimento adjacente (com área>= 100 cm2).",
+      "enabled": true,
+      "tags": ["volume", "compartimento", "tipo B", "8m3", "dimensionamento"]
+    },
+    {
+      "id": "GAS-VOL-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 25.o -- Volume Mínimo Compartimento (Tipo A)",
+      "description": "O compartimento onde se instalam aparelhos a gás tipo A (sem conduta de evacuação, ex: fogão) deve ter volume mínimo de 6 m3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.roomVolume", "operator": "<", "value": 6 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "==", "value": "type_A" }
+      ],
+      "currentValueTemplate": "{gas.roomVolume} m3",
+      "requiredValue": ">= 6 m3 (aparelhos tipo A)",
+      "remediation": "O compartimento não possui volume suficiente para a instalação do aparelho a gás tipo A. O volume mínimo é de 6 m3 para fogões e placas de cozinha. Considerar a relocalização do aparelho para compartimento maior. A kitchenette/cozinha deve ter área epé-direito suficientes.",
+      "enabled": true,
+      "tags": ["volume", "compartimento", "tipo A", "6m3", "dimensionamento", "fogão"]
+    },
+    {
+      "id": "GAS-CONT-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 9.o -- Localização do Contador de Gás",
+      "description": "O contador de gás deve ser instalado em local acessível, ventilado, fora de quartos e instalações sanitárias. A caixa do contador deve ser em material de classe M0 (nao combustível) com ventilação permanente >= 150 cm2.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.meterLocation", "operator": "in", "value": ["bedroom", "bathroom", "WC"] },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "Localização: {gas.meterLocation}",
+      "requiredValue": "Local acessível, ventilado, fora de quartos/IS; caixa M0",
+      "remediation": "Relocalizar o contador de gás para zona acessível e ventilada (cozinha, circulação, fachada exterior ou caixa de escada). É proibida a instalação em quartos, casas de banho ou locais sem ventilação. A caixa do contador deve ser executada em material não combustível (classe M0).",
+      "enabled": true,
+      "tags": ["contador", "localização", "ventilação", "M0", "acessibilidade"]
+    },
+    {
+      "id": "GAS-CONT-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 9.o -- Ventilação da Caixa do Contador",
+      "description": "A caixa do contador de gás deve dispor de ventilação permanente com área livre mínima de 150 cm2 (duas aberturas de 75 cm2, uma superior e uma inferior) para evitar acumulação de gás em caso de fuga.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.meterBoxVentilation", "operator": "<", "value": 150 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.meterBoxVentilation} cm2",
+      "requiredValue": ">= 150 cm2 de ventilação na caixa do contador",
+      "remediation": "Instalar grelhas de ventilação na caixa do contador com área total livre >= 150 cm2. Devem existir duas aberturas: uma na parte inferior e outra na parte superior da caixa, cada uma com área mínima de 75 cm2. As grelhas não devem ser obturáveis.",
+      "enabled": true,
+      "tags": ["contador", "caixa", "ventilação", "150cm2", "grelha"]
+    },
+    {
+      "id": "GAS-CONT-03",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 9.o -- Material da Caixa do Contador",
+      "description": "A caixa do contador de gás deve ser construída em material não combustível de classe M0 (metal, alvenaria, betão). É proibida a utilização de materiais combustíveis (madeira, plástico) na construção da caixa.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.meterBoxMaterial", "operator": "not_in", "value": ["M0", "metal", "masonry", "concrete"] },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "Material caixa: {gas.meterBoxMaterial}",
+      "requiredValue": "Material classe M0 (nao combustível)",
+      "remediation": "Substituir a caixa do contador por uma em material não combustível classe M0: chapa metálica, alvenaria rebocada ou betão. É proibido utilizar madeira, plástico ou materiais combustíveis. A porta deve ser igualmente em material M0 ou metálica.",
+      "enabled": true,
+      "tags": ["contador", "caixa", "M0", "material", "nao combustível"]
+    },
+    {
+      "id": "GAS-REG-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 10.o -- Regulador de Pressão Obrigatório",
+      "description": "É obrigatória a instalação de regulador de pressão quando a pressão da rede é superior a pressão de utilização dos aparelhos. O regulador deve reduzir a pressão para os valores nominais de utilização.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasPressureRegulator", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.networkPressureExceedsUtilization", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Regulador de pressão obrigatório se pressão rede > pressão utilização",
+      "remediation": "Instalar regulador de pressão a jusante do contador e a montante da rede interior. O regulador deve ser dimensionado para o caudal máximo da instalação e calibrado para a pressão de utilização: 20-25 mbar (gas natural), 28-30 mbar (GPL garrafa), 37 mbar (GPL canalizado).",
+      "enabled": true,
+      "tags": ["regulador", "pressão", "obrigatório", "rede", "utilização"]
+    },
+    {
+      "id": "GAS-REG-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 10.o -- Pressão de Utilização Gás Natural",
+      "description": "A pressão de utilização para gás natural deve estar compreendida entre 20 e 25 mbar nos aparelhos. Valores fora desta gama provocam mau funcionamento e risco de segurança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.utilizationPressure", "operator": "<", "value": 20 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "natural_gas" }
+      ],
+      "currentValueTemplate": "{gas.utilizationPressure} mbar",
+      "requiredValue": "20-25 mbar (gas natural)",
+      "remediation": "Regular a pressão de utilização para a gama 20-25 mbar. Pressão inferior a 20 mbar provoca combustão incompleta (produção de CO) e falha dos dispositivos de segurança. Pressão superior a 25 mbar provoca chamas excessivas e sobreaquecimento. Verificar e calibrar o regulador de pressão.",
+      "enabled": true,
+      "tags": ["pressão", "utilização", "gas natural", "20 mbar", "25 mbar", "regulador"]
+    },
+    {
+      "id": "GAS-REG-03",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 10.o -- Pressão de Utilização GPL Garrafa",
+      "description": "A pressão de utilização para GPL em garrafa (butano/propano) deve estar compreendida entre 28 e 30 mbar nos aparelhos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.utilizationPressure", "operator": "<", "value": 28 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "lpg_bottle" }
+      ],
+      "currentValueTemplate": "{gas.utilizationPressure} mbar",
+      "requiredValue": "28-30 mbar (GPL garrafa)",
+      "remediation": "Regular a pressão de utilização para a gama 28-30 mbar para GPL em garrafa. Verificar o regulador de pressão instalado na garrafa e substituir se necessário. O regulador deve ser compatível com o tipo de gás(butano ou propano) e calibrado de fabrica.",
+      "enabled": true,
+      "tags": ["pressão", "utilização", "GPL", "garrafa", "28 mbar", "30 mbar"]
+    },
+    {
+      "id": "GAS-REG-04",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 10.o -- Pressão de Utilização GPL Canalizado",
+      "description": "A pressão de utilização para GPL canalizado (rede de distribuição) deve ser de 37 mbar nos aparelhos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.utilizationPressure", "operator": "!=", "value": 37 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "lpg_piped" }
+      ],
+      "currentValueTemplate": "{gas.utilizationPressure} mbar",
+      "requiredValue": "37 mbar (GPL canalizado)",
+      "remediation": "Regular a pressão de utilização para 37 mbar para GPL canalizado. Verificar e calibrar o regulador de 2.o andar instalado na entrada da fração. O regulador deve estar acessível e em bom estado de funcionamento.",
+      "enabled": true,
+      "tags": ["pressão", "utilização", "GPL", "canalizado", "37 mbar", "regulador"]
+    },
+    {
+      "id": "GAS-CERT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 15.o -- Certificação por Instalador Credenciado DGEG",
+      "description": "A instalação, modificação ou reparação de instalações de gás deve ser realizada e certificada por instalador credenciado pela DGEG (Direção-Geral de Energia e Geologia). É obrigatória a emissão de certificado de conformidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasGasCertification", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "requiredValue": "Certificação por instalador credenciado DGEG obrigatória",
+      "remediation": "Contratar instalador credenciado pela DGEG para certificação da instalação. O instalador deve emitir certificado de conformidade com número de registo DGEG. A instalação sem certificação é ilegal e impede a ligação a rede e a obtenção de licença de utilização. Lista de instaladores em www.dgeg.gov.pt.",
+      "enabled": true,
+      "tags": ["certificação", "DGEG", "instalador", "credenciado", "obrigatório"]
+    },
+    {
+      "id": "GAS-INSP-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 24.o -- Inspeção Periódica (Residencial)",
+      "description": "As instalações de gás residenciais devem ser sujeitas a inspeção periódica a cada 10 anos por técnico credenciado. A inspeção inclui verificação de estanquidade, ventilação, estado dos aparelhos e da tubagem.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.yearsSinceLastInspection", "operator": ">", "value": 10 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.buildingUse", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "{gas.yearsSinceLastInspection} anos desde última inspeção",
+      "requiredValue": "Inspeção a cada 10 anos (residencial)",
+      "remediation": "Solicitar inspeção periódica da instalação de gás a técnico credenciado pela DGEG. A inspeção residencial é obrigatória a cada 10 anos e inclui: ensaio de estanquidade, verificação do estado da tubagem e acessórios, verificação da ventilação, teste dos dispositivos de segurança e estado dos aparelhos.",
+      "enabled": true,
+      "tags": ["inspeção", "periódica", "residencial", "10 anos", "DGEG"]
+    },
+    {
+      "id": "GAS-INSP-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 24.o -- Inspeção Periódica (Comercial)",
+      "description": "As instalações de gás comerciais (restaurantes, hotéis, padarias, etc.) devem ser sujeitas a inspeção periódica a cada 5 anos por técnico credenciado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.yearsSinceLastInspection", "operator": ">", "value": 5 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.buildingUse", "operator": "==", "value": "commercial" }
+      ],
+      "currentValueTemplate": "{gas.yearsSinceLastInspection} anos desde última inspeção",
+      "requiredValue": "Inspeção a cada 5 anos (comercial)",
+      "remediation": "Solicitar inspeção periódica da instalação de gás a técnico credenciado pela DGEG. A inspeção comercial é obrigatória a cada 5 anos, dado o uso mais intensivo e o risco acrescido em espaços com público. Inclui todos os pontos da inspeção residencial mais verificação do sistema de deteção e alarme.",
+      "enabled": true,
+      "tags": ["inspeção", "periódica", "comercial", "5 anos", "DGEG"]
+    },
+    {
+      "id": "GAS-MAINT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 25.o -- Manutenção Anual de Caldeiras",
+      "description": "As caldeiras a gás devem ser sujeitas a manutenção anual por técnico qualificado. A manutenção inclui limpeza do queimador, verificação da combustão, análise de gases e verificação dos dispositivos de segurança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.monthsSinceBoilerMaintenance", "operator": ">", "value": 12 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.hasBoiler", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{gas.monthsSinceBoilerMaintenance} meses desde última manutenção",
+      "requiredValue": "Manutenção anual obrigatória (caldeiras)",
+      "remediation": "Contratar técnico qualificado (CAT - Certificado de Aptidao Técnica) para manutenção anual da caldeira. A manutenção deve incluir: limpeza do queimador e do permutador, verificação da combustão (teor de CO < 50 ppm no ar ambiente), verificação da tiragem, teste dos dispositivos de segurança (termopar, pressostato, termostato de segurança) e emissão de relatorio.",
+      "enabled": true,
+      "tags": ["manutenção", "caldeira", "anual", "técnico", "qualificado"]
+    },
+    {
+      "id": "GAS-MAINT-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 25.o -- Manutenção de Esquentadores",
+      "description": "Os esquentadores a gás devem ser sujeitos a manutenção periódica, com verificação da combustão, limpeza e teste dos dispositivos de segurança.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.monthsSinceWaterHeaterMaintenance", "operator": ">", "value": 24 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.hasWaterHeater", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{gas.monthsSinceWaterHeaterMaintenance} meses desde última manutenção",
+      "requiredValue": "Manutenção periódica recomendada (esquentadores)",
+      "remediation": "Solicitar manutenção do esquentador a técnico qualificado. A manutenção deve incluir: limpeza do queimador e do permutador (desincrustacao), verificação do termopar e válvula de segurança, verificação da tiragem e da combustão (CO), e inspeção do estado geral do aparelho.",
+      "enabled": true,
+      "tags": ["manutenção", "esquentador", "periódica", "segurança"]
+    },
+    {
+      "id": "GAS-FLEX-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 16.o -- Comprimento Máximo de Tubos Flexiveis",
+      "description": "Os tubos flexíveis de ligação aos aparelhos a gás não devem exceder 1,50 m de comprimento e devem respeitar o prazo de validade indicado pelo fabricante.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.flexTubeLength", "operator": ">", "value": 1.50 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.flexTubeLength} m",
+      "requiredValue": "<= 1,50 m; dentro do prazo de validade",
+      "remediation": "Substituir o tubo flexível por um com comprimento máximo de 1,50 m e dentro do prazo de validade. Verificar a data de fabrico/validade impressa no tubo. Recomenda-se a utilização de tubos flexíveis metálicos (inox) com ligação roscada em vez de tubos de borracha com abracadeiras, para maior segurança.",
+      "enabled": true,
+      "tags": ["flexível", "tubo", "comprimento", "validade", "ligação"]
+    },
+    {
+      "id": "GAS-FLEX-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 16.o -- Validade dos Tubos Flexiveis",
+      "description": "Os tubos flexíveis de borracha para ligação a aparelhos de gás tem prazo de validade limitado (geralmente 5 anos). A utilização de tubos fora do prazo constitui risco grave de fuga.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.flexTubeExpired", "operator": "==", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "requiredValue": "Tubo flexível dentro do prazo de validade",
+      "remediation": "Substituir IMEDIATAMENTE o tubo flexível fora do prazo de validade. Os tubos de borracha deterioram-se com o tempo (ressecamento, fissuras) e constituem a principal causa de fugas de gás domésticas. Preferir tubos flexíveis metálicos (inox) com certificação para gás, que não tem prazo de validade.",
+      "enabled": true,
+      "tags": ["flexível", "tubo", "validade", "borracha", "segurança", "fuga"]
+    },
+    {
+      "id": "GAS-EXT-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 19.o -- Proteção Mecanica Tubagens Exteriores",
+      "description": "As tubagens de gás instaladas em fachada exterior devem dispor de proteção mecânica obrigatória até2,00 m de altura do solo e ser pintadas na cor amarela de identificação conforme NP 182.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.hasExteriorProtection", "operator": "!=", "value": true },
+        { "field": "gas.hasExteriorPipes", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "Proteção mecânica: {gas.hasExteriorProtection}",
+      "requiredValue": "Proteção mecânica até2,00 m; pintura amarela (NP 182)",
+      "remediation": "Instalar proteção mecânica (manga metálica, calha ou resguardo) nas tubagens de gás em fachada até uma altura mínima de 2,00 m do solo, para proteção contra impactos. Pintar as tubagens na cor amarela (RAL 1021) para identificação regulamentar conforme NP 182.",
+      "enabled": true,
+      "tags": ["exterior", "fachada", "proteção", "pintura", "amarela", "NP 182"]
+    },
+    {
+      "id": "GAS-EXT-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 19.o -- Tubagens Enterradas Profundidade Mínima",
+      "description": "As tubagens de gás enterradas devem estar a uma profundidade mínima de 0,60 m, com banda de sinalização amarela a 0,30 m acima da geração da tubagem.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.buriedPipeDepth", "operator": "<", "value": 0.60 },
+        { "field": "gas.hasBuriedPipes", "operator": "==", "value": true },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "currentValueTemplate": "{gas.buriedPipeDepth} m",
+      "requiredValue": ">= 0,60 m de profundidade; banda sinalização a 0,30 m acima",
+      "remediation": "As tubagens enterradas devem ser instaladas a profundidade >= 0,60 m para proteção contra cargas superficiais. Colocar banda de sinalização amarela (com inscrição 'ATENÇÃO - CANALIZAÇÃO DE GAS') a 0,30 m acima da geração da tubagem. Utilizar leito de areia para proteção mecânica.",
+      "enabled": true,
+      "tags": ["enterrado", "profundidade", "0.60m", "sinalização", "banda"]
+    },
+    {
+      "id": "GAS-PROJ-02",
+      "regulationId": "dl-521-99",
+      "article": "EN 1775 Sec. 4 -- Dimensionamento da Rede (Perda de Carga)",
+      "description": "Conforme EN 1775, a perda de carga total na rede interior de gás não deve exceder 1 mbar entre o contador e o aparelho mais desfavorável, para gás natural a baixa pressão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.totalPressureDrop", "operator": ">", "value": 1 },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "==", "value": "natural_gas" }
+      ],
+      "currentValueTemplate": "{gas.totalPressureDrop} mbar",
+      "requiredValue": "<= 1 mbar (perda de carga total, gás natural baixa pressão)",
+      "remediation": "Redimensionar a rede interior para reduzir a perda de carga total abaixo de 1 mbar. Aumentar o diâmetro das tubagens nos trocos com maior caudal. Verificar o cálculo hidráulico segundo EN 1775 considerando o comprimento equivalente (incluindo acessórios) e o caudal simultaneo dos aparelhos.",
+      "enabled": true,
+      "tags": ["dimensionamento", "perda de carga", "EN 1775", "pressão", "rede"]
+    },
+    {
+      "id": "GAS-PROJ-03",
+      "regulationId": "dl-521-99",
+      "article": "EN 1775 Sec. 6 -- Estanquidade das Ligações (EN 1775)",
+      "description": "Conforme EN 1775, todas as ligações da rede de gás devem ser estáveis e acessíveis para inspeção. As ligações não acessíveis (embutidas, enterradas) devem ser soldadas ou por fusão, sem acessórios desmontáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasInaccessibleDismountableJoints", "operator": "==", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "requiredValue": "Ligações não acessíveis: soldadas/fusão; sem acessórios desmontáveis",
+      "remediation": "Todas as ligações em trocos não acessíveis (embutidos em paredes ou pavimentos, enterrados) devem ser realizadas por soldadura (cobre: brasagem forte; aco: soldadura) ou por fusão (PE). É proibida a utilização de acessórios roscados, de compressão ou desmontáveis em trocos não inspecionáveis conforme EN 1775.",
+      "enabled": true,
+      "tags": ["ligação", "estanquidade", "EN 1775", "soldadura", "embutido"]
+    },
+    {
+      "id": "GAS-LOC-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 18.o / Portaria 361/98 Art. 24.o -- Proibição de Tubagens em Locais Nao Ventilados",
+      "description": "É proibida a passagem de tubagens de gás por locais não ventilados, tais como: espaços fechados sem ventilação, caixas de elevador, condutas de lixo, ductos sem ventilação e locais de difícil acesso.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.pipesInUnventilatedSpaces", "operator": "==", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "requiredValue": "Tubagens de gás proibidas em locais não ventilados",
+      "remediation": "Redirecionar as tubagens de gás para evitar a passagem por locais não ventilados. As tubagens só podem passar por espaços com ventilação permanente. Se necessário atravessar paredes ou pavimentos, utilizar mangas de proteção com ventilação nas extremidades. Nunca passar tubagens por caixas de elevador ou condutas de lixo.",
+      "enabled": true,
+      "tags": ["tubagem", "localização", "ventilação", "proibido", "elevador"]
+    },
+    {
+      "id": "GAS-LOC-02",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 24.o -- Proibição de Aparelhos a Gás em Quartos e IS",
+      "description": "É proibida a instalação de aparelhos a gás de tipo A ou tipo B em quartos de dormir e instalações sanitárias. Aparelhos do tipo C (circuito estanque) são permitidos nestas divisões.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.applianceLocation", "operator": "in", "value": ["bedroom", "bathroom", "WC"] },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "in", "value": ["type_A", "type_B"] }
+      ],
+      "currentValueTemplate": "Aparelho tipo {gas.applianceType} em {gas.applianceLocation}",
+      "requiredValue": "Aparelhos tipo A e B proibidos em quartos e IS",
+      "remediation": "Relocalizar o aparelho a gás para compartimento adequado (cozinha, lavandaria ou local técnico). Os aparelhos tipo A (fogão) e tipo B (esquentador/caldeira de circuito aberto) são proibidos em quartos e casas de banho pelo risco de intoxicação por CO durante o sono. Apenas aparelhos tipo C (circuito estanque) são permitidos nestas divisões.",
+      "enabled": true,
+      "tags": ["aparelho", "localização", "quarto", "IS", "proibido", "tipo A", "tipo B"]
+    },
+    {
+      "id": "GAS-SEG-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 28.o -- Dispositivo Anti-retorno de Chama",
+      "description": "Os aparelhos a gás tipo B devem dispor de dispositivo anti-retorno de chama (válvula anti-retorno) na ligação a conduta de exaustão para evitar a reentrada de gases de combustão no compartimento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.hasAntiReturnDevice", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.applianceType", "operator": "==", "value": "type_B" }
+      ],
+      "requiredValue": "Dispositivo anti-retorno de chama obrigatório (tipo B)",
+      "remediation": "Instalar dispositivo anti-retorno de chama (corta-tiragem) na ligação entre o aparelho tipo B e a conduta de exaustão. O dispositivo deve interromper automaticamente o funcionamento do aparelho em caso de inversão da tiragem. Verificar que o dispositivo e compatível com o aparelho e a conduta.",
+      "enabled": true,
+      "tags": ["anti-retorno", "chama", "tipo B", "tiragem", "segurança"]
+    },
+    {
+      "id": "GAS-SEG-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 23.o -- Acessibilidade dos Orgaos de Segurança",
+      "description": "Todos os órgãos de segurança (válvulas de corte, reguladores, detetores, eletroválvulas) devem ser acessíveis para operação e manutenção. Nenhum orgao de segurança pode ser obstruído ou dissimulado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "gas.safetyDevicesAccessible", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "requiredValue": "Todos os órgãos de segurança acessíveis e não obstruídos",
+      "remediation": "Garantir que todos os órgãos de segurança (válvulas de corte geral e individual, regulador de pressão, detetor de gás, eletroválvula) são fácilmente acessíveis. Remover qualquer obstrução (móveis, revestimentos, decorações). As válvulas devem estar entre 0,60 m e 1,80 m de altura e ser operáveis sem ferramentas.",
+      "enabled": true,
+      "tags": ["segurança", "acessibilidade", "válvula", "detetor", "manutenção"]
+    },
+    {
+      "id": "GAS-TRAV-01",
+      "regulationId": "dl-521-99",
+      "article": "Portaria 361/98 Art. 20.o -- Travessias de Paredes e Pavimentos",
+      "description": "Nas travessias de paredes e pavimentos, as tubagens de gás devem ser protegidas por mangas passantes com diâmetro superior ao da tubagem, seladas nas extremidades com material flexível e não combustível. A manga deve permitir a livre dilatação da tubagem.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.hasProtectedWallCrossings", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.hasWallCrossings", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Mangas passantes em todas as travessias; selagem flexível não combustível",
+      "remediation": "Instalar mangas passantes (bucins) em todas as travessias de paredes e pavimentos. A manga deve ter diâmetro interior > diâmetro exterior da tubagem, com selagem flexível e não combustível nas extremidades (mastic intumescente ou lã de rocha). A manga deve permitir a livre dilatação térmica da tubagem e impedir a passagem de gás em caso de fuga.",
+      "enabled": true,
+      "tags": ["travessia", "manga", "parede", "pavimento", "proteção", "selagem"]
+    },
+    {
+      "id": "GAS-IDENT-01",
+      "regulationId": "dl-521-99",
+      "article": "NP 182 / Portaria 361/98 Art. 19.o -- Identificação das Tubagens de Gás",
+      "description": "As tubagens de gás devem ser identificadas pela cor amarela (RAL 1021) conforme NP 182, em todo o seu percurso visível. As tubagens embutidas devem ter sinalização no revestimento indicando o percurso.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "gas.pipesIdentified", "operator": "!=", "value": true },
+        { "field": "gas.hasGasInstallation", "operator": "exists", "value": null },
+        { "field": "gas.gasType", "operator": "!=", "value": "none" }
+      ],
+      "requiredValue": "Tubagens identificadas cor amarela (RAL 1021) conforme NP 182",
+      "remediation": "Pintar todas as tubagens de gás visíveis na cor amarela (RAL 1021) conforme NP 182. As tubagens de cobre podem ser identificadas com fita adesiva amarela ou anéis amarelos a intervalos regulares (máximo 3 m). Nas zonas embutidas, marcar o percurso da tubagem no revestimento com sinalização adequada.",
+      "enabled": true,
+      "tags": ["identificação", "cor", "amarela", "NP 182", "RAL 1021", "sinalização"]
+    }
+  ]
+}

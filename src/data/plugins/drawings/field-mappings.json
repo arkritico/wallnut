@@ -1,0 +1,539 @@
+{
+  "pluginId": "drawings",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras de peças desenhadas e documentação de projeto (Portaria 113/2015, normas NP)",
+  "fields": [
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasLocationPlan",
+      "label": "Planta de localização",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui planta de localização com enquadramento na cartografia oficial"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.locationPlanScale",
+      "label": "Escala da planta de localização",
+      "type": "select",
+      "options": [
+        { "value": "1:1000", "label": "1:1000" },
+        { "value": "1:2000", "label": "1:2000" },
+        { "value": "1:2500", "label": "1:2500" },
+        { "value": "1:5000", "label": "1:5000" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "1:2500" },
+      "description": "Escala da planta de localização — tipicamente 1:2500 ou 1:5000"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasImplantationPlan",
+      "label": "Planta de implantação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui planta de implantação com cotas e alinhamentos"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.implantationPlanScale",
+      "label": "Escala da planta de implantação",
+      "type": "select",
+      "options": [
+        { "value": "1:200", "label": "1:200" },
+        { "value": "1:500", "label": "1:500" },
+        { "value": "1:1000", "label": "1:1000" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "1:500" },
+      "description": "Escala da planta de implantação — tipicamente 1:200 ou 1:500"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasFloorPlans",
+      "label": "Plantas de pisos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui plantas de todos os pisos distintos"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.floorPlanScale",
+      "label": "Escala das plantas de pisos",
+      "type": "select",
+      "options": [
+        { "value": "1:50", "label": "1:50" },
+        { "value": "1:100", "label": "1:100" },
+        { "value": "1:200", "label": "1:200" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "1:100" },
+      "description": "Escala das plantas de pisos — tipicamente 1:50 ou 1:100"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasSections",
+      "label": "Cortes",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui cortes longitudinais e transversais representativos"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.sectionCount",
+      "label": "Número de cortes",
+      "type": "number",
+      "sources": ["form"],
+      "defaults": { "_default": 2 },
+      "description": "Número de cortes incluídos no projeto — mínimo 2 (longitudinal e transversal)"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasElevations",
+      "label": "Alçados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui todos os alçados do edifício"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasDetails",
+      "label": "Pormenores construtivos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui desenhos de pormenorização construtiva"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.detailScale",
+      "label": "Escala dos pormenores",
+      "type": "select",
+      "options": [
+        { "value": "1:5", "label": "1:5" },
+        { "value": "1:10", "label": "1:10" },
+        { "value": "1:20", "label": "1:20" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "1:20" },
+      "description": "Escala dos desenhos de pormenor — tipicamente 1:5 a 1:20"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasRoofPlan",
+      "label": "Planta de cobertura",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui planta de cobertura com pendentes e sistema de drenagem"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasFinishesSchedule",
+      "label": "Mapa de acabamentos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui mapa de acabamentos interiores e exteriores"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasOpeningsSchedule",
+      "label": "Mapa de vãos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui mapa de vãos (portas e janelas) com dimensões e características"
+    },
+    {
+      "_group": "Peças Desenhadas Obrigatórias",
+      "field": "drawings.hasAreaSchedule",
+      "label": "Quadro de áreas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui quadro de áreas com áreas brutas, úteis e de implantação"
+    },
+
+    {
+      "_group": "Fases de Projeto",
+      "field": "drawings.hasPreliminaryProgram",
+      "label": "Programa preliminar",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe programa preliminar do projeto"
+    },
+    {
+      "_group": "Fases de Projeto",
+      "field": "drawings.hasPreliminaryStudy",
+      "label": "Estudo prévio",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe estudo prévio com a conceção geral da obra"
+    },
+    {
+      "_group": "Fases de Projeto",
+      "field": "drawings.hasPreliminaryDesign",
+      "label": "Anteprojeto",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe anteprojeto para efeitos de licenciamento"
+    },
+    {
+      "_group": "Fases de Projeto",
+      "field": "drawings.hasExecutionProject",
+      "label": "Projeto de execução",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe projeto de execução com detalhe suficiente para construção"
+    },
+    {
+      "_group": "Fases de Projeto",
+      "field": "drawings.hasCorrectScaleForPhase",
+      "label": "Escalas adequadas à fase de projeto",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as escalas utilizadas são adequadas à fase do projeto (ex.: 1:100 para licenciamento, 1:50 para execução)"
+    },
+
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasScaleBar",
+      "label": "Escala gráfica",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos incluem escala gráfica para verificação após impressão"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.lineWeightMin",
+      "label": "Espessura mínima de linha",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "defaults": { "_default": 0.13 },
+      "description": "Espessura mínima de linha nos desenhos — mínimo 0,13 mm para legibilidade"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasConsistentLineWeights",
+      "label": "Espessuras de linha consistentes",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as espessuras de linha são consistentes e hierarquizadas em todo o projeto"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasStandardLineTypes",
+      "label": "Tipos de linha normalizados",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se são utilizados tipos de linha normalizados (contínuo, tracejado, traço-ponto)"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.textHeightMin",
+      "label": "Altura mínima de texto",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "defaults": { "_default": 2.5 },
+      "description": "Altura mínima do texto nos desenhos — mínimo 2,5 mm à escala de impressão"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.titleTextHeight",
+      "label": "Altura do texto de títulos",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "defaults": { "_default": 5.0 },
+      "description": "Altura do texto de títulos e legendas principais"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasReadableTextAtScale",
+      "label": "Texto legível à escala de impressão",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se todo o texto é legível quando impresso à escala indicada"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasStandardBuildingRepresentation",
+      "label": "Representação construtiva normalizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a representação de elementos construtivos segue as normas de desenho técnico"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasStandardDrawingPrinciples",
+      "label": "Princípios de desenho normalizados",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos seguem os princípios gerais de representação normalizada (NP EN ISO 128)"
+    },
+    {
+      "_group": "Qualidade Gráfica",
+      "field": "drawings.hasMaterialHatching",
+      "label": "Hachuras de materiais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os materiais em corte são representados com hachuras normalizadas"
+    },
+
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasDimensioning",
+      "label": "Cotagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos incluem cotagem completa"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasLevelDimensions",
+      "label": "Cotas de nível",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos incluem cotas de nível (altimetria) referenciadas"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasPartialAndTotalDimensions",
+      "label": "Cotas parciais e totais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a cotagem inclui cotas parciais e cotas totais encadeadas"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasNorthOrientation",
+      "label": "Orientação norte",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as plantas incluem indicação da orientação norte geográfico"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasTitleBlock",
+      "label": "Legenda (carimbo)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos possuem legenda normalizada (carimbo) com informações do projeto"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.titleBlockHasDesigner",
+      "label": "Legenda com identificação do projetista",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a legenda inclui nome, assinatura e número de inscrição na ordem profissional"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.titleBlockHasScale",
+      "label": "Legenda com indicação de escala",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a legenda inclui a indicação numérica da escala utilizada"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasSequentialNumbering",
+      "label": "Numeração sequencial dos desenhos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos possuem numeração sequencial e organizada"
+    },
+    {
+      "_group": "Informação Complementar",
+      "field": "drawings.hasRevisionControl",
+      "label": "Controlo de revisões",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos possuem sistema de controlo de revisões com data e descrição das alterações"
+    },
+
+    {
+      "_group": "Simbologia",
+      "field": "drawings.hasSCIESymbology",
+      "label": "Simbologia SCIE",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos de segurança contra incêndio utilizam simbologia conforme NT-SCIE"
+    },
+    {
+      "_group": "Simbologia",
+      "field": "drawings.hasElectricalSymbology",
+      "label": "Simbologia elétrica",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos elétricos utilizam simbologia conforme NP EN 60617"
+    },
+    {
+      "_group": "Simbologia",
+      "field": "drawings.hasHVACSymbology",
+      "label": "Simbologia AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos AVAC utilizam simbologia normalizada"
+    },
+    {
+      "_group": "Simbologia",
+      "field": "drawings.hasHydraulicSymbology",
+      "label": "Simbologia hidráulica",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos de redes hidráulicas utilizam simbologia normalizada"
+    },
+    {
+      "_group": "Simbologia",
+      "field": "drawings.hasAccessibilitySymbology",
+      "label": "Simbologia de acessibilidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos incluem simbologia de acessibilidade conforme DL 163/2006"
+    },
+    {
+      "_group": "Simbologia",
+      "field": "drawings.hasSymbolLegend",
+      "label": "Legenda de símbolos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos incluem legenda explicativa dos símbolos utilizados"
+    },
+
+    {
+      "_group": "Apresentação e Formatação",
+      "field": "drawings.hasStandardPaperFormat",
+      "label": "Formato de papel normalizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos utilizam formatos de papel normalizados (série A: A0, A1, A2, A3, A4)"
+    },
+    {
+      "_group": "Apresentação e Formatação",
+      "field": "drawings.hasMinimumMargins",
+      "label": "Margens mínimas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos respeitam as margens mínimas de enquadramento e arquivo"
+    },
+    {
+      "_group": "Apresentação e Formatação",
+      "field": "drawings.hasFoldingMarks",
+      "label": "Marcas de dobragem",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os formatos superiores a A4 possuem marcas de dobragem normalizadas"
+    },
+    {
+      "_group": "Apresentação e Formatação",
+      "field": "drawings.hasSpecialtyCoordination",
+      "label": "Coordenação entre especialidades",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe coordenação gráfica entre as diversas especialidades do projeto"
+    },
+
+    {
+      "_group": "Documentos Escritos",
+      "field": "drawings.hasFireSafetyPlans",
+      "label": "Plantas de segurança contra incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de segurança contra incêndio para instrução do processo SCIE"
+    },
+    {
+      "_group": "Documentos Escritos",
+      "field": "drawings.hasAccessibilityPlans",
+      "label": "Plantas de acessibilidades",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de acessibilidades com percursos acessíveis e equipamentos"
+    },
+    {
+      "_group": "Documentos Escritos",
+      "field": "drawings.hasBOQ",
+      "label": "Mapa de quantidades de trabalho",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe mapa de quantidades de trabalho (medições) para orçamentação"
+    },
+    {
+      "_group": "Documentos Escritos",
+      "field": "drawings.hasSpecifications",
+      "label": "Caderno de encargos / condições técnicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe caderno de encargos ou condições técnicas especiais"
+    },
+    {
+      "_group": "Documentos Escritos",
+      "field": "drawings.hasBudgetEstimate",
+      "label": "Estimativa orçamental",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe estimativa orçamental ou orçamento detalhado"
+    },
+    {
+      "_group": "Documentos Escritos",
+      "field": "drawings.hasWorkPlan",
+      "label": "Plano de trabalhos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe plano de trabalhos com cronograma de execução da obra"
+    }
+  ]
+}

@@ -1,0 +1,1938 @@
+{
+  "pluginId": "fire-safety",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras SCIE (DL 220/2008, RT-SCIE, Notas Técnicas)",
+  "fields": [
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "buildingType",
+      "label": "Tipo de edifício",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial / Serviços" },
+        { "value": "mixed", "label": "Uso misto" },
+        { "value": "industrial", "label": "Industrial / Armazém" }
+      ],
+      "sources": ["form"],
+      "required": true
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "grossFloorArea",
+      "label": "Área bruta de construção",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "GrossFloorArea",
+        "pset": "Qto_BuildingBaseQuantities"
+      },
+      "required": true
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "numberOfFloors",
+      "label": "Número de pisos",
+      "type": "number",
+      "unit": "",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcBuildingStorey",
+        "method": "count"
+      },
+      "required": true
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.riskCategory",
+      "label": "Categoria de risco",
+      "type": "select",
+      "options": [
+        { "value": "1", "label": "1.ª Categoria" },
+        { "value": "2", "label": "2.ª Categoria" },
+        { "value": "3", "label": "3.ª Categoria" },
+        { "value": "4", "label": "4.ª Categoria" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Categoria de risco conforme DL 220/2008 Art. 12.º, determinada pela UT, altura, efetivo e área"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.buildingHeight",
+      "label": "Altura do edifício",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "Height",
+        "pset": "Qto_BuildingBaseQuantities"
+      },
+      "description": "Altura do edifício medida do plano de referência ao pavimento do último piso acima do solo suscetível de ocupação"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.occupantLoad",
+      "label": "Efetivo total do edifício",
+      "type": "number",
+      "unit": "pessoas",
+      "sources": ["form"],
+      "description": "Número máximo estimado de ocupantes do edifício (efetivo)"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.occupancyIndex",
+      "label": "Índice de ocupação",
+      "type": "number",
+      "unit": "pessoas/m²",
+      "sources": ["form"],
+      "defaults": {
+        "residential": 0.03,
+        "commercial": 0.1,
+        "industrial": 0.05
+      },
+      "description": "Índice de ocupação por m² conforme RT-SCIE, depende da utilização-tipo"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.isMixedUseBuilding",
+      "label": "Edifício de utilização mista",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "mixed": true, "residential": false, "commercial": false, "industrial": false },
+      "description": "Indica se o edifício contém mais de uma utilização-tipo"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.hasMixedUseIsolation",
+      "label": "Isolamento entre UTs distintas",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se as utilizações-tipo distintas no edifício misto estão devidamente isoladas"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.hasRiskBIsolation",
+      "label": "Isolamento de locais de risco B",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Locais de risco B (efetivo > 100 ou > 50 em pisos abaixo do PR) devidamente isolados"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.hasRiskDLocations",
+      "label": "Existência de locais de risco D",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Locais de risco D (acamados, crianças < 6 anos, pessoas com mobilidade condicionada)"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.hasRiskFIsolation",
+      "label": "Isolamento de locais de risco F",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Locais de risco F (centrais térmicas, postos de transformação, grupos de emergência) devidamente isolados"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.distanceToFireStation",
+      "label": "Distância ao quartel de bombeiros mais próximo",
+      "type": "number",
+      "unit": "km",
+      "sources": ["form"],
+      "description": "Distância rodoviária ao quartel de bombeiros mais próximo"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.distanceToAdjacentBuilding",
+      "label": "Distância ao edifício adjacente",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância entre fachadas de edifícios adjacentes para avaliação de propagação"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.fireStationsForTriangulation",
+      "label": "Quartéis para triangulação de socorro",
+      "type": "number",
+      "unit": "",
+      "sources": ["form"],
+      "description": "Número de quartéis de bombeiros a considerar na triangulação do socorro"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.responseTime",
+      "label": "Tempo de resposta dos bombeiros",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Tempo estimado de chegada dos bombeiros ao edifício"
+    },
+    {
+      "_group": "Classificação e Dados Gerais",
+      "field": "fireSafety.undergroundArea",
+      "label": "Área enterrada / pisos abaixo do PR",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcBuildingStorey",
+        "filter": "Elevation < 0",
+        "method": "sumArea"
+      },
+      "description": "Área total dos pisos abaixo do plano de referência"
+    },
+
+    {
+      "_group": "Estrutura e Resistência ao Fogo",
+      "field": "fireSafety.fireResistanceOfStructure",
+      "label": "Resistência ao fogo da estrutura (REI)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_WallCommon",
+        "method": "minValue"
+      },
+      "required": true,
+      "description": "Classificação mínima de resistência ao fogo dos elementos estruturais (REI) em minutos"
+    },
+    {
+      "_group": "Estrutura e Resistência ao Fogo",
+      "field": "fireSafety.structuralFireResistance",
+      "label": "Resistência ao fogo estrutural verificada",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_BeamCommon"
+      },
+      "description": "Valor efetivo de REI verificado nos elementos estruturais principais"
+    },
+    {
+      "_group": "Estrutura e Resistência ao Fogo",
+      "field": "fireSafety.hasStructuralFireExemption",
+      "label": "Isenção de resistência ao fogo da estrutura",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "residential": false, "commercial": false, "industrial": false },
+      "description": "Edifícios de 1.ª cat. com 1 piso e área < 300 m² podem ter isenção de classificação de resistência ao fogo"
+    },
+    {
+      "_group": "Estrutura e Resistência ao Fogo",
+      "field": "fireSafety.floorFireResistance",
+      "label": "Resistência ao fogo dos pavimentos (REI)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_SlabCommon"
+      },
+      "description": "Resistência ao fogo dos pavimentos que constituem compartimentação"
+    },
+
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.compartmentArea",
+      "label": "Área do compartimento corta-fogo",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "property": "NetFloorArea",
+        "method": "maxValue"
+      },
+      "description": "Maior área de compartimento corta-fogo existente no edifício"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.compartmentMinRating",
+      "label": "Classificação mínima do compartimento (EI)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_WallCommon",
+        "filter": "IsExternal=false"
+      },
+      "description": "Classificação mínima de resistência ao fogo das paredes de compartimentação (EI)"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.compartmentWallRating",
+      "label": "Resistência ao fogo das paredes de compartimentação (EI)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_WallCommon"
+      },
+      "description": "Classificação EI efetiva das paredes de compartimentação existentes"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.fireDoorsRating",
+      "label": "Classificação das portas corta-fogo (EI C)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_DoorCommon"
+      },
+      "description": "Classificação EI das portas corta-fogo nos caminhos de evacuação"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.fireDoorsHaveCloser",
+      "label": "Portas corta-fogo com fecho automático",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se as portas corta-fogo possuem dispositivo de fecho automático (C)"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.hasFireLobby",
+      "label": "Existência de câmara corta-fogo",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "property": "OccupancyType",
+        "filter": "OccupancyType=FireLobby"
+      },
+      "description": "Indica se existem câmaras corta-fogo nas vias de evacuação protegidas"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.hasFireStoppedPenetrations",
+      "label": "Selagem corta-fogo das travessias",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se as travessias de tubagens, cabos e condutas em paredes/pavimentos CF estão devidamente seladas"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.hasFireDampers",
+      "label": "Registos corta-fogo nas condutas AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existem registos corta-fogo (dampers) nas condutas que atravessam elementos de compartimentação"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.elevatorShaftRating",
+      "label": "Resistência ao fogo da caixa de elevadores (EI)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_WallCommon",
+        "filter": "IsExternal=false AND RelatedToElevator=true"
+      },
+      "description": "Classificação EI do encerramento da caixa de elevadores"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.elevatorsReturnOnAlarm",
+      "label": "Elevadores regressam ao piso de saída em caso de alarme",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se os elevadores estão programados para regressar ao piso de saída em caso de alarme de incêndio"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.hasFirefighterElevator",
+      "label": "Existência de elevador prioritário de bombeiros",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe elevador com comando prioritário para uso dos bombeiros (obrigatório para altura > 28 m)"
+    },
+    {
+      "_group": "Compartimentação Corta-Fogo",
+      "field": "fireSafety.hasUnprotectedVerticalOpening",
+      "label": "Existência de abertura vertical desprotegida",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existem aberturas verticais não protegidas (escadas abertas, vazios, átrios) que comunicam pisos"
+    },
+
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.wallReactionClass",
+      "label": "Classe de reação ao fogo de paredes e tetos",
+      "type": "string",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "SurfaceSpreadOfFlame",
+        "pset": "Pset_MaterialCommon"
+      },
+      "description": "Euroclasse de reação ao fogo dos revestimentos de paredes e tetos (ex.: A2-s1,d0)"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.floorReactionClass",
+      "label": "Classe de reação ao fogo dos pavimentos",
+      "type": "string",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "SurfaceSpreadOfFlame",
+        "pset": "Pset_MaterialCommon"
+      },
+      "description": "Euroclasse de reação ao fogo dos revestimentos de pavimentos (ex.: CFL-s2)"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.roofFireRating",
+      "label": "Resistência/reação ao fogo da cobertura",
+      "type": "string",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_RoofCommon"
+      },
+      "description": "Classificação de resistência ao fogo da cobertura (REI/EI)"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.roofCladding",
+      "label": "Revestimento da cobertura",
+      "type": "string",
+      "sources": ["form"],
+      "description": "Tipo e classe de reação ao fogo do revestimento de cobertura (ex.: BROOF(t1))"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.riskBCWallReactionClass",
+      "label": "Classe de reação ao fogo em locais de risco B/C",
+      "type": "string",
+      "sources": ["form"],
+      "description": "Euroclasse de reação ao fogo dos revestimentos de paredes em locais de risco B e C"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.riskCAreaWallRating",
+      "label": "Resistência ao fogo de paredes em locais de risco C",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Classificação EI das paredes que delimitam locais de risco C (armazéns, oficinas)"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.riskDArea",
+      "label": "Área de locais de risco D",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área dos locais de risco D (ocupantes acamados, crianças, mobilidade condicionada)"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.riskDAreaWallRating",
+      "label": "Resistência ao fogo de paredes em locais de risco D",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Classificação EI das paredes que delimitam locais de risco D"
+    },
+    {
+      "_group": "Reação ao Fogo dos Materiais",
+      "field": "fireSafety.cableFireRating",
+      "label": "Classificação de reação ao fogo dos cabos",
+      "type": "string",
+      "sources": ["form"],
+      "description": "Classe de reação ao fogo dos cabos elétricos (ex.: Cca-s1b,d1,a1)"
+    },
+
+    {
+      "_group": "Fachadas e Empenas",
+      "field": "fireSafety.empenaFireRating",
+      "label": "Resistência ao fogo da empena (EI)",
+      "type": "number",
+      "unit": "min",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "FireRating",
+        "pset": "Pset_WallCommon",
+        "filter": "IsExternal=true AND IsPartyWall=true"
+      },
+      "description": "Resistência ao fogo das empenas (paredes de meação) — mínimo EI 60 a EI 120"
+    },
+    {
+      "_group": "Fachadas e Empenas",
+      "field": "fireSafety.facadeFireBreakHeight",
+      "label": "Altura do pano de peito (faixa de proteção entre pisos)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "Height",
+        "pset": "Pset_CurtainWallCommon"
+      },
+      "description": "Altura mínima do pano de peito entre vãos de pisos consecutivos para impedir propagação vertical pela fachada"
+    },
+    {
+      "_group": "Fachadas e Empenas",
+      "field": "fireSafety.facadeProtectionStripHeight",
+      "label": "Altura da faixa de proteção na fachada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Altura da faixa de proteção entre pisos — mínimo 1,10 m em edifícios > 28 m"
+    },
+    {
+      "_group": "Fachadas e Empenas",
+      "field": "fireSafety.guardaFogosHeight",
+      "label": "Altura do guarda-fogos",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Altura do guarda-fogos na cobertura adjacente a empenas — mínimo 0,60 m"
+    },
+    {
+      "_group": "Fachadas e Empenas",
+      "field": "fireSafety.hasDiedroProtection",
+      "label": "Proteção de diedro entre fachadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se o diedro (ângulo < 135° entre fachadas) tem proteção contra propagação de incêndio"
+    },
+    {
+      "_group": "Fachadas e Empenas",
+      "field": "fireSafety.accessibleOpeningsPerFacade",
+      "label": "Aberturas acessíveis por fachada",
+      "type": "number",
+      "unit": "",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcWindow",
+        "method": "countPerFacade"
+      },
+      "description": "Número de aberturas acessíveis aos bombeiros por fachada do edifício"
+    },
+
+    {
+      "_group": "Pátios e Logradouros",
+      "field": "fireSafety.courtyardHeight",
+      "label": "Altura do pátio interior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "description": "Altura das paredes interiores do pátio interior (saguão)"
+    },
+    {
+      "_group": "Pátios e Logradouros",
+      "field": "fireSafety.courtyardVentArea",
+      "label": "Área de ventilação do pátio interior",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área livre de ventilação no topo do pátio interior"
+    },
+
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.numberOfExits",
+      "label": "Número de saídas de evacuação",
+      "type": "number",
+      "unit": "",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "filter": "IsExternal=true AND IsFireExit=true",
+        "method": "count"
+      },
+      "required": true,
+      "description": "Número total de saídas de evacuação do edifício ou fração"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.maxEvacuationDistance",
+      "label": "Distância máxima de evacuação",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": true,
+      "description": "Maior distância a percorrer desde qualquer ponto até à saída mais próxima"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.evacuationPathWidth",
+      "label": "Largura dos caminhos de evacuação",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcDoor",
+        "property": "OverallWidth",
+        "method": "minValue"
+      },
+      "description": "Largura mínima dos caminhos de evacuação (1 UP = 0,90 m; 2 UP = 1,40 m)"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.evacuationUP",
+      "label": "Unidades de passagem (UP) disponíveis",
+      "type": "number",
+      "unit": "UP",
+      "sources": ["form"],
+      "description": "Número de unidades de passagem (UP) nos caminhos de evacuação"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.deadEndDistance",
+      "label": "Distância em impasse",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Maior distância de percurso em impasse (sem saída alternativa) — máximo 15 m"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.horizontalRouteLength",
+      "label": "Comprimento máximo do caminho horizontal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Maior distância horizontal nos caminhos de evacuação"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.exitDoorsOpenOutward",
+      "label": "Portas de saída abrem no sentido da evacuação",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "OperationType",
+        "pset": "Pset_DoorCommon"
+      },
+      "description": "Indica se as portas das saídas de evacuação abrem no sentido da fuga (obrigatório para efetivo > 50)"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.exitsInDistinctDirections",
+      "label": "Saídas em direções distintas",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se as saídas de evacuação estão dispostas em direções distintas (ângulo > 45°)"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.hasProtectedStairs",
+      "label": "Escadas protegidas / enclausuradas",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcStair",
+        "property": "FireExit",
+        "pset": "Pset_StairCommon"
+      },
+      "description": "Indica se as escadas de evacuação são protegidas com envolvente resistente ao fogo"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.stepsPerFlight",
+      "label": "Número de degraus por lanço",
+      "type": "number",
+      "unit": "",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "NumberOfRiser",
+        "pset": "Pset_StairFlightCommon"
+      },
+      "description": "Número de degraus por lanço de escada (máximo 25, mínimo 3)"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.guardHeight",
+      "label": "Altura de guardas nas escadas e varandas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "Height",
+        "pset": "Pset_RailingCommon"
+      },
+      "description": "Altura mínima das guardas de proteção (mínimo 1,10 m)"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.roofGuardHeight",
+      "label": "Altura da guarda na cobertura",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Altura da guarda de proteção na cobertura acessível"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.hasRefugeSpaces",
+      "label": "Existência de espaços de refúgio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existem espaços de refúgio para pessoas com mobilidade condicionada"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.belowRefEvacDistance",
+      "label": "Distância de evacuação em pisos abaixo do plano de referência",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Maior distância de evacuação nos pisos abaixo do plano de referência"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.residentialEvacWidth",
+      "label": "Largura de evacuação em pisos habitacionais",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Largura mínima dos caminhos de evacuação nos pisos de utilização residencial"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.verticalEvacWidth",
+      "label": "Largura das vias verticais de evacuação",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "TreadLength",
+        "pset": "Pset_StairFlightCommon"
+      },
+      "description": "Largura mínima das escadas e rampas de evacuação vertical"
+    },
+    {
+      "_group": "Evacuação — Caminhos e Saídas",
+      "field": "fireSafety.storageEvacDistance",
+      "label": "Distância de evacuação em armazéns",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância máxima de evacuação em zonas de armazenagem"
+    },
+
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasFireDetection",
+      "label": "Sistema automático de deteção de incêndio (SADI)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "description": "Indica se o edifício possui sistema automático de deteção de incêndio conforme NP EN 54 / NT12"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasFireAlarm",
+      "label": "Sistema de alarme de incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "description": "Indica se o edifício possui sistema de alarme de incêndio (sirenes/difusores)"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.alarmConfigType",
+      "label": "Configuração do alarme",
+      "type": "select",
+      "options": [
+        { "value": "1", "label": "Configuração 1 — alarme local" },
+        { "value": "2", "label": "Configuração 2 — alarme parcial" },
+        { "value": "3", "label": "Configuração 3 — alarme geral temporizado" }
+      ],
+      "sources": ["form"],
+      "description": "Tipo de configuração do alarme conforme RT-SCIE Art. 121.º"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.detectorSpacing",
+      "label": "Espaçamento entre detetores",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância máxima entre detetores automáticos de incêndio"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.manualCallPointSpacing",
+      "label": "Espaçamento entre botões de alarme manual",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância máxima entre botões de alarme manual (botoneiras) — máximo 30 m"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasMonitoredFirePanel",
+      "label": "Central de deteção monitorizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se a central de deteção de incêndio (CDI) é monitorizada por posto de segurança ou CRA"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasFalseCeilingDetection",
+      "label": "Deteção em tetos falsos",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe deteção automática no espaço plenum dos tetos falsos (obrigatório se h > 0,80 m)"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasTechnicalZoneDetection",
+      "label": "Deteção em zonas técnicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe deteção automática em ductos, courettes e zonas técnicas"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasFireBrigadeAlert",
+      "label": "Alerta automático aos bombeiros",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se o sistema de deteção possui transmissão automática de alarme aos bombeiros"
+    },
+    {
+      "_group": "Deteção e Alarme de Incêndio",
+      "field": "fireSafety.hasCentralizedFireManagement",
+      "label": "Gestão técnica centralizada de segurança",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe sistema de gestão técnica centralizada que integre os sistemas de segurança contra incêndio"
+    },
+
+    {
+      "_group": "Sinalização de Segurança",
+      "field": "fireSafety.hasFireSignage",
+      "label": "Sinalização de segurança contra incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe sinalização fotoluminescente conforme ISO 7010 e NP 4386"
+    },
+    {
+      "_group": "Sinalização de Segurança",
+      "field": "fireSafety.signageHeight",
+      "label": "Altura da sinalização de segurança",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 2.1, "commercial": 2.1, "industrial": 2.1 },
+      "description": "Altura de montagem das placas de sinalização (tipicamente 2,10 m a 2,40 m)"
+    },
+    {
+      "_group": "Sinalização de Segurança",
+      "field": "fireSafety.signageLuminance",
+      "label": "Luminância da sinalização fotoluminescente",
+      "type": "number",
+      "unit": "cd/m²",
+      "sources": ["form"],
+      "description": "Luminância mínima das placas fotoluminescentes (≥ 2 cd/m² aos 10 min, ≥ 0,3 cd/m² aos 60 min)"
+    },
+
+    {
+      "_group": "Iluminação de Emergência",
+      "field": "fireSafety.hasEmergencyLighting",
+      "label": "Iluminação de emergência",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "description": "Indica se existe iluminação de emergência nos caminhos de evacuação e saídas"
+    },
+    {
+      "_group": "Iluminação de Emergência",
+      "field": "fireSafety.emergencyLightingLevel",
+      "label": "Nível de iluminação de emergência",
+      "type": "number",
+      "unit": "lux",
+      "sources": ["form"],
+      "defaults": { "residential": 1, "commercial": 1, "industrial": 1 },
+      "description": "Nível mínimo de iluminação de emergência nos percursos de evacuação (1 lux) e junto a equipamentos (5 lux)"
+    },
+    {
+      "_group": "Iluminação de Emergência",
+      "field": "fireSafety.emergencyLightingAutonomy",
+      "label": "Autonomia da iluminação de emergência",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "defaults": { "residential": 60, "commercial": 60, "industrial": 60 },
+      "description": "Autonomia mínima das luminárias de emergência (mínimo 60 minutos)"
+    },
+    {
+      "_group": "Iluminação de Emergência",
+      "field": "fireSafety.emergencyLightingActivationTime",
+      "label": "Tempo de ativação da iluminação de emergência",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "defaults": { "residential": 5, "commercial": 5, "industrial": 5 },
+      "description": "Tempo máximo para ativação da iluminação de emergência após falha da alimentação normal (≤ 5 s para 50% do nível)"
+    },
+    {
+      "_group": "Iluminação de Emergência",
+      "field": "fireSafety.emergencyLightingAtEquipment",
+      "label": "Iluminação de emergência junto a equipamentos de segurança",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe iluminação de emergência junto a extintores, bocas de incêndio e botões de alarme (mínimo 5 lux)"
+    },
+
+    {
+      "_group": "Alimentação de Emergência",
+      "field": "fireSafety.hasBackupPower",
+      "label": "Fonte de alimentação de emergência",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe fonte de energia de emergência (grupo gerador ou UPS) para os sistemas de segurança"
+    },
+    {
+      "_group": "Alimentação de Emergência",
+      "field": "fireSafety.emergencyPowerStartup",
+      "label": "Tempo de arranque do grupo de emergência",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "defaults": { "residential": 15, "commercial": 15, "industrial": 15 },
+      "description": "Tempo máximo para o grupo gerador de emergência entrar em funcionamento (≤ 15 s)"
+    },
+
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.extinguisherDensity",
+      "label": "Densidade de extintores (por 200 m²)",
+      "type": "number",
+      "unit": "un./200 m²",
+      "sources": ["form"],
+      "defaults": { "residential": 1, "commercial": 1, "industrial": 1 },
+      "description": "Número de extintores por cada 200 m² de área útil — mínimo 1 extintor por 200 m²"
+    },
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.extinguisherMaxDistance",
+      "label": "Distância máxima a um extintor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 15, "commercial": 15, "industrial": 15 },
+      "description": "Distância máxima de qualquer ponto do piso a um extintor — máximo 15 m"
+    },
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.extinguisherHeight",
+      "label": "Altura de montagem dos extintores",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 1.2, "commercial": 1.2, "industrial": 1.2 },
+      "description": "Altura do manípulo do extintor ao pavimento (máximo 1,20 m)"
+    },
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.extinguisherTotalCharge",
+      "label": "Carga total de agente extintor",
+      "type": "number",
+      "unit": "kg",
+      "sources": ["form"],
+      "description": "Carga total de agente extintor (pó químico ABC) — mínimo 18 kg por cada 500 m²"
+    },
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.kitchenExtinguisherRating",
+      "label": "Classificação do extintor de cozinha",
+      "type": "string",
+      "sources": ["form"],
+      "description": "Classificação do extintor específico para cozinhas (classe F) — ex.: 75F"
+    },
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.firstInterventionFlow",
+      "label": "Caudal de 1.ª intervenção",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "description": "Caudal disponível para meios de 1.ª intervenção (carretéis tipo teatro)"
+    },
+    {
+      "_group": "Extintores e 1.ª Intervenção",
+      "field": "fireSafety.firstInterventionAutonomy",
+      "label": "Autonomia dos meios de 1.ª intervenção",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Autonomia da reserva de água para meios de 1.ª intervenção"
+    },
+
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.hasRIA",
+      "label": "Rede de incêndio armada (RIA)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe rede de incêndio armada com bocas de incêndio tipo carretel (Ø 25 mm)"
+    },
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.riaMinPressure",
+      "label": "Pressão mínima na boca de incêndio (RIA)",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "defaults": { "residential": 2.5, "commercial": 2.5, "industrial": 2.5 },
+      "description": "Pressão mínima no difusor do carretel — mínimo 250 kPa (2,5 bar)"
+    },
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.riaSimultaneousFlow",
+      "label": "Caudal simultâneo da RIA",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "defaults": { "residential": 180, "commercial": 180, "industrial": 180 },
+      "description": "Caudal para 2 carretéis em funcionamento simultâneo (2 × 1,5 L/s = 180 L/min)"
+    },
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.riaMaxSpacing",
+      "label": "Espaçamento máximo entre bocas de incêndio (RIA)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 25, "commercial": 25, "industrial": 25 },
+      "description": "Distância máxima de qualquer ponto a uma boca de incêndio (20 m mangueira + 5 m jato)"
+    },
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.riaHoseLength",
+      "label": "Comprimento da mangueira da RIA",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 20, "commercial": 20, "industrial": 20 },
+      "description": "Comprimento da mangueira semi-rígida do carretel — tipicamente 20 m"
+    },
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.hasRASICapacityCalculation",
+      "label": "Cálculo hidráulico da RASI verificado",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se foi efetuado cálculo hidráulico da rede de alimentação de serviço de incêndio (RASI)"
+    },
+    {
+      "_group": "Rede de Incêndio Armada (RIA)",
+      "field": "fireSafety.hasHydraulicCalculation",
+      "label": "Cálculo hidráulico verificado",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se foi realizado e verificado o cálculo hidráulico da rede de incêndio"
+    },
+
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.hasDryRiser",
+      "label": "Coluna seca",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe coluna seca para uso dos bombeiros (obrigatória em edifícios com altura > 9 m)"
+    },
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.dryRiserDiameter",
+      "label": "Diâmetro da coluna seca",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "defaults": { "residential": 80, "commercial": 80, "industrial": 80 },
+      "description": "Diâmetro nominal da coluna seca — tipicamente DN 80"
+    },
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.dryRiserFlowRate",
+      "label": "Caudal de ensaio da coluna seca",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "description": "Caudal de ensaio da coluna seca para verificação hidráulica"
+    },
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.dryRiserMinPressure",
+      "label": "Pressão mínima na boca da coluna seca",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "description": "Pressão mínima na boca de incêndio mais desfavorável da coluna seca"
+    },
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.dryRiserTestPressure",
+      "label": "Pressão de ensaio da coluna seca",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "description": "Pressão de ensaio hidrostático da coluna seca (tipicamente 1,5× a pressão de serviço)"
+    },
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.hasSiameseConnection",
+      "label": "Entrada siamesa para alimentação pelos bombeiros",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe boca siamesa de alimentação na fachada acessível para ligação dos bombeiros"
+    },
+    {
+      "_group": "Coluna Seca",
+      "field": "fireSafety.supplyInletCabinetSize",
+      "label": "Dimensão do armário da boca de alimentação",
+      "type": "string",
+      "sources": ["form"],
+      "description": "Dimensões do armário que aloja a boca siamesa de alimentação na fachada"
+    },
+
+    {
+      "_group": "Coluna Húmida",
+      "field": "fireSafety.hasWetRiser",
+      "label": "Coluna húmida",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe coluna húmida permanentemente pressurizada para uso dos bombeiros"
+    },
+    {
+      "_group": "Coluna Húmida",
+      "field": "fireSafety.wetRiserTestPressure",
+      "label": "Pressão de ensaio da coluna húmida",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "description": "Pressão de ensaio hidrostático da coluna húmida"
+    },
+
+    {
+      "_group": "Hidrantes Exteriores",
+      "field": "fireSafety.hydrantDistance",
+      "label": "Distância ao hidrante exterior mais próximo",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância do edifício ao marco de incêndio ou boca de incêndio de parede mais próximo"
+    },
+    {
+      "_group": "Hidrantes Exteriores",
+      "field": "fireSafety.hydrantAutonomy",
+      "label": "Autonomia do abastecimento de hidrantes",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Autonomia mínima do abastecimento de água aos hidrantes exteriores"
+    },
+    {
+      "_group": "Hidrantes Exteriores",
+      "field": "fireSafety.nearestHydrantDistance",
+      "label": "Distância ao hidrante urbano mais próximo",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância à boca de incêndio ou marco de incêndio da rede pública mais próximo"
+    },
+    {
+      "_group": "Hidrantes Exteriores",
+      "field": "fireSafety.wallHydrantDistance",
+      "label": "Distância à boca de incêndio de parede exterior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância à boca de incêndio de parede exterior — máximo 15 m"
+    },
+    {
+      "_group": "Hidrantes Exteriores",
+      "field": "fireSafety.privateHydrantReserve",
+      "label": "Reserva de água para hidrantes privados",
+      "type": "number",
+      "unit": "m³",
+      "sources": ["form"],
+      "description": "Volume da reserva de água para hidrantes privados do edifício"
+    },
+
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.hasFireWaterReservoir",
+      "label": "Reservatório de água para serviço de incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe reservatório de água privativo para o serviço de incêndio"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.fireWaterReserveVolume",
+      "label": "Volume da reserva de água para incêndio",
+      "type": "number",
+      "unit": "m³",
+      "sources": ["form"],
+      "description": "Volume da reserva de água para o serviço de incêndio (RASI)"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.reservoirRefillTime",
+      "label": "Tempo de reenchimento do reservatório",
+      "type": "number",
+      "unit": "h",
+      "sources": ["form"],
+      "description": "Tempo máximo para reenchimento do reservatório de água de incêndio (tipicamente 36 h)"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.reservoirAccessSize",
+      "label": "Dimensão do acesso ao reservatório",
+      "type": "string",
+      "sources": ["form"],
+      "description": "Dimensões da abertura de acesso para limpeza e inspeção do reservatório"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.reservoirBottomSlope",
+      "label": "Pendente do fundo do reservatório",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Pendente mínima do fundo do reservatório para drenagem completa"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.hasFirePumpRoom",
+      "label": "Central de bombagem de incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe central de bombagem dedicada ao serviço de incêndio"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.maxServicePressure",
+      "label": "Pressão máxima de serviço",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "description": "Pressão máxima de serviço na rede de incêndio (tipicamente ≤ 10 bar nas bocas)"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.reducedFlow",
+      "label": "Caudal reduzido (by-pass)",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "description": "Caudal reduzido através da bomba jockey ou by-pass de manutenção de pressão"
+    },
+    {
+      "_group": "Reservatórios e Abastecimento de Água",
+      "field": "fireSafety.simultaneousOutlets",
+      "label": "Bocas de incêndio em funcionamento simultâneo",
+      "type": "number",
+      "unit": "",
+      "sources": ["form"],
+      "description": "Número de bocas de incêndio a considerar em funcionamento simultâneo para dimensionamento"
+    },
+
+    {
+      "_group": "Depósitos Pressurizados",
+      "field": "fireSafety.pressurizedTankCapacity",
+      "label": "Capacidade do depósito pressurizado",
+      "type": "number",
+      "unit": "L",
+      "sources": ["form"],
+      "description": "Capacidade total do depósito pressurizado de água para combate a incêndio"
+    },
+    {
+      "_group": "Depósitos Pressurizados",
+      "field": "fireSafety.pressurizedTankPressure",
+      "label": "Pressão do depósito pressurizado",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "description": "Pressão de serviço do depósito pressurizado"
+    },
+    {
+      "_group": "Depósitos Pressurizados",
+      "field": "fireSafety.pressurizedTankAirRatio",
+      "label": "Proporção ar/água no depósito pressurizado",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Proporção de ar no depósito pressurizado (tipicamente 30% ar, 70% água)"
+    },
+    {
+      "_group": "Depósitos Pressurizados",
+      "field": "fireSafety.pressurizedTankRefillTime",
+      "label": "Tempo de reenchimento do depósito pressurizado",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Tempo para reenchimento do depósito pressurizado após descarga"
+    },
+    {
+      "_group": "Depósitos Pressurizados",
+      "field": "fireSafety.pressurizedTankCompartmentRating",
+      "label": "Resistência ao fogo do compartimento do depósito",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Classificação de resistência ao fogo do compartimento que aloja o depósito pressurizado"
+    },
+    {
+      "_group": "Depósitos Pressurizados",
+      "field": "fireSafety.pressurizedTankProtectedArea",
+      "label": "Área protegida pelo depósito pressurizado",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área máxima de proteção garantida pelo depósito pressurizado"
+    },
+
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.branchLength",
+      "label": "Comprimento do ramal de ligação",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Comprimento do ramal de ligação da rede de incêndio"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.buriedPipeDepth",
+      "label": "Profundidade da tubagem enterrada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Profundidade mínima de enterramento das tubagens da rede de incêndio"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.hasAnticorrosionCoating",
+      "label": "Revestimento anticorrosivo das tubagens",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se as tubagens enterradas ou expostas possuem proteção anticorrosiva"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.pipeBendRadius",
+      "label": "Raio de curvatura das tubagens",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "description": "Raio mínimo de curvatura nas mudanças de direção das tubagens"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.pipeSupportSpacing",
+      "label": "Espaçamento entre suportes de tubagens",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância máxima entre apoios/suportes das tubagens da rede de incêndio"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.dischargePipeHeight",
+      "label": "Altura da tubagem de descarga",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Altura da tubagem de descarga de válvulas de segurança ou extravasores"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.outletAngle",
+      "label": "Ângulo da boca de saída",
+      "type": "number",
+      "unit": "°",
+      "sources": ["form"],
+      "description": "Ângulo de inclinação da boca de saída da coluna seca ou húmida"
+    },
+    {
+      "_group": "Tubagens e Acessórios da Rede de Incêndio",
+      "field": "fireSafety.fireOutletHeight",
+      "label": "Altura da boca de incêndio ao pavimento",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 1.5, "commercial": 1.5, "industrial": 1.5 },
+      "description": "Altura do centro da boca de incêndio ao pavimento (tipicamente 0,80 m a 1,50 m)"
+    },
+
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.hasSprinklers",
+      "label": "Sistema de sprinklers (extinção automática por água)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "description": "Indica se existe sistema de extinção automática por aspersores (sprinklers) conforme NP EN 12845"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerDensity",
+      "label": "Densidade de descarga dos sprinklers",
+      "type": "number",
+      "unit": "mm/min",
+      "sources": ["form"],
+      "description": "Densidade de descarga de água — risco ligeiro 2,25 mm/min, ordinário 5,0 mm/min"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerCoverageArea",
+      "label": "Área de cobertura por sprinkler",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área máxima de cobertura por cada aspersor individual"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerAreaPerHead",
+      "label": "Área por cabeça de sprinkler",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área protegida por cada cabeça de sprinkler no dimensionamento"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerMaxSpacing",
+      "label": "Espaçamento máximo entre sprinklers",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância máxima entre aspersores conforme classe de risco"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerActivationTemp",
+      "label": "Temperatura de ativação do sprinkler",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "defaults": { "residential": 68, "commercial": 68, "industrial": 68 },
+      "description": "Temperatura nominal de ativação do elemento termossensível (tipicamente 68 °C)"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerCalibrationTemp",
+      "label": "Temperatura de calibração do sprinkler",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "description": "Temperatura de calibração (rating) do aspersor"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerTempMargin",
+      "label": "Margem de temperatura do sprinkler",
+      "type": "number",
+      "unit": "°C",
+      "sources": ["form"],
+      "description": "Margem entre a temperatura máxima ambiente e a temperatura de ativação (mínimo 30 °C)"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerRTI",
+      "label": "Índice de tempo de resposta (RTI) do sprinkler",
+      "type": "number",
+      "unit": "(m·s)^½",
+      "sources": ["form"],
+      "description": "RTI do aspersor: resposta rápida < 50, resposta padrão 80–350"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerPipeVelocity",
+      "label": "Velocidade da água nas tubagens de sprinklers",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "description": "Velocidade máxima da água nas tubagens da rede de sprinklers (tipicamente ≤ 6 m/s)"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerTestPressure",
+      "label": "Pressão de ensaio da rede de sprinklers",
+      "type": "number",
+      "unit": "bar",
+      "sources": ["form"],
+      "description": "Pressão de ensaio hidrostático da rede de sprinklers"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklerWaterSupplyAutonomy",
+      "label": "Autonomia do abastecimento de água para sprinklers",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Autonomia da reserva de água para sprinklers — 30 min (risco ligeiro) a 90 min (risco grave)"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.sprinklersPerControlValve",
+      "label": "Sprinklers por válvula de controlo",
+      "type": "number",
+      "unit": "",
+      "sources": ["form"],
+      "description": "Número máximo de aspersores por cada válvula de controlo de instalação"
+    },
+    {
+      "_group": "Sprinklers (Extinção Automática por Água)",
+      "field": "fireSafety.hasESFRSprinklers",
+      "label": "Sprinklers ESFR (resposta rápida e supressão precoce)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se estão instalados sprinklers ESFR (Early Suppression, Fast Response) em armazéns de grande altura"
+    },
+
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.hasSmokeControl",
+      "label": "Sistema de controlo de fumo (desenfumagem)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe sistema de controlo de fumo nos caminhos de evacuação e espaços obrigatórios"
+    },
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.smokeControlAirVelocity",
+      "label": "Velocidade do ar no controlo de fumo",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "defaults": { "residential": 1, "commercial": 1, "industrial": 1 },
+      "description": "Velocidade mínima do ar nas portas de acesso a vias protegidas — mínimo 1 m/s"
+    },
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.smokeVentArea",
+      "label": "Área útil de abertura de desenfumagem",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área livre total das aberturas de desenfumagem (exutores, janelas, grelhas)"
+    },
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.smokeExtractionRatePerUP",
+      "label": "Caudal de extração de fumo por UP",
+      "type": "number",
+      "unit": "m³/h",
+      "sources": ["form"],
+      "description": "Caudal de extração de fumo por unidade de passagem nas vias horizontais"
+    },
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.stairSmokeVentArea",
+      "label": "Área de desenfumagem nas caixas de escada",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área livre da abertura de desenfumagem no topo da caixa de escadas (mínimo 1 m²)"
+    },
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.horizontalSmokeVentArea",
+      "label": "Área de desenfumagem em vias horizontais",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área de aberturas de desenfumagem nas vias horizontais de evacuação"
+    },
+    {
+      "_group": "Controlo de Fumo (Desenfumagem)",
+      "field": "fireSafety.parkingSmokeVentArea",
+      "label": "Área de desenfumagem em parques de estacionamento",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área de aberturas de desenfumagem nos parques de estacionamento cobertos"
+    },
+
+    {
+      "_group": "Cortinas de Água",
+      "field": "fireSafety.curtainFlowRate",
+      "label": "Caudal da cortina de água",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "description": "Caudal por metro linear de cortina de água para proteção de aberturas"
+    },
+    {
+      "_group": "Cortinas de Água",
+      "field": "fireSafety.curtainAutonomy",
+      "label": "Autonomia da cortina de água",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Autonomia do abastecimento de água para as cortinas de água"
+    },
+
+    {
+      "_group": "Extinção por Agente Gasoso",
+      "field": "fireSafety.hasGasSuppression",
+      "label": "Sistema de extinção por agente gasoso",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe sistema de extinção automática por agente gasoso (CO₂, FM-200, Novec, gases inertes)"
+    },
+    {
+      "_group": "Extinção por Agente Gasoso",
+      "field": "fireSafety.co2DischargeDuration",
+      "label": "Duração da descarga de CO₂",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "description": "Tempo máximo de descarga para sistemas de CO₂ (tipicamente ≤ 60 s para inundação total)"
+    },
+    {
+      "_group": "Extinção por Agente Gasoso",
+      "field": "fireSafety.fm200Concentration",
+      "label": "Concentração de FM-200",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Concentração de projeto de HFC-227ea (FM-200) para extinção"
+    },
+    {
+      "_group": "Extinção por Agente Gasoso",
+      "field": "fireSafety.novecConcentration",
+      "label": "Concentração de Novec 1230",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Concentração de projeto de FK-5-1-12 (Novec 1230) para extinção"
+    },
+    {
+      "_group": "Extinção por Agente Gasoso",
+      "field": "fireSafety.inertGasConcentration",
+      "label": "Concentração de gás inerte",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Concentração de projeto de gás inerte (IG-55, IG-541) para extinção"
+    },
+    {
+      "_group": "Extinção por Agente Gasoso",
+      "field": "fireSafety.gasAgentDischargeDelay",
+      "label": "Temporização antes da descarga de agente gasoso",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "defaults": { "residential": 30, "commercial": 30, "industrial": 30 },
+      "description": "Tempo de temporização entre o alarme e a descarga do agente gasoso para evacuação do espaço"
+    },
+
+    {
+      "_group": "Extinção Especial (Cozinhas)",
+      "field": "fireSafety.hasKitchenSuppression",
+      "label": "Sistema de extinção de cozinha",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe sistema de extinção automática na cozinha profissional"
+    },
+    {
+      "_group": "Extinção Especial (Cozinhas)",
+      "field": "fireSafety.hasSpecialKitchenSuppression",
+      "label": "Sistema de extinção especial de cozinha industrial",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe sistema de extinção específico para cozinhas industriais com potência ≥ 70 kW"
+    },
+    {
+      "_group": "Extinção Especial (Cozinhas)",
+      "field": "fireSafety.kitchenPower",
+      "label": "Potência total da cozinha",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "description": "Potência térmica total instalada na cozinha (obriga a sistema de extinção se > 20 kW)"
+    },
+    {
+      "_group": "Extinção Especial (Cozinhas)",
+      "field": "fireSafety.kitchenGasPower",
+      "label": "Potência a gás na cozinha",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "description": "Potência térmica dos equipamentos a gás na cozinha"
+    },
+
+    {
+      "_group": "Instalação de Gás",
+      "field": "fireSafety.hasGasInstallation",
+      "label": "Existência de instalação de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se o edifício possui instalação de gás combustível"
+    },
+    {
+      "_group": "Instalação de Gás",
+      "field": "fireSafety.hasGasAutoShutoff",
+      "label": "Corte automático de gás em caso de incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe válvula de corte automático de gás atuada pelo sistema de deteção de incêndio"
+    },
+    {
+      "_group": "Instalação de Gás",
+      "field": "fireSafety.gasSystemConnectionDeadline",
+      "label": "Prazo de ligação do sistema de gás ao SADI",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "description": "Tempo máximo para o corte de gás após ativação do alarme de incêndio"
+    },
+
+    {
+      "_group": "AVAC e Interação com Deteção",
+      "field": "fireSafety.hasHVACSystem",
+      "label": "Existência de sistema AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se o edifício possui sistema de aquecimento, ventilação e ar condicionado"
+    },
+    {
+      "_group": "AVAC e Interação com Deteção",
+      "field": "fireSafety.hvacStopsOnAlarm",
+      "label": "AVAC para em caso de alarme de incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se o sistema AVAC é desligado automaticamente em caso de alarme de incêndio"
+    },
+
+    {
+      "_group": "Armazenamento e Riscos Especiais",
+      "field": "fireSafety.combustibleStorageVolume",
+      "label": "Volume de armazenagem de combustíveis",
+      "type": "number",
+      "unit": "m³",
+      "sources": ["form"],
+      "description": "Volume total de armazenagem de materiais combustíveis ou líquidos inflamáveis"
+    },
+    {
+      "_group": "Armazenamento e Riscos Especiais",
+      "field": "fireSafety.warehouseStorageHeight",
+      "label": "Altura de armazenagem em estantes",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Altura máxima de armazenamento em estantes ou pilhas"
+    },
+    {
+      "_group": "Armazenamento e Riscos Especiais",
+      "field": "fireSafety.storageGroupArea",
+      "label": "Área de grupo de armazenagem",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área máxima de cada grupo (ilha) de armazenagem"
+    },
+    {
+      "_group": "Armazenamento e Riscos Especiais",
+      "field": "fireSafety.storageIndividualRating",
+      "label": "Resistência ao fogo individual de zonas de armazenagem",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Classificação EI das paredes que separam zonas individuais de armazenagem"
+    },
+
+    {
+      "_group": "Parques de Estacionamento",
+      "field": "fireSafety.parkingCompartmentArea",
+      "label": "Área do compartimento de estacionamento",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": "OccupancyType=Parking",
+        "method": "sumArea"
+      },
+      "description": "Área do compartimento corta-fogo do parque de estacionamento coberto"
+    },
+    {
+      "_group": "Parques de Estacionamento",
+      "field": "fireSafety.individualParkingRating",
+      "label": "Resistência ao fogo individual do parque",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Classificação EI das paredes de compartimentação dentro do parque de estacionamento"
+    },
+
+    {
+      "_group": "Meios de 2.ª Intervenção (Bombeiros)",
+      "field": "fireSafety.secondInterventionFlow",
+      "label": "Caudal de 2.ª intervenção",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "description": "Caudal disponível para meios de 2.ª intervenção (bocas de incêndio DN 52 para bombeiros)"
+    },
+    {
+      "_group": "Meios de 2.ª Intervenção (Bombeiros)",
+      "field": "fireSafety.secondInterventionAutonomy",
+      "label": "Autonomia dos meios de 2.ª intervenção",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "description": "Autonomia da reserva de água para meios de 2.ª intervenção"
+    },
+    {
+      "_group": "Meios de 2.ª Intervenção (Bombeiros)",
+      "field": "fireSafety.hasMinimumFirstAlarmResources",
+      "label": "Recursos mínimos de 1.º alarme disponíveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existem os meios mínimos de 1.º alarme exigidos (extintores, carretéis, mantas)"
+    },
+    {
+      "_group": "Meios de 2.ª Intervenção (Bombeiros)",
+      "field": "fireSafety.complementaryUnitDistance",
+      "label": "Distância à unidade complementar de apoio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Distância entre unidades complementares de meios de intervenção"
+    },
+
+    {
+      "_group": "Vias de Acesso e Estacionamento de Emergência",
+      "field": "fireSafety.accessRoadWidth",
+      "label": "Largura da via de acesso aos bombeiros",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Largura livre mínima da via de acesso para viaturas de socorro — mínimo 3,50 m (viatura tipo ligeiro) a 6,00 m"
+    },
+    {
+      "_group": "Vias de Acesso e Estacionamento de Emergência",
+      "field": "fireSafety.accessRoadHeight",
+      "label": "Altura livre da via de acesso",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 4, "commercial": 4, "industrial": 5 },
+      "description": "Altura livre mínima da via de acesso para viaturas de socorro — mínimo 4,00 m"
+    },
+    {
+      "_group": "Vias de Acesso e Estacionamento de Emergência",
+      "field": "fireSafety.accessRoadRadius",
+      "label": "Raio de curvatura da via de acesso (interior)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 11, "commercial": 11, "industrial": 13 },
+      "description": "Raio interior mínimo de curvatura da via de acesso — mínimo 11 m"
+    },
+    {
+      "_group": "Vias de Acesso e Estacionamento de Emergência",
+      "field": "fireSafety.accessRoadCurveRadius",
+      "label": "Raio de curvatura da via de acesso (exterior)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Raio exterior de curvatura da via de acesso para viaturas de socorro"
+    },
+
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasSecurityDelegate",
+      "label": "Delegado de segurança nomeado",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe delegado de segurança nomeado para o edifício (obrigatório para 1.ª e 2.ª categorias)"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasSecurityPost",
+      "label": "Posto de segurança",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe posto de segurança permanente (obrigatório para 3.ª e 4.ª categorias)"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasSecurityPlan",
+      "label": "Plano de segurança interno (PSI)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe plano de segurança interno aprovado conforme RT-SCIE Art. 196.º e seguintes"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasEmergencyPlan",
+      "label": "Plano de emergência interno (PEI)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe plano de emergência interno com procedimentos de evacuação"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasEmergencyPlans",
+      "label": "Plantas de emergência afixadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existem plantas de emergência (planos de evacuação) afixadas em locais visíveis"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasSecurityRecords",
+      "label": "Registos de segurança atualizados",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existem registos de segurança com registo de ocorrências, manutenções e inspeções"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.recordRetentionYears",
+      "label": "Período de retenção dos registos de segurança",
+      "type": "number",
+      "unit": "anos",
+      "sources": ["form"],
+      "defaults": { "residential": 5, "commercial": 5, "industrial": 5 },
+      "description": "Período mínimo de retenção dos registos de segurança"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasMaintenanceProgram",
+      "label": "Programa de manutenção dos sistemas de segurança",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se existe programa de manutenção preventiva dos sistemas e equipamentos de segurança contra incêndio"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasFireTraining",
+      "label": "Formação em segurança contra incêndio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se os funcionários/residentes recebem formação em segurança contra incêndio"
+    },
+    {
+      "_group": "Gestão e Organização da Segurança",
+      "field": "fireSafety.hasAnnualDrill",
+      "label": "Simulacro anual realizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Indica se é realizado simulacro de evacuação pelo menos uma vez por ano"
+    }
+  ]
+}

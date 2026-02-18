@@ -1,0 +1,465 @@
+{
+  "pluginId": "architecture",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras de arquitetura (RGEU, PDM, Portaria 62/2003, DL 163/2006)",
+  "fields": [
+    {
+      "_group": "Dados Gerais",
+      "field": "buildingType",
+      "label": "Tipo de edifício",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial / Serviços" },
+        { "value": "mixed", "label": "Uso misto" },
+        { "value": "industrial", "label": "Industrial / Armazém" }
+      ],
+      "sources": ["form"],
+      "required": true
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "isRehabilitation",
+      "label": "Edifício em reabilitação",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se se trata de uma obra de reabilitação, podendo beneficiar de flexibilizações regulamentares"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "architecture.isMultifamily",
+      "label": "Edifício multifamiliar",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Indica se o edifício possui mais do que um fogo (habitação coletiva)"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "architecture.hasBuildingPermitDesign",
+      "label": "Projeto de licenciamento",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Indica se existe projeto de arquitetura para efeitos de licenciamento camarário"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "architecture.pdmCompliance",
+      "label": "Conformidade com o PDM",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto está conforme os parâmetros urbanísticos do PDM vigente"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "architecture.buildingHeight",
+      "label": "Altura do edifício",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "Height",
+        "pset": "Qto_BuildingBaseQuantities"
+      },
+      "description": "Altura do edifício medida desde a cota do terreno até à cumeeira ou platibanda"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "architecture.ceilingHeight",
+      "label": "Pé-direito livre",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "defaults": { "residential": 2.7, "_default": 2.7 },
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "property": "Height",
+        "pset": "Qto_SpaceBaseQuantities"
+      },
+      "description": "Pé-direito livre mínimo dos compartimentos, conforme RGEU Art. 65.º (mínimo 2,70 m em habitação)"
+    },
+
+    {
+      "_group": "Áreas e Tipologia",
+      "field": "architecture.typology",
+      "label": "Tipologia da habitação",
+      "type": "select",
+      "options": [
+        { "value": "T0", "label": "T0" },
+        { "value": "T1", "label": "T1" },
+        { "value": "T2", "label": "T2" },
+        { "value": "T3", "label": "T3" },
+        { "value": "T4", "label": "T4" },
+        { "value": "T5", "label": "T5" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Tipologia da habitação (Tn, onde n é o número de quartos)"
+    },
+    {
+      "_group": "Áreas e Tipologia",
+      "field": "architecture.totalUsableArea",
+      "label": "Área útil total do fogo",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "property": "NetFloorArea",
+        "pset": "Qto_SpaceBaseQuantities",
+        "method": "sumByZone"
+      },
+      "description": "Área útil total do fogo, conforme Portaria 62/2003 — áreas mínimas variam com a tipologia"
+    },
+    {
+      "_group": "Áreas e Tipologia",
+      "field": "architecture.numberOfBedrooms",
+      "label": "Número de quartos",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": "OccupancyType=Bedroom",
+        "method": "count"
+      },
+      "description": "Número de quartos de dormir do fogo, define a tipologia (Tn)"
+    },
+    {
+      "_group": "Áreas e Tipologia",
+      "field": "architecture.numberOfBathrooms",
+      "label": "Número de instalações sanitárias",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": "OccupancyType=Bathroom",
+        "method": "count"
+      },
+      "description": "Número de instalações sanitárias do fogo"
+    },
+
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.hasKitchen",
+      "label": "Existência de cozinha",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": true, "_default": true },
+      "description": "Indica se o fogo possui cozinha independente, conforme RGEU"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.hasLivingRoom",
+      "label": "Existência de sala de estar",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": true, "_default": true },
+      "description": "Indica se o fogo possui sala de estar, obrigatória a partir de T1"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.livingRoomArea",
+      "label": "Área da sala de estar",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 12 },
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": "OccupancyType=LivingRoom",
+        "property": "NetFloorArea"
+      },
+      "description": "Área útil da sala de estar — mínimo 12 m² conforme Portaria 62/2003"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.livingRoomMinWidth",
+      "label": "Largura mínima da sala de estar",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 3.0 },
+      "description": "Largura mínima da sala de estar — mínimo 3,0 m"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.mainBedroomArea",
+      "label": "Área do quarto principal",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 10.5 },
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": "OccupancyType=Bedroom AND Name=MainBedroom",
+        "property": "NetFloorArea"
+      },
+      "description": "Área útil do quarto principal — mínimo 10,5 m² conforme Portaria 62/2003"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.mainBedroomMinWidth",
+      "label": "Largura mínima do quarto principal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 2.7 },
+      "description": "Largura mínima do quarto principal — mínimo 2,70 m"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.secondaryBedroomArea",
+      "label": "Área dos quartos secundários",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 9 },
+      "description": "Área útil dos quartos secundários — mínimo 9,0 m² conforme Portaria 62/2003"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.kitchenArea",
+      "label": "Área da cozinha",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 6 },
+      "ifcMapping": {
+        "entity": "IfcSpace",
+        "filter": "OccupancyType=Kitchen",
+        "property": "NetFloorArea"
+      },
+      "description": "Área útil da cozinha — mínimo 6,0 m² conforme Portaria 62/2003"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.kitchenMinWidth",
+      "label": "Largura mínima da cozinha",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 1.8 },
+      "description": "Largura mínima da cozinha — mínimo 1,80 m"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.bathroomArea",
+      "label": "Área da instalação sanitária",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 3.5 },
+      "description": "Área útil da instalação sanitária principal"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.hasStorageRoom",
+      "label": "Existência de arrecadação",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o fogo possui arrecadação individual, recomendada pelo RGEU"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.entryHallArea",
+      "label": "Área do vestíbulo de entrada",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "description": "Área do vestíbulo ou hall de entrada do fogo"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.basementCeilingHeight",
+      "label": "Pé-direito da cave",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "_default": 2.2 },
+      "description": "Pé-direito livre mínimo das caves — mínimo 2,20 m conforme RGEU"
+    },
+
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.windowToFloorRatio",
+      "label": "Relação envidraçado/pavimento",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 0.1, "_default": 0.1 },
+      "description": "Relação entre a área de envidraçado e a área de pavimento — mínimo 1/10 conforme RGEU Art. 71.º"
+    },
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.hasNaturalLight",
+      "label": "Iluminação natural nos compartimentos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "residential": true, "_default": true },
+      "description": "Indica se os compartimentos habitáveis possuem iluminação natural direta, conforme RGEU Art. 71.º"
+    },
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.roomDepthToHeightRatio",
+      "label": "Relação profundidade/pé-direito",
+      "type": "number",
+      "sources": ["form"],
+      "defaults": { "_default": 2.5 },
+      "description": "Relação entre a profundidade do compartimento e o pé-direito — máximo recomendado 2,5"
+    },
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.hasCrossVentilation",
+      "label": "Ventilação transversal",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o fogo possui ventilação cruzada (aberturas em fachadas opostas)"
+    },
+
+    {
+      "_group": "Escadas e Circulações",
+      "field": "architecture.commonStairWidth",
+      "label": "Largura da escada comum",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 1.1, "_default": 1.2 },
+      "ifcMapping": {
+        "entity": "IfcStairFlight",
+        "property": "OverallWidth"
+      },
+      "description": "Largura útil da escada comum do edifício — mínimo 1,10 m em edifícios até 3 pisos, 1,20 m acima"
+    },
+    {
+      "_group": "Escadas e Circulações",
+      "field": "architecture.stairWidth",
+      "label": "Largura da escada interior do fogo",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "residential": 0.9, "_default": 0.9 },
+      "description": "Largura útil da escada interior do fogo — mínimo 0,90 m"
+    },
+    {
+      "_group": "Escadas e Circulações",
+      "field": "architecture.stairLandingDepth",
+      "label": "Profundidade do patamar da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "_default": 1.2 },
+      "description": "Profundidade mínima do patamar intermédio e de piso da escada"
+    },
+    {
+      "_group": "Escadas e Circulações",
+      "field": "architecture.handrailHeight",
+      "label": "Altura do corrimão",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "_default": 0.9 },
+      "description": "Altura do corrimão da escada — entre 0,85 m e 0,95 m"
+    },
+    {
+      "_group": "Escadas e Circulações",
+      "field": "architecture.balconyGuardHeight",
+      "label": "Altura da guarda de varanda",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "defaults": { "_default": 1.1 },
+      "ifcMapping": {
+        "property": "Height",
+        "pset": "Pset_RailingCommon"
+      },
+      "description": "Altura mínima das guardas de varandas e terraços — mínimo 1,10 m"
+    },
+    {
+      "_group": "Escadas e Circulações",
+      "field": "architecture.corridorWidth",
+      "label": "Largura dos corredores",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "defaults": { "residential": 1.1, "_default": 1.2 },
+      "description": "Largura mínima dos corredores comuns — mínimo 1,10 m em habitação"
+    },
+
+    {
+      "_group": "Índices Urbanísticos",
+      "field": "architecture.maxAllowedHeight",
+      "label": "Altura máxima permitida pelo PDM",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Altura máxima de construção permitida pelo PDM para a parcela"
+    },
+    {
+      "_group": "Índices Urbanísticos",
+      "field": "architecture.implantationIndex",
+      "label": "Índice de implantação",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rácio entre a área de implantação e a área do lote — conforme PDM"
+    },
+    {
+      "_group": "Índices Urbanísticos",
+      "field": "architecture.impermeabilizationIndex",
+      "label": "Índice de impermeabilização",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rácio entre a área impermeabilizada e a área total do lote — conforme PDM"
+    },
+    {
+      "_group": "Índices Urbanísticos",
+      "field": "architecture.permeabilityIndex",
+      "label": "Índice de permeabilidade",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Percentagem de área permeável do lote — conforme PDM"
+    },
+    {
+      "_group": "Índices Urbanísticos",
+      "field": "architecture.sideSetback",
+      "label": "Afastamento lateral",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Afastamento mínimo do edifício à estrema lateral do lote — conforme PDM"
+    },
+    {
+      "_group": "Índices Urbanísticos",
+      "field": "architecture.rearSetback",
+      "label": "Afastamento posterior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "description": "Afastamento mínimo do edifício à estrema posterior do lote — conforme PDM"
+    },
+
+    {
+      "_group": "Exteriores e Estacionamento",
+      "field": "architecture.parkingSpaces",
+      "label": "Número de lugares de estacionamento",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Número total de lugares de estacionamento previstos, conforme PDM e tipologia"
+    },
+    {
+      "_group": "Exteriores e Estacionamento",
+      "field": "architecture.hasRoofPlan",
+      "label": "Existência de planta de cobertura",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui planta de cobertura com definição de pendentes e drenagem"
+    }
+  ]
+}

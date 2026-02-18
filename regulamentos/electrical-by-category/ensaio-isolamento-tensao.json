@@ -1,0 +1,62 @@
+{
+  "category": "Ensaio isolamento - Tensão",
+  "rules": [
+    {
+      "id": "ELEC_R089",
+      "reference": "RTIEBT Secção 612.3",
+      "category": "Instalações Elétricas",
+      "subcategory": "Ensaio isolamento - Tensão",
+      "rule_text": "Ensaio de resistência de isolamento: tensão CC aplicada e resistência mínima",
+      "parameters": {
+        "lookup_table": {
+          "TRS_TBTS": {
+            "test_V": 250,
+            "min_Mohm": 0.25
+          },
+          "<=500V": {
+            "test_V": 500,
+            "min_Mohm": 0.5
+          },
+          ">500V": {
+            "test_V": 1000,
+            "min_Mohm": 1
+          }
+        }
+      },
+      "validation_type": "formula",
+      "severity": "mandatory",
+      "formula": "insulation_resistance_Mohm >= lookup_612_3(circuit_voltage)",
+      "lookup_tables": {
+        "lookup_table": {
+          "TRS_TBTS": {
+            "test_V": 250,
+            "min_Mohm": 0.25
+          },
+          "<=500V": {
+            "test_V": 500,
+            "min_Mohm": 0.5
+          },
+          ">500V": {
+            "test_V": 1000,
+            "min_Mohm": 1
+          }
+        }
+      },
+      "error_message": "Resistência de isolamento inferior ao mínimo (612.3)",
+      "success_message": "✓ Conforme: Ensaio isolamento - Tensão",
+      "source": {
+        "regulation": "RTIEBT",
+        "article": "RTIEBT Secção 612.3",
+        "version": "3.0",
+        "date": "2026-02-15"
+      },
+      "metadata": {
+        "complexity": "complex",
+        "requires_calculation": true,
+        "application_scope": [
+          "Geral"
+        ]
+      }
+    }
+  ]
+}

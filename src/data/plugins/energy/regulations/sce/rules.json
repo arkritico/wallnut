@@ -1,0 +1,1017 @@
+{
+  "regulationRef": "dl-101d-2020-sce",
+  "description": "Regras de conformidade energética extraídas do SCE (DL 101-D/2020, DL 118/2013, Portaria 349-B/2013, RECS, REH e DL 162/2019)",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "SCE-CERT-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 3.º — Certificação Energética Obrigatória (Novos Edifícios)",
+      "description": "A certificação energética é obrigatória para todos os edifícios novos. O pré-certificado deve ser obtido na fase de projeto (antes do licenciamento) e o certificado final antes da utilização.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasCertificate", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{energy.hasCertificate}",
+      "requiredValue": "Certificado energético obrigatório para edifícios novos",
+      "remediation": "Obter pré-certificado energético na fase de projeto (antes de submeter ao licenciamento camarário) e certificado final antes da emissão da licença de utilização ou da primeira venda/arrendamento. Contratar Perito Qualificado (PQ) registado na ADENE.",
+      "enabled": true,
+      "tags": ["certificação", "obrigatório", "novos edifícios", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-CERT-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 20.º — Validade do Certificado Energético",
+      "description": "O certificado energético expirou ou excede o prazo máximo de validade. Edifícios existentes: 10 anos; grandes edifícios de serviços (GES): 6 anos; edifícios novos: 10 anos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.certificateValidity", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{energy.certificateValidity}",
+      "requiredValue": "Certificado válido (≤ 10 anos edifícios existentes/novos; ≤ 6 anos GES)",
+      "remediation": "Solicitar nova certificação energética por Perito Qualificado (PQ) registado na ADENE. Para GES, a renovação deve ocorrer a cada 6 anos; para edifícios de habitação e pequenos edifícios de serviços, a cada 10 anos.",
+      "enabled": true,
+      "tags": ["certificado", "validade", "ADENE", "PQ"]
+    },
+    {
+      "id": "SCE-CERT-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 3.º n.º 2 — Certificação em Grandes Reabilitações",
+      "description": "A certificação energética é obrigatória para grandes reabilitações (intervenções com custo superior a 25% do valor do edifício ou que afetem mais de 25% da envolvente).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasCertificate", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "isMajorRehabilitation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{energy.hasCertificate}",
+      "requiredValue": "Certificado energético obrigatório para grandes reabilitações",
+      "remediation": "Obter certificação energética para a grande reabilitação. A intervenção deve cumprir os requisitos mínimos de desempenho energético aplicáveis a edifícios novos (com possíveis exceções mediante parecer ADENE).",
+      "enabled": true,
+      "tags": ["certificação", "grandes reabilitações", "obrigatório", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-CERT-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 3.º n.º 3 — Certificação em Venda/Arrendamento",
+      "description": "O certificado energético é obrigatório para a celebração de contratos de venda ou arrendamento de edifícios ou frações autónomas. O proprietário deve disponibilizar o certificado ao potencial comprador ou arrendatário.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasCertificate", "operator": "==", "value": false },
+        { "field": "energy.transactionType", "operator": "in", "value": ["sale", "rent"] }
+      ],
+      "currentValueTemplate": "{energy.hasCertificate}",
+      "requiredValue": "Certificado energético obrigatório para venda/arrendamento",
+      "remediation": "Obter certificado energético válido antes de celebrar contrato de venda ou arrendamento. A ausência de certificado constitui contraordenação punível com coima. Contactar Perito Qualificado (PQ) registado na ADENE.",
+      "enabled": true,
+      "tags": ["certificação", "venda", "arrendamento", "obrigatório", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-CERT-05",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 14.º — Pré-Certificado na Fase de Projeto",
+      "description": "O pré-certificado energético é obrigatório na fase de projeto, devendo ser apresentado antes do licenciamento camarário. Não foi identificado pré-certificado no processo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasPreCertificate", "operator": "==", "value": false },
+        { "field": "projectPhase", "operator": "==", "value": "design" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{energy.hasPreCertificate}",
+      "requiredValue": "Pré-certificado obrigatório antes do licenciamento",
+      "remediation": "Solicitar pré-certificado energético ao Perito Qualificado (PQ) antes da submissão do projeto ao licenciamento camarário. O pré-certificado avalia o projeto e atribui uma classe energética prevista.",
+      "enabled": true,
+      "tags": ["pré-certificado", "projeto", "licenciamento", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-CERT-06",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 14.º — Certificado Final Antes da Utilização",
+      "description": "O certificado energético final é obrigatório antes da emissão da licença de utilização ou antes da primeira venda/arrendamento do imóvel.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasFinalCertificate", "operator": "==", "value": false },
+        { "field": "projectPhase", "operator": "in", "value": ["construction_complete", "pre_occupation"] }
+      ],
+      "currentValueTemplate": "{energy.hasFinalCertificate}",
+      "requiredValue": "Certificado final obrigatório antes da utilização/venda",
+      "remediation": "Solicitar emissão do certificado energético final ao Perito Qualificado (PQ) após conclusão da obra e antes de requerer a licença de utilização. O PQ deve verificar a conformidade da obra com o projeto certificado.",
+      "enabled": true,
+      "tags": ["certificado final", "licença utilização", "obrigatório", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-CERT-07",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 21.º — Publicidade com Classe Energética",
+      "description": "A classe energética deve constar obrigatoriamente em todos os anúncios de publicidade para venda ou arrendamento de imóveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.advertisingIncludesClass", "operator": "==", "value": false },
+        { "field": "energy.transactionType", "operator": "in", "value": ["sale", "rent"] }
+      ],
+      "currentValueTemplate": "{energy.advertisingIncludesClass}",
+      "requiredValue": "Classe energética obrigatória em anúncios imobiliários",
+      "remediation": "Incluir a classe energética (letra de A+ a F) em todos os anúncios de venda ou arrendamento, incluindo anúncios online, impressos e em montra. A omissão constitui contraordenação.",
+      "enabled": true,
+      "tags": ["publicidade", "classe energética", "anúncios", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-PERITO-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 13.º — Perito Qualificado Obrigatório",
+      "description": "A certificação energética deve ser realizada por Perito Qualificado (PQ) registado na ADENE. Não foi identificado PQ no processo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasCertifiedExpert", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{energy.hasCertifiedExpert}",
+      "requiredValue": "PQ registado na ADENE obrigatório",
+      "remediation": "Contratar Perito Qualificado (PQ) registado na ADENE para emitir o certificado energético. A lista de PQ está disponível no portal do SCE (www.sce.pt). O PQ deve estar habilitado para a tipologia do edifício (REH ou RECS).",
+      "enabled": true,
+      "tags": ["perito qualificado", "PQ", "ADENE", "certificação"]
+    },
+    {
+      "id": "SCE-CLASSE-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Classificação Energética Mínima (Edifícios Novos)",
+      "description": "A classificação energética do edifício ({energy.energyClass}) não cumpre o mínimo exigido. Edifícios novos devem atingir pelo menos classe B- (Ntc/Nt ≤ 1.00).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.ntcNtRatio", "operator": ">", "value": 1.00 },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Classe {energy.energyClass} (Ntc/Nt = {energy.ntcNtRatio})",
+      "requiredValue": "≥ Classe B- (Ntc/Nt ≤ 1.00) para edifícios novos",
+      "remediation": "Melhorar a eficiência energética para atingir no mínimo classe B-. Escala de classificação: A+ (≤ 0.25), A (≤ 0.50), B (≤ 0.75), B- (≤ 1.00), C (≤ 1.50), D (≤ 2.00), E (≤ 2.50), F (> 2.50). Atuar na envolvente, sistemas e contribuição renovável.",
+      "enabled": true,
+      "tags": ["classificação", "classe energética", "Ntc/Nt", "Portaria 349-B"]
+    },
+    {
+      "id": "SCE-CLASSE-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Classificação Energética Detalhada",
+      "description": "A classificação energética do edifício ({energy.energyClass}) baseada no rácio Ntc/Nt ({energy.ntcNtRatio}) determina o desempenho energético: A+ (≤ 0.25), A (≤ 0.50), B (≤ 0.75), B- (≤ 1.00), C (≤ 1.50), D (≤ 2.00), E (≤ 2.50), F (> 2.50).",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.ntcNtRatio", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "Classe {energy.energyClass} (Ntc/Nt = {energy.ntcNtRatio})",
+      "requiredValue": "A+ (≤0.25), A (≤0.50), B (≤0.75), B- (≤1.00), C (≤1.50), D (≤2.00), E (≤2.50), F (>2.50)",
+      "remediation": "Para melhorar a classificação energética: reforçar isolamento da envolvente (paredes, cobertura, pavimentos, envidraçados), instalar sistemas eficientes (bomba de calor, solar térmico, fotovoltaico), otimizar ventilação e iluminação. Cada redução de 0.25 no rácio Ntc/Nt equivale a subir uma classe.",
+      "enabled": true,
+      "tags": ["classificação", "classe energética", "escala", "Ntc/Nt", "Portaria 349-B"]
+    },
+    {
+      "id": "SCE-CLASSE-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Classificação Mínima Grandes Reabilitações",
+      "description": "Em grandes reabilitações, a classe energética mínima exigida é B- (Ntc/Nt ≤ 1.00), salvo exceções devidamente fundamentadas com parecer favorável da ADENE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.ntcNtRatio", "operator": ">", "value": 1.00 },
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "isMajorRehabilitation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Classe {energy.energyClass} (Ntc/Nt = {energy.ntcNtRatio})",
+      "requiredValue": "≥ Classe B- (Ntc/Nt ≤ 1.00) para grandes reabilitações",
+      "remediation": "Melhorar o desempenho energético da reabilitação para atingir no mínimo classe B-. Em caso de impossibilidade técnica comprovada, solicitar parecer à ADENE para dispensa parcial dos requisitos. A justificação deve demonstrar a inviabilidade técnica ou económica de atingir B-.",
+      "enabled": true,
+      "tags": ["classificação", "grandes reabilitações", "B-", "ADENE", "Portaria 349-B"]
+    },
+    {
+      "id": "SCE-NZEB-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "Art. 16.º — NZEB Obrigatório Desde 2021",
+      "description": "Desde 31 de dezembro de 2020, todos os edifícios novos devem ser NZEB (Nearly Zero Energy Buildings). Para edifícios residenciais: classe A ou superior (Ntc/Nt ≤ 0.50); para edifícios de serviços: IEEpr ≤ IEEref × 0.75.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "NZEB obrigatório: residencial classe A (Ntc/Nt ≤ 0.50); serviços IEEpr ≤ 0.75 × IEEref",
+      "remediation": "Verificar que o edifício cumpre os requisitos NZEB. Otimizar envolvente térmica, maximizar eficiência dos sistemas técnicos e integrar energias renováveis (solar térmico, fotovoltaico, bomba de calor). Para residencial: Ntc/Nt ≤ 0.50; para serviços: IEEpr ≤ 0.75 × IEEref.",
+      "enabled": true,
+      "tags": ["NZEB", "energia primária", "obrigatório", "DL 101-D/2020"]
+    },
+    {
+      "id": "SCE-NZEB-02",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Requisitos NZEB Residenciais",
+      "description": "Edifício residencial novo não cumpre os requisitos NZEB. O rácio Ntc/Nt ({energy.ntcNtRatio}) excede o limite de 0.50 para classificação A, obrigatório desde 2021.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.ntcNtRatio", "operator": ">", "value": 0.50 },
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ntc/Nt = {energy.ntcNtRatio}",
+      "requiredValue": "≤ 0.50 (classe A — NZEB residencial)",
+      "remediation": "Melhorar a envolvente térmica (isolamento paredes, cobertura, pavimentos, vãos envidraçados), otimizar sistemas técnicos (bomba de calor, solar térmico) e maximizar a contribuição renovável para atingir Ntc/Nt ≤ 0.50.",
+      "enabled": true,
+      "tags": ["NZEB", "residencial", "Ntc/Nt", "classe A", "DL 101-D/2020"]
+    },
+    {
+      "id": "SCE-NZEB-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Requisitos NZEB Edifícios de Serviços",
+      "description": "Edifício de serviços novo não cumpre os requisitos NZEB. O IEEpr ({energy.ieeActual} kWhEP/(m².ano)) excede 75% do IEEref ({energy.ieeReference} kWhEP/(m².ano)).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.primaryEnergyRatio", "operator": ">", "value": 0.75 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office"] },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "IEEpr/IEEref = {energy.primaryEnergyRatio}",
+      "requiredValue": "IEEpr ≤ IEEref × 0.75 (NZEB serviços)",
+      "remediation": "Reduzir o IEE previsto: otimizar envolvente, sistemas AVAC de alta eficiência, iluminação LED com controlo, sistemas de gestão técnica centralizada (GTC) e integração de energias renováveis para autoconsumo.",
+      "enabled": true,
+      "tags": ["NZEB", "serviços", "IEE", "DL 101-D/2020"]
+    },
+    {
+      "id": "SCE-NZEB-04",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Contribuição Renovável Obrigatória NZEB",
+      "description": "Edifícios NZEB devem incluir contribuição de energias renováveis. Painéis solares térmicos ou fotovoltaicos são obrigatórios em edifícios novos para cumprimento dos requisitos NZEB.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "systems.hasSolarPV", "operator": "not_exists", "value": null },
+        { "field": "systems.hasSolarThermal", "operator": "not_exists", "value": null },
+        { "field": "systems.hasHeatPump", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Contribuição renovável obrigatória (solar térmico, PV, bomba de calor ou biomassa)",
+      "remediation": "Instalar pelo menos um sistema de energia renovável: coletores solares térmicos para AQS, painéis fotovoltaicos para autoconsumo, bomba de calor (COP ≥ 2.5) ou caldeira a biomassa. A contribuição renovável é indispensável para atingir os limiares NZEB.",
+      "enabled": true,
+      "tags": ["NZEB", "renováveis", "obrigatório", "solar", "DL 101-D/2020"]
+    },
+    {
+      "id": "SCE-NZEB-05",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Exceções NZEB",
+      "description": "Edifícios históricos (classificados ou em vias de classificação), edifícios temporários (< 2 anos), edifícios religiosos (culto), edifícios industriais e agrícolas com baixas necessidades energéticas estão isentos dos requisitos NZEB.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["historic", "temporary", "religious", "industrial", "agricultural"] }
+      ],
+      "requiredValue": "Verificar elegibilidade para isenção NZEB",
+      "remediation": "Confirmar que o edifício se enquadra nas exceções previstas no DL 101-D/2020: (a) edifícios classificados ou em vias de classificação (património histórico); (b) edifícios temporários com utilização prevista inferior a 2 anos; (c) edifícios de culto e atividades religiosas; (d) edifícios industriais/agrícolas com baixas necessidades energéticas. Documentar a justificação para a isenção.",
+      "enabled": true,
+      "tags": ["NZEB", "exceções", "isenção", "edifícios históricos", "DL 101-D/2020"]
+    },
+    {
+      "id": "SCE-RENOV-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "Art. 29.º — Energias Renováveis (Edifícios Novos)",
+      "description": "O projeto não prevê qualquer sistema de aproveitamento de energias renováveis. É obrigatório em edifícios novos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "systems.hasSolarPV", "operator": "not_exists", "value": null },
+        { "field": "systems.hasSolarThermal", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "remediation": "Instalar sistema de aproveitamento de energias renováveis: painéis fotovoltaicos, coletores solares térmicos, bomba de calor ou biomassa.",
+      "requiredValue": "Sistema renovável obrigatório para edifícios novos",
+      "enabled": true,
+      "tags": ["renováveis", "solar", "obrigatório"]
+    },
+    {
+      "id": "SCE-RENOV-02",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "Art. 29.º — Energias Renováveis (Reabilitação)",
+      "description": "O projeto de reabilitação não prevê sistema de energias renováveis. Embora não seja obrigatório em todas as reabilitações, é fortemente recomendado para melhorar a classe energética.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.hasSolarPV", "operator": "not_exists", "value": null },
+        { "field": "systems.hasSolarThermal", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": true }
+      ],
+      "remediation": "Considerar instalação de sistema renovável mesmo em reabilitação para melhorar a classificação energética.",
+      "requiredValue": "Sistema renovável recomendado",
+      "enabled": true,
+      "tags": ["renováveis", "reabilitação"]
+    },
+    {
+      "id": "SCE-IEE-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 33.º / RECS — Índice de Eficiência Energética (Conformidade)",
+      "description": "O índice de eficiência energética previsto (IEEpr = {energy.ieeActual} kWhEP/(m².ano)) excede o valor de referência (IEEref = {energy.ieeReference} kWhEP/(m².ano)). Para conformidade regulamentar, IEEpr deve ser inferior ou igual a IEEref.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 0 },
+        { "field": "energy.ieeReference", "operator": ">", "value": 0 },
+        { "field": "energy.primaryEnergyRatio", "operator": ">", "value": 1.0 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office"] }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEEpr ≤ IEEref ({energy.ieeReference} kWhEP/(m².ano))",
+      "remediation": "O IEEpr deve ser inferior ou igual ao IEEref para cumprimento regulamentar. Otimizar sistemas AVAC, iluminação, equipamentos e envolvente. Implementar sistema de gestão de energia e considerar produção renovável para autoconsumo.",
+      "enabled": true,
+      "tags": ["IEE", "eficiência energética", "RECS", "serviços"]
+    },
+    {
+      "id": "SCE-IEE-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — IEE Referência por Tipologia (Escritórios)",
+      "description": "O IEE previsto para o edifício de escritórios ({energy.ieeActual} kWhEP/(m².ano)) excede o valor de referência típico para escritórios (~100 kWhEP/(m².ano)). A desagregação inclui: aquecimento, arrefecimento, AQS, iluminação e equipamentos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 100 },
+        { "field": "buildingType", "operator": "in", "value": ["office", "commercial"] }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEE referência escritórios: ~100 kWhEP/(m².ano)",
+      "remediation": "Reduzir IEE atuando nas componentes desagregadas: aquecimento (bomba de calor eficiente), arrefecimento (chiller classe A), AQS (solar térmico), iluminação (LED ≤ 10 W/m²) e equipamentos (classe A mínima). O fator de conversão para eletricidade é 2.5 kWhep/kWh.",
+      "enabled": true,
+      "tags": ["IEE", "escritórios", "referência", "RECS"]
+    },
+    {
+      "id": "SCE-IEE-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — IEE Referência por Tipologia (Escolas)",
+      "description": "O IEE previsto para o estabelecimento de ensino ({energy.ieeActual} kWhEP/(m².ano)) excede o valor de referência típico para escolas (~80 kWhEP/(m².ano)).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 80 },
+        { "field": "buildingType", "operator": "==", "value": "school" }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEE referência escolas: ~80 kWhEP/(m².ano)",
+      "remediation": "Reduzir IEE atuando na envolvente (isolamento, envidraçados eficientes), iluminação (LED ≤ 12 W/m² com sensores), ventilação natural assistida, sistemas AVAC eficientes e integração de renováveis (PV na cobertura).",
+      "enabled": true,
+      "tags": ["IEE", "escolas", "referência", "RECS"]
+    },
+    {
+      "id": "SCE-IEE-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — IEE Referência por Tipologia (Hospitais)",
+      "description": "O IEE previsto para a unidade de saúde ({energy.ieeActual} kWhEP/(m².ano)) excede o valor de referência típico para hospitais (~200 kWhEP/(m².ano)).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 200 },
+        { "field": "buildingType", "operator": "==", "value": "hospital" }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEE referência hospitais: ~200 kWhEP/(m².ano)",
+      "remediation": "Otimizar consumos nas componentes mais relevantes: AVAC (recuperação de calor, free-cooling), iluminação (LED IRC ≥ 90), AQS (cogeração ou solar térmico), equipamentos médicos de classe eficiente. Implementar GTC para monitorização e otimização contínua.",
+      "enabled": true,
+      "tags": ["IEE", "hospitais", "referência", "RECS"]
+    },
+    {
+      "id": "SCE-IEE-05",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — IEE Referência por Tipologia (Hotéis)",
+      "description": "O IEE previsto para o edifício hoteleiro ({energy.ieeActual} kWhEP/(m².ano)) excede o valor de referência típico para hotéis (~150 kWhEP/(m².ano)).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 150 },
+        { "field": "buildingType", "operator": "==", "value": "hotel" }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEE referência hotéis: ~150 kWhEP/(m².ano)",
+      "remediation": "Reduzir IEE hoteleiro: sistemas de key-card para controlo AVAC por quarto, iluminação LED com sensores de presença, AQS com solar térmico ou bomba de calor, cobertura PV, sistema de gestão de energia centralizado e recuperação de calor na ventilação.",
+      "enabled": true,
+      "tags": ["IEE", "hotéis", "referência", "RECS"]
+    },
+    {
+      "id": "SCE-IEE-06",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — IEE Referência por Tipologia (Comércio)",
+      "description": "O IEE previsto para o edifício comercial ({energy.ieeActual} kWhEP/(m².ano)) excede o valor de referência típico para comércio (~120 kWhEP/(m².ano)).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 120 },
+        { "field": "buildingType", "operator": "==", "value": "retail" }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEE referência comércio: ~120 kWhEP/(m².ano)",
+      "remediation": "Reduzir IEE em espaços comerciais: iluminação LED eficiente (≤ 15 W/m²), AVAC com recuperação de calor, cortinas de ar em entradas, controlo automático de iluminação e climatização, e integração de renováveis para autoconsumo.",
+      "enabled": true,
+      "tags": ["IEE", "comércio", "referência", "RECS"]
+    },
+    {
+      "id": "SCE-IEE-07",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Fatores de Conversão de Energia Primária",
+      "description": "Os fatores de conversão para energia primária devem ser aplicados corretamente no cálculo do IEE: eletricidade = 2.5 kWhep/kWh; gás natural = 1.0 kWhep/kWh; GPL = 1.0 kWhep/kWh; biomassa = 1.0 kWhep/kWh.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.ieeActual", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Eletricidade: 2.5 kWhep/kWh; Gás natural: 1.0; GPL: 1.0; Biomassa: 1.0",
+      "remediation": "Verificar que os fatores de conversão aplicados no cálculo do IEE estão corretos. A eletricidade tem fator de conversão de 2.5, penalizando o consumo elétrico. Privilegiar fontes com menor fator de conversão (gás natural, biomassa) ou produção renovável para autoconsumo (fator 0 para a componente renovável).",
+      "enabled": true,
+      "tags": ["IEE", "fatores conversão", "energia primária", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º / RECS — DPIE Escritórios",
+      "description": "A densidade de potência de iluminação efectiva ({energy.lightingDensity} W/m²) é superior ao valor de referência para escritórios (DPIE ≤ 10 W/m²).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lightingDensity", "operator": ">", "value": 10 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "office"] }
+      ],
+      "currentValueTemplate": "{energy.lightingDensity} W/m²",
+      "requiredValue": "DPIE ≤ 10 W/m² (escritórios)",
+      "remediation": "Substituir iluminação por LED de alta eficiência e instalar sensores de presença, regulação de fluxo luminoso (dimming) e aproveitamento de luz natural.",
+      "enabled": true,
+      "tags": ["iluminação", "DPIE", "LED", "W/m²", "escritórios", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º / RECS — DPIE Escolas",
+      "description": "A densidade de potência de iluminação efectiva ({energy.lightingDensity} W/m²) excede o valor de referência para estabelecimentos de ensino (DPIE ≤ 12 W/m²).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lightingDensity", "operator": ">", "value": 12 },
+        { "field": "buildingType", "operator": "==", "value": "school" }
+      ],
+      "currentValueTemplate": "{energy.lightingDensity} W/m²",
+      "requiredValue": "DPIE ≤ 12 W/m² (escolas)",
+      "remediation": "Substituir iluminação existente por LED de alta eficiência. Instalar sensores de presença em zonas de circulação, regulação de fluxo luminoso e sistemas de aproveitamento de luz natural. Em salas de aula, garantir níveis de iluminância adequados (≥ 300 lux) com menor potência instalada.",
+      "enabled": true,
+      "tags": ["iluminação", "DPIE", "LED", "W/m²", "escolas", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º / RECS — DPIE Hospitais",
+      "description": "A densidade de potência de iluminação efectiva ({energy.lightingDensity} W/m²) excede o valor de referência para hospitais e unidades de saúde (DPIE ≤ 15 W/m²).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lightingDensity", "operator": ">", "value": 15 },
+        { "field": "buildingType", "operator": "==", "value": "hospital" }
+      ],
+      "currentValueTemplate": "{energy.lightingDensity} W/m²",
+      "requiredValue": "DPIE ≤ 15 W/m² (hospitais)",
+      "remediation": "Otimizar iluminação com LED de alta eficiência e índice de restituição cromática (IRC) adequado para ambiente hospitalar (IRC ≥ 90). Implementar controlo por zonas, dimming e sensores de presença nas áreas de circulação.",
+      "enabled": true,
+      "tags": ["iluminação", "DPIE", "LED", "W/m²", "hospitais", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º / RECS — DPIE Comércio",
+      "description": "A densidade de potência de iluminação efectiva ({energy.lightingDensity} W/m²) excede o valor de referência para espaços comerciais (DPIE ≤ 15 W/m²).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lightingDensity", "operator": ">", "value": 15 },
+        { "field": "buildingType", "operator": "==", "value": "retail" }
+      ],
+      "currentValueTemplate": "{energy.lightingDensity} W/m²",
+      "requiredValue": "DPIE ≤ 15 W/m² (comércio)",
+      "remediation": "Otimizar iluminação comercial com LED de alta eficiência, controlo por zonas e programação horária. Iluminação de destaque (vitrinas) deve ser eficiente e desligada fora do horário de funcionamento.",
+      "enabled": true,
+      "tags": ["iluminação", "DPIE", "LED", "W/m²", "comércio", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-05",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º / RECS — DPIE Restauração",
+      "description": "A densidade de potência de iluminação efectiva ({energy.lightingDensity} W/m²) excede o valor de referência para espaços de restauração (DPIE ≤ 12 W/m²).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lightingDensity", "operator": ">", "value": 12 },
+        { "field": "buildingType", "operator": "==", "value": "restaurant" }
+      ],
+      "currentValueTemplate": "{energy.lightingDensity} W/m²",
+      "requiredValue": "DPIE ≤ 12 W/m² (restauração)",
+      "remediation": "Substituir iluminação por LED de alta eficiência com regulação de intensidade. Implementar cenários de iluminação adaptados ao período do dia e à ocupação.",
+      "enabled": true,
+      "tags": ["iluminação", "DPIE", "LED", "W/m²", "restauração", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-06",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Regulação Automática de Iluminação (Daylight Dimming)",
+      "description": "Em espaços com área superior a 100 m² e iluminação natural disponível, é obrigatória a regulação automática da iluminação artificial (daylight dimming) para aproveitamento da luz natural.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasAutoDimming", "operator": "==", "value": false },
+        { "field": "grossFloorArea", "operator": ">", "value": 100 },
+        { "field": "energy.hasNaturalLight", "operator": "==", "value": true },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "school", "retail"] }
+      ],
+      "currentValueTemplate": "{energy.hasAutoDimming}",
+      "requiredValue": "Regulação automática (daylight dimming) obrigatória em espaços >100 m² com luz natural",
+      "remediation": "Instalar sistema de regulação automática de iluminação (daylight dimming) com sensores de luminosidade. O sistema deve ajustar o fluxo luminoso artificial em função da luz natural disponível, mantendo os níveis de iluminância adequados à tarefa visual.",
+      "enabled": true,
+      "tags": ["iluminação", "daylight dimming", "regulação automática", "RECS"]
+    },
+    {
+      "id": "SCE-ILUM-07",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Deteção de Presença Obrigatória em Zonas Comuns",
+      "description": "A deteção de presença é obrigatória em zonas comuns (circulações, instalações sanitárias, arrumos, parques de estacionamento) para controlo automático da iluminação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasOccupancySensors", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "school", "hospital", "hotel", "retail", "residential_multi"] }
+      ],
+      "currentValueTemplate": "{energy.hasOccupancySensors}",
+      "requiredValue": "Deteção de presença obrigatória em zonas comuns (circulações, IS, arrumos)",
+      "remediation": "Instalar sensores de presença/ocupação em todas as zonas comuns: corredores, halls, instalações sanitárias, arrumos, garagens e parques de estacionamento. Os sensores devem desligar ou reduzir a iluminação após período de inatividade configurável (tipicamente 5-15 minutos).",
+      "enabled": true,
+      "tags": ["iluminação", "deteção presença", "sensores", "zonas comuns", "RECS"]
+    },
+    {
+      "id": "SCE-SOLAR-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Coletores Solares Térmicos Obrigatórios",
+      "description": "Em edifícios residenciais novos, é obrigatória a instalação de coletores solares térmicos para AQS com área mínima de 1.0 m² por ocupante equivalente (orientação Sul ±45°; inclinação aproximada à latitude do local).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "systems.hasSolarThermal", "operator": "not_exists", "value": null },
+        { "field": "systems.dhwSystem", "operator": "not_in", "value": ["heat_pump", "thermodynamic", "biomass"] },
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Coletores solares: ≥ 1.0 m² por ocupante (orientação S ±45°; inclinação ≈ latitude)",
+      "remediation": "Instalar coletores solares térmicos com área mínima de 1.0 m² por ocupante equivalente. A orientação deve ser Sul (±45°) e a inclinação aproximada à latitude do local (~38-41° em Portugal continental). O sistema deve incluir depósito de acumulação dimensionado para pelo menos 50 litros por m² de coletor.",
+      "enabled": true,
+      "tags": ["solar térmico", "coletores", "AQS", "obrigatório", "REH"]
+    },
+    {
+      "id": "SCE-SOLAR-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Alternativa ao Solar Térmico",
+      "description": "Em alternativa aos coletores solares térmicos, pode ser instalado sistema equivalente: bomba de calor para AQS (COP ≥ 2.5), caldeira a biomassa ou sistema fotovoltaico com contribuição energética equivalente.",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasSolarThermal", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Alternativa solar: bomba calor COP ≥ 2.5, caldeira biomassa ou PV equivalente",
+      "remediation": "Se a instalação de coletores solares térmicos não for viável (sombreamento, orientação, estrutura), instalar alternativa equivalente: (a) bomba de calor para AQS com COP ≥ 2.5; (b) caldeira a biomassa com rendimento ≥ 85%; (c) sistema fotovoltaico dimensionado para contribuição energética equivalente à fração solar mínima. A justificação técnica deve ser documentada.",
+      "enabled": true,
+      "tags": ["solar térmico", "alternativa", "bomba calor", "biomassa", "PV", "REH"]
+    },
+    {
+      "id": "SCE-SOLAR-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Contribuição Solar Mínima (Esolar)",
+      "description": "A contribuição solar mínima para preparação de AQS (Esolar) é obrigatória em edifícios residenciais novos. O sistema solar deve cobrir uma fração significativa das necessidades de AQS.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.solarContribution", "operator": "<", "value": 0.4 },
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Esolar = {energy.solarContribution}",
+      "requiredValue": "Contribuição solar mínima obrigatória para AQS (Esolar)",
+      "remediation": "Aumentar a contribuição solar para AQS: dimensionar adequadamente a área de coletores (≥ 1.0 m²/ocupante), otimizar orientação e inclinação, verificar sombreamento, aumentar volume de acumulação. A fração solar deve ser maximizada para o local e perfil de consumo.",
+      "enabled": true,
+      "tags": ["solar térmico", "Esolar", "AQS", "contribuição solar", "REH"]
+    },
+    {
+      "id": "SCE-PV-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Solar Fotovoltaico para Autoconsumo",
+      "description": "O edifício não possui sistema solar fotovoltaico para autoconsumo. O DL 162/2019 incentiva a produção descentralizada de energia renovável. Para UPAC até à potência contratada, não há limite de potência.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.hasSolarPV", "operator": "==", "value": false },
+        { "field": "grossFloorArea", "operator": ">", "value": 500 }
+      ],
+      "currentValueTemplate": "{energy.hasSolarPV}",
+      "requiredValue": "Sistema fotovoltaico para autoconsumo recomendado",
+      "remediation": "Instalar sistema fotovoltaico para autoconsumo dimensionado proporcionalmente à potência contratada e ao perfil de consumo. O DL 162/2019 simplifica o licenciamento para UPAC (Unidade de Produção para Autoconsumo) até 1 MW. Avaliar viabilidade técnico-económica considerando orientação da cobertura, sombreamento e tarifas de energia.",
+      "enabled": true,
+      "tags": ["fotovoltaico", "autoconsumo", "UPAC", "DL 162/2019", "renováveis"]
+    },
+    {
+      "id": "SCE-PV-02",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 Art. 5.º — Registo DGEG para UPAC > 350 W",
+      "description": "Unidades de Produção para Autoconsumo (UPAC) com potência superior a 350 W requerem registo obrigatório na DGEG (Direção-Geral de Energia e Geologia).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.pvPowerW", "operator": ">", "value": 350 },
+        { "field": "energy.hasDGEGRegistration", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "UPAC = {energy.pvPowerW} W",
+      "requiredValue": "Registo DGEG obrigatório para UPAC > 350 W",
+      "remediation": "Efetuar o registo da UPAC na DGEG através do portal SERUP (Sistema Eletrónico de Registo de Unidades de Produção). O registo deve ser efetuado antes da ligação do sistema à instalação elétrica. Documentação necessária: esquema unifilar, memória descritiva e certificado do instalador.",
+      "enabled": true,
+      "tags": ["fotovoltaico", "UPAC", "DGEG", "registo", "DL 162/2019"]
+    },
+    {
+      "id": "SCE-PV-03",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Certificação Instalador UPAC > 1.5 kW",
+      "description": "A instalação de UPAC com potência superior a 1.5 kW deve ser efetuada por instalador credenciado pela DGEG.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.pvPowerW", "operator": ">", "value": 1500 },
+        { "field": "energy.hasCertifiedInstaller", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "UPAC = {energy.pvPowerW} W",
+      "requiredValue": "Instalador credenciado obrigatório para UPAC > 1.5 kW",
+      "remediation": "Contratar instalador credenciado pela DGEG para a instalação da UPAC. O instalador deve emitir termo de responsabilidade e certificado de conformidade da instalação. Para UPAC > 1.5 kW, é também necessário inspeção e certificação da instalação.",
+      "enabled": true,
+      "tags": ["fotovoltaico", "UPAC", "instalador", "credenciação", "DL 162/2019"]
+    },
+    {
+      "id": "SCE-AQUEC-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "Eficiência dos Sistemas de Aquecimento",
+      "description": "O aquecimento por radiador elétrico (efeito Joule) é o sistema menos eficiente, com COP = 1.0. Os requisitos NZEB e SCE exigem sistemas de aquecimento eficientes.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.heatingSystem", "operator": "==", "value": "electric_radiator" }
+      ],
+      "requiredValue": "Sistema de aquecimento eficiente (COP ≥ 3.5)",
+      "remediation": "Substituir por bomba de calor ar-ar ou ar-água (COP ≥ 3.5). Redução de ~65% no consumo de energia para aquecimento. Em alternativa, considerar piso radiante com bomba de calor ou caldeira a biomassa.",
+      "enabled": true,
+      "tags": ["aquecimento", "eficiência", "radiador elétrico", "COP"]
+    },
+    {
+      "id": "SCE-AQS-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "Eficiência dos Sistemas de AQS",
+      "description": "A produção de AQS por termoacumulador elétrico convencional é pouco eficiente (COP = 0.9-0.95). Os requisitos regulamentares privilegiam sistemas com contribuição renovável.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.dhwSystem", "operator": "==", "value": "electric" }
+      ],
+      "requiredValue": "Sistema AQS eficiente (solar térmico, bomba de calor ou biomassa)",
+      "remediation": "Substituir por bomba de calor termodinâmica (COP ≥ 2.5) ou sistema solar térmico com apoio. Em alternativa, caldeira a biomassa com rendimento ≥ 85% ou sistema misto solar + bomba de calor.",
+      "enabled": true,
+      "tags": ["AQS", "termoacumulador", "eficiência"]
+    },
+    {
+      "id": "SCE-SIST-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Caldeiras de Condensação Obrigatórias (Novos)",
+      "description": "Em edifícios novos, as caldeiras a gás instaladas devem ser de condensação (rendimento ≥ 97% à carga parcial), conforme requisitos de eficiência dos sistemas técnicos do RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "systems.boilerType", "operator": "==", "value": "conventional_gas" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Caldeira de condensação obrigatória em edifícios novos (EN 15502)",
+      "remediation": "Substituir caldeira convencional por caldeira de condensação (classe A mínima, EN 15502). As caldeiras de condensação recuperam o calor latente dos gases de combustão, atingindo rendimentos de 97-109% (PCI). Para novos edifícios, é obrigatório o rendimento mínimo conforme a classe de eficiência da EN 15502.",
+      "enabled": true,
+      "tags": ["caldeira", "condensação", "EN 15502", "RECS", "sistemas técnicos"]
+    },
+    {
+      "id": "SCE-SIST-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — COP Mínimo Bombas de Calor",
+      "description": "As bombas de calor instaladas devem cumprir os valores mínimos de COP (Coefficient of Performance) definidos por tipo e potência, conforme os requisitos do RECS para sistemas técnicos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.heatPumpCOP", "operator": "<", "value": 2.5 },
+        { "field": "systems.hasHeatPump", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "COP = {systems.heatPumpCOP}",
+      "requiredValue": "COP mínimo conforme tipo/potência (tipicamente ≥ 2.5 para AQS; ≥ 3.5 para climatização)",
+      "remediation": "Substituir por bomba de calor com COP adequado: para AQS, COP ≥ 2.5; para climatização ar-ar, COP ≥ 3.5; para climatização ar-água, COP ≥ 3.0. O COP deve ser verificado nas condições de ensaio normalizadas (EN 14511 ou EN 16147 para AQS). Preferir equipamentos com classe A+ ou superior.",
+      "enabled": true,
+      "tags": ["bomba calor", "COP", "eficiência", "RECS", "sistemas técnicos"]
+    },
+    {
+      "id": "SCE-SIST-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — EER Mínimo e Classe Eficiência Chillers",
+      "description": "Os chillers (unidades de produção de frio) devem cumprir os valores mínimos de EER (Energy Efficiency Ratio) e ter classe de eficiência A mínima, conforme requisitos RECS.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "systems.chillerEfficiencyClass", "operator": "not_in", "value": ["A+++", "A++", "A+", "A"] },
+        { "field": "systems.hasChiller", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Classe {systems.chillerEfficiencyClass}",
+      "requiredValue": "Chiller com classe de eficiência ≥ A (EER mínimo conforme potência)",
+      "remediation": "Substituir chiller por equipamento com classe de eficiência mínima A. Para novos edifícios, preferir classe A+ ou superior. O EER deve ser verificado nas condições nominais de ensaio. Considerar chillers com recuperação de calor para AQS ou pré-aquecimento.",
+      "enabled": true,
+      "tags": ["chiller", "EER", "classe eficiência", "RECS", "sistemas técnicos"]
+    },
+    {
+      "id": "SCE-SIST-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Variadores de Velocidade Obrigatórios (> 5.5 kW)",
+      "description": "Os variadores de velocidade (VSD) são obrigatórios em bombas e ventiladores com potência superior a 5.5 kW, conforme requisitos de eficiência dos sistemas técnicos do RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "systems.hasVSD", "operator": "==", "value": false },
+        { "field": "systems.pumpFanPowerKW", "operator": ">", "value": 5.5 }
+      ],
+      "currentValueTemplate": "Potência = {systems.pumpFanPowerKW} kW; VSD = {systems.hasVSD}",
+      "requiredValue": "Variadores de velocidade obrigatórios em bombas/ventiladores > 5.5 kW",
+      "remediation": "Instalar variadores de velocidade (VSD/VFD) em todas as bombas e ventiladores com potência superior a 5.5 kW. Os VSD permitem ajustar a velocidade de rotação às necessidades reais, gerando poupanças de 20-50% no consumo energético. A potência absorvida varia com o cubo da velocidade (lei da afinidade).",
+      "enabled": true,
+      "tags": ["VSD", "variador velocidade", "bombas", "ventiladores", "RECS", "sistemas técnicos"]
+    },
+    {
+      "id": "SCE-MAINT-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 / RECS Art. 14.º — Plano de Manutenção Obrigatório",
+      "description": "Não foi identificado plano de manutenção preventiva para os sistemas técnicos do edifício. Para grandes edifícios de serviços (GES), é obrigatório TIM (Técnico de Instalação e Manutenção).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasMaintenancePlan", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office"] }
+      ],
+      "currentValueTemplate": "{energy.hasMaintenancePlan}",
+      "requiredValue": "Plano de manutenção obrigatório (TIM para GES)",
+      "remediation": "Elaborar plano de manutenção preventiva dos sistemas técnicos (AVAC, iluminação, elevadores, AQS). Para GES, contratar TIM (Técnico de Instalação e Manutenção) com qualificação adequada. O plano deve incluir periodicidade de inspeções, registos e procedimentos de manutenção.",
+      "enabled": true,
+      "tags": ["manutenção", "TIM", "GES", "RECS", "plano preventivo"]
+    },
+    {
+      "id": "SCE-MAINT-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS Art. 14.º — TIM II (Potência 25-250 kW)",
+      "description": "Edifícios de serviços com potência térmica instalada entre 25 e 250 kW requerem TIM II (Técnico de Instalação e Manutenção de nível II) para a manutenção obrigatória dos sistemas energéticos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.installedPower", "operator": ">=", "value": 25 },
+        { "field": "energy.installedPower", "operator": "<=", "value": 250 },
+        { "field": "energy.hasTIM", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "hotel", "hospital", "school", "retail"] }
+      ],
+      "currentValueTemplate": "Potência = {energy.installedPower} kW; TIM = {energy.hasTIM}",
+      "requiredValue": "TIM II obrigatório para potência 25-250 kW (GES)",
+      "remediation": "Contratar TIM II (Técnico de Instalação e Manutenção nível II) para a manutenção dos sistemas energéticos. O TIM II deve realizar inspeções periódicas, verificações de rendimento, limpezas e ajustes dos equipamentos. Manter registo atualizado das intervenções no livro de manutenção do edifício.",
+      "enabled": true,
+      "tags": ["TIM II", "manutenção", "25-250 kW", "GES", "RECS"]
+    },
+    {
+      "id": "SCE-MAINT-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS Art. 14.º — TIM III (Potência > 250 kW)",
+      "description": "Edifícios de serviços com potência térmica instalada superior a 250 kW requerem TIM III (Técnico de Instalação e Manutenção de nível III) para a manutenção obrigatória dos sistemas energéticos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.installedPower", "operator": ">", "value": 250 },
+        { "field": "energy.hasTIM", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "hotel", "hospital", "school", "retail"] }
+      ],
+      "currentValueTemplate": "Potência = {energy.installedPower} kW; TIM = {energy.hasTIM}",
+      "requiredValue": "TIM III obrigatório para potência > 250 kW",
+      "remediation": "Contratar TIM III (Técnico de Instalação e Manutenção nível III) para a manutenção dos sistemas energéticos. O TIM III é o nível mais elevado e é obrigatório para instalações com potência > 250 kW. Deve assegurar: inspeções periódicas, monitorização de rendimentos, otimização de funcionamento e registo detalhado de todas as intervenções.",
+      "enabled": true,
+      "tags": ["TIM III", "manutenção", ">250 kW", "GES", "RECS"]
+    },
+    {
+      "id": "SCE-AUDIT-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 / RECS — Auditoria Energética Obrigatória (≥ 500 kW)",
+      "description": "Grandes edifícios de serviços (GES) com potência térmica instalada ≥ 500 kW devem realizar auditoria energética periódica a cada 6 anos, por entidade acreditada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.installedPower", "operator": ">=", "value": 500 },
+        { "field": "energy.hasEnergyAudit", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "hotel", "hospital"] }
+      ],
+      "currentValueTemplate": "Potência = {energy.installedPower} kW; Auditoria = {energy.hasEnergyAudit}",
+      "requiredValue": "Auditoria energética obrigatória a cada 6 anos (potência ≥ 500 kW)",
+      "remediation": "Realizar auditoria energética por entidade acreditada. A auditoria deve incluir: levantamento energético detalhado, análise de consumos por uso final (aquecimento, arrefecimento, AQS, iluminação, equipamentos), identificação de medidas de melhoria e análise custo-benefício. Periodicidade: 6 anos para GES com potência ≥ 500 kW.",
+      "enabled": true,
+      "tags": ["auditoria", "GES", "RECS", "500 kW", "6 anos"]
+    },
+    {
+      "id": "SCE-AUDIT-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Plano de Racionalização de Energia (PRE)",
+      "description": "Quando a auditoria energética identifica medidas de melhoria com período de retorno (payback) inferior a 8 anos, é obrigatória a elaboração e implementação de um Plano de Racionalização de Energia (PRE).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.auditHasMeasuresUnder8yPayback", "operator": "==", "value": true },
+        { "field": "energy.hasPRE", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "PRE = {energy.hasPRE}",
+      "requiredValue": "PRE obrigatório se auditoria identifica medidas com payback < 8 anos",
+      "remediation": "Elaborar Plano de Racionalização de Energia (PRE) incluindo todas as medidas identificadas na auditoria com payback inferior a 8 anos. O PRE deve definir: medidas a implementar, cronograma, investimento previsto, poupança estimada e indicadores de verificação. A implementação do PRE é obrigatória e fiscalizável pela DGEG.",
+      "enabled": true,
+      "tags": ["PRE", "racionalização", "payback", "auditoria", "RECS"]
+    },
+    {
+      "id": "SCE-AUDIT-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Periodicidade da Auditoria Energética",
+      "description": "A auditoria energética tem periodicidade máxima de 6 anos para GES com potência ≥ 500 kW. O certificado deve ser renovado em conformidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lastAuditYearsAgo", "operator": ">", "value": 6 },
+        { "field": "energy.installedPower", "operator": ">=", "value": 500 }
+      ],
+      "currentValueTemplate": "Última auditoria: {energy.lastAuditYearsAgo} anos",
+      "requiredValue": "Auditoria a cada 6 anos (máximo)",
+      "remediation": "A auditoria energética está expirada ou próxima de expirar. Agendar nova auditoria energética por entidade acreditada. Garantir que a auditoria é realizada antes da renovação do certificado energético do GES.",
+      "enabled": true,
+      "tags": ["auditoria", "periodicidade", "6 anos", "GES", "RECS"]
+    },
+    {
+      "id": "SCE-ENV-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 / REH — Coeficiente Transmissão Térmica Paredes (Umáx)",
+      "description": "O coeficiente de transmissão térmica das paredes exteriores ({energy.wallUValue} W/(m².K)) excede o valor máximo admissível para a zona climática do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.wallUValue", "operator": ">", "value": 0 },
+        { "field": "energy.wallUValueExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "U paredes = {energy.wallUValue} W/(m².K)",
+      "requiredValue": "U ≤ Umáx conforme zona climática (I1: 1.75; I2: 1.60; I3: 1.45 W/(m².K))",
+      "remediation": "Reforçar o isolamento térmico das paredes exteriores para reduzir o coeficiente U abaixo do máximo admissível. Soluções: ETICS (isolamento pelo exterior), isolamento na caixa de ar, ou revestimento interior com isolante. Espessura do isolante a dimensionar conforme zona climática.",
+      "enabled": true,
+      "tags": ["envolvente", "paredes", "U", "isolamento", "REH"]
+    },
+    {
+      "id": "SCE-ENV-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 / REH — Coeficiente Transmissão Térmica Cobertura (Umáx)",
+      "description": "O coeficiente de transmissão térmica da cobertura ({energy.roofUValue} W/(m².K)) excede o valor máximo admissível para a zona climática do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.roofUValue", "operator": ">", "value": 0 },
+        { "field": "energy.roofUValueExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "U cobertura = {energy.roofUValue} W/(m².K)",
+      "requiredValue": "U ≤ Umáx conforme zona climática (I1: 1.25; I2: 1.00; I3: 0.90 W/(m².K))",
+      "remediation": "Reforçar o isolamento térmico da cobertura. Em coberturas planas: aplicar isolante (XPS, EPS ou lã de rocha) sobre a laje. Em coberturas inclinadas: isolante na vertente ou na esteira horizontal. A cobertura é tipicamente o elemento com maiores perdas térmicas.",
+      "enabled": true,
+      "tags": ["envolvente", "cobertura", "U", "isolamento", "REH"]
+    },
+    {
+      "id": "SCE-ENV-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 / REH — Coeficiente Transmissão Térmica Pavimento (Umáx)",
+      "description": "O coeficiente de transmissão térmica do pavimento sobre espaço não aquecido ({energy.floorUValue} W/(m².K)) excede o valor máximo admissível.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.floorUValue", "operator": ">", "value": 0 },
+        { "field": "energy.floorUValueExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "U pavimento = {energy.floorUValue} W/(m².K)",
+      "requiredValue": "U ≤ Umáx conforme zona climática (I1: 1.65; I2: 1.30; I3: 1.20 W/(m².K))",
+      "remediation": "Isolar o pavimento sobre espaço não aquecido (garagem, cave, pilotis). Aplicar isolante na face inferior da laje ou incorporado na camada de regularização. A espessura do isolante deve ser dimensionada conforme a zona climática.",
+      "enabled": true,
+      "tags": ["envolvente", "pavimento", "U", "isolamento", "REH"]
+    },
+    {
+      "id": "SCE-ENV-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 / REH — Coeficiente Transmissão Térmica Envidraçados (Uwmáx)",
+      "description": "O coeficiente de transmissão térmica dos vãos envidraçados ({energy.windowUValue} W/(m².K)) excede o valor máximo admissível para a zona climática.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.windowUValue", "operator": ">", "value": 0 },
+        { "field": "energy.windowUValueExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Uw envidraçados = {energy.windowUValue} W/(m².K)",
+      "requiredValue": "Uw ≤ Uwmáx conforme zona climática (I1: 4.30; I2: 3.30; I3: 2.80 W/(m².K))",
+      "remediation": "Substituir envidraçados por janelas com melhor desempenho térmico: vidro duplo ou triplo com corte térmico na caixilharia. Considerar vidros de baixa emissividade (Low-E) e preenchimento com gás (árgon). A caixilharia com corte térmico (RPT) reduz significativamente as pontes térmicas.",
+      "enabled": true,
+      "tags": ["envolvente", "envidraçados", "Uw", "janelas", "REH"]
+    },
+    {
+      "id": "SCE-VENT-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 / REH — Ventilação Mínima",
+      "description": "A taxa de renovação de ar do edifício ({energy.ventilationRate} rph) é inferior ao mínimo regulamentar para garantir a qualidade do ar interior (0.4 rph para edifícios residenciais).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ventilationRate", "operator": "<", "value": 0.4 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "Rph = {energy.ventilationRate} rph",
+      "requiredValue": "≥ 0.4 rph (ventilação mínima REH)",
+      "remediation": "Garantir taxa mínima de ventilação de 0.4 rph. Soluções: admissão de ar nos vãos (grelhas autorreguláveis), ventilação natural cruzada, ou ventilação mecânica com recuperação de calor. A ventilação com recuperação de calor (eficiência ≥ 70%) permite renovar o ar sem perdas energéticas significativas.",
+      "enabled": true,
+      "tags": ["ventilação", "rph", "qualidade ar", "REH"]
+    },
+    {
+      "id": "SCE-QAI-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Qualidade do Ar Interior (QAI) em Edifícios de Serviços",
+      "description": "Os edifícios de serviços devem garantir caudais mínimos de ar novo para qualidade do ar interior, conforme a Portaria 353-A/2013 e o RECS. Não foi identificado sistema de ventilação adequado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasAdequateVentilation", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "school", "hospital", "hotel"] }
+      ],
+      "currentValueTemplate": "{energy.hasAdequateVentilation}",
+      "requiredValue": "Caudais mínimos de ar novo conforme Portaria 353-A/2013",
+      "remediation": "Dimensionar e instalar sistema de ventilação mecânica que garanta os caudais mínimos de ar novo para cada tipo de espaço. Implementar monitorização de CO2 para ajuste dos caudais. Em espaços com grande ocupação, considerar ventilação com controlo por demanda (DCV).",
+      "enabled": true,
+      "tags": ["QAI", "ventilação", "ar novo", "RECS", "Portaria 353-A"]
+    },
+    {
+      "id": "SCE-GTC-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Sistema de Gestão Técnica Centralizada (GTC)",
+      "description": "Em grandes edifícios de serviços (GES), é recomendada a instalação de um sistema de Gestão Técnica Centralizada (GTC) para monitorização e otimização dos consumos energéticos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.hasGTC", "operator": "==", "value": false },
+        { "field": "energy.installedPower", "operator": ">", "value": 100 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "services", "office", "hotel", "hospital"] }
+      ],
+      "currentValueTemplate": "{energy.hasGTC}",
+      "requiredValue": "GTC recomendado para GES (potência > 100 kW)",
+      "remediation": "Instalar sistema de Gestão Técnica Centralizada (GTC/BMS) para monitorização e controlo dos sistemas de AVAC, iluminação, elevadores e produção de energia. O GTC permite: programação horária, otimização de setpoints, deteção de anomalias e reporte de consumos. A implementação de GTC permite tipicamente poupanças de 10-20% nos consumos energéticos.",
+      "enabled": true,
+      "tags": ["GTC", "BMS", "gestão técnica", "monitorização", "GES", "RECS"]
+    },
+    {
+      "id": "SCE-ELEV-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "RECS — Eficiência Energética de Elevadores",
+      "description": "Os elevadores e sistemas de transporte vertical devem ser energeticamente eficientes. Em edifícios novos ou grandes reabilitações, os elevadores devem ter classe de eficiência A ou superior (EN ISO 25745).",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasElevator", "operator": "==", "value": true },
+        { "field": "systems.elevatorEfficiencyClass", "operator": "not_in", "value": ["A", "B"] }
+      ],
+      "currentValueTemplate": "Classe elevador = {systems.elevatorEfficiencyClass}",
+      "requiredValue": "Elevador classe A ou superior (EN ISO 25745)",
+      "remediation": "Instalar elevadores com acionamento regenerativo, iluminação LED na cabina, modo standby com desligamento de iluminação e ventilação quando inativo. Preferir sistemas de tração sem casa de máquinas (MRL) com variador de velocidade. A classe energética deve ser A ou superior conforme EN ISO 25745.",
+      "enabled": true,
+      "tags": ["elevadores", "eficiência", "classe A", "RECS"]
+    },
+    {
+      "id": "SCE-PONTES-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 / REH — Pontes Térmicas Lineares",
+      "description": "As pontes térmicas lineares (PTL) não foram adequadamente tratadas no projeto. O coeficiente de transmissão térmica linear (ψ) das pontes térmicas deve ser minimizado para reduzir perdas energéticas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasThermalBridgeTreatment", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{energy.hasThermalBridgeTreatment}",
+      "requiredValue": "Tratamento de pontes térmicas lineares obrigatório",
+      "remediation": "Tratar as pontes térmicas lineares nos pontos críticos: ligação parede-laje, contorno de vãos, cunhais, ligação parede-cobertura e varandas. O isolamento pelo exterior (ETICS) é a solução mais eficaz para minimizar PTL. Para cada ponte térmica, o valor de ψ deve ser calculado e incluído no cálculo térmico (REH).",
+      "enabled": true,
+      "tags": ["pontes térmicas", "PTL", "envolvente", "REH"]
+    },
+    {
+      "id": "SCE-SOLAR-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Orientação e Inclinação Solar Térmico",
+      "description": "Os coletores solares térmicos devem ser instalados com orientação Sul (±45°) e inclinação aproximada à latitude do local (~38-41° em Portugal continental) para maximizar a captação solar.",
+      "severity": "info",
+      "conditions": [
+        { "field": "systems.hasSolarThermal", "operator": "==", "value": true },
+        { "field": "systems.solarOrientationOptimal", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Orientação: {systems.solarOrientation}; Inclinação: {systems.solarTilt}°",
+      "requiredValue": "Orientação Sul ±45°; inclinação ≈ latitude (38-41°)",
+      "remediation": "Corrigir a orientação e/ou inclinação dos coletores solares. A orientação ideal é Sul geográfico (azimute 0°) com desvio máximo de ±45°. A inclinação ideal é aproximada à latitude do local: ~38° em Lisboa/Faro, ~41° no Porto/Norte. Desvios significativos reduzem a captação solar anual.",
+      "enabled": true,
+      "tags": ["solar térmico", "orientação", "inclinação", "REH"]
+    },
+    {
+      "id": "SCE-NZEB-06",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Definição Quantitativa NZEB",
+      "description": "Um edifício NZEB (nearly zero energy building) apresenta necessidades quase nulas de energia, com elevado desempenho energético e a energia necessária quase totalmente proveniente de fontes renováveis, incluindo produzida no local ou nas proximidades.",
+      "severity": "info",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "NZEB: necessidades quase nulas + contribuição renovável significativa",
+      "remediation": "Para atingir o nível NZEB: (1) minimizar necessidades energéticas através de envolvente de elevado desempenho (U baixos, tratamento de pontes térmicas, sombreamento); (2) maximizar eficiência dos sistemas (COP > 3.5, iluminação LED, recuperação de calor); (3) cobrir fração significativa das necessidades remanescentes com energia renovável produzida no local (solar térmico + PV).",
+      "enabled": true,
+      "tags": ["NZEB", "definição", "necessidades quase nulas", "DL 101-D/2020"]
+    },
+    {
+      "id": "SCE-CERT-08",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 20.º — Validade Certificado GES (6 Anos)",
+      "description": "O certificado energético de grandes edifícios de serviços (GES) tem validade máxima de 6 anos (inferior aos 10 anos dos edifícios de habitação).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.certificateAgeYears", "operator": ">", "value": 5 },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Idade certificado = {energy.certificateAgeYears} anos",
+      "requiredValue": "Validade máxima 6 anos para GES",
+      "remediation": "O certificado energético do GES está próximo de expirar ou já expirou (validade 6 anos). Agendar a renovação da certificação energética, incluindo eventual auditoria energética obrigatória (se potência ≥ 500 kW). Contratar PQ habilitado RECS.",
+      "enabled": true,
+      "tags": ["certificado", "validade", "GES", "6 anos", "DL 118/2013"]
+    },
+    {
+      "id": "SCE-CERT-09",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 20.º — Validade Certificado Edifícios Novos (10 Anos)",
+      "description": "O certificado energético de edifícios novos tem validade de 10 anos a partir da data de emissão.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.certificateAgeYears", "operator": ">", "value": 8 },
+        { "field": "energy.isGES", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Idade certificado = {energy.certificateAgeYears} anos",
+      "requiredValue": "Validade 10 anos para edifícios novos/existentes",
+      "remediation": "O certificado energético está próximo de expirar (validade 10 anos). Planear a renovação da certificação energética atempadamente. Contratar Perito Qualificado (PQ) registado na ADENE.",
+      "enabled": true,
+      "tags": ["certificado", "validade", "10 anos", "DL 118/2013"]
+    }
+  ]
+}

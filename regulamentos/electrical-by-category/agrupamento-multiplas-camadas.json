@@ -1,0 +1,48 @@
+{
+  "category": "Agrupamento - Múltiplas camadas",
+  "rules": [
+    {
+      "id": "ELEC_R203",
+      "reference": "RTIEBT Quadro 52-E1 Nota",
+      "category": "Instalações Elétricas",
+      "subcategory": "Agrupamento - Múltiplas camadas",
+      "rule_text": "Fator multiplicativo para cabos em múltiplas camadas (a aplicar sobre 52-E1)",
+      "parameters": {
+        "lookup_table": {
+          "2_camadas": 0.8,
+          "3_camadas": 0.73,
+          "4_5_camadas": 0.7,
+          "6_8_camadas": 0.68,
+          ">=9_camadas": 0.66
+        }
+      },
+      "validation_type": "formula",
+      "severity": "mandatory",
+      "formula": "multi_layer_factor = lookup_multilayer(n_layers); total_factor = factor_52E1 * multi_layer_factor",
+      "lookup_tables": {
+        "lookup_table": {
+          "2_camadas": 0.8,
+          "3_camadas": 0.73,
+          "4_5_camadas": 0.7,
+          "6_8_camadas": 0.68,
+          ">=9_camadas": 0.66
+        }
+      },
+      "error_message": "Fator de múltiplas camadas não aplicado (52-E1 nota)",
+      "success_message": "✓ Conforme: Agrupamento - Múltiplas camadas",
+      "source": {
+        "regulation": "RTIEBT",
+        "article": "RTIEBT Quadro 52-E1 Nota",
+        "version": "3.0",
+        "date": "2026-02-15"
+      },
+      "metadata": {
+        "complexity": "complex",
+        "requires_calculation": true,
+        "application_scope": [
+          "Geral"
+        ]
+      }
+    }
+  ]
+}

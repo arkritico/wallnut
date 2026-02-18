@@ -1,0 +1,340 @@
+{
+  "pluginId": "energy",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras SCE/RECS (Sistema de Certificação Energética dos Edifícios / Regulamento de Desempenho Energético dos Edifícios de Comércio e Serviços)",
+  "fields": [
+    {
+      "_group": "Certificação Energética",
+      "field": "buildingType",
+      "label": "Tipo de edifício",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial / Serviços" },
+        { "value": "mixed", "label": "Uso misto" },
+        { "value": "industrial", "label": "Industrial / Armazém" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Tipo de edifício para determinação do regulamento aplicável (REH ou RECS)"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "isRehabilitation",
+      "label": "Edifício em reabilitação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício está sujeito a obras de reabilitação, com requisitos distintos no SCE"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "isMajorRehabilitation",
+      "label": "Grande intervenção de reabilitação",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a intervenção representa uma grande reabilitação (custo > 25% do valor do edifício ou > 25% da envolvente)"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "energy.hasCertificate",
+      "label": "Certificado energético emitido",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui certificado energético válido emitido pela ADENE"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "hasPreCertificate",
+      "label": "Pré-certificado energético",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi emitido pré-certificado energético na fase de projeto"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "hasFinalCertificate",
+      "label": "Certificado energético final",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi emitido certificado energético final após conclusão da obra"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "hasCertifiedExpert",
+      "label": "Perito qualificado designado",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe perito qualificado (PQ) designado para o processo de certificação"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "energy.certificateAgeYears",
+      "label": "Idade do certificado energético",
+      "type": "number",
+      "unit": "anos",
+      "sources": ["form"],
+      "description": "Número de anos desde a emissão do certificado energético (validade máxima 10 anos)"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "certificateValidity",
+      "label": "Validade do certificado",
+      "type": "number",
+      "unit": "anos",
+      "sources": ["form"],
+      "defaults": { "_default": 10 },
+      "description": "Período de validade do certificado energético — máximo 10 anos para edifícios existentes"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "energy.energyClass",
+      "label": "Classe energética",
+      "type": "select",
+      "options": [
+        { "value": "A+", "label": "A+" },
+        { "value": "A", "label": "A" },
+        { "value": "B", "label": "B" },
+        { "value": "B-", "label": "B-" },
+        { "value": "C", "label": "C" },
+        { "value": "D", "label": "D" },
+        { "value": "E", "label": "E" },
+        { "value": "F", "label": "F" }
+      ],
+      "sources": ["form"],
+      "description": "Classe energética do edifício conforme escala SCE (A+ a F)"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "energy.transactionType",
+      "label": "Tipo de transação",
+      "type": "select",
+      "options": [
+        { "value": "sale", "label": "Venda" },
+        { "value": "rental", "label": "Arrendamento" },
+        { "value": "new_construction", "label": "Construção nova" },
+        { "value": "major_renovation", "label": "Grande reabilitação" }
+      ],
+      "sources": ["form"],
+      "description": "Tipo de transação que desencadeia a obrigatoriedade de certificação energética"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "projectPhase",
+      "label": "Fase do projeto",
+      "type": "select",
+      "options": [
+        { "value": "design", "label": "Projeto" },
+        { "value": "construction", "label": "Construção" },
+        { "value": "operation", "label": "Exploração" }
+      ],
+      "sources": ["form"],
+      "description": "Fase do projeto para determinação dos requisitos SCE aplicáveis"
+    },
+    {
+      "_group": "Certificação Energética",
+      "field": "grossFloorArea",
+      "label": "Área bruta de construção",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "property": "GrossFloorArea",
+        "pset": "Qto_BuildingBaseQuantities"
+      },
+      "required": true,
+      "description": "Área bruta de pavimento do edifício para determinação de requisitos RECS"
+    },
+
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.ieeActual",
+      "label": "IEE efetivo (atual)",
+      "type": "number",
+      "unit": "kWh/m².ano",
+      "sources": ["form"],
+      "required": true,
+      "description": "Indicador de eficiência energética efetivo do edifício (consumo real por área útil por ano)"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "ieeReference",
+      "label": "IEE de referência",
+      "type": "number",
+      "unit": "kWh/m².ano",
+      "sources": ["form"],
+      "description": "Indicador de eficiência energética de referência para a tipologia do edifício"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.primaryEnergyRatio",
+      "label": "Rácio de energia primária (RNt)",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rácio entre as necessidades nominais e o limite regulamentar de energia primária"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.ntcNtRatio",
+      "label": "Rácio Ntc/Nt",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Rácio entre as necessidades nominais globais de energia primária (Ntc) e o limite (Nt)"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.isGES",
+      "label": "Grande edifício de comércio e serviços (GES)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício é um GES (área útil > 1000 m² ou 500 m² em centros comerciais)"
+    },
+    {
+      "_group": "Consumo e Eficiência",
+      "field": "energy.hasTIM",
+      "label": "Técnico de instalação e manutenção (TIM)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe TIM designado para manutenção dos sistemas técnicos do edifício"
+    },
+
+    {
+      "_group": "Sistemas de Energia",
+      "field": "energy.installedPower",
+      "label": "Potência instalada dos sistemas",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": true,
+      "description": "Potência nominal total dos sistemas técnicos instalados no edifício"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.hasHeatPump",
+      "label": "Sistema com bomba de calor",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício utiliza bomba de calor para climatização ou AQS"
+    },
+    {
+      "_group": "Sistemas de Energia",
+      "field": "systems.dhwSystem",
+      "label": "Sistema de AQS",
+      "type": "select",
+      "options": [
+        { "value": "gas_heater", "label": "Esquentador a gás" },
+        { "value": "gas_boiler", "label": "Caldeira a gás" },
+        { "value": "electric_heater", "label": "Termoacumulador elétrico" },
+        { "value": "heat_pump", "label": "Bomba de calor" },
+        { "value": "solar_thermal", "label": "Solar térmico" },
+        { "value": "combined", "label": "Sistema combinado" }
+      ],
+      "sources": ["form"],
+      "description": "Tipo de sistema de preparação de águas quentes sanitárias (AQS)"
+    },
+
+    {
+      "_group": "Iluminação",
+      "field": "energy.lightingDensity",
+      "label": "Densidade de potência de iluminação",
+      "type": "number",
+      "unit": "W/m²",
+      "sources": ["form"],
+      "description": "Densidade de potência de iluminação instalada (DPI) no edifício"
+    },
+    {
+      "_group": "Iluminação",
+      "field": "hasAutoDimming",
+      "label": "Regulação automática de fluxo luminoso",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de regulação automática do fluxo luminoso (dimming)"
+    },
+    {
+      "_group": "Iluminação",
+      "field": "hasNaturalLight",
+      "label": "Aproveitamento de luz natural",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de aproveitamento de luz natural integrado com a iluminação artificial"
+    },
+    {
+      "_group": "Iluminação",
+      "field": "hasOccupancySensors",
+      "label": "Sensores de ocupação",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem sensores de presença/ocupação para controlo da iluminação"
+    },
+
+    {
+      "_group": "Renováveis",
+      "field": "systems.hasSolarThermal",
+      "label": "Sistema solar térmico",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui sistema solar térmico para AQS (obrigatório em edifícios novos)"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "systems.hasSolarPV",
+      "label": "Sistema solar fotovoltaico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui sistema de produção de energia fotovoltaica"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "energy.pvPowerW",
+      "label": "Potência fotovoltaica instalada",
+      "type": "number",
+      "unit": "W",
+      "sources": ["form"],
+      "description": "Potência de pico do sistema fotovoltaico instalado (Wp)"
+    },
+    {
+      "_group": "Renováveis",
+      "field": "solarContribution",
+      "label": "Contribuição solar para AQS",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "description": "Percentagem de energia solar na preparação de AQS (fração solar)"
+    },
+
+    {
+      "_group": "Manutenção e Auditoria",
+      "field": "hasMaintenancePlan",
+      "label": "Plano de manutenção dos sistemas técnicos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe plano de manutenção preventiva dos sistemas técnicos conforme SCE"
+    },
+    {
+      "_group": "Manutenção e Auditoria",
+      "field": "hasEnergyAudit",
+      "label": "Auditoria energética realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizada auditoria energética ao edifício (obrigatória para GES)"
+    }
+  ]
+}

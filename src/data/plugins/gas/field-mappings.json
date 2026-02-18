@@ -1,0 +1,394 @@
+{
+  "pluginId": "gas",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras de instalações de gás (DL 521/99, Portaria 361/98)",
+  "fields": [
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.hasGasInstallation",
+      "label": "Existência de instalação de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui instalação de gás combustível — campo de entrada principal (gate)"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.gasType",
+      "label": "Tipo de gás combustível",
+      "type": "select",
+      "options": [
+        { "value": "natural_gas", "label": "Gás natural" },
+        { "value": "lpg_bottled", "label": "GPL em garrafa" },
+        { "value": "lpg_piped", "label": "GPL canalizado" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "description": "Tipo de gás combustível utilizado na instalação"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.installationType",
+      "label": "Tipo de instalação",
+      "type": "select",
+      "options": [
+        { "value": "individual", "label": "Individual" },
+        { "value": "collective", "label": "Coletiva" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "individual" },
+      "description": "Indica se a instalação de gás é individual (uma fração) ou coletiva (edifício inteiro)"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.hasGasProject",
+      "label": "Existência de projeto de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe projeto de instalação de gás aprovado por técnico responsável"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.buildingUse",
+      "label": "Utilização do edifício",
+      "type": "select",
+      "options": [
+        { "value": "residential", "label": "Habitacional" },
+        { "value": "commercial", "label": "Comercial" },
+        { "value": "industrial", "label": "Industrial" },
+        { "value": "mixed", "label": "Uso misto" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de utilização do edifício onde se encontra a instalação de gás"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.installationLocation",
+      "label": "Localização da instalação",
+      "type": "select",
+      "options": [
+        { "value": "interior", "label": "Interior" },
+        { "value": "exterior", "label": "Exterior" },
+        { "value": "both", "label": "Interior e exterior" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as tubagens de gás passam pelo interior, exterior, ou ambos"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.meterLocation",
+      "label": "Localização do contador de gás",
+      "type": "select",
+      "options": [
+        { "value": "exterior_cabinet", "label": "Armário exterior" },
+        { "value": "common_area", "label": "Área comum" },
+        { "value": "interior", "label": "Interior da fração" },
+        { "value": "technical_duct", "label": "Ducto técnico" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Localização do contador/medidor de gás conforme DL 521/99"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.utilizationPressure",
+      "label": "Pressão de utilização",
+      "type": "number",
+      "unit": "mbar",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "natural_gas": 21, "lpg_bottled": 30, "lpg_piped": 30 },
+      "description": "Pressão de utilização da instalação de gás nos aparelhos (tipicamente 21 mbar para GN, 30 mbar para GPL)"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.totalPressureDrop",
+      "label": "Perda de carga total da instalação",
+      "type": "number",
+      "unit": "mbar",
+      "sources": ["form"],
+      "required": false,
+      "description": "Perda de carga total admissível na instalação interior de gás"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.hasPressureRegulator",
+      "label": "Existência de regulador de pressão",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe regulador de pressão na instalação de gás"
+    },
+
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.applianceType",
+      "label": "Tipo de aparelho a gás",
+      "type": "select",
+      "options": [
+        { "value": "cooktop", "label": "Placa / Fogão" },
+        { "value": "water_heater", "label": "Esquentador" },
+        { "value": "boiler", "label": "Caldeira" },
+        { "value": "oven", "label": "Forno" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de aparelho de utilização de gás instalado no local"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.roomType",
+      "label": "Tipo de compartimento",
+      "type": "select",
+      "options": [
+        { "value": "kitchen", "label": "Cozinha" },
+        { "value": "bathroom", "label": "Casa de banho" },
+        { "value": "garage", "label": "Garagem" },
+        { "value": "laundry", "label": "Lavandaria" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de compartimento onde se encontra instalado o aparelho a gás"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.roomVolume",
+      "label": "Volume do compartimento",
+      "type": "number",
+      "unit": "m\u00b3",
+      "sources": ["form"],
+      "required": false,
+      "description": "Volume do compartimento onde se encontram os aparelhos a gás (mínimos definidos por tipo de aparelho)"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasPhysicalSeparation",
+      "label": "Separação física entre aparelhos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe separação física adequada entre aparelhos a gás no mesmo compartimento"
+    },
+
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.ventilationType",
+      "label": "Tipo de ventilação",
+      "type": "select",
+      "options": [
+        { "value": "natural", "label": "Natural" },
+        { "value": "mechanical", "label": "Mecânica" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Tipo de ventilação do compartimento onde se encontram aparelhos a gás"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.ventilationAreaLower",
+      "label": "Área de ventilação inferior (admissão)",
+      "type": "number",
+      "unit": "cm\u00b2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área da abertura de ventilação inferior para admissão de ar comburente"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.ventilationAreaUpper",
+      "label": "Área de ventilação superior (evacuação)",
+      "type": "number",
+      "unit": "cm\u00b2",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área da abertura de ventilação superior para evacuação de gases de combustão"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.mechanicalExtractionRate",
+      "label": "Caudal de extração mecânica",
+      "type": "number",
+      "unit": "m\u00b3/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de extração mecânica do compartimento com aparelhos a gás"
+    },
+
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.pipesMaterial",
+      "label": "Material das tubagens",
+      "type": "select",
+      "options": [
+        { "value": "copper", "label": "Cobre" },
+        { "value": "steel", "label": "Aço" },
+        { "value": "polyethylene", "label": "Polietileno" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Material das tubagens da instalação de gás (cobre e aço para interior; polietileno para exterior enterrado)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.interiorPipeDiameter",
+      "label": "Diâmetro das tubagens interiores",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diâmetro nominal das tubagens interiores da instalação de gás"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.exteriorPipeDiameter",
+      "label": "Diâmetro das tubagens exteriores",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diâmetro nominal das tubagens exteriores (ramal) da instalação de gás"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.copperPipeStandard",
+      "label": "Norma das tubagens de cobre",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "EN 1057" },
+      "description": "Norma de conformidade das tubagens de cobre (tipicamente EN 1057)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.steelPipeStandard",
+      "label": "Norma das tubagens de aço",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "EN 10255" },
+      "description": "Norma de conformidade das tubagens de aço (tipicamente EN 10255)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.flexTubeLength",
+      "label": "Comprimento do tubo flexível",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Comprimento do tubo flexível de ligação ao aparelho — máximo 1,50 m conforme regulamento"
+    },
+
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.hasFlueSystem",
+      "label": "Existência de chaminé / conduta de fumos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe sistema de evacuação de produtos de combustão (chaminé ou conduta de fumos)"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueDiameter",
+      "label": "Diâmetro da conduta de fumos",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Diâmetro interior da conduta de evacuação de fumos"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueHeight",
+      "label": "Altura da chaminé",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Altura total da chaminé de evacuação de fumos"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueHeightAboveRidge",
+      "label": "Altura da chaminé acima da cumeeira",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.5 },
+      "description": "Altura da chaminé acima da cumeeira do telhado — mínimo 0,50 m"
+    },
+
+    {
+      "_group": "Ensaios e Certificação",
+      "field": "gas.testPressure",
+      "label": "Pressão de ensaio de estanquidade",
+      "type": "number",
+      "unit": "mbar",
+      "sources": ["form"],
+      "required": false,
+      "description": "Pressão utilizada no ensaio de estanquidade da instalação (tipicamente 50 mbar para baixa pressão)"
+    },
+    {
+      "_group": "Ensaios e Certificação",
+      "field": "gas.hasGasCertification",
+      "label": "Certificação da instalação de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se a instalação de gás possui certificação emitida por entidade inspetora"
+    },
+    {
+      "_group": "Ensaios e Certificação",
+      "field": "gas.yearsSinceLastInspection",
+      "label": "Anos desde a última inspeção",
+      "type": "number",
+      "unit": "anos",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número de anos decorridos desde a última inspeção periódica da instalação de gás"
+    },
+
+    {
+      "_group": "Segurança",
+      "field": "gas.hasGasDetector",
+      "label": "Existência de detetor de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe detetor de gás combustível instalado no compartimento"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.hasEmergencyValve",
+      "label": "Existência de válvula de corte de emergência",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe válvula de corte de emergência acessível e identificada"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.hasIndividualValves",
+      "label": "Válvulas individuais nos aparelhos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se cada aparelho a gás possui válvula de corte individual"
+    }
+  ]
+}

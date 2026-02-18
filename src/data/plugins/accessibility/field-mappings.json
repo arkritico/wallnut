@@ -1,0 +1,986 @@
+{
+  "pluginId": "accessibility",
+  "version": "1.0.0",
+  "fields": [
+    {
+      "_group": "General accessibility / Acessibilidade geral"
+    },
+    {
+      "field": "buildingType",
+      "label": "Tipo de edifício",
+      "type": "select",
+      "options": ["residential", "commercial", "public", "mixed", "industrial", "educational", "healthcare"],
+      "sources": ["form"],
+      "required": true
+    },
+    {
+      "field": "isRehabilitation",
+      "label": "Edifício em reabilitação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "numberOfFloors",
+      "label": "Número de pisos",
+      "type": "number",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.hasAccessibleEntrance",
+      "label": "Entrada acessível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": true, "commercial": true, "public": true, "_default": true }
+    },
+    {
+      "field": "accessibility.hasAccessibleWC",
+      "label": "Instalação sanitária acessível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": false, "commercial": true, "public": true, "_default": true }
+    },
+    {
+      "field": "accessibility.hasElevator",
+      "label": "Ascensor acessível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.hasAccessibleParking",
+      "label": "Estacionamento acessível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "residential": false, "commercial": true, "public": true, "_default": false }
+    },
+    {
+      "field": "accessibility.hasAccessibilitySymbol",
+      "label": "Símbolo internacional de acessibilidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.hasExteriorPaths",
+      "label": "Percursos exteriores acessíveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.hasProtrudingObjects",
+      "label": "Existência de objectos salientes",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.venueCapacity",
+      "label": "Lotação do recinto",
+      "type": "number",
+      "sources": ["form"],
+      "required": false
+    },
+
+    {
+      "_group": "Paths & exterior / Percursos e espaços exteriores"
+    },
+    {
+      "field": "accessibility.pathWidth",
+      "label": "Largura do percurso acessível",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.2 }
+    },
+    {
+      "field": "accessibility.pathClearHeight",
+      "label": "Altura livre do percurso",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 2.4 }
+    },
+    {
+      "field": "accessibility.pathTurningWidth",
+      "label": "Largura da zona de manobra no percurso",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.5 }
+    },
+    {
+      "field": "accessibility.pathCrossSlope",
+      "label": "Inclinação transversal do percurso",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 2 }
+    },
+    {
+      "field": "accessibility.pathSurfaceCompliant",
+      "label": "Piso estável, durável e firme",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.pathFrictionCoefficient",
+      "label": "Coeficiente de atrito do piso",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.4 }
+    },
+    {
+      "field": "accessibility.grateOpeningWidth",
+      "label": "Abertura das grelhas no piso",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 15 }
+    },
+    {
+      "field": "accessibility.protrudingObjectLow",
+      "label": "Projecção inferior do objecto saliente",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.protrudingObjectHasTactile",
+      "label": "Objecto saliente com detecção táctil",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.pedestrianCrossingWidth",
+      "label": "Largura da passagem de peões",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.2 }
+    },
+
+    {
+      "_group": "Corridors / Corredores"
+    },
+    {
+      "field": "accessibility.corridorWidths",
+      "label": "Largura dos corredores",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "defaults": { "residential": 1.1, "commercial": 1.2, "public": 1.5, "_default": 1.2 },
+      "ifcMapping": {
+        "entityType": "IfcSpace",
+        "filter": { "LongName": "*corredor*", "ObjectType": "CORRIDOR" },
+        "property": "Dimensions.Width"
+      }
+    },
+    {
+      "field": "accessibility.corridorTurningWidth",
+      "label": "Largura de rotação em corredor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "defaults": { "_default": 1.5 },
+      "ifcMapping": {
+        "entityType": "IfcSpace",
+        "filter": { "ObjectType": "CORRIDOR" },
+        "property": "Dimensions.TurningRadius"
+      }
+    },
+    {
+      "field": "accessibility.lobbyMinDimension",
+      "label": "Dimensão mínima de átrio/patim",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.5 }
+    },
+
+    {
+      "_group": "Doors & openings / Portas e aberturas"
+    },
+    {
+      "field": "accessibility.doorWidths",
+      "label": "Largura útil das portas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "defaults": { "residential": 0.77, "commercial": 0.87, "public": 0.87, "_default": 0.87 },
+      "ifcMapping": {
+        "entityType": "IfcDoor",
+        "property": "OverallWidth",
+        "pset": "Pset_DoorCommon",
+        "psetProperty": "IsAccessible"
+      }
+    },
+    {
+      "field": "accessibility.doorWidthGeneral",
+      "label": "Largura geral de portas de passagem",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "defaults": { "_default": 0.87 },
+      "ifcMapping": {
+        "entityType": "IfcDoor",
+        "property": "OverallWidth"
+      }
+    },
+    {
+      "field": "accessibility.doorHeight",
+      "label": "Altura das portas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "defaults": { "_default": 2.0 },
+      "ifcMapping": {
+        "entityType": "IfcDoor",
+        "property": "OverallHeight"
+      }
+    },
+    {
+      "field": "accessibility.doorClearance",
+      "label": "Espaço livre junto à porta",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.6 }
+    },
+    {
+      "field": "accessibility.doorHandleHeight",
+      "label": "Altura do puxador da porta",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.9 }
+    },
+    {
+      "field": "accessibility.doorOpeningForce",
+      "label": "Força de abertura da porta",
+      "type": "number",
+      "unit": "N",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 22 }
+    },
+    {
+      "field": "accessibility.doorRecessDepth",
+      "label": "Profundidade do recolhimento da porta",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.doorAutoOpenTime",
+      "label": "Tempo de abertura automática da porta",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.doorAutoSensorFullWidth",
+      "label": "Sensor automático detecta largura total",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.doorSequentialClearance",
+      "label": "Espaço livre entre portas sequenciais",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.2 }
+    },
+    {
+      "field": "accessibility.entryDoorOpeningForce",
+      "label": "Força de abertura da porta de entrada",
+      "type": "number",
+      "unit": "N",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 22 }
+    },
+
+    {
+      "_group": "Ramps / Rampas"
+    },
+    {
+      "field": "accessibility.rampGradient",
+      "label": "Inclinação da rampa",
+      "type": "number",
+      "unit": "%",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "defaults": { "_default": 6 },
+      "ifcMapping": {
+        "entityType": "IfcRamp",
+        "pset": "Pset_RampCommon",
+        "psetProperty": "Slope"
+      }
+    },
+    {
+      "field": "accessibility.rampWidth",
+      "label": "Largura da rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "defaults": { "_default": 1.2 },
+      "ifcMapping": {
+        "entityType": "IfcRamp",
+        "property": "OverallWidth"
+      }
+    },
+    {
+      "field": "accessibility.rampLength",
+      "label": "Comprimento do lanço da rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "ifcMapping": {
+        "entityType": "IfcRamp",
+        "property": "OverallLength"
+      }
+    },
+    {
+      "field": "accessibility.rampLevelDifference",
+      "label": "Desnível vencido pela rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.rampCrossSlope",
+      "label": "Inclinação transversal da rampa",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1 }
+    },
+    {
+      "field": "accessibility.rampHasHandrails",
+      "label": "Rampa com corrimãos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.rampHandrailExtension",
+      "label": "Prolongamento do corrimão da rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.3 }
+    },
+    {
+      "field": "accessibility.rampGuardHeight",
+      "label": "Altura da guarda lateral da rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.05 }
+    },
+    {
+      "field": "accessibility.rampEdgeHeight",
+      "label": "Altura do rebaixamento lateral da rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.05 }
+    },
+    {
+      "field": "accessibility.rampRestingInterval",
+      "label": "Patamar de repouso da rampa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.5 }
+    },
+
+    {
+      "_group": "Stairs / Escadas"
+    },
+    {
+      "field": "accessibility.stairWidth",
+      "label": "Largura útil da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "defaults": { "_default": 1.2 },
+      "ifcMapping": {
+        "entityType": "IfcStairFlight",
+        "property": "OverallWidth"
+      }
+    },
+    {
+      "field": "accessibility.stairRiserHeight",
+      "label": "Altura do espelho do degrau",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.175 }
+    },
+    {
+      "field": "accessibility.stairTreadDepth",
+      "label": "Profundidade do cobertor do degrau",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.28 }
+    },
+    {
+      "field": "accessibility.stairBlondelValue",
+      "label": "Fórmula de Blondel (2e + c)",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.63 }
+    },
+    {
+      "field": "accessibility.stairRisersClosed",
+      "label": "Espelhos dos degraus fechados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.stairLandingLength",
+      "label": "Comprimento do patamar da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.2 }
+    },
+    {
+      "field": "accessibility.stairHandrailExtension",
+      "label": "Prolongamento do corrimão da escada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.3 }
+    },
+    {
+      "field": "accessibility.stairHasSecondHandrail",
+      "label": "Segundo corrimão na escada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.stairHasNonSlipStrips",
+      "label": "Faixas antiderrapantes nos degraus",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+
+    {
+      "_group": "Elevators & lifts / Ascensores e plataformas elevatórias"
+    },
+    {
+      "field": "accessibility.elevatorCabinWidth",
+      "label": "Largura da cabina do ascensor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.1 }
+    },
+    {
+      "field": "accessibility.elevatorCabinDepth",
+      "label": "Profundidade da cabina do ascensor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.4 }
+    },
+    {
+      "field": "accessibility.elevatorDoorWidth",
+      "label": "Largura da porta do ascensor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 }
+    },
+    {
+      "field": "accessibility.elevatorDoorOpenTime",
+      "label": "Tempo de abertura da porta do ascensor",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 5 }
+    },
+    {
+      "field": "accessibility.elevatorCallButtonHeight",
+      "label": "Altura dos botões de chamada do ascensor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.0 }
+    },
+    {
+      "field": "accessibility.elevatorButtonsBraille",
+      "label": "Botões do ascensor com braille",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.elevatorHasArrivalChime",
+      "label": "Ascensor com sinal sonoro de chegada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.elevatorHasFloorIndicator",
+      "label": "Ascensor com indicador de piso",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.elevatorHasRearMirror",
+      "label": "Espelho na parede posterior da cabina",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.elevatorLandingWidth",
+      "label": "Largura do patamar do ascensor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.5 }
+    },
+    {
+      "field": "accessibility.liftPlatformWidth",
+      "label": "Largura da plataforma elevatória",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 }
+    },
+    {
+      "field": "accessibility.liftPlatformDepth",
+      "label": "Profundidade da plataforma elevatória",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.25 }
+    },
+    {
+      "field": "accessibility.liftSpeed",
+      "label": "Velocidade da plataforma elevatória",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.15 }
+    },
+    {
+      "field": "accessibility.inclinedLiftWidth",
+      "label": "Largura da plataforma elevatória inclinada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 }
+    },
+    {
+      "field": "accessibility.inclinedLiftSpeed",
+      "label": "Velocidade da plataforma elevatória inclinada",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.15 }
+    },
+
+    {
+      "_group": "WC / Instalações sanitárias"
+    },
+    {
+      "field": "accessibility.wcArea",
+      "label": "Área da instalação sanitária acessível",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "ifcMapping": {
+        "entityType": "IfcSpace",
+        "filter": { "LongName": "*sanitár*", "ObjectType": "TOILET" },
+        "property": "Area"
+      }
+    },
+    {
+      "field": "accessibility.wcTurningDiameter",
+      "label": "Diâmetro de rotação no IS acessível",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.5 }
+    },
+    {
+      "field": "accessibility.wcDoorWidth",
+      "label": "Largura da porta do IS acessível",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "required": false,
+      "defaults": { "_default": 0.87 },
+      "ifcMapping": {
+        "entityType": "IfcDoor",
+        "filter": { "Space.ObjectType": "TOILET" },
+        "property": "OverallWidth"
+      }
+    },
+    {
+      "field": "accessibility.wcDoorOpensOutward",
+      "label": "Porta do IS abre para fora",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.wcDoorUnlockableFromOutside",
+      "label": "Porta do IS destrancável pelo exterior",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.toiletSeatHeight",
+      "label": "Altura do assento da sanita",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.45 }
+    },
+    {
+      "field": "accessibility.toiletWallDistance",
+      "label": "Distância lateral da sanita à parede",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.5 }
+    },
+    {
+      "field": "accessibility.grabBarHeight",
+      "label": "Altura das barras de apoio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.75 }
+    },
+    {
+      "field": "accessibility.grabBarLength",
+      "label": "Comprimento das barras de apoio",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.6 }
+    },
+    {
+      "field": "accessibility.wcAccessoryHeight",
+      "label": "Altura dos acessórios no IS",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.9 }
+    },
+    {
+      "field": "accessibility.washbasinHeight",
+      "label": "Altura do lavatório",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 }
+    },
+    {
+      "field": "accessibility.washbasinClearanceHeight",
+      "label": "Altura livre sob o lavatório",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.65 }
+    },
+    {
+      "field": "accessibility.washbasinClearanceDepth",
+      "label": "Profundidade livre sob o lavatório",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.5 }
+    },
+    {
+      "field": "accessibility.mirrorBaseHeight",
+      "label": "Altura da base do espelho",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.9 }
+    },
+
+    {
+      "_group": "Parking / Estacionamento"
+    },
+    {
+      "field": "accessibility.accessibleParkingCount",
+      "label": "Número de lugares de estacionamento acessíveis",
+      "type": "number",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.parkingSpaceWidth",
+      "label": "Largura do lugar de estacionamento acessível",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 2.5 }
+    },
+    {
+      "field": "accessibility.parkingSpaceLength",
+      "label": "Comprimento do lugar de estacionamento acessível",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 5.0 }
+    },
+    {
+      "field": "accessibility.parkingAislWidth",
+      "label": "Largura do corredor de acesso ao lugar",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.2 }
+    },
+    {
+      "field": "accessibility.parkingHasSignage",
+      "label": "Sinalização no lugar de estacionamento",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+
+    {
+      "_group": "Signage & tactile / Sinalização e elementos tácteis"
+    },
+    {
+      "field": "accessibility.hasVisualTactileSignage",
+      "label": "Sinalização visual e táctil",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "public": true, "commercial": true, "_default": false }
+    },
+    {
+      "field": "accessibility.hasBrailleOnDoorsAndButtons",
+      "label": "Braille em portas e botões",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "public": true, "_default": false }
+    },
+    {
+      "field": "accessibility.hasTactileWarningPaving",
+      "label": "Pavimento táctil de alerta",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "public": true, "_default": false }
+    },
+    {
+      "field": "accessibility.hasDirectionalTactilePaving",
+      "label": "Pavimento táctil direccional (guia)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "public": true, "_default": false }
+    },
+    {
+      "field": "accessibility.hasGuidingStrips",
+      "label": "Faixas-guia no piso",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.hasLevelChangeTactileContrast",
+      "label": "Contraste táctil em mudanças de nível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false }
+    },
+    {
+      "field": "accessibility.tactileAlertWidth",
+      "label": "Largura da faixa de alerta táctil",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.4 }
+    },
+
+    {
+      "_group": "Furniture & counters / Mobiliário e balcões"
+    },
+    {
+      "field": "accessibility.counterHeight",
+      "label": "Altura do balcão de atendimento",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.75 }
+    },
+    {
+      "field": "accessibility.counterAccessibleLength",
+      "label": "Extensão acessível do balcão",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 }
+    },
+    {
+      "field": "accessibility.counterHasKneeSpace",
+      "label": "Balcão com espaço para os joelhos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true }
+    },
+    {
+      "field": "accessibility.tableHeight",
+      "label": "Altura da mesa/superfície de trabalho",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.75 }
+    },
+    {
+      "field": "accessibility.tableKneeSpace",
+      "label": "Espaço livre sob a mesa para joelhos",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.65 }
+    },
+
+    {
+      "_group": "Seating / Lugares reservados"
+    },
+    {
+      "field": "accessibility.reservedSeats",
+      "label": "Número de lugares reservados",
+      "type": "number",
+      "sources": ["form"],
+      "required": false
+    },
+    {
+      "field": "accessibility.reservedSeatWidth",
+      "label": "Largura do lugar reservado",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 }
+    },
+    {
+      "field": "accessibility.reservedSeatDepth",
+      "label": "Profundidade do lugar reservado",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.2 }
+    }
+  ]
+}

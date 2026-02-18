@@ -1,0 +1,939 @@
+{
+  "regulationRef": "dl-38382-1951-rgeu",
+  "description": "Regras de conformidade arquitetónica extraídas do RGEU, Código Civil, RJUE e RJRU — aspetos de projeto de arquitetura (composição de fogos, áreas, iluminação, ventilação, vizinhança, urbanismo)",
+  "extractedBy": "claude-regulatory-expansion",
+  "extractedAt": "2026-02-17",
+  "version": "2.0",
+  "totalRules": 61,
+  "coverage": {
+    "regulations": [
+      "DL 38 382/1951 (RGEU) — Arts. 46.º-72.º",
+      "Código Civil — Arts. 1360.º-1363.º, 1422.º",
+      "DL 555/99 (RJUE) — Arts. 11.º, 60.º-63.º",
+      "DL 307/2009 (RJRU) — Arts. 51.º-53.º"
+    ]
+  },
+  "rules": [
+    {
+      "id": "ARQ-PERMIT-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 11.º — Projeto de Arquitetura (RJUE)",
+      "description": "O projeto de arquitetura é obrigatório para operações de licenciamento, devendo incluir peças desenhadas, memória descritiva e demonstração de conformidade regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasBuildingPermitDesign", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Projeto de arquitetura obrigatório",
+      "remediation": "Elaborar projeto de arquitetura subscrito por arquiteto inscrito na Ordem dos Arquitetos, incluindo peças desenhadas (plantas, cortes, alçados) e memória descritiva conforme Art. 11.º do RJUE.",
+      "enabled": true,
+      "tags": ["projeto", "arquitetura", "licenciamento", "RJUE"]
+    },
+    {
+      "id": "ARQ-PDM-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Conformidade com PDM/Regulamento Municipal",
+      "description": "O projeto de arquitetura deve ser conforme com o PDM e regulamento municipal aplicável, nomeadamente quanto a cércea, volumetria, alinhamentos e usos permitidos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.pdmCompliance", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Conformidade com PDM obrigatória",
+      "remediation": "Verificar e demonstrar conformidade do projeto com o Plano Director Municipal, incluindo usos, cércea, volumetria, alinhamentos e afastamentos previstos no regulamento municipal.",
+      "enabled": true,
+      "tags": ["PDM", "conformidade", "urbanismo", "RJUE"]
+    },
+    {
+      "id": "ARQ-CERCEA-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Cércea Máxima e Número de Pisos",
+      "description": "A cércea do edifício ({architecture.buildingHeight}m) excede a cércea máxima permitida pelo PDM/regulamento municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.buildingHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.maxAllowedHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.buildingHeight", "operator": ">", "value": null }
+      ],
+      "currentValueTemplate": "{architecture.buildingHeight} m / {architecture.numberOfFloors} pisos",
+      "requiredValue": "Conforme cércea máxima do PDM",
+      "remediation": "Reduzir a altura do edifício e/ou número de pisos para respeitar a cércea máxima definida no PDM ou regulamento municipal aplicável.",
+      "enabled": true,
+      "tags": ["cércea", "pisos", "altura", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-IMP-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Índice de Implantação",
+      "description": "O índice de implantação ({architecture.implantationIndex}) excede o máximo permitido pelo PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.implantationIndex", "operator": ">", "value": 0 },
+        { "field": "architecture.maxImplantationIndex", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "{architecture.implantationIndex}",
+      "requiredValue": "Conforme índice de implantação do PDM",
+      "remediation": "Reduzir a área de implantação do edifício para respeitar o índice de implantação máximo definido no PDM.",
+      "enabled": true,
+      "tags": ["implantação", "índice", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-UTIL-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Índice de Utilização",
+      "description": "O índice de utilização ({architecture.utilizationIndex}) excede o máximo permitido pelo PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.utilizationIndex", "operator": ">", "value": 0 },
+        { "field": "architecture.maxUtilizationIndex", "operator": ">", "value": 0 }
+      ],
+      "currentValueTemplate": "{architecture.utilizationIndex}",
+      "requiredValue": "Conforme índice de utilização do PDM",
+      "remediation": "Reduzir a área bruta de construção para respeitar o índice de utilização máximo definido no PDM.",
+      "enabled": true,
+      "tags": ["utilização", "índice", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-AFAST-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Afastamentos Laterais e Posteriores",
+      "description": "O afastamento lateral ({architecture.sideSetback}m) é inferior ao mínimo exigido pelo regulamento municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.sideSetback", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "{architecture.sideSetback} m",
+      "requiredValue": "Conforme afastamentos do PDM (mín. genérico 3.0m)",
+      "remediation": "Aumentar os afastamentos laterais e posteriores do edifício para cumprir os mínimos definidos no PDM ou regulamento municipal.",
+      "enabled": true,
+      "tags": ["afastamento", "lateral", "recuo", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-AFAST-02",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Afastamento Posterior",
+      "description": "O afastamento posterior ({architecture.rearSetback}m) é inferior ao mínimo exigido.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.rearSetback", "operator": "<", "value": 6.0 }
+      ],
+      "currentValueTemplate": "{architecture.rearSetback} m",
+      "requiredValue": "Conforme afastamentos do PDM (mín. genérico 6.0m)",
+      "remediation": "Aumentar o afastamento posterior do edifício para cumprir o mínimo definido no PDM ou regulamento municipal.",
+      "enabled": true,
+      "tags": ["afastamento", "posterior", "tardoz", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-IMPERM-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Percentagem de Impermeabilização Máxima",
+      "description": "O índice de impermeabilização ({architecture.impermeabilizationIndex}) excede o máximo permitido pelo PDM.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.impermeabilizationIndex", "operator": ">", "value": 0.70 }
+      ],
+      "currentValueTemplate": "{architecture.impermeabilizationIndex}",
+      "requiredValue": "≤ 70% (genérico, verificar PDM)",
+      "remediation": "Reduzir a área impermeabilizada do lote. Considerar pavimentos permeáveis, jardins e zonas verdes para respeitar o índice de impermeabilização máximo do PDM.",
+      "enabled": true,
+      "tags": ["impermeabilização", "permeabilidade", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-PD-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Pé-Direito Mínimo (Habitação)",
+      "description": "O pé-direito ({architecture.ceilingHeight}m) é inferior ao mínimo regulamentar de 2.70m para compartimentos habitáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.ceilingHeight", "operator": "<", "value": 2.70 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "{architecture.ceilingHeight} m",
+      "requiredValue": "≥ 2.70 m",
+      "remediation": "Aumentar o pé-direito para o mínimo regulamentar de 2.70m para compartimentos habitáveis conforme Art. 65.º do RGEU.",
+      "enabled": true,
+      "tags": ["pé-direito", "residencial", "RGEU"]
+    },
+    {
+      "id": "ARQ-PD-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Pé-Direito Mínimo (Comércio)",
+      "description": "O pé-direito ({architecture.ceilingHeight}m) é inferior ao mínimo de 3.00m para espaços comerciais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.ceilingHeight", "operator": "<", "value": 3.00 },
+        { "field": "buildingType", "operator": "==", "value": "commercial" }
+      ],
+      "currentValueTemplate": "{architecture.ceilingHeight} m",
+      "requiredValue": "≥ 3.00 m",
+      "remediation": "Aumentar o pé-direito para o mínimo de 3.00m para espaços comerciais conforme Art. 65.º do RGEU.",
+      "enabled": true,
+      "tags": ["pé-direito", "comercial", "RGEU"]
+    },
+    {
+      "id": "ARQ-PD-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Pé-Direito Mínimo (Caves)",
+      "description": "O pé-direito da cave ({architecture.basementCeilingHeight}m) é inferior ao mínimo de 2.20m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.basementCeilingHeight", "operator": "<", "value": 2.20 }
+      ],
+      "currentValueTemplate": "{architecture.basementCeilingHeight} m",
+      "requiredValue": "≥ 2.20 m",
+      "remediation": "Aumentar o pé-direito da cave para o mínimo de 2.20m conforme Art. 65.º do RGEU.",
+      "enabled": true,
+      "tags": ["pé-direito", "cave", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMP-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Composição de Fogos (T0)",
+      "description": "Um fogo T0 deve ser composto por, no mínimo: sala/quarto (espaço polivalente), cozinha ou kitchenette, e instalação sanitária.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.typology", "operator": "==", "value": "T0" },
+        { "field": "architecture.hasKitchen", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sala polivalente + cozinha/kitchenette + IS",
+      "remediation": "Garantir que o fogo T0 contém, no mínimo, um espaço polivalente (sala/quarto), cozinha ou kitchenette, e uma instalação sanitária completa conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["composição", "fogo", "T0", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMP-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Composição de Fogos (T1-T2)",
+      "description": "Um fogo T1/T2 deve incluir: sala, quarto(s), cozinha, instalação sanitária, despensa/arrumos e zona de lavandaria.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.typology", "operator": "in", "value": ["T1", "T2"] },
+        { "field": "architecture.hasLivingRoom", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sala + quarto(s) + cozinha + IS + despensa + lavandaria",
+      "remediation": "O fogo T1/T2 deve incluir obrigatoriamente: sala de estar, quarto(s), cozinha, instalação sanitária, despensa/arrumos e zona de tratamento de roupa conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["composição", "fogo", "T1", "T2", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMP-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Composição de Fogos (T3-T5+)",
+      "description": "Fogos T3 a T5+ devem incluir: sala, quartos (3 a 5+), cozinha, pelo menos 2 instalações sanitárias (1 privativa ao quarto principal), despensa e lavandaria.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.numberOfBedrooms", "operator": ">=", "value": 3 },
+        { "field": "architecture.numberOfBathrooms", "operator": "<", "value": 2 }
+      ],
+      "currentValueTemplate": "{architecture.numberOfBathrooms} IS",
+      "requiredValue": "≥ 2 instalações sanitárias em T3+",
+      "remediation": "Fogos T3+ devem ter pelo menos 2 instalações sanitárias, sendo uma privativa ao quarto principal, conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["composição", "fogo", "T3", "T4", "T5", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-AREA-T0-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Útil Mínima (T0)",
+      "description": "A área útil do fogo T0 ({architecture.totalUsableArea}m²) é inferior ao mínimo de 35m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.totalUsableArea", "operator": "<", "value": 35 },
+        { "field": "architecture.typology", "operator": "==", "value": "T0" }
+      ],
+      "currentValueTemplate": "{architecture.totalUsableArea} m²",
+      "requiredValue": "≥ 35 m²",
+      "remediation": "Aumentar a área útil do fogo T0 para o mínimo de 35 m² conforme requisitos de habitabilidade do RGEU.",
+      "enabled": true,
+      "tags": ["área", "útil", "T0", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-AREA-T1-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Útil Mínima (T1)",
+      "description": "A área útil do fogo T1 ({architecture.totalUsableArea}m²) é inferior ao mínimo de 52m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.totalUsableArea", "operator": "<", "value": 52 },
+        { "field": "architecture.typology", "operator": "==", "value": "T1" }
+      ],
+      "currentValueTemplate": "{architecture.totalUsableArea} m²",
+      "requiredValue": "≥ 52 m²",
+      "remediation": "Aumentar a área útil do fogo T1 para o mínimo de 52 m² conforme requisitos de habitabilidade do RGEU.",
+      "enabled": true,
+      "tags": ["área", "útil", "T1", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-AREA-T2-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Útil Mínima (T2)",
+      "description": "A área útil do fogo T2 ({architecture.totalUsableArea}m²) é inferior ao mínimo de 72m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.totalUsableArea", "operator": "<", "value": 72 },
+        { "field": "architecture.typology", "operator": "==", "value": "T2" }
+      ],
+      "currentValueTemplate": "{architecture.totalUsableArea} m²",
+      "requiredValue": "≥ 72 m²",
+      "remediation": "Aumentar a área útil do fogo T2 para o mínimo de 72 m² conforme requisitos de habitabilidade do RGEU.",
+      "enabled": true,
+      "tags": ["área", "útil", "T2", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-AREA-T3-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Útil Mínima (T3)",
+      "description": "A área útil do fogo T3 ({architecture.totalUsableArea}m²) é inferior ao mínimo de 91m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.totalUsableArea", "operator": "<", "value": 91 },
+        { "field": "architecture.typology", "operator": "==", "value": "T3" }
+      ],
+      "currentValueTemplate": "{architecture.totalUsableArea} m²",
+      "requiredValue": "≥ 91 m²",
+      "remediation": "Aumentar a área útil do fogo T3 para o mínimo de 91 m² conforme requisitos de habitabilidade do RGEU.",
+      "enabled": true,
+      "tags": ["área", "útil", "T3", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-AREA-T4-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Útil Mínima (T4)",
+      "description": "A área útil do fogo T4 ({architecture.totalUsableArea}m²) é inferior ao mínimo de 105m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.totalUsableArea", "operator": "<", "value": 105 },
+        { "field": "architecture.typology", "operator": "==", "value": "T4" }
+      ],
+      "currentValueTemplate": "{architecture.totalUsableArea} m²",
+      "requiredValue": "≥ 105 m²",
+      "remediation": "Aumentar a área útil do fogo T4 para o mínimo de 105 m² conforme requisitos de habitabilidade do RGEU.",
+      "enabled": true,
+      "tags": ["área", "útil", "T4", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-AREA-T5-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Útil Mínima (T5+)",
+      "description": "A área útil do fogo T5+ ({architecture.totalUsableArea}m²) é inferior ao mínimo de 122m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.totalUsableArea", "operator": "<", "value": 122 },
+        { "field": "architecture.numberOfBedrooms", "operator": ">=", "value": 5 }
+      ],
+      "currentValueTemplate": "{architecture.totalUsableArea} m²",
+      "requiredValue": "≥ 122 m²",
+      "remediation": "Aumentar a área útil do fogo T5+ para o mínimo de 122 m² conforme requisitos de habitabilidade do RGEU.",
+      "enabled": true,
+      "tags": ["área", "útil", "T5", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-SALA-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima da Sala de Estar",
+      "description": "A área da sala de estar ({architecture.livingRoomArea}m²) é inferior ao mínimo de 12m² para fogos T1+.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.livingRoomArea", "operator": "<", "value": 12 },
+        { "field": "architecture.numberOfBedrooms", "operator": ">=", "value": 1 }
+      ],
+      "currentValueTemplate": "{architecture.livingRoomArea} m²",
+      "requiredValue": "≥ 12 m² (T1+); ≥ 10 m² (T0)",
+      "remediation": "Aumentar a área da sala de estar para, no mínimo, 12 m² (T1+) ou 10 m² (T0) conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["área", "sala", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-QUART-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima do Quarto Principal",
+      "description": "A área do quarto principal ({architecture.mainBedroomArea}m²) é inferior ao mínimo de 10.5m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.mainBedroomArea", "operator": "<", "value": 10.5 }
+      ],
+      "currentValueTemplate": "{architecture.mainBedroomArea} m²",
+      "requiredValue": "≥ 10.5 m²",
+      "remediation": "Aumentar a área do quarto principal para o mínimo de 10.5 m² conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["área", "quarto", "principal", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-QUART-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima dos Quartos Secundários",
+      "description": "A área de um quarto secundário ({architecture.secondaryBedroomArea}m²) é inferior ao mínimo de 9m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.secondaryBedroomArea", "operator": "<", "value": 9 }
+      ],
+      "currentValueTemplate": "{architecture.secondaryBedroomArea} m²",
+      "requiredValue": "≥ 9 m²",
+      "remediation": "Aumentar a área dos quartos secundários para o mínimo de 9 m² conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["área", "quarto", "secundário", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-COZ-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima da Cozinha",
+      "description": "A área da cozinha ({architecture.kitchenArea}m²) é inferior ao mínimo de 6m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.kitchenArea", "operator": "<", "value": 6 }
+      ],
+      "currentValueTemplate": "{architecture.kitchenArea} m²",
+      "requiredValue": "≥ 6 m²",
+      "remediation": "Aumentar a área da cozinha para o mínimo de 6 m² conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["área", "cozinha", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-IS-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Área Mínima da Instalação Sanitária",
+      "description": "A área da instalação sanitária ({architecture.bathroomArea}m²) é inferior ao mínimo de 3.5m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.bathroomArea", "operator": "<", "value": 3.5 }
+      ],
+      "currentValueTemplate": "{architecture.bathroomArea} m²",
+      "requiredValue": "≥ 3.5 m² (IS completa)",
+      "remediation": "Aumentar a área da instalação sanitária para o mínimo de 3.5 m² (IS completa com banheira/base de duche, sanita e lavatório) conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["área", "instalação sanitária", "WC", "RGEU"]
+    },
+    {
+      "id": "ARQ-IS-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — IS por Tipologia (T3+)",
+      "description": "Fogos T3+ devem ter pelo menos 2 instalações sanitárias, com uma privativa ao quarto principal e equipada com banheira.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.numberOfBedrooms", "operator": ">=", "value": 3 },
+        { "field": "architecture.hasEnSuiteBathroom", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "IS privativa: {architecture.hasEnSuiteBathroom}",
+      "requiredValue": "IS privativa com banheira em T3+",
+      "remediation": "Dotar o fogo T3+ de pelo menos 2 IS, sendo 1 privativa ao quarto principal e equipada com banheira conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["instalação sanitária", "banheira", "T3", "tipologia", "RGEU"]
+    },
+    {
+      "id": "ARQ-IS-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — IS Composição Mínima",
+      "description": "Toda a instalação sanitária deve ser composta, no mínimo, por sanita, lavatório e base de duche ou banheira.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.bathroomHasMinEquipment", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sanita + lavatório + base de duche/banheira",
+      "remediation": "Toda a IS deve incluir, no mínimo, sanita, lavatório e base de duche ou banheira conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["instalação sanitária", "equipamento", "composição", "RGEU"]
+    },
+    {
+      "id": "ARQ-LARG-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Largura Mínima da Sala",
+      "description": "A largura mínima da sala ({architecture.livingRoomMinWidth}m) é inferior ao mínimo de 3.0m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.livingRoomMinWidth", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "{architecture.livingRoomMinWidth} m",
+      "requiredValue": "≥ 3.0 m",
+      "remediation": "A sala deve ter dimensão linear mínima de 3.0 m conforme Art. 67.º do RGEU.",
+      "enabled": true,
+      "tags": ["largura", "sala", "dimensão", "RGEU"]
+    },
+    {
+      "id": "ARQ-LARG-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Largura Mínima do Quarto Principal",
+      "description": "A largura mínima do quarto principal ({architecture.mainBedroomMinWidth}m) é inferior ao mínimo de 2.70m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.mainBedroomMinWidth", "operator": "<", "value": 2.70 }
+      ],
+      "currentValueTemplate": "{architecture.mainBedroomMinWidth} m",
+      "requiredValue": "≥ 2.70 m",
+      "remediation": "O quarto principal deve ter largura mínima de 2.70 m conforme Art. 67.º do RGEU.",
+      "enabled": true,
+      "tags": ["largura", "quarto", "principal", "RGEU"]
+    },
+    {
+      "id": "ARQ-LARG-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Largura Mínima da Cozinha",
+      "description": "A largura mínima da cozinha ({architecture.kitchenMinWidth}m) é inferior ao mínimo de 2.10m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.kitchenMinWidth", "operator": "<", "value": 2.10 }
+      ],
+      "currentValueTemplate": "{architecture.kitchenMinWidth} m",
+      "requiredValue": "≥ 2.10 m",
+      "remediation": "A cozinha deve ter largura mínima de 2.10 m conforme Art. 67.º do RGEU.",
+      "enabled": true,
+      "tags": ["largura", "cozinha", "dimensão", "RGEU"]
+    },
+    {
+      "id": "ARQ-LUZ-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Iluminação Natural (Rácio Vão/Pavimento)",
+      "description": "O rácio entre a área de vãos e a área do pavimento ({architecture.windowToFloorRatio}) é inferior ao mínimo regulamentar de 10%.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.windowToFloorRatio", "operator": "<", "value": 0.10 }
+      ],
+      "currentValueTemplate": "{architecture.windowToFloorRatio}",
+      "requiredValue": "≥ 10% (0.10)",
+      "remediation": "Aumentar a área dos vãos envidraçados para que a relação entre área de vão e área de pavimento seja, no mínimo, 10% conforme Art. 71.º do RGEU.",
+      "enabled": true,
+      "tags": ["iluminação", "natural", "vão", "janela", "RGEU"]
+    },
+    {
+      "id": "ARQ-LUZ-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Iluminação Natural Directa Obrigatória",
+      "description": "Todos os compartimentos habitáveis (sala, quartos, cozinha) devem ter iluminação natural directa por vão exterior.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasNaturalLight", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Iluminação natural directa obrigatória",
+      "remediation": "Garantir que todos os compartimentos habitáveis têm vão envidraçado para o exterior com iluminação natural directa conforme Art. 71.º do RGEU.",
+      "enabled": true,
+      "tags": ["iluminação", "natural", "directa", "RGEU"]
+    },
+    {
+      "id": "ARQ-PROF-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Profundidade Máxima de Compartimentos",
+      "description": "A profundidade do compartimento ({architecture.roomDepth}m) excede 2.5 vezes o pé-direito, comprometendo a iluminação natural.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.roomDepthToHeightRatio", "operator": ">", "value": 2.5 }
+      ],
+      "currentValueTemplate": "Prof./PD = {architecture.roomDepthToHeightRatio}",
+      "requiredValue": "≤ 2.5× pé-direito",
+      "remediation": "A profundidade dos compartimentos não deve exceder 2.5 vezes o pé-direito para garantir iluminação natural adequada conforme Art. 71.º do RGEU.",
+      "enabled": true,
+      "tags": ["profundidade", "iluminação", "pé-direito", "RGEU"]
+    },
+    {
+      "id": "ARQ-VENT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 72.º — Ventilação Natural Cruzada",
+      "description": "O fogo deve dispor de ventilação natural cruzada, com aberturas em fachadas opostas ou perpendiculares.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasCrossVentilation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Ventilação cruzada obrigatória",
+      "remediation": "Garantir ventilação cruzada através de vãos em fachadas opostas ou perpendiculares conforme Art. 72.º do RGEU. Em alternativa, prever sistema de ventilação mecânica.",
+      "enabled": true,
+      "tags": ["ventilação", "cruzada", "natural", "RGEU"]
+    },
+    {
+      "id": "ARQ-VENT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 72.º — Cozinha com Ventilação Natural ou Mecânica",
+      "description": "A cozinha deve dispor de ventilação natural directa ou sistema de ventilação mecânica com conduta de exaustão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.kitchenHasVentilation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Ventilação natural ou mecânica obrigatória",
+      "remediation": "A cozinha deve ter vão para ventilação natural ou conduta de exaustão mecânica conforme Art. 72.º do RGEU.",
+      "enabled": true,
+      "tags": ["ventilação", "cozinha", "exaustão", "RGEU"]
+    },
+    {
+      "id": "ARQ-VENT-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 72.º — Chaminé de Ventilação de IS sem Janela",
+      "description": "As instalações sanitárias interiores (sem janela) devem ter conduta de ventilação/exaustão com saída acima da cobertura.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.interiorBathroomHasVentShaft", "operator": "==", "value": false },
+        { "field": "architecture.bathroomHasWindow", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Conduta de ventilação obrigatória em IS sem janela",
+      "remediation": "Instalar conduta de ventilação/exaustão na IS interior, com saída acima da cobertura, conforme Art. 72.º do RGEU.",
+      "enabled": true,
+      "tags": ["ventilação", "chaminé", "IS", "conduta", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESC-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 46.º — Caixa de Escadas (Dimensões)",
+      "description": "A caixa de escadas comum deve ter dimensões que permitam a largura mínima de 1.20m e patamares regulamentares.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.commonStairWidth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{architecture.commonStairWidth} m",
+      "requiredValue": "≥ 1.20 m (escadas comuns)",
+      "remediation": "A caixa de escadas comum deve permitir largura mínima do lanço de 1.20 m conforme Art. 46.º do RGEU.",
+      "enabled": true,
+      "tags": ["escadas", "caixa", "largura", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESC-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 46.º — Caixa de Escadas (Iluminação e Ventilação)",
+      "description": "A caixa de escadas deve ter iluminação natural e ventilação, preferencialmente por vão no topo ou em cada piso.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.stairwellHasNaturalLight", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Iluminação e ventilação na caixa de escadas",
+      "remediation": "A caixa de escadas deve ter iluminação natural e ventilação, com claraboia ou janelas em cada piso conforme Art. 46.º do RGEU.",
+      "enabled": true,
+      "tags": ["escadas", "caixa", "iluminação", "ventilação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESC-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 47.º — Largura Mínima de Escadas por Uso",
+      "description": "A largura das escadas interiores de fogo ({architecture.stairWidth}m) é inferior ao mínimo de 0.90m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.stairWidth", "operator": "<", "value": 0.90 }
+      ],
+      "currentValueTemplate": "{architecture.stairWidth} m",
+      "requiredValue": "≥ 0.90 m (interiores de fogo); ≥ 1.20 m (comuns)",
+      "remediation": "As escadas interiores de fogo devem ter largura mínima de 0.90 m; as escadas comuns devem ter largura mínima de 1.20 m conforme Art. 47.º do RGEU.",
+      "enabled": true,
+      "tags": ["escadas", "largura", "fogo", "RGEU"]
+    },
+    {
+      "id": "ARQ-PAT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 48.º — Patamares e Patins",
+      "description": "Os patamares de piso devem ter profundidade mínima de 1.20m nas escadas comuns.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.stairLandingDepth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{architecture.stairLandingDepth} m",
+      "requiredValue": "≥ 1.20 m (escadas comuns)",
+      "remediation": "Os patamares de piso das escadas comuns devem ter profundidade mínima de 1.20 m conforme Art. 48.º do RGEU.",
+      "enabled": true,
+      "tags": ["patamar", "patim", "escadas", "RGEU"]
+    },
+    {
+      "id": "ARQ-CORR-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 49.º — Corrimão Obrigatório e Altura",
+      "description": "A altura do corrimão ({architecture.handrailHeight}m) é inferior ao mínimo de 0.90m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.handrailHeight", "operator": "<", "value": 0.90 }
+      ],
+      "currentValueTemplate": "{architecture.handrailHeight} m",
+      "requiredValue": "≥ 0.90 m",
+      "remediation": "As escadas devem ter corrimão contínuo com altura mínima de 0.90 m conforme Art. 49.º do RGEU.",
+      "enabled": true,
+      "tags": ["corrimão", "altura", "escadas", "segurança", "RGEU"]
+    },
+    {
+      "id": "ARQ-CORR-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 49.º — Corrimão em Ambos os Lados",
+      "description": "As escadas comuns com largura ≥1.20m devem ter corrimão em ambos os lados.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.commonStairHasDoubleHandrail", "operator": "==", "value": false },
+        { "field": "architecture.commonStairWidth", "operator": ">=", "value": 1.20 }
+      ],
+      "requiredValue": "Corrimão em ambos os lados",
+      "remediation": "Instalar corrimão em ambos os lados das escadas comuns com largura ≥1.20 m conforme Art. 49.º do RGEU.",
+      "enabled": true,
+      "tags": ["corrimão", "duplo", "escadas", "comuns", "RGEU"]
+    },
+    {
+      "id": "ARQ-CAVE-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 58.º — Caves (Requisitos Especiais)",
+      "description": "As caves devem ser impermeabilizadas, ventiladas e não podem ser utilizadas para fins habitacionais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.basementIsWaterproof", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Impermeabilização e ventilação obrigatórias",
+      "remediation": "As caves devem ser impermeabilizadas contra infiltrações de águas subterrâneas e ter ventilação natural ou mecânica conforme Art. 58.º-60.º do RGEU.",
+      "enabled": true,
+      "tags": ["cave", "impermeabilização", "ventilação", "RGEU"]
+    },
+    {
+      "id": "ARQ-COB-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 53.º — Coberturas (Acesso e Manutenção)",
+      "description": "A cobertura deve dispor de acesso seguro para manutenção e ser dotada de impermeabilização e isolamento térmico adequados.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.roofHasMaintenanceAccess", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Acesso seguro, impermeabilização e isolamento",
+      "remediation": "Prever acesso seguro à cobertura para manutenção, com impermeabilização e isolamento térmico conforme Arts. 53.º-55.º do RGEU.",
+      "enabled": true,
+      "tags": ["cobertura", "acesso", "manutenção", "impermeabilização", "RGEU"]
+    },
+    {
+      "id": "ARQ-FACH-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Fachadas (Estética e Manutenção)",
+      "description": "As fachadas devem apresentar harmonia estética com a envolvente urbana e ser concebidas para permitir manutenção periódica.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.facadeAestheticCompliance", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Harmonia estética e manutenibilidade",
+      "remediation": "Conceber fachadas em harmonia com a envolvente urbana, com materiais duráveis e acessíveis para manutenção conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["fachada", "estética", "manutenção", "RGEU"]
+    },
+    {
+      "id": "ARQ-FACH-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 57.º — Projecções sobre a Via Pública",
+      "description": "As saliências (varandas, palas, beirais) sobre a via pública devem respeitar as alturas e dimensões regulamentares.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeProjectionCompliance", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Projecções conforme regulamento",
+      "remediation": "As saliências sobre a via pública (varandas, palas, beirais) devem ter altura mínima ao passeio ≥ 3.00 m e não exceder 1.20 m de balanço conforme Art. 57.º do RGEU.",
+      "enabled": true,
+      "tags": ["fachada", "projecção", "varanda", "via pública", "RGEU"]
+    },
+    {
+      "id": "ARQ-GUARD-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 49.º — Guarda-Corpo de Varandas e Terraços",
+      "description": "A altura do guarda-corpo ({architecture.balconyGuardHeight}m) é inferior ao mínimo de 1.10m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.balconyGuardHeight", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "{architecture.balconyGuardHeight} m",
+      "requiredValue": "≥ 1.10 m",
+      "remediation": "O guarda-corpo de varandas, terraços e platibandas deve ter altura mínima de 1.10 m conforme regulamentação de segurança.",
+      "enabled": true,
+      "tags": ["guarda-corpo", "varanda", "terraço", "segurança", "RGEU"]
+    },
+    {
+      "id": "ARQ-LAV-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Lavandaria/Estendal Obrigatório",
+      "description": "O fogo deve dispor de zona de lavandaria ou estendal para secagem de roupa, integrada ou em varanda.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasLaundryArea", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Zona de lavandaria/estendal obrigatória",
+      "remediation": "Prever zona de lavandaria ou estendal no fogo, podendo ser integrada na cozinha, varanda ou compartimento específico conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["lavandaria", "estendal", "roupa", "RGEU"]
+    },
+    {
+      "id": "ARQ-ARR-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Arrumos/Despensa Obrigatório",
+      "description": "O fogo deve dispor de arrumo ou despensa com área mínima de 2m².",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasStorageRoom", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Arrumo/despensa ≥ 2 m²",
+      "remediation": "Prever compartimento de arrumos ou despensa com área mínima de 2 m² conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["arrumos", "despensa", "RGEU"]
+    },
+    {
+      "id": "ARQ-HALL-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Zonas Comuns (Hall de Entrada)",
+      "description": "O hall de entrada do edifício multifamiliar deve ter dimensões adequadas para circulação, acesso a escadas/elevador e caixas de correio.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.entryHallArea", "operator": "<", "value": 6.0 },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.entryHallArea} m²",
+      "requiredValue": "≥ 6 m² (hall de entrada multifamiliar)",
+      "remediation": "O hall de entrada do edifício multifamiliar deve ter dimensões adequadas (mínimo 6 m²) para circulação e acesso conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["hall", "entrada", "zonas comuns", "multifamiliar", "RGEU"]
+    },
+    {
+      "id": "ARQ-CORRED-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Largura Mínima de Corredores",
+      "description": "A largura do corredor interior ({architecture.corridorWidth}m) é inferior ao mínimo de 1.10m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.corridorWidth", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "{architecture.corridorWidth} m",
+      "requiredValue": "≥ 1.10 m",
+      "remediation": "Os corredores interiores devem ter largura mínima de 1.10 m conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["corredor", "largura", "circulação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ORIENT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Orientação Solar Preferencial",
+      "description": "Os compartimentos habitáveis principais (sala, quartos) devem ter orientação preferencial Sul, Nascente ou Poente para maximizar ganhos solares.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.mainRoomOrientation", "operator": "not_in", "value": ["S", "SE", "SW", "E", "W"] }
+      ],
+      "currentValueTemplate": "Orientação: {architecture.mainRoomOrientation}",
+      "requiredValue": "Orientação preferencial Sul/Nascente/Poente",
+      "remediation": "Orientar os compartimentos habitáveis principais (sala e quartos) preferencialmente a Sul, Nascente ou Poente para maximizar iluminação natural e ganhos solares conforme boas práticas do RGEU (Art. 71.º).",
+      "enabled": true,
+      "tags": ["orientação", "solar", "iluminação", "RGEU"]
+    },
+    {
+      "id": "ARQ-PARK-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Estacionamento (Lugares por Fogo)",
+      "description": "O número de lugares de estacionamento ({architecture.parkingSpaces}) é inferior ao mínimo exigido pelo PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.parkingSpaces", "operator": "<", "value": 1 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "{architecture.parkingSpaces} lugares",
+      "requiredValue": "≥ 1 lugar por fogo (genérico PDM)",
+      "remediation": "Prever, no mínimo, 1 lugar de estacionamento por fogo conforme PDM. Fogos T3+ podem exigir 2 lugares. Verificar regulamento municipal específico.",
+      "enabled": true,
+      "tags": ["estacionamento", "garagem", "PDM", "urbanismo"]
+    },
+    {
+      "id": "ARQ-PERM-01",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Logradouro (Índice de Permeabilidade)",
+      "description": "O índice de permeabilidade do lote ({architecture.permeabilityIndex}) é inferior ao mínimo exigido.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.permeabilityIndex", "operator": "<", "value": 0.30 }
+      ],
+      "currentValueTemplate": "{architecture.permeabilityIndex}",
+      "requiredValue": "≥ 30% (0.30) — verificar PDM",
+      "remediation": "Garantir que pelo menos 30% da área do lote é permeável, através de zonas ajardinadas, terra vegetal e pavimentos permeáveis conforme requisitos do PDM.",
+      "enabled": true,
+      "tags": ["permeabilidade", "logradouro", "PDM", "urbanismo"]
+    },
+    {
+      "id": "CC-JAN-01",
+      "regulationId": "codigo-civil-edificacao",
+      "article": "Art. 1360.º — Distância de Janelas/Varandas ao Vizinho",
+      "description": "A distância de janelas ou varandas ao limite do prédio vizinho ({architecture.windowDistanceToBoundary}m) é inferior ao mínimo legal de 1.5m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.windowDistanceToBoundary", "operator": "<", "value": 1.5 }
+      ],
+      "currentValueTemplate": "{architecture.windowDistanceToBoundary} m",
+      "requiredValue": "≥ 1.5 m",
+      "remediation": "Recuar janelas, varandas e outros vãos devassáveis para manter distância mínima de 1.5 m ao limite do prédio vizinho conforme Art. 1360.º do Código Civil.",
+      "enabled": true,
+      "tags": ["janelas", "varandas", "vizinho", "distância", "Código Civil"]
+    },
+    {
+      "id": "CC-FREST-01",
+      "regulationId": "codigo-civil-edificacao",
+      "article": "Art. 1361.º — Frestas, Seteiras e Óculos",
+      "description": "Frestas, seteiras e óculos abertos na parede divisória devem respeitar as limitações legais: altura ≥1.80m do pavimento e abertura ≤0.15m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasRestrictedOpenings", "operator": "==", "value": true },
+        { "field": "architecture.restrictedOpeningHeight", "operator": "<", "value": 1.80 }
+      ],
+      "currentValueTemplate": "Altura: {architecture.restrictedOpeningHeight} m",
+      "requiredValue": "Altura ≥ 1.80 m; abertura ≤ 0.15 m",
+      "remediation": "As frestas, seteiras e óculos na parede encostada ao prédio vizinho devem estar a ≥1.80 m do pavimento e ter abertura máxima de 0.15 m conforme Art. 1361.º do Código Civil.",
+      "enabled": true,
+      "tags": ["frestas", "seteiras", "óculos", "vizinho", "Código Civil"]
+    },
+    {
+      "id": "CC-CHUVA-01",
+      "regulationId": "codigo-civil-edificacao",
+      "article": "Art. 1362.º — Estilicídio (Águas Pluviais)",
+      "description": "É proibido que as águas pluviais caiam directamente no terreno do vizinho. As águas devem ser recolhidas e conduzidas para o terreno próprio ou via pública.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasRainwaterDrainage", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Recolha de águas pluviais obrigatória",
+      "remediation": "Instalar caleiras, algerozes e tubos de queda para recolher e conduzir as águas pluviais. Proibido o estilicídio sobre propriedade vizinha conforme Art. 1362.º do Código Civil.",
+      "enabled": true,
+      "tags": ["estilicídio", "águas pluviais", "caleiras", "Código Civil"]
+    },
+    {
+      "id": "CC-MURO-01",
+      "regulationId": "codigo-civil-edificacao",
+      "article": "Art. 1363.º — Paredes e Muros Divisórios",
+      "description": "As paredes e muros divisórios entre prédios presumem-se comuns (compropriedade). Qualquer alteração requer acordo entre vizinhos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.modifiesBoundaryWall", "operator": "==", "value": true },
+        { "field": "architecture.hasNeighborAgreement", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Acordo com vizinho para alteração de muros divisórios",
+      "remediation": "Obter acordo escrito do vizinho para qualquer alteração a paredes ou muros divisórios, que se presumem em compropriedade conforme Art. 1363.º do Código Civil.",
+      "enabled": true,
+      "tags": ["muro", "divisório", "compropriedade", "vizinho", "Código Civil"]
+    },
+    {
+      "id": "CC-PH-01",
+      "regulationId": "codigo-civil-edificacao",
+      "article": "Art. 1422.º — Propriedade Horizontal (Partes Comuns)",
+      "description": "Em propriedade horizontal, é proibido prejudicar a segurança, a linha arquitectónica ou o arranjo estético do edifício sem autorização da assembleia de condóminos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.isHorizontalProperty", "operator": "==", "value": true },
+        { "field": "architecture.respectsCommonParts", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Autorização da assembleia para alterações a partes comuns",
+      "remediation": "Obter autorização da assembleia de condóminos para qualquer alteração à fachada, estrutura ou partes comuns conforme Art. 1422.º do Código Civil.",
+      "enabled": true,
+      "tags": ["propriedade horizontal", "condóminos", "fachada", "partes comuns", "Código Civil"]
+    },
+    {
+      "id": "ARQ-REHAB-01",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 51.º — Dispensa Parcial de Requisitos RGEU (Reabilitação)",
+      "description": "Em operações de reabilitação urbana inseridas em ARU, pode haver dispensa parcial de requisitos do RGEU, desde que se garantam condições mínimas de salubridade e segurança.",
+      "severity": "info",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.isInARU", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Dispensa parcial aplicável em ARU",
+      "remediation": "Em reabilitação urbana em ARU, solicitar dispensa parcial de requisitos RGEU conforme Art. 51.º do RJRU. Devem ser garantidas condições mínimas de salubridade, segurança estrutural e protecção contra incêndio.",
+      "enabled": true,
+      "tags": ["reabilitação", "ARU", "dispensa", "RJRU"]
+    },
+    {
+      "id": "ARQ-REHAB-02",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 53.º — Limites Mínimos de Salubridade (Reabilitação)",
+      "description": "Mesmo com dispensa de requisitos RGEU, a reabilitação deve garantir limites mínimos de salubridade: pé-direito ≥2.40m, iluminação e ventilação mínimas, e IS funcional.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.ceilingHeight", "operator": "<", "value": 2.40 }
+      ],
+      "currentValueTemplate": "{architecture.ceilingHeight} m",
+      "requiredValue": "≥ 2.40 m (mínimo absoluto em reabilitação)",
+      "remediation": "Mesmo em reabilitação com dispensa RGEU, o pé-direito não pode ser inferior a 2.40 m e devem ser garantidas condições mínimas de salubridade conforme Art. 53.º do RJRU.",
+      "enabled": true,
+      "tags": ["reabilitação", "salubridade", "pé-direito", "RJRU"]
+    }
+  ]
+}

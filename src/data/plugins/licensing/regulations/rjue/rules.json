@@ -1,0 +1,727 @@
+{
+  "regulationRef": "dl-555-99-rjue",
+  "description": "Regras de licenciamento urbanístico extraídas do RJUE (DL 555/99, alterado por DL 136/2014 e Lei 60/2007), RJRU (DL 307/2009) e DL 273/2003",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "RJUE-LIC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. a) — Licenciamento de Construção Nova",
+      "description": "As obras de construção nova estão sujeitas a licenciamento municipal obrigatório.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "construcao_nova" },
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Licenciamento obrigatório para construção nova",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal competente. O início de obras sem licença constitui contraordenação grave (Art. 98.º).",
+      "enabled": true,
+      "tags": ["licenciamento", "construção_nova", "obrigatório"]
+    },
+    {
+      "id": "RJUE-LIC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. b) — Licenciamento de Reconstrução com Alteração",
+      "description": "As obras de reconstrução com alteração de fachada, cércea ou número de pisos estão sujeitas a licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "reconstrucao" },
+        { "field": "licensing.altersFacadeOrHeight", "operator": "==", "value": true },
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType} com alteração de fachada/cércea",
+      "requiredValue": "Licenciamento obrigatório para reconstrução com alteração",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal. A reconstrução com alteração de fachada, cércea ou número de pisos exige licença.",
+      "enabled": true,
+      "tags": ["licenciamento", "reconstrução", "fachada", "cércea"]
+    },
+    {
+      "id": "RJUE-LIC-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. c) — Licenciamento de Ampliação",
+      "description": "As obras de ampliação estão sujeitas a licenciamento municipal obrigatório.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "ampliacao" },
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Licenciamento obrigatório para ampliação",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal. A ampliação de edifícios existentes requer licença de construção.",
+      "enabled": true,
+      "tags": ["licenciamento", "ampliação", "obrigatório"]
+    },
+    {
+      "id": "RJUE-LIC-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. e) — Licenciamento de Demolição",
+      "description": "As obras de demolição que não estejam integradas em obra nova licenciada estão sujeitas a licenciamento autónomo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "demolicao" },
+        { "field": "licensing.hasDemolitionLicense", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Licenciamento obrigatório para demolição autónoma",
+      "remediation": "Submeter pedido de licenciamento de demolição à câmara municipal. A demolição integrada em obra nova pode ser abrangida pelo mesmo alvará.",
+      "enabled": true,
+      "tags": ["licenciamento", "demolição", "obrigatório"]
+    },
+    {
+      "id": "RJUE-LIC-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. d) — Alteração de Utilização",
+      "description": "As alterações de utilização que estejam em desacordo com o PDM ou instrumento de gestão territorial aplicável requerem licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "alteracao_utilizacao" },
+        { "field": "licensing.isConformWithPDM", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Licenciamento obrigatório para alteração de utilização em desacordo com PDM",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal. Quando a nova utilização pretendida está em desacordo com o PDM vigente, é necessária licença.",
+      "enabled": true,
+      "tags": ["licenciamento", "alteração_utilização", "PDM"]
+    },
+    {
+      "id": "RJUE-LIC-06",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. f) — Obras em Imóveis Classificados",
+      "description": "As obras em imóveis classificados ou em vias de classificação, ou situados em zonas de proteção, estão sujeitas a licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.isProtectedArea", "operator": "==", "value": true },
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.isProtectedArea}",
+      "requiredValue": "Licenciamento obrigatório em imóvel classificado ou zona de proteção",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal com parecer prévio da DGPC ou entidade competente. Obras em imóveis classificados têm regime especial.",
+      "enabled": true,
+      "tags": ["licenciamento", "património", "classificado", "zona_proteção"]
+    },
+    {
+      "id": "RJUE-CP-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4, al. a) — Comunicação Prévia de Reconstrução",
+      "description": "As obras de reconstrução sem alteração de estrutura, fachada ou número de pisos estão sujeitas a comunicação prévia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "reconstrucao" },
+        { "field": "licensing.altersFacadeOrHeight", "operator": "==", "value": false },
+        { "field": "licensing.hasComunicacaoPrevia", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Comunicação prévia obrigatória para reconstrução sem alteração",
+      "remediation": "Submeter comunicação prévia à câmara municipal. A reconstrução sem alteração de estrutura, fachada ou número de pisos segue regime simplificado.",
+      "enabled": true,
+      "tags": ["comunicação_prévia", "reconstrução", "simplificado"]
+    },
+    {
+      "id": "RJUE-CP-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4, al. b) — Comunicação Prévia de Alterações Interiores",
+      "description": "As alterações interiores com preservação da estrutura resistente estão sujeitas a comunicação prévia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "alteracao_interior" },
+        { "field": "licensing.preservesStructure", "operator": "==", "value": true },
+        { "field": "licensing.hasComunicacaoPrevia", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Comunicação prévia obrigatória para alterações interiores",
+      "remediation": "Submeter comunicação prévia à câmara municipal. As alterações interiores que preservem a estrutura resistente seguem regime simplificado.",
+      "enabled": true,
+      "tags": ["comunicação_prévia", "alterações_interiores", "estrutura"]
+    },
+    {
+      "id": "RJUE-CP-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4, al. d) — Comunicação Prévia de Piscinas, Muros e Vedações",
+      "description": "A construção de piscinas, muros de vedação e vedações está sujeita a comunicação prévia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "in", "value": ["piscina", "muro", "vedacao"] },
+        { "field": "licensing.hasComunicacaoPrevia", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Comunicação prévia obrigatória para piscinas, muros e vedações",
+      "remediation": "Submeter comunicação prévia à câmara municipal para construção de piscinas, muros de vedação ou vedações.",
+      "enabled": true,
+      "tags": ["comunicação_prévia", "piscina", "muro", "vedação"]
+    },
+    {
+      "id": "RJUE-ISE-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º, n.º 1, al. a) — Isenção: Obras de Conservação",
+      "description": "As obras de conservação estão isentas de controlo prévio (licenciamento ou comunicação prévia).",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "conservacao" }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Obras de conservação isentas de controlo prévio",
+      "remediation": "As obras de conservação não carecem de licenciamento nem comunicação prévia. Contudo, devem respeitar as normas técnicas aplicáveis e o PDM.",
+      "enabled": true,
+      "tags": ["isenção", "conservação", "controlo_prévio"]
+    },
+    {
+      "id": "RJUE-ISE-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º, n.º 1, al. b) — Isenção: Obras Interiores sem Alteração Estrutural",
+      "description": "As obras interiores sem alteração estrutural em edifícios não classificados estão isentas de controlo prévio.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "==", "value": "alteracao_interior" },
+        { "field": "licensing.altersStructure", "operator": "==", "value": false },
+        { "field": "licensing.isProtectedArea", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Obras interiores em edifícios não classificados isentas",
+      "remediation": "Obras no interior de edifícios não classificados que não alterem a estrutura resistente estão isentas. Em imóveis classificados aplica-se licenciamento.",
+      "enabled": true,
+      "tags": ["isenção", "obras_interiores", "não_classificado"]
+    },
+    {
+      "id": "RJUE-ISE-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º, n.º 1 — Isenção: Painéis Solares e Ar Condicionado",
+      "description": "A instalação de painéis solares e equipamentos de ar condicionado está isenta de controlo prévio, dentro dos limites regulamentares.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.operationType", "operator": "in", "value": ["paineis_solares", "ar_condicionado"] },
+        { "field": "licensing.isProtectedArea", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{licensing.operationType}",
+      "requiredValue": "Instalação isenta dentro dos limites regulamentares",
+      "remediation": "A instalação de painéis solares e AC está isenta quando cumpre limites de dimensão e não se trate de imóvel classificado. Verificar regulamento municipal.",
+      "enabled": true,
+      "tags": ["isenção", "painéis_solares", "ar_condicionado", "energias_renováveis"]
+    },
+    {
+      "id": "RJUE-REQ-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 9.º — Requerimento ao Presidente da Câmara Municipal",
+      "description": "O pedido de licenciamento é dirigido ao Presidente da Câmara Municipal da localização do prédio.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasRequerimento", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "licensing" }
+      ],
+      "currentValueTemplate": "{licensing.hasRequerimento}",
+      "requiredValue": "Requerimento dirigido ao Presidente da CM obrigatório",
+      "remediation": "Elaborar e submeter requerimento dirigido ao Presidente da Câmara Municipal, identificando o requerente, a localização do prédio e a pretensão.",
+      "enabled": true,
+      "tags": ["requerimento", "câmara_municipal", "instrução"]
+    },
+    {
+      "id": "RJUE-REQ-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 9.º, n.º 1, al. b) — Certidão Predial",
+      "description": "A certidão da descrição e inscrição predial é obrigatória na instrução do pedido de licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasCertidaoPredial", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "licensing" }
+      ],
+      "currentValueTemplate": "{licensing.hasCertidaoPredial}",
+      "requiredValue": "Certidão predial obrigatória",
+      "remediation": "Obter certidão permanente da descrição e inscrição predial na Conservatória do Registo Predial. Deve comprovar a legitimidade do requerente.",
+      "enabled": true,
+      "tags": ["certidão", "registo_predial", "instrução"]
+    },
+    {
+      "id": "RJUE-ARQ-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º — Projeto de Arquitetura",
+      "description": "O projeto de arquitetura é obrigatório para operações urbanísticas sujeitas a licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasArchitecturalProject", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.hasArchitecturalProject}",
+      "requiredValue": "Projeto de arquitetura obrigatório",
+      "remediation": "Elaborar projeto de arquitetura subscrito por arquiteto inscrito na Ordem dos Arquitetos.",
+      "enabled": true,
+      "tags": ["arquitetura", "projeto", "obrigatório"]
+    },
+    {
+      "id": "RJUE-ESP-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 4 — Projetos de Especialidades",
+      "description": "Os projetos de especialidades são obrigatórios e devem ser entregues após aprovação do projeto de arquitetura.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasSpecialtyProjects", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.hasSpecialtyProjects}",
+      "requiredValue": "Todas as especialidades obrigatórias",
+      "remediation": "Elaborar todos os projetos de especialidades: estabilidade, águas e esgotos, eletricidade, gás, ITED, térmica, acústica, SCIE e acessibilidade.",
+      "enabled": true,
+      "tags": ["especialidades", "obrigatório"]
+    },
+    {
+      "id": "RJUE-REQ-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 3 — Calendarização e Estimativa de Custo",
+      "description": "O pedido de licenciamento deve incluir a calendarização da obra e a estimativa do custo total.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasCalendarizacao", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "licensing" }
+      ],
+      "currentValueTemplate": "{licensing.hasCalendarizacao}",
+      "requiredValue": "Calendarização e estimativa de custo obrigatórias",
+      "remediation": "Incluir no pedido a calendarização da execução da obra e a estimativa do custo total, para efeitos de cálculo de taxas.",
+      "enabled": true,
+      "tags": ["calendarização", "custo", "instrução"]
+    },
+    {
+      "id": "RJUE-TERMO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 10.º — Termos de Responsabilidade dos Autores",
+      "description": "Os termos de responsabilidade de todos os autores do projeto são obrigatórios.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasTermoDeResponsabilidade", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.hasTermoDeResponsabilidade}",
+      "requiredValue": "Termos de responsabilidade obrigatórios",
+      "remediation": "Obter termos de responsabilidade de todos os autores: arquiteto e engenheiros das especialidades. Os termos atestam a conformidade com normas vigentes.",
+      "enabled": true,
+      "tags": ["termo", "responsabilidade", "autores"]
+    },
+    {
+      "id": "RJUE-REQ-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º — Ficha de Projeto por Especialidade",
+      "description": "Deve ser apresentada ficha de projeto para cada especialidade, contendo a síntese das soluções adotadas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasFichasDeProjeto", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "licensing" }
+      ],
+      "currentValueTemplate": "{licensing.hasFichasDeProjeto}",
+      "requiredValue": "Fichas de projeto por especialidade obrigatórias",
+      "remediation": "Preparar ficha-síntese para cada especialidade, com identificação do autor, soluções adotadas e declaração de conformidade.",
+      "enabled": true,
+      "tags": ["fichas", "especialidades", "instrução"]
+    },
+    {
+      "id": "RJUE-APRE-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 20.º — Prazo de Apreciação do Licenciamento",
+      "description": "O prazo de apreciação é de 45 dias para licenciamento e 20 dias para comunicação prévia.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.projectPhase", "operator": "==", "value": "licensing" },
+        { "field": "licensing.hasMunicipalApproval", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.projectPhase}",
+      "requiredValue": "Prazo de apreciação: 45 dias (licenciamento) / 20 dias (comunicação prévia)",
+      "remediation": "A câmara municipal deve apreciar o pedido no prazo de 45 dias (licenciamento) ou 20 dias (comunicação prévia). Ultrapassado o prazo, pode haver deferimento tácito.",
+      "enabled": true,
+      "tags": ["prazo", "apreciação", "câmara"]
+    },
+    {
+      "id": "RJUE-APRE-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º — Consultas Externas",
+      "description": "Conforme aplicável, devem ser realizadas consultas externas a entidades como ANPC, CCDR e DGPC.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.requiresExternalConsultation", "operator": "==", "value": true },
+        { "field": "licensing.hasExternalConsultations", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.requiresExternalConsultation}",
+      "requiredValue": "Consultas externas obrigatórias conforme aplicável",
+      "remediation": "Solicitar pareceres das entidades externas aplicáveis: ANPC (segurança contra incêndio), CCDR (ordenamento do território), DGPC (património cultural), entre outras.",
+      "enabled": true,
+      "tags": ["consultas_externas", "ANPC", "CCDR", "DGPC"]
+    },
+    {
+      "id": "RJUE-APRE-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 111.º — Deferimento Tácito",
+      "description": "Se a câmara municipal não se pronunciar no prazo legal, opera o deferimento tácito do pedido.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.prazoUltrapassado", "operator": "==", "value": true },
+        { "field": "licensing.hasMunicipalApproval", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.prazoUltrapassado}",
+      "requiredValue": "Deferimento tácito se prazo ultrapassado",
+      "remediation": "Se o prazo legal foi ultrapassado sem decisão, pode invocar-se o deferimento tácito. Requerer certidão de deferimento tácito à câmara municipal.",
+      "enabled": true,
+      "tags": ["deferimento_tácito", "prazo", "aprovação"]
+    },
+    {
+      "id": "RJUE-APRE-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 24.º — Indeferimento Fundamentado",
+      "description": "O pedido é indeferido se violar o PDM, regulamentos ou normas legais aplicáveis.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.isConformWithPDM", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{licensing.isConformWithPDM}",
+      "requiredValue": "Conformidade com PDM e regulamentos obrigatória",
+      "remediation": "Garantir a conformidade do projeto com o PDM, regulamentos municipais e normas técnicas. O indeferimento deve ser fundamentado e pode ser impugnado.",
+      "enabled": true,
+      "tags": ["indeferimento", "PDM", "conformidade"]
+    },
+    {
+      "id": "RJUE-ALV-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 58.º — Emissão de Alvará de Construção",
+      "description": "O alvará de construção é emitido após aprovação do projeto e pagamento das taxas urbanísticas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "not_in", "value": ["none", "utilization"] }
+      ],
+      "currentValueTemplate": "{licensing.hasConstructionLicense}",
+      "requiredValue": "Alvará de construção obrigatório",
+      "remediation": "Requerer a emissão do alvará de construção após aprovação do projeto e pagamento das taxas devidas. Sem alvará, é proibido iniciar obras.",
+      "enabled": true,
+      "tags": ["alvará", "construção", "licença", "taxas"]
+    },
+    {
+      "id": "RJUE-ALV-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 58.º, n.º 5 — Prazo de Validade do Alvará",
+      "description": "O alvará de construção tem prazo de validade de 12 meses para início das obras.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasConstructionLicense", "operator": "exists", "value": null },
+        { "field": "licensing.alvaraValidityMonths", "operator": ">", "value": 12 }
+      ],
+      "currentValueTemplate": "{licensing.alvaraValidityMonths} meses desde emissão",
+      "requiredValue": "Início das obras dentro de 12 meses após emissão do alvará",
+      "remediation": "Iniciar as obras dentro do prazo de 12 meses após a emissão do alvará. Caso contrário, o alvará caduca e deve ser renovado.",
+      "enabled": true,
+      "tags": ["alvará", "validade", "prazo", "caducidade"]
+    },
+    {
+      "id": "RJUE-DIR-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º — Diretor de Obra",
+      "description": "A nomeação de diretor de obra é obrigatória para todas as obras sujeitas a licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasTechnicalDirector", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" }
+      ],
+      "currentValueTemplate": "{licensing.hasTechnicalDirector}",
+      "requiredValue": "Diretor de obra obrigatório",
+      "remediation": "Designar diretor de obra inscrito na Ordem profissional competente (Ordem dos Engenheiros ou dos Engenheiros Técnicos). Comunicar à câmara municipal.",
+      "enabled": true,
+      "tags": ["diretor_obra", "obrigatório", "construção"]
+    },
+    {
+      "id": "RJUE-DIR-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-A — Diretor de Fiscalização",
+      "description": "A nomeação de diretor de fiscalização de obra é obrigatória.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasFiscalizationDirector", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" }
+      ],
+      "currentValueTemplate": "{licensing.hasFiscalizationDirector}",
+      "requiredValue": "Diretor de fiscalização obrigatório",
+      "remediation": "Designar diretor de fiscalização de obra, que deve ser independente do construtor e inscrito na Ordem profissional competente.",
+      "enabled": true,
+      "tags": ["diretor_fiscalização", "obrigatório", "construção"]
+    },
+    {
+      "id": "RJUE-LIVRO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 97.º — Livro de Obra",
+      "description": "O livro de obra é obrigatório e deve estar disponível no estaleiro durante toda a execução da obra.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasBookOfWork", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" }
+      ],
+      "currentValueTemplate": "{licensing.hasBookOfWork}",
+      "requiredValue": "Livro de obra obrigatório no estaleiro",
+      "remediation": "Adquirir e manter o livro de obra em estaleiro. Nele devem ser registados todos os factos relevantes da execução, pelo diretor de obra e de fiscalização.",
+      "enabled": true,
+      "tags": ["livro_obra", "estaleiro", "obrigatório"]
+    },
+    {
+      "id": "RJUE-PLACA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 97.º — Placa de Obra (Aviso de Obra)",
+      "description": "A afixação de placa identificativa da obra é obrigatória e deve ser visível da via pública.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasPlacaDeObra", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" }
+      ],
+      "currentValueTemplate": "{licensing.hasPlacaDeObra}",
+      "requiredValue": "Placa de obra obrigatória e visível",
+      "remediation": "Afixar placa de obra visível da via pública, contendo: número do alvará, identificação do dono de obra, diretor de obra, diretor de fiscalização e empreiteiro.",
+      "enabled": true,
+      "tags": ["placa_obra", "aviso", "obrigatório"]
+    },
+    {
+      "id": "RJUE-INICIO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 80.º-A — Comunicação de Início de Obra",
+      "description": "O dono da obra deve comunicar à câmara municipal o início dos trabalhos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasComunicacaoInicio", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" }
+      ],
+      "currentValueTemplate": "{licensing.hasComunicacaoInicio}",
+      "requiredValue": "Comunicação de início de obra obrigatória",
+      "remediation": "Comunicar à câmara municipal o início dos trabalhos, com identificação do diretor de obra, diretor de fiscalização e empresa de construção.",
+      "enabled": true,
+      "tags": ["comunicação_início", "câmara", "construção"]
+    },
+    {
+      "id": "RJUE-UTIL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º — Licença de Utilização",
+      "description": "A licença de utilização é obrigatória para ocupar ou utilizar o edifício após conclusão das obras.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasUtilizationLicense", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "utilization" }
+      ],
+      "currentValueTemplate": "{licensing.hasUtilizationLicense}",
+      "requiredValue": "Licença de utilização obrigatória",
+      "remediation": "Requerer licença de utilização à câmara municipal após conclusão da obra. Sem licença de utilização, o edifício não pode ser ocupado ou transacionado.",
+      "enabled": true,
+      "tags": ["utilização", "licença", "obrigatório"]
+    },
+    {
+      "id": "RJUE-UTIL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º — Vistoria Municipal para Licença de Utilização",
+      "description": "A emissão da licença de utilização depende de vistoria municipal que confirme a conformidade da obra com o projeto aprovado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasVistoriaMunicipal", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "utilization" }
+      ],
+      "currentValueTemplate": "{licensing.hasVistoriaMunicipal}",
+      "requiredValue": "Vistoria municipal obrigatória para licença de utilização",
+      "remediation": "Agendar vistoria municipal após conclusão da obra. A vistoria verifica a conformidade da obra executada com o projeto aprovado e condições do alvará.",
+      "enabled": true,
+      "tags": ["vistoria", "municipal", "utilização"]
+    },
+    {
+      "id": "RJUE-CERT-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 2 — Certificações Obrigatórias",
+      "description": "Para obtenção da licença de utilização são obrigatórias as certificações ITED, gás, eletricidade e energética (SCE).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasCertificacoes", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "utilization" }
+      ],
+      "currentValueTemplate": "{licensing.hasCertificacoes}",
+      "requiredValue": "Certificações ITED, gás, eletricidade e energética obrigatórias",
+      "remediation": "Obter todas as certificações obrigatórias: ITED (telecomunicações), instalação de gás, instalação elétrica e certificado energético (SCE). Sem estas certificações, a licença de utilização não é emitida.",
+      "enabled": true,
+      "tags": ["certificações", "ITED", "gás", "elétrica", "energética", "SCE"]
+    },
+    {
+      "id": "RJUE-TELAS-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 128.º — Telas Finais",
+      "description": "As telas finais (as-built) são obrigatórias e devem refletir a obra efetivamente executada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasTelasFinais", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "utilization" }
+      ],
+      "currentValueTemplate": "{licensing.hasTelasFinais}",
+      "requiredValue": "Telas finais obrigatórias",
+      "remediation": "Elaborar telas finais (desenhos as-built) que reflitam a obra executada. Devem ser entregues com o pedido de licença de utilização e assinadas pelos autores dos projetos.",
+      "enabled": true,
+      "tags": ["telas_finais", "as-built", "utilização"]
+    },
+    {
+      "id": "RJUE-FISC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 102.º — Embargo de Obras Ilegais",
+      "description": "A câmara municipal pode embargar obras que decorram sem licença, em desconformidade com o projeto aprovado, ou que violem normas legais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" }
+      ],
+      "currentValueTemplate": "{licensing.hasConstructionLicense}",
+      "requiredValue": "Licença válida obrigatória para evitar embargo",
+      "remediation": "Garantir que a obra possui licença válida e está em conformidade com o projeto aprovado. Em caso de embargo, suspender imediatamente os trabalhos e regularizar a situação.",
+      "enabled": true,
+      "tags": ["embargo", "fiscalização", "ilegal"]
+    },
+    {
+      "id": "RJUE-FISC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 106.º — Demolição de Obras Ilegais",
+      "description": "A câmara municipal pode ordenar a demolição de obras ilegais que não possam ser legalizadas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null },
+        { "field": "licensing.isLegalizable", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{licensing.isLegalizable}",
+      "requiredValue": "Legalização obrigatória para evitar demolição",
+      "remediation": "Regularizar a situação da obra junto da câmara municipal. Caso a obra não seja legalizável (por violação do PDM ou normas inultrapassáveis), pode ser ordenada a demolição.",
+      "enabled": true,
+      "tags": ["demolição", "fiscalização", "ilegal", "legalização"]
+    },
+    {
+      "id": "RJUE-COIMA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 98.º, n.º 1 — Coimas por Início sem Licença",
+      "description": "O início de obras sem licença ou comunicação prévia constitui contraordenação punível com coima.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasConstructionLicense", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "==", "value": "construction" },
+        { "field": "licensing.hasComunicacaoPrevia", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.hasConstructionLicense}",
+      "requiredValue": "Licença ou comunicação prévia obrigatória antes do início",
+      "remediation": "Obter alvará de construção ou admissão de comunicação prévia antes de iniciar os trabalhos. A coima por início sem licença pode atingir valores elevados (até 200.000€ para pessoas coletivas).",
+      "enabled": true,
+      "tags": ["coima", "contraordenação", "sem_licença"]
+    },
+    {
+      "id": "RJUE-COIMA-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 98.º, n.º 2 — Coimas por Desvio ao Projeto",
+      "description": "A execução de obras em desconformidade com o projeto aprovado constitui contraordenação punível com coima.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasDesvioAoProjeto", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{licensing.hasDesvioAoProjeto}",
+      "requiredValue": "Conformidade com o projeto aprovado obrigatória",
+      "remediation": "Garantir que a execução da obra segue rigorosamente o projeto aprovado. Qualquer alteração deve ser previamente aprovada pela câmara municipal através de aditamento ao projeto.",
+      "enabled": true,
+      "tags": ["coima", "contraordenação", "desvio", "projeto"]
+    },
+    {
+      "id": "RJUE-ARU-01",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "DL 307/2009 — ARU: Benefícios Fiscais",
+      "description": "As obras de reabilitação em Área de Reabilitação Urbana (ARU) beneficiam de IVA a 6%, isenção de IMI (até 5 anos) e isenção de IMT.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.isInARU", "operator": "==", "value": true },
+        { "field": "licensing.isRehabilitation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{licensing.isInARU}",
+      "requiredValue": "Benefícios fiscais disponíveis em ARU",
+      "remediation": "Verificar elegibilidade para benefícios fiscais: IVA a 6% nas empreitadas de reabilitação, isenção de IMI até 5 anos, isenção de IMT na primeira transmissão após reabilitação, dedução em IRS de encargos com reabilitação.",
+      "enabled": true,
+      "tags": ["ARU", "benefícios", "fiscal", "IVA", "IMI", "IMT"]
+    },
+    {
+      "id": "RJUE-ARU-02",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "DL 307/2009 — Dispensa Parcial de Requisitos em Reabilitação",
+      "description": "Em operações de reabilitação urbana em ARU pode haver dispensa parcial de requisitos técnicos, nomeadamente acessibilidades e requisitos energéticos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.isInARU", "operator": "==", "value": true },
+        { "field": "licensing.isRehabilitation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{licensing.isInARU}",
+      "requiredValue": "Possibilidade de dispensa parcial de requisitos em ARU",
+      "remediation": "Em reabilitação urbana em ARU, pode solicitar-se dispensa fundamentada de requisitos técnicos incompatíveis com a natureza do edifício existente (ex.: acessibilidades, eficiência energética).",
+      "enabled": true,
+      "tags": ["ARU", "reabilitação", "dispensa", "requisitos"]
+    },
+    {
+      "id": "RJUE-ARU-03",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "DL 307/2009, Art. 14.º — Regime Especial de Comunicação Prévia em ARU",
+      "description": "Em ARU pode aplicar-se regime especial de comunicação prévia, com procedimento simplificado e prazos reduzidos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.isInARU", "operator": "==", "value": true },
+        { "field": "licensing.operationType", "operator": "in", "value": ["reconstrucao", "alteracao_interior", "conservacao"] }
+      ],
+      "currentValueTemplate": "{licensing.isInARU}",
+      "requiredValue": "Regime especial de comunicação prévia aplicável em ARU",
+      "remediation": "Em ARU, verificar se a operação urbanística pode beneficiar do regime especial de comunicação prévia, com procedimento simplificado e prazos de decisão reduzidos.",
+      "enabled": true,
+      "tags": ["ARU", "comunicação_prévia", "simplificado", "regime_especial"]
+    },
+    {
+      "id": "RJUE-VIA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Regulamento Municipal — Licença de Ocupação da Via Pública",
+      "description": "A ocupação da via pública para instalação de estaleiro de obra requer licença municipal específica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.hasViaPublicaLicense", "operator": "not_exists", "value": null },
+        { "field": "licensing.requiresViaPublicaOccupation", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{licensing.hasViaPublicaLicense}",
+      "requiredValue": "Licença de ocupação da via pública obrigatória",
+      "remediation": "Requerer licença de ocupação da via pública à câmara municipal antes da instalação do estaleiro. Deve incluir planta de ocupação, sinalização e prazo pretendido.",
+      "enabled": true,
+      "tags": ["via_pública", "estaleiro", "licença", "ocupação"]
+    },
+    {
+      "id": "RJUE-PSS-01",
+      "regulationId": "dl-273-2003",
+      "article": "DL 273/2003 — Plano de Segurança e Saúde",
+      "description": "O plano de segurança e saúde (PSS) é obrigatório em todas as obras sujeitas a licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "licensing.hasPSS", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "not_in", "value": ["none", "utilization"] }
+      ],
+      "currentValueTemplate": "{licensing.hasPSS}",
+      "requiredValue": "Plano de Segurança e Saúde obrigatório",
+      "remediation": "Elaborar o Plano de Segurança e Saúde (PSS) nos termos do DL 273/2003. Deve ser elaborado em fase de projeto e atualizado em fase de obra pelo coordenador de segurança.",
+      "enabled": true,
+      "tags": ["PSS", "segurança", "saúde", "estaleiro"]
+    },
+    {
+      "id": "RJUE-PROT-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º-A — Parecer da DGPC em Áreas Protegidas",
+      "description": "Obras em imóveis classificados ou em zona de proteção requerem parecer favorável da DGPC ou entidade competente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "licensing.isProtectedArea", "operator": "==", "value": true },
+        { "field": "licensing.hasDGPCApproval", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{licensing.isProtectedArea}",
+      "requiredValue": "Parecer DGPC obrigatório em áreas protegidas",
+      "remediation": "Requerer parecer favorável da DGPC (Direção-Geral do Património Cultural) ou da entidade competente antes da aprovação do projeto. Os prazos de apreciação são mais longos.",
+      "enabled": true,
+      "tags": ["património", "DGPC", "protegida", "parecer"]
+    },
+    {
+      "id": "RJUE-APROV-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 26.º — Aprovação Municipal",
+      "description": "Aguardar aprovação municipal antes de iniciar obras. A obra sem aprovação está sujeita a embargo e coimas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "licensing.hasMunicipalApproval", "operator": "not_exists", "value": null },
+        { "field": "licensing.projectPhase", "operator": "not_in", "value": ["none", "utilization"] }
+      ],
+      "currentValueTemplate": "{licensing.hasMunicipalApproval}",
+      "requiredValue": "Aprovação municipal necessária",
+      "remediation": "Aguardar decisão da câmara municipal sobre o pedido de licenciamento ou comunicação prévia. A câmara aprecia no prazo de 45 dias (licenciamento) ou 20 dias (comunicação prévia).",
+      "enabled": true,
+      "tags": ["câmara", "aprovação", "prazo"]
+    }
+  ]
+}

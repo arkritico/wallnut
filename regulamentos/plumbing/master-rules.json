@@ -1,0 +1,6058 @@
+{
+  "metadata": {
+    "name": "Master — Regras Quantitativas Instalações Hidráulicas e Qualidade da Água",
+    "version": "1.0",
+    "consolidation_date": "2026-02-16",
+    "total_rules": 231,
+    "sources": [
+      "Decreto Regulamentar 23/95, de 23 de Agosto (RGSPPDADAR)",
+      "Anexo IV - Caudais mínimos nos dispositivos de utilização",
+      "Anexo V - Caudais de cálculo / Simultaneidade de fluxómetros",
+      "Decreto Regulamentar 23/95 (RGSPPDADAR) - Título V",
+      "Anexos XIV, XVI, XVII",
+      "Decreto Regulamentar 23/95 (RGSPPDADAR)",
+      "Portaria 1532/2008 (RT-SCIE) + Portaria 135/2020",
+      "NT 13 - Despacho 8904/2020",
+      "NT 14 - Despacho 8902/2020",
+      "Decreto-Lei 69/2023, de 21 de agosto",
+      "Diretiva (UE) 2020/2184",
+      "EN 806-2:2005 — Design of water supply installations",
+      "EN 806-3:2006 — Pipe sizing — Simplified method",
+      "EN 806-4:2010 — Installation",
+      "EN 806-5:2012 — Operation and maintenance",
+      "EN 12056-1:2000 — Gravity drainage — General and performance requirements",
+      "EN 12056-2:2000 — Sanitary pipework, layout and calculation",
+      "EN 12056-3:2000 — Roof drainage, layout and calculation"
+    ],
+    "articles_covered": [
+      "RGSPPDADAR Abastecimento: Art. 82-113 (Título III - Sistemas de distribuição predial de água)",
+      "RGSPPDADAR Drenagem: Art. 198-270 + Anexos XIV, XVI, XVII",
+      "RGSPPDADAR Complementar: Art. 7, 13, 17, 18, 21-29, 34-37, 40, 46, 49, 53, 55-56, 70-71, 111",
+      "RT-SCIE Incêndio: Art. 12, 164-174, NT13, NT14",
+      "DL 69/2023 Qualidade Água: Art. 6, Anexo I (Partes A-E), Anexo II (monitorização operacional)",
+      "EN 806 / EN 12056: EN 806-2 §3-4, EN 806-3 §4-6 + Table 2, EN 806-4 §7, EN 806-5 §5-6, EN 12056-2 §4-7 + Tables 2-5, EN 12056-3 §5-6"
+    ],
+    "source_files": [
+      {
+        "file": "plumb-supply-v2.json",
+        "label": "RGSPPDADAR Abastecimento",
+        "batch": 1,
+        "rules_loaded": 18
+      },
+      {
+        "file": "plumb-drain-v2_2.json",
+        "label": "RGSPPDADAR Drenagem",
+        "batch": 2,
+        "rules_loaded": 52
+      },
+      {
+        "file": "plumb-misc-v2.json",
+        "label": "RGSPPDADAR Complementar",
+        "batch": 3,
+        "rules_loaded": 46
+      },
+      {
+        "file": "fire-water-v2.json",
+        "label": "RT-SCIE Incêndio",
+        "batch": 4,
+        "rules_loaded": 33
+      },
+      {
+        "file": "water-quality-v2.json",
+        "label": "DL 69/2023 Qualidade Água",
+        "batch": 5,
+        "rules_loaded": 65
+      },
+      {
+        "file": "euro-norms-v2.json",
+        "label": "EN 806 / EN 12056",
+        "batch": 6,
+        "rules_loaded": 24
+      }
+    ],
+    "validation": {
+      "all_rules_have_numeric_check": true,
+      "rules_rejected_no_check": 0,
+      "duplicates_removed": 7
+    }
+  },
+  "rules": [
+    {
+      "id": "MASTER_001",
+      "article": "DR 23/95 Art. 87, nº 2",
+      "description": "Pressão mínima de serviço nos dispositivos de utilização prediais",
+      "parameter": "pressao_min_servico_dispositivo",
+      "check": "pressao >= 50",
+      "values": {
+        "min": 50
+      },
+      "unit": "kPa",
+      "scope": {
+        "applies_to": "dispositivos_utilizacao_predial"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S001"
+      }
+    },
+    {
+      "id": "MASTER_002",
+      "article": "DR 23/95 Art. 87, nº 2",
+      "description": "Pressão máxima de serviço nos dispositivos de utilização prediais",
+      "parameter": "pressao_max_servico_dispositivo",
+      "check": "pressao <= 600",
+      "values": {
+        "max": 600
+      },
+      "unit": "kPa",
+      "scope": {
+        "applies_to": "dispositivos_utilizacao_predial"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S002"
+      }
+    },
+    {
+      "id": "MASTER_003",
+      "article": "DR 23/95 Art. 87, nº 2",
+      "description": "Gama recomendável de pressão de serviço nos dispositivos de utilização",
+      "parameter": "pressao_recomendavel_dispositivo",
+      "check": "pressao >= 150 AND pressao <= 300",
+      "values": {
+        "min": 150,
+        "max": 300
+      },
+      "unit": "kPa",
+      "scope": {
+        "applies_to": "dispositivos_utilizacao_predial",
+        "nota": "valor_recomendavel_nao_obrigatorio"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S003"
+      }
+    },
+    {
+      "id": "MASTER_004",
+      "article": "DR 23/95 Art. 90, nº 2 + Anexo IV",
+      "description": "Caudais instantâneos mínimos nos dispositivos de utilização (água fria ou quente)",
+      "parameter": "caudal_instantaneo_min_dispositivo",
+      "check": "caudal >= values.table[dispositivo].min",
+      "values": {
+        "table": [
+          {
+            "dispositivo": "lavatorio_individual",
+            "min": 0.1
+          },
+          {
+            "dispositivo": "lavatorio_coletivo_por_torneira",
+            "min": 0.05
+          },
+          {
+            "dispositivo": "bide",
+            "min": 0.1
+          },
+          {
+            "dispositivo": "banheira",
+            "min": 0.25
+          },
+          {
+            "dispositivo": "chuveiro_individual",
+            "min": 0.15
+          },
+          {
+            "dispositivo": "autoclismo_bacia_retrete",
+            "min": 0.1
+          },
+          {
+            "dispositivo": "fluxometro_bacia_retrete",
+            "min": 1.5
+          },
+          {
+            "dispositivo": "mictorio_torneira_individual",
+            "min": 0.15
+          },
+          {
+            "dispositivo": "mictorio_fluxometro",
+            "min": 0.5
+          },
+          {
+            "dispositivo": "pia_lavar_louca",
+            "min": 0.2
+          },
+          {
+            "dispositivo": "maquina_lavar_louca",
+            "min": 0.15
+          },
+          {
+            "dispositivo": "maquina_lavar_roupa",
+            "min": 0.2
+          },
+          {
+            "dispositivo": "tanque_lavar_roupa",
+            "min": 0.2
+          },
+          {
+            "dispositivo": "boca_rega_15mm",
+            "min": 0.3
+          },
+          {
+            "dispositivo": "boca_rega_20mm",
+            "min": 0.45
+          }
+        ]
+      },
+      "unit": "l/s",
+      "scope": {
+        "applies_to": "todos_dispositivos_utilizacao"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S004"
+      }
+    },
+    {
+      "id": "MASTER_005",
+      "article": "DR 23/95 Art. 91, nº 5 + Anexo V",
+      "description": "Número de fluxómetros em funcionamento simultâneo para cálculo",
+      "parameter": "n_fluxometros_simultaneo",
+      "check": "n_simultaneo == table[n_total]",
+      "values": {
+        "table": [
+          {
+            "n_total": "2",
+            "n_simultaneo": 2
+          },
+          {
+            "n_total": "3-5",
+            "n_simultaneo": 3
+          },
+          {
+            "n_total": "6-10",
+            "n_simultaneo": 4
+          },
+          {
+            "n_total": "11-20",
+            "n_simultaneo": 5
+          },
+          {
+            "n_total": "21-50",
+            "n_simultaneo": 6
+          },
+          {
+            "n_total": ">50",
+            "n_simultaneo": 8
+          }
+        ]
+      },
+      "unit": "un",
+      "scope": {
+        "applies_to": "fluxometros_bacia_retrete"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S005"
+      }
+    },
+    {
+      "id": "MASTER_006",
+      "article": "DR 23/95 Art. 94, nº 1 al. b)",
+      "description": "Velocidade mínima de escoamento na rede predial de água fria e quente",
+      "parameter": "velocidade_min_escoamento_predial",
+      "check": "velocidade >= 0.5",
+      "values": {
+        "min": 0.5
+      },
+      "unit": "m/s",
+      "scope": {
+        "applies_to": "rede_predial_AF_AQ"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S006"
+      }
+    },
+    {
+      "id": "MASTER_007",
+      "article": "DR 23/95 Art. 94, nº 1 al. b)",
+      "description": "Velocidade máxima de escoamento na rede predial de água fria e quente",
+      "parameter": "velocidade_max_escoamento_predial",
+      "check": "velocidade <= 2.0",
+      "values": {
+        "max": 2.0
+      },
+      "unit": "m/s",
+      "scope": {
+        "applies_to": "rede_predial_AF_AQ"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S007"
+      }
+    },
+    {
+      "id": "MASTER_008",
+      "article": "DR 23/95 Art. 94, nº 2",
+      "description": "Diâmetro mínimo do ramal de alimentação de fluxómetros conforme pressão disponível",
+      "parameter": "dn_min_ramal_fluxometro",
+      "check": "IF pressao >= 250 THEN dn >= 32; IF pressao >= 150 AND pressao < 250 THEN dn >= 40",
+      "values": {
+        "table": [
+          {
+            "condicao": "pressao >= 250 kPa",
+            "dn_min": 32
+          },
+          {
+            "condicao": "pressao >= 150 kPa e < 250 kPa",
+            "dn_min": 40
+          }
+        ]
+      },
+      "unit": "mm",
+      "scope": {
+        "applies_to": "ramal_alimentacao_fluxometro"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S008"
+      }
+    },
+    {
+      "id": "MASTER_009",
+      "article": "DR 23/95 Art. 95, nº 1",
+      "description": "Inclinação recomendável dos troços horizontais das canalizações prediais",
+      "parameter": "inclinacao_trocos_horizontais",
+      "check": "inclinacao >= 0.5",
+      "values": {
+        "min": 0.5
+      },
+      "unit": "%",
+      "scope": {
+        "applies_to": "canalizacoes_prediais_horizontais",
+        "nota": "valor_orientativo"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S009"
+      }
+    },
+    {
+      "id": "MASTER_010",
+      "article": "DR 23/95 Art. 95, nº 4",
+      "description": "Distância mínima entre canalizações de água fria e de água quente",
+      "parameter": "dist_min_AF_AQ",
+      "check": "distancia >= 0.05",
+      "values": {
+        "min": 0.05
+      },
+      "unit": "m",
+      "scope": {
+        "applies_to": "canalizacoes_AF_AQ_paralelas"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S010"
+      }
+    },
+    {
+      "id": "MASTER_011",
+      "article": "DR 23/95 Art. 97, nº 2",
+      "description": "Temperatura máxima da água na distribuição de água quente",
+      "parameter": "temp_max_agua_quente",
+      "check": "temperatura <= 60",
+      "values": {
+        "max": 60
+      },
+      "unit": "°C",
+      "scope": {
+        "applies_to": "rede_agua_quente"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S011"
+      }
+    },
+    {
+      "id": "MASTER_012",
+      "article": "DR 23/95 Art. 102, al. d)",
+      "description": "Pressão limite para obrigatoriedade de válvula redutora de pressão no ramal de introdução",
+      "parameter": "pressao_limite_valvula_redutora",
+      "check": "IF pressao > 600 THEN valvula_redutora == true",
+      "values": {
+        "max": 600
+      },
+      "unit": "kPa",
+      "scope": {
+        "applies_to": "ramal_introducao"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S012"
+      }
+    },
+    {
+      "id": "MASTER_013",
+      "article": "DR 23/95 Art. 111, nº 2 al. b)",
+      "description": "Pressão de ensaio de estanquidade da rede predial de abastecimento",
+      "parameter": "pressao_ensaio_estanquidade_predial",
+      "check": "pressao_ensaio >= max(pressao_max_servico * 1.5, 900)",
+      "values": {
+        "fator": 1.5,
+        "min_absoluto": 900
+      },
+      "unit": "kPa",
+      "scope": {
+        "applies_to": "rede_predial_abastecimento"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S013"
+      }
+    },
+    {
+      "id": "MASTER_014",
+      "article": "DR 23/95 Art. 111, nº 2 al. c)",
+      "description": "Duração mínima do ensaio de estanquidade da rede predial",
+      "parameter": "duracao_ensaio_estanquidade_predial",
+      "check": "duracao >= 15",
+      "values": {
+        "min": 15
+      },
+      "unit": "min",
+      "scope": {
+        "applies_to": "rede_predial_abastecimento"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S014"
+      }
+    },
+    {
+      "id": "MASTER_015",
+      "article": "DR 23/95 Art. 34",
+      "description": "Velocidade de escoamento nos ramais de ligação",
+      "parameter": "velocidade_escoamento_ramal_ligacao",
+      "check": "velocidade >= 0.5 AND velocidade <= 2.0",
+      "values": {
+        "min": 0.5,
+        "max": 2.0
+      },
+      "unit": "m/s",
+      "scope": {
+        "applies_to": "ramal_ligacao"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S015"
+      }
+    },
+    {
+      "id": "MASTER_016",
+      "article": "DR 23/95 Art. 35, nº 1",
+      "description": "Diâmetro nominal mínimo do ramal de ligação",
+      "parameter": "dn_min_ramal_ligacao",
+      "check": "dn >= 20",
+      "values": {
+        "min": 20
+      },
+      "unit": "mm",
+      "scope": {
+        "applies_to": "ramal_ligacao"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S016"
+      }
+    },
+    {
+      "id": "MASTER_017",
+      "article": "DR 23/95 Art. 35, nº 2",
+      "description": "Diâmetro nominal mínimo do ramal de ligação quando assegura combate a incêndios sem reservatório",
+      "parameter": "dn_min_ramal_ligacao_incendio",
+      "check": "dn >= 45",
+      "values": {
+        "min": 45
+      },
+      "unit": "mm",
+      "scope": {
+        "applies_to": "ramal_ligacao_com_incendio"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S017"
+      }
+    },
+    {
+      "id": "MASTER_018",
+      "article": "DR 23/95 Art. 36",
+      "description": "Profundidade mínima de assentamento do ramal de ligação",
+      "parameter": "profundidade_min_ramal_ligacao",
+      "check": "IF circulacao_viaria THEN profundidade >= 0.80; IF NOT circulacao_viaria THEN profundidade >= 0.50",
+      "values": {
+        "table": [
+          {
+            "condicao": "zona com circulação viária",
+            "min": 0.8
+          },
+          {
+            "condicao": "zona sem circulação viária",
+            "min": 0.5
+          }
+        ]
+      },
+      "unit": "m",
+      "scope": {
+        "applies_to": "ramal_ligacao"
+      },
+      "origin": {
+        "file": "plumb-supply-v2.json",
+        "batch": 1,
+        "original_id": "PLUMB_S018"
+      }
+    },
+    {
+      "id": "MASTER_019",
+      "article": "RGSPPDADAR Anexo XIV",
+      "description": "Caudais de descarga e diâmetros mínimos dos ramais de descarga por aparelho sanitário",
+      "parameter": "caudal_descarga_e_DN_ramal_por_aparelho",
+      "check": "caudal_descarga >= table[aparelho].caudal AND DN_ramal >= table[aparelho].DN_ramal",
+      "values": {
+        "table": {
+          "bacia_retrete": {
+            "caudal": 90,
+            "DN_ramal": 90,
+            "DN_sifao": null,
+            "nota": "sifão incorporado"
+          },
+          "banheira": {
+            "caudal": 60,
+            "DN_ramal": 40,
+            "DN_sifao": 30
+          },
+          "bide": {
+            "caudal": 30,
+            "DN_ramal": 40,
+            "DN_sifao": 30
+          },
+          "chuveiro": {
+            "caudal": 30,
+            "DN_ramal": 40,
+            "DN_sifao": 30
+          },
+          "lavatorio": {
+            "caudal": 30,
+            "DN_ramal": 40,
+            "DN_sifao": 30
+          },
+          "maquina_lava_louca": {
+            "caudal": 60,
+            "DN_ramal": 50,
+            "DN_sifao": 40
+          },
+          "maquina_lava_roupa": {
+            "caudal": 60,
+            "DN_ramal": 50,
+            "DN_sifao": 40
+          },
+          "mictorio_espaldar": {
+            "caudal": 90,
+            "DN_ramal": 75,
+            "DN_sifao": 60
+          },
+          "mictorio_suspenso": {
+            "caudal": 60,
+            "DN_ramal": 50,
+            "DN_sifao": null,
+            "nota": "sifão incorporado"
+          },
+          "pia_lava_louca": {
+            "caudal": 30,
+            "DN_ramal": 50,
+            "DN_sifao": 40
+          },
+          "tanque": {
+            "caudal": 60,
+            "DN_ramal": 50,
+            "DN_sifao": 30
+          },
+          "ralo_pavimento": {
+            "caudal": 30,
+            "DN_ramal": null,
+            "DN_sifao": null
+          }
+        }
+      },
+      "unit": "l/min (caudal), mm (diâmetros)",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_descarga_individuais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P001"
+      }
+    },
+    {
+      "id": "MASTER_020",
+      "article": "RGSPPDADAR Art. 210, nº 2",
+      "description": "Período de retorno mínimo para dimensionamento pluvial predial",
+      "parameter": "periodo_retorno_pluvial_predial",
+      "check": "periodo_retorno >= 5",
+      "values": {
+        "min": 5
+      },
+      "unit": "anos",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "rede_predial_pluvial"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P002"
+      }
+    },
+    {
+      "id": "MASTER_021",
+      "article": "RGSPPDADAR Art. 210, nº 2",
+      "description": "Duração de precipitação a considerar no dimensionamento pluvial predial",
+      "parameter": "duracao_precipitacao_predial",
+      "check": "duracao == 5",
+      "values": {
+        "exact": 5
+      },
+      "unit": "min",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "rede_predial_pluvial"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P003"
+      }
+    },
+    {
+      "id": "MASTER_022",
+      "article": "RGSPPDADAR Art. 211",
+      "description": "Coeficiente de escoamento para coberturas de edifícios",
+      "parameter": "coef_escoamento_coberturas",
+      "check": "C == 1.0",
+      "values": {
+        "exact": 1.0
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "coberturas_edificios"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P004"
+      }
+    },
+    {
+      "id": "MASTER_023",
+      "article": "RGSPPDADAR Art. 214, nº 1b",
+      "description": "Inclinação dos ramais de descarga de águas residuais domésticas",
+      "parameter": "inclinacao_ramal_descarga_domestico",
+      "check": "inclinacao >= 10 AND inclinacao <= 40",
+      "values": {
+        "min": 10,
+        "max": 40
+      },
+      "unit": "mm/m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_descarga"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P005"
+      }
+    },
+    {
+      "id": "MASTER_024",
+      "article": "RGSPPDADAR Art. 214, nº 3-4",
+      "description": "Ramais de descarga não individuais dimensionados a meia secção",
+      "parameter": "taxa_ocupacao_ramal_nao_individual",
+      "check": "h_lamina <= 0.5 * h_total",
+      "values": {
+        "max_ratio": 0.5
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_descarga_nao_individuais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P006"
+      }
+    },
+    {
+      "id": "MASTER_025",
+      "article": "RGSPPDADAR Art. 214, nº 5b",
+      "description": "Inclinação mínima dos ramais de descarga de águas pluviais",
+      "parameter": "inclinacao_min_ramal_descarga_pluvial",
+      "check": "inclinacao >= 5",
+      "values": {
+        "min": 5
+      },
+      "unit": "mm/m",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "ramais_descarga"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P007"
+      }
+    },
+    {
+      "id": "MASTER_026",
+      "article": "RGSPPDADAR Art. 215, nº 2",
+      "description": "Diâmetro mínimo dos ramais de descarga de águas pluviais",
+      "parameter": "DN_min_ramal_descarga_pluvial",
+      "check": "DN >= 40",
+      "values": {
+        "min": 40
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "ramais_descarga"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P008"
+      }
+    },
+    {
+      "id": "MASTER_027",
+      "article": "RGSPPDADAR Art. 215, nº 2",
+      "description": "Diâmetro mínimo dos ramais de descarga pluviais com ralos de pinha",
+      "parameter": "DN_min_ramal_descarga_pluvial_ralo_pinha",
+      "check": "DN >= 50",
+      "values": {
+        "min": 50
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "ramais_descarga_com_ralo_pinha"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P009"
+      }
+    },
+    {
+      "id": "MASTER_028",
+      "article": "RGSPPDADAR Art. 217, nº 2",
+      "description": "Altura máxima do troço vertical de um ramal de descarga",
+      "parameter": "altura_max_troco_vertical_ramal",
+      "check": "altura_vertical <= 2.0",
+      "values": {
+        "max": 2.0
+      },
+      "unit": "m",
+      "scope": {
+        "system": "all",
+        "applies_to": "ramais_descarga"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P010"
+      }
+    },
+    {
+      "id": "MASTER_029",
+      "article": "RGSPPDADAR Art. 218, nº 2",
+      "description": "Ângulo máximo de inserção de forquilha para ligação de ramais de retrete e sabão no mesmo plano do tubo de queda",
+      "parameter": "angulo_max_forquilha_mesmo_plano",
+      "check": "angulo_insercao <= 45",
+      "values": {
+        "max": 45
+      },
+      "unit": "graus",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ligacao_ramal_tubo_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P011"
+      }
+    },
+    {
+      "id": "MASTER_030",
+      "article": "RGSPPDADAR Anexo XVI",
+      "description": "Distâncias máximas entre sifão e secção ventilada para escoamento a secção cheia",
+      "parameter": "dist_max_sifao_seccao_ventilada",
+      "check": "distancia <= table[DN].dist_max",
+      "values": {
+        "table": {
+          "DN_40": {
+            "dist_max": 1.0
+          },
+          "DN_50": {
+            "dist_max": 1.2
+          },
+          "DN_75": {
+            "dist_max": 1.8
+          },
+          "DN_90": {
+            "dist_max": 2.4
+          },
+          "DN_100": {
+            "dist_max": 3.0
+          }
+        }
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_descarga_individuais_seccao_cheia"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P012"
+      }
+    },
+    {
+      "id": "MASTER_031",
+      "article": "RGSPPDADAR Art. 221",
+      "description": "Diâmetro mínimo do ramal de ventilação em função do ramal de descarga",
+      "parameter": "DN_min_ramal_ventilacao",
+      "check": "DN_ventilacao >= (2/3) * DN_descarga",
+      "values": {
+        "min_ratio": 0.667
+      },
+      "unit": "adimensional (ratio)",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P013"
+      }
+    },
+    {
+      "id": "MASTER_032",
+      "article": "RGSPPDADAR Art. 222, nº 1",
+      "description": "Altura mínima do ramal de ventilação acima do aparelho mais elevado",
+      "parameter": "altura_min_ramal_ventilacao_acima_aparelho",
+      "check": "altura >= 0.15",
+      "values": {
+        "min": 0.15
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P014"
+      }
+    },
+    {
+      "id": "MASTER_033",
+      "article": "RGSPPDADAR Art. 222, nº 2",
+      "description": "Inclinação mínima da ligação do ramal de ventilação à coluna de ventilação",
+      "parameter": "inclinacao_min_ramal_ventilacao_coluna",
+      "check": "inclinacao >= 2",
+      "values": {
+        "min": 2
+      },
+      "unit": "%",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P015"
+      }
+    },
+    {
+      "id": "MASTER_034",
+      "article": "RGSPPDADAR Art. 222, nº 3",
+      "description": "Distância mínima de inserção do ramal de ventilação ao sifão",
+      "parameter": "dist_min_ventilacao_sifao",
+      "check": "distancia >= 2 * DN_ramal",
+      "values": {
+        "min_factor": 2,
+        "reference": "DN_ramal_descarga"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P016"
+      }
+    },
+    {
+      "id": "MASTER_035",
+      "article": "RGSPPDADAR Art. 222, nº 4",
+      "description": "Espaçamento máximo de ligações de ramais de ventilação colectivos em bateria",
+      "parameter": "espacamento_max_ventilacao_bateria",
+      "check": "n_aparelhos_entre_ligacoes <= 3",
+      "values": {
+        "max": 3
+      },
+      "unit": "aparelhos",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ramais_ventilacao_bateria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P017"
+      }
+    },
+    {
+      "id": "MASTER_036",
+      "article": "RGSPPDADAR Art. 227, nº d",
+      "description": "Altura máxima da lâmina líquida em algerozes e caleiras",
+      "parameter": "h_max_lamina_algeroz_caleira",
+      "check": "h_lamina <= 0.7 * h_seccao",
+      "values": {
+        "max_ratio": 0.7
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "algerozes_caleiras"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P018"
+      }
+    },
+    {
+      "id": "MASTER_037",
+      "article": "RGSPPDADAR Art. 231, nº 1b",
+      "description": "Taxa de ocupação máxima de tubos de queda com ventilação secundária",
+      "parameter": "taxa_ocupacao_max_TQ_com_ventilacao",
+      "check": "taxa_ocupacao <= 1/3",
+      "values": {
+        "max": 0.333
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_com_ventilacao_secundaria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P019"
+      }
+    },
+    {
+      "id": "MASTER_038",
+      "article": "RGSPPDADAR Art. 231, nº 1b + Anexo XVII",
+      "description": "Taxa de ocupação máxima de tubos de queda sem ventilação secundária",
+      "parameter": "taxa_ocupacao_max_TQ_sem_ventilacao",
+      "check": "taxa_ocupacao <= 1/7",
+      "values": {
+        "max": 0.143
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_sem_ventilacao_secundaria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P020"
+      }
+    },
+    {
+      "id": "MASTER_039",
+      "article": "RGSPPDADAR Art. 231, nº 3",
+      "description": "Obrigatoriedade de coluna de ventilação em tubos de queda altos com caudal elevado",
+      "parameter": "TQ_obriga_coluna_ventilacao",
+      "check": "IF altura_TQ > 35 AND caudal > 700 THEN coluna_ventilacao == true",
+      "values": {
+        "altura_limite": 35,
+        "caudal_limite": 700
+      },
+      "unit": "m (altura), l/min (caudal)",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P021"
+      }
+    },
+    {
+      "id": "MASTER_040",
+      "article": "RGSPPDADAR Art. 232",
+      "description": "Diâmetro mínimo dos tubos de queda",
+      "parameter": "DN_min_tubo_queda",
+      "check": "DN_TQ >= max(DN_maior_ramal, 50)",
+      "values": {
+        "min_absolute": 50,
+        "min_rule": "maior DN ramal ligado"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "all",
+        "applies_to": "tubos_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P022"
+      }
+    },
+    {
+      "id": "MASTER_041",
+      "article": "RGSPPDADAR Art. 233, nº 2",
+      "description": "Translação máxima em mudança de direcção de tubo de queda",
+      "parameter": "translacao_max_TQ",
+      "check": "translacao <= 10 * DN_TQ",
+      "values": {
+        "max_factor": 10,
+        "reference": "DN_tubo_queda"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "all",
+        "applies_to": "tubos_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P023"
+      }
+    },
+    {
+      "id": "MASTER_042",
+      "article": "RGSPPDADAR Art. 233, nº 4",
+      "description": "Raio mínimo de curva de concordância de tubo de queda doméstico",
+      "parameter": "raio_min_curva_TQ",
+      "check": "raio >= 3 * DN_TQ",
+      "values": {
+        "min_factor": 3,
+        "reference": "DN_tubo_queda"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P024"
+      }
+    },
+    {
+      "id": "MASTER_043",
+      "article": "RGSPPDADAR Art. 233, nº 5a",
+      "description": "Altura mínima de abertura do tubo de queda acima da cobertura (não terraço)",
+      "parameter": "altura_min_abertura_TQ_cobertura",
+      "check": "altura >= 0.5",
+      "values": {
+        "min": 0.5
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_ventilacao_primaria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P025"
+      }
+    },
+    {
+      "id": "MASTER_044",
+      "article": "RGSPPDADAR Art. 233, nº 5a",
+      "description": "Altura mínima de abertura do tubo de queda acima do terraço (cobertura acessível)",
+      "parameter": "altura_min_abertura_TQ_terraco",
+      "check": "altura >= 2.0",
+      "values": {
+        "min": 2.0
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_ventilacao_primaria_terraco"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P026"
+      }
+    },
+    {
+      "id": "MASTER_045",
+      "article": "RGSPPDADAR Art. 233, nº 5b",
+      "description": "Altura mínima de abertura do TQ acima do capelo de chaminé próxima (<0.5m)",
+      "parameter": "altura_min_TQ_acima_capelo_chamine",
+      "check": "IF dist_chamine < 0.5 THEN altura_TQ >= capelo + 0.2",
+      "values": {
+        "min_acima": 0.2,
+        "dist_limite": 0.5
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_ventilacao_primaria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P027"
+      }
+    },
+    {
+      "id": "MASTER_046",
+      "article": "RGSPPDADAR Art. 233, nº 5c",
+      "description": "Altura mínima da abertura do TQ acima de vergas de vãos próximos (<4m)",
+      "parameter": "altura_min_TQ_acima_vergas_vaos",
+      "check": "IF dist_vao < 4.0 THEN abertura_TQ >= verga + 1.0",
+      "values": {
+        "min_acima": 1.0,
+        "dist_limite": 4.0
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_ventilacao_primaria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P028"
+      }
+    },
+    {
+      "id": "MASTER_047",
+      "article": "RGSPPDADAR Art. 235, nº 1c",
+      "description": "Espaçamento máximo de bocas de limpeza em tubos de queda",
+      "parameter": "espacamento_max_bocas_limpeza_TQ",
+      "check": "n_pisos_entre_bocas <= 3",
+      "values": {
+        "max": 3
+      },
+      "unit": "pisos",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P029"
+      }
+    },
+    {
+      "id": "MASTER_048",
+      "article": "RGSPPDADAR Art. 236, nº 2",
+      "description": "Distância máxima do colector ao troço vertical do TQ sem ventilação secundária ou câmara",
+      "parameter": "dist_max_colector_TQ_sem_ventilacao",
+      "check": "distancia <= 10 * DN_TQ",
+      "values": {
+        "max_factor": 10,
+        "reference": "DN_tubo_queda"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ligacao_TQ_colector_predial"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P030"
+      }
+    },
+    {
+      "id": "MASTER_049",
+      "article": "RGSPPDADAR Art. 241, nº 2a",
+      "description": "Distância da origem da coluna de ventilação ao tubo de queda",
+      "parameter": "dist_origem_coluna_ventilacao_TQ",
+      "check": "distancia == 10 * DN_TQ",
+      "values": {
+        "factor": 10,
+        "reference": "DN_tubo_queda"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "colunas_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P031"
+      }
+    },
+    {
+      "id": "MASTER_050",
+      "article": "RGSPPDADAR Art. 241, nº 2b",
+      "description": "Altura mínima de terminação da coluna de ventilação acima do ramal de descarga mais elevado",
+      "parameter": "altura_min_terminacao_coluna_ventilacao",
+      "check": "altura >= 1.0",
+      "values": {
+        "min": 1.0
+      },
+      "unit": "m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "colunas_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P032"
+      }
+    },
+    {
+      "id": "MASTER_051",
+      "article": "RGSPPDADAR Art. 241, nº 2c",
+      "description": "Espaçamento máximo de ligações da coluna de ventilação ao tubo de queda",
+      "parameter": "espacamento_max_ligacao_coluna_TQ",
+      "check": "n_pisos_entre_ligacoes <= 3",
+      "values": {
+        "max": 3
+      },
+      "unit": "pisos",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "colunas_ventilacao"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P033"
+      }
+    },
+    {
+      "id": "MASTER_052",
+      "article": "RGSPPDADAR Art. 246, nº 1b",
+      "description": "Inclinação dos colectores prediais de águas residuais domésticas",
+      "parameter": "inclinacao_colector_predial_domestico",
+      "check": "inclinacao >= 10 AND inclinacao <= 40",
+      "values": {
+        "min": 10,
+        "max": 40
+      },
+      "unit": "mm/m",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "colectores_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P034"
+      }
+    },
+    {
+      "id": "MASTER_053",
+      "article": "RGSPPDADAR Art. 246, nº 1b",
+      "description": "Inclinação mínima dos colectores prediais de águas pluviais",
+      "parameter": "inclinacao_min_colector_predial_pluvial",
+      "check": "inclinacao >= 5",
+      "values": {
+        "min": 5
+      },
+      "unit": "mm/m",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "colectores_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P035"
+      }
+    },
+    {
+      "id": "MASTER_054",
+      "article": "RGSPPDADAR Art. 246, nº 2",
+      "description": "Escoamento máximo dos colectores prediais domésticos a meia secção",
+      "parameter": "taxa_ocupacao_max_colector_predial_domestico",
+      "check": "h_lamina <= 0.5 * h_total",
+      "values": {
+        "max_ratio": 0.5
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "colectores_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P036"
+      }
+    },
+    {
+      "id": "MASTER_055",
+      "article": "RGSPPDADAR Art. 247",
+      "description": "Diâmetro mínimo dos colectores prediais",
+      "parameter": "DN_min_colector_predial",
+      "check": "DN >= max(DN_maior_ligado, 100)",
+      "values": {
+        "min_absolute": 100,
+        "min_rule": "maior DN ligado"
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "all",
+        "applies_to": "colectores_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P037"
+      }
+    },
+    {
+      "id": "MASTER_056",
+      "article": "RGSPPDADAR Art. 249, nº 4",
+      "description": "Distância máxima entre câmaras ou bocas de limpeza consecutivas nos colectores prediais",
+      "parameter": "dist_max_camaras_limpeza_colector_predial",
+      "check": "distancia <= 15",
+      "values": {
+        "max": 15
+      },
+      "unit": "m",
+      "scope": {
+        "system": "all",
+        "applies_to": "colectores_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P038"
+      }
+    },
+    {
+      "id": "MASTER_057",
+      "article": "RGSPPDADAR Art. 254, nº 2",
+      "description": "Fecho hídrico mínimo dos sifões de águas residuais domésticas",
+      "parameter": "fecho_hidrico_min_sifao_domestico",
+      "check": "fecho_hidrico >= 50",
+      "values": {
+        "min": 50
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "sifoes"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P039"
+      }
+    },
+    {
+      "id": "MASTER_058",
+      "article": "RGSPPDADAR Art. 254, nº 2",
+      "description": "Fecho hídrico máximo dos sifões de águas residuais domésticas",
+      "parameter": "fecho_hidrico_max_sifao_domestico",
+      "check": "fecho_hidrico <= 75",
+      "values": {
+        "max": 75
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "sifoes"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P040"
+      }
+    },
+    {
+      "id": "MASTER_059",
+      "article": "RGSPPDADAR Art. 254, nº 2",
+      "description": "Fecho hídrico máximo dos sifões de águas pluviais",
+      "parameter": "fecho_hidrico_max_sifao_pluvial",
+      "check": "fecho_hidrico <= 100",
+      "values": {
+        "max": 100
+      },
+      "unit": "mm",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "sifoes"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P041"
+      }
+    },
+    {
+      "id": "MASTER_060",
+      "article": "RGSPPDADAR Art. 255, nº 2",
+      "description": "Distância máxima de sifão não incorporado ao aparelho sanitário",
+      "parameter": "dist_max_sifao_aparelho",
+      "check": "distancia <= 3.0",
+      "values": {
+        "max": 3.0
+      },
+      "unit": "m",
+      "scope": {
+        "system": "all",
+        "applies_to": "sifoes"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P042"
+      }
+    },
+    {
+      "id": "MASTER_061",
+      "article": "RGSPPDADAR Art. 258, nº 1",
+      "description": "Área útil mínima dos ralos de águas residuais domésticas",
+      "parameter": "area_util_min_ralo_domestico",
+      "check": "area_util_ralo >= (2/3) * area_seccao_ramal",
+      "values": {
+        "min_ratio": 0.667
+      },
+      "unit": "adimensional (ratio)",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ralos"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P043"
+      }
+    },
+    {
+      "id": "MASTER_062",
+      "article": "RGSPPDADAR Art. 258, nº 2",
+      "description": "Área útil mínima dos ralos no topo de tubos de queda pluviais",
+      "parameter": "area_util_min_ralo_topo_TQ_pluvial",
+      "check": "area_util_ralo >= 1.5 * area_seccao_TQ",
+      "values": {
+        "min_ratio": 1.5
+      },
+      "unit": "adimensional (ratio)",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "ralos_topo_tubos_queda"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P044"
+      }
+    },
+    {
+      "id": "MASTER_063",
+      "article": "RGSPPDADAR Art. 261, nº 2",
+      "description": "Dimensão mínima em planta de câmaras de inspecção prediais (altura < 1 m)",
+      "parameter": "dim_min_camara_inspecao_baixa",
+      "check": "dim_planta >= 0.8 * altura_camara",
+      "values": {
+        "min_ratio": 0.8,
+        "applies_when": "altura < 1.0"
+      },
+      "unit": "m",
+      "scope": {
+        "system": "all",
+        "applies_to": "camaras_inspecao_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P045"
+      }
+    },
+    {
+      "id": "MASTER_064",
+      "article": "RGSPPDADAR Art. 261, nº 3 (ref. Art. 158)",
+      "description": "Dimensão mínima em planta de câmaras de inspecção prediais (altura 1-2.5 m)",
+      "parameter": "dim_min_camara_inspecao_media",
+      "check": "dim_planta >= 1.0",
+      "values": {
+        "min": 1.0,
+        "applies_when": "1.0 <= altura < 2.5"
+      },
+      "unit": "m",
+      "scope": {
+        "system": "all",
+        "applies_to": "camaras_inspecao_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P046"
+      }
+    },
+    {
+      "id": "MASTER_065",
+      "article": "RGSPPDADAR Art. 261, nº 3 (ref. Art. 158)",
+      "description": "Dimensão mínima em planta de câmaras de inspecção prediais (altura >= 2.5 m)",
+      "parameter": "dim_min_camara_inspecao_alta",
+      "check": "dim_planta >= 1.25",
+      "values": {
+        "min": 1.25,
+        "applies_when": "altura >= 2.5"
+      },
+      "unit": "m",
+      "scope": {
+        "system": "all",
+        "applies_to": "camaras_inspecao_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P047"
+      }
+    },
+    {
+      "id": "MASTER_066",
+      "article": "RGSPPDADAR Art. 269, nº 1a",
+      "description": "Pressão de ensaio de estanquidade com ar ou fumo",
+      "parameter": "pressao_ensaio_estanquidade_ar",
+      "check": "pressao == 400",
+      "values": {
+        "exact": 400
+      },
+      "unit": "Pa",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "ensaio_estanquidade"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P048"
+      }
+    },
+    {
+      "id": "MASTER_067",
+      "article": "RGSPPDADAR Art. 269, nº 1b",
+      "description": "Duração mínima do ensaio de estanquidade (ar, fumo ou água)",
+      "parameter": "duracao_min_ensaio_estanquidade",
+      "check": "duracao >= 15",
+      "values": {
+        "min": 15
+      },
+      "unit": "min",
+      "scope": {
+        "system": "all",
+        "applies_to": "ensaio_estanquidade"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P049"
+      }
+    },
+    {
+      "id": "MASTER_068",
+      "article": "RGSPPDADAR Anexo XVII",
+      "description": "Caudais máximos em tubos de queda sem ventilação secundária por diâmetro",
+      "parameter": "caudal_max_TQ_sem_ventilacao_por_DN",
+      "check": "caudal <= table[DN].caudal_max",
+      "values": {
+        "table": {
+          "DN_50": {
+            "caudal_max": 30
+          },
+          "DN_75": {
+            "caudal_max": 90
+          },
+          "DN_90": {
+            "caudal_max": 150
+          },
+          "DN_100": {
+            "caudal_max": 210
+          },
+          "DN_125": {
+            "caudal_max": 390
+          },
+          "DN_150": {
+            "caudal_max": 540
+          }
+        }
+      },
+      "unit": "l/min",
+      "scope": {
+        "system": "domestico",
+        "applies_to": "tubos_queda_sem_ventilacao_secundaria"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P050"
+      }
+    },
+    {
+      "id": "MASTER_069",
+      "article": "RGSPPDADAR Art. 246, nº 2",
+      "description": "Colectores prediais pluviais dimensionados para secção cheia",
+      "parameter": "taxa_ocupacao_max_colector_predial_pluvial",
+      "check": "h_lamina <= h_total",
+      "values": {
+        "max_ratio": 1.0
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "colectores_prediais"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P051"
+      }
+    },
+    {
+      "id": "MASTER_070",
+      "article": "RGSPPDADAR Art. 214, nº 6",
+      "description": "Ramais de descarga pluviais dimensionados para secção cheia",
+      "parameter": "taxa_ocupacao_max_ramal_descarga_pluvial",
+      "check": "h_lamina <= h_total",
+      "values": {
+        "max_ratio": 1.0
+      },
+      "unit": "adimensional",
+      "scope": {
+        "system": "pluvial",
+        "applies_to": "ramais_descarga"
+      },
+      "origin": {
+        "file": "plumb-drain-v2_2.json",
+        "batch": 2,
+        "original_id": "DRAIN_P052"
+      }
+    },
+    {
+      "id": "MASTER_071",
+      "article": "DR 23/95 Art. 7, nº 1",
+      "description": "Pressão mínima nos dispositivos de utilização prediais (rede pública)",
+      "parameter": "pressao_min_dispositivos_publica",
+      "check": "pressao >= 100",
+      "values": {
+        "min": 100
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "rede_publica_distribuicao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M001"
+      }
+    },
+    {
+      "id": "MASTER_072",
+      "article": "DR 23/95 Art. 7, nº 1",
+      "description": "Pressão máxima nos dispositivos de utilização prediais (rede pública)",
+      "parameter": "pressao_max_dispositivos_publica",
+      "check": "pressao <= 600",
+      "values": {
+        "max": 600
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "rede_publica_distribuicao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M002"
+      }
+    },
+    {
+      "id": "MASTER_073",
+      "article": "DR 23/95 Art. 13",
+      "description": "Capitações mínimas na distribuição domiciliária por dimensão do aglomerado",
+      "parameter": "capitacao_minima_domestica",
+      "check": "IF pop <= 1000 THEN cap >= 80; IF pop <= 10000 THEN cap >= 100; IF pop <= 20000 THEN cap >= 125; IF pop <= 50000 THEN cap >= 150; IF pop > 50000 THEN cap >= 175",
+      "values": {
+        "table": [
+          {
+            "condicao": "pop <= 1000",
+            "min": 80
+          },
+          {
+            "condicao": "1000 < pop <= 10000",
+            "min": 100
+          },
+          {
+            "condicao": "10000 < pop <= 20000",
+            "min": 125
+          },
+          {
+            "condicao": "20000 < pop <= 50000",
+            "min": 150
+          },
+          {
+            "condicao": "pop > 50000",
+            "min": 175
+          }
+        ]
+      },
+      "unit": "l/hab/dia",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "distribuicao_domiciliaria"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M003"
+      }
+    },
+    {
+      "id": "MASTER_074",
+      "article": "DR 23/95 Art. 17",
+      "description": "Valor mínimo admissível para fugas de água no sistema",
+      "parameter": "percentagem_min_fugas",
+      "check": "fugas >= 10",
+      "values": {
+        "min": 10
+      },
+      "unit": "%",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "sistema_distribuicao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M004"
+      }
+    },
+    {
+      "id": "MASTER_075",
+      "article": "DR 23/95 Art. 18, nº 2",
+      "description": "Caudal instantâneo para combate a incêndios por grau de risco na rede pública",
+      "parameter": "caudal_incendio_rede_publica",
+      "check": "IF grau == 1 THEN caudal >= 15; IF grau == 2 THEN caudal >= 22.5; IF grau == 3 THEN caudal >= 30; IF grau == 4 THEN caudal >= 45",
+      "values": {
+        "table": [
+          {
+            "grau_risco": 1,
+            "min": 15
+          },
+          {
+            "grau_risco": 2,
+            "min": 22.5
+          },
+          {
+            "grau_risco": 3,
+            "min": 30
+          },
+          {
+            "grau_risco": 4,
+            "min": 45
+          }
+        ]
+      },
+      "unit": "l/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "rede_publica_incendio"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M005"
+      }
+    },
+    {
+      "id": "MASTER_076",
+      "article": "DR 23/95 Art. 21, nº 1 b)",
+      "description": "Velocidade mínima de escoamento na rede pública no início de exploração",
+      "parameter": "velocidade_min_rede_publica",
+      "check": "velocidade >= 0.30",
+      "values": {
+        "min": 0.3
+      },
+      "unit": "m/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "condutas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M006"
+      }
+    },
+    {
+      "id": "MASTER_077",
+      "article": "DR 23/95 Art. 21, nº 1 c)",
+      "description": "Pressão máxima estática ou de serviço ao nível do solo na rede pública",
+      "parameter": "pressao_max_solo_rede_publica",
+      "check": "pressao <= 600",
+      "values": {
+        "max": 600
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "rede_publica_distribuicao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M007"
+      }
+    },
+    {
+      "id": "MASTER_078",
+      "article": "DR 23/95 Art. 21, nº 1 d)",
+      "description": "Variação máxima de pressão ao longo do dia em cada nó da rede pública",
+      "parameter": "variacao_pressao_diaria_no",
+      "check": "variacao_pressao <= 300",
+      "values": {
+        "max": 300
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "rede_publica_distribuicao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M008"
+      }
+    },
+    {
+      "id": "MASTER_079",
+      "article": "DR 23/95 Art. 21, nº 1 e)",
+      "description": "Pressão mínima na rede pública ao nível do arruamento em função do nº de pisos",
+      "parameter": "pressao_min_arruamento_pisos",
+      "check": "pressao >= 100 + 40 * n_pisos",
+      "values": {
+        "formula": "H = 100 + 40 * n",
+        "base": 100,
+        "incremento_por_piso": 40
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "rede_publica_distribuicao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M009"
+      }
+    },
+    {
+      "id": "MASTER_080",
+      "article": "DR 23/95 Art. 23, nº 1",
+      "description": "Diâmetro nominal mínimo das condutas de distribuição pública",
+      "parameter": "dn_min_condutas_publica",
+      "check": "IF pop < 20000 THEN dn >= 60; IF pop >= 20000 THEN dn >= 80",
+      "values": {
+        "table": [
+          {
+            "condicao": "pop < 20000",
+            "min": 60
+          },
+          {
+            "condicao": "pop >= 20000",
+            "min": 80
+          }
+        ]
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "condutas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M010"
+      }
+    },
+    {
+      "id": "MASTER_081",
+      "article": "DR 23/95 Art. 23, nº 2",
+      "description": "Diâmetro nominal mínimo das condutas públicas com serviço de incêndio por grau de risco",
+      "parameter": "dn_min_condutas_incendio",
+      "check": "IF grau == 1 THEN dn >= 80; IF grau == 2 THEN dn >= 90; IF grau == 3 THEN dn >= 100; IF grau == 4 THEN dn >= 125; IF grau == 5 THEN dn >= 150",
+      "values": {
+        "table": [
+          {
+            "grau_risco": 1,
+            "min": 80
+          },
+          {
+            "grau_risco": 2,
+            "min": 90
+          },
+          {
+            "grau_risco": 3,
+            "min": 100
+          },
+          {
+            "grau_risco": 4,
+            "min": 125
+          },
+          {
+            "grau_risco": 5,
+            "min": 150
+          }
+        ]
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "condutas_rede_publica_incendio"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M011"
+      }
+    },
+    {
+      "id": "MASTER_082",
+      "article": "DR 23/95 Art. 24, nº 2",
+      "description": "Distância mínima das condutas públicas aos limites das propriedades",
+      "parameter": "dist_min_conduta_limite_propriedade",
+      "check": "distancia >= 0.80",
+      "values": {
+        "min": 0.8
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "condutas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M012"
+      }
+    },
+    {
+      "id": "MASTER_083",
+      "article": "DR 23/95 Art. 24, nº 3",
+      "description": "Distância mínima entre condutas de água e colectores de águas residuais",
+      "parameter": "dist_min_conduta_colector",
+      "check": "distancia >= 1.0",
+      "values": {
+        "min": 1.0
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "condutas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M013"
+      }
+    },
+    {
+      "id": "MASTER_084",
+      "article": "DR 23/95 Art. 25, nº 1",
+      "description": "Profundidade mínima de assentamento das condutas públicas",
+      "parameter": "prof_min_condutas_publica",
+      "check": "profundidade >= 0.80",
+      "values": {
+        "min": 0.8
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "condutas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M014"
+      }
+    },
+    {
+      "id": "MASTER_085",
+      "article": "DR 23/95 Art. 26, nº 1",
+      "description": "Largura mínima de valas para condutas até DN 500 (profundidade até 3 m)",
+      "parameter": "largura_vala_condutas_pequenas",
+      "check": "largura >= De + 0.50",
+      "values": {
+        "formula": "L = De + 0.50",
+        "incremento": 0.5
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "valas_condutas_dn_ate_500"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M015"
+      }
+    },
+    {
+      "id": "MASTER_086",
+      "article": "DR 23/95 Art. 26, nº 1",
+      "description": "Largura mínima de valas para condutas acima de DN 500 (profundidade até 3 m)",
+      "parameter": "largura_vala_condutas_grandes",
+      "check": "largura >= De + 0.70",
+      "values": {
+        "formula": "L = De + 0.70",
+        "incremento": 0.7
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "valas_condutas_dn_sup_500"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M016"
+      }
+    },
+    {
+      "id": "MASTER_087",
+      "article": "DR 23/95 Art. 27, nº 3",
+      "description": "Espessura da camada de assentamento em terreno rochoso",
+      "parameter": "espessura_camada_rochoso",
+      "check": "espessura >= 0.15 AND espessura <= 0.30",
+      "values": {
+        "min": 0.15,
+        "max": 0.3
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "assentamento_terreno_rochoso"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M017"
+      }
+    },
+    {
+      "id": "MASTER_088",
+      "article": "DR 23/95 Art. 27, nº 3",
+      "description": "Dimensão máxima do material de assentamento em terreno rochoso",
+      "parameter": "dim_max_material_assentamento",
+      "check": "dimensao <= 20",
+      "values": {
+        "max": 20
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "assentamento_terreno_rochoso"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M018"
+      }
+    },
+    {
+      "id": "MASTER_089",
+      "article": "DR 23/95 Art. 37, nº 2",
+      "description": "Diâmetro máximo da conduta pública para inserção de ramal de ligação",
+      "parameter": "dn_max_conduta_insercao_ramal",
+      "check": "dn_conduta <= 300",
+      "values": {
+        "max": 300
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "insercao_ramal_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M024"
+      }
+    },
+    {
+      "id": "MASTER_090",
+      "article": "DR 23/95 Art. 40, nº 2 c)",
+      "description": "Número máximo de habitantes por zona isolável por válvulas de seccionamento",
+      "parameter": "n_max_hab_zona_isolavel",
+      "check": "habitantes <= 500",
+      "values": {
+        "max": 500
+      },
+      "unit": "hab",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "valvulas_seccionamento"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M025"
+      }
+    },
+    {
+      "id": "MASTER_091",
+      "article": "DR 23/95 Art. 40, nº 2 d)",
+      "description": "Espaçamento máximo entre válvulas de seccionamento em condutas sem serviço de percurso",
+      "parameter": "espacamento_max_valvulas_sem_percurso",
+      "check": "espacamento <= 1000",
+      "values": {
+        "max": 1000
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "valvulas_seccionamento"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M026"
+      }
+    },
+    {
+      "id": "MASTER_092",
+      "article": "DR 23/95 Art. 40, nº 2 e)",
+      "description": "Número de válvulas de seccionamento nos cruzamentos principais",
+      "parameter": "n_valvulas_cruzamento",
+      "check": "n_valvulas >= 3",
+      "values": {
+        "min": 3
+      },
+      "unit": "un",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "valvulas_seccionamento_cruzamentos"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M027"
+      }
+    },
+    {
+      "id": "MASTER_093",
+      "article": "DR 23/95 Art. 40, nº 2 f)",
+      "description": "Número de válvulas de seccionamento nos entroncamentos principais",
+      "parameter": "n_valvulas_entroncamento",
+      "check": "n_valvulas >= 2",
+      "values": {
+        "min": 2
+      },
+      "unit": "un",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "valvulas_seccionamento_entroncamentos"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M028"
+      }
+    },
+    {
+      "id": "MASTER_094",
+      "article": "DR 23/95 Art. 46, nº 1",
+      "description": "Comprimento mínimo de condutas sem serviço de percurso para exigir ventosas",
+      "parameter": "comprimento_conduta_exige_ventosa",
+      "check": "comprimento > 1000",
+      "values": {
+        "min": 1000
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "ventosas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M029"
+      }
+    },
+    {
+      "id": "MASTER_095",
+      "article": "DR 23/95 Art. 46, nº 3",
+      "description": "Diâmetro mínimo de ventosas na rede pública",
+      "parameter": "dn_min_ventosa",
+      "check": "dn_ventosa >= max(dn_conduta / 8, 20)",
+      "values": {
+        "formula": "dn = max(D/8, 20)",
+        "fracao": 0.125,
+        "min_absoluto": 20
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "ventosas_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M030"
+      }
+    },
+    {
+      "id": "MASTER_096",
+      "article": "DR 23/95 Art. 49",
+      "description": "Diâmetro mínimo de descargas de fundo na rede pública",
+      "parameter": "dn_min_descarga_fundo",
+      "check": "dn_descarga >= max(dn_conduta / 6, 50)",
+      "values": {
+        "formula": "dn = max(D/6, 50)",
+        "fracao": 0.167,
+        "min_absoluto": 50
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "descargas_fundo_rede_publica"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M031"
+      }
+    },
+    {
+      "id": "MASTER_097",
+      "article": "DR 23/95 Art. 53, nº 2",
+      "description": "Afastamento máximo entre bocas de rega e lavagem",
+      "parameter": "afastamento_max_bocas_rega",
+      "check": "afastamento <= 50",
+      "values": {
+        "max": 50
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "bocas_rega_lavagem"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M032"
+      }
+    },
+    {
+      "id": "MASTER_098",
+      "article": "DR 23/95 Art. 53, nº 3",
+      "description": "Diâmetro nominal mínimo das bocas de rega/lavagem e respectivos ramais",
+      "parameter": "dn_min_bocas_rega",
+      "check": "dn >= 20",
+      "values": {
+        "min": 20
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "bocas_rega_lavagem"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M033"
+      }
+    },
+    {
+      "id": "MASTER_099",
+      "article": "DR 23/95 Art. 55 a)",
+      "description": "Afastamento máximo entre bocas de incêndio em construções em banda contínua",
+      "parameter": "afastamento_bocas_incendio_banda",
+      "check": "afastamento <= 25",
+      "values": {
+        "max": 25
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "bocas_incendio_passeio"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M034"
+      }
+    },
+    {
+      "id": "MASTER_100",
+      "article": "DR 23/95 Art. 55 b)",
+      "description": "Espaçamento máximo entre marcos de água por grau de risco de incêndio",
+      "parameter": "espacamento_marcos_agua",
+      "check": "IF grau == 1 THEN espacamento <= 200; IF grau == 2 THEN espacamento <= 150; IF grau == 3 THEN espacamento <= 130; IF grau == 4 THEN espacamento <= 100",
+      "values": {
+        "table": [
+          {
+            "grau_risco": 1,
+            "max": 200
+          },
+          {
+            "grau_risco": 2,
+            "max": 150
+          },
+          {
+            "grau_risco": 3,
+            "max": 130
+          },
+          {
+            "grau_risco": 4,
+            "max": 100
+          }
+        ]
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "marcos_agua"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M035"
+      }
+    },
+    {
+      "id": "MASTER_101",
+      "article": "DR 23/95 Art. 56, nº 1",
+      "description": "Diâmetro nominal mínimo do ramal de alimentação de bocas de incêndio",
+      "parameter": "dn_min_ramal_boca_incendio",
+      "check": "dn >= 45",
+      "values": {
+        "min": 45
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "ramais_bocas_incendio"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M036"
+      }
+    },
+    {
+      "id": "MASTER_102",
+      "article": "DR 23/95 Art. 56, nº 1",
+      "description": "Diâmetro nominal mínimo do ramal de alimentação de marcos de água",
+      "parameter": "dn_min_ramal_marco_agua",
+      "check": "dn >= 90",
+      "values": {
+        "min": 90
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "ramais_marcos_agua"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M037"
+      }
+    },
+    {
+      "id": "MASTER_103",
+      "article": "DR 23/95 Art. 56, nº 2",
+      "description": "Diâmetro de saída das bocas de incêndio",
+      "parameter": "dn_saida_boca_incendio",
+      "check": "dn == 40",
+      "values": {
+        "exact": 40
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "bocas_incendio"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M038"
+      }
+    },
+    {
+      "id": "MASTER_104",
+      "article": "DR 23/95 Art. 70, nº 7",
+      "description": "Reserva mínima de água para incêndio nos reservatórios por grau de risco",
+      "parameter": "reserva_incendio_reservatorio",
+      "check": "IF grau == 1 THEN volume >= 75; IF grau == 2 THEN volume >= 125; IF grau == 3 THEN volume >= 200; IF grau == 4 THEN volume >= 300",
+      "values": {
+        "table": [
+          {
+            "grau_risco": 1,
+            "min": 75
+          },
+          {
+            "grau_risco": 2,
+            "min": 125
+          },
+          {
+            "grau_risco": 3,
+            "min": 200
+          },
+          {
+            "grau_risco": 4,
+            "min": 300
+          }
+        ]
+      },
+      "unit": "m3",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "reservatorios_publicos"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M039"
+      }
+    },
+    {
+      "id": "MASTER_105",
+      "article": "DR 23/95 Art. 70, nº 9",
+      "description": "Capacidade mínima de equilíbrio em torres de pressão (15 min de caudal de ponta)",
+      "parameter": "capacidade_min_torre_pressao",
+      "check": "volume >= Q_ponta * 15 / 60",
+      "values": {
+        "min_tempo": 15
+      },
+      "unit": "min",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "torres_pressao"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M040"
+      }
+    },
+    {
+      "id": "MASTER_106",
+      "article": "DR 23/95 Art. 70, nº 10",
+      "description": "Coeficiente K mínimo para capacidade de armazenamento do sistema V >= K*Qmd",
+      "parameter": "coeficiente_K_armazenamento",
+      "check": "IF pop > 100000 THEN K >= 1.0; IF 10000 <= pop <= 100000 THEN K >= 1.25; IF 1000 <= pop < 10000 THEN K >= 1.5; IF pop < 1000 THEN K >= 2.0",
+      "values": {
+        "table": [
+          {
+            "condicao": "pop > 100000",
+            "min": 1.0
+          },
+          {
+            "condicao": "10000 <= pop <= 100000",
+            "min": 1.25
+          },
+          {
+            "condicao": "1000 <= pop < 10000",
+            "min": 1.5
+          },
+          {
+            "condicao": "pop < 1000",
+            "min": 2.0
+          }
+        ]
+      },
+      "unit": "adim",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "reservatorios_publicos"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M041"
+      }
+    },
+    {
+      "id": "MASTER_107",
+      "article": "DR 23/95 Art. 71, nº 1",
+      "description": "Inclinação mínima do fundo dos reservatórios para caleiras ou descarga",
+      "parameter": "inclinacao_min_fundo_reservatorio",
+      "check": "inclinacao >= 1",
+      "values": {
+        "min": 1
+      },
+      "unit": "%",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "reservatorios_publicos"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M042"
+      }
+    },
+    {
+      "id": "MASTER_108",
+      "article": "DR 23/95 Art. 16, nº 1",
+      "description": "Capitação de consumos públicos (rega, lavagem, fontanários)",
+      "parameter": "capitacao_consumos_publicos",
+      "check": "capitacao >= 5 AND capitacao <= 20",
+      "values": {
+        "min": 5,
+        "max": 20
+      },
+      "unit": "l/hab/dia",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "consumos_publicos"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M045"
+      }
+    },
+    {
+      "id": "MASTER_109",
+      "article": "DR 23/95 Art. 28, nº 1",
+      "description": "Altura mínima de aterro acima do extradorso das tubagens",
+      "parameter": "altura_aterro_acima_tubagem",
+      "check": "altura >= 0.15 AND altura <= 0.30",
+      "values": {
+        "min": 0.15,
+        "max": 0.3
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "applies_to": "aterro_valas_condutas"
+      },
+      "origin": {
+        "file": "plumb-misc-v2.json",
+        "batch": 3,
+        "original_id": "PLUMB_M046"
+      }
+    },
+    {
+      "id": "MASTER_110",
+      "article": "RT-SCIE Art. 12, nº 5",
+      "description": "Cota de instalação de bocas de incêndio exteriores (fachada)",
+      "parameter": "cota_boca_incendio_exterior",
+      "check": "cota >= 0.4 AND cota <= 0.8",
+      "values": {
+        "min": 0.4,
+        "max": 0.8
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "bocas_incendio_fachada"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W001"
+      }
+    },
+    {
+      "id": "MASTER_111",
+      "article": "RT-SCIE Art. 12, nº 5",
+      "description": "Distância máxima de bocas de incêndio às saídas de evacuação",
+      "parameter": "dist_boca_exterior_saida",
+      "check": "distancia <= 30",
+      "values": {
+        "max": 30
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "bocas_incendio_fachada"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W002"
+      }
+    },
+    {
+      "id": "MASTER_112",
+      "article": "RT-SCIE Art. 12, nº 5",
+      "description": "Distância máxima entre bocas de incêndio em zonas urbanas",
+      "parameter": "dist_entre_bocas_exteriores",
+      "check": "distancia <= 40",
+      "values": {
+        "max": 40
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "bocas_incendio_fachada"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W003"
+      }
+    },
+    {
+      "id": "MASTER_113",
+      "article": "RT-SCIE Art. 165, nº 2",
+      "description": "Altura máxima do eixo da válvula da BITC ao pavimento",
+      "parameter": "altura_eixo_BITC",
+      "check": "altura <= 1.50",
+      "values": {
+        "max": 1.5
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "II",
+          "III",
+          "IV",
+          "V",
+          "VI",
+          "VII",
+          "VIII",
+          "IX",
+          "X",
+          "XI",
+          "XII"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "BITC"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W004"
+      }
+    },
+    {
+      "id": "MASTER_114",
+      "article": "RT-SCIE Art. 165, nº 1",
+      "description": "Raio de cobertura da BITC (comprimento mangueira + jato)",
+      "parameter": "alcance_BITC",
+      "check": "comprimento_mangueira + 5 >= distancia_ponto_mais_afastado",
+      "values": {
+        "jato": 5
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "II",
+          "III",
+          "IV",
+          "V",
+          "VI",
+          "VII",
+          "VIII",
+          "IX",
+          "X",
+          "XI",
+          "XII"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "BITC"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W005"
+      }
+    },
+    {
+      "id": "MASTER_115",
+      "article": "RT-SCIE Art. 166",
+      "description": "Diâmetro nominal da mangueira semirrígida do carretel",
+      "parameter": "dn_mangueira_BITC",
+      "check": "diametro == 25",
+      "values": {
+        "exact": 25
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "BITC"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W006"
+      }
+    },
+    {
+      "id": "MASTER_116",
+      "article": "RT-SCIE Art. 166",
+      "description": "Pressão dinâmica mínima na BITC mais desfavorável",
+      "parameter": "pressao_BITC_desfavoravel",
+      "check": "pressao >= 250",
+      "values": {
+        "min": 250
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "BITC"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W007"
+      }
+    },
+    {
+      "id": "MASTER_117",
+      "article": "RT-SCIE Art. 166",
+      "description": "Caudal mínimo na BITC mais desfavorável",
+      "parameter": "caudal_BITC_desfavoravel",
+      "check": "caudal >= 1.5",
+      "values": {
+        "min": 1.5
+      },
+      "unit": "l/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "BITC"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W008"
+      }
+    },
+    {
+      "id": "MASTER_118",
+      "article": "RT-SCIE Art. 166",
+      "description": "Número de BITC em funcionamento simultâneo para cálculo",
+      "parameter": "n_BITC_simultaneo",
+      "check": "n_simultaneo == min(ceil(n_total * 0.5), 4)",
+      "values": {
+        "fraction": 0.5,
+        "max_simultaneo": 4
+      },
+      "unit": "un",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "BITC"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W009"
+      }
+    },
+    {
+      "id": "MASTER_119",
+      "article": "RT-SCIE Art. 168, nº 5",
+      "description": "Pressão dinâmica mínima na boca de 2ª intervenção mais desfavorável (rede húmida)",
+      "parameter": "pressao_boca_2a_interv",
+      "check": "pressao >= 350",
+      "values": {
+        "min": 350
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_humida_2a_intervencao"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W010"
+      }
+    },
+    {
+      "id": "MASTER_120",
+      "article": "RT-SCIE Art. 168, nº 5",
+      "description": "Caudal mínimo na boca de 2ª intervenção mais desfavorável (rede húmida)",
+      "parameter": "caudal_boca_2a_interv",
+      "check": "caudal >= 4",
+      "values": {
+        "min": 4
+      },
+      "unit": "l/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_humida_2a_intervencao"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W011"
+      }
+    },
+    {
+      "id": "MASTER_121",
+      "article": "RT-SCIE Art. 168, nº 5",
+      "description": "Número de bocas de 2ª intervenção em funcionamento simultâneo para cálculo",
+      "parameter": "n_bocas_2a_simultaneo",
+      "check": "n_simultaneo == min(ceil(n_total * 0.5), 4)",
+      "values": {
+        "fraction": 0.5,
+        "max_simultaneo": 4
+      },
+      "unit": "un",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_humida_2a_intervencao"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W012"
+      }
+    },
+    {
+      "id": "MASTER_122",
+      "article": "RT-SCIE Art. 169, nº 1",
+      "description": "Número mínimo de bocas de incêndio de 2ª intervenção por piso",
+      "parameter": "n_bocas_2a_por_piso",
+      "check": "n_bocas >= 1",
+      "values": {
+        "min": 1
+      },
+      "unit": "un",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_2a_intervencao"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W013"
+      }
+    },
+    {
+      "id": "MASTER_123",
+      "article": "NT13 §3.2",
+      "description": "Cota do eixo da boca de alimentação siamesa ao pavimento",
+      "parameter": "cota_boca_alimentacao",
+      "check": "cota >= 0.80 AND cota <= 1.20",
+      "values": {
+        "min": 0.8,
+        "max": 1.2
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "boca_alimentacao_siamesa"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W014"
+      }
+    },
+    {
+      "id": "MASTER_124",
+      "article": "NT13 §3.3",
+      "description": "Ângulo do eixo da boca de alimentação com o plano vertical",
+      "parameter": "angulo_boca_alimentacao",
+      "check": "angulo >= 30 AND angulo <= 50",
+      "values": {
+        "min": 30,
+        "max": 50
+      },
+      "unit": "graus",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "boca_alimentacao_siamesa"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W015"
+      }
+    },
+    {
+      "id": "MASTER_125",
+      "article": "NT13 §4.1",
+      "description": "Diâmetro nominal mínimo de colunas secas/húmidas montantes",
+      "parameter": "dn_coluna_montante",
+      "check": "IF altura_ut <= 50 THEN dn >= 80; IF altura_ut > 50 THEN dn >= 100",
+      "values": {
+        "table": [
+          {
+            "condicao": "altura_ut <= 50",
+            "min": 80
+          },
+          {
+            "condicao": "altura_ut > 50",
+            "min": 100
+          },
+          {
+            "condicao": "ligacao_indireta == true",
+            "min": 100
+          }
+        ]
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "coluna_seca_humida"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W016"
+      }
+    },
+    {
+      "id": "MASTER_126",
+      "article": "NT13 §4.2",
+      "description": "Comprimento mínimo do troço vertical fechado no topo da coluna seca",
+      "parameter": "comprimento_troco_topo",
+      "check": "comprimento >= 1.5",
+      "values": {
+        "min": 1.5
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "coluna_seca"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W017"
+      }
+    },
+    {
+      "id": "MASTER_127",
+      "article": "NT13 §5.1",
+      "description": "Pressão de ensaio de estanquidade da rede seca",
+      "parameter": "pressao_ensaio_rede_seca",
+      "check": "pressao_ensaio >= 2500",
+      "values": {
+        "min": 2500
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_seca"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W018"
+      }
+    },
+    {
+      "id": "MASTER_128",
+      "article": "NT13 §5.2",
+      "description": "Pressão de ensaio da rede húmida de 2ª intervenção",
+      "parameter": "pressao_ensaio_rede_humida_2a",
+      "check": "pressao_ensaio >= max(1400, pressao_max_bombagem + 300)",
+      "values": {
+        "min_absoluto": 1400,
+        "sobrepressao": 300
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_humida_2a_intervencao"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W019"
+      }
+    },
+    {
+      "id": "MASTER_129",
+      "article": "NT13 §5.2",
+      "description": "Duração mínima do ensaio hidráulico da rede húmida",
+      "parameter": "duracao_ensaio_rede_humida",
+      "check": "duracao >= 2",
+      "values": {
+        "min": 2
+      },
+      "unit": "h",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_humida"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W020"
+      }
+    },
+    {
+      "id": "MASTER_130",
+      "article": "NT13 §5.2",
+      "description": "Pressão de ensaio da rede de 1ª intervenção alimentada pela rede pública",
+      "parameter": "pressao_ensaio_1a_interv_publica",
+      "check": "pressao_ensaio >= max(900, pressao_max_servico * 1.5)",
+      "values": {
+        "min_absoluto": 900,
+        "fator": 1.5
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "rede_1a_intervencao"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W021"
+      }
+    },
+    {
+      "id": "MASTER_131",
+      "article": "NT13 §4.3",
+      "description": "Velocidade máxima da água nas condutas da rede de incêndio",
+      "parameter": "velocidade_agua_rede_incendio",
+      "check": "velocidade <= 10",
+      "values": {
+        "max": 10
+      },
+      "unit": "m/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "tubagem_incendio"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W022"
+      }
+    },
+    {
+      "id": "MASTER_132",
+      "article": "NT13 §4.4",
+      "description": "Profundidade mínima de enterramento de tubagem PEAD de rede de incêndio",
+      "parameter": "prof_enterramento_PEAD_incendio",
+      "check": "profundidade >= 0.8",
+      "values": {
+        "min": 0.8
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "tubagem_PEAD_enterrada"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W023"
+      }
+    },
+    {
+      "id": "MASTER_133",
+      "article": "NT13 §6",
+      "description": "Largura mínima dos anéis de sinalização vermelha na tubagem de incêndio",
+      "parameter": "largura_anel_sinalizacao",
+      "check": "largura >= 150",
+      "values": {
+        "min": 150
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "tubagem_incendio"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W024"
+      }
+    },
+    {
+      "id": "MASTER_134",
+      "article": "NT13 §6",
+      "description": "Intervalo máximo entre anéis de sinalização na tubagem de incêndio",
+      "parameter": "intervalo_aneis_sinalizacao",
+      "check": "intervalo <= 5",
+      "values": {
+        "max": 5
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "tubagem_incendio"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W025"
+      }
+    },
+    {
+      "id": "MASTER_135",
+      "article": "NT14 Quadro I",
+      "description": "Autonomia mínima da reserva de água para redes húmidas de 2ª intervenção",
+      "parameter": "autonomia_RASI_redes_humidas",
+      "check": "IF cat_risco <= 2 THEN autonomia >= 60; IF cat_risco >= 3 THEN autonomia >= 90",
+      "values": {
+        "table": [
+          {
+            "cat_risco": [
+              1,
+              2
+            ],
+            "min": 60
+          },
+          {
+            "cat_risco": [
+              3,
+              4
+            ],
+            "min": 90
+          }
+        ]
+      },
+      "unit": "min",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "RASI"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W026"
+      }
+    },
+    {
+      "id": "MASTER_136",
+      "article": "NT14 Quadro I + Quadro II",
+      "description": "Autonomia mínima da reserva de água para sprinklers por classe de risco",
+      "parameter": "autonomia_RASI_sprinklers",
+      "check": "IF classe in ['ligeiro','ordinario'] THEN autonomia >= 60; IF classe == 'grave' THEN autonomia >= 90",
+      "values": {
+        "table": [
+          {
+            "classe_risco": "ligeiro",
+            "min": 60
+          },
+          {
+            "classe_risco": "ordinario",
+            "min": 60
+          },
+          {
+            "classe_risco": "grave",
+            "min": 90
+          },
+          {
+            "classe_risco": "ESFR",
+            "min": 60
+          }
+        ]
+      },
+      "unit": "min",
+      "scope": {
+        "ut": [
+          "II",
+          "III",
+          "IV",
+          "V",
+          "VI",
+          "VII",
+          "VIII",
+          "IX",
+          "X",
+          "XI",
+          "XII"
+        ],
+        "cat_risco": [
+          3,
+          4
+        ],
+        "applies_to": "sprinklers"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W027"
+      }
+    },
+    {
+      "id": "MASTER_137",
+      "article": "NT14 Quadro I",
+      "description": "Autonomia mínima da reserva de água para cortinas de água",
+      "parameter": "autonomia_RASI_cortinas",
+      "check": "IF cat_risco <= 2 THEN autonomia >= 60; IF cat_risco >= 3 THEN autonomia >= 90",
+      "values": {
+        "table": [
+          {
+            "cat_risco": [
+              1,
+              2
+            ],
+            "min": 60
+          },
+          {
+            "cat_risco": [
+              3,
+              4
+            ],
+            "min": 90
+          }
+        ]
+      },
+      "unit": "min",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "applies_to": "cortinas_agua"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W028"
+      }
+    },
+    {
+      "id": "MASTER_138",
+      "article": "NT14 §3",
+      "description": "Fórmula de cálculo do volume da RASI",
+      "parameter": "volume_RASI",
+      "check": "volume >= (QH*TH + QS*TS + QC*TC) / 1000",
+      "values": {
+        "formula": "V = (QH*TH + QS*TS + QC*TC) / 1000",
+        "divisor": 1000,
+        "min": 0
+      },
+      "unit": "m3",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "RASI"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W029"
+      }
+    },
+    {
+      "id": "MASTER_139",
+      "article": "NT14 §4",
+      "description": "Cota da tubagem de descarga acima do fundo do reservatório RASI",
+      "parameter": "cota_descarga_RASI",
+      "check": "cota_descarga_acima_fundo >= 0.05",
+      "values": {
+        "min": 0.05
+      },
+      "unit": "m",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "RASI"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W030"
+      }
+    },
+    {
+      "id": "MASTER_140",
+      "article": "NT14 §4",
+      "description": "Número mínimo de aberturas de ventilação no reservatório RASI",
+      "parameter": "n_ventilacoes_RASI",
+      "check": "n_ventilacoes >= 2",
+      "values": {
+        "min": 2
+      },
+      "unit": "un",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "RASI"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W031"
+      }
+    },
+    {
+      "id": "MASTER_141",
+      "article": "NT14 §4",
+      "description": "Tempo máximo de reposição do volume de água no RASI após utilização",
+      "parameter": "tempo_reposicao_RASI",
+      "check": "tempo_reposicao <= 8",
+      "values": {
+        "max": 8
+      },
+      "unit": "h",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "RASI"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W032"
+      }
+    },
+    {
+      "id": "MASTER_142",
+      "article": "NT14 §4.2",
+      "description": "Inclinação mínima da cobertura do reservatório RASI",
+      "parameter": "inclinacao_cobertura_RASI",
+      "check": "inclinacao >= 2",
+      "values": {
+        "min": 2
+      },
+      "unit": "%",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          2,
+          3,
+          4
+        ],
+        "applies_to": "RASI"
+      },
+      "origin": {
+        "file": "fire-water-v2.json",
+        "batch": 4,
+        "original_id": "FIRE_W033"
+      }
+    },
+    {
+      "id": "MASTER_143",
+      "article": "DL 69/2023, Anexo I, Parte A",
+      "description": "Valor paramétrico de Enterococos intestinais na água para consumo",
+      "parameter": "enterococos_intestinais",
+      "check": "contagem == 0",
+      "values": {
+        "max": 0
+      },
+      "unit": "N/100ml",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_A001"
+      }
+    },
+    {
+      "id": "MASTER_144",
+      "article": "DL 69/2023, Anexo I, Parte A",
+      "description": "Valor paramétrico de Escherichia coli na água para consumo",
+      "parameter": "escherichia_coli",
+      "check": "contagem == 0",
+      "values": {
+        "max": 0
+      },
+      "unit": "N/100ml",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_A002"
+      }
+    },
+    {
+      "id": "MASTER_145",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de ácidos haloacéticos (HAA)",
+      "parameter": "acidos_haloaceticos_HAA",
+      "check": "concentracao <= 60",
+      "values": {
+        "max": 60
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B001"
+      }
+    },
+    {
+      "id": "MASTER_146",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de acrilamida",
+      "parameter": "acrilamida",
+      "check": "concentracao <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B002"
+      }
+    },
+    {
+      "id": "MASTER_147",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de antimónio",
+      "parameter": "antimonio",
+      "check": "concentracao <= 10",
+      "values": {
+        "max": 10
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B003"
+      }
+    },
+    {
+      "id": "MASTER_148",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de arsénio",
+      "parameter": "arsenio",
+      "check": "concentracao <= 10",
+      "values": {
+        "max": 10
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B004"
+      }
+    },
+    {
+      "id": "MASTER_149",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de benzeno",
+      "parameter": "benzeno",
+      "check": "concentracao <= 1.0",
+      "values": {
+        "max": 1.0
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B005"
+      }
+    },
+    {
+      "id": "MASTER_150",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de benzo(a)pireno",
+      "parameter": "benzo_a_pireno",
+      "check": "concentracao <= 0.010",
+      "values": {
+        "max": 0.01
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B006"
+      }
+    },
+    {
+      "id": "MASTER_151",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de bisfenol A",
+      "parameter": "bisfenol_A",
+      "check": "concentracao <= 2.5",
+      "values": {
+        "max": 2.5
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B007"
+      }
+    },
+    {
+      "id": "MASTER_152",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de boro",
+      "parameter": "boro",
+      "check": "concentracao <= 1.5",
+      "values": {
+        "max": 1.5
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B008"
+      }
+    },
+    {
+      "id": "MASTER_153",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de bromatos",
+      "parameter": "bromatos",
+      "check": "concentracao <= 10",
+      "values": {
+        "max": 10
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B009"
+      }
+    },
+    {
+      "id": "MASTER_154",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de cádmio",
+      "parameter": "cadmio",
+      "check": "concentracao <= 5.0",
+      "values": {
+        "max": 5.0
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B010"
+      }
+    },
+    {
+      "id": "MASTER_155",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de cloratos",
+      "parameter": "cloratos",
+      "check": "concentracao <= 0.25",
+      "values": {
+        "max": 0.25
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B011"
+      }
+    },
+    {
+      "id": "MASTER_156",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de cloritos",
+      "parameter": "cloritos",
+      "check": "concentracao <= 0.25",
+      "values": {
+        "max": 0.25
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B012"
+      }
+    },
+    {
+      "id": "MASTER_157",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de crómio",
+      "parameter": "cromio",
+      "check": "concentracao <= 25",
+      "values": {
+        "max": 25
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B013"
+      }
+    },
+    {
+      "id": "MASTER_158",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de cobre",
+      "parameter": "cobre",
+      "check": "concentracao <= 2.0",
+      "values": {
+        "max": 2.0
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B014"
+      }
+    },
+    {
+      "id": "MASTER_159",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de cianetos",
+      "parameter": "cianetos",
+      "check": "concentracao <= 50",
+      "values": {
+        "max": 50
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B015"
+      }
+    },
+    {
+      "id": "MASTER_160",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de chumbo na rede de distribuição",
+      "parameter": "chumbo",
+      "check": "concentracao <= 5",
+      "values": {
+        "max": 5
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B016"
+      }
+    },
+    {
+      "id": "MASTER_161",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de cloreto de vinilo",
+      "parameter": "cloreto_vinilo",
+      "check": "concentracao <= 0.50",
+      "values": {
+        "max": 0.5
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B017"
+      }
+    },
+    {
+      "id": "MASTER_162",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de 1,2-dicloroetano",
+      "parameter": "dicloroetano_1_2",
+      "check": "concentracao <= 3.0",
+      "values": {
+        "max": 3.0
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B018"
+      }
+    },
+    {
+      "id": "MASTER_163",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de epicloridrina",
+      "parameter": "epicloridrina",
+      "check": "concentracao <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B019"
+      }
+    },
+    {
+      "id": "MASTER_164",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de fluoretos",
+      "parameter": "fluoretos",
+      "check": "concentracao <= 1.5",
+      "values": {
+        "max": 1.5
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B020"
+      }
+    },
+    {
+      "id": "MASTER_165",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de hidrocarbonetos aromáticos policíclicos (HAP)",
+      "parameter": "HAP",
+      "check": "concentracao <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B021"
+      }
+    },
+    {
+      "id": "MASTER_166",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de mercúrio",
+      "parameter": "mercurio",
+      "check": "concentracao <= 1.0",
+      "values": {
+        "max": 1.0
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B022"
+      }
+    },
+    {
+      "id": "MASTER_167",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de microcistina-LR",
+      "parameter": "microcistina_LR",
+      "check": "concentracao <= 1.0",
+      "values": {
+        "max": 1.0
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B023"
+      }
+    },
+    {
+      "id": "MASTER_168",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de níquel",
+      "parameter": "niquel",
+      "check": "concentracao <= 20",
+      "values": {
+        "max": 20
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B024"
+      }
+    },
+    {
+      "id": "MASTER_169",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de nitratos",
+      "parameter": "nitratos",
+      "check": "concentracao <= 50",
+      "values": {
+        "max": 50
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B025"
+      }
+    },
+    {
+      "id": "MASTER_170",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de nitritos",
+      "parameter": "nitritos",
+      "check": "concentracao <= 0.50",
+      "values": {
+        "max": 0.5
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B026"
+      }
+    },
+    {
+      "id": "MASTER_171",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de pesticida individual",
+      "parameter": "pesticida_individual",
+      "check": "concentracao <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B027"
+      }
+    },
+    {
+      "id": "MASTER_172",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de pesticidas - total",
+      "parameter": "pesticidas_total",
+      "check": "concentracao <= 0.50",
+      "values": {
+        "max": 0.5
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B028"
+      }
+    },
+    {
+      "id": "MASTER_173",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de total de substâncias perfluoroalquiladas (PFAS)",
+      "parameter": "total_PFAS",
+      "check": "concentracao <= 0.50",
+      "values": {
+        "max": 0.5
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B029"
+      }
+    },
+    {
+      "id": "MASTER_174",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de selénio",
+      "parameter": "selenio",
+      "check": "concentracao <= 20",
+      "values": {
+        "max": 20
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B030"
+      }
+    },
+    {
+      "id": "MASTER_175",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de soma de PFAS",
+      "parameter": "soma_PFAS",
+      "check": "concentracao <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B031"
+      }
+    },
+    {
+      "id": "MASTER_176",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de tetracloroeteno e tricloroeteno (soma)",
+      "parameter": "tetracloroeteno_tricloroeteno",
+      "check": "concentracao <= 10",
+      "values": {
+        "max": 10
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B032"
+      }
+    },
+    {
+      "id": "MASTER_177",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de trihalometanos (THM) na torneira do consumidor",
+      "parameter": "trihalometanos_THM",
+      "check": "IF ponto == 'torneira' THEN concentracao <= 100; IF ponto == 'ponto_entrega' THEN concentracao <= 80",
+      "values": {
+        "table": [
+          {
+            "condicao": "torneira_consumidor",
+            "max": 100
+          },
+          {
+            "condicao": "ponto_entrega_alta",
+            "max": 80
+          }
+        ]
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B033"
+      }
+    },
+    {
+      "id": "MASTER_178",
+      "article": "DL 69/2023, Anexo I, Parte B",
+      "description": "Valor paramétrico de urânio",
+      "parameter": "uranio",
+      "check": "concentracao <= 30",
+      "values": {
+        "max": 30
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_B034"
+      }
+    },
+    {
+      "id": "MASTER_179",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de alumínio",
+      "parameter": "aluminio",
+      "check": "concentracao <= 200",
+      "values": {
+        "max": 200
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C001"
+      }
+    },
+    {
+      "id": "MASTER_180",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de amónio",
+      "parameter": "amonio",
+      "check": "concentracao <= 0.50",
+      "values": {
+        "max": 0.5
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C002"
+      }
+    },
+    {
+      "id": "MASTER_181",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de bactérias coliformes",
+      "parameter": "bacterias_coliformes",
+      "check": "contagem == 0",
+      "values": {
+        "max": 0
+      },
+      "unit": "N/100ml",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C003"
+      }
+    },
+    {
+      "id": "MASTER_182",
+      "article": "DL 69/2023, Anexo I, Parte C, Nota 3",
+      "description": "Concentração máxima recomendada de cálcio",
+      "parameter": "calcio",
+      "check": "concentracao <= 100",
+      "values": {
+        "max": 100
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_recomendacao"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C004"
+      }
+    },
+    {
+      "id": "MASTER_183",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de cheiro a 25°C",
+      "parameter": "cheiro_25C",
+      "check": "fator_diluicao <= 3",
+      "values": {
+        "max": 3
+      },
+      "unit": "fator_diluicao",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C005"
+      }
+    },
+    {
+      "id": "MASTER_184",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de cloretos",
+      "parameter": "cloretos",
+      "check": "concentracao <= 250",
+      "values": {
+        "max": 250
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C006"
+      }
+    },
+    {
+      "id": "MASTER_185",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de Clostridium perfringens",
+      "parameter": "clostridium_perfringens",
+      "check": "contagem == 0",
+      "values": {
+        "max": 0
+      },
+      "unit": "N/100ml",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C007"
+      }
+    },
+    {
+      "id": "MASTER_186",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de condutividade",
+      "parameter": "condutividade",
+      "check": "condutividade <= 2500",
+      "values": {
+        "max": 2500
+      },
+      "unit": "µS/cm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C008"
+      }
+    },
+    {
+      "id": "MASTER_187",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de cor",
+      "parameter": "cor",
+      "check": "cor <= 20",
+      "values": {
+        "max": 20
+      },
+      "unit": "mg/l PtCo",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C009"
+      }
+    },
+    {
+      "id": "MASTER_188",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de ferro",
+      "parameter": "ferro",
+      "check": "concentracao <= 200",
+      "values": {
+        "max": 200
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C010"
+      }
+    },
+    {
+      "id": "MASTER_189",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de manganês",
+      "parameter": "manganes",
+      "check": "concentracao <= 50",
+      "values": {
+        "max": 50
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C011"
+      }
+    },
+    {
+      "id": "MASTER_190",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de oxidabilidade",
+      "parameter": "oxidabilidade",
+      "check": "concentracao <= 5.0",
+      "values": {
+        "max": 5.0
+      },
+      "unit": "mg/l O2",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C012"
+      }
+    },
+    {
+      "id": "MASTER_191",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de pH",
+      "parameter": "pH",
+      "check": "pH >= 6.5 AND pH <= 9.5",
+      "values": {
+        "min": 6.5,
+        "max": 9.5
+      },
+      "unit": "unidades pH",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C013"
+      }
+    },
+    {
+      "id": "MASTER_192",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de sabor a 25°C",
+      "parameter": "sabor_25C",
+      "check": "fator_diluicao <= 3",
+      "values": {
+        "max": 3
+      },
+      "unit": "fator_diluicao",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C014"
+      }
+    },
+    {
+      "id": "MASTER_193",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de sódio",
+      "parameter": "sodio",
+      "check": "concentracao <= 200",
+      "values": {
+        "max": 200
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C015"
+      }
+    },
+    {
+      "id": "MASTER_194",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de sulfatos",
+      "parameter": "sulfatos",
+      "check": "concentracao <= 250",
+      "values": {
+        "max": 250
+      },
+      "unit": "mg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C016"
+      }
+    },
+    {
+      "id": "MASTER_195",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico indicador de turvação",
+      "parameter": "turvacao",
+      "check": "turvacao <= 4",
+      "values": {
+        "max": 4
+      },
+      "unit": "UNT",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_indicador"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C017"
+      }
+    },
+    {
+      "id": "MASTER_196",
+      "article": "DL 69/2023, Anexo I, Parte C, Nota 8",
+      "description": "Intervalo recomendado de dureza total em CaCO3",
+      "parameter": "dureza_total",
+      "check": "dureza >= 150 AND dureza <= 500",
+      "values": {
+        "min": 150,
+        "max": 500
+      },
+      "unit": "mg/l CaCO3",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_recomendacao"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C018"
+      }
+    },
+    {
+      "id": "MASTER_197",
+      "article": "DL 69/2023, Anexo I, Parte C, Nota 13",
+      "description": "Turvação máxima à saída da ETA para águas superficiais",
+      "parameter": "turvacao_saida_ETA",
+      "check": "turvacao <= 1",
+      "values": {
+        "max": 1
+      },
+      "unit": "UNT",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "estacao_tratamento_aguas_superficiais"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_C019"
+      }
+    },
+    {
+      "id": "MASTER_198",
+      "article": "DL 69/2023, Anexo I, Parte C (DI/Radão/Trítio) + Parte D",
+      "description": "Valor paramétrico da dose indicativa (DI) de radioatividade",
+      "parameter": "dose_indicativa",
+      "check": "DI <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "mSv",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_radiologico"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_D001"
+      }
+    },
+    {
+      "id": "MASTER_199",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico de radão na água para consumo",
+      "parameter": "radao",
+      "check": "concentracao <= 500",
+      "values": {
+        "max": 500
+      },
+      "unit": "Bq/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_radiologico"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_D002"
+      }
+    },
+    {
+      "id": "MASTER_200",
+      "article": "DL 69/2023, Anexo I, Parte C",
+      "description": "Valor paramétrico de trítio na água para consumo",
+      "parameter": "tritio",
+      "check": "concentracao <= 100",
+      "values": {
+        "max": 100
+      },
+      "unit": "Bq/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "agua_consumo_humano_radiologico"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_D003"
+      }
+    },
+    {
+      "id": "MASTER_201",
+      "article": "DL 69/2023, Anexo I, Parte D, §1.b",
+      "description": "Nível de verificação da atividade alfa total (screening radiológico)",
+      "parameter": "atividade_alfa_total",
+      "check": "atividade <= 0.10",
+      "values": {
+        "max": 0.1
+      },
+      "unit": "Bq/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "screening_radiologico"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_D004"
+      }
+    },
+    {
+      "id": "MASTER_202",
+      "article": "DL 69/2023, Anexo I, Parte D, §1.b",
+      "description": "Nível de verificação da atividade beta total (screening radiológico)",
+      "parameter": "atividade_beta_total",
+      "check": "atividade <= 1.0",
+      "values": {
+        "max": 1.0
+      },
+      "unit": "Bq/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "screening_radiologico"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_D005"
+      }
+    },
+    {
+      "id": "MASTER_203",
+      "article": "DL 69/2023, Anexo I, Parte E",
+      "description": "Valor paramétrico de Legionella spp na distribuição predial",
+      "parameter": "legionella_spp",
+      "check": "contagem < 1000",
+      "values": {
+        "max": 1000
+      },
+      "unit": "UFC/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "distribuicao_predial_instalacoes_prioritarias"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_E001"
+      }
+    },
+    {
+      "id": "MASTER_204",
+      "article": "DL 69/2023, Anexo I, Parte E",
+      "description": "Valor paramétrico de chumbo na distribuição predial (instalações prioritárias)",
+      "parameter": "chumbo_predial",
+      "check": "concentracao <= 10",
+      "values": {
+        "max": 10
+      },
+      "unit": "µg/l",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "distribuicao_predial_instalacoes_prioritarias"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_E002"
+      }
+    },
+    {
+      "id": "MASTER_205",
+      "article": "DL 69/2023, Anexo II, Parte A, Quadro 1",
+      "description": "Turvação operacional à saída da ETA (95% das amostras)",
+      "parameter": "turvacao_operacional_ETA_95pct",
+      "check": "turvacao_95pct <= 0.3",
+      "values": {
+        "max": 0.3
+      },
+      "unit": "UTN",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "monitorizacao_operacional_ETA"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_M001"
+      }
+    },
+    {
+      "id": "MASTER_206",
+      "article": "DL 69/2023, Anexo II, Parte A, Quadro 1",
+      "description": "Turvação operacional máxima absoluta à saída da ETA (nenhuma amostra)",
+      "parameter": "turvacao_operacional_ETA_max",
+      "check": "turvacao <= 1",
+      "values": {
+        "max": 1
+      },
+      "unit": "UTN",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "monitorizacao_operacional_ETA"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_M002"
+      }
+    },
+    {
+      "id": "MASTER_207",
+      "article": "DL 69/2023, Anexo II, Parte A, Quadro 2",
+      "description": "Valor de referência de colífagos somáticos na água bruta",
+      "parameter": "colifagos_somaticos_agua_bruta",
+      "check": "contagem <= 50",
+      "values": {
+        "max": 50
+      },
+      "unit": "UFP/100ml",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "monitorizacao_operacional_agua_bruta"
+      },
+      "origin": {
+        "file": "water-quality-v2.json",
+        "batch": 5,
+        "original_id": "WQ_M003"
+      }
+    },
+    {
+      "id": "MASTER_208",
+      "article": "EN 806-3 §4, Table 2",
+      "description": "Equivalência base de 1 Loading Unit (LU) em caudal de extração",
+      "parameter": "LU_equivalencia_caudal",
+      "check": "1_LU == 0.1",
+      "values": {
+        "exact": 0.1
+      },
+      "unit": "l/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "abastecimento_agua"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N001"
+      }
+    },
+    {
+      "id": "MASTER_209",
+      "article": "EN 806-3, Table 2",
+      "description": "Loading Units (LU) por aparelho sanitário para dimensionamento simplificado",
+      "parameter": "LU_por_aparelho",
+      "check": "LU_aparelho >= valor_tabela",
+      "values": {
+        "table": [
+          {
+            "aparelho": "lavatorio",
+            "QA": 0.1,
+            "LU": 1
+          },
+          {
+            "aparelho": "bide",
+            "QA": 0.1,
+            "LU": 1
+          },
+          {
+            "aparelho": "chuveiro",
+            "QA": 0.2,
+            "LU": 2
+          },
+          {
+            "aparelho": "banheira",
+            "QA": 0.4,
+            "LU": 4
+          },
+          {
+            "aparelho": "pia_cozinha",
+            "QA": 0.2,
+            "LU": 2
+          },
+          {
+            "aparelho": "maquina_lavar_roupa",
+            "QA": 0.2,
+            "LU": 2
+          },
+          {
+            "aparelho": "maquina_lavar_louca",
+            "QA": 0.1,
+            "LU": 1
+          },
+          {
+            "aparelho": "autoclismo_WC",
+            "QA": 0.1,
+            "LU": 1
+          },
+          {
+            "aparelho": "fluxometro_WC",
+            "QA": 1.5,
+            "LU": 15
+          }
+        ]
+      },
+      "unit": "LU",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "abastecimento_agua"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N002"
+      }
+    },
+    {
+      "id": "MASTER_210",
+      "article": "EN 806-3 §6",
+      "description": "Velocidade máxima da água em colunas montantes e distribuidores principais",
+      "parameter": "velocidade_max_coluna_distribuidor",
+      "check": "velocidade <= 2.0",
+      "values": {
+        "max": 2.0
+      },
+      "unit": "m/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "colunas_montantes_distribuidores"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N003"
+      }
+    },
+    {
+      "id": "MASTER_211",
+      "article": "EN 806-3 §6",
+      "description": "Velocidade máxima da água em ramais terminais (dead legs) até pontos de consumo",
+      "parameter": "velocidade_max_ramal_terminal",
+      "check": "velocidade <= 4.0",
+      "values": {
+        "max": 4.0
+      },
+      "unit": "m/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "ramais_terminais"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N004"
+      }
+    },
+    {
+      "id": "MASTER_212",
+      "article": "EN 806-2 §3.4.1",
+      "description": "Pressão estática máxima admissível em qualquer ponto de utilização",
+      "parameter": "pressao_estatica_max_ponto_utilizacao",
+      "check": "pressao_estatica <= 500",
+      "values": {
+        "max": 500
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "pontos_utilizacao"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N005"
+      }
+    },
+    {
+      "id": "MASTER_213",
+      "article": "EN 806-2 §3.4.1",
+      "description": "Pressão dinâmica mínima (flow pressure) em qualquer ponto de utilização",
+      "parameter": "pressao_dinamica_min_ponto_utilizacao",
+      "check": "pressao_dinamica >= 100",
+      "values": {
+        "min": 100
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "pontos_utilizacao"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N006"
+      }
+    },
+    {
+      "id": "MASTER_214",
+      "article": "EN 806-2 §3.4.2",
+      "description": "Pressão de ensaio mínima da rede de abastecimento (fator sobre pressão máxima de serviço)",
+      "parameter": "pressao_ensaio_abastecimento",
+      "check": "pressao_ensaio >= PMA * 1.5",
+      "values": {
+        "fator": 1.5
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "rede_abastecimento"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N007"
+      }
+    },
+    {
+      "id": "MASTER_215",
+      "article": "EN 806-4 §7.2",
+      "description": "Pressão de ensaio da instalação predial (1,1 × MDP, onde MDP = 1,5 × PMA)",
+      "parameter": "pressao_ensaio_instalacao_predial",
+      "check": "pressao_ensaio >= 1.1 * 1.5 * PMA",
+      "values": {
+        "fator_MDP": 1.5,
+        "fator_ensaio": 1.1,
+        "fator_combinado": 1.65
+      },
+      "unit": "kPa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "instalacao_predial_agua"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N008"
+      }
+    },
+    {
+      "id": "MASTER_216",
+      "article": "EN 806-5 §5.2",
+      "description": "Temperatura mínima de armazenamento de água quente sanitária (prevenção Legionella)",
+      "parameter": "temperatura_armazenamento_AQS",
+      "check": "temperatura_armazenamento >= 60",
+      "values": {
+        "min": 60
+      },
+      "unit": "°C",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "deposito_AQS"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N009"
+      }
+    },
+    {
+      "id": "MASTER_217",
+      "article": "EN 806-5 §5.2",
+      "description": "Temperatura mínima de distribuição de água quente nos pontos de utilização",
+      "parameter": "temperatura_distribuicao_AQS",
+      "check": "IF tipo == 'geral' THEN temperatura >= 50; IF tipo == 'hospitalar' THEN temperatura >= 55",
+      "values": {
+        "table": [
+          {
+            "tipo": "geral",
+            "min": 50
+          },
+          {
+            "tipo": "hospitalar",
+            "min": 55
+          }
+        ]
+      },
+      "unit": "°C",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "distribuicao_AQS"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N010"
+      }
+    },
+    {
+      "id": "MASTER_218",
+      "article": "EN 806-5 §5.2",
+      "description": "Temperatura máxima da água fria na rede predial (prevenção Legionella)",
+      "parameter": "temperatura_max_agua_fria",
+      "check": "temperatura_AF <= 25",
+      "values": {
+        "max": 25
+      },
+      "unit": "°C",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "rede_agua_fria"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N011"
+      }
+    },
+    {
+      "id": "MASTER_219",
+      "article": "EN 806-5 §6.3",
+      "description": "Intervalo máximo de descarga de pontos de consumo inativos (flushing anti-estagnação)",
+      "parameter": "intervalo_flushing_inatividade",
+      "check": "intervalo_flushing <= 7",
+      "values": {
+        "max": 7
+      },
+      "unit": "dias",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "pontos_utilizacao_inativos"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N012"
+      }
+    },
+    {
+      "id": "MASTER_220",
+      "article": "EN 12056-2, Table 2 (Sistema III)",
+      "description": "Valores DU (Discharge Units) por aparelho sanitário para cálculo de drenagem (Sistema III — single stack)",
+      "parameter": "DU_por_aparelho_sistemaIII",
+      "check": "DU_aparelho >= valor_tabela",
+      "values": {
+        "table": [
+          {
+            "aparelho": "lavatorio",
+            "DU": 0.3
+          },
+          {
+            "aparelho": "bide",
+            "DU": 0.3
+          },
+          {
+            "aparelho": "chuveiro_sem_tampao",
+            "DU": 0.4
+          },
+          {
+            "aparelho": "banheira",
+            "DU": 1.3
+          },
+          {
+            "aparelho": "pia_cozinha",
+            "DU": 1.3
+          },
+          {
+            "aparelho": "maquina_lavar_louca",
+            "DU": 0.2
+          },
+          {
+            "aparelho": "maquina_lavar_roupa_6kg",
+            "DU": 0.6
+          },
+          {
+            "aparelho": "maquina_lavar_roupa_12kg",
+            "DU": 1.2
+          },
+          {
+            "aparelho": "WC_autoclismo_6L",
+            "DU": 1.7
+          },
+          {
+            "aparelho": "WC_autoclismo_9L",
+            "DU": 2.0
+          }
+        ]
+      },
+      "unit": "l/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "drenagem_predial"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N013"
+      }
+    },
+    {
+      "id": "MASTER_221",
+      "article": "EN 12056-2 §4.2, Table 3",
+      "description": "Fator de frequência K para cálculo do caudal de dimensionamento de drenagem",
+      "parameter": "fator_frequencia_K",
+      "check": "K >= valor_tabela",
+      "values": {
+        "table": [
+          {
+            "utilizacao": "intermitente (habitação, escritório)",
+            "K": 0.5
+          },
+          {
+            "utilizacao": "frequente (hospital, escola, hotel)",
+            "K": 0.7
+          },
+          {
+            "utilizacao": "congestionada (sanitários públicos)",
+            "K": 1.0
+          },
+          {
+            "utilizacao": "especial (laboratório)",
+            "K": 1.2
+          }
+        ]
+      },
+      "unit": "adimensional",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "drenagem_predial"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N014"
+      }
+    },
+    {
+      "id": "MASTER_222",
+      "article": "EN 12056-2 §4.2",
+      "description": "Fórmula de cálculo do caudal de águas residuais domésticas (design flow)",
+      "parameter": "caudal_residuais_Qww",
+      "check": "Qww == K * sqrt(sum_DU)",
+      "values": {
+        "formula": "Qww = K × √(ΣDU)",
+        "K_min": 0.5,
+        "K_max": 1.2
+      },
+      "unit": "l/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "drenagem_predial"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N015"
+      }
+    },
+    {
+      "id": "MASTER_223",
+      "article": "EN 12056-2 §6.1.2",
+      "description": "Velocidade mínima de autolimpeza em coletores prediais de águas residuais domésticas",
+      "parameter": "velocidade_autolimpeza_coletor",
+      "check": "velocidade >= 0.7",
+      "values": {
+        "min": 0.7
+      },
+      "unit": "m/s",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "coletores_prediais"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N016"
+      }
+    },
+    {
+      "id": "MASTER_224",
+      "article": "EN 12056-2 §6.1",
+      "description": "Grau de enchimento máximo em coletores prediais por tipo de sistema de drenagem",
+      "parameter": "grau_enchimento_max_coletor",
+      "check": "IF sistema == 'I' THEN h_d <= 0.5; IF sistema == 'II' THEN h_d <= 0.7; IF sistema == 'III' THEN h_d <= 0.7; IF sistema == 'IV' THEN h_d <= 1.0",
+      "values": {
+        "table": [
+          {
+            "sistema": "I",
+            "max_h_d": 0.5
+          },
+          {
+            "sistema": "II",
+            "max_h_d": 0.7
+          },
+          {
+            "sistema": "III",
+            "max_h_d": 0.7
+          },
+          {
+            "sistema": "IV",
+            "max_h_d": 1.0
+          }
+        ]
+      },
+      "unit": "adimensional",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "coletores_prediais"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N017"
+      }
+    },
+    {
+      "id": "MASTER_225",
+      "article": "EN 12056-2 §5.4.2",
+      "description": "Profundidade mínima do fecho hídrico de sifões de aparelhos sanitários",
+      "parameter": "profundidade_fecho_hidrico",
+      "check": "profundidade >= 50",
+      "values": {
+        "min": 50
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "sifoes"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N018"
+      }
+    },
+    {
+      "id": "MASTER_226",
+      "article": "EN 12056-2, Table 4",
+      "description": "Diâmetro mínimo de ramais de descarga de sanitas (WC)",
+      "parameter": "dn_min_ramal_WC",
+      "check": "IF sistema in ['I','II','III'] THEN dn >= 80; IF sistema == 'IV' THEN dn >= 80",
+      "values": {
+        "min": 80
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "ramal_descarga_WC"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N019"
+      }
+    },
+    {
+      "id": "MASTER_227",
+      "article": "EN 12056-2, Table 4",
+      "description": "Diâmetro mínimo de ramais de descarga de lavatórios",
+      "parameter": "dn_min_ramal_lavatorio",
+      "check": "dn >= 32",
+      "values": {
+        "min": 32
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "ramal_descarga_lavatorio"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N020"
+      }
+    },
+    {
+      "id": "MASTER_228",
+      "article": "EN 12056-2, Table 6",
+      "description": "Diâmetro mínimo de tubo de queda (stack) com ligação de WC",
+      "parameter": "dn_min_tubo_queda_com_WC",
+      "check": "dn >= 80",
+      "values": {
+        "min": 80
+      },
+      "unit": "mm",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "tubo_queda"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N021"
+      }
+    },
+    {
+      "id": "MASTER_229",
+      "article": "EN 12056-1 §5.3",
+      "description": "Pressão máxima negativa no interior do sistema de drenagem (proteção de fecho hídrico)",
+      "parameter": "pressao_negativa_max_drenagem",
+      "check": "abs(pressao_negativa) <= 250",
+      "values": {
+        "max": 250
+      },
+      "unit": "Pa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "sistema_drenagem"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N022"
+      }
+    },
+    {
+      "id": "MASTER_230",
+      "article": "EN 12056-1 §5.3",
+      "description": "Pressão máxima positiva no interior do sistema de drenagem",
+      "parameter": "pressao_positiva_max_drenagem",
+      "check": "pressao_positiva <= 250",
+      "values": {
+        "max": 250
+      },
+      "unit": "Pa",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "sistema_drenagem"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N023"
+      }
+    },
+    {
+      "id": "MASTER_231",
+      "article": "EN 12056-2 §6.1.2",
+      "description": "Inclinação mínima de coletores prediais para garantir autolimpeza",
+      "parameter": "inclinacao_min_coletor_predial",
+      "check": "IF dn <= 80 THEN inclinacao >= 2.5; IF dn >= 100 THEN inclinacao >= 1.0",
+      "values": {
+        "table": [
+          {
+            "condicao": "DN <= 80",
+            "min": 2.5
+          },
+          {
+            "condicao": "DN 100",
+            "min": 1.0
+          },
+          {
+            "condicao": "DN >= 150",
+            "min": 0.7
+          }
+        ]
+      },
+      "unit": "%",
+      "scope": {
+        "ut": [
+          "all"
+        ],
+        "cat_risco": [
+          "all"
+        ],
+        "applies_to": "coletores_prediais"
+      },
+      "origin": {
+        "file": "euro-norms-v2.json",
+        "batch": 6,
+        "original_id": "EURO_N024"
+      }
+    }
+  ]
+}

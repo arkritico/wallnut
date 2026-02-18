@@ -1,0 +1,1211 @@
+{
+  "regulationRef": "dl-123-2009-ited",
+  "description": "Regras de conformidade ITED/ITUR extraídas do DL 123/2009, Portaria 264/2023 (Manual ITED 4ª edição) e Manual ITUR 3ª edição",
+  "extractedBy": "system-migration",
+  "extractedAt": "2026-02-17",
+  "rules": [
+    {
+      "id": "ITED-ED-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Edição — Portaria 264/2023",
+      "description": "O projeto referencia uma edição anterior do manual ITED. A versão atual é a 4ª edição (Portaria 264/2023, em vigor desde 25 de agosto de 2023).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "telecommunications.itedEdition", "operator": "<", "value": 4 },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{telecommunications.itedEdition}ª edição",
+      "requiredValue": "4ª edição (Portaria 264/2023)",
+      "remediation": "Atualizar o projeto para a 4ª edição do manual ITED (Portaria 264/2023). Edifícios novos devem cumprir a edição em vigor.",
+      "enabled": true,
+      "tags": ["edição", "atualização", "ITED"]
+    },
+    {
+      "id": "ITED-PROJ-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 59.º — Obrigatoriedade de Projeto ITED",
+      "description": "Edifícios novos ou sujeitos a obras de remodelação profunda devem possuir projeto ITED elaborado por projetista credenciado pela ANACOM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasITEDProject", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "remediation": "Elaborar projeto ITED por projetista credenciado pela ANACOM. O projeto é obrigatório para obtenção de licença de construção (DL 123/2009, Art. 59.º).",
+      "requiredValue": "Projeto ITED obrigatório para edifícios novos",
+      "enabled": true,
+      "tags": ["projeto", "ITED", "obrigatório", "ANACOM"]
+    },
+    {
+      "id": "ITED-ATE-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITED 4ª Ed., Cap. 3.2 — ATE (Armário de Telecomunicações de Edifício)",
+      "description": "O edifício não prevê ATE. O ATE é obrigatório em edifícios com mais de 1 fração autónoma.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasATE", "operator": "not_exists", "value": null },
+        { "field": "numberOfDwellings", "operator": ">=", "value": 2 }
+      ],
+      "remediation": "Instalar ATE (Armário de Telecomunicações de Edifício) em zona comum acessível, com dimensões adequadas ao número de frações. O ATE deve ser localizado no piso de entrada ou cave, preferencialmente junto à entrada de cabos do edifício.",
+      "requiredValue": "ATE obrigatório para ≥ 2 frações",
+      "enabled": true,
+      "tags": ["ATE", "armário", "edifício"]
+    },
+    {
+      "id": "ITED-ATE-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.2.1 — Dimensões do ATE (até 8 fogos)",
+      "description": "As dimensões do ATE são insuficientes para edifícios até 8 fogos. O ATE deve ter dimensões mínimas de 0.40×0.60×0.20 m (L×A×P).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "numberOfDwellings", "operator": "<=", "value": 8 },
+        { "field": "numberOfDwellings", "operator": ">=", "value": 2 },
+        { "field": "ited.ateWidth", "operator": "<", "value": 0.40 }
+      ],
+      "currentValueTemplate": "{ited.ateWidth}×{ited.ateHeight}×{ited.ateDepth} m",
+      "requiredValue": "≥ 0.40×0.60×0.20 m (L×A×P) para até 8 fogos",
+      "remediation": "Aumentar as dimensões do ATE para no mínimo 0.40 m (largura) × 0.60 m (altura) × 0.20 m (profundidade) conforme Manual ITED 4ª edição para edifícios até 8 fogos.",
+      "enabled": true,
+      "tags": ["ATE", "dimensões", "até 8 fogos"]
+    },
+    {
+      "id": "ITED-ATE-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.2.1 — Dimensões do ATE (9 a 24 fogos)",
+      "description": "As dimensões do ATE são insuficientes para edifícios de 9 a 24 fogos. O ATE deve ter dimensões mínimas de 0.60×0.80×0.20 m (L×A×P).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "numberOfDwellings", "operator": ">=", "value": 9 },
+        { "field": "numberOfDwellings", "operator": "<=", "value": 24 },
+        { "field": "ited.ateWidth", "operator": "<", "value": 0.60 }
+      ],
+      "currentValueTemplate": "{ited.ateWidth}×{ited.ateHeight}×{ited.ateDepth} m",
+      "requiredValue": "≥ 0.60×0.80×0.20 m (L×A×P) para 9 a 24 fogos",
+      "remediation": "Aumentar as dimensões do ATE para no mínimo 0.60 m (largura) × 0.80 m (altura) × 0.20 m (profundidade) conforme Manual ITED 4ª edição para edifícios de 9 a 24 fogos.",
+      "enabled": true,
+      "tags": ["ATE", "dimensões", "9-24 fogos"]
+    },
+    {
+      "id": "ITED-ATE-04",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.2.1 — Dimensões do ATE (> 24 fogos)",
+      "description": "As dimensões do ATE são insuficientes para edifícios com mais de 24 fogos. O ATE deve ter dimensões mínimas de 0.80×1.00×0.20 m (L×A×P).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "numberOfDwellings", "operator": ">", "value": 24 },
+        { "field": "ited.ateWidth", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "{ited.ateWidth}×{ited.ateHeight}×{ited.ateDepth} m",
+      "requiredValue": "≥ 0.80×1.00×0.20 m (L×A×P) para > 24 fogos",
+      "remediation": "Aumentar as dimensões do ATE para no mínimo 0.80 m (largura) × 1.00 m (altura) × 0.20 m (profundidade) conforme Manual ITED 4ª edição para edifícios com mais de 24 fogos. Para edifícios de grande porte, considerar sala técnica dedicada (CEMU).",
+      "enabled": true,
+      "tags": ["ATE", "dimensões", ">24 fogos"]
+    },
+    {
+      "id": "ITED-ATI-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITED 4ª Ed., Cap. 3.3 — ATI (Armário de Telecomunicações Individual)",
+      "description": "Não está previsto ATI. Cada fração autónoma deve possuir ATI para concentração das redes interiores.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasATI", "operator": "not_exists", "value": null }
+      ],
+      "remediation": "Instalar ATI (Armário de Telecomunicações Individual) em cada fração autónoma. O ATI deve estar localizado num ponto acessível da fração, preferencialmente na zona de entrada.",
+      "requiredValue": "ATI obrigatório por fração",
+      "enabled": true,
+      "tags": ["ATI", "fração", "individual"]
+    },
+    {
+      "id": "ITED-ATI-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.3.1 — Dimensões Mínimas do ATI",
+      "description": "As dimensões do ATI são inferiores ao mínimo exigido. Cada fração deve ter ATI com dimensões mínimas de 0.30×0.50×0.12 m (L×A×P).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.atiWidth", "operator": "<", "value": 0.30 }
+      ],
+      "currentValueTemplate": "{ited.atiWidth}×{ited.atiHeight}×{ited.atiDepth} m",
+      "requiredValue": "≥ 0.30×0.50×0.12 m (L×A×P) por fogo",
+      "remediation": "Aumentar as dimensões do ATI para no mínimo 0.30 m (largura) × 0.50 m (altura) × 0.12 m (profundidade). O ATI deve acomodar réguas de ligação, repartidores e patch panels para cobre, coaxial e fibra óptica.",
+      "enabled": true,
+      "tags": ["ATI", "dimensões", "mínimo"]
+    },
+    {
+      "id": "ITED-PAT-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.4 — PAT (Passagem Aérea de Topo)",
+      "description": "Não está prevista PAT (Passagem Aérea de Topo). É obrigatória uma passagem em tubo desde o ATE até à cobertura do edifício para acesso de operadores de telecomunicações.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.hasPAT", "operator": "not_exists", "value": null },
+        { "field": "numberOfDwellings", "operator": ">=", "value": 2 }
+      ],
+      "remediation": "Instalar PAT (Passagem Aérea de Topo) em tubo com diâmetro mínimo de 40 mm desde o ATE até à cobertura do edifício. A PAT permite o acesso aéreo de operadores de telecomunicações ao edifício.",
+      "requiredValue": "PAT obrigatória com tubo ≥ Ø40 mm do ATE à cobertura",
+      "enabled": true,
+      "tags": ["PAT", "passagem aérea", "cobertura", "topo"]
+    },
+    {
+      "id": "ITED-PAT-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.4.1 — Diâmetro do Tubo PAT",
+      "description": "O diâmetro do tubo da PAT é inferior ao mínimo exigido de 40 mm.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.patDiameter", "operator": "<", "value": 40 }
+      ],
+      "currentValueTemplate": "Ø{ited.patDiameter} mm",
+      "requiredValue": "≥ Ø40 mm",
+      "remediation": "Aumentar o diâmetro do tubo da PAT para no mínimo 40 mm conforme Manual ITED 4ª edição.",
+      "enabled": true,
+      "tags": ["PAT", "diâmetro", "tubo"]
+    },
+    {
+      "id": "ITED-CVM-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.5 — CVM (Câmara de Visita Multi-operador)",
+      "description": "Não está prevista CVM (Câmara de Visita Multi-operador) na entrada do edifício. A CVM é obrigatória para acesso multi-operador.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.hasCVM", "operator": "not_exists", "value": null },
+        { "field": "numberOfDwellings", "operator": ">=", "value": 2 }
+      ],
+      "remediation": "Instalar CVM (Câmara de Visita Multi-operador) na entrada do edifício, com dimensões mínimas de 0.60×0.60×0.60 m. A CVM permite o acesso dos operadores de telecomunicações à infraestrutura do edifício.",
+      "requiredValue": "CVM obrigatória na entrada do edifício; ≥ 0.60×0.60×0.60 m",
+      "enabled": true,
+      "tags": ["CVM", "câmara visita", "multi-operador", "entrada"]
+    },
+    {
+      "id": "ITED-CVM-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.5.1 — Dimensões Mínimas da CVM",
+      "description": "As dimensões da CVM são inferiores ao mínimo exigido de 0.60×0.60×0.60 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.cvmWidth", "operator": "<", "value": 0.60 }
+      ],
+      "currentValueTemplate": "{ited.cvmWidth}×{ited.cvmLength}×{ited.cvmDepth} m",
+      "requiredValue": "≥ 0.60×0.60×0.60 m",
+      "remediation": "Aumentar as dimensões da CVM para no mínimo 0.60 m × 0.60 m × 0.60 m conforme Manual ITED 4ª edição. A CVM deve permitir acesso fácil para manutenção e ligação de operadores.",
+      "enabled": true,
+      "tags": ["CVM", "dimensões", "câmara visita"]
+    },
+    {
+      "id": "ITED-FO-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1 — Obrigatoriedade de Fibra Óptica",
+      "description": "O projeto não prevê cablagem em fibra óptica. A 4ª edição do ITED torna obrigatória a fibra óptica monomodo em edifícios novos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasFiberOptic", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "remediation": "Instalar cablagem em fibra óptica monomodo (single mode) desde o ATE/ODF até ao ATI de cada fração. Obrigatório pela 4ª edição do ITED (Portaria 264/2023).",
+      "requiredValue": "Fibra óptica monomodo obrigatória",
+      "enabled": true,
+      "tags": ["fibra óptica", "monomodo", "obrigatório"]
+    },
+    {
+      "id": "ITED-FO-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.1 — Tipo de Fibra Óptica",
+      "description": "A fibra óptica prevista não é monomodo OS2 (9/125 μm). A 4ª edição exige fibra monomodo OS2.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasFiberOptic", "operator": "exists", "value": null },
+        { "field": "telecommunications.fiberType", "operator": "!=", "value": "single_mode" }
+      ],
+      "currentValueTemplate": "Fibra tipo: {telecommunications.fiberType}",
+      "requiredValue": "Fibra monomodo OS2 (9/125 μm)",
+      "remediation": "Substituir por fibra óptica monomodo OS2 (9/125 μm) conforme exigido pela 4ª edição do ITED. A fibra OS2 garante compatibilidade com redes GPON/XGS-PON dos operadores.",
+      "enabled": true,
+      "tags": ["fibra óptica", "tipo", "monomodo", "OS2"]
+    },
+    {
+      "id": "ITED-FO-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.2 — Mínimo de Fibras por Fogo",
+      "description": "O número de fibras ópticas por fogo é inferior ao mínimo de 2 fibras exigido pela 4ª edição do ITED.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fibersPerDwelling", "operator": "<", "value": 2 }
+      ],
+      "currentValueTemplate": "{ited.fibersPerDwelling} fibras por fogo",
+      "requiredValue": "≥ 2 fibras monomodo OS2 por fogo",
+      "remediation": "Aumentar para no mínimo 2 fibras monomodo OS2 (9/125 μm) por fogo. As 2 fibras permitem redundância e suporte a múltiplos operadores em simultâneo.",
+      "enabled": true,
+      "tags": ["fibra óptica", "mínimo", "por fogo"]
+    },
+    {
+      "id": "ITED-FO-04",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.3 — Atenuação por Fusão",
+      "description": "A atenuação por fusão da fibra óptica excede o máximo admissível de 0.3 dB por ponto de fusão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fiberSpliceAttenuation", "operator": ">", "value": 0.3 }
+      ],
+      "currentValueTemplate": "{ited.fiberSpliceAttenuation} dB por fusão",
+      "requiredValue": "≤ 0.3 dB por fusão",
+      "remediation": "Refazer as fusões de fibra óptica para obter atenuação ≤ 0.3 dB por ponto. Utilizar equipamento de fusão por arco elétrico calibrado. Verificar alinhamento e limpeza das fibras antes da fusão.",
+      "enabled": true,
+      "tags": ["fibra óptica", "atenuação", "fusão"]
+    },
+    {
+      "id": "ITED-FO-05",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.3 — Atenuação por Conector",
+      "description": "A atenuação por conector da fibra óptica excede o máximo admissível de 0.5 dB por conector.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fiberConnectorAttenuation", "operator": ">", "value": 0.5 }
+      ],
+      "currentValueTemplate": "{ited.fiberConnectorAttenuation} dB por conector",
+      "requiredValue": "≤ 0.5 dB por conector",
+      "remediation": "Substituir os conectores de fibra óptica com atenuação excessiva. A atenuação máxima por conector é de 0.5 dB. Utilizar conectores de qualidade e verificar a limpeza das faces dos conectores.",
+      "enabled": true,
+      "tags": ["fibra óptica", "atenuação", "conector"]
+    },
+    {
+      "id": "ITED-FO-06",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.4 — Atenuação Total do Percurso de Fibra",
+      "description": "A atenuação total do percurso de fibra óptica (do ODF do edifício à tomada) excede o máximo admissível de 5 dB.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fiberAttenuation", "operator": ">", "value": 5 }
+      ],
+      "currentValueTemplate": "{ited.fiberAttenuation} dB (total percurso)",
+      "requiredValue": "≤ 5 dB (do ODF do edifício à tomada)",
+      "remediation": "Reduzir a atenuação total do percurso de fibra óptica para ≤ 5 dB. Verificar qualidade das fusões (≤ 0.3 dB) e conectores (≤ 0.5 dB). Considerar redução do número de emendas, utilização de conectores de menor perda, ou percursos mais curtos.",
+      "enabled": true,
+      "tags": ["fibra óptica", "atenuação", "total", "percurso"]
+    },
+    {
+      "id": "ITED-FO-07",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.5 — Raio de Curvatura da Fibra (Instalação)",
+      "description": "O raio de curvatura da fibra óptica durante a instalação é inferior ao mínimo de 30 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fiberBendRadiusInstallation", "operator": "<", "value": 30 }
+      ],
+      "currentValueTemplate": "{ited.fiberBendRadiusInstallation} mm (durante instalação)",
+      "requiredValue": "≥ 30 mm durante a instalação",
+      "remediation": "Garantir raio de curvatura mínimo de 30 mm durante a instalação da fibra óptica. Utilizar guias e acessórios de encaminhamento adequados nas mudanças de direção. Raios inferiores provocam micro-curvaturas e atenuação excessiva.",
+      "enabled": true,
+      "tags": ["fibra óptica", "raio curvatura", "instalação"]
+    },
+    {
+      "id": "ITED-FO-08",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.5 — Raio de Curvatura da Fibra (Instalado)",
+      "description": "O raio de curvatura da fibra óptica após instalação permanente é inferior ao mínimo de 15 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fiberBendRadius", "operator": "<", "value": 15 }
+      ],
+      "currentValueTemplate": "{ited.fiberBendRadius} mm (instalado)",
+      "requiredValue": "≥ 15 mm após instalação permanente",
+      "remediation": "Corrigir o raio de curvatura da fibra óptica instalada para ≥ 15 mm. Utilizar organizadores de fibra nos armários e caixas com raio de curvatura adequado. Raios inferiores danificam a fibra e provocam atenuação.",
+      "enabled": true,
+      "tags": ["fibra óptica", "raio curvatura", "permanente"]
+    },
+    {
+      "id": "ITED-FO-09",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.6 — Conector na Tomada (SC/APC)",
+      "description": "O conector na tomada de fibra óptica não é do tipo SC/APC. A 4ª edição do ITED exige conector SC/APC na tomada do utilizador.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.fiberOutletConnector", "operator": "!=", "value": "SC/APC" }
+      ],
+      "currentValueTemplate": "Conector: {ited.fiberOutletConnector}",
+      "requiredValue": "SC/APC na tomada do utilizador",
+      "remediation": "Substituir o conector na tomada de fibra óptica por SC/APC conforme exigido pelo Manual ITED 4ª edição. O conector SC/APC (Angled Physical Contact) minimiza reflexões e é o padrão para redes FTTH.",
+      "enabled": true,
+      "tags": ["fibra óptica", "conector", "SC/APC", "tomada"]
+    },
+    {
+      "id": "ITED-FO-10",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.6 — Conector no ODF (SC/APC ou LC/APC)",
+      "description": "O conector no ODF não é do tipo SC/APC ou LC/APC. O Manual ITED permite SC/APC ou LC/APC no ODF do edifício.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.fiberODFConnector", "operator": "not_in", "value": ["SC/APC", "LC/APC"] }
+      ],
+      "currentValueTemplate": "Conector ODF: {ited.fiberODFConnector}",
+      "requiredValue": "SC/APC ou LC/APC no ODF",
+      "remediation": "Utilizar conectores SC/APC ou LC/APC no ODF (Optical Distribution Frame) conforme Manual ITED 4ª edição. O LC/APC permite maior densidade de ligações no ODF.",
+      "enabled": true,
+      "tags": ["fibra óptica", "conector", "ODF", "LC/APC"]
+    },
+    {
+      "id": "ITED-CU-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2 — Categoria Mínima do Cobre",
+      "description": "A cablagem de par de cobre é inferior à Categoria mínima exigida. O mínimo é Cat.6 (250 MHz).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasCopperCabling", "operator": "exists", "value": null },
+        { "field": "telecommunications.copperCableCategory", "operator": "ordinal_lt", "value": "6", "scale": ["none", "5e", "6", "6a", "7"] }
+      ],
+      "currentValueTemplate": "Cat. {telecommunications.copperCableCategory}",
+      "requiredValue": "≥ Cat.6 (250 MHz)",
+      "remediation": "Utilizar cablagem UTP mínimo Categoria 6 (250 MHz). Cat.5e não é admissível em edifícios novos ao abrigo da 4ª edição do ITED.",
+      "enabled": true,
+      "tags": ["cobre", "categoria", "UTP", "Cat.6"]
+    },
+    {
+      "id": "ITED-CU-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2 — Cat.6A Recomendado",
+      "description": "Em edifícios novos, Cat.6A (500 MHz) é recomendado para suportar 10 Gigabit Ethernet e futuras necessidades.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.copperCategory", "operator": "ordinal_lt", "value": "6A", "scale": ["5e", "6", "6A", "7"] },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Cat. {ited.copperCategory}",
+      "requiredValue": "Cat.6A (500 MHz) recomendado para edifícios novos",
+      "remediation": "Utilizar cablagem Cat.6A (500 MHz) em edifícios novos para garantir compatibilidade com 10GBASE-T e futuras aplicações de elevada largura de banda. O mínimo obrigatório é Cat.6 (250 MHz).",
+      "enabled": true,
+      "tags": ["cobre", "categoria", "Cat.6A", "recomendação"]
+    },
+    {
+      "id": "ITED-CU-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.1 — Comprimento Máximo Canal Permanente",
+      "description": "O comprimento do canal permanente de cobre excede o máximo de 90 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.copperPermanentLinkLength", "operator": ">", "value": 90 }
+      ],
+      "currentValueTemplate": "{ited.copperPermanentLinkLength} m",
+      "requiredValue": "≤ 90 m (canal permanente)",
+      "remediation": "Reduzir o comprimento do canal permanente de cobre para ≤ 90 m. O canal permanente é medido desde o patch panel no ATI até à tomada RJ45. Se necessário, reposicionar o ATI ou adicionar um ponto de consolidação intermédio.",
+      "enabled": true,
+      "tags": ["cobre", "comprimento", "canal permanente", "90m"]
+    },
+    {
+      "id": "ITED-CU-04",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.1 — Comprimento Máximo Total (c/ Cordões)",
+      "description": "O comprimento total do canal de cobre (incluindo cordões de equipamento e de utilizador) excede o máximo de 100 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.copperTotalChannelLength", "operator": ">", "value": 100 }
+      ],
+      "currentValueTemplate": "{ited.copperTotalChannelLength} m (incluindo cordões)",
+      "requiredValue": "≤ 100 m (total incluindo cordões)",
+      "remediation": "Reduzir o comprimento total do canal de cobre para ≤ 100 m. O total inclui o canal permanente (≤ 90 m) mais os cordões de equipamento e de utilizador (total ≤ 10 m). Conforme norma TIA/EIA-568.",
+      "enabled": true,
+      "tags": ["cobre", "comprimento", "total", "100m", "cordões"]
+    },
+    {
+      "id": "ITED-CU-05",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.2 — Impedância do Par de Cobre",
+      "description": "A impedância da cablagem de par de cobre está fora da tolerância de 100±15 Ω.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.copperImpedance", "operator": "not_in_range", "value": [85, 115] }
+      ],
+      "currentValueTemplate": "{ited.copperImpedance} Ω",
+      "requiredValue": "100±15 Ω (intervalo: 85-115 Ω)",
+      "remediation": "Verificar e substituir os cabos ou conectores que não cumprem a impedância de 100±15 Ω. Impedâncias fora do intervalo provocam reflexões e degradação do sinal. Verificar terminações e qualidade dos conectores RJ45.",
+      "enabled": true,
+      "tags": ["cobre", "impedância", "100 Ω"]
+    },
+    {
+      "id": "ITED-CU-06",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.3 — Raio de Curvatura do Cobre",
+      "description": "O raio de curvatura do cabo de cobre é inferior ao mínimo de 4× o diâmetro exterior do cabo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.copperBendRadius", "operator": "<", "value": 25 }
+      ],
+      "currentValueTemplate": "{ited.copperBendRadius} mm",
+      "requiredValue": "≥ 4× diâmetro exterior do cabo (tipicamente ≥ 25 mm para Cat.6)",
+      "remediation": "Corrigir o raio de curvatura dos cabos de cobre para ≥ 4× o diâmetro exterior do cabo (tipicamente ≥ 25 mm para Cat.6, ≥ 32 mm para Cat.6A). Raios inferiores degradam o desempenho (aumento de diafonia NEXT/FEXT e atenuação).",
+      "enabled": true,
+      "tags": ["cobre", "raio curvatura", "UTP"]
+    },
+    {
+      "id": "ITED-CU-07",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.4 — Separação de Energia (Perpendicular)",
+      "description": "A separação entre cablagem de telecomunicações e cabos de energia é inferior ao mínimo de 50 mm em cruzamentos perpendiculares.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.separationFromPower", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "{ited.separationFromPower} mm",
+      "requiredValue": "≥ 50 mm (cruzamento perpendicular)",
+      "remediation": "Aumentar a separação entre cablagem de telecomunicações e cabos de energia para ≥ 50 mm nos cruzamentos perpendiculares. Utilizar separadores físicos ou tubagem metálica quando a distância não pode ser garantida.",
+      "enabled": true,
+      "tags": ["cobre", "separação", "energia", "perpendicular"]
+    },
+    {
+      "id": "ITED-CU-08",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.4 — Separação de Energia (Paralela >10 m)",
+      "description": "A separação entre cablagem de telecomunicações e cabos de energia é inferior ao mínimo de 200 mm em percursos paralelos superiores a 10 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.separationFromPowerParallel", "operator": "<", "value": 200 },
+        { "field": "ited.parallelRunLength", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "{ited.separationFromPowerParallel} mm (percurso paralelo > 10 m)",
+      "requiredValue": "≥ 200 mm para percursos paralelos > 10 m",
+      "remediation": "Aumentar a separação para ≥ 200 mm em percursos paralelos superiores a 10 m entre cabos de telecomunicações e de energia. Em alternativa, utilizar tubagem metálica com ligação à terra para blindagem eletromagnética.",
+      "enabled": true,
+      "tags": ["cobre", "separação", "energia", "paralela"]
+    },
+    {
+      "id": "ITED-COAX-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3 — Obrigatoriedade de Cablagem Coaxial",
+      "description": "Não está prevista cablagem coaxial. O ITED exige cablagem coaxial para distribuição de sinais CATV/MATV.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "telecommunications.hasCoaxialCabling", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "remediation": "Instalar cablagem coaxial tipo RG-6 ou equivalente para distribuição de sinais CATV/MATV. A cablagem coaxial continua a ser exigida pelo ITED para televisão por cabo e satélite.",
+      "requiredValue": "Cablagem coaxial RG-6 (75 Ω) exigida",
+      "enabled": true,
+      "tags": ["coaxial", "CATV", "MATV", "RG-6"]
+    },
+    {
+      "id": "ITED-COAX-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.1 — Tipo e Impedância do Cabo Coaxial",
+      "description": "O cabo coaxial não é do tipo RG-6 ou equivalente com impedância de 75 Ω.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.coaxialImpedance", "operator": "!=", "value": 75 }
+      ],
+      "currentValueTemplate": "{ited.coaxialImpedance} Ω",
+      "requiredValue": "75 Ω (RG-6 ou equivalente)",
+      "remediation": "Utilizar cabo coaxial RG-6 ou equivalente com impedância de 75 Ω. Cabos com impedância diferente (ex. 50 Ω) não são adequados para distribuição CATV/MATV/DTH.",
+      "enabled": true,
+      "tags": ["coaxial", "impedância", "75 Ω", "RG-6"]
+    },
+    {
+      "id": "ITED-COAX-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.2 — Atenuação Coaxial a 862 MHz",
+      "description": "A atenuação do percurso coaxial excede o máximo admissível de 12 dB a 862 MHz (CATV terrestre).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.coaxialAttenuation", "operator": ">", "value": 12 }
+      ],
+      "currentValueTemplate": "{ited.coaxialAttenuation} dB a 862 MHz",
+      "requiredValue": "≤ 12 dB a 862 MHz (entrada edifício à tomada)",
+      "remediation": "Reduzir a atenuação do percurso coaxial para ≤ 12 dB a 862 MHz. Verificar qualidade dos conectores tipo F, repartidores e extensão dos cabos. Utilizar cabo coaxial de baixa perda e minimizar o número de derivações.",
+      "enabled": true,
+      "tags": ["coaxial", "atenuação", "862 MHz", "CATV"]
+    },
+    {
+      "id": "ITED-COAX-04",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.2 — Atenuação Coaxial a 2150 MHz (Satélite)",
+      "description": "A atenuação do percurso coaxial excede o máximo admissível de 17 dB a 2150 MHz (recepção satélite/DTH).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.coaxialAttenuationSat", "operator": ">", "value": 17 }
+      ],
+      "currentValueTemplate": "{ited.coaxialAttenuationSat} dB a 2150 MHz",
+      "requiredValue": "≤ 17 dB a 2150 MHz (satélite/DTH)",
+      "remediation": "Reduzir a atenuação do percurso coaxial para ≤ 17 dB a 2150 MHz. Para recepção satélite, utilizar cabo coaxial com baixa atenuação a frequências elevadas (ex. RG-6 tri-shield). Verificar qualidade dos conectores tipo F e minimizar derivações.",
+      "enabled": true,
+      "tags": ["coaxial", "atenuação", "2150 MHz", "satélite", "DTH"]
+    },
+    {
+      "id": "ITED-COAX-05",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.3 — Conectores Coaxiais Tipo F",
+      "description": "Os conectores coaxiais não são do tipo F. O ITED exige conectores tipo F em toda a rede coaxial.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.coaxialConnectorType", "operator": "!=", "value": "F" }
+      ],
+      "currentValueTemplate": "Conector tipo: {ited.coaxialConnectorType}",
+      "requiredValue": "Conectores tipo F",
+      "remediation": "Utilizar conectores tipo F em toda a rede coaxial conforme Manual ITED. Os conectores tipo F garantem blindagem e desempenho adequados para as frequências utilizadas.",
+      "enabled": true,
+      "tags": ["coaxial", "conector", "tipo F"]
+    },
+    {
+      "id": "ITED-COAX-06",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.4 — Blindagem do Cabo Coaxial",
+      "description": "A blindagem do cabo coaxial é inferior ao mínimo de 85 dB.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.coaxialShielding", "operator": "<", "value": 85 }
+      ],
+      "currentValueTemplate": "{ited.coaxialShielding} dB de blindagem",
+      "requiredValue": "≥ 85 dB de blindagem",
+      "remediation": "Utilizar cabo coaxial com blindagem ≥ 85 dB (classe A segundo EN 50117). Blindagem insuficiente provoca interferências na recepção de sinais CATV e satélite.",
+      "enabled": true,
+      "tags": ["coaxial", "blindagem", "85 dB"]
+    },
+    {
+      "id": "ITED-TOM-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1 — Tomadas RJ45 por Tipologia (T0-T1)",
+      "description": "O número de tomadas RJ45 em frações T0 ou T1 é inferior ao mínimo de 2.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "in", "value": ["t0", "t1"] },
+        { "field": "telecommunications.rj45OutletsPerDwelling", "operator": "<", "value": 2 }
+      ],
+      "currentValueTemplate": "{telecommunications.rj45OutletsPerDwelling} tomadas RJ45",
+      "requiredValue": "≥ 2 tomadas RJ45 para T0-T1",
+      "remediation": "Instalar no mínimo 2 tomadas RJ45 Cat.6 em frações T0 ou T1 conforme ITED 4ª edição.",
+      "enabled": true,
+      "tags": ["tomadas", "RJ45", "T0", "T1"]
+    },
+    {
+      "id": "ITED-TOM-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1 — Tomadas RJ45 por Tipologia (T2)",
+      "description": "O número de tomadas RJ45 em frações T2 é inferior ao mínimo de 3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "==", "value": "t2" },
+        { "field": "telecommunications.rj45OutletsPerDwelling", "operator": "<", "value": 3 }
+      ],
+      "currentValueTemplate": "{telecommunications.rj45OutletsPerDwelling} tomadas RJ45",
+      "requiredValue": "≥ 3 tomadas RJ45 para T2",
+      "remediation": "Instalar no mínimo 3 tomadas RJ45 Cat.6 em frações T2 conforme ITED 4ª edição.",
+      "enabled": true,
+      "tags": ["tomadas", "RJ45", "T2"]
+    },
+    {
+      "id": "ITED-TOM-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1 — Tomadas RJ45 por Tipologia (T3)",
+      "description": "O número de tomadas RJ45 em frações T3 é inferior ao mínimo de 4.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "==", "value": "t3" },
+        { "field": "telecommunications.rj45OutletsPerDwelling", "operator": "<", "value": 4 }
+      ],
+      "currentValueTemplate": "{telecommunications.rj45OutletsPerDwelling} tomadas RJ45",
+      "requiredValue": "≥ 4 tomadas RJ45 para T3",
+      "remediation": "Instalar no mínimo 4 tomadas RJ45 Cat.6 em frações T3 conforme ITED 4ª edição.",
+      "enabled": true,
+      "tags": ["tomadas", "RJ45", "T3"]
+    },
+    {
+      "id": "ITED-TOM-04",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1 — Tomadas RJ45 por Tipologia (T4+)",
+      "description": "O número de tomadas RJ45 em frações T4 ou superior é inferior ao mínimo de 5.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "in", "value": ["t4", "t4plus"] },
+        { "field": "telecommunications.rj45OutletsPerDwelling", "operator": "<", "value": 5 }
+      ],
+      "currentValueTemplate": "{telecommunications.rj45OutletsPerDwelling} tomadas RJ45",
+      "requiredValue": "≥ 5 tomadas RJ45 para T4+",
+      "remediation": "Instalar no mínimo 5 tomadas RJ45 Cat.6 em frações T4 ou superior conforme ITED 4ª edição.",
+      "enabled": true,
+      "tags": ["tomadas", "RJ45", "T4", "T4+"]
+    },
+    {
+      "id": "ITED-TOM-05",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2 — Tomadas Coaxiais TV (T0-T1)",
+      "description": "O número de tomadas coaxiais TV em frações T0 ou T1 é inferior ao mínimo de 1.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "in", "value": ["t0", "t1"] },
+        { "field": "telecommunications.coaxOutletsPerDwelling", "operator": "<", "value": 1 }
+      ],
+      "currentValueTemplate": "{telecommunications.coaxOutletsPerDwelling} tomadas coaxiais",
+      "requiredValue": "≥ 1 tomada coaxial TV para T0-T1",
+      "remediation": "Instalar no mínimo 1 tomada coaxial TV na sala de frações T0 ou T1.",
+      "enabled": true,
+      "tags": ["tomadas", "coaxial", "TV", "T0", "T1"]
+    },
+    {
+      "id": "ITED-TOM-06",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2 — Tomadas Coaxiais TV (T2-T3)",
+      "description": "O número de tomadas coaxiais TV em frações T2 ou T3 é inferior ao mínimo de 2.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "in", "value": ["t2", "t3"] },
+        { "field": "telecommunications.coaxOutletsPerDwelling", "operator": "<", "value": 2 }
+      ],
+      "currentValueTemplate": "{telecommunications.coaxOutletsPerDwelling} tomadas coaxiais",
+      "requiredValue": "≥ 2 tomadas coaxiais TV para T2-T3",
+      "remediation": "Instalar no mínimo 2 tomadas coaxiais TV em frações T2 ou T3 (sala + quarto principal ou outra divisão).",
+      "enabled": true,
+      "tags": ["tomadas", "coaxial", "TV", "T2", "T3"]
+    },
+    {
+      "id": "ITED-TOM-07",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2 — Tomadas Coaxiais TV (T4+)",
+      "description": "O número de tomadas coaxiais TV em frações T4 ou superior é inferior ao mínimo de 3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "in", "value": ["t4", "t4plus"] },
+        { "field": "telecommunications.coaxOutletsPerDwelling", "operator": "<", "value": 3 }
+      ],
+      "currentValueTemplate": "{telecommunications.coaxOutletsPerDwelling} tomadas coaxiais",
+      "requiredValue": "≥ 3 tomadas coaxiais TV para T4+",
+      "remediation": "Instalar no mínimo 3 tomadas coaxiais TV em frações T4 ou superior.",
+      "enabled": true,
+      "tags": ["tomadas", "coaxial", "TV", "T4", "T4+"]
+    },
+    {
+      "id": "ITED-TOM-08",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.3 — Tomada de Fibra Óptica por Fogo",
+      "description": "Cada fração deve ter pelo menos 1 tomada de fibra óptica. Obrigatório pela 4ª edição do ITED.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.fiberOutletsPerDwelling", "operator": "<", "value": 1 },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "remediation": "Instalar pelo menos 1 tomada de fibra óptica (com conector SC/APC) no ATI ou na sala de cada fração. Obrigatório pela 4ª edição do ITED.",
+      "requiredValue": "≥ 1 tomada FO por fração (obrigatório 4ª edição)",
+      "enabled": true,
+      "tags": ["fibra", "tomada", "obrigatório", "4ª edição"]
+    },
+    {
+      "id": "ITED-TOM-09",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4 — Localização Obrigatória: Sala",
+      "description": "A sala deve ter obrigatoriamente tomadas RJ45, coaxial e fibra óptica.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.livingRoomHasAllOutlets", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "Sala: RJ45 + coaxial + FO (obrigatório)",
+      "remediation": "Instalar na sala tomadas RJ45 (Cat.6), coaxial (tipo F) e fibra óptica (SC/APC). A sala é a divisão com presença obrigatória de todos os tipos de tomadas de telecomunicações.",
+      "enabled": true,
+      "tags": ["tomadas", "sala", "localização", "obrigatório"]
+    },
+    {
+      "id": "ITED-TOM-10",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4 — Localização Obrigatória: Quartos",
+      "description": "Cada quarto deve ter pelo menos uma tomada RJ45.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.bedroomsWithRJ45", "operator": "<", "value": 1 }
+      ],
+      "requiredValue": "≥ 1 tomada RJ45 por quarto",
+      "remediation": "Instalar pelo menos 1 tomada RJ45 Cat.6 em cada quarto para acesso à rede de dados.",
+      "enabled": true,
+      "tags": ["tomadas", "RJ45", "quartos", "localização"]
+    },
+    {
+      "id": "ITED-TOM-11",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4 — Localização: Cozinha (T3+)",
+      "description": "Em frações T3 ou superiores, a cozinha deve ter pelo menos uma tomada RJ45.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "computed.dwellingSize", "operator": "in", "value": ["t3", "t4", "t4plus"] },
+        { "field": "ited.kitchenHasRJ45", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "≥ 1 tomada RJ45 na cozinha para T3+",
+      "remediation": "Instalar pelo menos 1 tomada RJ45 Cat.6 na cozinha para frações T3 ou superiores, conforme ITED 4ª edição.",
+      "enabled": true,
+      "tags": ["tomadas", "RJ45", "cozinha", "T3+"]
+    },
+    {
+      "id": "ITED-DUCT-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.1 — Tubo Individual (ATI-Tomada)",
+      "description": "O diâmetro do tubo individual entre o ATI e as tomadas é inferior ao mínimo de 25 mm ERFE.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.individualDuctDiameter", "operator": "<", "value": 25 }
+      ],
+      "currentValueTemplate": "Ø{ited.individualDuctDiameter} mm",
+      "requiredValue": "≥ Ø25 mm ERFE (tubo individual ATI-tomada)",
+      "remediation": "Aumentar o diâmetro do tubo individual para ≥ 25 mm ERFE (Embebido em Roço de Parede ou Pavimento). O tubo deve permitir a passagem dos cabos de telecomunicações com taxa de ocupação ≤ 50%.",
+      "enabled": true,
+      "tags": ["tubagem", "individual", "Ø25 mm", "ERFE"]
+    },
+    {
+      "id": "ITED-DUCT-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2 — Tubo Coluna Montante",
+      "description": "O diâmetro do tubo da coluna montante é inferior ao mínimo de 40 mm.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.riserDuctDiameter", "operator": "<", "value": 40 }
+      ],
+      "currentValueTemplate": "Ø{ited.riserDuctDiameter} mm",
+      "requiredValue": "≥ Ø40 mm (coluna montante)",
+      "remediation": "Aumentar o diâmetro do tubo da coluna montante para ≥ 40 mm. A coluna montante deve permitir a passagem de todos os cabos verticais (cobre, coaxial e fibra) entre o ATE e os pisos.",
+      "enabled": true,
+      "tags": ["tubagem", "coluna montante", "Ø40 mm"]
+    },
+    {
+      "id": "ITED-DUCT-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.3 — Tubo Entrada Edifício (até 8 fogos)",
+      "description": "O diâmetro do tubo de entrada do edifício é inferior ao mínimo de 63 mm para edifícios até 8 fogos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "numberOfDwellings", "operator": "<=", "value": 8 },
+        { "field": "ited.buildingEntryDuctDiameter", "operator": "<", "value": 63 }
+      ],
+      "currentValueTemplate": "Ø{ited.buildingEntryDuctDiameter} mm",
+      "requiredValue": "≥ Ø63 mm (até 8 fogos)",
+      "remediation": "Aumentar o diâmetro do tubo de entrada do edifício para ≥ 63 mm. O tubo de entrada liga a CVM ao ATE e deve permitir a passagem dos cabos de todos os operadores.",
+      "enabled": true,
+      "tags": ["tubagem", "entrada", "Ø63 mm", "até 8 fogos"]
+    },
+    {
+      "id": "ITED-DUCT-04",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.3 — Tubo Entrada Edifício (> 8 fogos)",
+      "description": "O diâmetro do tubo de entrada do edifício é inferior ao mínimo de 90 mm para edifícios com mais de 8 fogos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "numberOfDwellings", "operator": ">", "value": 8 },
+        { "field": "ited.buildingEntryDuctDiameter", "operator": "<", "value": 90 }
+      ],
+      "currentValueTemplate": "Ø{ited.buildingEntryDuctDiameter} mm",
+      "requiredValue": "≥ Ø90 mm (> 8 fogos)",
+      "remediation": "Aumentar o diâmetro do tubo de entrada do edifício para ≥ 90 mm para edifícios com mais de 8 fogos. Considerar tubos adicionais se a taxa de ocupação exceder 50%.",
+      "enabled": true,
+      "tags": ["tubagem", "entrada", "Ø90 mm", ">8 fogos"]
+    },
+    {
+      "id": "ITED-DUCT-05",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.4 — Taxa de Ocupação de Tubos Individuais",
+      "description": "A taxa de ocupação dos tubos individuais de telecomunicações excede o máximo de 50%.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.ductOccupancyRate", "operator": ">", "value": 50 }
+      ],
+      "currentValueTemplate": "{ited.ductOccupancyRate}% de ocupação",
+      "requiredValue": "≤ 50% (tubos individuais)",
+      "remediation": "Reduzir a taxa de ocupação dos tubos individuais para ≤ 50% da secção. Aumentar o diâmetro dos tubos ou utilizar tubos adicionais para permitir futuras ampliações e facilitar a passagem de cabos.",
+      "enabled": true,
+      "tags": ["tubagem", "ocupação", "50%", "tubos"]
+    },
+    {
+      "id": "ITED-DUCT-06",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.4 — Taxa de Ocupação de Caminhos de Cabos",
+      "description": "A taxa de ocupação dos caminhos de cabos (esteiras/calhas) excede o máximo de 40%.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.cablewayOccupancyRate", "operator": ">", "value": 40 }
+      ],
+      "currentValueTemplate": "{ited.cablewayOccupancyRate}% de ocupação",
+      "requiredValue": "≤ 40% (caminhos de cabos / esteiras / calhas)",
+      "remediation": "Reduzir a taxa de ocupação dos caminhos de cabos para ≤ 40%. Aumentar a dimensão das esteiras ou calhas. A taxa de 40% é inferior à dos tubos para facilitar o acesso e manutenção.",
+      "enabled": true,
+      "tags": ["tubagem", "ocupação", "40%", "caminhos de cabos", "esteiras"]
+    },
+    {
+      "id": "ITED-DUCT-07",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.5 — Caixas de Derivação",
+      "description": "As caixas de derivação de telecomunicações não cumprem as dimensões mínimas de 0.10×0.10×0.05 m ou não são acessíveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.junctionBoxCompliant", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "≥ 0.10×0.10×0.05 m; acessíveis",
+      "remediation": "Instalar caixas de derivação com dimensões mínimas de 0.10 m × 0.10 m × 0.05 m. As caixas devem ser acessíveis (não embutidas atrás de elementos fixos) e permitir a identificação e manutenção da cablagem.",
+      "enabled": true,
+      "tags": ["caixas derivação", "dimensões", "acessibilidade"]
+    },
+    {
+      "id": "ITED-RISER-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2 — Coluna Montante Obrigatória",
+      "description": "Em edifícios com múltiplas frações, é obrigatória a coluna montante vertical entre o ATE e os pisos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasRiserCableway", "operator": "not_exists", "value": null },
+        { "field": "numberOfDwellings", "operator": ">=", "value": 2 }
+      ],
+      "remediation": "Prever coluna montante (caminhos de cabos verticais) entre o ATE e os pisos/frações, com tubo ≥ Ø40 mm. A coluna deve ter caixas de derivação em cada piso para acesso aos cabos.",
+      "requiredValue": "Coluna montante obrigatória com tubo ≥ Ø40 mm",
+      "enabled": true,
+      "tags": ["coluna montante", "caminhos de cabos", "vertical"]
+    },
+    {
+      "id": "ITUR-PROJ-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 62.º — Projeto ITUR Obrigatório",
+      "description": "Loteamentos e urbanizações requerem projeto ITUR aprovado por projetista credenciado ANACOM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasITURProject", "operator": "not_exists", "value": null },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "remediation": "Elaborar projeto ITUR por projetista credenciado ANACOM. O projeto ITUR é obrigatório para loteamentos e urbanizações e deve prever infraestruturas subterrâneas multi-operador.",
+      "requiredValue": "Projeto ITUR obrigatório para urbanizações",
+      "enabled": true,
+      "tags": ["ITUR", "urbanização", "projeto"]
+    },
+    {
+      "id": "ITUR-DUCT-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.1 — Condutas Subterrâneas PEAD",
+      "description": "As condutas subterrâneas ITUR devem ser em PEAD com diâmetro mínimo de 110 mm, com mínimo de 2 condutas por percurso.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "itur.ductDiameter", "operator": "<", "value": 110 },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Ø{itur.ductDiameter} mm",
+      "requiredValue": "≥ Ø110 mm PEAD; mínimo 2 condutas por percurso",
+      "remediation": "Instalar condutas subterrâneas em PEAD (polietileno de alta densidade) com diâmetro mínimo de 110 mm. Prever no mínimo 2 condutas por percurso para permitir acesso multi-operador e reserva de capacidade.",
+      "enabled": true,
+      "tags": ["ITUR", "condutas", "PEAD", "Ø110 mm"]
+    },
+    {
+      "id": "ITUR-DUCT-02",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.1.1 — Mínimo de Condutas por Percurso",
+      "description": "O número de condutas ITUR por percurso é inferior ao mínimo de 2.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "itur.ductsPerRoute", "operator": "<", "value": 2 },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{itur.ductsPerRoute} condutas por percurso",
+      "requiredValue": "≥ 2 condutas por percurso",
+      "remediation": "Aumentar para no mínimo 2 condutas por percurso na rede ITUR. As condutas adicionais permitem redundância e acesso a múltiplos operadores.",
+      "enabled": true,
+      "tags": ["ITUR", "condutas", "mínimo", "percurso"]
+    },
+    {
+      "id": "ITUR-DEPTH-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.2 — Profundidade de Enterramento (Passeio)",
+      "description": "A profundidade de enterramento das condutas ITUR sob passeio é inferior ao mínimo de 0.60 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "itur.burialDepthSidewalk", "operator": "<", "value": 0.60 },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{itur.burialDepthSidewalk} m (passeio)",
+      "requiredValue": "≥ 0.60 m sob passeio",
+      "remediation": "Aumentar a profundidade de enterramento das condutas para ≥ 0.60 m sob passeio. A profundidade mínima garante proteção mecânica contra cargas superficiais.",
+      "enabled": true,
+      "tags": ["ITUR", "profundidade", "enterramento", "passeio"]
+    },
+    {
+      "id": "ITUR-DEPTH-02",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.2 — Profundidade de Enterramento (Faixa Rodagem)",
+      "description": "A profundidade de enterramento das condutas ITUR sob faixa de rodagem é inferior ao mínimo de 0.80 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "itur.burialDepthRoadway", "operator": "<", "value": 0.80 },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{itur.burialDepthRoadway} m (faixa rodagem)",
+      "requiredValue": "≥ 0.80 m sob faixa de rodagem",
+      "remediation": "Aumentar a profundidade de enterramento das condutas para ≥ 0.80 m sob faixa de rodagem. A profundidade superior garante proteção contra cargas de tráfego rodoviário.",
+      "enabled": true,
+      "tags": ["ITUR", "profundidade", "enterramento", "faixa rodagem"]
+    },
+    {
+      "id": "ITUR-CVMu-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.3 — Câmaras de Visita (CVMu)",
+      "description": "As câmaras de visita multi-operador da urbanização (CVMu) devem ter dimensões mínimas de 0.60×0.60×0.60 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "itur.cvmuWidth", "operator": "<", "value": 0.60 },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{itur.cvmuWidth}×{itur.cvmuLength}×{itur.cvmuDepth} m",
+      "requiredValue": "CVMu ≥ 0.60×0.60×0.60 m",
+      "remediation": "Aumentar as dimensões das câmaras de visita (CVMu) para no mínimo 0.60 m × 0.60 m × 0.60 m. As câmaras devem permitir acesso para manutenção e ligação de operadores.",
+      "enabled": true,
+      "tags": ["ITUR", "CVMu", "câmara visita", "dimensões"]
+    },
+    {
+      "id": "ITUR-CVMu-02",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.3.1 — Espaçamento Máximo entre CVMu",
+      "description": "O espaçamento entre câmaras de visita (CVMu) excede o máximo de 70 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "itur.cvmuSpacing", "operator": ">", "value": 70 },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{itur.cvmuSpacing} m entre CVMu",
+      "requiredValue": "≤ 70 m entre câmaras de visita",
+      "remediation": "Reduzir o espaçamento entre câmaras de visita para ≤ 70 m. Adicionar câmaras intermédias nos percursos que excedam esta distância para facilitar a passagem e manutenção dos cabos.",
+      "enabled": true,
+      "tags": ["ITUR", "CVMu", "espaçamento", "70 m"]
+    },
+    {
+      "id": "ITUR-FITA-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "Manual ITUR 3ª Ed., Cap. 3.4 — Fita Sinalizadora",
+      "description": "Não está prevista fita sinalizadora a 0.30 m acima das condutas ITUR enterradas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "itur.hasSignalTape", "operator": "!=", "value": true },
+        { "field": "telecommunications.isUrbanization", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Fita sinalizadora a 0.30 m acima da conduta",
+      "remediation": "Instalar fita sinalizadora de cor adequada (tipicamente verde para telecomunicações) a 0.30 m acima das condutas enterradas. A fita alerta para a presença de infraestruturas de telecomunicações durante futuras escavações.",
+      "enabled": true,
+      "tags": ["ITUR", "fita sinalizadora", "sinalização", "enterrada"]
+    },
+    {
+      "id": "ITED-TERRA-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009 / Manual ITED 4ª Ed., Cap. 7.1 — Barramento de Terras do ATE",
+      "description": "O barramento de terras do ATE deve estar ligado ao terra geral do edifício com resistência ≤ 10 Ω.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.earthResistance", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "{ited.earthResistance} Ω",
+      "requiredValue": "≤ 10 Ω; ligado ao terra geral do edifício",
+      "remediation": "Instalar barramento de terras no ATE em cobre (secção mínima 16 mm²) com ligação ao terra geral do edifício. A resistência do sistema de terras deve ser ≤ 10 Ω. Verificar continuidade e qualidade das ligações equipotenciais.",
+      "enabled": true,
+      "tags": ["terra", "ATE", "proteção", "equipotencial", "10 Ω"]
+    },
+    {
+      "id": "ITED-TERRA-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2 — Descarregadores de Sobretensões",
+      "description": "Não estão previstos descarregadores de sobretensões nos cabos de cobre à entrada do ATE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.hasSurgeProtectors", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "Descarregadores de sobretensões obrigatórios nos cabos de cobre à entrada do ATE",
+      "remediation": "Instalar descarregadores de sobretensões (SPD — Surge Protection Devices) nos cabos de par de cobre à entrada do ATE. Os descarregadores protegem os equipamentos e a cablagem interior contra sobretensões de origem atmosférica ou industrial.",
+      "enabled": true,
+      "tags": ["proteção", "sobretensões", "SPD", "ATE", "cobre"]
+    },
+    {
+      "id": "ITED-TERRA-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.3 — Distância a Pára-Raios",
+      "description": "A cablagem ITED está a menos de 2.00 m dos condutores de pára-raios.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.distanceFromLightningRod", "operator": "<", "value": 2.00 }
+      ],
+      "currentValueTemplate": "{ited.distanceFromLightningRod} m de distância",
+      "requiredValue": "≥ 2.00 m de distância dos condutores de pára-raios",
+      "remediation": "Afastar a cablagem ITED para ≥ 2.00 m dos condutores de pára-raios. A proximidade a condutores de pára-raios pode induzir sobretensões destrutivas na cablagem de telecomunicações durante descargas atmosféricas. Se a distância não puder ser garantida, utilizar blindagem metálica adequada.",
+      "enabled": true,
+      "tags": ["proteção", "pára-raios", "distância", "sobretensões"]
+    },
+    {
+      "id": "ITED-CERT-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 66.º — Certificação ITED Obrigatória",
+      "description": "A instalação ITED requer certificação emitida pelo instalador credenciado e entregue ao dono da obra.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.hasITEDCertification", "operator": "not_exists", "value": null },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "remediation": "Obter certificação ITED emitida pelo instalador credenciado ANACOM. A certificação é obrigatória para a emissão da licença de utilização e deve ser entregue ao dono da obra. O certificado inclui os resultados dos testes realizados.",
+      "requiredValue": "Certificação ITED emitida pelo instalador; entregue ao dono da obra",
+      "enabled": true,
+      "tags": ["certificação", "ANACOM", "instalador", "licença"]
+    },
+    {
+      "id": "ITED-CERT-02",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 64.º — Instalador Credenciado ANACOM",
+      "description": "A execução do projeto ITED deve ser realizada por instalador com credenciação ANACOM válida.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "telecommunications.installerITEDLicense", "operator": "not_exists", "value": null }
+      ],
+      "remediation": "Contratar instalador com credenciação ANACOM válida para a execução da instalação ITED. O instalador é responsável pela certificação e pelos testes obrigatórios. A lista de instaladores credenciados está disponível no site da ANACOM.",
+      "requiredValue": "Instalador com credenciação ANACOM obrigatório",
+      "enabled": true,
+      "tags": ["instalador", "ANACOM", "credenciação", "obrigatório"]
+    },
+    {
+      "id": "ITED-TEST-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.1 — Testes Obrigatórios: Fibra Óptica",
+      "description": "Os testes obrigatórios de fibra óptica (OTDR + potência óptica) devem ser realizados e documentados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.fiberTestsCompleted", "operator": "!=", "value": true },
+        { "field": "telecommunications.hasFiberOptic", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Testes OTDR + medição de potência óptica obrigatórios",
+      "remediation": "Realizar testes de fibra óptica conforme Manual ITED: teste OTDR (reflectometria no domínio do tempo) para verificar atenuação, emendas e eventos ao longo da fibra; e medição de potência óptica para confirmar a atenuação total do percurso (≤ 5 dB). Documentar resultados no relatório de certificação.",
+      "enabled": true,
+      "tags": ["testes", "fibra óptica", "OTDR", "potência", "certificação"]
+    },
+    {
+      "id": "ITED-TEST-02",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.2 — Testes Obrigatórios: Cobre Cat.6",
+      "description": "Os testes obrigatórios de certificação de cablagem de cobre Cat.6 devem ser realizados e documentados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.copperTestsCompleted", "operator": "!=", "value": true },
+        { "field": "telecommunications.hasCopperCabling", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Certificação Cat.6 com certificador de nível IIIe/IV obrigatória",
+      "remediation": "Realizar testes de certificação de cablagem de cobre Cat.6 com certificador de campo de nível IIIe ou IV. Os testes devem incluir: wiremap, comprimento, atenuação, NEXT, PSNEXT, ACR-N, ACR-F, PSACR-F, delay e delay skew. Documentar resultados PASS/FAIL no relatório de certificação.",
+      "enabled": true,
+      "tags": ["testes", "cobre", "Cat.6", "certificação"]
+    },
+    {
+      "id": "ITED-TEST-03",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.3 — Testes Obrigatórios: Coaxial",
+      "description": "Os testes obrigatórios de coaxial (atenuação + blindagem) devem ser realizados e documentados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.coaxialTestsCompleted", "operator": "!=", "value": true },
+        { "field": "telecommunications.hasCoaxialCabling", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Testes de atenuação e blindagem coaxial obrigatórios",
+      "remediation": "Realizar testes de coaxial conforme Manual ITED: medição de atenuação a 862 MHz (≤ 12 dB) e a 2150 MHz (≤ 17 dB para percursos satélite); e teste de blindagem (≥ 85 dB). Verificar continuidade e isolamento dos conectores tipo F. Documentar resultados no relatório de certificação.",
+      "enabled": true,
+      "tags": ["testes", "coaxial", "atenuação", "blindagem", "certificação"]
+    },
+    {
+      "id": "ITED-WIFI-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.5 — Preparação para Wi-Fi (Edifícios de Serviços)",
+      "description": "Em edifícios de serviços, a 4ª edição do ITED exige pré-cablagem para pontos de acesso Wi-Fi (1 por cada 100 m² de área útil).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.wifiAccessPoints", "operator": "<", "value": 1 },
+        { "field": "buildingType", "operator": "in", "value": ["services", "commercial", "office", "mixed"] }
+      ],
+      "currentValueTemplate": "{ited.wifiAccessPoints} pontos de acesso previstos",
+      "requiredValue": "≥ 1 ponto de acesso Wi-Fi por cada 100 m²",
+      "remediation": "Prever pontos de acesso Wi-Fi com pré-cablagem Cat.6A (mínimo 1 ponto por cada 100 m² de área útil). Cada ponto de acesso deve ter tomada RJ45 Cat.6A e alimentação elétrica (ou PoE). Localizar os pontos de acesso em posição central para maximizar a cobertura.",
+      "enabled": true,
+      "tags": ["Wi-Fi", "sem fios", "pré-cablagem", "serviços"]
+    },
+    {
+      "id": "ITED-CCTV-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.6 — Preparação para CCTV",
+      "description": "O projeto não prevê infraestrutura de tubagem dedicada para videovigilância (CCTV) nos acessos e zonas comuns.",
+      "severity": "info",
+      "conditions": [
+        { "field": "ited.hasCCTVPreparation", "operator": "!=", "value": true },
+        { "field": "numberOfDwellings", "operator": ">=", "value": 2 }
+      ],
+      "currentValueTemplate": "Preparação CCTV: {ited.hasCCTVPreparation}",
+      "requiredValue": "Tubagem dedicada para CCTV nos acessos e zonas comuns",
+      "remediation": "Prever tubagem dedicada para sistema de videovigilância (CCTV) nos acessos ao edifício e zonas comuns. Instalar tubos de reserva (mínimo Ø25 mm) desde o ATE até aos pontos de câmara. Prever alimentação elétrica ou PoE nos pontos de instalação de câmaras.",
+      "enabled": true,
+      "tags": ["CCTV", "videovigilância", "segurança", "tubagem"]
+    },
+    {
+      "id": "ITED-SMART-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.7 — Preparação para Domótica",
+      "description": "O projeto não prevê infraestrutura para domótica ou gestão técnica centralizada.",
+      "severity": "info",
+      "conditions": [
+        { "field": "ited.hasSmartBuildingPrep", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Preparação domótica: {ited.hasSmartBuildingPrep}",
+      "requiredValue": "Tubagem dedicada + par de cobre Cat.6 ao ATI",
+      "remediation": "Prever tubagem dedicada para sistemas de gestão técnica e domótica. Instalar pelo menos 1 par de cobre Cat.6 desde o quadro de gestão técnica até ao ATI de cada fração. Prever tubo de reserva (mínimo Ø20 mm) para sensores e atuadores. Considerar protocolo KNX/TP ou equivalente.",
+      "enabled": true,
+      "tags": ["domótica", "gestão técnica", "smart building", "automação"]
+    },
+    {
+      "id": "ITED-ODF-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.6 — ODF (Optical Distribution Frame) no ATE",
+      "description": "Não está previsto ODF (Optical Distribution Frame) no ATE. O ODF é obrigatório para a distribuição de fibra óptica no edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "ited.hasODF", "operator": "not_exists", "value": null },
+        { "field": "telecommunications.hasFiberOptic", "operator": "exists", "value": null }
+      ],
+      "remediation": "Instalar ODF (Optical Distribution Frame) no ATE para terminação e distribuição das fibras ópticas. O ODF deve ter capacidade para todas as fibras do edifício (mínimo 2 por fogo) e permitir ligação dos operadores. Utilizar conectores SC/APC ou LC/APC.",
+      "requiredValue": "ODF obrigatório no ATE para distribuição de fibra óptica",
+      "enabled": true,
+      "tags": ["ODF", "ATE", "fibra óptica", "distribuição"]
+    },
+    {
+      "id": "ITED-RC-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.5 — Repartidor Coaxial no ATI",
+      "description": "Não está previsto repartidor coaxial no ATI. O ATI deve incluir repartidor para distribuição do sinal coaxial às tomadas da fração.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.hasCoaxialSplitter", "operator": "not_exists", "value": null },
+        { "field": "telecommunications.hasCoaxialCabling", "operator": "exists", "value": null }
+      ],
+      "remediation": "Instalar repartidor coaxial no ATI para distribuição do sinal às tomadas da fração. Utilizar repartidores com perda de inserção conhecida para garantir que a atenuação total do percurso não exceda os limites regulamentares.",
+      "requiredValue": "Repartidor coaxial no ATI obrigatório",
+      "enabled": true,
+      "tags": ["coaxial", "repartidor", "ATI", "distribuição"]
+    },
+    {
+      "id": "ITED-RGE-01",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 68.º — Registo na ANACOM",
+      "description": "A instalação ITED deve ser registada na ANACOM pelo instalador credenciado após a conclusão dos trabalhos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.hasANACOMRegistration", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "Registo na ANACOM obrigatório após conclusão",
+      "remediation": "O instalador credenciado deve registar a instalação ITED na plataforma da ANACOM após conclusão dos trabalhos e emissão da certificação. O registo é condição para a emissão da licença de utilização pelo município.",
+      "enabled": true,
+      "tags": ["registo", "ANACOM", "licença", "instalador"]
+    },
+    {
+      "id": "ITED-ETQ-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 9.1 — Etiquetagem da Cablagem",
+      "description": "A cablagem de telecomunicações deve ser devidamente etiquetada em ambas as extremidades conforme esquema de identificação do projeto ITED.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "ited.hasCableLabeling", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "Etiquetagem obrigatória em ambas as extremidades de cada cabo",
+      "remediation": "Etiquetar toda a cablagem de telecomunicações (cobre, coaxial e fibra) em ambas as extremidades com identificação legível e permanente. As etiquetas devem corresponder ao esquema de identificação definido no projeto ITED e nos esquemas as-built.",
+      "enabled": true,
+      "tags": ["etiquetagem", "identificação", "cablagem", "as-built"]
+    },
+    {
+      "id": "ITED-RES-01",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.6 — Tubagem de Reserva",
+      "description": "O projeto deve prever tubagem de reserva para futuras ampliações da infraestrutura de telecomunicações.",
+      "severity": "info",
+      "conditions": [
+        { "field": "ited.hasReserveDucts", "operator": "!=", "value": true }
+      ],
+      "requiredValue": "Tubagem de reserva recomendada para futuras ampliações",
+      "remediation": "Prever tubagem de reserva em todos os percursos da infraestrutura ITED (coluna montante, distribuição horizontal, entrada do edifício) para permitir futuras ampliações sem intervenção estrutural. Recomenda-se pelo menos 1 tubo de reserva por percurso.",
+      "enabled": true,
+      "tags": ["tubagem", "reserva", "ampliação", "futuro"]
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "category": "Resistência ao fogo elementos estruturais",
+  "rules": [
+    {
+      "id": "ELEC_R223",
+      "reference": "Portaria 1532/2008, Art. 15 Quadro IX",
+      "category": "Instalações Elétricas",
+      "subcategory": "Resistência ao fogo elementos estruturais",
+      "rule_text": "Elementos estruturais devem ter resistência ao fogo mínima conforme UT e categoria de risco",
+      "parameters": {
+        "lookup_table": {
+          "I,III,IV,V,VI,VII,VIII,IX,X": {
+            "1": "R30/REI30",
+            "2": "R60/REI60",
+            "3": "R90/REI90",
+            "4": "R120/REI120"
+          },
+          "II,XI,XII": {
+            "1": "R60/REI60",
+            "2": "R90/REI90",
+            "3": "R120/REI120",
+            "4": "R180/REI180"
+          }
+        }
+      },
+      "validation_type": "formula",
+      "severity": "mandatory",
+      "formula": "resistencia_fogo_elemento >= lookup_table[ut_group][categoria_risco]",
+      "lookup_tables": {
+        "lookup_table": {
+          "I,III,IV,V,VI,VII,VIII,IX,X": {
+            "1": "R30/REI30",
+            "2": "R60/REI60",
+            "3": "R90/REI90",
+            "4": "R120/REI120"
+          },
+          "II,XI,XII": {
+            "1": "R60/REI60",
+            "2": "R90/REI90",
+            "3": "R120/REI120",
+            "4": "R180/REI180"
+          }
+        }
+      },
+      "error_message": "Resistência ao fogo do elemento estrutural inferior ao mínimo exigido pelo Quadro IX",
+      "success_message": "✓ Conforme: Resistência ao fogo elementos estruturais",
+      "source": {
+        "regulation": "Portaria 1532/2008",
+        "article": "Portaria 1532/2008, Art. 15 Quadro IX",
+        "version": "3.0",
+        "date": "2026-02-15"
+      },
+      "metadata": {
+        "complexity": "complex",
+        "requires_calculation": true,
+        "application_scope": [
+          "Geral"
+        ]
+      }
+    }
+  ]
+}

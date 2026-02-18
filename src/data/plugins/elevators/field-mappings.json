@@ -1,0 +1,388 @@
+{
+  "pluginId": "elevators",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras de ascensores (DL 320/2002, Diretiva 2014/33/UE, EN 81-20/50)",
+  "fields": [
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.hasElevator",
+      "label": "Existência de ascensor",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui ascensor instalado — campo de entrada principal (gate)"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "numberOfFloors",
+      "label": "Número de pisos",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "required": true,
+      "ifcMapping": {
+        "entity": "IfcBuildingStorey",
+        "method": "count"
+      },
+      "description": "Número total de pisos do edifício — obrigatório ascensor para edifícios com mais de 4 pisos"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.numberOfElevators",
+      "label": "Número de ascensores",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número total de ascensores instalados no edifício"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.driveType",
+      "label": "Tipo de acionamento",
+      "type": "select",
+      "options": [
+        { "value": "traction", "label": "Tração (por cabos)" },
+        { "value": "hydraulic", "label": "Hidráulico" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "traction" },
+      "description": "Tipo de acionamento do ascensor — por tração (cabos) ou hidráulico"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.speed",
+      "label": "Velocidade nominal",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.0 },
+      "description": "Velocidade nominal do ascensor — tipicamente 1,0 m/s para edifícios residenciais"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.cabinCapacity",
+      "label": "Capacidade da cabina",
+      "type": "number",
+      "unit": "kg",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 630 },
+      "description": "Carga nominal da cabina do ascensor em quilogramas"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.ratedPersons",
+      "label": "Número de pessoas (lotação)",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 8 },
+      "description": "Número máximo de passageiros conforme a carga nominal (75 kg/pessoa)"
+    },
+    {
+      "_group": "Dados Gerais do Ascensor",
+      "field": "elevator.hasCEMarking",
+      "label": "Marcação CE",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se o ascensor possui marcação CE conforme Diretiva 2014/33/UE"
+    },
+
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.cabinDepth",
+      "label": "Profundidade da cabina",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.4 },
+      "description": "Profundidade interior da cabina do ascensor"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.doorWidth",
+      "label": "Largura da porta da cabina",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.8 },
+      "description": "Largura livre da porta de acesso à cabina do ascensor"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.doorOpenTime",
+      "label": "Tempo de abertura da porta",
+      "type": "number",
+      "unit": "s",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 5 },
+      "description": "Tempo mínimo de permanência da porta aberta antes do fecho automático"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.levellingAccuracy",
+      "label": "Precisão de nivelamento",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 10 },
+      "description": "Precisão de paragem ao nível do piso — máximo \u00b110 mm conforme EN 81-20"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.cabinIlluminance",
+      "label": "Iluminação da cabina",
+      "type": "number",
+      "unit": "lux",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 100 },
+      "description": "Nível mínimo de iluminação no interior da cabina — mínimo 100 lux"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.hasHandrail",
+      "label": "Existência de corrimão na cabina",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se a cabina possui corrimão em pelo menos uma parede lateral"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.hasFloorIndicator",
+      "label": "Indicador de piso na cabina",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe indicador visual de piso no interior da cabina"
+    },
+    {
+      "_group": "Cabina e Dimensões",
+      "field": "elevator.hasCabinVentilation",
+      "label": "Ventilação da cabina",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se a cabina possui aberturas ou ventilação adequada conforme EN 81-20"
+    },
+
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.pitDepth",
+      "label": "Profundidade do poço",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Profundidade do poço do ascensor abaixo do nível mais baixo servido"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.headroom",
+      "label": "Altura livre no topo da caixa",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância vertical livre entre o topo da cabina e o teto da caixa do ascensor"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.hasBuffers",
+      "label": "Existência de amortecedores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existem amortecedores (buffers) no fundo do poço conforme EN 81-20"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.hasSpeedGovernor",
+      "label": "Existência de limitador de velocidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe limitador de velocidade que aciona o para-quedas em caso de excesso de velocidade"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.cableSafetyFactor",
+      "label": "Coeficiente de segurança dos cabos",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 12 },
+      "description": "Coeficiente de segurança dos cabos de tração — mínimo 12 conforme EN 81-20"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.landingDoorFireRating",
+      "label": "Resistência ao fogo das portas de patamar",
+      "type": "number",
+      "unit": "min",
+      "sources": ["form"],
+      "required": false,
+      "description": "Classificação de resistência ao fogo (E/EI) das portas de patamar do ascensor"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.hasEmergencyCommunication",
+      "label": "Comunicação bidirecional de emergência",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se a cabina possui sistema de comunicação bidirecional (intercomunicador) com serviço de resgate 24h"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.hasEmergencyLighting",
+      "label": "Iluminação de emergência na cabina",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se a cabina possui iluminação de emergência com autonomia mínima de 1 hora"
+    },
+    {
+      "_group": "Segurança e Proteção",
+      "field": "elevator.hasEmergencyPower",
+      "label": "Alimentação de emergência",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o ascensor possui alimentação de emergência para funcionamento em caso de falha elétrica"
+    },
+
+    {
+      "_group": "Acessibilidade",
+      "field": "elevator.isAccessible",
+      "label": "Ascensor acessível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se o ascensor cumpre os requisitos de acessibilidade para pessoas com mobilidade condicionada (DL 163/2006)"
+    },
+    {
+      "_group": "Acessibilidade",
+      "field": "elevator.callButtonHeight",
+      "label": "Altura dos botões de chamada",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.0 },
+      "description": "Altura dos botões de chamada nos patamares — entre 0,90 m e 1,10 m"
+    },
+    {
+      "_group": "Acessibilidade",
+      "field": "elevator.interiorPanelHeight",
+      "label": "Altura do painel de comandos interior",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.0 },
+      "description": "Altura do botão mais alto no painel de comandos interior da cabina — máximo 1,20 m"
+    },
+    {
+      "_group": "Acessibilidade",
+      "field": "elevator.hasAudioAnnouncement",
+      "label": "Anúncio sonoro de piso",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe anúncio sonoro automático do piso de paragem para pessoas com deficiência visual"
+    },
+
+    {
+      "_group": "Casa das Máquinas",
+      "field": "elevator.machineRoomHeight",
+      "label": "Altura da casa das máquinas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Altura livre no interior da casa das máquinas do ascensor"
+    },
+
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "elevator.hasMaintenanceContract",
+      "label": "Contrato de manutenção",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe contrato de manutenção com empresa de manutenção de ascensores (obrigatório)"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "elevator.maintenanceVisitsPerYear",
+      "label": "Visitas de manutenção por ano",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 12 },
+      "description": "Número mínimo de visitas de manutenção por ano — mínimo 12 conforme DL 320/2002"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "elevator.hasPeriodicInspection",
+      "label": "Inspeção periódica realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se a inspeção periódica obrigatória foi realizada por entidade inspetora (a cada 2 anos)"
+    },
+    {
+      "_group": "Manutenção e Inspeção",
+      "field": "elevator.hasLogBook",
+      "label": "Existência de livro de registo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se existe livro de registo do ascensor com histórico de manutenções e inspeções"
+    },
+
+    {
+      "_group": "Ascensor de Bombeiros",
+      "field": "elevator.isFirefighterElevator",
+      "label": "Ascensor de bombeiros",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o ascensor é destinado a uso prioritário dos bombeiros conforme EN 81-72"
+    },
+    {
+      "_group": "Ascensor de Bombeiros",
+      "field": "elevator.hasFirefighterElevator",
+      "label": "Existência de ascensor de bombeiros no edifício",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o edifício possui pelo menos um ascensor prioritário para bombeiros (obrigatório para altura > 28 m)"
+    }
+  ]
+}

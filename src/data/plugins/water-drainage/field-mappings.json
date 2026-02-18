@@ -1,0 +1,397 @@
+{
+  "pluginId": "water-drainage",
+  "version": "1.0.0",
+  "description": "Mapeamento de campos para regras RGSPPDADAR (Regulamento Geral dos Sistemas P\u00fablicos e Prediais de Distribui\u00e7\u00e3o de \u00c1gua e de Drenagem de \u00c1guas Residuais)",
+  "fields": [
+    {
+      "_group": "Dados Gerais",
+      "field": "water.hasPublicWaterConnection",
+      "label": "Liga\u00e7\u00e3o \u00e0 rede p\u00fablica de \u00e1gua",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se o edif\u00edcio possui liga\u00e7\u00e3o \u00e0 rede p\u00fablica de distribui\u00e7\u00e3o de \u00e1gua conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "water.hasWaterMeter",
+      "label": "Exist\u00eancia de contador de \u00e1gua",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se existe contador de \u00e1gua individual conforme RGSPPDADAR Art.\u00ba 82.\u00ba"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "water.hasCheckValve",
+      "label": "Exist\u00eancia de v\u00e1lvula de reten\u00e7\u00e3o",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se existe v\u00e1lvula de reten\u00e7\u00e3o (anti-retorno) para prote\u00e7\u00e3o contra refluxo conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "water.hasSeparateDrainageSystem",
+      "label": "Sistema separativo de drenagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se o sistema de drenagem \u00e9 separativo (residu\u00e1is dom\u00e9sticas separadas das pluviais) conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "water.waterPipeMaterial",
+      "label": "Material das tubagens de \u00e1gua",
+      "type": "select",
+      "options": [
+        { "value": "PPR", "label": "PPR (Polipropileno)" },
+        { "value": "PVC", "label": "PVC (Policloreto de vinilo)" },
+        { "value": "PEAD", "label": "PEAD (Polietileno de alta densidade)" },
+        { "value": "copper", "label": "Cobre" },
+        { "value": "steel", "label": "A\u00e7o galvanizado" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": "PPR" },
+      "description": "Material das tubagens da rede predial de distribui\u00e7\u00e3o de \u00e1gua conforme RGSPPDADAR Art.\u00ba 93.\u00ba"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "water.pipeMaterial",
+      "label": "Material das tubagens de esgoto",
+      "type": "select",
+      "options": [
+        { "value": "PVC", "label": "PVC (Policloreto de vinilo)" },
+        { "value": "PP", "label": "PP (Polipropileno)" },
+        { "value": "PEAD", "label": "PEAD (Polietileno de alta densidade)" },
+        { "value": "gres", "label": "Gr\u00e9s cer\u00e2mico" },
+        { "value": "iron", "label": "Ferro fundido d\u00factil" }
+      ],
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": "PVC" },
+      "description": "Material das tubagens da rede predial de drenagem de \u00e1guas residuais conforme RGSPPDADAR"
+    },
+
+    {
+      "_group": "Abastecimento de \u00c1gua",
+      "field": "water.hotWaterTemp",
+      "label": "Temperatura da \u00e1gua quente",
+      "type": "number",
+      "unit": "\u00b0C",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 60 },
+      "description": "Temperatura de distribui\u00e7\u00e3o da \u00e1gua quente sanit\u00e1ria (m\u00edn. 50 \u00b0C, recomendado 60 \u00b0C para preven\u00e7\u00e3o de Legionella)"
+    },
+    {
+      "_group": "Abastecimento de \u00c1gua",
+      "field": "water.fixtureFlowRate",
+      "label": "Caudal instant\u00e2neo m\u00ednimo",
+      "type": "number",
+      "unit": "L/min",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal instant\u00e2neo m\u00ednimo nos dispositivos de utiliza\u00e7\u00e3o conforme RGSPPDADAR Quadro I"
+    },
+    {
+      "_group": "Abastecimento de \u00c1gua",
+      "field": "water.stackDiameter",
+      "label": "Di\u00e2metro da coluna montante de \u00e1gua",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Di\u00e2metro da coluna montante de distribui\u00e7\u00e3o de \u00e1gua conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Abastecimento de \u00c1gua",
+      "field": "water.pipeInsulationThickness",
+      "label": "Espessura do isolamento t\u00e9rmico das tubagens",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 10 },
+      "description": "Espessura m\u00ednima do isolamento t\u00e9rmico das tubagens de \u00e1gua quente conforme RGSPPDADAR"
+    },
+
+    {
+      "_group": "Press\u00f5es e Velocidades",
+      "field": "water.pressaoMinimaKPa",
+      "label": "Press\u00e3o m\u00ednima de servi\u00e7o",
+      "type": "number",
+      "unit": "kPa",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": 100 },
+      "description": "Press\u00e3o m\u00ednima nos dispositivos de utiliza\u00e7\u00e3o conforme RGSPPDADAR Art.\u00ba 87.\u00ba (100 kPa = 10 m.c.a.)"
+    },
+    {
+      "_group": "Press\u00f5es e Velocidades",
+      "field": "water.pressaoMaximaKPa",
+      "label": "Press\u00e3o m\u00e1xima de servi\u00e7o",
+      "type": "number",
+      "unit": "kPa",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": 600 },
+      "description": "Press\u00e3o m\u00e1xima nos dispositivos de utiliza\u00e7\u00e3o conforme RGSPPDADAR Art.\u00ba 87.\u00ba (600 kPa = 60 m.c.a.)"
+    },
+    {
+      "_group": "Press\u00f5es e Velocidades",
+      "field": "water.maxPressure",
+      "label": "Press\u00e3o m\u00e1xima na rede predial",
+      "type": "number",
+      "unit": "kPa",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 600 },
+      "description": "Press\u00e3o est\u00e1tica m\u00e1xima em qualquer ponto da rede predial conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Press\u00f5es e Velocidades",
+      "field": "water.velocidadeMinimaMS",
+      "label": "Velocidade m\u00ednima de escoamento",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": 0.5 },
+      "description": "Velocidade m\u00ednima de escoamento na rede de distribui\u00e7\u00e3o de \u00e1gua conforme RGSPPDADAR Art.\u00ba 94.\u00ba"
+    },
+    {
+      "_group": "Press\u00f5es e Velocidades",
+      "field": "water.pipeVelocity",
+      "label": "Velocidade m\u00e1xima de escoamento",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": 2.0 },
+      "description": "Velocidade m\u00e1xima de escoamento na rede predial de \u00e1gua conforme RGSPPDADAR Art.\u00ba 94.\u00ba (m\u00e1x. 2,0 m/s)"
+    },
+    {
+      "_group": "Press\u00f5es e Velocidades",
+      "field": "water.fracaoDiametroConduta",
+      "label": "Fator de rela\u00e7\u00e3o di\u00e2metro/caudal",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Fator utilizado no dimensionamento hidr\u00e1ulico para rela\u00e7\u00e3o entre di\u00e2metro e caudal conforme RGSPPDADAR"
+    },
+
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "water.hasVentilatedDrainage",
+      "label": "Ventila\u00e7\u00e3o da rede de drenagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se a rede de drenagem possui ventila\u00e7\u00e3o (prim\u00e1ria ou secund\u00e1ria) conforme RGSPPDADAR Art.\u00ba 209.\u00ba"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "water.hasDrainageSiphons",
+      "label": "Exist\u00eancia de sif\u00f5es",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se todos os aparelhos sanit\u00e1rios possuem sif\u00e3o individual ou partilhado conforme RGSPPDADAR Art.\u00ba 210.\u00ba"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "water.hasBackflowPrevention",
+      "label": "Prote\u00e7\u00e3o contra refluxo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se existe prote\u00e7\u00e3o contra refluxo de \u00e1guas residuais em pisos abaixo da cota da via p\u00fablica"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "water.hasGreaseTrap",
+      "label": "Exist\u00eancia de separador de gorduras",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existe separador de gorduras, obrigat\u00f3rio em cozinhas coletivas conforme RGSPPDADAR Art.\u00ba 225.\u00ba"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "drainage.diametroMinimoMm",
+      "label": "Di\u00e2metro m\u00ednimo dos ramais de descarga",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 40 },
+      "description": "Di\u00e2metro m\u00ednimo dos ramais de descarga de \u00e1guas residuais conforme RGSPPDADAR Quadro XXII"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "drainage.decliveMinimoMmM",
+      "label": "Declive m\u00ednimo dos coletores prediais",
+      "type": "number",
+      "unit": "mm/m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 10 },
+      "description": "Declive m\u00ednimo dos coletores prediais de \u00e1guas residuais conforme RGSPPDADAR Art.\u00ba 218.\u00ba (m\u00edn. 10 mm/m)"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "drainage.alturaMinimaM",
+      "label": "Altura m\u00ednima do fecho h\u00eddrico",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.05 },
+      "description": "Altura m\u00ednima do fecho h\u00eddrico dos sif\u00f5es conforme RGSPPDADAR Art.\u00ba 210.\u00ba (m\u00edn. 50 mm)"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "drainage.velocidadeMinimaMs",
+      "label": "Velocidade m\u00ednima nos coletores de drenagem",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 0.6 },
+      "description": "Velocidade m\u00ednima de escoamento nos coletores prediais conforme RGSPPDADAR (auto-limpeza)"
+    },
+    {
+      "_group": "Drenagem de \u00c1guas Residuais",
+      "field": "water.drainPipeDiameter",
+      "label": "Di\u00e2metro do tubo de queda",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 90 },
+      "description": "Di\u00e2metro do tubo de queda de \u00e1guas residuais conforme RGSPPDADAR Quadro XXIII"
+    },
+
+    {
+      "_group": "Drenagem Pluvial",
+      "field": "water.hasStormwaterManagement",
+      "label": "Gest\u00e3o de \u00e1guas pluviais",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": true },
+      "description": "Indica se o edif\u00edcio possui sistema de recolha e gest\u00e3o de \u00e1guas pluviais conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Drenagem Pluvial",
+      "field": "water.stormwaterDrainDiameter",
+      "label": "Di\u00e2metro dos tubos de queda pluviais",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 75 },
+      "description": "Di\u00e2metro m\u00ednimo dos tubos de queda de \u00e1guas pluviais conforme RGSPPDADAR"
+    },
+    {
+      "_group": "Drenagem Pluvial",
+      "field": "water.stormwaterIntensity",
+      "label": "Intensidade de precipita\u00e7\u00e3o de c\u00e1lculo",
+      "type": "number",
+      "unit": "L/min/m\u00b2",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": 1.5 },
+      "description": "Intensidade de precipita\u00e7\u00e3o utilizada no dimensionamento conforme RGSPPDADAR e regi\u00e3o pluviom\u00e9trica"
+    },
+
+    {
+      "_group": "Materiais e Tubagens",
+      "field": "water.pipeNominalPressure",
+      "label": "Press\u00e3o nominal das tubagens (PN)",
+      "type": "select",
+      "options": [
+        { "value": "PN6", "label": "PN6 (drenagem)" },
+        { "value": "PN10", "label": "PN10" },
+        { "value": "PN16", "label": "PN16" },
+        { "value": "PN20", "label": "PN20" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "PN16" },
+      "description": "Press\u00e3o nominal das tubagens de distribui\u00e7\u00e3o de \u00e1gua conforme RGSPPDADAR Art.\u00ba 93.\u00ba"
+    },
+    {
+      "_group": "Materiais e Tubagens",
+      "field": "water.pipeRoughnessCoefficient",
+      "label": "Coeficiente de rugosidade (K)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "PPR": 0.007, "copper": 0.0015, "steel": 0.045, "PVC": 0.01, "_default": 0.007 },
+      "description": "Coeficiente de rugosidade equivalente do material para c\u00e1lculo de perdas de carga (f\u00f3rmula de Colebrook-White)"
+    },
+
+    {
+      "_group": "Ensaios",
+      "field": "water.hasHydraulicTest",
+      "label": "Ensaio hidrost\u00e1tico realizado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizado ensaio hidrost\u00e1tico \u00e0 rede de distribui\u00e7\u00e3o de \u00e1gua conforme RGSPPDADAR Art.\u00ba 100.\u00ba"
+    },
+    {
+      "_group": "Ensaios",
+      "field": "water.hasDrainageTest",
+      "label": "Ensaio de estanquidade da drenagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": true,
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizado ensaio de estanquidade \u00e0 rede de drenagem conforme RGSPPDADAR Art.\u00ba 237.\u00ba"
+    },
+    {
+      "_group": "Implanta\u00e7\u00e3o Espacial",
+      "field": "waterDrainage.collectorDistanceToProperty",
+      "label": "Dist\u00e2ncia dos colectores aos limites da propriedade",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Dist\u00e2ncia m\u00ednima dos colectores de drenagem aos limites das propriedades (Art. 136 RGSPPDADAR)"
+    },
+    {
+      "_group": "Implanta\u00e7\u00e3o Espacial",
+      "field": "waterDrainage.waterToWastewaterDistance",
+      "label": "Dist\u00e2ncia entre condutas de \u00e1gua e colectores residuais",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Dist\u00e2ncia entre condutas de distribui\u00e7\u00e3o de \u00e1gua e colectores de \u00e1guas residuais (Art. 24 RGSPPDADAR)"
+    },
+    {
+      "_group": "Implanta\u00e7\u00e3o Espacial",
+      "field": "waterDrainage.waterAboveWastewater",
+      "label": "Condutas de \u00e1gua em plano superior aos colectores residuais",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": true },
+      "description": "Indica se as condutas de \u00e1gua est\u00e3o instaladas num plano superior ao dos colectores de \u00e1guas residuais (Art. 24 RGSPPDADAR)"
+    }
+  ]
+}

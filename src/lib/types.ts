@@ -33,6 +33,9 @@ export interface BuildingProject {
   location: PortugalLocation;
   yearBuilt?: number;
   isRehabilitation: boolean;
+  isMajorRehabilitation?: boolean;
+  isDemolition?: boolean;
+  hasUndergroundFloors?: boolean;
 
   // Dimensions
   grossFloorArea: number; // m²
@@ -96,6 +99,12 @@ export interface BuildingProject {
 
   // 18. Project context
   projectContext: ProjectContext;
+
+  // 19. Energy certification (SCE)
+  energy?: EnergyInfo;
+
+  // Allow dynamic fields from context builder (aliases, virtual namespaces)
+  [key: string]: unknown;
 }
 
 export interface PortugalLocation {
@@ -121,6 +130,14 @@ export interface ArchitectureInfo {
   ceilingHeight?: number; // Pé-direito (m)
   hasNaturalLight: boolean; // Iluminação natural nos compartimentos principais
   hasCrossVentilation: boolean; // Ventilação cruzada
+  // Extended fields for rule evaluation
+  hasWaterproofing?: boolean;
+  hasThermalInsulation?: boolean;
+  hasAcousticInsulation?: boolean;
+  windowToFloorRatio?: number;
+  hasCompliantFireEscape?: boolean;
+  facadeArea?: number; // m²
+  [key: string]: unknown;
 }
 
 export interface AVACInfo {
@@ -135,6 +152,13 @@ export interface AVACInfo {
   installedHVACPower?: number; // kW total
   hasFGasCompliance: boolean; // Conformidade com regulamento F-Gas
   hasRadonProtection: boolean; // Proteção contra radão (DL 108/2018)
+  // Extended HVAC fields
+  hasEnergyRecovery?: boolean;
+  hasIAQMonitoring?: boolean; // Monitorização QAI
+  co2Concentration?: number; // ppm
+  hasLegionellaPrevention?: boolean;
+  hasBMSIntegration?: boolean; // Building Management System
+  [key: string]: unknown;
 }
 
 /** Local municipal regulations - user uploads */
@@ -159,6 +183,7 @@ export interface LocalRegulationsInfo {
   pdmNotes?: string;
   // Entity consultation
   consultedEntities: ConsultedEntity[];
+  [key: string]: unknown;
 }
 
 export interface ConsultedEntity {
@@ -192,6 +217,7 @@ export interface DrawingQualityInfo {
   hasDimensioning: boolean;
   hasSheetTitleBlock: boolean; // Carimbo/legendas nas folhas
   numberOfSheets?: number;
+  [key: string]: unknown;
 }
 
 export interface ProjectContext {
@@ -226,6 +252,7 @@ export interface BuildingEnvelope {
   airChangesPerHour: number; // h⁻¹
   hasHRV: boolean; // Heat Recovery Ventilation
   hrvEfficiency?: number; // percentage
+  [key: string]: unknown;
 }
 
 export interface BuildingSystems {
@@ -250,32 +277,272 @@ export interface BuildingSystems {
 
   // Lighting (commercial)
   lightingPowerDensity?: number; // W/m²
+  [key: string]: unknown;
 }
 
 export interface AccessibilityInfo {
+  // General
   hasAccessibleEntrance: boolean;
   hasElevator: boolean;
-  elevatorMinWidth?: number; // meters
-  elevatorMinDepth?: number; // meters
-  doorWidths: number; // minimum door width in meters
-  corridorWidths: number; // minimum corridor width in meters
   hasAccessibleWC: boolean;
   hasAccessibleParking: boolean;
+  hasExteriorPaths?: boolean;
+
+  // Paths & exterior
+  pathWidth?: number; // m
+  pathClearHeight?: number; // m
+  pathCrossSlope?: number; // %
+  pathTurningWidth?: number; // m
+  pathSurfaceCompliant?: boolean;
+  pathFrictionCoefficient?: number;
+  hasDirectionalTactilePaving?: boolean;
+  hasTactileWarningPaving?: boolean;
+
+  // Doors & openings
+  doorWidths: number; // minimum door width in meters
+  doorWidthGeneral?: number; // m
+  doorHeight?: number; // m
+  doorOpeningForce?: number; // N
+  doorClearance?: number; // m
+  doorHandleHeight?: number; // m
+  doorRecessDepth?: number; // m
+  doorAutoOpenTime?: number; // s
+
+  // Corridors
+  corridorWidths: number; // minimum corridor width in meters
+  corridorTurningWidth?: number; // m
+  lobbyMinDimension?: number; // m
+
+  // Ramps
   rampGradient?: number; // percentage
+  rampWidth?: number; // m
+  rampLength?: number; // m
+  rampHasHandrails?: boolean;
+  rampHandrailExtension?: number; // m
+  rampEdgeHeight?: number; // m
+  rampCrossSlope?: number; // %
+  rampRestingInterval?: number; // m
+  rampGuardHeight?: number; // m
+  rampLevelDifference?: number; // m
+
+  // Stairs
+  stairWidth?: number; // m
+  stairRiserHeight?: number; // m
+  stairTreadDepth?: number; // m
+  stairBlondelValue?: number; // 2R + G
+  stairLandingLength?: number; // m
+  stairHasNonSlipStrips?: boolean;
+  stairHasSecondHandrail?: boolean;
+  stairHandrailExtension?: number; // m
+  stairRisersClosed?: boolean;
+
+  // Elevators
+  elevatorMinWidth?: number; // meters
+  elevatorMinDepth?: number; // meters
+  elevatorCabinWidth?: number; // m
+  elevatorCabinDepth?: number; // m
+  elevatorDoorWidth?: number; // m
+  elevatorDoorOpenTime?: number; // s
+  elevatorCallButtonHeight?: number; // m
+  elevatorHasArrivalChime?: boolean;
+  elevatorHasFloorIndicator?: boolean;
+  elevatorHasRearMirror?: boolean;
+  elevatorButtonsBraille?: boolean;
+  elevatorLandingWidth?: number; // m
+
+  // WC / sanitary
+  wcArea?: number; // m²
+  wcTurningDiameter?: number; // m
+  wcDoorWidth?: number; // m
+  wcDoorOpensOutward?: boolean;
+  wcDoorUnlockableFromOutside?: boolean;
+  toiletSeatHeight?: number; // m
+  toiletWallDistance?: number; // m
+  grabBarHeight?: number; // m
+  grabBarLength?: number; // m
+  washbasinHeight?: number; // m
+  washbasinClearanceHeight?: number; // m
+  washbasinClearanceDepth?: number; // m
+  wcAccessoryHeight?: number; // m
+  mirrorBaseHeight?: number; // m
+
+  // Parking
+  accessibleParkingCount?: number;
+  parkingSpaceWidth?: number; // m
+  parkingSpaceLength?: number; // m
+  parkingAislWidth?: number; // m
+  parkingHasSignage?: boolean;
+
+  // Signage & tactile
+  hasVisualTactileSignage?: boolean;
+  hasBrailleOnDoorsAndButtons?: boolean;
+  hasAccessibilitySymbol?: boolean;
+  hasGuidingStrips?: boolean;
+  hasLevelChangeTactileContrast?: boolean;
+  tactileAlertWidth?: number; // m
+  hasProtrudingObjects?: boolean;
+  protrudingObjectLow?: number; // m
+
+  // Lifts
+  liftPlatformWidth?: number; // m
+  liftPlatformDepth?: number; // m
+  liftSpeed?: number; // m/s
+  inclinedLiftWidth?: number; // m
+  inclinedLiftSpeed?: number; // m/s
+
+  // Furniture & seating
+  counterHeight?: number; // m
+  counterHasKneeSpace?: boolean;
+  counterAccessibleLength?: number; // m
+  tableHeight?: number; // m
+  tableKneeSpace?: number; // m
+  reservedSeats?: number;
+  reservedSeatWidth?: number; // m
+  reservedSeatDepth?: number; // m
+  venueCapacity?: number;
+
+  // Dynamic fields
+  [key: string]: unknown;
 }
 
 export interface FireSafetyInfo {
+  // Classification
   utilizationType: "I" | "II" | "III" | "IV" | "V" | "VI" | "VII" | "VIII" | "IX" | "X" | "XI" | "XII";
   riskCategory: "1" | "2" | "3" | "4";
+  buildingHeight?: number; // m (fire safety specific height)
+
+  // Structure & compartmentation
+  fireResistanceOfStructure: number; // minutes (REI)
+  structuralFireResistance?: number; // minutes
+  compartmentArea?: number; // m²
+  compartmentWallRating?: number; // minutes
+  compartmentMinRating?: number; // minutes
+  floorFireResistance?: number; // minutes
+  wallReactionClass?: string; // Euroclass (A1, A2, B, C, D, E, F)
+  floorReactionClass?: string; // CFL-s1, CFL-s2, etc.
+  roofFireRating?: number; // minutes
+  empenaFireRating?: number; // minutes
+  fireDoorsRating?: number; // minutes
+  fireDoorsHaveCloser?: boolean;
+  elevatorShaftRating?: number; // minutes
+  hasFireStoppedPenetrations?: boolean;
+  hasFireDampers?: boolean;
+  hasMixedUseIsolation?: boolean;
+  isMixedUseBuilding?: boolean;
+
+  // Detection & alarm
   hasFireDetection: boolean;
   hasFireAlarm: boolean;
-  hasSprinklers: boolean;
-  hasEmergencyLighting: boolean;
-  hasFireExtinguishers: boolean;
+  hasFalseCeilingDetection?: boolean;
+  hasTechnicalZoneDetection?: boolean;
+  hasMonitoredFirePanel?: boolean;
+  hasCentralizedFireManagement?: boolean;
+  hasFireBrigadeAlert?: boolean;
+  detectorSpacing?: number; // m
+  manualCallPointSpacing?: number; // m
+  alarmConfigType?: string;
+
+  // Evacuation
   evacuationRouteWidth: number; // meters
   numberOfExits: number;
   maxEvacuationDistance: number; // meters
-  fireResistanceOfStructure: number; // minutes (REI)
+  deadEndDistance?: number; // m
+  horizontalRouteLength?: number; // m
+  evacuationPathWidth?: number; // m
+  verticalEvacWidth?: number; // m
+  residentialEvacWidth?: number; // m
+  evacuationUP?: number; // unidades de passagem
+  occupantLoad?: number;
+  occupancyIndex?: number;
+  exitDoorsOpenOutward?: boolean;
+  exitsInDistinctDirections?: boolean;
+  hasProtectedStairs?: boolean;
+  hasFireLobby?: boolean;
+  hasRefugeSpaces?: boolean;
+  stepsPerFlight?: number;
+
+  // Emergency lighting
+  hasEmergencyLighting: boolean;
+  emergencyLightingLevel?: number; // lux
+  emergencyLightingAutonomy?: number; // minutes
+  emergencyLightingActivationTime?: number; // seconds
+  hasBackupPower?: boolean;
+  emergencyPowerStartup?: number; // seconds
+
+  // Extinguishers & first intervention
+  hasFireExtinguishers: boolean;
+  extinguisherMaxDistance?: number; // m
+  extinguisherDensity?: number; // per area
+  extinguisherHeight?: number; // m
+  extinguisherTotalCharge?: number; // kg
+  hasRIA?: boolean; // Rede de Incêndio Armada
+  riaMaxSpacing?: number; // m
+  riaMinPressure?: number; // bar
+  riaHoseLength?: number; // m
+  riaSimultaneousFlow?: number; // L/min
+
+  // Water supply (dry/wet risers, hydrants, reservoirs)
+  hasDryRiser?: boolean;
+  dryRiserDiameter?: number; // mm
+  dryRiserFlowRate?: number; // L/min
+  dryRiserMinPressure?: number; // bar
+  hasWetRiser?: boolean;
+  hasSiameseConnection?: boolean;
+  hasFireWaterReservoir?: boolean;
+  fireWaterReserveVolume?: number; // m³
+  hydrantDistance?: number; // m
+  nearestHydrantDistance?: number; // m
+  hydrantAutonomy?: number; // min
+  firstInterventionFlow?: number; // L/min
+  firstInterventionAutonomy?: number; // min
+  secondInterventionFlow?: number; // L/min
+  secondInterventionAutonomy?: number; // min
+
+  // Sprinklers
+  hasSprinklers: boolean;
+  sprinklerDensity?: number; // mm/min
+  sprinklerMaxSpacing?: number; // m
+  sprinklerActivationTemp?: number; // °C
+  sprinklerWaterSupplyAutonomy?: number; // min
+  sprinklerCoverageArea?: number; // m²
+
+  // Smoke control
+  hasSmokeControl?: boolean;
+  smokeVentArea?: number; // m²
+  smokeControlAirVelocity?: number; // m/s
+  smokeExtractionRatePerUP?: number; // m³/s per UP
+
+  // Gas suppression
+  hasGasSuppression?: boolean;
+  co2DischargeDuration?: number; // seconds
+  fm200Concentration?: number; // %
+  novecConcentration?: number; // %
+  gasAgentDischargeDelay?: number; // seconds
+
+  // Signage
+  hasFireSignage?: boolean;
+  signageHeight?: number; // m
+  signageLuminance?: number; // cd/m²
+
+  // Access roads
+  accessRoadWidth?: number; // m
+  accessRoadHeight?: number; // m
+  accessRoadCurveRadius?: number; // m
+  distanceToFireStation?: number; // km
+  responseTime?: number; // min
+
+  // Management & operations
+  hasSecurityDelegate?: boolean;
+  hasSecurityPost?: boolean;
+  hasSecurityPlan?: boolean;
+  hasEmergencyPlan?: boolean;
+  hasMaintenanceProgram?: boolean;
+  hasFireTraining?: boolean;
+  hasAnnualDrill?: boolean;
+  hasSecurityRecords?: boolean;
+
+  // Dynamic fields from context builder
+  [key: string]: unknown;
 }
 
 export interface ElectricalInfo {
@@ -316,6 +583,14 @@ export interface ElectricalInfo {
   // Labelling
   hasDistributionBoardLabelling: boolean;
   hasSchematicDiagram: boolean; // Esquema unifilar
+
+  // Extended electrical fields
+  hasSelectiveProtection?: boolean;
+  hasTNSEarthing?: boolean;
+  hasFireAlarmCircuit?: boolean;
+  installedPower?: number; // kVA
+  simultaneityFactor?: number;
+  [key: string]: unknown;
 }
 
 export interface TelecomInfo {
@@ -352,6 +627,7 @@ export interface TelecomInfo {
   // Certification
   hasITEDCertification: boolean; // Certificação ITED por instalador
   installerITEDLicense: boolean; // Instalador com credenciação ANACOM
+  [key: string]: unknown;
 }
 
 export interface AcousticInfo {
@@ -364,6 +640,7 @@ export interface AcousticInfo {
   facadeInsulationValue?: number; // D2m,nT,w (dB)
   hasEquipmentNoiseControl: boolean; // Controlo de ruído de equipamentos
   hasAcousticProject: boolean; // Projeto de condicionamento acústico
+  [key: string]: unknown;
 }
 
 export interface GasInfo {
@@ -378,6 +655,7 @@ export interface GasInfo {
   hasPressureTest: boolean; // Ensaio de estanquidade
   hasGasCertification: boolean; // Certificação por instalador credenciado
   installationAge?: number; // Years
+  [key: string]: unknown;
 }
 
 export interface WaterDrainageInfo {
@@ -396,6 +674,7 @@ export interface WaterDrainageInfo {
   hasStormwaterManagement: boolean; // Gestão de águas pluviais
   hasWaterReuse: boolean; // Reutilização de águas cinzentas/pluviais
   hasBackflowPrevention: boolean; // Prevenção de refluxo
+  [key: string]: unknown;
 }
 
 export interface StructuralInfo {
@@ -408,6 +687,13 @@ export interface StructuralInfo {
   foundationType: "shallow" | "deep" | "mixed";
   hasSeismicDesign: boolean; // Projetado para ação sísmica
   ductilityClass: "DCL" | "DCM" | "DCH"; // Classe de ductilidade (Low/Medium/High)
+  // Extended structural fields
+  behaviourFactor?: number; // q factor
+  hasProgressiveCollapseDesign?: boolean;
+  concreteClass?: string; // C25/30, C30/37, etc.
+  steelGrade?: string; // S235, S275, S355, etc.
+  hasFireResistanceDesign?: boolean;
+  [key: string]: unknown;
 }
 
 export interface ElevatorInfo {
@@ -421,6 +707,7 @@ export interface ElevatorInfo {
   hasPitAndHeadroom: boolean; // Fosso e altura livre adequados
   hasAccessibleElevator: boolean; // Ascensor acessível (DL 163/2006)
   elevatorAge?: number;
+  [key: string]: unknown;
 }
 
 export interface LicensingInfo {
@@ -438,6 +725,7 @@ export interface LicensingInfo {
   submissionDate?: string; // ISO date
   hasPIPResponse?: boolean; // PIP ou direito à informação já respondido
   pipResponseSummary?: string;
+  [key: string]: unknown;
 }
 
 export interface WasteInfo {
@@ -449,6 +737,53 @@ export interface WasteInfo {
   hasWasteRegistration: boolean; // Registo em plataforma eletrónica (e-GAR)
   hasDemolitionAudit: boolean; // Auditoria prévia (demolições)
   recyclingPercentageTarget: number; // % target
+  [key: string]: unknown;
+}
+
+/** Energy certification (SCE) — DL 101-D/2020 */
+export interface EnergyInfo {
+  // Certification
+  hasCertificate?: boolean;
+  certificateValidity?: number; // years
+  hasPreCertificate?: boolean;
+  hasFinalCertificate?: boolean;
+  hasCertifiedExpert?: boolean; // Perito qualificado
+  transactionType?: "sale" | "rental" | "new_construction" | "renovation" | "none";
+  advertisingIncludesClass?: boolean;
+  // Energy performance ratios
+  ntcNtRatio?: number; // Ntc/Nt (heating+cooling needs vs reference)
+  primaryEnergyRatio?: number; // Nac/Na or Ntc/Nt
+  ieeActual?: number; // IEE real (kWhEP/m².year)
+  ieeReference?: number; // IEE reference
+  ieeRenewable?: number; // IEE renewable contribution
+  // Requirements
+  hasMinimumRenewable?: boolean;
+  renewableContribution?: number; // %
+  hasNZEBCompliance?: boolean; // Nearly Zero Energy Building
+  hasTechnicalBuildingSystems?: boolean;
+  hasRegularInspection?: boolean;
+  inspectionInterval?: number; // years
+  // Dynamic fields
+  [key: string]: unknown;
+}
+
+/** Per-specialty rule evaluation metrics — shows how many rules were actually evaluable */
+export interface RuleEvaluationMetrics {
+  pluginId: string;
+  pluginName: string;
+  area: RegulationArea;
+  /** Total active rules in this plugin */
+  totalRules: number;
+  /** Rules successfully evaluated (conditions could be checked) */
+  evaluatedRules: number;
+  /** Rules skipped due to missing project fields */
+  skippedRules: number;
+  /** Rules that fired (produced findings) */
+  firedRules: number;
+  /** Coverage percentage: evaluatedRules / totalRules */
+  coveragePercent: number;
+  /** IDs of rules skipped (for audit trail) */
+  skippedRuleIds?: string[];
 }
 
 export interface AnalysisResult {
@@ -458,6 +793,27 @@ export interface AnalysisResult {
   findings: Finding[];
   recommendations: Recommendation[];
   regulationSummary: RegulationSummary[];
+  /** Per-specialty rule evaluation metrics */
+  ruleEvaluation?: RuleEvaluationMetrics[];
+  /** Context builder coverage: how many rule fields are populated vs missing */
+  contextCoverage?: {
+    /** Total fields tracked by field mappings */
+    total: number;
+    /** Fields populated (from IFC, form, or defaults) */
+    populated: number;
+    /** Coverage percentage */
+    percentage: number;
+    /** Fields still missing (rules skipped) */
+    missingFields: string[];
+    /** Per-source breakdown */
+    sources: {
+      fromIfc: string[];
+      fromForm: string[];
+      fromDefaults: string[];
+    };
+    /** Namespace aliases applied */
+    aliasesApplied: string[];
+  };
 }
 
 export interface Finding {
@@ -469,6 +825,8 @@ export interface Finding {
   severity: Severity;
   currentValue?: string;
   requiredValue?: string;
+  /** Remediation guidance: specific steps to resolve this finding */
+  remediation?: string;
 }
 
 export interface Recommendation {

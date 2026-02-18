@@ -1,17 +1,249 @@
+@font-face {
+  font-family: "PP Mori";
+  src: url("/fonts/PPMori-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PP Mori";
+  src: url("/fonts/PPMori-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #202A30;
+  --heading: #000000;
+  --card-bg: #ffffff;
+  --card-border: rgba(0,0,0,0.20);
+  --input-bg: #ffffff;
+  --input-border: rgba(0,0,0,0.24);
+  --section-bg: #f9fafb;
+  --muted: rgba(0,0,0,0.54);
+  --accent: #4d65ff;
+  --accent-hover: #3a4fdb;
+  --accent-light: rgba(77,101,255,0.08);
+  --accent-medium: rgba(77,101,255,0.15);
+  --accent-ring: rgba(77,101,255,0.3);
+  --accent-text: #4d65ff;
+  --accent-text-hover: #3a4fdb;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --heading: #f1f5f9;
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  --input-bg: #1e293b;
+  --input-border: #475569;
+  --section-bg: #1e293b;
+  --muted: #94a3b8;
+  --accent: #6b82ff;
+  --accent-hover: #8598ff;
+  --accent-light: rgba(107,130,255,0.12);
+  --accent-medium: rgba(107,130,255,0.20);
+  --accent-ring: rgba(107,130,255,0.35);
+  --accent-text: #8598ff;
+  --accent-text-hover: #a3b1ff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-heading: var(--heading);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
+  --color-accent-medium: var(--accent-medium);
+  --color-accent-ring: var(--accent-ring);
+  --color-accent-text: var(--accent-text);
+  --font-family-sans: "PP Mori", Arial, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "PP Mori", Arial, sans-serif;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Dark mode overrides for Tailwind utility classes */
+.dark .bg-white { background-color: var(--card-bg); }
+.dark .bg-gray-50 { background-color: #0f172a; }
+.dark .bg-gray-100 { background-color: #1e293b; }
+.dark .border-gray-200 { border-color: var(--card-border); }
+.dark .border-gray-300 { border-color: var(--input-border); }
+.dark .text-gray-900 { color: #f1f5f9; }
+.dark .text-gray-800 { color: #e2e8f0; }
+.dark .text-gray-700 { color: #cbd5e1; }
+.dark .text-gray-600 { color: #94a3b8; }
+.dark .text-gray-500 { color: #64748b; }
+.dark .text-gray-400 { color: #64748b; }
+.dark .hover\:bg-gray-50:hover { background-color: #334155; }
+.dark .hover\:bg-gray-200:hover { background-color: #334155; }
+.dark input, .dark select, .dark textarea {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--foreground);
+}
+.dark input:disabled { background-color: #334155; color: #64748b; }
+.dark .bg-gradient-to-b { background-image: none; background-color: #0f172a; }
+.dark .shadow-sm { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+.dark .shadow-lg { box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); }
+
+/* Colored sections in dark mode */
+.dark .bg-green-50 { background-color: #1a3a2a; }
+.dark .bg-red-50 { background-color: #3a1a1a; }
+.dark .bg-amber-50 { background-color: #3a2e1a; }
+.dark .bg-indigo-50 { background-color: #1e2050; }
+.dark .bg-sky-50 { background-color: #1a2e3a; }
+.dark .border-green-200 { border-color: #16a34a40; }
+.dark .border-red-200 { border-color: #dc262640; }
+.dark .border-amber-200 { border-color: #d9770640; }
+.dark .border-indigo-200 { border-color: #6366f140; }
+.dark .border-sky-200 { border-color: #0ea5e940; }
+.dark .text-green-800 { color: #86efac; }
+.dark .text-red-700 { color: #fca5a5; }
+.dark .text-amber-800 { color: #fcd34d; }
+.dark .text-indigo-800 { color: #a5b4fc; }
+.dark .text-sky-800 { color: #7dd3fc; }
+.dark .text-green-900 { color: #bbf7d0; }
+.dark .text-amber-900 { color: #fef3c7; }
+.dark .text-indigo-900 { color: #c7d2fe; }
+.dark .text-sky-900 { color: #bae6fd; }
+
+/* Reusable form input classes */
+.input-field {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: var(--input-bg);
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
+}
+.input-field:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+.dark .input-field:disabled {
+  background-color: #334155;
+  color: #64748b;
+}
+.input-field-sm {
+  width: 100%;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  background-color: var(--input-bg);
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input-field-sm:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
+}
+.input-field-sm:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+.dark .input-field-sm:disabled {
+  background-color: #334155;
+  color: #64748b;
+}
+
+/* ============================================================
+   Print Styles
+   ============================================================ */
+@media print {
+  /* Reset backgrounds for print */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+
+  /* Hide non-printable elements */
+  button, .no-print, nav, [role="tablist"],
+  .bg-gradient-to-b, footer {
+    display: none !important;
+  }
+
+  /* Show all collapsed sections */
+  [class*="CollapsibleSection"] > div:last-child,
+  .overflow-hidden > div:last-child {
+    display: block !important;
+    max-height: none !important;
+  }
+
+  /* Remove shadows and rounded corners */
+  .shadow-sm, .shadow-lg, .shadow-md {
+    box-shadow: none !important;
+  }
+  .rounded-xl, .rounded-lg {
+    border-radius: 0 !important;
+  }
+
+  /* Ensure cards have visible borders */
+  .border { border: 1px solid #ccc !important; }
+
+  /* Severity indicators — add text markers for B&W printing */
+  .bg-red-50::before { content: "[CRITICO] "; font-weight: bold; }
+  .bg-amber-50::before { content: "[AVISO] "; font-weight: bold; }
+  .bg-green-50::before { content: "[OK] "; font-weight: bold; }
+
+  /* Score circle — ensure visibility */
+  .bg-green-50, .bg-amber-50, .bg-red-50 {
+    background: white !important;
+    border: 2px solid #333 !important;
+  }
+
+  /* Page breaks */
+  .space-y-6 > div {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Remove hover effects */
+  [class*="hover:"] {
+    all: revert;
+  }
+
+  /* Colored text → black for readability */
+  .text-accent, .text-accent-text,
+  .text-green-600, .text-green-700, .text-green-800,
+  .text-amber-600, .text-amber-800, .text-amber-900,
+  .text-red-500, .text-red-600, .text-red-700,
+  .text-indigo-800, .text-indigo-900,
+  .text-sky-800, .text-sky-900 {
+    color: black !important;
+  }
+
+  /* Expand action buttons area to show WBS/PDF links as text */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+  }
 }
