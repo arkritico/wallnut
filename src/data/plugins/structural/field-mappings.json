@@ -4,35 +4,1427 @@
   "description": "Mapeamento de campos para regras estruturais (Eurocódigos EN 1990 a EN 1998, NP EN 206, NP EN 1992 a 1998)",
   "fields": [
     {
-      "_group": "Dados Gerais",
-      "field": "structural.hasStructuralProject",
-      "label": "Existência de projeto de estabilidade",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": false },
-      "description": "Indica se existe projeto de estabilidade aprovado, obrigatório para obras sujeitas a licenciamento"
-    },
-    {
-      "_group": "Dados Gerais",
-      "field": "structural.hasULSVerification",
-      "label": "Verificação aos estados limites últimos (ELU)",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": false },
-      "description": "Indica se foi efetuada verificação aos estados limites últimos conforme EN 1990"
-    },
-    {
-      "_group": "Dados Gerais",
-      "field": "structural.designLife",
-      "label": "Vida útil de projeto",
+      "_group": "Ação Sísmica",
+      "field": "structural.behaviourFactor",
+      "label": "Fator de comportamento (q)",
       "type": "number",
-      "unit": "anos",
-      "sources": ["form"],
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "DCL": 1.5,
+        "DCM": 3.0,
+        "DCH": 4.5,
+        "_default": 3.0
+      },
+      "description": "Fator de comportamento sísmico conforme EN 1998-1 Quadro 5.1, depende do sistema estrutural e classe de ductilidade"
+    },
+    {
+      "_group": "Ação Sísmica",
+      "field": "structural.ductilityClass",
+      "label": "Classe de ductilidade",
+      "type": "select",
+      "options": [
+        {
+          "value": "DCL",
+          "label": "DCL - Ductilidade baixa"
+        },
+        {
+          "value": "DCM",
+          "label": "DCM - Ductilidade média"
+        },
+        {
+          "value": "DCH",
+          "label": "DCH - Ductilidade alta"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": "DCM"
+      },
+      "description": "Classe de ductilidade da estrutura conforme EN 1998-1 Secção 5.2, influencia o dimensionamento sísmico"
+    },
+    {
+      "_group": "Ação Sísmica",
+      "field": "structural.interstoreyDrift",
+      "label": "Deslocamento relativo entre pisos",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
       "required": false,
-      "defaults": { "_default": 50 },
-      "description": "Vida útil de projeto da estrutura conforme EN 1990 Quadro 2.1 (50 anos para edifícios correntes)"
+      "description": "Deslocamento relativo entre pisos (drift) para verificação de limitação de danos conforme EN 1998-1 Secção 4.4.3"
+    },
+    {
+      "_group": "Ação Sísmica",
+      "field": "structural.seismicZone",
+      "label": "Zona sísmica",
+      "type": "select",
+      "options": [
+        {
+          "value": "1.1",
+          "label": "1.1 - ag,R = 2,5 m/s²"
+        },
+        {
+          "value": "1.2",
+          "label": "1.2 - ag,R = 2,0 m/s²"
+        },
+        {
+          "value": "1.3",
+          "label": "1.3 - ag,R = 1,5 m/s²"
+        },
+        {
+          "value": "1.4",
+          "label": "1.4 - ag,R = 1,0 m/s²"
+        },
+        {
+          "value": "1.5",
+          "label": "1.5 - ag,R = 0,6 m/s²"
+        },
+        {
+          "value": "1.6",
+          "label": "1.6 - ag,R = 0,35 m/s²"
+        },
+        {
+          "value": "2.1",
+          "label": "2.1 - ag,R = 2,5 m/s²"
+        },
+        {
+          "value": "2.2",
+          "label": "2.2 - ag,R = 2,0 m/s²"
+        },
+        {
+          "value": "2.3",
+          "label": "2.3 - ag,R = 1,7 m/s²"
+        },
+        {
+          "value": "2.4",
+          "label": "2.4 - ag,R = 1,1 m/s²"
+        },
+        {
+          "value": "2.5",
+          "label": "2.5 - ag,R = 0,8 m/s²"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "description": "Zona sísmica conforme EN 1998-1 Anexo Nacional NA.I (tipo 1 e tipo 2 para Portugal)"
+    },
+    {
+      "_group": "Ação Sísmica",
+      "field": "structural.soilType",
+      "label": "Tipo de terreno",
+      "type": "select",
+      "options": [
+        {
+          "value": "A",
+          "label": "A - Rocha"
+        },
+        {
+          "value": "B",
+          "label": "B - Depósitos rijos"
+        },
+        {
+          "value": "C",
+          "label": "C - Depósitos densos a medianamente densos"
+        },
+        {
+          "value": "D",
+          "label": "D - Depósitos soltos a medianamente soltos"
+        },
+        {
+          "value": "E",
+          "label": "E - Perfil com camada aluvionar superficial"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": "B"
+      },
+      "description": "Tipo de terreno de fundação conforme EN 1998-1 Quadro 3.1 para determinação do espetro de resposta"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.beamCriticalZoneReinfRatio",
+      "label": "beam Crítica Zona Reinf Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.1.2(4) — Armadura Mínima, EC8 / NP EN 1998-1 §5.4.3.1.2(5) — Armadura Máxima"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.columnSlendernessNormalized",
+      "label": "column Slenderness Normalizado",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.3.1.4 — Esbelteza Máxima"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.criticalZoneStirrupSpacing",
+      "label": "critical Zona Stirrup Espaçamento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.2.2(11) — Espaçamento Ci, EC8 / NP EN 1998-1 §5.4.3.2.2(8) — Espaçamento Cin"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.gammaG_seismic",
+      "label": "gamma G_seismic",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA-A1.3 — Combinação Sísmi"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasAccidentalTorsion",
+      "label": "Tem Acidental Torção",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.3.2 — Torção Acidental"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasCapacityDesignCheck",
+      "label": "Tem Capacidade Projeto Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.2.3 — Capacity Design: MRc"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasDiaphragmVerification",
+      "label": "Tem Diafragma Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.4.2.5 — Diafragmas Rígidos"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasFoundationOverstrength",
+      "label": "Tem Fundação Sobredimensionamento",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.4.2.6 — Sobredimensionamento"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasNonStructuralVerification",
+      "label": "Tem Non Estrutural Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.3.5 — Elementos Não-Estrutur"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasSoftStoreyCheck",
+      "label": "Tem Piso Flexível Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.2.3.3(2) — Verificação de Pi"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasTorsion",
+      "label": "Tem Torção",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.3 — Verificação à Torção"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.hasTorsionVerification",
+      "label": "Tem Torção Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.3 — Verificação à Torção"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.normalizedAxialForce",
+      "label": "normalized Axial Força",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN",
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.2.1 — Esforço Axial Norm"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.punchingShearExceedsCapacity",
+      "label": "punching Esforço Transverso Exceeds Capacidade",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.4.5 — Armadura de Punçoame"
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.seismicJointWidth",
+      "label": "seismic Joint Largura",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.4.2.7 — Junta Sísmica Entre "
+    },
+    {
+      "_group": "Ação Sísmica (EC8)",
+      "field": "structural.torsionRadius",
+      "label": "torsion Radius",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.2.3.2 — Raio de Torção"
+    },
+    {
+      "_group": "Ação da Neve",
+      "field": "structural.snowLoad",
+      "label": "Carga de neve ao nível do solo (sk)",
+      "type": "number",
+      "unit": "kN/m²",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 0.3
+      },
+      "description": "Valor característico da carga de neve ao nível do solo conforme EN 1991-1-3 Anexo Nacional"
+    },
+    {
+      "_group": "Ação da Neve",
+      "field": "structural.snowZone",
+      "label": "Zona de neve",
+      "type": "select",
+      "options": [
+        {
+          "value": "Z1",
+          "label": "Z1 - Zona 1"
+        },
+        {
+          "value": "Z2",
+          "label": "Z2 - Zona 2"
+        },
+        {
+          "value": "Z3",
+          "label": "Z3 - Zona 3"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": "Z1"
+      },
+      "description": "Zona de neve conforme EN 1991-1-3 Anexo Nacional para Portugal continental"
+    },
+    {
+      "_group": "Ação do Vento",
+      "field": "structural.altitude",
+      "label": "Altitude do local",
+      "type": "number",
+      "unit": "m",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 0
+      },
+      "description": "Altitude do local de implantação para correção da pressão do vento e ação da neve"
+    },
+    {
+      "_group": "Ação do Vento",
+      "field": "structural.terrainCategory",
+      "label": "Categoria de terreno (rugosidade)",
+      "type": "select",
+      "options": [
+        {
+          "value": "0",
+          "label": "0 - Mar ou zona costeira exposta"
+        },
+        {
+          "value": "I",
+          "label": "I - Lagos ou zona plana sem obstáculos"
+        },
+        {
+          "value": "II",
+          "label": "II - Vegetação baixa e obstáculos isolados"
+        },
+        {
+          "value": "III",
+          "label": "III - Vegetação e edifícios regulares"
+        },
+        {
+          "value": "IV",
+          "label": "IV - Zona urbana (> 15% edifícios > 15 m)"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": "II"
+      },
+      "description": "Categoria de rugosidade do terreno conforme EN 1991-1-4 Quadro 4.1"
+    },
+    {
+      "_group": "Ação do Vento",
+      "field": "structural.windSpeed",
+      "label": "Velocidade básica do vento (vb,0)",
+      "type": "number",
+      "unit": "m/s",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "A": 27,
+        "B": 30,
+        "_default": 27
+      },
+      "description": "Valor de referência da velocidade do vento conforme EN 1991-1-4 Anexo Nacional"
+    },
+    {
+      "_group": "Ação do Vento",
+      "field": "structural.windZone",
+      "label": "Zona de vento",
+      "type": "select",
+      "options": [
+        {
+          "value": "A",
+          "label": "A - Generalidade do território (vb,0 = 27 m/s)"
+        },
+        {
+          "value": "B",
+          "label": "B - Regiões autónomas e faixa costeira (vb,0 = 30 m/s)"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": "A"
+      },
+      "description": "Zona de vento conforme EN 1991-1-4 Anexo Nacional para Portugal"
+    },
+    {
+      "_group": "Ações e Cargas",
+      "field": "structural.gammaG",
+      "label": "Coeficiente parcial para ações permanentes (γG)",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 1.35
+      },
+      "description": "Coeficiente parcial de segurança para ações permanentes conforme EN 1990 Quadro A1.2(B)"
+    },
+    {
+      "_group": "Ações e Cargas",
+      "field": "structural.gammaQ",
+      "label": "Coeficiente parcial para ações variáveis (γQ)",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 1.5
+      },
+      "description": "Coeficiente parcial de segurança para ações variáveis conforme EN 1990 Quadro A1.2(B)"
+    },
+    {
+      "_group": "Ações e Cargas",
+      "field": "structural.liveLoad",
+      "label": "Sobrecarga de utilização",
+      "type": "number",
+      "unit": "kN/m²",
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "A": 2.0,
+        "B": 3.0,
+        "C": 4.0,
+        "D": 5.0,
+        "E": 7.5,
+        "_default": 2.0
+      },
+      "description": "Sobrecarga de utilização conforme EN 1991-1-1 Quadro 6.2 para a categoria de utilização"
+    },
+    {
+      "_group": "Ações e Cargas",
+      "field": "structural.psi0",
+      "label": "Coeficiente de combinação (ψ0)",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "A": 0.7,
+        "B": 0.7,
+        "C": 0.7,
+        "D": 0.7,
+        "E": 1.0,
+        "_default": 0.7
+      },
+      "description": "Coeficiente de combinação para ações variáveis conforme EN 1990 Quadro A1.1"
+    },
+    {
+      "_group": "Ações e Cargas",
+      "field": "structural.roofLiveLoad",
+      "label": "Sobrecarga na cobertura",
+      "type": "number",
+      "unit": "kN/m²",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 0.4
+      },
+      "description": "Sobrecarga de utilização na cobertura (categoria H) conforme EN 1991-1-1"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "numberOfFloors",
+      "label": "number Of Floors",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-2 — Resistência ao Fogo de Estr, EC7 / NP EN 1997-1 — Estudo Geotécnico Obrigatório"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.concentratedLoad",
+      "label": "concentrated Carga",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN/m²",
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 Quadro NA-6.2 — Carga Concent"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.hasAreaReductionFactor",
+      "label": "Tem Área Reduction Fator",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.3.1.2(10) — Redução por Ár"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.hasConcentratedLoadsOnWeb",
+      "label": "Tem Concentrada Cargas On Web",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-5 §6 — Resistência da Alma a Fo"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.hasLoadReductionFactor",
+      "label": "Tem Carga Reduction Fator",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.3.1.2(11) — Redução por Nú"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.hasTemperatureAction",
+      "label": "Tem Temperature Action",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro A1.1 — Coeficientes ψ Temp"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.loadedArea",
+      "label": "loaded Área",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN/m²",
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.3.1.2(10) — Redução por Ár"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.masonryDensity",
+      "label": "masonry Density",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN/m³",
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 Anexo A — Peso Próprio Alvena"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.numberOfFloors",
+      "label": "number Of Floors",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.3.1.2(11) — Redução por Nú"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.partitionSurcharge",
+      "label": "partition Surcharge",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN/m²",
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.3.1.2 — Sobrecarga de Divi"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.partitionWeight",
+      "label": "partition Weight",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN/m³",
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.3.1.2 — Sobrecarga de Divi"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.psi0Snow",
+      "label": "psi0Neve",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA.A1.1 — Coeficiente ψ0 N"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.psi0Wind",
+      "label": "psi0Vento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA.A1.1 — Coeficiente ψ0 V"
+    },
+    {
+      "_group": "Ações e Cargas (EC1)",
+      "field": "structural.psiSnow0",
+      "label": "psi Neve0",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro A1.1 — Coeficientes ψ Neve"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.anchorageLength",
+      "label": "Comprimento de amarração",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "description": "Comprimento de amarração de cálculo conforme EN 1992-1-1 Secção 8.4"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.beamBarDiameter",
+      "label": "Diâmetro dos varões em vigas",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 16
+      },
+      "description": "Diâmetro dos varões longitudinais em vigas"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.columnBarDiameter",
+      "label": "Diâmetro dos varões em pilares",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 16
+      },
+      "description": "Diâmetro dos varões longitudinais em pilares (mín. 12 mm conforme EN 1992-1-1)"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.columnReinfRatio",
+      "label": "Taxa de armadura em pilares",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 0.01
+      },
+      "description": "Taxa geométrica de armadura longitudinal em pilares (mín. 1% conforme EN 1992-1-1 Secção 9.5.2)"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.coverDepth",
+      "label": "Recobrimento nominal",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "XC1": 25,
+        "XC2": 35,
+        "XC3": 35,
+        "XC4": 40,
+        "XS1": 45,
+        "_default": 25
+      },
+      "description": "Recobrimento nominal das armaduras conforme EN 1992-1-1 Secção 4.4, depende da classe de exposição"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.crackWidth",
+      "label": "Abertura máxima de fendas (wmax)",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 0.3
+      },
+      "description": "Valor máximo admissível da abertura de fendas conforme EN 1992-1-1 Quadro 7.1N"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.maxDeflection",
+      "label": "Flecha máxima admissível",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "description": "Valor máximo de flecha permitido (tipicamente L/250 para aspeto e L/500 para danos) conforme EN 1992-1-1"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.stirrupDiameter",
+      "label": "Diâmetro dos estribos",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 8
+      },
+      "description": "Diâmetro dos estribos (mín. 6 mm conforme EN 1992-1-1)"
+    },
+    {
+      "_group": "Betão Armado",
+      "field": "structural.stirrupSpacing",
+      "label": "Espaçamento máximo dos estribos",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "description": "Espaçamento máximo entre estribos conforme EN 1992-1-1 e EN 1998-1 para zonas críticas"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.barSpacing",
+      "label": "bar Espaçamento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §8.2 — Espaçamento Mínimo ent"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.barrierHorizontalLoad",
+      "label": "barrier Horizontal Carga",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kN/m²",
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-1 §6.4 — Carga Horizontal em Ba, EC1 / NP EN 1991-1-1 §6.4 — Carga Horizontal em Gu"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.cementContent",
+      "label": "cement Dosagem",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "kg/m³",
+      "description": "Campo utilizado nas regras NP EN 206 Quadro F.1 — Dosagem Mínima de Cimento X"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.columnSlenderness",
+      "label": "column Slenderness",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §5.8.3 — Efeitos de 2ª Ordem "
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.columnStirrupSpacing",
+      "label": "column Stirrup Espaçamento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.5.3(1) — Espaçamento Máxim"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.concreteConsistencyClass",
+      "label": "concrete Consistência Classe",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras NP EN 206 §5.3.2 — Classe de Consistência do Betão"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.gammaConcrete",
+      "label": "gamma Betão",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 Quadro 2.1N — Coeficiente Par"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasCorbels",
+      "label": "Tem Consolas",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.5.4 — Consolas Curtas"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasCorbelsDesign",
+      "label": "Tem Consolas Projeto",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.5.4 — Consolas Curtas"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasCreepShrinkageAnalysis",
+      "label": "Tem Fluência Retração Analysis",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §3.1.4 — Fluência e Retração"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasFlatSlab",
+      "label": "Tem Flat Laje",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.4 — Verificação ao Punçoam, EC2 / NP EN 1992-1-1 §6.4.5 — Armadura de Punçoame"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasPunchingReinforcement",
+      "label": "Tem Punçoamento Armadura",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.4.5 — Armadura de Punçoame"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasPunchingVerification",
+      "label": "Tem Punçoamento Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.4 — Verificação ao Punçoam"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasReducedStirrupSpacingAtBeams",
+      "label": "Tem Reduced Stirrup Espaçamento At Vigas",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.5.3(4) — Cintas Junto a Vi"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasSecondOrderAnalysis",
+      "label": "Tem Second Order Analysis",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §5.8.3 — Efeitos de 2ª Ordem "
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasShearVerification",
+      "label": "Tem Esforço Transverso Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.2.1 — Verificação ao Esfor"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.hasSuspensionReinforcement",
+      "label": "Tem Suspension Armadura",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.3 — Armadura de Suspen"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.horizontalDeflectionRatio",
+      "label": "horizontal Deflection Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §7.2 — Deslocamento Horizonta"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.lapLength",
+      "label": "lap Length",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §8.7.3 — Comprimento de Sobre"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.lapPercentageAtSection",
+      "label": "lap Percentage At Section",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §8.7.2 — Percentagem de Emend"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.shearReinfRatio",
+      "label": "shear Reinf Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.2(5) — Taxa Mínima Armad"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.slabBarSpacing",
+      "label": "slab Bar Espaçamento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.3.1.1(3) — Espaçamento Máx"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.slabSecondaryReinfRatio",
+      "label": "slab Secondary Reinf Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.3.1.1(2) — Armadura Secund"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.slabThickness",
+      "label": "slab Espessura",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.3.1 — Espessura Mínima Laj, EC2 / NP EN 1992-1-2 Quadro 5.8 — Espessura Mínima"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.steelBeamDeflection",
+      "label": "steel Viga Deflection",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §7.2 — Flecha Máxima Vigas (L"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.steelBeamDeflectionRatio",
+      "label": "steel Viga Deflection Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §7.2 — Flecha Máxima Vigas (L"
+    },
+    {
+      "_group": "Betão Armado (EC2)",
+      "field": "structural.waterCementRatio",
+      "label": "water Cimento Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras NP EN 206 Quadro F.1 — Relação Água/Cimento Máxima"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.KFI",
+      "label": "KFI",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro B.3 — Coeficiente KFI (Dif"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.combinationExpression",
+      "label": "combination Expression",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "6.10a",
+          "label": "6.10a"
+        },
+        {
+          "value": "6.10b",
+          "label": "6.10b"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 NA-A1.2.1(1) — Proibição de 6.10a"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.consequenceClass",
+      "label": "consequence Classe",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 §B.3 — Classes de Consequência"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaG_EQU_sup",
+      "label": "gamma G_EQU_sup",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA-A1.2(A) — Coeficientes "
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaG_GEO_A1",
+      "label": "gamma G_GEO_A1",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 Quadro A.4 — Fatores Parciais A"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaG_SLS",
+      "label": "gamma G_SLS",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 §A1.4.1(1) — Coeficientes SLS"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaG_accidental",
+      "label": "gamma G_accidental",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA-A1.3 — Combinação Acide"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaG_fav",
+      "label": "gamma G_fav",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA.A1.2(B) — Coeficiente P"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaM0",
+      "label": "gamma M0",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.1 — Coeficiente Parcial γM"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaM1",
+      "label": "gamma M1",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.1 — Coeficiente Parcial γM"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaM2",
+      "label": "gamma M2",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.1 — Coeficiente Parcial γM"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.gammaQ_GEO_C",
+      "label": "gamma Q_GEO_C",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA-A1.2(C) — Coeficientes "
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.hasAccidentalCombination",
+      "label": "Tem Acidental Combination",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA-A1.3 — Combinação Acide"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.hasEquilibriumCheck",
+      "label": "Tem Equilíbrio Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA-A1.2(A) — Coeficientes "
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.psiTemp0",
+      "label": "psi Temp0",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro A1.1 — Coeficientes ψ Temp"
+    },
+    {
+      "_group": "Coeficientes e Combinações (EC0)",
+      "field": "structural.reliabilityClass",
+      "label": "reliability Classe",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "RC3",
+          "label": "RC3"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro B.3 — Coeficiente KFI (Dif"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "buildingType",
+      "label": "building Tipo",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "assembly_C1",
+          "label": "assembly_C1"
+        },
+        {
+          "value": "assembly_C5",
+          "label": "assembly_C5"
+        },
+        {
+          "value": "commercial",
+          "label": "commercial"
+        },
+        {
+          "value": "office",
+          "label": "office"
+        },
+        {
+          "value": "parking",
+          "label": "parking"
+        },
+        {
+          "value": "residential",
+          "label": "residential"
+        },
+        {
+          "value": "warehouse",
+          "label": "warehouse"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro NA.A1.1 — Coeficientes ψ E, EC0 / NP EN 1990 Quadro NA.A1.1 — Coeficientes ψ H, EC1 / NP EN 1991-1-1 Quadro NA.6.2 — Sobrecarga Ar"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.agR_type1",
+      "label": "ag R_type1",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 AN Quadro NA.I — Zonamento Sísm"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.agR_type2",
+      "label": "ag R_type2",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 AN Quadro NA.I — Zonamento Sísm"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.beamAs",
+      "label": "beam As",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.1 — Fórmula Armadura M"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.beamMinWidth",
+      "label": "beam Mín. Largura",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.1 — Largura Mínima Vig, EC2 / NP EN 1992-1-2 Quadro 5.6 — Largura Mínima V"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.beamReinfRatio",
+      "label": "beam Reinf Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.1 — Taxa Mínima Armadu"
     },
     {
       "_group": "Dados Gerais",
@@ -40,15 +1432,329 @@
       "label": "Categoria de utilização do edifício",
       "type": "select",
       "options": [
-        { "value": "A", "label": "A - Habitação / Residencial" },
-        { "value": "B", "label": "B - Escritórios" },
-        { "value": "C", "label": "C - Zonas de reunião" },
-        { "value": "D", "label": "D - Zonas comerciais" },
-        { "value": "E", "label": "E - Armazenamento" }
+        {
+          "value": "A",
+          "label": "A - Habitação / Residencial"
+        },
+        {
+          "value": "B",
+          "label": "B - Escritórios"
+        },
+        {
+          "value": "C",
+          "label": "C - Zonas de reunião"
+        },
+        {
+          "value": "D",
+          "label": "D - Zonas comerciais"
+        },
+        {
+          "value": "E",
+          "label": "E - Armazenamento"
+        }
       ],
-      "sources": ["form"],
+      "sources": [
+        "form"
+      ],
       "required": true,
       "description": "Categoria de utilização conforme EN 1991-1-1 Quadro 6.1, determina as sobrecargas aplicáveis"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.columnMinDimension",
+      "label": "column Mín. Dimension",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.5.1 — Dimensão Mínima Pila, EC2 / NP EN 1992-1-2 Quadro 5.5 — Dimensão Mínima , EC8 / NP EN 1998-1 §5.4.1.2.3 — Dimensão Mínima Pi"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.criticalLengthPillar",
+      "label": "critical Length Pillar",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.2.2 — Comprimento Crític"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.deltaT",
+      "label": "delta T",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-5 — Ação da Temperatura"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.designLife",
+      "label": "Vida útil de projeto",
+      "type": "number",
+      "unit": "anos",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 50
+      },
+      "description": "Vida útil de projeto da estrutura conforme EN 1990 Quadro 2.1 (50 anos para edifícios correntes)"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.eccentricity",
+      "label": "eccentricity",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.2.3.2 — Regularidade em Plan"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.geoTestCount",
+      "label": "geo Test Count",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-2 — Ensaios Geotécnicos Mínimos"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasAdjacentBuilding",
+      "label": "Tem Adjacent Edifício",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.4.2.7 — Junta Sísmica Entre "
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasContinuousBeam",
+      "label": "Tem Continuous Viga",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.4 — Armadura nos Apoio"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasGeotechnicalStudy",
+      "label": "Existência de estudo geotécnico",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": false
+      },
+      "description": "Indica se foi realizado estudo geotécnico do terreno de fundação conforme EN 1997"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasIndirectSupport",
+      "label": "Tem Indirect Support",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.3 — Armadura de Suspen"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasMinReinfCheck",
+      "label": "Tem Mín. Reinf Verificação",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.1 — Fórmula Armadura M"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasPerformanceLevelAssessment",
+      "label": "Tem Desempenho Nível Assessment",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8-3 / NP EN 1998-3 §4.2 — Estados Limite de Dese"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasPrestress",
+      "label": "Tem Prestress",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 — Classe Mínima Betão Pré-esf"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasSeismicDesign",
+      "label": "Dimensionamento sísmico obrigatório",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": true
+      },
+      "description": "Indica se a estrutura requer dimensionamento à ação sísmica conforme EN 1998 e Anexo Nacional"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasStructuralAssessment",
+      "label": "Tem Estrutural Assessment",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras NP EN 1998-3 — Inspeção e Avaliação de Estruturas "
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasStructuralProject",
+      "label": "Existência de projeto de estabilidade",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": false
+      },
+      "description": "Indica se existe projeto de estabilidade aprovado, obrigatório para obras sujeitas a licenciamento"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasTopReinfAtSupport",
+      "label": "Tem Top Reinf At Support",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §9.2.1.4 — Armadura nos Apoio"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.hasULSVerification",
+      "label": "Verificação aos estados limites últimos (ELU)",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": false
+      },
+      "description": "Indica se foi efetuada verificação aos estados limites últimos conforme EN 1990"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.importanceClass",
+      "label": "importance Classe",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "II",
+          "label": "II"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 Quadro NA.III — Classe de Impor"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.importanceFactor",
+      "label": "Fator de importância",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 1.0
+      },
+      "description": "Coeficiente de importância da estrutura conforme EN 1998-1 (1.0 para edifícios correntes, 1.2 para escolas/hospitais)"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.isExistingStructure",
+      "label": "É Existente Estrutura",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC8-3 / NP EN 1998-3 §3.2 — Níveis de Conhecimento, EC8-3 / NP EN 1998-3 §4.2 — Estados Limite de Dese"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.isExposed",
+      "label": "É Exposed",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC1 / NP EN 1991-1-5 — Ação da Temperatura"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.knowledgeLevel",
+      "label": "knowledge Nível",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8-3 / NP EN 1998-3 §3.2 — Níveis de Conhecimento"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.spanToDepthRatio",
+      "label": "span To Profundidade Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §7.4.1 — Relação Vão/Altura M"
     },
     {
       "_group": "Dados Gerais",
@@ -56,102 +1762,749 @@
       "label": "Sistema estrutural",
       "type": "select",
       "options": [
-        { "value": "frame", "label": "Pórtico" },
-        { "value": "wall", "label": "Parede" },
-        { "value": "dual", "label": "Misto pórtico-parede" },
-        { "value": "mixed", "label": "Misto" }
+        {
+          "value": "frame",
+          "label": "Pórtico"
+        },
+        {
+          "value": "wall",
+          "label": "Parede"
+        },
+        {
+          "value": "dual",
+          "label": "Misto pórtico-parede"
+        },
+        {
+          "value": "mixed",
+          "label": "Misto"
+        }
       ],
-      "sources": ["form"],
+      "sources": [
+        "form"
+      ],
       "required": true,
-      "defaults": { "_default": "frame" },
+      "defaults": {
+        "_default": "frame"
+      },
       "description": "Tipologia do sistema estrutural resistente, influencia o fator de comportamento sísmico"
     },
     {
       "_group": "Dados Gerais",
-      "field": "structural.hasGeotechnicalStudy",
-      "label": "Existência de estudo geotécnico",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": false },
-      "description": "Indica se foi realizado estudo geotécnico do terreno de fundação conforme EN 1997"
+      "field": "structural.structureCategory",
+      "label": "structure Categoria",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "monumental",
+          "label": "monumental"
+        },
+        {
+          "value": "provisional",
+          "label": "provisional"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 Quadro 2.1 — Vida Útil Estruturas"
     },
     {
       "_group": "Dados Gerais",
-      "field": "structural.importanceFactor",
-      "label": "Fator de importância",
+      "field": "structural.strutAngle",
+      "label": "strut Angle",
       "type": "number",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 1.0 },
-      "description": "Coeficiente de importância da estrutura conforme EN 1998-1 (1.0 para edifícios correntes, 1.2 para escolas/hospitais)"
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 §6.2.3(3) — Ângulo de Inclina"
     },
     {
       "_group": "Dados Gerais",
-      "field": "structural.hasSeismicDesign",
-      "label": "Dimensionamento sísmico obrigatório",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": true },
-      "description": "Indica se a estrutura requer dimensionamento à ação sísmica conforme EN 1998 e Anexo Nacional"
+      "field": "structural.thetaPDelta",
+      "label": "theta P Delta",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §4.4.2.2 — Efeitos de 2ª Ordem "
     },
-
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.tieSpacingCritical",
+      "label": "tie Espaçamento Crítica",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.2.2 — Cintas na Zona Crí"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.tieSpacingJoint",
+      "label": "tie Espaçamento Joint",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.3 — Cintas em Nós Viga-P"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.wallThickness",
+      "label": "wall Espessura",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.4.2 — Espessura Mínima P"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "structural.wallVerticalReinfRatio",
+      "label": "wall Vertical Reinf Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 §5.4.3.4.2 — Armadura Mínima Pa"
+    },
+    {
+      "_group": "Estrutura Metálica",
+      "field": "structural.fireResistance",
+      "label": "Resistência ao fogo requerida",
+      "type": "select",
+      "options": [
+        {
+          "value": "R30",
+          "label": "R30 - 30 minutos"
+        },
+        {
+          "value": "R60",
+          "label": "R60 - 60 minutos"
+        },
+        {
+          "value": "R90",
+          "label": "R90 - 90 minutos"
+        },
+        {
+          "value": "R120",
+          "label": "R120 - 120 minutos"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": "R60"
+      },
+      "description": "Resistência ao fogo requerida para elementos estruturais conforme EN 1993-1-2 e SCIE"
+    },
+    {
+      "_group": "Estrutura Metálica",
+      "field": "structural.sectionClass",
+      "label": "Classe da secção transversal",
+      "type": "select",
+      "options": [
+        {
+          "value": "1",
+          "label": "Classe 1 - Plástica"
+        },
+        {
+          "value": "2",
+          "label": "Classe 2 - Compacta"
+        },
+        {
+          "value": "3",
+          "label": "Classe 3 - Semi-compacta"
+        },
+        {
+          "value": "4",
+          "label": "Classe 4 - Esbelta"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": "1"
+      },
+      "description": "Classe da secção transversal metálica conforme EN 1993-1-1 Quadro 5.2"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.boltDiameter",
+      "label": "bolt Diâmetro",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-8 §3.6 — Diâmetro Mínimo Parafu"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.boltEdgeDistance",
+      "label": "bolt Bordo Distance",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-8 §3.5 — Distância Mínima Paraf"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.boltSpacing",
+      "label": "bolt Espaçamento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-8 §3.5 — Espaçamento Mínimo ent"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.gammaSteel",
+      "label": "gamma Aço",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC2 / NP EN 1992-1-1 Quadro 2.1N — Coeficiente Par"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasBucklingCheck",
+      "label": "Tem Encurvadura Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.3.1 — Encurvadura por Flex"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasImperfectionsAnalysis",
+      "label": "Tem Imperfeições Analysis",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §5.3 — Imperfeições Globais"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasLateralBucklingCheck",
+      "label": "Tem Lateral Encurvadura Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.3.2 — Encurvadura Lateral-"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasSteelBeams",
+      "label": "Tem Aço Vigas",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.3.2 — Encurvadura Lateral-"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasSteelColumns",
+      "label": "Tem Aço Pilars",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §6.3.1 — Encurvadura por Flex"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasSteelFrame",
+      "label": "Tem Aço Frame",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §5.3 — Imperfeições Globais, EC3 / NP EN 1993-1-1 §7.2 — Deslocamento Horizonta"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.hasWeldedConnections",
+      "label": "Tem Soldaduraed Connections",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-8 §4 — Classificação de Soldadu"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.minWeldThroat",
+      "label": "min Soldadura Garganta",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-8 §4 — Classificação de Soldadu"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.steelAnalysisType",
+      "label": "steel Analysis Tipo",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "plastic",
+          "label": "plastic"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §5.5 — Classificação de Secçõ"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.steelBeamSpan",
+      "label": "steel Viga Span",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "m",
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 §7.2 — Flecha Máxima Vigas (L"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.steelStructuralGrade",
+      "label": "steel Estrutural Classe",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "S235",
+          "label": "S235"
+        },
+        {
+          "value": "S275",
+          "label": "S275"
+        },
+        {
+          "value": "S355",
+          "label": "S355"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 Quadro 3.1 — Classe de Aço S2, EC3 / NP EN 1993-1-1 Quadro 3.1 — Classe de Aço S3"
+    },
+    {
+      "_group": "Estrutura Metálica (EC3)",
+      "field": "structural.steelYieldStrength",
+      "label": "steel Yield Resistência",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "MPa",
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-1 Quadro 3.1 — Classe de Aço S2, EC3 / NP EN 1993-1-1 Quadro 3.1 — Classe de Aço S3"
+    },
+    {
+      "_group": "Fundações e Geotecnia",
+      "field": "structural.expectedSettlement",
+      "label": "Assentamento previsto",
+      "type": "number",
+      "unit": "mm",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "description": "Assentamento total previsto da fundação conforme EN 1997-1 (máx. 25 mm para estruturas correntes)"
+    },
+    {
+      "_group": "Fundações e Geotecnia",
+      "field": "structural.foundationSafetyFactor",
+      "label": "Fator de segurança da fundação",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 3.0
+      },
+      "description": "Fator de segurança global para a capacidade de carga da fundação conforme EN 1997-1"
+    },
+    {
+      "_group": "Fundações e Geotecnia",
+      "field": "structural.foundationType",
+      "label": "Tipo de fundação",
+      "type": "select",
+      "options": [
+        {
+          "value": "shallow",
+          "label": "Superficial (sapatas)"
+        },
+        {
+          "value": "deep",
+          "label": "Profunda (estacas)"
+        },
+        {
+          "value": "piles",
+          "label": "Estacas"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": true,
+      "defaults": {
+        "_default": "shallow"
+      },
+      "description": "Tipo de fundação adotado conforme EN 1997-1 e estudo geotécnico"
+    },
+    {
+      "_group": "Fundações e Geotecnia",
+      "field": "structural.geotechnicalCategory",
+      "label": "Categoria geotécnica",
+      "type": "select",
+      "options": [
+        {
+          "value": "1",
+          "label": "1 - Estruturas simples, risco baixo"
+        },
+        {
+          "value": "2",
+          "label": "2 - Estruturas convencionais"
+        },
+        {
+          "value": "3",
+          "label": "3 - Estruturas complexas ou risco elevado"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": "2"
+      },
+      "description": "Categoria geotécnica conforme EN 1997-1 Secção 2.1, define o nível de investigação necessário"
+    },
+    {
+      "_group": "Fundações e Geotecnia",
+      "field": "structural.soilBearingCapacity",
+      "label": "Capacidade de carga do solo",
+      "type": "number",
+      "unit": "kPa",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "description": "Tensão admissível do terreno de fundação obtida do estudo geotécnico"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.designApproach",
+      "label": "design Abordagem",
+      "type": "select",
+      "sources": [
+        "form"
+      ],
+      "options": [
+        {
+          "value": "DA1",
+          "label": "DA1"
+        },
+        {
+          "value": "DA3",
+          "label": "DA3"
+        }
+      ],
+      "description": "Campo utilizado nas regras EC0 / NP EN 1990 NA-A1.3.1(5) — Abordagem Geotécni, EC0 / NP EN 1990 Quadro NA-A1.2(C) — Coeficientes , EC7 / NP EN 1997-1 AN §2.4.7.3.4 — Abordagem de Cá"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.differentialSettlement",
+      "label": "differential Assentamento",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §6.6.1 — Assentamento Diferenci"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.differentialSettlementRatio",
+      "label": "differential Assentamento Taxa",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §6.6.1 — Assentamento Diferenci"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.foundationDepth",
+      "label": "foundation Profundidade",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "unit": "mm",
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §6.5.2.1 — Profundidade Mínima "
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.gammaPhiSoil",
+      "label": "gamma Phi Soil",
+      "type": "number",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 Quadro A.4 — Fatores Parciais S"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasFoundationDesign",
+      "label": "Tem Fundação Projeto",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 — Projeto de Fundações Obrigató"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasNegativeFrictionCheck",
+      "label": "Tem Negative Friction Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §7.3.2 — Ações sobre Estacas"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasOverturnCheck",
+      "label": "Tem Derrubamento Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §9.7.3 — Estabilidade ao Derrub"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasPileLoadTest",
+      "label": "Tem Estaca Carga Test",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §7.6.2 — Resistência de Estacas"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasRetainingWall",
+      "label": "Tem Suporte Parede",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §9.7.2 — Estabilidade ao Desliz, EC7 / NP EN 1997-1 §9.7.3 — Estabilidade ao Derrub"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasSlidingCheck",
+      "label": "Tem Deslizamento Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §9.7.2 — Estabilidade ao Desliz"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasSlope",
+      "label": "Tem Talude",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §11.5.1 — Estabilidade Global d"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasSlopeStabilityCheck",
+      "label": "Tem Talude Stability Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §11.5.1 — Estabilidade Global d"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.hasWebBearingCheck",
+      "label": "Tem Web Portante Verificação",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC3 / NP EN 1993-1-5 §6 — Resistência da Alma a Fo"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.investigationDepthAdequate",
+      "label": "investigation Profundidade Adequate",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-2 §B.3 — Profundidade Mínima de P"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.soilFactorS",
+      "label": "soil Fator S",
+      "type": "string",
+      "sources": [
+        "form"
+      ],
+      "description": "Campo utilizado nas regras EC8 / NP EN 1998-1 Quadro 3.1 — Fator de Solo S (T"
+    },
+    {
+      "_group": "Fundações e Geotecnia (EC7)",
+      "field": "structural.waterTableDetermined",
+      "label": "water Table Determined",
+      "type": "boolean",
+      "sources": [
+        "form"
+      ],
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras EC7 / NP EN 1997-1 §3.2.2 — Nível Freático"
+    },
     {
       "_group": "Materiais",
       "field": "structural.concreteClass",
       "label": "Classe de resistência do betão",
       "type": "select",
       "options": [
-        { "value": "C20/25", "label": "C20/25" },
-        { "value": "C25/30", "label": "C25/30" },
-        { "value": "C30/37", "label": "C30/37" },
-        { "value": "C35/45", "label": "C35/45" },
-        { "value": "C40/50", "label": "C40/50" },
-        { "value": "C45/55", "label": "C45/55" },
-        { "value": "C50/60", "label": "C50/60" }
+        {
+          "value": "C20/25",
+          "label": "C20/25"
+        },
+        {
+          "value": "C25/30",
+          "label": "C25/30"
+        },
+        {
+          "value": "C30/37",
+          "label": "C30/37"
+        },
+        {
+          "value": "C35/45",
+          "label": "C35/45"
+        },
+        {
+          "value": "C40/50",
+          "label": "C40/50"
+        },
+        {
+          "value": "C45/55",
+          "label": "C45/55"
+        },
+        {
+          "value": "C50/60",
+          "label": "C50/60"
+        }
       ],
-      "sources": ["form"],
+      "sources": [
+        "form"
+      ],
       "required": true,
-      "defaults": { "_default": "C25/30" },
+      "defaults": {
+        "_default": "C25/30"
+      },
       "description": "Classe de resistência à compressão do betão conforme NP EN 206 e EN 1992-1-1"
-    },
-    {
-      "_group": "Materiais",
-      "field": "structural.steelGrade",
-      "label": "Classe do aço de armaduras",
-      "type": "select",
-      "options": [
-        { "value": "A400NR", "label": "A400NR" },
-        { "value": "A500NR", "label": "A500NR" },
-        { "value": "A500ER", "label": "A500ER" }
-      ],
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": "A500NR" },
-      "description": "Classe do aço para armaduras ordinárias conforme NP EN 1992-1-1 e especificações LNEC"
     },
     {
       "_group": "Materiais",
       "field": "structural.concreteDensity",
       "label": "Massa volúmica do betão armado",
       "type": "number",
-      "unit": "kN/m\u00b3",
-      "sources": ["form"],
+      "unit": "kN/m³",
+      "sources": [
+        "form"
+      ],
       "required": false,
-      "defaults": { "_default": 25 },
+      "defaults": {
+        "_default": 25
+      },
       "description": "Peso volúmico do betão armado para cálculo do peso próprio conforme EN 1991-1-1"
-    },
-    {
-      "_group": "Materiais",
-      "field": "structural.steelDensity",
-      "label": "Massa volúmica do aço estrutural",
-      "type": "number",
-      "unit": "kN/m\u00b3",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 78.5 },
-      "description": "Peso volúmico do aço estrutural para cálculo do peso próprio conforme EN 1991-1-1"
     },
     {
       "_group": "Materiais",
@@ -159,417 +2512,99 @@
       "label": "Classe de exposição ambiental",
       "type": "select",
       "options": [
-        { "value": "XC1", "label": "XC1 - Seco ou permanentemente húmido" },
-        { "value": "XC2", "label": "XC2 - Húmido, raramente seco" },
-        { "value": "XC3", "label": "XC3 - Humidade moderada" },
-        { "value": "XC4", "label": "XC4 - Ciclos húmido/seco" },
-        { "value": "XS1", "label": "XS1 - Ambiente marítimo (ar)" },
-        { "value": "XS2", "label": "XS2 - Submerso em água do mar" },
-        { "value": "XS3", "label": "XS3 - Zona de marés/salpicos" }
+        {
+          "value": "XC1",
+          "label": "XC1 - Seco ou permanentemente húmido"
+        },
+        {
+          "value": "XC2",
+          "label": "XC2 - Húmido, raramente seco"
+        },
+        {
+          "value": "XC3",
+          "label": "XC3 - Humidade moderada"
+        },
+        {
+          "value": "XC4",
+          "label": "XC4 - Ciclos húmido/seco"
+        },
+        {
+          "value": "XS1",
+          "label": "XS1 - Ambiente marítimo (ar)"
+        },
+        {
+          "value": "XS2",
+          "label": "XS2 - Submerso em água do mar"
+        },
+        {
+          "value": "XS3",
+          "label": "XS3 - Zona de marés/salpicos"
+        }
       ],
-      "sources": ["form"],
+      "sources": [
+        "form"
+      ],
       "required": true,
-      "defaults": { "_default": "XC1" },
+      "defaults": {
+        "_default": "XC1"
+      },
       "description": "Classe de exposição ambiental do betão conforme NP EN 206 Quadro 1, determina o recobrimento mínimo"
     },
-
     {
-      "_group": "A\u00e7\u00f5es e Cargas",
-      "field": "structural.liveLoad",
-      "label": "Sobrecarga de utiliza\u00e7\u00e3o",
+      "_group": "Materiais",
+      "field": "structural.steelDensity",
+      "label": "Massa volúmica do aço estrutural",
       "type": "number",
-      "unit": "kN/m\u00b2",
-      "sources": ["form"],
+      "unit": "kN/m³",
+      "sources": [
+        "form"
+      ],
+      "required": false,
+      "defaults": {
+        "_default": 78.5
+      },
+      "description": "Peso volúmico do aço estrutural para cálculo do peso próprio conforme EN 1991-1-1"
+    },
+    {
+      "_group": "Materiais",
+      "field": "structural.steelGrade",
+      "label": "Classe do aço de armaduras",
+      "type": "select",
+      "options": [
+        {
+          "value": "A400NR",
+          "label": "A400NR"
+        },
+        {
+          "value": "A500NR",
+          "label": "A500NR"
+        },
+        {
+          "value": "A500ER",
+          "label": "A500ER"
+        }
+      ],
+      "sources": [
+        "form"
+      ],
       "required": true,
-      "defaults": { "A": 2.0, "B": 3.0, "C": 4.0, "D": 5.0, "E": 7.5, "_default": 2.0 },
-      "description": "Sobrecarga de utiliza\u00e7\u00e3o conforme EN 1991-1-1 Quadro 6.2 para a categoria de utiliza\u00e7\u00e3o"
+      "defaults": {
+        "_default": "A500NR"
+      },
+      "description": "Classe do aço para armaduras ordinárias conforme NP EN 1992-1-1 e especificações LNEC"
     },
     {
-      "_group": "A\u00e7\u00f5es e Cargas",
-      "field": "structural.roofLiveLoad",
-      "label": "Sobrecarga na cobertura",
-      "type": "number",
-      "unit": "kN/m\u00b2",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 0.4 },
-      "description": "Sobrecarga de utiliza\u00e7\u00e3o na cobertura (categoria H) conforme EN 1991-1-1"
-    },
-    {
-      "_group": "A\u00e7\u00f5es e Cargas",
-      "field": "structural.gammaG",
-      "label": "Coeficiente parcial para a\u00e7\u00f5es permanentes (\u03b3G)",
-      "type": "number",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 1.35 },
-      "description": "Coeficiente parcial de seguran\u00e7a para a\u00e7\u00f5es permanentes conforme EN 1990 Quadro A1.2(B)"
-    },
-    {
-      "_group": "A\u00e7\u00f5es e Cargas",
-      "field": "structural.gammaQ",
-      "label": "Coeficiente parcial para a\u00e7\u00f5es vari\u00e1veis (\u03b3Q)",
-      "type": "number",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 1.5 },
-      "description": "Coeficiente parcial de seguran\u00e7a para a\u00e7\u00f5es vari\u00e1veis conforme EN 1990 Quadro A1.2(B)"
-    },
-    {
-      "_group": "A\u00e7\u00f5es e Cargas",
-      "field": "structural.psi0",
-      "label": "Coeficiente de combina\u00e7\u00e3o (\u03c80)",
-      "type": "number",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "A": 0.7, "B": 0.7, "C": 0.7, "D": 0.7, "E": 1.0, "_default": 0.7 },
-      "description": "Coeficiente de combina\u00e7\u00e3o para a\u00e7\u00f5es vari\u00e1veis conforme EN 1990 Quadro A1.1"
-    },
-
-    {
-      "_group": "A\u00e7\u00e3o S\u00edsmica",
-      "field": "structural.seismicZone",
-      "label": "Zona s\u00edsmica",
-      "type": "select",
-      "options": [
-        { "value": "1.1", "label": "1.1 - ag,R = 2,5 m/s\u00b2" },
-        { "value": "1.2", "label": "1.2 - ag,R = 2,0 m/s\u00b2" },
-        { "value": "1.3", "label": "1.3 - ag,R = 1,5 m/s\u00b2" },
-        { "value": "1.4", "label": "1.4 - ag,R = 1,0 m/s\u00b2" },
-        { "value": "1.5", "label": "1.5 - ag,R = 0,6 m/s\u00b2" },
-        { "value": "1.6", "label": "1.6 - ag,R = 0,35 m/s\u00b2" },
-        { "value": "2.1", "label": "2.1 - ag,R = 2,5 m/s\u00b2" },
-        { "value": "2.2", "label": "2.2 - ag,R = 2,0 m/s\u00b2" },
-        { "value": "2.3", "label": "2.3 - ag,R = 1,7 m/s\u00b2" },
-        { "value": "2.4", "label": "2.4 - ag,R = 1,1 m/s\u00b2" },
-        { "value": "2.5", "label": "2.5 - ag,R = 0,8 m/s\u00b2" }
+      "_group": "Outros Campos",
+      "field": "isRehabilitation",
+      "label": "É Rehabilitation",
+      "type": "boolean",
+      "sources": [
+        "form"
       ],
-      "sources": ["form"],
-      "required": true,
-      "description": "Zona s\u00edsmica conforme EN 1998-1 Anexo Nacional NA.I (tipo 1 e tipo 2 para Portugal)"
-    },
-    {
-      "_group": "A\u00e7\u00e3o S\u00edsmica",
-      "field": "structural.soilType",
-      "label": "Tipo de terreno",
-      "type": "select",
-      "options": [
-        { "value": "A", "label": "A - Rocha" },
-        { "value": "B", "label": "B - Dep\u00f3sitos rijos" },
-        { "value": "C", "label": "C - Dep\u00f3sitos densos a medianamente densos" },
-        { "value": "D", "label": "D - Dep\u00f3sitos soltos a medianamente soltos" },
-        { "value": "E", "label": "E - Perfil com camada aluvionar superficial" }
-      ],
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": "B" },
-      "description": "Tipo de terreno de funda\u00e7\u00e3o conforme EN 1998-1 Quadro 3.1 para determina\u00e7\u00e3o do espetro de resposta"
-    },
-    {
-      "_group": "A\u00e7\u00e3o S\u00edsmica",
-      "field": "structural.ductilityClass",
-      "label": "Classe de ductilidade",
-      "type": "select",
-      "options": [
-        { "value": "DCL", "label": "DCL - Ductilidade baixa" },
-        { "value": "DCM", "label": "DCM - Ductilidade m\u00e9dia" },
-        { "value": "DCH", "label": "DCH - Ductilidade alta" }
-      ],
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": "DCM" },
-      "description": "Classe de ductilidade da estrutura conforme EN 1998-1 Sec\u00e7\u00e3o 5.2, influencia o dimensionamento s\u00edsmico"
-    },
-    {
-      "_group": "A\u00e7\u00e3o S\u00edsmica",
-      "field": "structural.behaviourFactor",
-      "label": "Fator de comportamento (q)",
-      "type": "number",
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "DCL": 1.5, "DCM": 3.0, "DCH": 4.5, "_default": 3.0 },
-      "description": "Fator de comportamento s\u00edsmico conforme EN 1998-1 Quadro 5.1, depende do sistema estrutural e classe de ductilidade"
-    },
-    {
-      "_group": "A\u00e7\u00e3o S\u00edsmica",
-      "field": "structural.interstoreyDrift",
-      "label": "Deslocamento relativo entre pisos",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "description": "Deslocamento relativo entre pisos (drift) para verifica\u00e7\u00e3o de limita\u00e7\u00e3o de danos conforme EN 1998-1 Sec\u00e7\u00e3o 4.4.3"
-    },
-
-    {
-      "_group": "A\u00e7\u00e3o do Vento",
-      "field": "structural.windZone",
-      "label": "Zona de vento",
-      "type": "select",
-      "options": [
-        { "value": "A", "label": "A - Generalidade do territ\u00f3rio (vb,0 = 27 m/s)" },
-        { "value": "B", "label": "B - Regi\u00f5es aut\u00f3nomas e faixa costeira (vb,0 = 30 m/s)" }
-      ],
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": "A" },
-      "description": "Zona de vento conforme EN 1991-1-4 Anexo Nacional para Portugal"
-    },
-    {
-      "_group": "A\u00e7\u00e3o do Vento",
-      "field": "structural.windSpeed",
-      "label": "Velocidade b\u00e1sica do vento (vb,0)",
-      "type": "number",
-      "unit": "m/s",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "A": 27, "B": 30, "_default": 27 },
-      "description": "Valor de refer\u00eancia da velocidade do vento conforme EN 1991-1-4 Anexo Nacional"
-    },
-    {
-      "_group": "A\u00e7\u00e3o do Vento",
-      "field": "structural.terrainCategory",
-      "label": "Categoria de terreno (rugosidade)",
-      "type": "select",
-      "options": [
-        { "value": "0", "label": "0 - Mar ou zona costeira exposta" },
-        { "value": "I", "label": "I - Lagos ou zona plana sem obst\u00e1culos" },
-        { "value": "II", "label": "II - Vegeta\u00e7\u00e3o baixa e obst\u00e1culos isolados" },
-        { "value": "III", "label": "III - Vegeta\u00e7\u00e3o e edif\u00edcios regulares" },
-        { "value": "IV", "label": "IV - Zona urbana (> 15% edif\u00edcios > 15 m)" }
-      ],
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": "II" },
-      "description": "Categoria de rugosidade do terreno conforme EN 1991-1-4 Quadro 4.1"
-    },
-    {
-      "_group": "A\u00e7\u00e3o do Vento",
-      "field": "structural.altitude",
-      "label": "Altitude do local",
-      "type": "number",
-      "unit": "m",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 0 },
-      "description": "Altitude do local de implanta\u00e7\u00e3o para corre\u00e7\u00e3o da press\u00e3o do vento e a\u00e7\u00e3o da neve"
-    },
-
-    {
-      "_group": "A\u00e7\u00e3o da Neve",
-      "field": "structural.snowZone",
-      "label": "Zona de neve",
-      "type": "select",
-      "options": [
-        { "value": "Z1", "label": "Z1 - Zona 1" },
-        { "value": "Z2", "label": "Z2 - Zona 2" },
-        { "value": "Z3", "label": "Z3 - Zona 3" }
-      ],
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": "Z1" },
-      "description": "Zona de neve conforme EN 1991-1-3 Anexo Nacional para Portugal continental"
-    },
-    {
-      "_group": "A\u00e7\u00e3o da Neve",
-      "field": "structural.snowLoad",
-      "label": "Carga de neve ao n\u00edvel do solo (sk)",
-      "type": "number",
-      "unit": "kN/m\u00b2",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 0.3 },
-      "description": "Valor caracter\u00edstico da carga de neve ao n\u00edvel do solo conforme EN 1991-1-3 Anexo Nacional"
-    },
-
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.coverDepth",
-      "label": "Recobrimento nominal",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "XC1": 25, "XC2": 35, "XC3": 35, "XC4": 40, "XS1": 45, "_default": 25 },
-      "description": "Recobrimento nominal das armaduras conforme EN 1992-1-1 Sec\u00e7\u00e3o 4.4, depende da classe de exposi\u00e7\u00e3o"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.crackWidth",
-      "label": "Abertura m\u00e1xima de fendas (wmax)",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 0.3 },
-      "description": "Valor m\u00e1ximo admiss\u00edvel da abertura de fendas conforme EN 1992-1-1 Quadro 7.1N"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.maxDeflection",
-      "label": "Flecha m\u00e1xima admiss\u00edvel",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "description": "Valor m\u00e1ximo de flecha permitido (tipicamente L/250 para aspeto e L/500 para danos) conforme EN 1992-1-1"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.columnReinfRatio",
-      "label": "Taxa de armadura em pilares",
-      "type": "number",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 0.01 },
-      "description": "Taxa geom\u00e9trica de armadura longitudinal em pilares (m\u00edn. 1% conforme EN 1992-1-1 Sec\u00e7\u00e3o 9.5.2)"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.columnBarDiameter",
-      "label": "Di\u00e2metro dos var\u00f5es em pilares",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 16 },
-      "description": "Di\u00e2metro dos var\u00f5es longitudinais em pilares (m\u00edn. 12 mm conforme EN 1992-1-1)"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.beamBarDiameter",
-      "label": "Di\u00e2metro dos var\u00f5es em vigas",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 16 },
-      "description": "Di\u00e2metro dos var\u00f5es longitudinais em vigas"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.stirrupDiameter",
-      "label": "Di\u00e2metro dos estribos",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 8 },
-      "description": "Di\u00e2metro dos estribos (m\u00edn. 6 mm conforme EN 1992-1-1)"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.stirrupSpacing",
-      "label": "Espa\u00e7amento m\u00e1ximo dos estribos",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "description": "Espa\u00e7amento m\u00e1ximo entre estribos conforme EN 1992-1-1 e EN 1998-1 para zonas cr\u00edticas"
-    },
-    {
-      "_group": "Bet\u00e3o Armado",
-      "field": "structural.anchorageLength",
-      "label": "Comprimento de amarração",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "description": "Comprimento de amarração de c\u00e1lculo conforme EN 1992-1-1 Sec\u00e7\u00e3o 8.4"
-    },
-
-    {
-      "_group": "Estrutura Met\u00e1lica",
-      "field": "structural.sectionClass",
-      "label": "Classe da sec\u00e7\u00e3o transversal",
-      "type": "select",
-      "options": [
-        { "value": "1", "label": "Classe 1 - Pl\u00e1stica" },
-        { "value": "2", "label": "Classe 2 - Compacta" },
-        { "value": "3", "label": "Classe 3 - Semi-compacta" },
-        { "value": "4", "label": "Classe 4 - Esbelta" }
-      ],
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": "1" },
-      "description": "Classe da sec\u00e7\u00e3o transversal met\u00e1lica conforme EN 1993-1-1 Quadro 5.2"
-    },
-    {
-      "_group": "Estrutura Met\u00e1lica",
-      "field": "structural.fireResistance",
-      "label": "Resist\u00eancia ao fogo requerida",
-      "type": "select",
-      "options": [
-        { "value": "R30", "label": "R30 - 30 minutos" },
-        { "value": "R60", "label": "R60 - 60 minutos" },
-        { "value": "R90", "label": "R90 - 90 minutos" },
-        { "value": "R120", "label": "R120 - 120 minutos" }
-      ],
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": "R60" },
-      "description": "Resist\u00eancia ao fogo requerida para elementos estruturais conforme EN 1993-1-2 e SCIE"
-    },
-
-    {
-      "_group": "Funda\u00e7\u00f5es e Geotecnia",
-      "field": "structural.foundationType",
-      "label": "Tipo de funda\u00e7\u00e3o",
-      "type": "select",
-      "options": [
-        { "value": "shallow", "label": "Superficial (sapatas)" },
-        { "value": "deep", "label": "Profunda (estacas)" },
-        { "value": "piles", "label": "Estacas" }
-      ],
-      "sources": ["form"],
-      "required": true,
-      "defaults": { "_default": "shallow" },
-      "description": "Tipo de funda\u00e7\u00e3o adotado conforme EN 1997-1 e estudo geot\u00e9cnico"
-    },
-    {
-      "_group": "Funda\u00e7\u00f5es e Geotecnia",
-      "field": "structural.geotechnicalCategory",
-      "label": "Categoria geot\u00e9cnica",
-      "type": "select",
-      "options": [
-        { "value": "1", "label": "1 - Estruturas simples, risco baixo" },
-        { "value": "2", "label": "2 - Estruturas convencionais" },
-        { "value": "3", "label": "3 - Estruturas complexas ou risco elevado" }
-      ],
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": "2" },
-      "description": "Categoria geot\u00e9cnica conforme EN 1997-1 Sec\u00e7\u00e3o 2.1, define o n\u00edvel de investiga\u00e7\u00e3o necess\u00e1rio"
-    },
-    {
-      "_group": "Funda\u00e7\u00f5es e Geotecnia",
-      "field": "structural.soilBearingCapacity",
-      "label": "Capacidade de carga do solo",
-      "type": "number",
-      "unit": "kPa",
-      "sources": ["form"],
-      "required": false,
-      "description": "Tens\u00e3o admiss\u00edvel do terreno de funda\u00e7\u00e3o obtida do estudo geot\u00e9cnico"
-    },
-    {
-      "_group": "Funda\u00e7\u00f5es e Geotecnia",
-      "field": "structural.expectedSettlement",
-      "label": "Assentamento previsto",
-      "type": "number",
-      "unit": "mm",
-      "sources": ["form"],
-      "required": false,
-      "description": "Assentamento total previsto da funda\u00e7\u00e3o conforme EN 1997-1 (m\u00e1x. 25 mm para estruturas correntes)"
-    },
-    {
-      "_group": "Funda\u00e7\u00f5es e Geotecnia",
-      "field": "structural.foundationSafetyFactor",
-      "label": "Fator de seguran\u00e7a da funda\u00e7\u00e3o",
-      "type": "number",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": 3.0 },
-      "description": "Fator de seguran\u00e7a global para a capacidade de carga da funda\u00e7\u00e3o conforme EN 1997-1"
+      "defaults": {
+        "_default": false
+      },
+      "description": "Campo utilizado nas regras NP EN 1998-3 — Inspeção e Avaliação de Estruturas "
     }
   ]
 }
