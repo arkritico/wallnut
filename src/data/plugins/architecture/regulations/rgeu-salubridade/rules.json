@@ -1,0 +1,153 @@
+{
+  "regulationRef": "dl-38382-1951-rgeu-salubridade",
+  "description": "Regras RGEU Arts. 31.º-40.º — Salubridade: abastecimento de água, drenagem, humidade, condições higrotérmicas, espaços comuns, condições mínimas de habitabilidade. NOTA: O RGEU será revogado a 01/06/2026 (DL 10/2024) e substituído pelo Código da Construção. Estas regras técnicas permanecem válidas como referência até essa data.",
+  "extractedBy": "claude-regulatory-expansion-v3",
+  "extractedAt": "2026-02-18",
+  "rules": [
+    {
+      "id": "ARQ-SAL-AGUA-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 31.º — Abastecimento de Água Potável",
+      "description": "O edifício não dispõe de abastecimento de água potável ligado à rede pública ou a captação própria com qualidade atestada, condição essencial de habitabilidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasWaterSupply", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Abastecimento de água potável obrigatório em todas as edificações habitáveis",
+      "remediation": "Garantir abastecimento de água: (1) Ligação à rede pública de distribuição (obrigatória quando disponível no arruamento). (2) Captação própria: análise físico-química e bacteriológica obrigatória. (3) Pressão mínima na rede interior: 100 kPa (1 bar) no ponto mais desfavorável. (4) Caudal mínimo por tipologia: T0-T1: 0.10 l/s, T2-T3: 0.15 l/s, T4+: 0.20 l/s. (5) Depósito de reserva obrigatório em edifícios > 4 pisos.",
+      "enabled": true,
+      "tags": ["água", "abastecimento", "salubridade", "rede pública"]
+    },
+    {
+      "id": "ARQ-SAL-DREN-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 32.º — Drenagem de Águas Residuais",
+      "description": "O edifício não dispõe de sistema de drenagem de águas residuais domésticas ligado à rede pública de saneamento ou a fossa séptica regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasDrainage", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sistema de drenagem de águas residuais obrigatório",
+      "remediation": "Garantir drenagem adequada: (1) Ligação ao coletor público obrigatória quando disponível. (2) Rede separativa: águas residuais domésticas separadas das pluviais. (3) Fossa séptica: solução temporária apenas quando não existe rede pública (DL 236/98). (4) Tubagens de queda com ventilação primária obrigatória. (5) Caixas de inspeção acessíveis. (6) Pendentes mínimas: 1% em coletores prediais.",
+      "enabled": true,
+      "tags": ["drenagem", "saneamento", "águas residuais", "salubridade"]
+    },
+    {
+      "id": "ARQ-SAL-PLUV-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 33.º — Drenagem de Águas Pluviais",
+      "description": "O edifício não possui sistema adequado de recolha e drenagem de águas pluviais de coberturas, terraços e logradouros.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasPluvialDrainage", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Sistema de drenagem pluvial em coberturas, terraços e logradouros",
+      "remediation": "Instalar drenagem pluvial: (1) Caleiras e tubos de queda em todas as coberturas. (2) Dimensionamento: EN 12056-3 (intensidade pluviométrica I = 1.5 mm/min para Lisboa). (3) Pendentes em terraços: ≥ 1% para ralos. (4) Ligação à rede pluvial pública ou descarga no logradouro. (5) Nunca ligar pluviais à rede de águas residuais domésticas.",
+      "enabled": true,
+      "tags": ["pluviais", "drenagem", "cobertura", "terraço"]
+    },
+    {
+      "id": "ARQ-SAL-HUMID-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 34.º — Proteção Contra Humidades",
+      "description": "O edifício não possui proteção adequada contra humidades ascensionais, de infiltração e de condensação, comprometendo a salubridade dos espaços habitáveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasMoistureProtection", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Proteção contra humidades ascensionais, infiltração e condensação em todos os elementos construtivos",
+      "remediation": "Garantir proteção contra humidades: (1) Humidade ascensional: barreira impermeável (corte hídrico) nas paredes em contacto com o terreno. (2) Humidade de infiltração: impermeabilização de coberturas, terraços e paredes enterradas. (3) Condensação: isolamento térmico pelo exterior (ETICS) ou ventilação adequada. (4) IS e cozinhas: revestimento impermeável até 1.50m de altura mínimo. (5) Fachadas: reboco hidrófugo ou sistema de drenagem de fachada ventilada.",
+      "enabled": true,
+      "tags": ["humidade", "impermeabilização", "condensação", "salubridade"]
+    },
+    {
+      "id": "ARQ-SAL-TEMPHAB-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 35.º — Condições Higrotérmicas Mínimas",
+      "description": "Os compartimentos habitáveis não garantem condições higrotérmicas adequadas, com temperaturas interiores inferiores a 18°C no inverno sem recurso a climatização permanente.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "architecture.hasAdequateThermalComfort", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Temperatura interior mínima 18°C (inverno) sem recurso permanente a climatização ativa",
+      "remediation": "Melhorar conforto higrotérmico: (1) Isolamento térmico: U paredes ≤ 0.50 W/(m².K), coberturas ≤ 0.40. (2) Janelas: vidro duplo com caixilharia de rotura térmica (U ≤ 2.4). (3) Ventilação controlada: grelhas auto-reguláveis (Rph = 0.4-0.6 h⁻¹). (4) Inércia térmica: paredes de alvenaria ≥ 15 cm contribuem para estabilidade térmica. (5) Orientação solar: fachada principal a Sul maximiza ganhos solares passivos.",
+      "enabled": true,
+      "tags": ["higrotérmico", "temperatura", "conforto", "inverno"]
+    },
+    {
+      "id": "ARQ-SAL-COMUN-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 36.º — Iluminação e Ventilação de Espaços Comuns",
+      "description": "Os espaços comuns do edifício (átrio, corredores, caixa de escadas) não possuem iluminação natural e ventilação adequadas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
+        { "field": "architecture.hasCommonAreaLighting", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Iluminação natural e ventilação em espaços comuns (átrio, escadas, corredores)",
+      "remediation": "Garantir salubridade dos espaços comuns: (1) Caixa de escadas: iluminação natural por vão em cada piso ou claraboia no topo. (2) Átrio: iluminação natural ou artificial com ≥ 100 lux. (3) Corredores comuns: iluminação mínima 50 lux. (4) Ventilação: aberturas com área ≥ 2% da área do pavimento. (5) Garagens comuns: ventilação mecânica se naturalmente insuficiente (EN 13779).",
+      "enabled": true,
+      "tags": ["espaços comuns", "iluminação", "ventilação", "multifamiliar"]
+    },
+    {
+      "id": "ARQ-SAL-LIXO-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 37.º — Recolha de Resíduos Sólidos",
+      "description": "O edifício multifamiliar não possui local adequado para depósito temporário de resíduos sólidos urbanos, acessível aos moradores e ao serviço de recolha.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
+        { "field": "architecture.hasWasteStorage", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Local de depósito de resíduos ventilado, impermeável, com ponto de água e escoamento",
+      "remediation": "Prever espaço para resíduos: (1) Compartimento dedicado ao nível do piso de entrada ou cave. (2) Área mínima: 1.5-2.0 m² por fogo (orientação prática). (3) Ventilação natural ou mecânica (evitar odores). (4) Pavimento impermeável com ralo de escoamento. (5) Ponto de água para lavagem. (6) Acesso direto ao exterior para recolha municipal. (7) Separação por 4 frações: indiferenciado, papel, embalagens, vidro.",
+      "enabled": true,
+      "tags": ["resíduos", "lixo", "recolha", "multifamiliar"]
+    },
+    {
+      "id": "ARQ-SAL-ELETRIC-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 38.º — Instalação Elétrica Obrigatória",
+      "description": "O edifício habitável não dispõe de instalação elétrica com iluminação em todos os compartimentos, condição essencial de habitabilidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasElectricalInstallation", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Instalação elétrica com iluminação em todos os compartimentos habitáveis e de serviço",
+      "remediation": "Garantir instalação elétrica: (1) Quadro elétrico com disjuntor diferencial ≤ 30 mA. (2) Pelo menos 1 ponto de luz e 2 tomadas por compartimento habitável. (3) Cozinha: mínimo 4 tomadas (2 sobre bancada) + tomada dedicada para forno/placa. (4) IS: tomada com proteção IP44 a ≥ 0.60 m de banheira/duche. (5) Potência contratada mínima: 3.45 kVA (T0-T1), 6.90 kVA (T2-T3), 10.35 kVA (T4+).",
+      "enabled": true,
+      "tags": ["elétrica", "iluminação", "tomadas", "salubridade"]
+    },
+    {
+      "id": "ARQ-SAL-INFEST-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 39.º — Proteção Contra Infestações",
+      "description": "O edifício não possui medidas de proteção contra infestações de insetos, roedores e outros agentes biológicos nocivos à salubridade.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "architecture.hasPestProtection", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Medidas construtivas de proteção contra infestações (redes, vedações, sifões)",
+      "remediation": "Prevenir infestações: (1) Redes mosquiteiras em vãos de ventilação de caves e sótãos. (2) Sifões em todos os ralos e pontos de drenagem (barreira hídrica). (3) Vedação de passagens de tubagens com materiais adequados. (4) Pavimentos e paredes de caves sem fissuras ou juntas abertas. (5) Contentores de resíduos fechados e lavados regularmente.",
+      "enabled": true,
+      "tags": ["infestações", "salubridade", "proteção", "higiene"]
+    },
+    {
+      "id": "ARQ-SAL-INSOL-01",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "RGEU Art. 40.º — Insolação Mínima dos Fogos",
+      "description": "O fogo habitacional não recebe insolação direta durante pelo menos 2 horas por dia no solstício de inverno, em pelo menos um compartimento habitável.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "architecture.hasMinimumInsolation", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Insolação direta ≥ 2 horas/dia no solstício de inverno em ≥ 1 compartimento habitável",
+      "remediation": "Garantir insolação mínima: (1) Orientação preferencial de compartimentos habitáveis: Sul, SE, SO. (2) Evitar orientação exclusiva Norte para todos os compartimentos. (3) Distância entre edifícios: regra D ≥ H × tan(90° - altitude solar no solstício). (4) Para Lisboa (latitude 38.7°N): D ≥ 1.5 × H (orientação Sul). (5) Varandas e palas: não devem obstruir mais de 30° do ângulo de incidência solar.",
+      "enabled": true,
+      "tags": ["insolação", "orientação", "solar", "inverno"]
+    }
+  ]
+}

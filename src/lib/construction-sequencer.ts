@@ -102,6 +102,13 @@ const PHASE_DEPS: Record<ConstructionPhase, { phase: ConstructionPhase; type: "F
   external_works: [{ phase: "external_finishes", type: "SS", lag: 5 }],
   testing: [{ phase: "electrical_fixtures", type: "FS" }, { phase: "plumbing_fixtures", type: "FS" }, { phase: "fire_safety", type: "FS" }],
   cleanup: [{ phase: "testing", type: "FS" }, { phase: "painting", type: "FS" }, { phase: "external_works", type: "FS" }],
+  // Licensing phases (managed by licensing-phases.ts, not the construction sequencer)
+  licensing_preparation: [],
+  specialty_projects: [],
+  external_consultations: [],
+  licensing_approval: [],
+  construction_authorization: [],
+  utilization_authorization: [],
 };
 
 /** Phase display names (Portuguese) */
@@ -136,6 +143,13 @@ const PHASE_NAMES: Record<ConstructionPhase, string> = {
   external_works: "Arranjos Exteriores",
   testing: "Ensaios e Certificações",
   cleanup: "Limpeza Final e Entrega",
+  // Licensing phases (managed by licensing-phases.ts)
+  licensing_preparation: "Preparação Documental",
+  specialty_projects: "Projetos de Especialidades",
+  external_consultations: "Consultas a Entidades Externas",
+  licensing_approval: "Aprovação Municipal",
+  construction_authorization: "Título de Operação Urbanística",
+  utilization_authorization: "Autorização de Utilização",
 };
 
 // ============================================================

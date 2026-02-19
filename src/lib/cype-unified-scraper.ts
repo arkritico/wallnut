@@ -408,6 +408,8 @@ export class CypeUnifiedScraper {
     const currentPath = new URL(currentUrl).pathname;
     const baseDir = currentPath.replace(/\/[^/]*\.html$/, "");
 
+    const baseHost = new URL(this.config.baseUrl).hostname;
+
     $("a[href]").each((_, el) => {
       const href = $(el).attr("href");
       const text = $(el).text().trim();
@@ -420,6 +422,11 @@ export class CypeUnifiedScraper {
       // Build absolute URL
       let fullUrl: string;
       if (href.startsWith("http")) {
+        // Reject links to other domains/subdomains (e.g. angola.geradordeprecos.info)
+        try {
+          const linkHost = new URL(href).hostname;
+          if (linkHost !== baseHost) return;
+        } catch { return; }
         fullUrl = href;
       } else if (href.startsWith("/")) {
         fullUrl = `${this.config.baseUrl}${href}`;

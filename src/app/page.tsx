@@ -853,6 +853,7 @@ export default function Home() {
               onEditProject={handleBackToForm}
               budgetExcel={unifiedResult?.budgetExcel}
               msProjectXml={unifiedResult?.msProjectXml}
+              ccpmGanttExcel={unifiedResult?.ccpmGanttExcel}
               complianceExcel={unifiedResult?.complianceExcel}
               projectId={currentProjectId ?? undefined}
               userRole={currentUserRole}

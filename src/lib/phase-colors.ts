@@ -50,6 +50,13 @@ const PHASE_VISUALS: Record<ConstructionPhase, PhaseVisual> = {
   external_works:      { hex: "#16a34a", label: "Arranjos ext." },
   testing:             { hex: "#475569", label: "Ensaios" },
   cleanup:             { hex: "#22c55e", label: "Limpeza" },
+  // Licensing phases (DL 10/2024)
+  licensing_preparation:    { hex: "#0ea5e9", label: "Prep. documental" },
+  specialty_projects:       { hex: "#0284c7", label: "Especialidades" },
+  external_consultations:   { hex: "#0369a1", label: "Consultas ext." },
+  licensing_approval:       { hex: "#1d4ed8", label: "Aprovação mun." },
+  construction_authorization: { hex: "#1e40af", label: "Título operação" },
+  utilization_authorization: { hex: "#7e22ce", label: "Aut. utilização" },
 };
 
 /** Get the hex color for a construction phase. */

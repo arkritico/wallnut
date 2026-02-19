@@ -15,7 +15,56 @@ import { analyzeElectricalRTIEBT, canAnalyzeElectrical } from "./electrical-anal
 import { analyzePlumbingRGSPPDADAR, canAnalyzePlumbing } from "./plumbing-analyzer";
 import { analyzeEnergySCE, canAnalyzeEnergy, enrichProjectWithEnergyCalculations } from "./energy-analyzer";
 import { analyzeFireSafetySCIE, canAnalyzeFireSafety, enrichProjectWithFireSafetyCalculations } from "./fire-safety-analyzer";
-import { buildProjectContext } from "./context-builder";
+import { buildProjectContext, type ContextBuildReport } from "./context-builder";
+
+// ── Determine which regulation areas have REAL data (IFC/form, not defaults) ──
+// This prevents false PASS findings for specialties with no project data.
+const NAMESPACE_TO_AREAS: Record<string, string[]> = {
+  gas: ["gas"],
+  fireSafety: ["fire_safety"],
+  electrical: ["electrical"],
+  waterDrainage: ["water_drainage"],
+  water: ["water_drainage"],
+  plumbing: ["water_drainage"],
+  avac: ["avac"],
+  hvac: ["avac"],
+  acoustic: ["acoustic"],
+  elevators: ["elevators"],
+  elevator: ["elevators"],
+  thermal: ["thermal"],
+  envelope: ["thermal", "energy"],
+  energy: ["energy"],
+  ited: ["ited_itur"],
+  itur: ["ited_itur"],
+  telecommunications: ["ited_itur"],
+  accessibility: ["accessibility"],
+  licensing: ["licensing"],
+  waste: ["waste"],
+  drawings: ["drawings"],
+  structure: ["structural"],
+  structural: ["structural"],
+};
+
+function getAnalyzedAreas(report: ContextBuildReport): Set<string> {
+  const realFields = [...report.fromIfc, ...report.fromForm];
+  const namespaces = new Set<string>();
+
+  for (const field of realFields) {
+    if (field.startsWith("(")) continue; // Skip aggregate entries like "(15 standard fields)"
+    const dotIdx = field.indexOf(".");
+    if (dotIdx > 0) namespaces.add(field.substring(0, dotIdx));
+  }
+
+  // Architecture, general, and local use generic building data — always analyzable
+  const areas = new Set<string>(["architecture", "general", "local"]);
+
+  for (const ns of namespaces) {
+    const mapped = NAMESPACE_TO_AREAS[ns];
+    if (mapped) for (const area of mapped) areas.add(area);
+  }
+
+  return areas;
+}
 
 // ── Missing-field helpers for actionable SKIPPED findings ──────────
 function getMissingFieldsSCE(project: BuildingProject): string[] {
@@ -234,8 +283,9 @@ export async function analyzeProject(project: BuildingProject): Promise<Analysis
   // PDM / Municipal Zoning (municipality-specific database checks)
   findings.push(...checkPdmCompliance(enriched));
 
-  // Generate pass findings for areas with no violations
-  findings.push(...generatePassFindings(findings));
+  // Generate pass/not-analyzed findings for areas based on real data availability
+  const analyzedAreas = getAnalyzedAreas(contextReport);
+  findings.push(...generatePassFindings(findings, analyzedAreas));
 
   // Enrich findings with remediation guidance
   for (const f of findings) {
@@ -317,14 +367,24 @@ function evaluatePluginRulesWithMetrics(project: BuildingProject): {
 }
 
 /**
- * Generate pass findings for regulation areas with no violations.
- * Shows compliance status per area when all plugin rules pass.
+ * Generate pass/not-analyzed findings for regulation areas.
+ * - Areas with violations → skip (already have findings)
+ * - Areas with SKIPPED/UNAVAIL info → skip (already flagged by deep analyzers)
+ * - Areas with real data and no violations → PASS
+ * - Areas without real data → NOT ANALYZED (info severity)
  */
-function generatePassFindings(findings: Finding[]): Finding[] {
+function generatePassFindings(findings: Finding[], analyzedAreas: Set<string>): Finding[] {
   const passFindings: Finding[] = [];
   const violationAreas = new Set(
     findings
       .filter(f => f.severity === "critical" || f.severity === "warning")
+      .map(f => f.area)
+  );
+
+  // Areas that already have SKIPPED/UNAVAIL info findings from deep analyzers
+  const skippedAreas = new Set(
+    findings
+      .filter(f => f.severity === "info" && /-(SKIPPED|UNAVAIL)$/.test(f.id))
       .map(f => f.area)
   );
 
@@ -352,7 +412,11 @@ function generatePassFindings(findings: Finding[]): Finding[] {
   const plugins = getAvailablePlugins();
   for (const plugin of plugins) {
     for (const area of plugin.areas) {
-      if (!violationAreas.has(area)) {
+      // Already has violations or was already flagged as skipped
+      if (violationAreas.has(area) || skippedAreas.has(area)) continue;
+
+      if (analyzedAreas.has(area)) {
+        // Real data present, rules evaluated → PASS
         passFindings.push({
           id: `PASS-${area}`,
           area: area as RegulationArea,
@@ -360,6 +424,16 @@ function generatePassFindings(findings: Finding[]): Finding[] {
           article: "",
           description: `${areaLabels[area] ?? area} — sem não conformidades detetadas.`,
           severity: "pass",
+        });
+      } else {
+        // No real data for this specialty → NOT ANALYZED
+        passFindings.push({
+          id: `NA-${area}`,
+          area: area as RegulationArea,
+          regulation: plugin.name,
+          article: "",
+          description: `${areaLabels[area] ?? area} — não analisado (sem dados de projeto).`,
+          severity: "info",
         });
       }
     }

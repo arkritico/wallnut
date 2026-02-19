@@ -219,7 +219,15 @@ export type ConstructionPhase =
   | "fire_safety"
   | "external_works"
   | "testing"
-  | "cleanup";
+  | "cleanup"
+  // Pre-construction licensing phases (DL 10/2024)
+  | "licensing_preparation"
+  | "specialty_projects"
+  | "external_consultations"
+  | "licensing_approval"
+  | "construction_authorization"
+  // Post-construction
+  | "utilization_authorization";
 
 export interface ProjectSchedule {
   projectName: string;

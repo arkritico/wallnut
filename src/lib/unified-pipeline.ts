@@ -72,6 +72,7 @@ export interface UnifiedPipelineResult {
   ifcAnalyses?: SpecialtyAnalysisResult[];
   budgetExcel?: ArrayBuffer;
   msProjectXml?: string;
+  ccpmGanttExcel?: ArrayBuffer;
   elementMapping?: ElementTaskMappingResult;
   cashFlow?: CashFlowResult;
   complianceExcel?: ArrayBuffer;
@@ -223,6 +224,7 @@ export async function runUnifiedPipeline(
   let budgetExcel: ArrayBuffer | undefined;
   let msProjectXml: string | undefined;
   let complianceExcel: ArrayBuffer | undefined;
+  let ccpmGanttExcel: ArrayBuffer | undefined;
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -573,6 +575,23 @@ export async function runUnifiedPipeline(
     }
   }
 
+  // CCPM Gantt Excel
+  if (schedule && resources) {
+    try {
+      const { generateCcpmGanttExcel } = await import("./ccpm-gantt-export");
+      const buffer = await generateCcpmGanttExcel(schedule, resources, cashFlow, {
+        projectName: project.name,
+        projectLocation: project.location?.municipality,
+      });
+      ccpmGanttExcel = new ArrayBuffer(buffer.byteLength);
+      new Uint8Array(ccpmGanttExcel).set(buffer);
+    } catch (err) {
+      warnings.push(
+        `Exportação CCPM Gantt falhou: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
   progress.completeStage("export");
 
   const processingTimeMs = Math.round(performance.now() - startTime);
@@ -591,6 +610,7 @@ export async function runUnifiedPipeline(
     cashFlow,
     budgetExcel,
     msProjectXml,
+    ccpmGanttExcel,
     complianceExcel,
     warnings,
     processingTimeMs,

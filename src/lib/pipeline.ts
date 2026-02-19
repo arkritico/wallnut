@@ -17,7 +17,7 @@ import type { ChecklistResult } from "./document-checklist";
 import type { GeoLookupResult } from "./geospatial";
 import type { CostSummary } from "./cost-estimation";
 import type { ExtrapolationResult } from "./project-extrapolator";
-import type { WbsArticle } from "./wbs-types";
+import type { WbsArticle, ScheduleTask } from "./wbs-types";
 import type { ParsedBoq } from "./xlsx-parser";
 import type { ExtractedCoordinates } from "./coordinate-extractor";
 
@@ -78,6 +78,8 @@ export interface PipelineResult {
   extrapolation?: ExtrapolationResult;
   /** WBS remediation articles */
   wbsArticles?: WbsArticle[];
+  /** Licensing phase schedule tasks (pre-construction + post-construction) */
+  licensingPhases?: ScheduleTask[];
   /** Parsed BOQ from uploaded Excel files */
   parsedBoq?: ParsedBoq;
   /** Warnings from all stages */
@@ -456,6 +458,7 @@ export async function runPipeline(
   let costEstimation: CostSummary | undefined;
   let extrapolation: ExtrapolationResult | undefined;
   let wbsArticles: WbsArticle[] | undefined;
+  let licensingPhases: ScheduleTask[] | undefined;
 
   // Cost estimation (from findings)
   if (opts.includeCostEstimation !== false) {
@@ -496,6 +499,23 @@ export async function runPipeline(
     );
   }
 
+  // Licensing phases (DL 10/2024 timeline bridge)
+  try {
+    progress.reportPartial("extrapolate", 0.9, "A gerar fases de licenciamento...");
+    const { generateLicensingPhases } = await import("./licensing-phases");
+    const licensingResult = generateLicensingPhases(project, analysis.findings, {
+      includePostConstruction: true,
+      startingUid: 8000,
+    });
+    if (licensingResult.allTasks.length > 0) {
+      licensingPhases = licensingResult.allTasks;
+    }
+  } catch (err) {
+    warnings.push(
+      `Geração de fases de licenciamento falhou: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
+
   progress.completeStage("extrapolate");
 
   // ─── Stage 8: Complete ────────────────────────────────────
@@ -514,6 +534,7 @@ export async function runPipeline(
     costEstimation,
     extrapolation,
     wbsArticles,
+    licensingPhases,
     parsedBoq,
     warnings,
     processingTimeMs,

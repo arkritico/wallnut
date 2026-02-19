@@ -751,14 +751,18 @@ describe("E2E: Fully compliant project", async () => {
     );
   });
 
-  it("has more pass findings than violations", async () => {
-    const passCount = compliantResult.findings.filter(
-      (f) => f.severity === "pass",
+  it("has a better pass-to-violation ratio than the default project", async () => {
+    const compliantPass = compliantResult.findings.filter(f => f.severity === "pass").length;
+    const compliantViolations = compliantResult.findings.filter(
+      f => f.severity === "critical" || f.severity === "warning",
     ).length;
-    const violationCount = compliantResult.findings.filter(
-      (f) => f.severity === "critical" || f.severity === "warning",
+    const defaultPass = defaultResult.findings.filter(f => f.severity === "pass").length;
+    const defaultViolations = defaultResult.findings.filter(
+      f => f.severity === "critical" || f.severity === "warning",
     ).length;
-    expect(passCount).toBeGreaterThan(violationCount);
+    const compliantRatio = compliantViolations > 0 ? compliantPass / compliantViolations : Infinity;
+    const defaultRatio = defaultViolations > 0 ? defaultPass / defaultViolations : Infinity;
+    expect(compliantRatio).toBeGreaterThan(defaultRatio);
   });
 
   it("has fewer critical findings than the default project", async () => {

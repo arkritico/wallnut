@@ -60,6 +60,9 @@ export function serializeResult(
       ? toBase64(result.budgetExcel)
       : undefined,
     msProjectXml: result.msProjectXml,
+    ccpmGanttExcelBase64: result.ccpmGanttExcel
+      ? toBase64(result.ccpmGanttExcel)
+      : undefined,
     complianceExcelBase64: result.complianceExcel
       ? toBase64(result.complianceExcel)
       : undefined,

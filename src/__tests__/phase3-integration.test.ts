@@ -47,6 +47,7 @@ describe("Phase 3 — Plugin engine as sole evaluation path", () => {
       // deep analyzer findings (SCE- for energy, SCIE-CALC- / SCIE- for fire safety),
       // and *-SKIPPED / *-UNAVAIL findings (engine missing data or crashed)
       const validPrefix = f.id.startsWith("PF-") || f.id.startsWith("PDM-") || f.id.startsWith("PASS-")
+        || f.id.startsWith("NA-")
         || f.id.startsWith("RTIEBT_") || f.id.startsWith("RTIEBT-")
         || f.id.startsWith("PLUMB_") || f.id.startsWith("plumbing-")
         || f.id.startsWith("SCE-") || f.id.startsWith("SCIE-CALC-") || f.id.startsWith("SCIE-")

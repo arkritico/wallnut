@@ -221,6 +221,9 @@ export default function UnifiedUpload({
         ? base64ToArrayBuffer(json.budgetExcelBase64 as string)
         : undefined,
       msProjectXml: json.msProjectXml as string | undefined,
+      ccpmGanttExcel: json.ccpmGanttExcelBase64
+        ? base64ToArrayBuffer(json.ccpmGanttExcelBase64 as string)
+        : undefined,
       complianceExcel: json.complianceExcelBase64
         ? base64ToArrayBuffer(json.complianceExcelBase64 as string)
         : undefined,

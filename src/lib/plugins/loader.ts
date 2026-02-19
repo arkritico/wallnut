@@ -151,6 +151,14 @@ import drawingsComputed from "../../data/plugins/drawings/computed-fields.json";
 import architecturePlugin from "../../data/plugins/architecture/plugin.json";
 import architectureRegistry from "../../data/plugins/architecture/regulations/registry.json";
 import architectureRgeuRules from "../../data/plugins/architecture/regulations/rgeu/rules.json";
+import architectureRgeuSalubridadeRules from "../../data/plugins/architecture/regulations/rgeu-salubridade/rules.json";
+import architectureRgeuCobGarRules from "../../data/plugins/architecture/regulations/rgeu-coberturas-garagens/rules.json";
+import architectureRgeuConservacaoRules from "../../data/plugins/architecture/regulations/rgeu-conservacao/rules.json";
+import architecturePortaria62Rules from "../../data/plugins/architecture/regulations/portaria-62-2003/rules.json";
+import architecturePortaria216bRules from "../../data/plugins/architecture/regulations/portaria-216b-2008/rules.json";
+import architectureDl177Rules from "../../data/plugins/architecture/regulations/dl-177-2001/rules.json";
+import architectureCcExpandedRules from "../../data/plugins/architecture/regulations/codigo-civil-expanded/rules.json";
+import architectureDl10Rules from "../../data/plugins/architecture/regulations/dl-10-2024/rules.json";
 import architectureTables from "../../data/plugins/architecture/lookup-tables.json";
 import architectureComputed from "../../data/plugins/architecture/computed-fields.json";
 
@@ -349,7 +357,17 @@ export function loadDrawingsPlugin(): SpecialtyPlugin {
 }
 
 export function loadArchitecturePlugin(): SpecialtyPlugin {
-  return loadCached("architecture", architecturePlugin, architectureRegistry, [architectureRgeuRules], architectureTables, architectureComputed);
+  return loadCached("architecture", architecturePlugin, architectureRegistry, [
+    architectureRgeuRules,
+    architectureRgeuSalubridadeRules,
+    architectureRgeuCobGarRules,
+    architectureRgeuConservacaoRules,
+    architecturePortaria62Rules,
+    architecturePortaria216bRules,
+    architectureDl177Rules,
+    architectureCcExpandedRules,
+    architectureDl10Rules,
+  ], architectureTables, architectureComputed);
 }
 
 export function loadGeneralPlugin(): SpecialtyPlugin {

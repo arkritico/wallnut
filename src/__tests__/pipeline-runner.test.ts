@@ -42,9 +42,12 @@ describe("serializeResult", () => {
     const excelBuf = new TextEncoder().encode("EXCEL_DATA").buffer;
     const complianceBuf = new TextEncoder().encode("COMPLIANCE").buffer;
 
+    const ccpmBuf = new TextEncoder().encode("CCPM_GANTT").buffer;
+
     const result = {
       project: { name: "Test" },
       budgetExcel: excelBuf,
+      ccpmGanttExcel: ccpmBuf,
       complianceExcel: complianceBuf,
       msProjectXml: "<xml/>",
       warnings: ["w1"],
@@ -55,6 +58,9 @@ describe("serializeResult", () => {
 
     expect(serialized.budgetExcelBase64).toBe(
       Buffer.from("EXCEL_DATA").toString("base64"),
+    );
+    expect(serialized.ccpmGanttExcelBase64).toBe(
+      Buffer.from("CCPM_GANTT").toString("base64"),
     );
     expect(serialized.complianceExcelBase64).toBe(
       Buffer.from("COMPLIANCE").toString("base64"),
@@ -74,6 +80,7 @@ describe("serializeResult", () => {
     const serialized = serializeResult(result);
 
     expect(serialized.budgetExcelBase64).toBeUndefined();
+    expect(serialized.ccpmGanttExcelBase64).toBeUndefined();
     expect(serialized.complianceExcelBase64).toBeUndefined();
   });
 });

@@ -58,6 +58,7 @@ export interface SerializedPipelineResult {
   cashFlow?: unknown;
   budgetExcelBase64?: string;
   msProjectXml?: string;
+  ccpmGanttExcelBase64?: string;
   complianceExcelBase64?: string;
   warnings: string[];
   processingTimeMs: number;

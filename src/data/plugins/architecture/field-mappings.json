@@ -1,7 +1,7 @@
 {
   "pluginId": "architecture",
-  "version": "1.0.0",
-  "description": "Mapeamento de campos para regras de arquitetura (RGEU, PDM, Portaria 62/2003, DL 163/2006)",
+  "version": "2.0.0",
+  "description": "Mapeamento de campos para regras de arquitetura (RGEU, PDM, Portaria 62/2003, DL 163/2006, DL 177/2001, DL 10/2024, Código Civil)",
   "fields": [
     {
       "_group": "Dados Gerais",
@@ -82,6 +82,33 @@
       },
       "description": "Pé-direito livre mínimo dos compartimentos, conforme RGEU Art. 65.º (mínimo 2,70 m em habitação)"
     },
+    {
+      "_group": "Dados Gerais",
+      "field": "architecture.numberOfFloors",
+      "label": "Número de pisos acima da cota de soleira",
+      "type": "number",
+      "sources": ["ifc", "form"],
+      "ifcMapping": {
+        "entity": "IfcBuilding",
+        "property": "NumberOfStoreys",
+        "pset": "Pset_BuildingCommon"
+      },
+      "description": "Número de pisos acima da cota de soleira — elevador obrigatório se > 3 (DL 177/2001)"
+    },
+    {
+      "_group": "Dados Gerais",
+      "field": "projectPhase",
+      "label": "Fase do projeto",
+      "type": "select",
+      "options": [
+        { "value": "design", "label": "Projeto" },
+        { "value": "construction", "label": "Construção" },
+        { "value": "operation", "label": "Exploração/Utilização" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "design" },
+      "description": "Fase em que se encontra o projeto — algumas regras aplicam-se apenas na fase de exploração"
+    },
 
     {
       "_group": "Áreas e Tipologia",
@@ -142,6 +169,15 @@
         "method": "count"
       },
       "description": "Número de instalações sanitárias do fogo"
+    },
+    {
+      "_group": "Áreas e Tipologia",
+      "field": "architecture.isSocialHousing",
+      "label": "Habitação a custos controlados",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Habitação social/custos controlados — áreas mínimas regulamentares pela Portaria 62/2003"
     },
 
     {
@@ -285,6 +321,30 @@
       "defaults": { "_default": 2.2 },
       "description": "Pé-direito livre mínimo das caves — mínimo 2,20 m conforme RGEU"
     },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.hasKitchenMinEquipment",
+      "label": "Equipamento mínimo de cozinha",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Cozinha com bancada ≥ 2.10 m, lava-louça, placa/fogão, exaustão, ponto de AQS (Portaria 62/2003)"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.hasBathroomMinEquipment",
+      "label": "Equipamento mínimo de IS",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "IS com lavatório, sanita e banheira/base de duche (Portaria 62/2003)"
+    },
+    {
+      "_group": "Compartimentos",
+      "field": "architecture.hasLaundrySpace",
+      "label": "Espaço de lavandaria/secagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Espaço dedicado ou solução para lavagem e secagem de roupa"
+    },
 
     {
       "_group": "Ventilação e Iluminação",
@@ -321,6 +381,30 @@
       "sources": ["form"],
       "defaults": { "_default": false },
       "description": "Indica se o fogo possui ventilação cruzada (aberturas em fachadas opostas)"
+    },
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.hasNP1037Compliance",
+      "label": "Conformidade NP 1037-1 (ventilação)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Ventilação natural conforme NP 1037-1: admissão em secos, extração em húmidos (DL 177/2001)"
+    },
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.hasCommonAreaLighting",
+      "label": "Iluminação de espaços comuns",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Espaços comuns com iluminação natural/artificial adequada (RGEU Art. 36.º)"
+    },
+    {
+      "_group": "Ventilação e Iluminação",
+      "field": "architecture.hasMinimumInsolation",
+      "label": "Insolação mínima do fogo",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "≥ 2 horas de sol direto no solstício de inverno em ≥ 1 compartimento (RGEU Art. 40.º)"
     },
 
     {
@@ -454,12 +538,507 @@
     },
     {
       "_group": "Exteriores e Estacionamento",
+      "field": "architecture.parkingRatioPerUnit",
+      "label": "Rácio estacionamento/fogo",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Lugares de estacionamento por fogo — mínimo 1.0 orientativo (PDM define por município)"
+    },
+    {
+      "_group": "Exteriores e Estacionamento",
+      "field": "architecture.parkingSpotWidth",
+      "label": "Largura do lugar de estacionamento",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "_default": 2.3 },
+      "description": "Largura do lugar: ≥ 2.30 m perpendicular, ≥ 2.00 m paralelo"
+    },
+    {
+      "_group": "Exteriores e Estacionamento",
       "field": "architecture.hasRoofPlan",
       "label": "Existência de planta de cobertura",
       "type": "boolean",
       "sources": ["form"],
       "defaults": { "_default": false },
       "description": "Indica se o projeto inclui planta de cobertura com definição de pendentes e drenagem"
+    },
+
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasWaterSupply",
+      "label": "Abastecimento de água potável",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Ligação à rede pública de água potável ou captação própria com qualidade atestada (RGEU Art. 31.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasDrainage",
+      "label": "Drenagem de águas residuais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Sistema de drenagem de águas residuais domésticas (RGEU Art. 32.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasPluvialDrainage",
+      "label": "Drenagem de águas pluviais",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Sistema de recolha e drenagem de águas pluviais (RGEU Art. 33.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasMoistureProtection",
+      "label": "Proteção contra humidades",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Proteção contra humidades ascensionais, de infiltração e de condensação (RGEU Art. 34.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasAdequateThermalComfort",
+      "label": "Conforto higrotérmico adequado",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Temperatura interior ≥ 18°C no inverno sem climatização permanente (RGEU Art. 35.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasElectricalInstallation",
+      "label": "Instalação elétrica",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Instalação elétrica com iluminação em todos os compartimentos (RGEU Art. 38.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasWasteStorage",
+      "label": "Local para resíduos",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Compartimento para depósito temporário de RSU ventilado e impermeável (RGEU Art. 37.º)"
+    },
+    {
+      "_group": "Salubridade e Infraestruturas",
+      "field": "architecture.hasPestProtection",
+      "label": "Proteção contra infestações",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Medidas construtivas contra insetos, roedores e agentes biológicos (RGEU Art. 39.º)"
+    },
+
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasAccessibleTerrace",
+      "label": "Terraço acessível",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "defaults": { "_default": false },
+      "description": "O edifício possui terraço acessível (cobertura plana acessível)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasTerraceMembrane",
+      "label": "Impermeabilização de terraço",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Terraço com membrana impermeável contínua e proteção mecânica (RGEU Art. 50.º)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.terraceGuardHeight",
+      "label": "Altura guarda-corpo terraço",
+      "type": "number",
+      "unit": "m",
+      "sources": ["ifc", "form"],
+      "defaults": { "_default": 1.1 },
+      "description": "Guarda-corpo ≥ 1.10 m em terraços e varandas com desnível > 0.40 m"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasInclinedRoof",
+      "label": "Cobertura inclinada",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "O edifício possui cobertura inclinada (não plana)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.roofSlopeAdequate",
+      "label": "Pendente adequada ao material",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Pendente de cobertura conforme material: telha ≥ 30%, chapa ≥ 8%, membrana ≥ 3%"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasGarage",
+      "label": "Existência de garagem",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "defaults": { "_default": false },
+      "description": "O edifício possui garagem ou estacionamento coberto"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.garageCeilingHeight",
+      "label": "Pé-direito da garagem",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "_default": 2.2 },
+      "description": "Pé-direito livre mínimo da garagem: 2.20 m (RGEU Art. 54.º)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasGarageVentilation",
+      "label": "Ventilação da garagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Ventilação natural ≥ 5% ou mecânica com deteção CO (RGEU Art. 55.º)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.garageRampSlope",
+      "label": "Inclinação da rampa de garagem",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "defaults": { "_default": 15 },
+      "description": "Inclinação máxima: 20% no troço reto, 12% junto à via pública (RGEU Art. 56.º)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasCommercialFloor",
+      "label": "Piso comercial",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "O edifício possui piso comercial (rés-do-chão de comércio/serviços)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.commercialCeilingHeight",
+      "label": "Pé-direito comercial",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "defaults": { "_default": 3.0 },
+      "description": "Pé-direito mínimo de pisos comerciais: 3.00 m (RGEU Art. 57.º)"
+    },
+    {
+      "_group": "Coberturas e Garagens",
+      "field": "architecture.hasBasementVentilation",
+      "label": "Ventilação da cave",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Caves habitáveis com ventilação natural (vão exterior) ou mecânica ≥ 6 ren/h"
+    },
+
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.conservationState",
+      "label": "Estado de conservação",
+      "type": "select",
+      "options": [
+        { "value": "good", "label": "Bom" },
+        { "value": "fair", "label": "Razoável" },
+        { "value": "poor", "label": "Mau" },
+        { "value": "very_poor", "label": "Muito mau" },
+        { "value": "ruin", "label": "Ruína" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "good" },
+      "description": "Estado geral de conservação do edifício — em exploração (RGEU Art. 73.º)"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.hasFacadeDegradation",
+      "label": "Degradação de fachadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Fachadas com reboco destacado, pintura deteriorada ou elementos em risco de queda"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.hasRoofLeaks",
+      "label": "Infiltrações na cobertura",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Cobertura com infiltrações ou telhas danificadas"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.hasStructuralDamage",
+      "label": "Danos estruturais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Fissuras ativas, deformações excessivas ou armaduras expostas"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.lastMaintenanceYears",
+      "label": "Anos desde última manutenção",
+      "type": "number",
+      "unit": "anos",
+      "sources": ["form"],
+      "description": "Tempo decorrido desde a última intervenção de conservação (obrigatória a cada 8 anos)"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.isDemolition",
+      "label": "Obra de demolição",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se se trata de obra de demolição total ou parcial"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.hasDemolitionPermit",
+      "label": "Licença de demolição",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Licença de demolição obtida (exceto demolições isentas pelo DL 10/2024)"
+    },
+    {
+      "_group": "Conservação e Estado",
+      "field": "architecture.hasTechnicalMaintenance",
+      "label": "Manutenção técnica periódica",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Inspeções e manutenção de elevadores, gás, elétrica, AVAC, incêndio"
+    },
+
+    {
+      "_group": "Ficha Técnica da Habitação",
+      "field": "architecture.hasTechnicalSheet",
+      "label": "Ficha técnica da habitação",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "FTH elaborada conforme Portaria 216-B/2008 — obrigatória para edifícios novos e reabilitados"
+    },
+    {
+      "_group": "Ficha Técnica da Habitação",
+      "field": "architecture.hasMaterialsDescription",
+      "label": "Descrição de materiais na FTH",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Ficha técnica com descrição de materiais e técnicas construtivas"
+    },
+    {
+      "_group": "Ficha Técnica da Habitação",
+      "field": "architecture.hasEquipmentDescription",
+      "label": "Descrição de equipamentos na FTH",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Ficha técnica com descrição de equipamentos e redes técnicas"
+    },
+    {
+      "_group": "Ficha Técnica da Habitação",
+      "field": "architecture.hasAreaSchedule",
+      "label": "Quadro de áreas na FTH",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Ficha técnica com quadro de áreas por compartimento"
+    },
+    {
+      "_group": "Ficha Técnica da Habitação",
+      "field": "architecture.hasWarrantyInfo",
+      "label": "Informação de garantias na FTH",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Prazos de garantia: estrutura (10 anos), impermeabilização (5), equipamentos (2)"
+    },
+    {
+      "_group": "Ficha Técnica da Habitação",
+      "field": "architecture.hasFinishesDescription",
+      "label": "Descrição de acabamentos na FTH",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Acabamentos por compartimento (pavimentos, paredes, tetos)"
+    },
+
+    {
+      "_group": "Qualidade Habitacional (DL 177/2001)",
+      "field": "architecture.interUnitWallRw",
+      "label": "Isolamento acústico entre fogos (Rw)",
+      "type": "number",
+      "unit": "dB",
+      "sources": ["form"],
+      "defaults": { "_default": 50 },
+      "description": "Índice de redução sonora Rw das paredes entre fogos — mínimo 50 dB (DL 177/2001)"
+    },
+    {
+      "_group": "Qualidade Habitacional (DL 177/2001)",
+      "field": "architecture.hasFireSafetyIntegration",
+      "label": "Integração de SCIE no projeto",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Projeto de arquitetura com integração de requisitos de segurança contra incêndio"
+    },
+    {
+      "_group": "Qualidade Habitacional (DL 177/2001)",
+      "field": "architecture.hasElevator",
+      "label": "Existência de elevador",
+      "type": "boolean",
+      "sources": ["ifc", "form"],
+      "description": "Elevador obrigatório em edifícios multifamiliares novos > 3 pisos (DL 177/2001)"
+    },
+    {
+      "_group": "Qualidade Habitacional (DL 177/2001)",
+      "field": "architecture.hasAdequateCommonAreas",
+      "label": "Espaços comuns adequados",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Átrio, escadas, caixa de correio, casa do lixo, arrecadações (DL 177/2001)"
+    },
+    {
+      "_group": "Qualidade Habitacional (DL 177/2001)",
+      "field": "architecture.hasResourceEfficiency",
+      "label": "Eficiência de recursos",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Medidas de eficiência hídrica e energética integradas no projeto"
+    },
+
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasHorizontalPropertyTitle",
+      "label": "Título constitutivo da PH",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Título constitutivo da propriedade horizontal com frações, permilagens e partes comuns (Art. 1415.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasCondominiumAdmin",
+      "label": "Administração do condomínio",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Administração organizada com assembleia anual e fundo de reserva ≥ 10% (Art. 1430.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasPublicRoadAccess",
+      "label": "Acesso à via pública",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": true },
+      "description": "Prédio com acesso à via pública — servidão de passagem se encravado (Art. 1550.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasTreesNearBoundary",
+      "label": "Árvores junto ao limite",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Árvores plantadas próximas do limite do prédio vizinho (Art. 1366.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasNuisanceEmissions",
+      "label": "Emissões nocivas para vizinhança",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Fumos, ruídos, vibrações que causam prejuízo substancial ao vizinho (Art. 1346.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasSharedWall",
+      "label": "Parede meeira",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Muro ou parede divisória entre prédios (compropriedade, Art. 1370.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasFireInsurance",
+      "label": "Seguro contra incêndio (PH)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Seguro obrigatório para frações e partes comuns em PH (Art. 1429.º CC)"
+    },
+    {
+      "_group": "Vizinhança e Propriedade (Código Civil)",
+      "field": "architecture.hasEstablishedViews",
+      "label": "Vistas estabelecidas (> 20 anos)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Janelas com vistas diretas para vizinho mantidas > 20 anos — servidão por usucapião (Art. 1362.º CC)"
+    },
+
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.isMinorWork",
+      "label": "Obra menor / isenta",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Obra potencialmente isenta de controlo prévio (DL 10/2024 Art. 6.º e 6.º-A)"
+    },
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.isPublicEntity",
+      "label": "Entidade pública",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Operação de entidade pública isenta de controlo prévio (DL 10/2024 Art. 7.º)"
+    },
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.hasLotAllotment",
+      "label": "Lote com alvará de loteamento",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Lote inserido em alvará de loteamento em vigor — comunicação prévia possível"
+    },
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.requiresLicensing",
+      "label": "Requer licenciamento",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Operação requer licenciamento municipal (não basta comunicação prévia)"
+    },
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.licensingPendingDays",
+      "label": "Dias em análise de licenciamento",
+      "type": "number",
+      "unit": "dias",
+      "sources": ["form"],
+      "description": "Dias decorridos desde a submissão — deferimento tácito se exceder prazos legais"
+    },
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.hasDigitalSubmission",
+      "label": "Submissão digital",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Submissão através de plataforma eletrónica (obrigatória desde 05/01/2026)"
+    },
+    {
+      "_group": "Licenciamento (DL 10/2024 Simplex)",
+      "field": "architecture.hasMunicipalNotification",
+      "label": "Notificação municipal (obras isentas)",
+      "type": "boolean",
+      "sources": ["form"],
+      "description": "Notificação ao município antes do início de obras isentas de controlo prévio"
     }
   ]
 }

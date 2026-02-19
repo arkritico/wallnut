@@ -133,6 +133,13 @@ const DEFAULT_CONSTRAINTS: SiteCapacityConstraints = {
     external_works: 10,
     testing: 4,
     cleanup: 6,
+    // Licensing phases (no site workers)
+    licensing_preparation: 0,
+    specialty_projects: 0,
+    external_consultations: 0,
+    licensing_approval: 0,
+    construction_authorization: 0,
+    utilization_authorization: 0,
   },
   equipmentConflicts: [
     { equipment: "crane", maxSimultaneous: 1 },
