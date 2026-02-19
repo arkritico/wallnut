@@ -149,7 +149,7 @@ export default function IfcViewer({
         await ifcLoader.setup({
           wasm: {
             path: "/wasm/",
-            absolute: false,
+            absolute: true,
           },
           autoSetWasm: false,
         });
