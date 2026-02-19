@@ -1480,6 +1480,412 @@
         "DL-12-2004",
         "RJUE"
       ]
+    },
+
+    {
+      "id": "PDM-EMBAR-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 102.º — Embargo de Obras Ilegais",
+      "description": "A câmara municipal pode embargar obras que estejam a ser executadas sem licença, em desconformidade com a licença, ou em violação das normas legais e regulamentares aplicáveis. O embargo é uma ordem administrativa de cessação imediata dos trabalhos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasStopWorkOrder", "operator": "==", "value": true },
+        { "field": "municipal.stopWorkOrderResolved", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ordem de embargo ativa: {municipal.hasStopWorkOrder} | Resolvida: {municipal.stopWorkOrderResolved}",
+      "requiredValue": "Obra sem embargo ativo ou embargo resolvido (stopWorkOrderResolved = true)",
+      "remediation": "Cessar imediatamente todos os trabalhos de construção. O embargo (Art. 102.º do DL 555/99) impõe a paragem de todas as obras no local. Para levantar o embargo: corrigir as desconformidades identificadas, submeter projeto de alterações se necessário, ou requerer a legalização da obra. A continuação de obras embargadas constitui crime de desobediência e agrava as coimas aplicáveis.",
+      "enabled": true,
+      "tags": ["embargo", "obras-ilegais", "cessação", "Art-102", "RJUE"]
+    },
+    {
+      "id": "PDM-EMBAR-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 102.º-A — Processo de Legalização",
+      "description": "Após embargo ou deteção de obras ilegais, o proprietário pode requerer a legalização da construção, demonstrando a conformidade com as normas urbanísticas em vigor ou propondo as alterações necessárias para atingir essa conformidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.requiresLegalization", "operator": "==", "value": true },
+        { "field": "municipal.legalizationSubmitted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Legalização necessária: {municipal.requiresLegalization} | Pedido submetido: {municipal.legalizationSubmitted}",
+      "requiredValue": "Pedido de legalização submetido à câmara municipal (legalizationSubmitted = true)",
+      "remediation": "Submeter pedido de legalização à câmara municipal nos termos do Art. 102.º-A do DL 555/99. O pedido deve incluir: levantamento topográfico e arquitetónico da construção existente, projeto de arquitetura e especialidades demonstrando a conformidade com as normas em vigor, e os elementos instrutórios exigidos pela Portaria 113/2015. A câmara fixa prazo para a apresentação dos elementos em falta.",
+      "enabled": true,
+      "tags": ["embargo", "legalização", "conformidade", "Art-102-A", "RJUE"]
+    },
+    {
+      "id": "PDM-EMBAR-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 98.º a 100.º — Cálculo de Coimas por Infrações Urbanísticas",
+      "description": "As infrações urbanísticas (construção sem licença, desconformidade com o projeto, incumprimento de embargo) estão sujeitas a coimas cujo valor varia em função da gravidade da infração, da área de construção ilegal e da natureza do infrator (pessoa singular ou coletiva).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.urbanInfractionDetected", "operator": "==", "value": true },
+        { "field": "municipal.penaltyCalculated", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Infração urbanística detetada: {municipal.urbanInfractionDetected} | Coima calculada: {municipal.penaltyCalculated}",
+      "requiredValue": "Coima calculada e notificada conforme Art. 98.º-100.º RJUE",
+      "remediation": "As coimas por infrações urbanísticas variam conforme o Art. 98.º a 100.º do DL 555/99: construção sem licença — contraordenação grave (coima até €200.000 para pessoas coletivas); desobediência a embargo — crime (Art. 348.º do Código Penal); desconformidade com projeto — contraordenação (coima proporcional à gravidade). Consultar advogado especialista em direito do urbanismo para defesa no processo contraordenacional.",
+      "enabled": true,
+      "tags": ["embargo", "coimas", "infrações", "contraordenação", "Art-98", "RJUE"]
+    },
+    {
+      "id": "PDM-EMBAR-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 106.º — Ordem de Demolição de Construção Ilegal",
+      "description": "Quando a legalização não é possível (por incompatibilidade com as normas urbanísticas em vigor), a câmara municipal pode ordenar a demolição total ou parcial da construção ilegal, a expensas do infrator.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.demolitionOrderIssued", "operator": "==", "value": true },
+        { "field": "municipal.demolitionCompleted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ordem de demolição emitida: {municipal.demolitionOrderIssued} | Demolição executada: {municipal.demolitionCompleted}",
+      "requiredValue": "Demolição executada ou contestada judicialmente (demolitionCompleted = true)",
+      "remediation": "A ordem de demolição (Art. 106.º do DL 555/99) é o último recurso quando a legalização é impossível. O proprietário deve: (1) executar a demolição no prazo fixado; ou (2) contestar judicialmente a ordem se considerar que a legalização é viável. A não execução da demolição no prazo permite à câmara proceder à demolição coerciva, imputando os custos ao proprietário. Recomenda-se consultar advogado antes de executar a demolição.",
+      "enabled": true,
+      "tags": ["embargo", "demolição", "ordem", "construção-ilegal", "Art-106", "RJUE"]
+    },
+    {
+      "id": "PDM-EMBAR-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 93.º a 95.º — Deteção de Construção Ilegal e Fiscalização",
+      "description": "A câmara municipal tem competência para fiscalizar a conformidade das obras com as licenças emitidas e detetar construções ilegais. A fiscalização pode ser desencadeada por denúncia, inspeção periódica ou monitorização por imagem aérea/satélite.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.fiscalizationPending", "operator": "==", "value": true },
+        { "field": "municipal.fiscalizationResolved", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Fiscalização pendente: {municipal.fiscalizationPending} | Resolvida: {municipal.fiscalizationResolved}",
+      "requiredValue": "Situação de fiscalização resolvida sem infrações pendentes (fiscalizationResolved = true)",
+      "remediation": "Colaborar com a fiscalização municipal, facultando o acesso à obra e apresentando a licença, o alvará e o livro de obra. Se forem detetadas desconformidades, proceder à sua correção no prazo fixado pela câmara. A obstrução à fiscalização constitui contraordenação. Manter no estaleiro cópias do alvará, projeto aprovado e termos de responsabilidade, conforme exigido pelo Art. 95.º do DL 555/99.",
+      "enabled": true,
+      "tags": ["embargo", "fiscalização", "deteção", "conformidade", "Art-93", "RJUE"]
+    },
+
+    {
+      "id": "PDM-CONSUL-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 13.º-A / DL 80/2015 — Consulta à CCDR",
+      "description": "As operações urbanísticas sujeitas a licenciamento em áreas abrangidas por servidões administrativas ou restrições de utilidade pública podem exigir parecer vinculativo da CCDR (Comissão de Coordenação e Desenvolvimento Regional) competente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.ccdrConsultationRequired", "operator": "==", "value": true },
+        { "field": "municipal.ccdrConsultationObtained", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Consulta CCDR necessária: {municipal.ccdrConsultationRequired} | Parecer obtido: {municipal.ccdrConsultationObtained}",
+      "requiredValue": "Parecer da CCDR obtido (ccdrConsultationObtained = true)",
+      "remediation": "Requerer parecer à CCDR competente (Norte, Centro, Lisboa e Vale do Tejo, Alentejo ou Algarve) para a operação urbanística. A CCDR pronuncia-se sobre a conformidade com os instrumentos de gestão territorial e as servidões/restrições de utilidade pública. O parecer é vinculativo e deve ser obtido antes da deliberação da câmara municipal. O prazo de emissão é de 20 dias úteis (Art. 13.º-A do RJUE).",
+      "enabled": true,
+      "tags": ["consultas", "CCDR", "parecer", "servidões", "RJUE"]
+    },
+    {
+      "id": "PDM-CONSUL-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 13.º-A / DL 151-B/2013 — Parecer da APA (Avaliação de Impacte Ambiental)",
+      "description": "Os projetos sujeitos a Avaliação de Impacte Ambiental (AIA) nos termos do DL 151-B/2013 devem obter Declaração de Impacte Ambiental (DIA) favorável ou condicionalmente favorável da APA antes do licenciamento urbanístico.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.apaEnvironmentalReviewRequired", "operator": "==", "value": true },
+        { "field": "municipal.apaEnvironmentalReviewApproved", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Revisão ambiental APA necessária: {municipal.apaEnvironmentalReviewRequired} | DIA favorável: {municipal.apaEnvironmentalReviewApproved}",
+      "requiredValue": "Declaração de Impacte Ambiental (DIA) favorável obtida (apaEnvironmentalReviewApproved = true)",
+      "remediation": "Submeter Estudo de Impacte Ambiental (EIA) à APA e obter DIA favorável ou condicionalmente favorável antes de iniciar o processo de licenciamento urbanístico. O EIA deve abranger: descrição do projeto, alternativas estudadas, estado de referência do ambiente, avaliação dos impactes, medidas de mitigação e programa de monitorização. O prazo de decisão da APA é de 50 dias úteis após consulta pública.",
+      "enabled": true,
+      "tags": ["consultas", "APA", "AIA", "impacte-ambiental", "DIA", "RJUE"]
+    },
+    {
+      "id": "PDM-CONSUL-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 13.º-A / DL 107/2001 — Parecer da DGPC para Património Cultural",
+      "description": "As obras em imóveis classificados ou em vias de classificação, ou nas respetivas zonas de proteção, exigem parecer vinculativo da DGPC (Direção-Geral do Património Cultural) ou da DRCN/DRCC/DRC competente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.dgpcHeritageApprovalRequired", "operator": "==", "value": true },
+        { "field": "municipal.dgpcHeritageApprovalObtained", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Parecer DGPC necessário: {municipal.dgpcHeritageApprovalRequired} | Parecer obtido: {municipal.dgpcHeritageApprovalObtained}",
+      "requiredValue": "Parecer da DGPC/DRC favorável obtido (dgpcHeritageApprovalObtained = true)",
+      "remediation": "Submeter pedido de parecer à DGPC ou à Direção Regional de Cultura competente para obras em imóveis classificados ou nas suas zonas de proteção (50 m ou zona especial de proteção). O parecer incide sobre o impacto da intervenção no valor patrimonial do imóvel e da sua envolvente. Incluir levantamento fotográfico completo, memória descritiva detalhada das intervenções e justificação dos materiais e técnicas propostas. O parecer é vinculativo (Art. 13.º-A do RJUE).",
+      "enabled": true,
+      "tags": ["consultas", "DGPC", "património", "classificado", "zona-proteção", "RJUE"]
+    },
+    {
+      "id": "PDM-CONSUL-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 13.º-A / DL 142/2008 — Parecer do ICNF para Áreas Protegidas",
+      "description": "As operações urbanísticas em áreas protegidas (Parque Nacional, Parque Natural, Reserva Natural, Paisagem Protegida) ou em áreas da Rede Natura 2000 exigem parecer vinculativo do ICNF (Instituto da Conservação da Natureza e das Florestas).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.icnfNaturalAreaApprovalRequired", "operator": "==", "value": true },
+        { "field": "municipal.icnfNaturalAreaApprovalObtained", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Parecer ICNF necessário: {municipal.icnfNaturalAreaApprovalRequired} | Parecer obtido: {municipal.icnfNaturalAreaApprovalObtained}",
+      "requiredValue": "Parecer do ICNF favorável obtido (icnfNaturalAreaApprovalObtained = true)",
+      "remediation": "Submeter pedido de parecer ao ICNF para operações urbanísticas em áreas protegidas ou Rede Natura 2000. O ICNF avalia o impacto da operação sobre os valores naturais protegidos (habitats, espécies, paisagem). O parecer pode impor condições específicas: períodos de restrição de obras (nidificação), compensação ecológica, limites de impermeabilização, preservação de corredores ecológicos. O parecer é vinculativo e deve ser obtido antes da deliberação municipal.",
+      "enabled": true,
+      "tags": ["consultas", "ICNF", "áreas-protegidas", "Rede-Natura", "biodiversidade", "RJUE"]
+    },
+    {
+      "id": "PDM-CONSUL-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 13.º-A / Lei da Água (Lei 58/2005) — Parecer da Autoridade da Água (APA/ARH)",
+      "description": "As operações urbanísticas em domínio hídrico público ou nas respetivas margens e zonas adjacentes exigem parecer ou título de utilização de recursos hídricos emitido pela APA/ARH (Administração da Região Hidrográfica).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.waterAuthorityConsultationRequired", "operator": "==", "value": true },
+        { "field": "municipal.waterAuthorityConsultationObtained", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Parecer autoridade da água necessário: {municipal.waterAuthorityConsultationRequired} | Parecer obtido: {municipal.waterAuthorityConsultationObtained}",
+      "requiredValue": "Parecer/título da APA/ARH obtido (waterAuthorityConsultationObtained = true)",
+      "remediation": "Requerer parecer ou título de utilização de recursos hídricos à APA/ARH competente para operações urbanísticas em domínio hídrico público, margens de cursos de água (faixa de 10/50 m) ou zonas adjacentes classificadas. O título pode ser: licença (para construções permanentes), autorização (para obras temporárias) ou concessão (para grandes empreendimentos). A construção em leito ou margens de cursos de água sem título constitui contraordenação muito grave.",
+      "enabled": true,
+      "tags": ["consultas", "APA", "ARH", "domínio-hídrico", "recursos-hídricos", "RJUE"]
+    },
+
+    {
+      "id": "PDM-CONCES-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99) / CCP (DL 18/2008) — Requisitos do Contrato de Concessão Urbanística",
+      "description": "A concessão de urbanização ou edificação em terrenos municipais exige a celebração de contrato de concessão nos termos do RJUE e do Código dos Contratos Públicos, definindo obrigações, prazos, cauções e condições de reversão.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isConcessionProject", "operator": "==", "value": true },
+        { "field": "municipal.concessionContractSigned", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Projeto de concessão: {municipal.isConcessionProject} | Contrato assinado: {municipal.concessionContractSigned}",
+      "requiredValue": "Contrato de concessão assinado e registado (concessionContractSigned = true)",
+      "remediation": "Celebrar contrato de concessão urbanística com a câmara municipal, contendo: identificação do terreno e programa, prazo de concessão, obrigações do concessionário (obras, cedências, infraestruturas), caução (tipicamente 5% do investimento), cláusulas de reversão, fiscalização municipal e penalidades por incumprimento. O contrato deve ser registado na conservatória do registo predial e publicado em Diário da República.",
+      "enabled": true,
+      "tags": ["concessão", "contrato", "urbanização", "CCP", "RJUE"]
+    },
+    {
+      "id": "PDM-CONCES-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99) / DL 280/2007 — Condições de Ocupação de Terreno Municipal",
+      "description": "A ocupação temporária ou permanente de terrenos do domínio privado municipal para fins urbanísticos está sujeita a autorização de ocupação com condições específicas de uso, manutenção e reversão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.occupiesMunicipalLand", "operator": "==", "value": true },
+        { "field": "municipal.landOccupationPermit", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ocupa terreno municipal: {municipal.occupiesMunicipalLand} | Licença de ocupação: {municipal.landOccupationPermit}",
+      "requiredValue": "Autorização de ocupação de terreno municipal obtida (landOccupationPermit = true)",
+      "remediation": "Requerer à câmara municipal autorização de ocupação do terreno do domínio privado municipal, indicando: finalidade da ocupação, área pretendida, prazo, condições de manutenção e restituição. A autorização pode estar sujeita a taxa de ocupação anual fixada no regulamento municipal de taxas. A ocupação sem autorização constitui uso ilegítimo de domínio público/privado municipal.",
+      "enabled": true,
+      "tags": ["concessão", "terreno-municipal", "ocupação", "autorização", "RJUE"]
+    },
+    {
+      "id": "PDM-CONCES-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 22.º — Licenças de Utilização Temporária",
+      "description": "As utilizações temporárias de edifícios ou terrenos (eventos, feiras, mercados sazonais, estaleiros de obra) estão sujeitas a licença de utilização temporária com prazo definido, condições de uso e obrigação de reposição do estado anterior.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.temporaryUsePermitRequired", "operator": "==", "value": true },
+        { "field": "municipal.temporaryUsePermitObtained", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Licença de utilização temporária necessária: {municipal.temporaryUsePermitRequired} | Obtida: {municipal.temporaryUsePermitObtained}",
+      "requiredValue": "Licença de utilização temporária obtida (temporaryUsePermitObtained = true)",
+      "remediation": "Requerer licença de utilização temporária à câmara municipal, indicando: finalidade, prazo pretendido (máximo tipicamente 1 ano, renovável), condições de segurança, acessibilidade e impacto na envolvente. A licença pode impor condições de horário, nível de ruído, ocupação do espaço público e obrigação de reposição do terreno no estado original após o termo da utilização.",
+      "enabled": true,
+      "tags": ["concessão", "utilização-temporária", "licença", "prazo", "RJUE"]
+    },
+    {
+      "id": "PDM-CONCES-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / Código dos Contratos Públicos — Renovação de Concessão Urbanística",
+      "description": "A renovação de contratos de concessão urbanística está sujeita a avaliação pela câmara municipal e pode exigir a renegociação de condições, atualização de caução e verificação do cumprimento das obrigações contratuais anteriores.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.concessionRenewalDue", "operator": "==", "value": true },
+        { "field": "municipal.concessionRenewalSubmitted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Renovação de concessão devida: {municipal.concessionRenewalDue} | Pedido submetido: {municipal.concessionRenewalSubmitted}",
+      "requiredValue": "Pedido de renovação de concessão submetido (concessionRenewalSubmitted = true)",
+      "remediation": "Submeter pedido de renovação da concessão à câmara municipal com antecedência mínima de 6 meses antes do termo. O pedido deve incluir: relatório de cumprimento das obrigações contratuais, demonstração da viabilidade técnica e financeira da continuação do projeto, atualização da caução e proposta de novas condições se aplicável. A câmara pode recusar a renovação se houver incumprimento grave ou alteração do interesse público.",
+      "enabled": true,
+      "tags": ["concessão", "renovação", "contrato", "avaliação", "RJUE"]
+    },
+    {
+      "id": "PDM-CONCES-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / CCP — Extinção e Reversão de Concessão Urbanística",
+      "description": "A concessão urbanística pode extinguir-se por caducidade, rescisão, revogação por interesse público ou termo do prazo, determinando a reversão dos terrenos e infraestruturas para o município nas condições definidas no contrato.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.concessionTerminationPending", "operator": "==", "value": true },
+        { "field": "municipal.concessionReversionCompleted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Extinção de concessão pendente: {municipal.concessionTerminationPending} | Reversão concluída: {municipal.concessionReversionCompleted}",
+      "requiredValue": "Processo de reversão concluído conforme contrato (concessionReversionCompleted = true)",
+      "remediation": "Proceder à reversão dos terrenos e infraestruturas conforme as cláusulas do contrato de concessão: entregar ao município todas as infraestruturas em bom estado de conservação, apresentar telas finais atualizadas, liquidar quaisquer obrigações pendentes e cancelar o registo da concessão na conservatória. A reversão por incumprimento pode determinar a perda da caução e a responsabilidade por danos.",
+      "enabled": true,
+      "tags": ["concessão", "extinção", "reversão", "caducidade", "RJUE"]
+    },
+
+    {
+      "id": "PDM-PHTELA-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99) / Código Civil, Art. 1414.º a 1438.º-A — Título Constitutivo da Propriedade Horizontal",
+      "description": "A constituição de propriedade horizontal exige escritura pública ou documento particular autenticado que identifique cada fração autónoma, sua permilagem, uso e partes comuns, em conformidade com a licença de utilização emitida.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isHorizontalProperty", "operator": "==", "value": true },
+        { "field": "municipal.horizontalPropertyTitleRegistered", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Propriedade horizontal: {municipal.isHorizontalProperty} | Título registado: {municipal.horizontalPropertyTitleRegistered}",
+      "requiredValue": "Título constitutivo da propriedade horizontal registado na conservatória (horizontalPropertyTitleRegistered = true)",
+      "remediation": "Elaborar e registar o título constitutivo da propriedade horizontal mediante escritura pública ou documento particular autenticado. O título deve incluir: identificação de cada fração autónoma (designação por letra), uso autorizado (habitação, comércio, serviços), permilagem, descrição das partes comuns e regulamento do condomínio. O título deve ser conforme com a licença de utilização — qualquer divergência (n.º de frações, usos) impede o registo.",
+      "enabled": true,
+      "tags": ["propriedade-horizontal", "título-constitutivo", "frações", "permilagem", "RJUE"]
+    },
+    {
+      "id": "PDM-PHTELA-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 128.º-A — Tolerância no Levantamento de Tela Final (As-Built)",
+      "description": "O levantamento de tela final (as-built) deve refletir fielmente a construção executada. As tolerâncias admissíveis entre o projeto aprovado e a obra executada são definidas no RJUE e nos regulamentos técnicos, tipicamente ±5 cm em dimensões lineares e ±2% em áreas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.asBuiltSurveyCompleted", "operator": "==", "value": true },
+        { "field": "municipal.asBuiltWithinTolerance", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Tela final dentro das tolerâncias: {municipal.asBuiltWithinTolerance}",
+      "requiredValue": "Tela final dentro das tolerâncias admissíveis (asBuiltWithinTolerance = true)",
+      "remediation": "Rever o levantamento de tela final e identificar os desvios relativamente ao projeto aprovado. Desvios dentro das tolerâncias regulamentares (±5 cm em dimensões lineares, ±2% em áreas, ±0,5° em ângulos) são admissíveis. Desvios superiores exigem projeto de alterações e novo licenciamento. Se os desvios afetam a conformidade com o PDM (cércea, afastamentos, índices), é necessário regularizar antes da emissão da licença de utilização.",
+      "enabled": true,
+      "tags": ["tela-final", "as-built", "tolerâncias", "levantamento", "RJUE"]
+    },
+    {
+      "id": "PDM-PHTELA-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99), Art. 128.º — Certificação da Tela Final por Técnico Responsável",
+      "description": "A tela final (projeto as-built) deve ser certificada pelo diretor de fiscalização da obra ou pelo técnico responsável pelo levantamento, atestando a conformidade da construção executada com o projeto aprovado, dentro das tolerâncias regulamentares.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.asBuiltCertified", "operator": "==", "value": false },
+        { "field": "municipal.worksCompleted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Tela final certificada: {municipal.asBuiltCertified}",
+      "requiredValue": "Tela final certificada pelo técnico responsável (asBuiltCertified = true)",
+      "remediation": "O diretor de fiscalização da obra ou o técnico responsável pelo levantamento topográfico/arquitetónico deve certificar a tela final (as-built), emitindo termo de responsabilidade que atesta: a conformidade geral com o projeto aprovado, os desvios identificados e a sua admissibilidade, e a exatidão do levantamento. A tela final certificada é elemento obrigatório para o pedido de licença de utilização (Art. 63.º do RJUE).",
+      "enabled": true,
+      "tags": ["tela-final", "certificação", "técnico-responsável", "conformidade", "RJUE"]
+    },
+    {
+      "id": "PDM-PHTELA-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE (DL 555/99) / Código do Registo Predial — Atualização do Registo Predial após Obra",
+      "description": "Após a conclusão da obra e obtenção da licença de utilização, o proprietário deve atualizar a descrição predial na conservatória do registo predial, refletindo a nova realidade física (área construída, n.º de pisos, frações).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.propertyRegistryUpdated", "operator": "==", "value": false },
+        { "field": "municipal.occupancyPermitObtained", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Registo predial atualizado: {municipal.propertyRegistryUpdated}",
+      "requiredValue": "Descrição predial atualizada na conservatória (propertyRegistryUpdated = true)",
+      "remediation": "Requerer à conservatória do registo predial a atualização da descrição do prédio, apresentando: licença de utilização, tela final certificada, caderneta predial atualizada nas finanças e, no caso de propriedade horizontal, o título constitutivo. A não atualização do registo pode impedir a venda das frações, a celebração de escrituras e a obtenção de crédito bancário com garantia hipotecária.",
+      "enabled": true,
+      "tags": ["registo-predial", "atualização", "conservatória", "descrição-predial", "RJUE"]
+    },
+    {
+      "id": "PDM-PHTELA-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / Código Civil, Art. 1430.º — Requisitos para Constituição do Condomínio",
+      "description": "Após a constituição da propriedade horizontal e a venda de frações, deve ser constituída a administração do condomínio, incluindo a assembleia de condóminos, a eleição do administrador e a aprovação do orçamento de despesas comuns.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isHorizontalProperty", "operator": "==", "value": true },
+        { "field": "municipal.condominiumFormed", "operator": "==", "value": false },
+        { "field": "municipal.fractionsPartlySold", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Condomínio constituído: {municipal.condominiumFormed}",
+      "requiredValue": "Condomínio constituído com administração e regulamento aprovado (condominiumFormed = true)",
+      "remediation": "Convocar assembleia de condóminos para constituição formal do condomínio, nos termos do Art. 1430.º e seguintes do Código Civil: eleger administrador, aprovar o regulamento do condomínio, fixar o orçamento de despesas comuns e a quota mensal de cada fração (proporcional à permilagem). Contratar seguro obrigatório de incêndio do edifício (Art. 1429.º CC). O promotor/construtor atua como administrador provisório até à constituição formal.",
+      "enabled": true,
+      "tags": ["condomínio", "administração", "assembleia", "regulamento", "RJUE"]
+    },
+
+    {
+      "id": "PDM-FINAN-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / EBF (Estatuto dos Benefícios Fiscais), Art. 71.º — Incentivos Fiscais à Reabilitação Urbana",
+      "description": "As obras de reabilitação em edifícios localizados em Áreas de Reabilitação Urbana (ARU) podem beneficiar de incentivos fiscais: IVA reduzido (6%), isenção de IMI por 3-5 anos, isenção de IMT na aquisição e dedução à coleta de IRS.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isInARU", "operator": "==", "value": true },
+        { "field": "municipal.rehabilitationTaxBenefitsClaimed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Edifício em ARU: {municipal.isInARU} | Benefícios fiscais requeridos: {municipal.rehabilitationTaxBenefitsClaimed}",
+      "requiredValue": "Benefícios fiscais de reabilitação urbana requeridos (rehabilitationTaxBenefitsClaimed = true)",
+      "remediation": "Requerer os benefícios fiscais previstos no Art. 71.º do EBF para obras de reabilitação em ARU: (1) IVA à taxa reduzida de 6% nas empreitadas de reabilitação; (2) isenção de IMI por 3 anos (prorrogável por mais 2); (3) isenção de IMT na primeira transmissão após reabilitação; (4) dedução à coleta de IRS de 30% dos encargos com reabilitação (até €500). Obter previamente certificação da câmara municipal de que a obra constitui ação de reabilitação.",
+      "enabled": true,
+      "tags": ["incentivos", "reabilitação", "ARU", "fiscal", "IMI", "IMT", "RJUE"]
+    },
+    {
+      "id": "PDM-FINAN-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / DL 118/2013 (SCE) — Subsídios para Eficiência Energética",
+      "description": "As obras que melhorem o desempenho energético do edifício (isolamento, janelas, sistemas renováveis) podem beneficiar de programas de apoio financeiro nacionais e municipais, incluindo o Fundo Ambiental e programas de eficiência energética.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.energyEfficiencyUpgradePlanned", "operator": "==", "value": true },
+        { "field": "municipal.energyEfficiencySubsidyApplied", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Melhoria de eficiência energética planeada: {municipal.energyEfficiencyUpgradePlanned} | Candidatura a subsídio: {municipal.energyEfficiencySubsidyApplied}",
+      "requiredValue": "Candidatura a subsídio de eficiência energética submetida (energyEfficiencySubsidyApplied = true)",
+      "remediation": "Candidatar-se a programas de apoio à eficiência energética: (1) Programa de Apoio a Edifícios Mais Sustentáveis (PAEMS) — comparticipação até 85% em isolamento térmico, janelas eficientes e sistemas de energia renovável; (2) Fundo Ambiental — apoios a bombas de calor, painéis solares e sistemas de AQS; (3) Programas municipais específicos de reabilitação energética. As candidaturas devem ser submetidas antes do início das obras, com certificado energético prévio (classe D ou inferior).",
+      "enabled": true,
+      "tags": ["incentivos", "eficiência-energética", "subsídios", "Fundo-Ambiental", "RJUE"]
+    },
+    {
+      "id": "PDM-FINAN-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / DL 107/2001 / DL 138/2009 — Financiamento para Restauro de Património",
+      "description": "As obras de conservação e restauro de imóveis classificados ou de interesse municipal podem candidatar-se a financiamento público (DRCN/DGPC, fundos europeus, mecenato) para custear os trabalhos de conservação do património edificado.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isClassifiedHeritage", "operator": "==", "value": true },
+        { "field": "municipal.heritageRestorationFundingApplied", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Imóvel classificado: {municipal.isClassifiedHeritage} | Financiamento requerido: {municipal.heritageRestorationFundingApplied}",
+      "requiredValue": "Candidatura a financiamento de restauro patrimonial submetida (heritageRestorationFundingApplied = true)",
+      "remediation": "Candidatar-se a programas de financiamento para conservação e restauro patrimonial: (1) DGPC/DRC — apoios diretos a imóveis classificados de interesse nacional ou público; (2) Programas europeus (FEDER, Interreg) para património cultural; (3) Mecenato cultural (Lei do Mecenato) — benefício fiscal para entidades que financiem restauro de património; (4) Programas municipais de conservação do edificado histórico. O projeto de restauro deve ser aprovado pela DGPC/DRC competente.",
+      "enabled": true,
+      "tags": ["incentivos", "restauro", "património", "financiamento", "DGPC", "RJUE"]
+    },
+    {
+      "id": "PDM-FINAN-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / Lei 81/2014 (NRAU) — Benefícios para Habitação a Custos Controlados",
+      "description": "Os promotores que destinem frações a habitação a custos controlados (renda acessível, renda apoiada) podem beneficiar de redução de taxas urbanísticas, majoração de índices de construção e isenções fiscais conforme o PDM e programas municipais de habitação.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.affordableHousingPlanned", "operator": "==", "value": true },
+        { "field": "municipal.affordableHousingBenefitsClaimed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Habitação acessível planeada: {municipal.affordableHousingPlanned} | Benefícios requeridos: {municipal.affordableHousingBenefitsClaimed}",
+      "requiredValue": "Benefícios para habitação a custos controlados requeridos (affordableHousingBenefitsClaimed = true)",
+      "remediation": "Requerer os benefícios previstos no PDM e nos programas municipais de habitação para promoção de habitação a custos controlados: (1) redução ou isenção de taxas urbanísticas municipais; (2) majoração do índice de utilização em até 20% para frações de renda acessível; (3) isenção de IMI durante 5-10 anos; (4) acesso a programas de financiamento do IHRU (Instituto da Habitação e da Reabilitação Urbana). Celebrar protocolo com a câmara municipal definindo o número de frações, rendas máximas e período de afetação.",
+      "enabled": true,
+      "tags": ["incentivos", "habitação-acessível", "renda-acessível", "taxas", "IHRU", "RJUE"]
+    },
+    {
+      "id": "PDM-FINAN-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "RJUE / DL 307/2009 (RJRU) — Vantagens em Área de Regeneração Urbana (ARU)",
+      "description": "As operações urbanísticas em Áreas de Regeneração Urbana (ARU) delimitadas pelo município beneficiam de procedimentos simplificados de licenciamento, redução de taxas urbanísticas e acesso prioritário a programas de financiamento público.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isInURRegenerationArea", "operator": "==", "value": true },
+        { "field": "municipal.regenerationAreaBenefitsClaimed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Em Área de Regeneração Urbana: {municipal.isInURRegenerationArea} | Benefícios requeridos: {municipal.regenerationAreaBenefitsClaimed}",
+      "requiredValue": "Benefícios de Área de Regeneração Urbana requeridos (regenerationAreaBenefitsClaimed = true)",
+      "remediation": "Requerer os benefícios previstos no RJRU (DL 307/2009) e na Operação de Reabilitação Urbana (ORU) aprovada para a ARU: (1) procedimento simplificado de controlo prévio; (2) redução de taxas urbanísticas em até 80%; (3) IVA à taxa reduzida de 6%; (4) isenção de IMI e IMT; (5) acesso prioritário a programas IFRRU 2020/PT 2030 para financiamento de reabilitação urbana. Verificar na câmara municipal os benefícios específicos previstos na ORU e os requisitos de elegibilidade.",
+      "enabled": true,
+      "tags": ["incentivos", "regeneração-urbana", "ARU", "ORU", "RJRU", "RJUE"]
     }
   ]
 }

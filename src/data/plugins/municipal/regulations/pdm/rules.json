@@ -1515,6 +1515,422 @@
       "remediation": "Prever junto ao edifício uma área de manobra para viaturas de emergência conforme o RT-SCIE. Para edifícios com altura > 9 m, a via de acesso deve ter uma faixa operacional com largura ≥ 7,00 m junto à fachada acessível, para estacionamento de autoescada. Incluir rotunda ou placa de inversão de marcha em vias sem saída (raio interior ≥ 11 m). A área deve suportar veículos de 26 toneladas.",
       "enabled": true,
       "tags": ["incêndio", "área-manobra", "emergência", "autoescada", "SCIE", "PDM"]
+    },
+
+    {
+      "id": "PDM-RUIDO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGR (DL 9/2007) — Classificação de Zona Acústica",
+      "description": "O terreno deve estar classificado quanto à zona acústica (zona sensível ou zona mista) na planta de zonamento acústico do PDM. A classificação determina os valores-limite de exposição ao ruído ambiente aplicáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.acousticZoneClassification", "operator": "not_exists", "value": null },
+        { "field": "municipal.isInUrbanArea", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Classificação acústica: {municipal.acousticZoneClassification}",
+      "requiredValue": "Zona acústica classificada no PDM (sensível ou mista)",
+      "remediation": "Consultar a planta de zonamento acústico do PDM para determinar a classificação da zona acústica do terreno. A classificação como zona sensível (habitação, escolas, hospitais) ou zona mista (comércio, serviços) determina os valores-limite de ruído aplicáveis nos termos do DL 9/2007 (Regulamento Geral do Ruído). A ausência de classificação pode impedir o licenciamento.",
+      "enabled": true,
+      "tags": ["ruído", "zonamento-acústico", "zona-sensível", "zona-mista", "PDM"]
+    },
+    {
+      "id": "PDM-RUIDO-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGR (DL 9/2007), Art. 11.º — Valor Limite LAeq Diurno e Noturno",
+      "description": "O nível sonoro contínuo equivalente ponderado A (LAeq) no exterior do edifício não pode exceder os valores-limite fixados: 55 dB(A) diurno e 45 dB(A) noturno em zonas sensíveis; 65 dB(A) diurno e 55 dB(A) noturno em zonas mistas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.laeqDay", "operator": "exists", "value": null },
+        { "field": "municipal.laeqDayMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "LAeq diurno: {municipal.laeqDay} dB(A) | LAeq noturno: {municipal.laeqNight} dB(A)",
+      "requiredValue": "LAeq diurno ≤ {municipal.laeqDayMax} dB(A) e LAeq noturno ≤ {municipal.laeqNightMax} dB(A)",
+      "remediation": "Caso os valores-limite de ruído sejam excedidos, elaborar mapa de ruído e estudo de impacte acústico demonstrando que as medidas de mitigação propostas (barreiras acústicas, isolamento de fachada, reorientação de edifícios) garantem o cumprimento dos limites do DL 9/2007. Em zonas sensíveis os limites são 55/45 dB(A) dia/noite; em zonas mistas 65/55 dB(A).",
+      "enabled": true,
+      "tags": ["ruído", "LAeq", "valores-limite", "diurno", "noturno", "PDM"]
+    },
+    {
+      "id": "PDM-RUIDO-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGR (DL 9/2007) — Barreiras Acústicas em Vias Rodoviárias",
+      "description": "Nos terrenos adjacentes a vias rodoviárias com tráfego intenso, o PDM pode exigir a instalação de barreiras acústicas ou a adoção de soluções de atenuação do ruído de tráfego para proteção das zonas habitacionais.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.adjacentToHighTrafficRoad", "operator": "==", "value": true },
+        { "field": "municipal.acousticBarrierRequired", "operator": "==", "value": true },
+        { "field": "municipal.acousticBarrierProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Via de tráfego intenso adjacente: {municipal.adjacentToHighTrafficRoad} | Barreira acústica prevista: {municipal.acousticBarrierProvided}",
+      "requiredValue": "Barreira acústica ou medida de atenuação de ruído de tráfego prevista (acousticBarrierProvided = true)",
+      "remediation": "Prever barreira acústica ou solução equivalente de atenuação do ruído de tráfego rodoviário. As barreiras devem ter altura e comprimento suficientes para garantir uma atenuação mínima de 10 dB(A). Alternativas incluem: taludes ajardinados, muros com material absorvente, ou reforço do isolamento acústico da fachada exposta ao ruído (Rw ≥ 33 dB conforme RRAE).",
+      "enabled": true,
+      "tags": ["ruído", "barreira-acústica", "tráfego", "vias-rodoviárias", "PDM"]
+    },
+    {
+      "id": "PDM-RUIDO-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGR (DL 9/2007), Art. 8.º — Zona Tampão para Recetores Sensíveis ao Ruído",
+      "description": "Os equipamentos sensíveis ao ruído (escolas, hospitais, lares de idosos) devem estar afastados de fontes de ruído significativas. O PDM pode definir faixas de proteção acústica entre zonas industriais/comerciais e zonas sensíveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isSensitiveNoiseReceptor", "operator": "==", "value": true },
+        { "field": "municipal.distanceToNoiseSource", "operator": "exists", "value": null },
+        { "field": "municipal.noiseBufferMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Distância à fonte de ruído: {municipal.distanceToNoiseSource} m",
+      "requiredValue": "Distância à fonte de ruído ≥ {municipal.noiseBufferMin} m",
+      "remediation": "Recuar o equipamento sensível ao ruído para fora da faixa de proteção acústica definida no PDM, ou implementar medidas de mitigação que garantam o cumprimento dos valores-limite no interior do edifício. Para escolas e hospitais, o RRAE exige índices de isolamento acústico reforçados (D2m,nT,w ≥ 33 dB para fachadas).",
+      "enabled": true,
+      "tags": ["ruído", "recetores-sensíveis", "zona-tampão", "escolas", "hospitais", "PDM"]
+    },
+    {
+      "id": "PDM-RUIDO-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGR (DL 9/2007), Art. 15.º — Limites de Ruído de Construção",
+      "description": "As atividades ruidosas temporárias (obras de construção) estão sujeitas a limites de ruído e horários de funcionamento definidos pelo regulamento municipal de ruído. Tipicamente, as obras são permitidas nos dias úteis entre as 08h00 e as 20h00.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.constructionNoiseRestrictions", "operator": "exists", "value": null },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Restrições de ruído de construção definidas: {municipal.constructionNoiseRestrictions}",
+      "requiredValue": "Cumprimento do horário e limites de ruído de obra conforme regulamento municipal",
+      "remediation": "Cumprir os horários de funcionamento da obra definidos no regulamento municipal de ruído (tipicamente dias úteis 08h00-20h00, sábados 08h00-13h00, proibido domingos e feriados). Para atividades especialmente ruidosas (demolição, cravação de estacas, britadeira), pode ser necessária licença especial de ruído. Requerer à câmara municipal autorização para atividades ruidosas temporárias nos termos do Art. 15.º do DL 9/2007.",
+      "enabled": true,
+      "tags": ["ruído", "construção", "horários", "atividades-ruidosas", "PDM"]
+    },
+
+    {
+      "id": "PDM-TURISMO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJET (DL 39/2008) — Densidade Turística Máxima",
+      "description": "Nas zonas turísticas delimitadas no PDM, a densidade de alojamento turístico (n.º de camas ou unidades de alojamento por hectare) não pode exceder o limite definido para a zona, de forma a evitar a sobrecarga de infraestruturas e a preservar a qualidade ambiental.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInTourismZone", "operator": "==", "value": true },
+        { "field": "municipal.tourismDensity", "operator": "exists", "value": null },
+        { "field": "municipal.tourismDensityMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Densidade turística proposta: {municipal.tourismDensity} camas/ha",
+      "requiredValue": "Densidade turística ≤ {municipal.tourismDensityMax} camas/ha",
+      "remediation": "Reduzir o número de unidades de alojamento ou camas turísticas para cumprir a densidade máxima definida no PDM para a zona turística. Considerar a redistribuição do programa em vários lotes ou a redução do número de pisos. A densidade turística inclui todas as tipologias de alojamento (hotel, aparthotel, turismo rural, AL).",
+      "enabled": true,
+      "tags": ["turismo", "densidade", "alojamento", "zona-turística", "PDM"]
+    },
+    {
+      "id": "PDM-TURISMO-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJET (DL 39/2008) — Cércea Máxima em Zonas Turísticas Costeiras",
+      "description": "Nas zonas turísticas costeiras, o PDM pode fixar alturas máximas mais restritivas para preservar a paisagem litoral e evitar o impacto visual de edifícios de grande porte na orla costeira.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInCoastalTourismZone", "operator": "==", "value": true },
+        { "field": "municipal.proposedHeight", "operator": "exists", "value": null },
+        { "field": "municipal.coastalMaxHeight", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Altura proposta: {municipal.proposedHeight} m",
+      "requiredValue": "Altura ≤ {municipal.coastalMaxHeight} m (cércea máxima em zona costeira turística)",
+      "remediation": "Reduzir a altura do empreendimento turístico para cumprir a cércea máxima definida no PDM para zonas turísticas costeiras. Privilegiar soluções de baixa volumetria integradas na topografia natural. A cércea em zonas costeiras é tipicamente mais restritiva (ex.: 2-3 pisos) para minimizar o impacto visual na paisagem litoral.",
+      "enabled": true,
+      "tags": ["turismo", "cércea", "costeira", "paisagem", "litoral", "PDM"]
+    },
+    {
+      "id": "PDM-TURISMO-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / POOC — Acesso Público à Praia e Faixa Costeira",
+      "description": "Os empreendimentos turísticos localizados na faixa costeira devem garantir o acesso público livre à praia e à faixa de domínio público marítimo. O PDM e o POOC definem corredores de acesso público obrigatórios.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInCoastalZone", "operator": "==", "value": true },
+        { "field": "municipal.publicBeachAccessProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Acesso público à praia garantido: {municipal.publicBeachAccessProvided}",
+      "requiredValue": "Acesso público à praia e faixa costeira garantido (publicBeachAccessProvided = true)",
+      "remediation": "Prever corredores de acesso público à praia com largura mínima definida no POOC (tipicamente ≥ 3 m). O empreendimento turístico não pode obstruir o acesso livre ao domínio público marítimo (faixa de 50 m a partir da linha de máxima preia-mar). Incluir sinalética direcional e garantir que os acessos são permanentes e não condicionados ao funcionamento do empreendimento.",
+      "enabled": true,
+      "tags": ["turismo", "acesso-praia", "POOC", "domínio-público", "costeira", "PDM"]
+    },
+    {
+      "id": "PDM-TURISMO-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Preservação da Paisagem Cultural em Zonas Turísticas",
+      "description": "Nas zonas turísticas com valor paisagístico ou cultural classificado no PDM, as novas construções devem respeitar a tipologia arquitetónica, materiais e cromatismo tradicionais da paisagem envolvente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInCulturalLandscapeZone", "operator": "==", "value": true },
+        { "field": "municipal.culturalLandscapeAssessment", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Avaliação de integração paisagística realizada: {municipal.culturalLandscapeAssessment}",
+      "requiredValue": "Estudo de integração na paisagem cultural aprovado (culturalLandscapeAssessment = true)",
+      "remediation": "Elaborar estudo de integração paisagística demonstrando a compatibilidade do projeto com a paisagem cultural envolvente. O estudo deve incluir fotomontagens, análise de visibilidade, paleta de materiais e cores, volumetria comparativa com o edificado existente. Privilegiar materiais locais (pedra, madeira, telha cerâmica), cores neutras e volumetria fragmentada que respeite a escala do conjunto edificado tradicional.",
+      "enabled": true,
+      "tags": ["turismo", "paisagem-cultural", "integração", "tipologia", "PDM"]
+    },
+    {
+      "id": "PDM-TURISMO-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJUE — Limitação de Estruturas Temporárias em Zonas Turísticas",
+      "description": "A instalação de estruturas temporárias (barracas, quiosques, esplanadas, tendas) em zonas turísticas está condicionada a autorização municipal e a limites de área, período de permanência e impacto visual definidos no PDM ou regulamento municipal.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isInTourismZone", "operator": "==", "value": true },
+        { "field": "municipal.temporaryStructurePlanned", "operator": "==", "value": true },
+        { "field": "municipal.temporaryStructureAuthorized", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Estrutura temporária autorizada: {municipal.temporaryStructureAuthorized}",
+      "requiredValue": "Autorização municipal para estrutura temporária obtida (temporaryStructureAuthorized = true)",
+      "remediation": "Requerer autorização à câmara municipal para a instalação de estruturas temporárias em zona turística, indicando: localização, área, período de permanência, materiais e aspeto visual. As estruturas temporárias devem ser amovíveis, não podem afetar o espaço público ou o acesso à praia, e devem respeitar os limites de área e localização definidos no PDM ou regulamento municipal de ocupação do espaço público.",
+      "enabled": true,
+      "tags": ["turismo", "estruturas-temporárias", "quiosques", "esplanadas", "PDM"]
+    },
+
+    {
+      "id": "PDM-INDUST-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Afastamento de Zonas Industriais a Zonas Residenciais",
+      "description": "As instalações industriais devem respeitar o afastamento mínimo a zonas residenciais definido no PDM, de forma a proteger a saúde e o bem-estar dos residentes dos impactos da atividade industrial (ruído, emissões, tráfego pesado).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInIndustrialZone", "operator": "==", "value": true },
+        { "field": "municipal.distanceToResidentialZone", "operator": "exists", "value": null },
+        { "field": "municipal.industrialResidentialSetbackMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Distância à zona residencial: {municipal.distanceToResidentialZone} m",
+      "requiredValue": "Distância à zona residencial ≥ {municipal.industrialResidentialSetbackMin} m",
+      "remediation": "Recuar a implantação industrial para cumprir o afastamento mínimo à zona residencial definido no PDM. O afastamento visa proteger os residentes de ruído, emissões atmosféricas, odores e tráfego pesado. Em zonas industriais de tipo 1 (indústria pesada), o afastamento é tipicamente ≥ 200 m; para zonas industriais de tipo 2 (indústria ligeira/armazéns), ≥ 50 m.",
+      "enabled": true,
+      "tags": ["industrial", "afastamento", "residencial", "proteção", "PDM"]
+    },
+    {
+      "id": "PDM-INDUST-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 127/2013 (Regime PCIP) — Faixa Tampão de Poluição Industrial",
+      "description": "As instalações industriais abrangidas pelo regime de Prevenção e Controlo Integrados da Poluição (PCIP) devem dispor de uma faixa tampão (buffer zone) em torno do perímetro industrial, com largura definida no PDM ou na licença ambiental.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isPCIPInstallation", "operator": "==", "value": true },
+        { "field": "municipal.pollutionBufferZone", "operator": "exists", "value": null },
+        { "field": "municipal.pollutionBufferZoneMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Faixa tampão de poluição: {municipal.pollutionBufferZone} m",
+      "requiredValue": "Faixa tampão ≥ {municipal.pollutionBufferZoneMin} m conforme PDM/licença ambiental",
+      "remediation": "Assegurar a manutenção da faixa tampão de poluição em torno da instalação industrial, livre de ocupação residencial ou de equipamentos sensíveis. A largura da faixa é definida em função da classe de perigosidade da instalação e dos poluentes emitidos. Consultar a APA e a CCDR para validação da faixa tampão no âmbito do licenciamento ambiental.",
+      "enabled": true,
+      "tags": ["industrial", "poluição", "faixa-tampão", "PCIP", "licença-ambiental", "PDM"]
+    },
+    {
+      "id": "PDM-INDUST-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Acesso Rodoviário Industrial Adequado",
+      "description": "As instalações industriais devem dispor de acesso rodoviário com perfil adequado à circulação de veículos pesados, incluindo largura mínima de faixa de rodagem, capacidade de carga e ligação à rede viária principal, conforme definido no PDM.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInIndustrialZone", "operator": "==", "value": true },
+        { "field": "municipal.industrialRoadAccessAdequate", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Acesso rodoviário industrial adequado: {municipal.industrialRoadAccessAdequate}",
+      "requiredValue": "Acesso rodoviário com perfil para veículos pesados (industrialRoadAccessAdequate = true)",
+      "remediation": "Prever acesso rodoviário com perfil adequado para circulação de veículos pesados: faixa de rodagem ≥ 7,00 m (2 x 3,50 m), curvas com raio interior ≥ 12 m, capacidade de carga para veículos de 40 toneladas, e ligação direta à rede viária principal sem atravessar zonas residenciais. Incluir zona de cargas/descargas dentro do lote industrial.",
+      "enabled": true,
+      "tags": ["industrial", "acesso-rodoviário", "veículos-pesados", "rede-viária", "PDM"]
+    },
+    {
+      "id": "PDM-INDUST-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 236/98 — Tratamento de Efluentes Industriais",
+      "description": "As instalações industriais com produção de efluentes líquidos devem dispor de sistema de tratamento de efluentes (ETAR industrial) que garanta o cumprimento dos valores-limite de emissão antes da descarga na rede pública ou no meio hídrico.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInIndustrialZone", "operator": "==", "value": true },
+        { "field": "municipal.producesIndustrialEffluent", "operator": "==", "value": true },
+        { "field": "municipal.effluentTreatmentProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Tratamento de efluentes previsto: {municipal.effluentTreatmentProvided}",
+      "requiredValue": "Sistema de tratamento de efluentes industriais implementado (effluentTreatmentProvided = true)",
+      "remediation": "Projetar e instalar sistema de tratamento de efluentes industriais (ETAR) que garanta o cumprimento dos valores-limite de emissão do DL 236/98 (Anexo XVIII) antes da descarga. Obter licença de descarga da APA/ARH. Se a descarga for na rede pública de saneamento, obter autorização da entidade gestora e cumprir o regulamento de descarga de águas residuais industriais.",
+      "enabled": true,
+      "tags": ["industrial", "efluentes", "ETAR", "tratamento", "DL-236-98", "PDM"]
+    },
+    {
+      "id": "PDM-INDUST-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 150/2015 (Regime Seveso) — Distância de Segurança para Armazenagem de Substâncias Perigosas",
+      "description": "As instalações de armazenagem de substâncias perigosas (regime Seveso) devem respeitar distâncias de segurança a zonas habitadas, equipamentos públicos e vias de comunicação, conforme definido no PDM e no estudo de segurança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hazardousStoragePlanned", "operator": "==", "value": true },
+        { "field": "municipal.hazardousSafetyDistance", "operator": "exists", "value": null },
+        { "field": "municipal.hazardousSafetyDistanceMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Distância de segurança: {municipal.hazardousSafetyDistance} m",
+      "requiredValue": "Distância de segurança ≥ {municipal.hazardousSafetyDistanceMin} m (conforme estudo Seveso)",
+      "remediation": "Assegurar que a distância entre a instalação de armazenagem de substâncias perigosas e zonas habitadas, equipamentos públicos e vias de comunicação cumpre os valores definidos no estudo de segurança e no PDM. O DL 150/2015 transpõe a Diretiva Seveso III e exige a elaboração de relatório de segurança, plano de emergência interno e externo, e avaliação das consequências de acidentes graves. A APA é a entidade competente para a aprovação do estudo.",
+      "enabled": true,
+      "tags": ["industrial", "substâncias-perigosas", "Seveso", "distância-segurança", "PDM"]
+    },
+
+    {
+      "id": "PDM-MOBILID-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGEU / Plano de Mobilidade — Estacionamento de Bicicletas Obrigatório",
+      "description": "Os novos edifícios devem prever estacionamento para bicicletas em número proporcional à área bruta de construção ou ao número de fogos/frações, conforme definido no PDM ou regulamento municipal de mobilidade sustentável.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.bicycleParkingRequired", "operator": "==", "value": true },
+        { "field": "municipal.bicycleParkingProvided", "operator": "exists", "value": null },
+        { "field": "municipal.bicycleParkingMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Lugares de bicicleta previstos: {municipal.bicycleParkingProvided}",
+      "requiredValue": "Estacionamento de bicicletas ≥ {municipal.bicycleParkingMin} lugares",
+      "remediation": "Prever estacionamento para bicicletas coberto e seguro conforme o rácio definido no PDM (tipicamente 1 lugar por fogo em habitação, 1 lugar por 200 m² em comércio/serviços). O estacionamento deve incluir suportes tipo 'U invertido', ser coberto, iluminado e localizado junto às entradas do edifício. Para edifícios de habitação, prever espaço em cave ou área comum com acesso direto ao exterior.",
+      "enabled": true,
+      "tags": ["mobilidade", "bicicletas", "estacionamento", "sustentável", "PDM"]
+    },
+    {
+      "id": "PDM-MOBILID-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 39/2010 — Carregamento de Veículos Elétricos por Lugar de Estacionamento",
+      "description": "Os novos edifícios com estacionamento coberto devem prever infraestrutura para carregamento de veículos elétricos numa percentagem mínima dos lugares de estacionamento, conforme o PDM ou regulamento municipal.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.evChargingRequired", "operator": "==", "value": true },
+        { "field": "municipal.evChargingPointsProvided", "operator": "exists", "value": null },
+        { "field": "municipal.evChargingPointsMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Pontos de carregamento EV previstos: {municipal.evChargingPointsProvided}",
+      "requiredValue": "Pontos de carregamento EV ≥ {municipal.evChargingPointsMin}",
+      "remediation": "Instalar infraestrutura de carregamento de veículos elétricos (tubagem, cablagem, quadro elétrico) na percentagem mínima de lugares exigida pelo PDM (tipicamente 20% dos lugares com ponto de carregamento instalado e 100% com pré-instalação). Para edifícios de habitação nova, a Diretiva EPBD (transposta) exige pré-instalação em todos os lugares. Prever potência elétrica adequada no quadro geral do edifício.",
+      "enabled": true,
+      "tags": ["mobilidade", "veículos-elétricos", "carregamento", "estacionamento", "PDM"]
+    },
+    {
+      "id": "PDM-MOBILID-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Plano de Mobilidade Municipal — Zonas de Prioridade Pedonal",
+      "description": "Nas zonas de prioridade pedonal delimitadas no PDM, os novos edifícios devem garantir a continuidade dos percursos pedonais, a supressão de barreiras arquitetónicas e a criação de espaços de fruição pública ao nível do rés-do-chão.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isInPedestrianPriorityZone", "operator": "==", "value": true },
+        { "field": "municipal.pedestrianContinuityProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Continuidade pedonal garantida: {municipal.pedestrianContinuityProvided}",
+      "requiredValue": "Continuidade dos percursos pedonais e acessibilidade garantidas (pedestrianContinuityProvided = true)",
+      "remediation": "Garantir a continuidade dos percursos pedonais ao nível do rés-do-chão, sem barreiras arquitetónicas, com pavimento acessível e largura mínima de passeio de 1,50 m (DL 163/2006). Em zonas de prioridade pedonal, privilegiar a criação de galerias, arcadas ou recuos que ampliem o espaço público ao nível do solo. Os acessos a garagens não devem interromper o percurso pedonal contínuo.",
+      "enabled": true,
+      "tags": ["mobilidade", "pedonal", "acessibilidade", "percursos", "PDM"]
+    },
+    {
+      "id": "PDM-MOBILID-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Plano de Mobilidade — Proximidade a Transportes Públicos",
+      "description": "O PDM pode condicionar a densidade de construção à proximidade a paragens de transporte público, privilegiando densidades mais elevadas junto a nós de transporte (TOD — Transit-Oriented Development) e limitando a construção em zonas sem cobertura de transporte público.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.distanceToPublicTransport", "operator": "exists", "value": null },
+        { "field": "municipal.publicTransportProximityMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Distância ao transporte público mais próximo: {municipal.distanceToPublicTransport} m",
+      "requiredValue": "Distância ao transporte público ≤ {municipal.publicTransportProximityMax} m",
+      "remediation": "Verificar a proximidade do terreno a paragens de transporte público coletivo. O PDM pode exigir que novos empreendimentos com mais de X fogos estejam a menos de 500 m de paragem de transporte público. Caso a distância exceda o limite, prever medidas compensatórias: contribuição para extensão da rede de transportes, serviço de shuttle, ou redução do número de fogos para a densidade admissível fora da área de influência do transporte público.",
+      "enabled": true,
+      "tags": ["mobilidade", "transporte-público", "proximidade", "TOD", "densidade", "PDM"]
+    },
+    {
+      "id": "PDM-MOBILID-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Zonas Livres de Automóveis (Car-Free)",
+      "description": "O PDM pode delimitar zonas livres de automóveis (car-free zones) nos centros históricos ou áreas pedonais, onde o estacionamento automóvel no interior dos lotes é proibido ou fortemente limitado, devendo o estacionamento ser resolvido em parques periféricos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.isInCarFreeZone", "operator": "==", "value": true },
+        { "field": "municipal.onSiteParkingPlanned", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Zona car-free: {municipal.isInCarFreeZone} | Estacionamento no lote previsto: {municipal.onSiteParkingPlanned}",
+      "requiredValue": "Estacionamento automóvel resolvido em parque periférico (sem estacionamento no lote em zona car-free)",
+      "remediation": "Em zonas delimitadas como car-free no PDM, o estacionamento automóvel deve ser resolvido fora do lote, em parques de estacionamento periféricos ou subterrâneos designados pela câmara municipal. A dotação de estacionamento obrigatória pode ser cumprida mediante aquisição de lugares em parque municipal. Prever apenas acesso para cargas/descargas e emergência, em horário restrito.",
+      "enabled": true,
+      "tags": ["mobilidade", "car-free", "estacionamento", "centro-histórico", "PDM"]
+    },
+
+    {
+      "id": "PDM-CLIMA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EMAAC — Avaliação de Risco de Cheia Obrigatória",
+      "description": "Os terrenos localizados em zonas de risco de cheia identificadas no PDM ou na EMAAC (Estratégia Municipal de Adaptação às Alterações Climáticas) devem ser objeto de avaliação de risco de cheia antes do licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInFloodRiskZone", "operator": "==", "value": true },
+        { "field": "municipal.floodRiskAssessmentCompleted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Zona de risco de cheia: {municipal.isInFloodRiskZone} | Avaliação de risco realizada: {municipal.floodRiskAssessmentCompleted}",
+      "requiredValue": "Avaliação de risco de cheia concluída e aprovada (floodRiskAssessmentCompleted = true)",
+      "remediation": "Elaborar avaliação de risco de cheia conforme a Diretiva Cheias (DL 115/2010) e a carta de zonas inundáveis do PDM. O estudo deve incluir: modelação hidrológica e hidráulica, identificação do período de retorno (T=20, 50, 100 anos), cotas de cheia, propostas de mitigação (cotas mínimas de implantação, impermeabilização, bacias de retenção). Em zonas de cheia T≤100 anos, a construção pode ser proibida ou condicionada.",
+      "enabled": true,
+      "tags": ["clima", "cheia", "risco", "EMAAC", "adaptação", "PDM"]
+    },
+    {
+      "id": "PDM-CLIMA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EMAAC — Mitigação da Ilha de Calor Urbana",
+      "description": "O PDM pode exigir medidas de mitigação da ilha de calor urbana em novos empreendimentos, incluindo coberturas verdes, materiais de elevada refletância solar (cool roofs), e sombreamento natural por arborização.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInHeatIslandZone", "operator": "==", "value": true },
+        { "field": "municipal.heatMitigationMeasures", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Medidas de mitigação da ilha de calor previstas: {municipal.heatMitigationMeasures}",
+      "requiredValue": "Medidas de mitigação da ilha de calor urbana implementadas (heatMitigationMeasures = true)",
+      "remediation": "Implementar medidas de mitigação da ilha de calor urbana: coberturas verdes (extensivas ou intensivas) em ≥ 50% da área de cobertura; utilização de materiais com índice de refletância solar (SRI) ≥ 29 em coberturas e ≥ 33 em pavimentos; plantação de árvores de folha caduca para sombreamento dos espaços exteriores e fachadas orientadas a sul/poente; minimização de superfícies impermeáveis escuras.",
+      "enabled": true,
+      "tags": ["clima", "ilha-de-calor", "coberturas-verdes", "refletância", "PDM"]
+    },
+    {
+      "id": "PDM-CLIMA-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 226-A/2007 — Retenção de Águas Pluviais no Lote",
+      "description": "O PDM pode exigir que os novos empreendimentos retenham no lote um volume mínimo de águas pluviais correspondente ao incremento de escoamento superficial gerado pela impermeabilização, através de bacias de retenção, poços absorventes ou cisternas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.stormwaterRetentionRequired", "operator": "==", "value": true },
+        { "field": "municipal.stormwaterRetentionProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Retenção de águas pluviais prevista: {municipal.stormwaterRetentionProvided}",
+      "requiredValue": "Sistema de retenção de águas pluviais implementado (stormwaterRetentionProvided = true)",
+      "remediation": "Projetar sistema de retenção de águas pluviais (SUDS — Sustainable Urban Drainage Systems) no lote: bacias de retenção, trincheiras de infiltração, poços absorventes, cisternas para reutilização, ou pavimentos permeáveis. O volume de retenção deve compensar o incremento de escoamento causado pela impermeabilização (tipicamente calcular para chuvada com T=10 anos e duração de 15 min). Obter parecer da entidade gestora de saneamento.",
+      "enabled": true,
+      "tags": ["clima", "águas-pluviais", "retenção", "SUDS", "escoamento", "PDM"]
+    },
+    {
+      "id": "PDM-CLIMA-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EMAAC — Rácio Mínimo de Pavimento Permeável",
+      "description": "O PDM pode fixar um rácio mínimo de pavimento permeável nos espaços exteriores dos novos empreendimentos, para além do índice de permeabilidade do lote, visando a infiltração de águas pluviais e a recarga de aquíferos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.permeablePavementRatio", "operator": "exists", "value": null },
+        { "field": "municipal.permeablePavementRatioMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Rácio de pavimento permeável: {municipal.permeablePavementRatio} %",
+      "requiredValue": "Rácio de pavimento permeável ≥ {municipal.permeablePavementRatioMin} %",
+      "remediation": "Aumentar a percentagem de pavimento permeável nos espaços exteriores do empreendimento: utilizar pavimentos permeáveis em grelha (relva-betão), blocos drenantes, saibro estabilizado, gravilha ou deck sobre leito drenante. O pavimento permeável dos estacionamentos exteriores e acessos pode contar para o rácio. Evitar o uso generalizado de betão betuminoso ou lajes impermeáveis em áreas exteriores.",
+      "enabled": true,
+      "tags": ["clima", "pavimento-permeável", "infiltração", "drenagem", "PDM"]
+    },
+    {
+      "id": "PDM-CLIMA-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EMAAC — Canópia Arbórea Urbana Mínima",
+      "description": "O PDM pode fixar um objetivo mínimo de cobertura de canópia arbórea (tree canopy cover) nos novos empreendimentos, para promoção do conforto térmico, qualidade do ar, biodiversidade e resiliência climática.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.treeCanopyCoverage", "operator": "exists", "value": null },
+        { "field": "municipal.treeCanopyCoverageMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Cobertura de canópia arbórea: {municipal.treeCanopyCoverage} %",
+      "requiredValue": "Cobertura de canópia arbórea ≥ {municipal.treeCanopyCoverageMin} % da área do lote",
+      "remediation": "Plantar árvores em quantidade e porte suficientes para atingir a cobertura mínima de canópia arbórea definida no PDM (tipicamente 15-25% da área do lote). Privilegiar espécies autóctones e de folha caduca para sombreamento estival. Para estacionamentos exteriores, prever 1 árvore por cada 4 lugares. A canópia é medida pela projeção horizontal da copa na fase adulta (15-20 anos após plantação). Incluir plano de manutenção das árvores.",
+      "enabled": true,
+      "tags": ["clima", "canópia", "arborização", "biodiversidade", "conforto-térmico", "PDM"]
     }
   ]
 }
