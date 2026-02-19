@@ -7484,6 +7484,1634 @@
         "manutenção",
         "EN 81-20"
       ]
+    },
+    {
+      "id": "ELEV-ESCROL-01",
+      "regulationId": "en-81-20",
+      "article": "EN 115-1 §5.3.2.1 — Largura Mínima dos Degraus de Escada Rolante",
+      "description": "A largura útil dos degraus da escada rolante é de {elevator.escalatorStepWidthMm} mm. Para utilização pública com dois sentidos de fluxo, a largura mínima deve ser de 1000 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.escalatorStepWidthMm",
+          "operator": "<",
+          "value": 1000
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "escalator"
+        },
+        {
+          "field": "elevator.escalatorPublicUse",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Largura dos degraus: {elevator.escalatorStepWidthMm} mm",
+      "requiredValue": ">= 1000 mm para escadas rolantes de utilização pública",
+      "remediation": "Substituir ou adaptar degraus da escada rolante: (1) para utilização pública, largura mínima de 1000 mm (permite passagem de dois utilizadores); (2) para espaços com restrição, mínimo admissível de 600 mm (uso unidirecional); (3) verificar conformidade com EN 115-1 §5.3.2.1; (4) medir largura útil entre balaústres excluindo espaço de segurança lateral de 25 mm por lado.",
+      "enabled": true,
+      "tags": [
+        "escadas-rolantes",
+        "largura",
+        "degraus",
+        "EN 115-1"
+      ]
+    },
+    {
+      "id": "ELEV-ESCROL-02",
+      "regulationId": "en-81-20",
+      "article": "EN 115-1 §5.3.2.3 — Largura Máxima dos Degraus de Escada Rolante",
+      "description": "A largura dos degraus da escada rolante é de {elevator.escalatorStepWidthMm} mm. A largura máxima não deve exceder 1100 mm conforme EN 115-1.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.escalatorStepWidthMm",
+          "operator": ">",
+          "value": 1100
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "escalator"
+        }
+      ],
+      "currentValueTemplate": "Largura dos degraus: {elevator.escalatorStepWidthMm} mm",
+      "requiredValue": "<= 1100 mm conforme EN 115-1",
+      "remediation": "Verificar largura dos degraus: (1) largura máxima normalizada de 1100 mm; (2) larguras normalizadas: 600 mm, 800 mm e 1000 mm; (3) se excedida, avaliar substituição por degraus normalizados; (4) verificar compatibilidade com balaústres e guias laterais. Conforme EN 115-1 §5.3.2.3.",
+      "enabled": true,
+      "tags": [
+        "escadas-rolantes",
+        "largura",
+        "máximo",
+        "degraus",
+        "EN 115-1"
+      ]
+    },
+    {
+      "id": "ELEV-ESCROL-03",
+      "regulationId": "en-81-20",
+      "article": "EN 115-1 §5.3.2.2 — Profundidade do Degrau de Escada Rolante",
+      "description": "A profundidade útil do degrau da escada rolante é de {elevator.escalatorStepDepthMm} mm. A profundidade mínima deve ser de 380 mm para garantir apoio seguro do pé.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.escalatorStepDepthMm",
+          "operator": "<",
+          "value": 380
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "escalator"
+        }
+      ],
+      "currentValueTemplate": "Profundidade do degrau: {elevator.escalatorStepDepthMm} mm",
+      "requiredValue": ">= 380 mm conforme EN 115-1",
+      "remediation": "Verificar profundidade dos degraus: (1) profundidade mínima de 380 mm medida na superfície de apoio; (2) ranhuras antiderrapantes com profundidade de 5–7 mm; (3) degraus desgastados com profundidade inferior devem ser substituídos; (4) verificar alinhamento com placa de pente. Conforme EN 115-1 §5.3.2.2.",
+      "enabled": true,
+      "tags": [
+        "escadas-rolantes",
+        "profundidade",
+        "degraus",
+        "segurança",
+        "EN 115-1"
+      ]
+    },
+    {
+      "id": "ELEV-TAPROL-01",
+      "regulationId": "en-81-20",
+      "article": "EN 115-1 §5.2.4.1 — Velocidade Máxima do Tapete Rolante Horizontal",
+      "description": "A velocidade do tapete rolante é de {elevator.movingWalkwaySpeedMs} m/s. Para tapetes rolantes horizontais (inclinação 0°), a velocidade máxima admissível é de 0,75 m/s.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.movingWalkwaySpeedMs",
+          "operator": ">",
+          "value": 0.75
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "moving_walkway"
+        },
+        {
+          "field": "elevator.movingWalkwayInclinationDeg",
+          "operator": "<=",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Velocidade do tapete rolante: {elevator.movingWalkwaySpeedMs} m/s",
+      "requiredValue": "<= 0,75 m/s para tapetes rolantes horizontais",
+      "remediation": "Reduzir velocidade do tapete rolante: (1) ajustar variador de frequência para velocidade <= 0,75 m/s; (2) para tapetes inclinados (até 6°), velocidade máxima de 0,50 m/s; (3) para inclinações entre 6° e 12°, velocidade máxima de 0,50 m/s; (4) instalar sensor de velocidade com paragem automática se velocidade excedida. Conforme EN 115-1 §5.2.4.1.",
+      "enabled": true,
+      "tags": [
+        "tapete-rolante",
+        "velocidade",
+        "limite",
+        "EN 115-1"
+      ]
+    },
+    {
+      "id": "ELEV-TAPROL-02",
+      "regulationId": "en-81-20",
+      "article": "EN 115-1 §5.2.4.2 — Velocidade Máxima do Tapete Rolante Inclinado",
+      "description": "A velocidade do tapete rolante inclinado é de {elevator.movingWalkwaySpeedMs} m/s com inclinação de {elevator.movingWalkwayInclinationDeg}°. Para inclinações superiores a 6°, a velocidade máxima é de 0,50 m/s.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.movingWalkwaySpeedMs",
+          "operator": ">",
+          "value": 0.50
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "moving_walkway"
+        },
+        {
+          "field": "elevator.movingWalkwayInclinationDeg",
+          "operator": ">",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "Velocidade: {elevator.movingWalkwaySpeedMs} m/s, Inclinação: {elevator.movingWalkwayInclinationDeg}°",
+      "requiredValue": "<= 0,50 m/s para tapetes rolantes com inclinação > 6°",
+      "remediation": "Reduzir velocidade do tapete rolante inclinado: (1) ajustar variador de frequência para <= 0,50 m/s; (2) verificar que inclinação máxima não excede 12°; (3) instalar dispositivo de monitorização contínua de velocidade; (4) paragem automática se velocidade excedida em mais de 20%. Conforme EN 115-1 §5.2.4.2.",
+      "enabled": true,
+      "tags": [
+        "tapete-rolante",
+        "velocidade",
+        "inclinado",
+        "EN 115-1"
+      ]
+    },
+    {
+      "id": "ELEV-TAPROL-03",
+      "regulationId": "dl-320-2002",
+      "article": "EN 115-1 §5.2.4.3 — Largura Mínima do Tapete Rolante",
+      "description": "A largura do tapete rolante é de {elevator.movingWalkwayWidthMm} mm. A largura mínima para utilização pública deve ser de 600 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.movingWalkwayWidthMm",
+          "operator": "<",
+          "value": 600
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "moving_walkway"
+        }
+      ],
+      "currentValueTemplate": "Largura do tapete rolante: {elevator.movingWalkwayWidthMm} mm",
+      "requiredValue": ">= 600 mm para utilização pública",
+      "remediation": "Verificar largura do tapete rolante: (1) largura mínima de 600 mm para passagem unidirecional; (2) recomendado 1000 mm para espaços comerciais e aeroportos; (3) medir entre balaústres descontando 25 mm de cada lado. Conforme EN 115-1 §5.2.4.3.",
+      "enabled": true,
+      "tags": [
+        "tapete-rolante",
+        "largura",
+        "mínimo",
+        "EN 115-1"
+      ]
+    },
+    {
+      "id": "ELEV-PLAT-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-41 §5.3.1 — Dimensões Mínimas da Plataforma Elevatória",
+      "description": "A plataforma elevatória tem dimensões de {elevator.platformLiftWidthMm} mm × {elevator.platformLiftDepthMm} mm. As dimensões mínimas para acessibilidade de cadeira de rodas são 900 mm × 1400 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.platformLiftWidthMm",
+          "operator": "<",
+          "value": 900
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "platform_lift"
+        }
+      ],
+      "currentValueTemplate": "Largura da plataforma: {elevator.platformLiftWidthMm} mm",
+      "requiredValue": ">= 900 mm de largura para plataforma elevatória acessível",
+      "remediation": "Adequar dimensões da plataforma elevatória: (1) largura mínima de 900 mm (permite acesso de cadeira de rodas padrão); (2) profundidade mínima de 1400 mm; (3) para plataformas com porta oposta, profundidade recomendada de 1500 mm; (4) área livre de obstáculos no patamar mínima de 1500 mm × 1500 mm. Conforme EN 81-41 §5.3.1 e DL 163/2006.",
+      "enabled": true,
+      "tags": [
+        "plataforma-elevatória",
+        "dimensões",
+        "acessibilidade",
+        "EN 81-41"
+      ]
+    },
+    {
+      "id": "ELEV-PLAT-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-41 §5.2.3 — Velocidade Máxima da Plataforma Elevatória",
+      "description": "A velocidade da plataforma elevatória é de {elevator.platformLiftSpeedMs} m/s. A velocidade máxima para plataformas elevatórias verticais com caixa é de 0,15 m/s.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.platformLiftSpeedMs",
+          "operator": ">",
+          "value": 0.15
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "platform_lift"
+        }
+      ],
+      "currentValueTemplate": "Velocidade da plataforma: {elevator.platformLiftSpeedMs} m/s",
+      "requiredValue": "<= 0,15 m/s para plataformas elevatórias verticais",
+      "remediation": "Reduzir velocidade da plataforma elevatória: (1) ajustar válvula de fluxo hidráulico para <= 0,15 m/s; (2) instalar limitador de velocidade mecânico; (3) verificar velocidade com tacómetro em carga nominal e em vazio; (4) ensaiar dispositivo anti-queda. Conforme EN 81-41 §5.2.3.",
+      "enabled": true,
+      "tags": [
+        "plataforma-elevatória",
+        "velocidade",
+        "limite",
+        "EN 81-41"
+      ]
+    },
+    {
+      "id": "ELEV-PLAT-03",
+      "regulationId": "dl-320-2002",
+      "article": "EN 81-41 §5.4.2 — Carga Nominal da Plataforma Elevatória",
+      "description": "A capacidade de carga da plataforma elevatória é de {elevator.platformLiftCapacityKg} kg. A carga mínima para utilizadores em cadeira de rodas deve ser de 250 kg.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.platformLiftCapacityKg",
+          "operator": "<",
+          "value": 250
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "platform_lift"
+        }
+      ],
+      "currentValueTemplate": "Capacidade de carga: {elevator.platformLiftCapacityKg} kg",
+      "requiredValue": ">= 250 kg para plataformas elevatórias acessíveis",
+      "remediation": "Adequar capacidade de carga da plataforma: (1) dimensionar para mínimo de 250 kg (utilizador em cadeira de rodas + acompanhante); (2) instalar detetor de sobrecarga com bloqueio de arranque; (3) sinalizar claramente a carga máxima na plataforma; (4) ensaiar com 125% da carga nominal conforme EN 81-41 §5.4.2.",
+      "enabled": true,
+      "tags": [
+        "plataforma-elevatória",
+        "carga",
+        "capacidade",
+        "EN 81-41"
+      ]
+    },
+    {
+      "id": "ELEV-CADESC-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-40 §5.3.1 — Largura Mínima da Escada para Instalação de Cadeira Elevatória",
+      "description": "A largura livre da escada após instalação da cadeira elevatória é de {elevator.stairliftClearWidthMm} mm. Deve manter-se uma largura livre mínima de 750 mm para passagem quando a cadeira está rebatida.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.stairliftClearWidthMm",
+          "operator": "<",
+          "value": 750
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "stairlift"
+        }
+      ],
+      "currentValueTemplate": "Largura livre da escada: {elevator.stairliftClearWidthMm} mm",
+      "requiredValue": ">= 750 mm de largura livre com cadeira rebatida",
+      "remediation": "Verificar compatibilidade da cadeira elevatória com a escada: (1) medir largura total da escada entre paredes; (2) descontar largura do carril e cadeira rebatida (tipicamente 300–400 mm); (3) largura livre residual >= 750 mm; (4) se insuficiente, considerar carril em parede oposta ou modelo de cadeira mais compacto; (5) verificar regulamento municipal de edificação. Conforme EN 81-40 §5.3.1.",
+      "enabled": true,
+      "tags": [
+        "cadeira-elevatória",
+        "stairlift",
+        "largura",
+        "escada",
+        "EN 81-40"
+      ]
+    },
+    {
+      "id": "ELEV-CADESC-02",
+      "regulationId": "dl-320-2002",
+      "article": "EN 81-40 §5.4.1 — Carga Nominal da Cadeira Elevatória",
+      "description": "A capacidade de carga da cadeira elevatória é de {elevator.stairliftCapacityKg} kg. A carga mínima deve ser de 125 kg para garantir utilização por pessoa adulta.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.stairliftCapacityKg",
+          "operator": "<",
+          "value": 125
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "stairlift"
+        }
+      ],
+      "currentValueTemplate": "Capacidade de carga: {elevator.stairliftCapacityKg} kg",
+      "requiredValue": ">= 125 kg conforme EN 81-40",
+      "remediation": "Verificar capacidade da cadeira elevatória: (1) carga mínima de 125 kg conforme EN 81-40; (2) para utilizadores de maior peso, considerar modelos de 150 kg ou 200 kg; (3) ensaiar com 125% da carga nominal; (4) instalar dispositivo de sobrecarga que impeça arranque. Conforme EN 81-40 §5.4.1.",
+      "enabled": true,
+      "tags": [
+        "cadeira-elevatória",
+        "stairlift",
+        "carga",
+        "EN 81-40"
+      ]
+    },
+    {
+      "id": "ELEV-CADESC-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-40 §5.2.2 — Velocidade Máxima da Cadeira Elevatória",
+      "description": "A velocidade da cadeira elevatória é de {elevator.stairliftSpeedMs} m/s. A velocidade máxima admissível é de 0,15 m/s.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.stairliftSpeedMs",
+          "operator": ">",
+          "value": 0.15
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "stairlift"
+        }
+      ],
+      "currentValueTemplate": "Velocidade da cadeira elevatória: {elevator.stairliftSpeedMs} m/s",
+      "requiredValue": "<= 0,15 m/s conforme EN 81-40",
+      "remediation": "Ajustar velocidade da cadeira elevatória: (1) regular motor/variador para velocidade <= 0,15 m/s; (2) verificar velocidade com carga nominal e em vazio; (3) instalar limitador mecânico de velocidade; (4) ensaiar paragem de emergência a velocidade máxima. Conforme EN 81-40 §5.2.2.",
+      "enabled": true,
+      "tags": [
+        "cadeira-elevatória",
+        "stairlift",
+        "velocidade",
+        "EN 81-40"
+      ]
+    },
+    {
+      "id": "ELEV-MCARGAS-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.5.2 — Especificações de Portas de Monta-cargas",
+      "description": "A porta do monta-cargas tem altura de abertura de {elevator.goodsLiftDoorHeightMm} mm. Para monta-cargas de utilização industrial, a altura mínima da porta deve ser de 2000 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.goodsLiftDoorHeightMm",
+          "operator": "<",
+          "value": 2000
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "goods_lift"
+        }
+      ],
+      "currentValueTemplate": "Altura da porta do monta-cargas: {elevator.goodsLiftDoorHeightMm} mm",
+      "requiredValue": ">= 2000 mm de altura para monta-cargas industriais",
+      "remediation": "Adequar portas do monta-cargas: (1) altura mínima de 2000 mm para permitir carga com empilhador ou porta-paletes; (2) largura mínima de 900 mm (preferencialmente 1200 mm para paletes EUR); (3) portas de patamar com resistência ao fogo conforme EN 81-58; (4) proteção contra impacto de empilhadores. Conforme EN 81-20 §5.3.5.2.",
+      "enabled": true,
+      "tags": [
+        "monta-cargas",
+        "portas",
+        "altura",
+        "industrial",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-MCARGAS-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.5.3 — Largura de Portas de Monta-cargas",
+      "description": "A largura da porta do monta-cargas é de {elevator.goodsLiftDoorWidthMm} mm. Para monta-cargas que recebem paletes EUR (800×1200 mm), a largura mínima da porta deve ser de 1200 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.goodsLiftDoorWidthMm",
+          "operator": "<",
+          "value": 1200
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "goods_lift"
+        },
+        {
+          "field": "elevator.goodsLiftPalletAccess",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Largura da porta: {elevator.goodsLiftDoorWidthMm} mm",
+      "requiredValue": ">= 1200 mm para acesso de paletes EUR",
+      "remediation": "Adequar largura da porta do monta-cargas: (1) para paletes EUR, largura mínima de 1200 mm; (2) para empilhadores, considerar 1500 mm; (3) portas de correr vertical para maximizar abertura; (4) proteção das ombreiras contra impacto. Conforme EN 81-20 §5.3.5.3.",
+      "enabled": true,
+      "tags": [
+        "monta-cargas",
+        "portas",
+        "largura",
+        "paletes",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-MCARGAS-03",
+      "regulationId": "dl-320-2002",
+      "article": "EN 81-20 §5.3.9 — Resistência ao Impacto de Portas de Monta-cargas",
+      "description": "As portas do monta-cargas devem ter resistência ao impacto adequada para utilização com equipamento de movimentação de cargas (empilhadores, porta-paletes).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.goodsLiftDoorImpactResistant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "goods_lift"
+        }
+      ],
+      "currentValueTemplate": "Resistência ao impacto das portas: {elevator.goodsLiftDoorImpactResistant}",
+      "requiredValue": "Portas com reforço contra impacto de equipamento de movimentação",
+      "remediation": "Reforçar portas do monta-cargas: (1) instalar proteção inferior em aço (bumper de 300 mm de altura); (2) reforçar painéis inferiores das portas com chapa de 3 mm; (3) instalar guias laterais de empilhador no patamar; (4) considerar portas de correr vertical em aço para máxima resistência. Conforme EN 81-20 §5.3.9.",
+      "enabled": true,
+      "tags": [
+        "monta-cargas",
+        "portas",
+        "impacto",
+        "resistência",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-SERVALI-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 3.º / Reg. (CE) 852/2004 — Higiene do Monta-pratos",
+      "description": "O monta-pratos (service lift) para transporte de alimentos deve ter superfícies interiores lisas, laváveis e resistentes à corrosão, conforme regulamentos de higiene alimentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.serviceLiftHygienicSurfaces",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "service_lift"
+        },
+        {
+          "field": "elevator.serviceLiftFoodTransport",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Superfícies higiénicas: {elevator.serviceLiftHygienicSurfaces}",
+      "requiredValue": "Superfícies interiores em aço inoxidável ou material lavável e não poroso",
+      "remediation": "Adequar monta-pratos para transporte de alimentos: (1) revestir interior com aço inoxidável AISI 304 ou 316; (2) cantos arredondados (raio >= 25 mm) para facilitar limpeza; (3) superfícies sem juntas ou fendas onde possam acumular-se resíduos; (4) protocolo de limpeza e desinfeção diária documentado. Conforme Reg. (CE) 852/2004 Anexo II Cap. V.",
+      "enabled": true,
+      "tags": [
+        "monta-pratos",
+        "service-lift",
+        "higiene",
+        "alimentar",
+        "HACCP"
+      ]
+    },
+    {
+      "id": "ELEV-SERVALI-02",
+      "regulationId": "dl-320-2002",
+      "article": "Reg. (CE) 852/2004 Anexo II Cap. V — Temperatura do Monta-pratos",
+      "description": "O monta-pratos para alimentos quentes/frios deve garantir manutenção da cadeia de temperatura durante o transporte. Tempo máximo de percurso recomendado: 60 segundos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.serviceLiftTransitTimeSec",
+          "operator": ">",
+          "value": 60
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "service_lift"
+        },
+        {
+          "field": "elevator.serviceLiftFoodTransport",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Tempo de trânsito: {elevator.serviceLiftTransitTimeSec} s",
+      "requiredValue": "<= 60 s para manter cadeia de temperatura dos alimentos",
+      "remediation": "Otimizar tempo de trânsito do monta-pratos: (1) verificar velocidade do equipamento; (2) priorizar chamadas quando em modo de serviço alimentar; (3) considerar isolamento térmico do compartimento; (4) monitorizar temperatura com sonda no interior. Conforme Reg. (CE) 852/2004.",
+      "enabled": true,
+      "tags": [
+        "monta-pratos",
+        "service-lift",
+        "temperatura",
+        "alimentos",
+        "HACCP"
+      ]
+    },
+    {
+      "id": "ELEV-SERVALI-03",
+      "regulationId": "dl-320-2002",
+      "article": "Reg. (CE) 852/2004 — Separação de Alimentos e Resíduos no Monta-pratos",
+      "description": "O monta-pratos utilizado para transporte de alimentos e resíduos deve dispor de protocolo de separação temporal ou espacial para evitar contaminação cruzada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.serviceLiftSeparationProtocol",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "service_lift"
+        },
+        {
+          "field": "elevator.serviceLiftFoodTransport",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Protocolo de separação: {elevator.serviceLiftSeparationProtocol}",
+      "requiredValue": "Protocolo de separação temporal ou espacial implementado",
+      "remediation": "Implementar protocolo de separação no monta-pratos: (1) definir horários distintos para alimentos limpos e resíduos; (2) limpeza e desinfeção entre utilizações de diferente natureza; (3) sinalização de ciclo ativo (alimentos/resíduos); (4) registo documental dos ciclos de utilização para auditoria HACCP. Conforme Reg. (CE) 852/2004 Anexo II.",
+      "enabled": true,
+      "tags": [
+        "monta-pratos",
+        "service-lift",
+        "separação",
+        "contaminação",
+        "HACCP"
+      ]
+    },
+    {
+      "id": "ELEV-SHUTTLE-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.2 — Capacidade do Elevador Shuttle de Estacionamento",
+      "description": "O elevador shuttle de parque de estacionamento tem capacidade de {elevator.shuttleCapacityPersons} pessoas. Para parques com mais de 200 lugares, a capacidade mínima recomendada é de 21 pessoas (1600 kg).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.shuttleCapacityPersons",
+          "operator": "<",
+          "value": 21
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "car_park_shuttle"
+        },
+        {
+          "field": "elevator.parkingSpaces",
+          "operator": ">",
+          "value": 200
+        }
+      ],
+      "currentValueTemplate": "Capacidade: {elevator.shuttleCapacityPersons} pessoas",
+      "requiredValue": ">= 21 pessoas (1600 kg) para parques > 200 lugares",
+      "remediation": "Dimensionar elevador shuttle de estacionamento: (1) calcular tráfego de ponta (tipicamente 10% dos lugares em 15 minutos); (2) para > 200 lugares, mínimo de 1600 kg / 21 pessoas; (3) considerar dois elevadores para redundância; (4) velocidade recomendada >= 1,6 m/s para percursos > 4 pisos. Conforme EN 81-20 §5.4.2.",
+      "enabled": true,
+      "tags": [
+        "estacionamento",
+        "shuttle",
+        "capacidade",
+        "tráfego",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-SHUTTLE-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.5 — Largura de Porta do Elevador Shuttle",
+      "description": "A porta do elevador shuttle tem largura de {elevator.shuttleDoorWidthMm} mm. Para elevadores de estacionamento com tráfego intenso, a largura mínima recomendada é de 1100 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.shuttleDoorWidthMm",
+          "operator": "<",
+          "value": 1100
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "car_park_shuttle"
+        }
+      ],
+      "currentValueTemplate": "Largura da porta: {elevator.shuttleDoorWidthMm} mm",
+      "requiredValue": ">= 1100 mm para elevador shuttle de estacionamento",
+      "remediation": "Adequar portas do elevador shuttle: (1) largura mínima de 1100 mm para fluxo bidirecional; (2) considerar portas de abertura central para reduzir tempo de abertura; (3) tempo de abertura/fecho <= 3,5 s; (4) proteção por cortina de luz em toda a altura. Conforme EN 81-20 §5.3.5.",
+      "enabled": true,
+      "tags": [
+        "estacionamento",
+        "shuttle",
+        "portas",
+        "largura",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-PANOR-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.1.2 — Resistência Estrutural do Vidro Panorâmico",
+      "description": "O elevador panorâmico utiliza vidro com classificação {elevator.panoramicGlassType}. O vidro deve ser laminado de segurança conforme EN 12150 e EN 14449, com espessura mínima calculada para a área do painel.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.panoramicGlassType",
+          "operator": "not_in",
+          "value": [
+            "laminated_safety",
+            "laminated_tempered"
+          ]
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "panoramic"
+        }
+      ],
+      "currentValueTemplate": "Tipo de vidro: {elevator.panoramicGlassType}",
+      "requiredValue": "Vidro laminado de segurança (laminated_safety ou laminated_tempered)",
+      "remediation": "Substituir vidro do elevador panorâmico: (1) vidro laminado de segurança conforme EN 12150 e EN 14449; (2) espessura mínima de 8+8 mm (vidro+PVB+vidro) para painéis até 2 m²; (3) ensaio de impacto com pêndulo (EN 12600); (4) película de retenção para evitar queda de fragmentos; (5) certificação do vidro por laboratório acreditado. Conforme EN 81-20 §5.2.1.2.",
+      "enabled": true,
+      "tags": [
+        "panorâmico",
+        "vidro",
+        "segurança",
+        "estrutural",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-PANOR-02",
+      "regulationId": "en-81-50",
+      "article": "EN 81-20 §5.2.1.3 / EN 81-50 — Carga de Vento no Elevador Panorâmico Exterior",
+      "description": "O elevador panorâmico exterior deve ser calculado para resistir a cargas de vento conforme EN 1991-1-4, considerando a pressão dinâmica para a zona e altitude do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.panoramicWindLoadCalculated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "panoramic"
+        },
+        {
+          "field": "elevator.panoramicExterior",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cálculo de carga de vento: {elevator.panoramicWindLoadCalculated}",
+      "requiredValue": "Cálculo de carga de vento conforme EN 1991-1-4 realizado",
+      "remediation": "Realizar cálculo estrutural para carga de vento: (1) determinar pressão dinâmica de referência para a zona (Portugal continental: zonas A e B conforme NA.4.2); (2) calcular coeficiente de pressão para a geometria da caixa; (3) verificar estrutura metálica de suporte da caixa; (4) verificar ancoragens ao edifício; (5) ensaio de oscilação se altura > 30 m. Conforme EN 81-50 e EN 1991-1-4.",
+      "enabled": true,
+      "tags": [
+        "panorâmico",
+        "vento",
+        "estrutural",
+        "exterior",
+        "EN 81-50"
+      ]
+    },
+    {
+      "id": "ELEV-PANOR-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.5.2 — Proteção Solar e Térmica do Elevador Panorâmico",
+      "description": "O elevador panorâmico com exposição solar deve dispor de ventilação forçada ou ar condicionado para manter temperatura interior abaixo de 40 °C.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.panoramicThermalProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "panoramic"
+        },
+        {
+          "field": "elevator.panoramicExterior",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção térmica: {elevator.panoramicThermalProtection}",
+      "requiredValue": "Ventilação forçada ou ar condicionado para temperatura < 40 °C",
+      "remediation": "Instalar proteção térmica no elevador panorâmico: (1) ventilação forçada com caudal mínimo de 40 l/s; (2) vidro com controlo solar (fator solar g <= 0,40); (3) para exposição sul/oeste intensa, considerar ar condicionado de cabina; (4) sensor de temperatura com alarme a 40 °C; (5) película de proteção UV nos vidros. Conforme EN 81-20 §5.2.5.2.",
+      "enabled": true,
+      "tags": [
+        "panorâmico",
+        "temperatura",
+        "ventilação",
+        "proteção-solar",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-MODSEG-01",
+      "regulationId": "en-81-50",
+      "article": "EN 81-80 §5.1 — Avaliação de Risco Pré-Modernização",
+      "description": "A modernização do ascensor requer avaliação de risco conforme EN 81-80, com classificação de prioridade para cada item de não conformidade identificado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.modernizationRiskAssessment",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isModernization",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Avaliação de risco EN 81-80: {elevator.modernizationRiskAssessment}",
+      "requiredValue": "Avaliação de risco com classificação de prioridade concluída",
+      "remediation": "Realizar avaliação de risco conforme EN 81-80: (1) inspeção por entidade acreditada pelo IPAC; (2) avaliação de cada componente conforme lista de verificação Anexo A; (3) classificação em prioridades 1 (urgente), 2 (necessário a curto prazo) e 3 (recomendado); (4) relatório detalhado com estimativa de custos; (5) plano de ação calendarizado. Conforme EN 81-80 §5.1.",
+      "enabled": true,
+      "tags": [
+        "modernização",
+        "avaliação-risco",
+        "EN 81-80",
+        "prioridades"
+      ]
+    },
+    {
+      "id": "ELEV-MODSEG-02",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º — Notificação de Modernização ao IMPIC",
+      "description": "A modernização do ascensor deve ser notificada ao IMPIC com antecedência mínima de 30 dias, incluindo descrição das alterações e declaração de conformidade do instalador.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.modernizationIMPICNotified",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isModernization",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Notificação IMPIC: {elevator.modernizationIMPICNotified}",
+      "requiredValue": "Notificação ao IMPIC submetida >= 30 dias antes do início",
+      "remediation": "Submeter notificação de modernização ao IMPIC: (1) descrição detalhada das alterações previstas; (2) declaração CE de conformidade do instalador; (3) parecer da EMA (Entidade de Manutenção de Ascensores); (4) prazo previsto de execução; (5) designação do técnico responsável pela obra. Conforme DL 320/2002 Art. 4.º.",
+      "enabled": true,
+      "tags": [
+        "modernização",
+        "IMPIC",
+        "notificação",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-MODSEG-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-80 §5.8 — Inspeção Pós-Modernização",
+      "description": "Após a conclusão da modernização, o ascensor deve ser submetido a inspeção por entidade inspetora acreditada antes de ser recolocado ao serviço.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.postModernizationInspection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isModernization",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.modernizationComplete",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Inspeção pós-modernização: {elevator.postModernizationInspection}",
+      "requiredValue": "Inspeção por entidade acreditada aprovada",
+      "remediation": "Agendar inspeção pós-modernização: (1) contactar entidade inspetora acreditada pelo IPAC; (2) disponibilizar dossiê técnico atualizado com as alterações realizadas; (3) ensaios de carga (125% da carga nominal); (4) ensaio de todos os dispositivos de segurança; (5) emissão de certificado de conformidade antes de reentrada em serviço. Conforme EN 81-80 §5.8.",
+      "enabled": true,
+      "tags": [
+        "modernização",
+        "inspeção",
+        "pós-obra",
+        "certificação",
+        "EN 81-80"
+      ]
+    },
+    {
+      "id": "ELEV-REMOTO-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 5.º / EN 81-28 — Sistema de Monitorização Remota",
+      "description": "O ascensor deve dispor de sistema de monitorização remota que transmita alarmes de avaria, aprisionamento e anomalias ao centro de controlo da EMA em tempo real.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.remoteMonitoring",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "numberOfFloors",
+          "operator": ">=",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "Monitorização remota: {elevator.remoteMonitoring}",
+      "requiredValue": "Sistema de monitorização remota ligado ao centro da EMA",
+      "remediation": "Instalar sistema de monitorização remota: (1) unidade de comunicação IoT com ligação GSM/IP ao centro de controlo; (2) transmissão de alarmes de aprisionamento em < 30 s; (3) monitorização de estado de portas, movimento e posição; (4) registo de eventos com timestamp para análise; (5) bateria de reserva >= 1 hora. Conforme EN 81-28 e DL 320/2002.",
+      "enabled": true,
+      "tags": [
+        "monitorização",
+        "remota",
+        "IoT",
+        "alarmes",
+        "EN 81-28"
+      ]
+    },
+    {
+      "id": "ELEV-REMOTO-02",
+      "regulationId": "dl-320-2002",
+      "article": "EN 81-28 §5.3 — Tempo de Resposta da Monitorização Remota",
+      "description": "O sistema de monitorização remota deve transmitir alarmes de aprisionamento ao centro de controlo dentro de {elevator.remoteAlarmResponseSec} segundos. O tempo máximo admissível é de 30 segundos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.remoteAlarmResponseSec",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "elevator.remoteMonitoring",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Tempo de resposta do alarme remoto: {elevator.remoteAlarmResponseSec} s",
+      "requiredValue": "<= 30 s para transmissão de alarme de aprisionamento",
+      "remediation": "Otimizar tempo de resposta da monitorização: (1) verificar cobertura GSM na casa de máquinas e fosso; (2) considerar ligação IP redundante; (3) testar latência de comunicação mensalmente; (4) instalar antena externa se sinal GSM insuficiente; (5) manter contrato de manutenção do sistema de monitorização. Conforme EN 81-28 §5.3.",
+      "enabled": true,
+      "tags": [
+        "monitorização",
+        "remota",
+        "alarme",
+        "tempo-resposta",
+        "EN 81-28"
+      ]
+    },
+    {
+      "id": "ELEV-PREDMNT-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 5.º / ISO 22400-2 — Sensores de Manutenção Preditiva",
+      "description": "O ascensor deve estar equipado com sensores de manutenção preditiva para monitorização contínua de vibrações, temperatura do motor e corrente de alimentação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.predictiveMaintenanceSensors",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "elevator.ratedSpeedMs",
+          "operator": ">=",
+          "value": 1.0
+        }
+      ],
+      "currentValueTemplate": "Sensores preditivos: {elevator.predictiveMaintenanceSensors}",
+      "requiredValue": "Sensores de vibração, temperatura e corrente instalados",
+      "remediation": "Instalar sensores de manutenção preditiva: (1) acelerómetro triaxial no motor e na cabina para análise de vibrações; (2) sensor de temperatura no motor e no variador de frequência; (3) medição contínua de corrente de alimentação; (4) gateway IoT para transmissão de dados ao sistema de gestão; (5) software de análise com alertas automáticos por tendência. Conforme ISO 22400-2.",
+      "enabled": true,
+      "tags": [
+        "manutenção-preditiva",
+        "sensores",
+        "vibrações",
+        "IoT",
+        "ISO 22400"
+      ]
+    },
+    {
+      "id": "ELEV-PREDMNT-02",
+      "regulationId": "dl-320-2002",
+      "article": "ISO 22400-2 §6.2 — Monitorização de Desgaste de Cabos",
+      "description": "O sistema de manutenção preditiva deve incluir monitorização do desgaste dos cabos de tração por sensores magnéticos ou óticos, detetando redução de secção ou fios partidos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.ropeWearMonitoring",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.tractionType",
+          "operator": "==",
+          "value": "roped"
+        }
+      ],
+      "currentValueTemplate": "Monitorização de desgaste de cabos: {elevator.ropeWearMonitoring}",
+      "requiredValue": "Sensor de desgaste de cabos instalado e calibrado",
+      "remediation": "Instalar sistema de monitorização de cabos: (1) sensor magnético de fluxo para deteção de fios partidos internos; (2) sensor ótico para desgaste superficial; (3) alerta automático quando degradação atinge 50% do critério de substituição EN 81-50; (4) registo histórico de evolução do desgaste; (5) integração com plano de manutenção da EMA. Conforme ISO 22400-2 e EN 81-50.",
+      "enabled": true,
+      "tags": [
+        "manutenção-preditiva",
+        "cabos",
+        "desgaste",
+        "sensores",
+        "monitorização"
+      ]
+    },
+    {
+      "id": "ELEV-PREDMNT-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.9.3 / ISO 22400-2 — Monitorização de Vibrações do Motor",
+      "description": "O nível de vibração do motor do ascensor é de {elevator.motorVibrationMmS} mm/s RMS. O limite de alerta para manutenção preditiva é de 4,5 mm/s RMS (ISO 10816-3).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.motorVibrationMmS",
+          "operator": ">",
+          "value": 4.5
+        },
+        {
+          "field": "elevator.predictiveMaintenanceSensors",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Vibração do motor: {elevator.motorVibrationMmS} mm/s RMS",
+      "requiredValue": "<= 4,5 mm/s RMS (limite de alerta ISO 10816-3)",
+      "remediation": "Diagnosticar causa de vibração excessiva do motor: (1) verificar alinhamento motor-redutor; (2) verificar estado dos rolamentos (análise espectral); (3) verificar equilíbrio do rotor; (4) verificar acoplamento elástico; (5) substituir rolamentos se vibração em frequência de defeito de rolamento. Conforme ISO 10816-3 e EN 81-20.",
+      "enabled": true,
+      "tags": [
+        "manutenção-preditiva",
+        "vibrações",
+        "motor",
+        "ISO 10816",
+        "diagnóstico"
+      ]
+    },
+    {
+      "id": "ELEV-TRAFEG-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.1 / ISO 8100-32 — Análise de Tráfego de Ascensores",
+      "description": "O grupo de ascensores deve ter análise de tráfego documentada com capacidade de transporte >= 12% da população do edifício em 5 minutos (intervalo de ponta manhã).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.trafficAnalysisHandlingCapacityPct",
+          "operator": "<",
+          "value": 12
+        },
+        {
+          "field": "elevator.numberOfElevators",
+          "operator": ">=",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Capacidade de transporte em 5 min: {elevator.trafficAnalysisHandlingCapacityPct}%",
+      "requiredValue": ">= 12% da população em 5 minutos (up-peak)",
+      "remediation": "Melhorar capacidade de transporte do grupo: (1) realizar simulação de tráfego com software especializado (ISO 8100-32); (2) para escritórios, objetivo de 12–15% em 5 min; (3) para residencial, 5–7% em 5 min; (4) considerar destination dispatch para melhorar eficiência em 25–30%; (5) considerar aumento de velocidade ou adição de ascensor se insuficiente. Conforme ISO 8100-32.",
+      "enabled": true,
+      "tags": [
+        "tráfego",
+        "capacidade",
+        "análise",
+        "up-peak",
+        "ISO 8100"
+      ]
+    },
+    {
+      "id": "ELEV-TRAFEG-02",
+      "regulationId": "en-81-20",
+      "article": "ISO 8100-32 §6.3 — Tempo Médio de Espera",
+      "description": "O tempo médio de espera do grupo de ascensores é de {elevator.averageWaitTimeSec} segundos. Para edifícios de escritórios, o tempo médio de espera não deve exceder 30 segundos em hora de ponta.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.averageWaitTimeSec",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "elevator.numberOfElevators",
+          "operator": ">=",
+          "value": 2
+        },
+        {
+          "field": "elevator.buildingUse",
+          "operator": "==",
+          "value": "office"
+        }
+      ],
+      "currentValueTemplate": "Tempo médio de espera: {elevator.averageWaitTimeSec} s",
+      "requiredValue": "<= 30 s em hora de ponta para edifícios de escritórios",
+      "remediation": "Reduzir tempo de espera: (1) otimizar algoritmo de despacho do grupo; (2) implementar destination dispatch; (3) ajustar temporização de portas (reduzir tempo de porta aberta); (4) instalar chamada antecipada com badge de acesso; (5) considerar expressão de pisos (bypass de pisos com baixa procura). Conforme ISO 8100-32 §6.3.",
+      "enabled": true,
+      "tags": [
+        "tráfego",
+        "espera",
+        "desempenho",
+        "escritórios",
+        "ISO 8100"
+      ]
+    },
+    {
+      "id": "ELEV-DUPLO-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.4 — Altura Mínima entre Pisos para Elevador Double-Deck",
+      "description": "A distância entre pisos é de {elevator.floorToFloorHeightMm} mm. Para elevadores double-deck, a distância entre pisos deve ser constante e entre 3200 mm e 4200 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.floorToFloorHeightMm",
+          "operator": "not_in_range",
+          "value": [
+            3200,
+            4200
+          ]
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "double_deck"
+        }
+      ],
+      "currentValueTemplate": "Distância entre pisos: {elevator.floorToFloorHeightMm} mm",
+      "requiredValue": "Entre 3200 mm e 4200 mm para elevadores double-deck",
+      "remediation": "Verificar viabilidade de elevador double-deck: (1) distância entre pisos deve ser constante em todo o edifício; (2) faixa admissível: 3200–4200 mm; (3) sistema de ajuste de nível (deck adjustment) para variações até ±100 mm; (4) se distância variável, considerar sistema com ajuste automático (±200 mm). Conforme EN 81-20 §5.12.4.",
+      "enabled": true,
+      "tags": [
+        "double-deck",
+        "altura-pisos",
+        "dimensionamento",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-DUPLO-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.4.3 — Comunicação Independente em Cada Cabina Double-Deck",
+      "description": "Cada cabina do elevador double-deck deve possuir sistema de comunicação bidirecional independente conforme EN 81-28, permitindo contacto separado com centro de assistência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.doubleDeckIndependentIntercom",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "double_deck"
+        }
+      ],
+      "currentValueTemplate": "Intercomunicador independente por cabina: {elevator.doubleDeckIndependentIntercom}",
+      "requiredValue": "Intercomunicador independente em cada cabina do double-deck",
+      "remediation": "Instalar intercomunicadores independentes: (1) sistema bidirecional conforme EN 81-28 em cada cabina; (2) identificação automática da cabina (superior/inferior) na chamada; (3) botão de alarme amarelo acessível a PMR em cada cabina; (4) indicação visual de chamada em curso; (5) bateria de reserva independente para cada sistema. Conforme EN 81-20 §5.12.4.3 e EN 81-28.",
+      "enabled": true,
+      "tags": [
+        "double-deck",
+        "comunicação",
+        "intercomunicador",
+        "EN 81-28"
+      ]
+    },
+    {
+      "id": "ELEV-DUPLO-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.4.5 — Evacuação Independente de Cada Cabina Double-Deck",
+      "description": "Cada cabina do elevador double-deck deve permitir evacuação independente de passageiros, com alçapão de evacuação e escada retrátil entre as duas cabinas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.doubleDeckEvacuationSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.elevatorType",
+          "operator": "==",
+          "value": "double_deck"
+        }
+      ],
+      "currentValueTemplate": "Sistema de evacuação double-deck: {elevator.doubleDeckEvacuationSystem}",
+      "requiredValue": "Alçapão e escada de evacuação entre cabinas instalados",
+      "remediation": "Instalar sistema de evacuação inter-cabinas: (1) alçapão no teto da cabina inferior e no piso da cabina superior (mín. 500 mm × 700 mm); (2) escada retrátil ou dobrável entre cabinas; (3) iluminação de emergência no espaço inter-cabinas; (4) procedimento de evacuação afixado em ambas as cabinas; (5) ensaio de evacuação na inspeção periódica. Conforme EN 81-20 §5.12.4.5.",
+      "enabled": true,
+      "tags": [
+        "double-deck",
+        "evacuação",
+        "emergência",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-DESTDISP-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.2 — Tempo de Resposta do Algoritmo Destination Dispatch",
+      "description": "O tempo de atribuição do ascensor pelo sistema destination dispatch é de {elevator.destinationDispatchResponseMs} ms. O tempo máximo admissível para resposta ao utilizador é de 2000 ms.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.destinationDispatchResponseMs",
+          "operator": ">",
+          "value": 2000
+        },
+        {
+          "field": "elevator.destinationDispatch",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Tempo de resposta do despacho: {elevator.destinationDispatchResponseMs} ms",
+      "requiredValue": "<= 2000 ms para atribuição do ascensor",
+      "remediation": "Otimizar algoritmo de destination dispatch: (1) verificar tempo de processamento do controlador (CPU e memória); (2) atualizar firmware do sistema de gestão de grupo; (3) verificar latência de comunicação entre terminais e controlador; (4) objetivo: resposta ao utilizador em < 1000 ms; (5) diagnóstico de rede de dados do sistema. Conforme EN 81-20 §5.12.2.",
+      "enabled": true,
+      "tags": [
+        "destination-dispatch",
+        "algoritmo",
+        "tempo-resposta",
+        "desempenho",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-DESTDISP-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.2 / EN 81-20 §5.12.2 — Acessibilidade do Terminal Destination Dispatch",
+      "description": "O terminal de destination dispatch deve ser acessível a PMR, com ecrã a altura entre 900 mm e 1200 mm, botões táteis e feedback sonoro.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.destinationDispatchAccessible",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.destinationDispatch",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Acessibilidade do terminal: {elevator.destinationDispatchAccessible}",
+      "requiredValue": "Terminal acessível a PMR conforme EN 81-70",
+      "remediation": "Adequar terminal de destination dispatch para acessibilidade: (1) ecrã e teclado entre 900 mm e 1200 mm do pavimento; (2) botões com numeração tátil e Braille; (3) feedback sonoro da cabina atribuída; (4) indicação visual com caracteres >= 30 mm; (5) contraste de cores >= 30 pontos; (6) possibilidade de utilização com uma mão. Conforme EN 81-70 §5.4.2.",
+      "enabled": true,
+      "tags": [
+        "destination-dispatch",
+        "acessibilidade",
+        "PMR",
+        "terminal",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-PRESSUR-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-72 §5.2.2 / SCIE Art. 104.º — Pressurização da Caixa do Ascensor",
+      "description": "A caixa do ascensor de bombeiros deve ser pressurizada com sobrepressão de {elevator.shaftPressurePa} Pa. A sobrepressão mínima é de 50 Pa com todas as portas fechadas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.shaftPressurePa",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "elevator.firefighterElevator",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sobrepressão na caixa: {elevator.shaftPressurePa} Pa",
+      "requiredValue": ">= 50 Pa com todas as portas fechadas",
+      "remediation": "Instalar ou ajustar sistema de pressurização: (1) ventilador de pressurização com caudal dimensionado para fugas pelas portas; (2) sobrepressão de 50 Pa (portas fechadas), não excedendo 100 Pa; (3) deteção de incêndio para ativação automática; (4) grelhas de descarga calibradas para limitar pressão máxima; (5) ensaio de pressurização conforme EN 12101-6. Conforme EN 81-72 §5.2.2.",
+      "enabled": true,
+      "tags": [
+        "pressurização",
+        "caixa",
+        "bombeiros",
+        "EN 81-72",
+        "SCIE"
+      ]
+    },
+    {
+      "id": "ELEV-PRESSUR-02",
+      "regulationId": "en-81-20",
+      "article": "EN 12101-6 §6.3 — Limitação de Sobrepressão na Caixa",
+      "description": "A sobrepressão na caixa do ascensor não deve exceder {elevator.shaftMaxPressurePa} Pa. O limite máximo com uma porta aberta é de 100 Pa para permitir abertura da porta.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.shaftMaxPressurePa",
+          "operator": ">",
+          "value": 100
+        },
+        {
+          "field": "elevator.shaftPressurized",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sobrepressão máxima: {elevator.shaftMaxPressurePa} Pa",
+      "requiredValue": "<= 100 Pa para permitir abertura das portas",
+      "remediation": "Ajustar sistema de pressurização: (1) instalar ou calibrar grelhas de alívio de pressão; (2) verificar que a força de abertura da porta não excede 100 N (conforme EN 81-20); (3) instalar sensor de pressão diferencial com regulação automática do ventilador; (4) ensaiar com 1 porta aberta e todas as portas fechadas. Conforme EN 12101-6 §6.3.",
+      "enabled": true,
+      "tags": [
+        "pressurização",
+        "sobrepressão",
+        "limitação",
+        "portas",
+        "EN 12101-6"
+      ]
+    },
+    {
+      "id": "ELEV-ILUEMER-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.10.3.5 — Duração da Iluminação de Emergência da Cabina",
+      "description": "A iluminação de emergência da cabina tem autonomia de {elevator.emergencyLightingDurationMin} minutos. A duração mínima deve ser de 60 minutos (1 hora) conforme EN 81-20.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.emergencyLightingDurationMin",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Autonomia da iluminação de emergência: {elevator.emergencyLightingDurationMin} min",
+      "requiredValue": ">= 60 minutos de autonomia",
+      "remediation": "Adequar iluminação de emergência da cabina: (1) substituir bateria por modelo com capacidade >= 60 min a 1 lux; (2) intensidade mínima de 5 lux ao nível do pavimento (EN 81-20); (3) ativação automática em caso de falha de energia; (4) LED de baixo consumo para maximizar autonomia; (5) teste mensal de autonomia com registo. Conforme EN 81-20 §5.10.3.5.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "emergência",
+        "autonomia",
+        "bateria",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-ILUEMER-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.10.3.5 — Intensidade da Iluminação de Emergência",
+      "description": "A intensidade da iluminação de emergência na cabina é de {elevator.emergencyLightingLux} lux. O mínimo é de 5 lux ao nível do pavimento da cabina.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.emergencyLightingLux",
+          "operator": "<",
+          "value": 5
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Intensidade de emergência: {elevator.emergencyLightingLux} lux",
+      "requiredValue": ">= 5 lux ao nível do pavimento",
+      "remediation": "Melhorar iluminação de emergência: (1) substituir lâmpadas por LED de maior eficiência; (2) posicionar luminária para iluminação uniforme ao nível do pavimento; (3) medir com luxímetro em 5 pontos do pavimento; (4) verificar ativação automática desligando alimentação principal. Conforme EN 81-20 §5.10.3.5.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "emergência",
+        "intensidade",
+        "lux",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-VENTCAB-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.5.1 — Caudal de Ventilação da Cabina",
+      "description": "O caudal de ventilação da cabina é de {elevator.cabinVentilationRateLs} l/s. O caudal mínimo deve ser de {elevator.ratedLoadKg} × 0,01 l/s (1% da carga nominal em kg convertida a l/s), com mínimo absoluto de 17 l/s.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.cabinVentilationRateLs",
+          "operator": "<",
+          "value": 17
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Caudal de ventilação: {elevator.cabinVentilationRateLs} l/s",
+      "requiredValue": ">= 17 l/s (mínimo absoluto) ou 1% da carga nominal em kg",
+      "remediation": "Adequar ventilação da cabina: (1) instalar ventilador de extração com caudal >= 1% da carga nominal (mín. 17 l/s); (2) aberturas de ventilação no teto e na parte inferior da cabina com área efetiva >= 1% da área do pavimento; (3) filtro de ar se ambiente com poeira; (4) nível de ruído do ventilador <= 40 dB(A). Conforme EN 81-20 §5.2.5.1.",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "cabina",
+        "caudal",
+        "ar",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-VENTCAB-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.5.2 — Ventilação Natural Mínima da Cabina",
+      "description": "A área de aberturas de ventilação natural da cabina é de {elevator.cabinVentOpeningAreaPct}% da área do pavimento. O mínimo é de 1% da área do pavimento da cabina.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.cabinVentOpeningAreaPct",
+          "operator": "<",
+          "value": 1
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Área de ventilação: {elevator.cabinVentOpeningAreaPct}% da área do pavimento",
+      "requiredValue": ">= 1% da área do pavimento da cabina",
+      "remediation": "Aumentar aberturas de ventilação: (1) instalar grelhas de ventilação no teto e parte inferior da cabina; (2) área livre total >= 1% da área do pavimento (metade em cima, metade em baixo); (3) grelhas não devem permitir introdução de objetos (abertura <= 10 mm); (4) se ventilação natural insuficiente, instalar ventilador forçado. Conforme EN 81-20 §5.2.5.2.",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "cabina",
+        "natural",
+        "aberturas",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-INTERCOM-01",
+      "regulationId": "en-81-70",
+      "article": "EN 81-28 §5.4 / EN 81-70 §5.4.5 — Acessibilidade do Intercomunicador",
+      "description": "O botão de alarme do intercomunicador está a {elevator.intercomButtonHeightMm} mm do pavimento. Deve estar entre 850 mm e 1200 mm para acessibilidade de PMR.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.intercomButtonHeightMm",
+          "operator": "not_in_range",
+          "value": [
+            850,
+            1200
+          ]
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Altura do botão de alarme: {elevator.intercomButtonHeightMm} mm",
+      "requiredValue": "Entre 850 mm e 1200 mm do pavimento",
+      "remediation": "Reposicionar botão de alarme do intercomunicador: (1) centro do botão entre 850 mm e 1200 mm do pavimento; (2) botão amarelo com símbolo de sino em relevo e Braille; (3) diâmetro mínimo de 40 mm; (4) força de atuação entre 2,5 N e 5 N; (5) feedback visual e sonoro de chamada em curso. Conforme EN 81-28 §5.4 e EN 81-70 §5.4.5.",
+      "enabled": true,
+      "tags": [
+        "intercomunicador",
+        "acessibilidade",
+        "PMR",
+        "botão-alarme",
+        "EN 81-28"
+      ]
+    },
+    {
+      "id": "ELEV-INTERCOM-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-28 §5.5 / EN 81-70 §5.4.6 — Anel de Indução no Intercomunicador",
+      "description": "O intercomunicador da cabina deve dispor de anel de indução magnética (hearing loop) para utilizadores com aparelhos auditivos, sinalizado com o símbolo internacional.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.intercomHearingLoop",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Anel de indução: {elevator.intercomHearingLoop}",
+      "requiredValue": "Anel de indução magnética instalado e sinalizado",
+      "remediation": "Instalar anel de indução magnética: (1) anel de indução conforme IEC 60118-4 (nível de campo 400 mA/m ± 3 dB); (2) posicionar anel na zona do altifalante/microfone; (3) sinalizar com símbolo internacional de hearing loop (orelha estilizada com T); (4) verificar nível de campo com medidor específico; (5) ausência de interferência de cabos e motores. Conforme EN 81-70 §5.4.6.",
+      "enabled": true,
+      "tags": [
+        "intercomunicador",
+        "anel-indução",
+        "hearing-loop",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-BRAILLE-01",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.3.1 — Marcação Braille nos Botões da Cabina",
+      "description": "Os botões da cabina devem ter marcação Braille à esquerda do botão, em Braille de grau 1, com o número do piso correspondente. Dimensão da célula Braille: diâmetro do ponto {elevator.brailleDotDiameterMm} mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.brailleDotDiameterMm",
+          "operator": "not_in_range",
+          "value": [
+            1.4,
+            1.6
+          ]
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Diâmetro do ponto Braille: {elevator.brailleDotDiameterMm} mm",
+      "requiredValue": "Diâmetro entre 1,4 mm e 1,6 mm conforme EN 81-70",
+      "remediation": "Adequar marcação Braille dos botões: (1) diâmetro dos pontos entre 1,4 mm e 1,6 mm; (2) altura dos pontos entre 0,6 mm e 0,9 mm; (3) espaçamento entre centros de pontos na mesma célula: 2,3–2,5 mm; (4) espaçamento entre células adjacentes: 6,0–6,2 mm; (5) posicionar à esquerda do botão a 5–10 mm de distância. Conforme EN 81-70 §5.4.3.1.",
+      "enabled": true,
+      "tags": [
+        "Braille",
+        "botões",
+        "acessibilidade",
+        "dimensões",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-BRAILLE-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.3.2 — Marcação Tátil e Braille nos Patamares",
+      "description": "Os botões de chamada nos patamares devem ter identificação tátil em relevo e Braille, indicando os pisos servidos e a direção de viagem.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.landingBrailleMarking",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Marcação Braille nos patamares: {elevator.landingBrailleMarking}",
+      "requiredValue": "Marcação Braille e tátil em todos os patamares",
+      "remediation": "Instalar marcação Braille nos patamares: (1) identificação do piso em Braille e caracteres táteis em relevo junto à botoneira de patamar; (2) setas de direção (subir/descer) em relevo; (3) placa de identificação na ombreira da porta a 1400–1600 mm do pavimento; (4) caracteres táteis com altura >= 15 mm e relevo >= 0,8 mm. Conforme EN 81-70 §5.4.3.2.",
+      "enabled": true,
+      "tags": [
+        "Braille",
+        "tátil",
+        "patamares",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-BRAILLE-03",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.3.3 — Altura dos Caracteres Táteis nos Botões",
+      "description": "A altura dos caracteres táteis em relevo nos botões é de {elevator.tactileCharHeightMm} mm. O mínimo conforme EN 81-70 é de 15 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.tactileCharHeightMm",
+          "operator": "<",
+          "value": 15
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Altura dos caracteres táteis: {elevator.tactileCharHeightMm} mm",
+      "requiredValue": ">= 15 mm conforme EN 81-70",
+      "remediation": "Substituir botões com caracteres táteis conformes: (1) altura dos caracteres >= 15 mm; (2) relevo >= 0,8 mm acima da superfície; (3) tipo de letra sans-serif para melhor legibilidade tátil; (4) contraste visual >= 30 pontos entre caractere e fundo; (5) posicionar à direita da marcação Braille. Conforme EN 81-70 §5.4.3.3.",
+      "enabled": true,
+      "tags": [
+        "tátil",
+        "caracteres",
+        "relevo",
+        "botões",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-FOLGA-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.3.1 — Folga entre Pavimento da Cabina e Patamar",
+      "description": "A folga entre o pavimento da cabina e o patamar é de {elevator.carFloorGapMm} mm. A folga máxima admissível é de 35 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.carFloorGapMm",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Folga cabina-patamar: {elevator.carFloorGapMm} mm",
+      "requiredValue": "<= 35 mm conforme EN 81-20",
+      "remediation": "Reduzir folga entre cabina e patamar: (1) verificar e ajustar nivelamento do ascensor (precisão de paragem); (2) verificar desgaste das guias de cabina; (3) verificar flexão do pavimento da cabina sob carga; (4) ajustar posição da placa de soleira; (5) para PMR, folga recomendada <= 20 mm (EN 81-70). Conforme EN 81-20 §5.4.3.1.",
+      "enabled": true,
+      "tags": [
+        "folga",
+        "pavimento",
+        "nivelamento",
+        "cabina",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-FOLGA-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.2 — Desnível Máximo entre Cabina e Patamar para PMR",
+      "description": "O desnível entre o pavimento da cabina e o patamar é de {elevator.carFloorLevelDiffMm} mm. Para acessibilidade de PMR, o desnível máximo é de 15 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.carFloorLevelDiffMm",
+          "operator": ">",
+          "value": 15
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Desnível cabina-patamar: {elevator.carFloorLevelDiffMm} mm",
+      "requiredValue": "<= 15 mm para acessibilidade PMR",
+      "remediation": "Melhorar precisão de paragem: (1) ajustar sistema de nivelamento (renivelamento automático com precisão <= ±5 mm); (2) instalar sensores de nível de maior resolução; (3) verificar sob carga nominal e em vazio; (4) verificar em todos os pisos; (5) considerar sistema de renivelamento automático em standby. Conforme EN 81-70 §5.3.2.",
+      "enabled": true,
+      "tags": [
+        "folga",
+        "desnível",
+        "nivelamento",
+        "PMR",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-FOLGA-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.6.4 — Folga Lateral entre Porta de Cabina e Porta de Patamar",
+      "description": "A folga lateral entre a porta de cabina e a porta de patamar é de {elevator.doorSideGapMm} mm. A folga máxima entre as faces de fecho das portas é de 120 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.doorSideGapMm",
+          "operator": ">",
+          "value": 120
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Folga lateral de portas: {elevator.doorSideGapMm} mm",
+      "requiredValue": "<= 120 mm entre faces de fecho das portas",
+      "remediation": "Ajustar folga lateral de portas: (1) verificar alinhamento entre porta de cabina e porta de patamar; (2) ajustar guias e rolamentos das portas; (3) se folga excessiva por projeto, instalar avental vertical de proteção; (4) verificar funcionamento do encravamento com folga existente. Conforme EN 81-20 §5.3.6.4.",
+      "enabled": true,
+      "tags": [
+        "folga",
+        "portas",
+        "lateral",
+        "alinhamento",
+        "EN 81-20"
+      ]
     }
   ]
 }

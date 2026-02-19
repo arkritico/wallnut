@@ -4560,6 +4560,1043 @@
         "impermeabilização",
         "PDM"
       ]
+    },
+    {
+      "id": "PDM-REGEN-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJRU (DL 307/2009) — Incentivos à Regeneração Urbana",
+      "description": "Os projetos localizados em Áreas de Reabilitação Urbana (ARU) declaradas pelo município podem beneficiar de majoração do índice de utilização do solo (Iu) até 20% acima do limite genérico do PDM, como incentivo à regeneração urbana.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.aruBonusApplied",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Localização em ARU: {municipal.isInARU} | Majoração aplicada: {municipal.aruBonusApplied}",
+      "requiredValue": "Majoração de Iu até 20% disponível em ARU (aruBonusApplied = true se aplicada)",
+      "remediation": "Verificar se o projeto se insere numa Área de Reabilitação Urbana (ARU) declarada pelo município (DL 307/2009). Se sim, o promotor pode requerer a majoração do índice de utilização do solo (até +20%) mediante compromisso de reabilitação integral do edificado existente. Submeter requerimento à câmara municipal com memória descritiva das obras de reabilitação propostas.",
+      "enabled": true,
+      "tags": [
+        "regeneração-urbana",
+        "ARU",
+        "incentivos",
+        "majoração",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-REGEN-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / CIVA Art. 18.º — Elegibilidade para IVA Reduzido em Reabilitação Urbana",
+      "description": "As empreitadas de reabilitação urbana realizadas em imóveis localizados em ARU ou com classificação patrimonial podem beneficiar da taxa reduzida de IVA (6%) prevista no CIVA, desde que o projeto seja certificado pelo município.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "reabilitacao",
+            "reconstrucao",
+            "conservacao"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Tipo de obra: {municipal.operationType} | Em ARU: {municipal.isInARU}",
+      "requiredValue": "Certificação municipal para taxa reduzida de IVA em reabilitação urbana",
+      "remediation": "Requerer à câmara municipal a certificação de que a obra se qualifica como reabilitação urbana nos termos do DL 307/2009, possibilitando a aplicação da taxa reduzida de IVA (6%) prevista na verba 2.23 da Lista I do CIVA. Apresentar projeto detalhado e orçamento discriminado das obras de reabilitação.",
+      "enabled": true,
+      "tags": [
+        "regeneração-urbana",
+        "IVA-reduzido",
+        "reabilitação",
+        "ARU",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-REAB-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EBF Art. 45.º — Benefícios Fiscais à Reabilitação Urbana",
+      "description": "Os imóveis reabilitados em ARU podem beneficiar de isenção de IMI por 3 anos e de IMT na primeira transmissão após a reabilitação, desde que as obras sejam concluídas num prazo de 3 anos e certificadas pelo município.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.rehabilitationCertified",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "reabilitacao",
+            "reconstrucao"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Reabilitação certificada: {municipal.rehabilitationCertified} | Em ARU: {municipal.isInARU}",
+      "requiredValue": "Certificação de reabilitação obtida para benefícios fiscais (rehabilitationCertified = true)",
+      "remediation": "Requerer a certificação municipal de conclusão da reabilitação nos termos do Art. 45.º do Estatuto dos Benefícios Fiscais (EBF). As obras devem ser concluídas no prazo máximo de 3 anos. A certificação permite: isenção de IMI por 3 anos (renovável por mais 5), isenção de IMT na primeira transmissão, dedução em IRS de 30% dos encargos com a reabilitação (máx. 500€), e tributação autónoma de rendas a 5%.",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "benefícios-fiscais",
+        "IMI",
+        "IMT",
+        "ARU",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-SISMO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EC8 / DL 95/2019 — Zona Sísmica e Reforço Estrutural",
+      "description": "Os edifícios localizados em zonas sísmicas de risco elevado (zonas 1.1 a 1.3 e 2.1 a 2.3 do Anexo Nacional do EC8) que sejam objeto de reabilitação significativa devem incluir avaliação de vulnerabilidade sísmica e, se necessário, projeto de reforço estrutural.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.seismicZone",
+          "operator": "in",
+          "value": [
+            "1.1",
+            "1.2",
+            "1.3",
+            "2.1",
+            "2.2",
+            "2.3"
+          ]
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "reabilitacao",
+            "reconstrucao",
+            "ampliacao"
+          ]
+        },
+        {
+          "field": "municipal.seismicAssessmentDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona sísmica: {municipal.seismicZone} | Avaliação sísmica: {municipal.seismicAssessmentDone}",
+      "requiredValue": "Avaliação de vulnerabilidade sísmica realizada (seismicAssessmentDone = true)",
+      "remediation": "Contratar engenheiro de estruturas para realizar a avaliação de vulnerabilidade sísmica do edifício existente, de acordo com o EC8-3 (NP EN 1998-3) e o Anexo Nacional. Para edifícios em zonas de risco elevado (ag ≥ 0.15g), a reabilitação deve incluir reforço estrutural que garanta, no mínimo, o nível de desempenho de 'Limitação de Danos' (SD). Submeter projeto de reforço estrutural à câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "sismicidade",
+        "reforço-estrutural",
+        "EC8",
+        "vulnerabilidade",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-SISMO-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 95/2019 — Reforço Sísmico Obrigatório em Edifícios Pré-1983",
+      "description": "Os edifícios construídos antes de 1983 (anteriores ao RSA/REBAP) que sejam objeto de obras de alteração superiores a 25% do valor patrimonial tributário devem ser sujeitos a avaliação sísmica obrigatória nos termos do DL 95/2019.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.buildingConstructionYear",
+          "operator": "<",
+          "value": 1983
+        },
+        {
+          "field": "municipal.alterationCostExceeds25PercentVPT",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.seismicRetrofitPlanSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ano de construção: {municipal.buildingConstructionYear} | Custo > 25% VPT: {municipal.alterationCostExceeds25PercentVPT}",
+      "requiredValue": "Plano de reforço sísmico submetido (seismicRetrofitPlanSubmitted = true)",
+      "remediation": "Para edifícios construídos antes de 1983, quando o custo das obras de alteração excede 25% do valor patrimonial tributário, é obrigatória a avaliação sísmica e, se insuficiente, o reforço estrutural. Contratar engenheiro de estruturas qualificado para elaborar relatório de avaliação de vulnerabilidade e projeto de reforço conforme EC8-3. Submeter à câmara municipal juntamente com o projeto de alteração.",
+      "enabled": true,
+      "tags": [
+        "sismicidade",
+        "reforço-sísmico",
+        "pré-1983",
+        "RSA",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COAST-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / POOC / Lei 54/2005 — Recuo Obrigatório por Erosão Costeira",
+      "description": "As novas construções em zonas costeiras devem respeitar a faixa de salvaguarda definida no POOC (Plano de Ordenamento da Orla Costeira), tipicamente 200 m a partir da linha de máxima preia-mar de águas vivas equinociais, podendo ser superior em zonas de erosão ativa.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isCoastalZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.distanceToCoastlineMeters",
+          "operator": "<",
+          "value": 200
+        },
+        {
+          "field": "municipal.coastalSetbackExemption",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à linha de costa: {municipal.distanceToCoastlineMeters} m",
+      "requiredValue": "Distância à linha de costa ≥ faixa de salvaguarda POOC (tipicamente ≥ 200 m)",
+      "remediation": "Recuar a implantação do edifício para fora da faixa de salvaguarda definida no POOC aplicável. Em zonas de erosão ativa identificadas pela APA, o recuo pode ser superior a 200 m. Consultar a carta de vulnerabilidades do troço costeiro e obter parecer prévio da APA — Agência Portuguesa do Ambiente. A construção na faixa de risco é proibida, exceto para infraestruturas de apoio balnear amovíveis.",
+      "enabled": true,
+      "tags": [
+        "erosão-costeira",
+        "POOC",
+        "faixa-salvaguarda",
+        "litoral",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COAST-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / POOC — Limitação de Cércea em Zona Costeira",
+      "description": "Na faixa costeira entre 200 m e 500 m da linha de costa, a cércea máxima dos novos edifícios não pode exceder o perfil natural do terreno em mais de 9 m (equivalente a rés-do-chão + 2 pisos), salvo disposição específica do POOC.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isCoastalZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.distanceToCoastlineMeters",
+          "operator": "between",
+          "value": [
+            200,
+            500
+          ]
+        },
+        {
+          "field": "municipal.proposedHeight",
+          "operator": ">",
+          "value": 9
+        }
+      ],
+      "currentValueTemplate": "Distância à costa: {municipal.distanceToCoastlineMeters} m | Cércea proposta: {municipal.proposedHeight} m",
+      "requiredValue": "Cércea ≤ 9 m na faixa costeira (200–500 m da linha de costa)",
+      "remediation": "Reduzir a cércea do edifício para um máximo de 9 m acima do perfil natural do terreno na faixa costeira intermédia (200–500 m). Consultar as disposições específicas do POOC aplicável ao troço costeiro em causa, que pode definir limites diferentes. Submeter estudo de impacte visual à câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "erosão-costeira",
+        "cércea",
+        "POOC",
+        "litoral",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-RIPAR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei da Água (Lei 58/2005) — Faixa de Proteção Ripícola",
+      "description": "É proibida a construção numa faixa de 10 m medida a partir do limite do leito dos cursos de água navegáveis ou flutuáveis, e de 5 m para os restantes cursos de água. O PDM pode definir faixas de proteção mais amplas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWatercourseMeters",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.distanceToWatercourseMeters",
+          "operator": "<",
+          "value": 10
+        },
+        {
+          "field": "municipal.riparianBufferExemption",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância ao curso de água: {municipal.distanceToWatercourseMeters} m",
+      "requiredValue": "Distância ao curso de água ≥ faixa de proteção (10 m navegável / 5 m restantes)",
+      "remediation": "Recuar a implantação do edifício para fora da faixa de proteção ao domínio hídrico (mín. 10 m para cursos de água navegáveis/flutuáveis, 5 m para os restantes), nos termos da Lei 58/2005 (Lei da Água) e do DL 226-A/2007. A faixa do PDM pode ser mais restritiva. Obter parecer prévio da ARH (Administração da Região Hidrográfica) competente. A vegetação ripícola existente deve ser mantida.",
+      "enabled": true,
+      "tags": [
+        "domínio-hídrico",
+        "faixa-ripícola",
+        "curso-de-água",
+        "Lei-da-Água",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-RIPAR-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / ENCNB 2030 — Corredor Ecológico Ripícola",
+      "description": "Os projetos adjacentes a cursos de água classificados como corredores ecológicos na Estrutura Ecológica Municipal (EEM) devem preservar uma faixa de corredor ecológico mínima de 30 m de cada lado, assegurando a conectividade ecológica.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.adjacentToEcologicalCorridor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.ecologicalCorridorBufferMeters",
+          "operator": "<",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "Faixa de corredor ecológico preservada: {municipal.ecologicalCorridorBufferMeters} m",
+      "requiredValue": "Faixa de corredor ecológico ≥ 30 m de cada lado do curso de água",
+      "remediation": "Garantir a preservação de uma faixa mínima de 30 m de cada lado do curso de água classificado como corredor ecológico na Estrutura Ecológica Municipal. Nesta faixa não é permitida edificação, impermeabilização ou remoção de vegetação ripícola autóctone. Integrar a faixa como espaço verde de enquadramento no projeto de loteamento.",
+      "enabled": true,
+      "tags": [
+        "corredor-ecológico",
+        "ripícola",
+        "EEM",
+        "biodiversidade",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-PAISAG-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 142/2008 — Limites de Construção em Paisagem Protegida",
+      "description": "Nas áreas classificadas como Paisagem Protegida (regional ou local), as novas construções estão sujeitas a limites volumétricos específicos e a parecer prévio do ICNF ou da entidade gestora da área protegida.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInProtectedLandscape",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.icnfOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Paisagem protegida: {municipal.isInProtectedLandscape} | Parecer ICNF: {municipal.icnfOpinionObtained}",
+      "requiredValue": "Parecer prévio do ICNF obtido (icnfOpinionObtained = true)",
+      "remediation": "Submeter pedido de parecer prévio ao ICNF (Instituto da Conservação da Natureza e das Florestas) ou à entidade gestora da paisagem protegida, nos termos do DL 142/2008, antes de requerer o licenciamento municipal. O parecer deve pronunciar-se sobre a compatibilidade do projeto com os objetivos de conservação da paisagem. As construções devem respeitar os materiais e tipologias tradicionais da região.",
+      "enabled": true,
+      "tags": [
+        "paisagem-protegida",
+        "ICNF",
+        "conservação",
+        "volumetria",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-PAISAG-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Plano de Ordenamento de Área Protegida — Cércea em Paisagem Protegida",
+      "description": "Nas áreas de paisagem protegida, a cércea dos novos edifícios não pode exceder a cércea dominante do aglomerado onde se inserem, com um máximo absoluto de 7 m (rés-do-chão + 1 piso), salvo disposição mais favorável do plano de ordenamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isInProtectedLandscape",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.proposedHeight",
+          "operator": ">",
+          "value": 7
+        }
+      ],
+      "currentValueTemplate": "Cércea proposta: {municipal.proposedHeight} m (paisagem protegida)",
+      "requiredValue": "Cércea ≤ 7 m em paisagem protegida (ou cércea dominante do aglomerado, se inferior)",
+      "remediation": "Reduzir a cércea do edifício para um máximo de 7 m ou para a cércea dominante do aglomerado (a que for menor). Consultar o Plano de Ordenamento da Área Protegida (POAP) aplicável para verificar se existem disposições específicas. O projeto deve privilegiar a integração paisagística, utilizando materiais e cores compatíveis com a envolvente.",
+      "enabled": true,
+      "tags": [
+        "paisagem-protegida",
+        "cércea",
+        "integração-paisagística",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-VENTO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Estratégia Municipal de Adaptação Climática — Corredores de Ventilação",
+      "description": "Em zonas urbanas identificadas na carta climática municipal, os novos edifícios não devem obstruir os corredores de ventilação natural, devendo respeitar recuos e descontinuidades volumétricas que permitam a circulação do ar.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isInWindCorridor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.windCorridorComplianceVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Corredor de ventilação: {municipal.isInWindCorridor} | Verificação: {municipal.windCorridorComplianceVerified}",
+      "requiredValue": "Conformidade com corredor de ventilação verificada (windCorridorComplianceVerified = true)",
+      "remediation": "O projeto deve demonstrar que não obstrui os corredores de ventilação identificados na carta climática municipal ou no PDM. Considerar: (1) descontinuidades na fachada com aberturas ≥ 20% da extensão do lote; (2) pisos vazados ao nível térreo (pilotis); (3) recuos escalonados nos pisos superiores; (4) orientação do edifício alinhada com os ventos dominantes. Apresentar estudo de ventilação natural (CFD ou ensaio em túnel de vento) para edifícios com mais de 6 pisos.",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "corredor-vento",
+        "clima-urbano",
+        "adaptação-climática",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CALOR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal de Sustentabilidade — Mitigação da Ilha de Calor Urbana",
+      "description": "Em zonas urbanas consolidadas identificadas como ilhas de calor no PDM, as novas construções devem apresentar um índice de refletância solar (SRI) médio das coberturas ≥ 78 (coberturas planas) ou ≥ 29 (coberturas inclinadas), ou, alternativamente, coberturas verdes em pelo menos 50% da área.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isInHeatIslandZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.roofSolarReflectanceIndex",
+          "operator": "<",
+          "value": 78
+        },
+        {
+          "field": "municipal.greenRoofCoveragePercent",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "SRI da cobertura: {municipal.roofSolarReflectanceIndex} | Cobertura verde: {municipal.greenRoofCoveragePercent}%",
+      "requiredValue": "SRI ≥ 78 (cobertura plana) ou cobertura verde ≥ 50% da área de cobertura",
+      "remediation": "Adotar pelo menos uma das seguintes medidas: (1) Aplicar materiais de cobertura com índice de refletância solar (SRI) ≥ 78 para coberturas planas ou ≥ 29 para inclinadas (>2:12); (2) Instalar cobertura verde (extensiva ou intensiva) em pelo menos 50% da área de cobertura; (3) Instalar painéis fotovoltaicos cobrindo pelo menos 75% da área de cobertura. Estas medidas visam reduzir o efeito de ilha de calor urbana.",
+      "enabled": true,
+      "tags": [
+        "ilha-de-calor",
+        "SRI",
+        "cobertura-verde",
+        "sustentabilidade",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CALOR-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Pavimentos Reflectivos em Zona de Ilha de Calor",
+      "description": "Nas zonas de ilha de calor urbana, os pavimentos exteriores dos novos empreendimentos devem ter SRI ≥ 33 em pelo menos 50% da área pavimentada não coberta, para reduzir a absorção de radiação solar.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInHeatIslandZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.pavementSRICompliance",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Conformidade SRI de pavimentos: {municipal.pavementSRICompliance}",
+      "requiredValue": "SRI dos pavimentos exteriores ≥ 33 em ≥ 50% da área pavimentada (pavementSRICompliance = true)",
+      "remediation": "Utilizar pavimentos de cor clara com índice de refletância solar (SRI) ≥ 33 em pelo menos 50% da área pavimentada a céu aberto. Materiais recomendados: betão branco, calcário, granito claro, blocos de betão pré-fabricado de cor clara. Alternativamente, sombrear a área pavimentada com estruturas de cobertura (pérgulas, grelhas solares) ou árvores de copa larga.",
+      "enabled": true,
+      "tags": [
+        "ilha-de-calor",
+        "pavimentos",
+        "SRI",
+        "sustentabilidade",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-VERDE-06",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal de Sustentabilidade — Cobertura Verde Obrigatória",
+      "description": "Os novos edifícios com área bruta de construção (ABC) superior a 500 m² devem instalar cobertura verde (extensiva ou intensiva) em pelo menos 30% da área de cobertura, contribuindo para a retenção de águas pluviais, biodiversidade e conforto térmico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.grossFloorAreaSqm",
+          "operator": ">",
+          "value": 500
+        },
+        {
+          "field": "municipal.greenRoofCoveragePercent",
+          "operator": "<",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "ABC: {municipal.grossFloorAreaSqm} m² | Cobertura verde: {municipal.greenRoofCoveragePercent}%",
+      "requiredValue": "Cobertura verde ≥ 30% da área de cobertura para ABC > 500 m²",
+      "remediation": "Instalar cobertura verde (extensiva — substrato ≥ 8 cm com sedum/herbáceas, ou intensiva — substrato ≥ 20 cm com arbustivas) em pelo menos 30% da área total de cobertura. A cobertura verde deve incluir: membrana anti-raízes, camada drenante, substrato e vegetação adaptada ao clima local. Apresentar projeto de cobertura verde elaborado por arquiteto paisagista, incluindo plano de manutenção.",
+      "enabled": true,
+      "tags": [
+        "cobertura-verde",
+        "sustentabilidade",
+        "retenção-pluvial",
+        "biodiversidade",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-VERDE-07",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Fachada Verde em Edifícios Comerciais",
+      "description": "Os novos edifícios comerciais ou de serviços com fachada contínua superior a 20 m devem incluir elementos de fachada verde (trepadeiras, jardins verticais ou floreiras integradas) em pelo menos 15% da área de fachada.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.buildingUse",
+          "operator": "in",
+          "value": [
+            "comercial",
+            "servicos",
+            "misto"
+          ]
+        },
+        {
+          "field": "municipal.facadeContinuousLengthMeters",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "municipal.greenFacadePercent",
+          "operator": "<",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "Fachada verde: {municipal.greenFacadePercent}% | Comprimento fachada: {municipal.facadeContinuousLengthMeters} m",
+      "requiredValue": "Fachada verde ≥ 15% da área de fachada para edifícios comerciais com fachada > 20 m",
+      "remediation": "Integrar elementos de vegetação na fachada: (1) Trepadeiras com estrutura de suporte em aço inox ou cabo de aço; (2) Jardins verticais modulares com sistema de rega automática; (3) Floreiras integradas em cada piso. A vegetação deve ser autóctone ou adaptada ao clima local, com baixa manutenção. Apresentar projeto de fachada verde com especificação do sistema de rega e plano de manutenção.",
+      "enabled": true,
+      "tags": [
+        "fachada-verde",
+        "jardim-vertical",
+        "sustentabilidade",
+        "comercial",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-JARDCH-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal de Drenagem — Jardins de Chuva Obrigatórios",
+      "description": "Os novos loteamentos com área total superior a 2.000 m² devem prever jardins de chuva (rain gardens) ou bacias de biorretenção para tratamento e infiltração das primeiras águas pluviais, dimensionados para um mínimo de 5% da área impermeabilizada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.totalLotAreaSqm",
+          "operator": ">",
+          "value": 2000
+        },
+        {
+          "field": "municipal.rainGardenAreaPercent",
+          "operator": "<",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "Área do loteamento: {municipal.totalLotAreaSqm} m² | Jardins de chuva: {municipal.rainGardenAreaPercent}% da área impermeabilizada",
+      "requiredValue": "Jardins de chuva ≥ 5% da área impermeabilizada",
+      "remediation": "Projetar jardins de chuva (rain gardens) ou bacias de biorretenção com área mínima de 5% da área impermeabilizada do loteamento. Os jardins de chuva devem incluir: (1) depressão topográfica de 15–30 cm; (2) substrato filtrante (areia, composto, solo vegetal) com profundidade ≥ 60 cm; (3) camada drenante em brita; (4) vegetação hidrófila autóctone. O dimensionamento deve reter as primeiras águas pluviais (first flush) equivalentes a 15 mm de precipitação.",
+      "enabled": true,
+      "tags": [
+        "jardins-de-chuva",
+        "biorretenção",
+        "SUDS",
+        "drenagem",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-JARDCH-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Plano de Manutenção de Infraestruturas Verdes de Drenagem",
+      "description": "Os jardins de chuva, trincheiras de infiltração e outras infraestruturas verdes de drenagem devem dispor de plano de manutenção aprovado pelo município, com responsabilidade atribuída à entidade gestora do condomínio ou ao proprietário.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.hasGreenDrainageInfra",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.greenDrainageMaintenancePlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Infraestrutura verde de drenagem: {municipal.hasGreenDrainageInfra} | Plano de manutenção: {municipal.greenDrainageMaintenancePlan}",
+      "requiredValue": "Plano de manutenção aprovado (greenDrainageMaintenancePlan = true)",
+      "remediation": "Elaborar plano de manutenção das infraestruturas verdes de drenagem incluindo: (1) inspeção visual trimestral; (2) limpeza de sedimentos semestral; (3) poda e replantação da vegetação anual; (4) verificação da capacidade de infiltração anual (teste de percolação); (5) designação da entidade responsável pela manutenção (condomínio, proprietário ou empresa de manutenção). Submeter plano à câmara municipal para aprovação.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "jardins-de-chuva",
+        "infraestrutura-verde",
+        "drenagem",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-PERMEA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Rácio Mínimo de Pavimento Permeável",
+      "description": "Nos novos empreendimentos, pelo menos 40% da área de espaço exterior (excluindo a área de implantação) deve ser pavimentada com materiais permeáveis ou semipermeáveis, de modo a garantir a infiltração natural das águas pluviais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.permeablePavementRatio",
+          "operator": "<",
+          "value": 0.4
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "construcao_nova",
+            "loteamento",
+            "ampliacao"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Rácio de pavimento permeável: {municipal.permeablePavementRatio}",
+      "requiredValue": "Rácio de pavimento permeável ≥ 0,40 (40% da área exterior)",
+      "remediation": "Aumentar a área de pavimento permeável nos espaços exteriores utilizando: (1) grelhas de enrelvamento (betão ou plástico reciclado); (2) blocos autoblocantes com juntas abertas (≥ 6 mm); (3) tout-venant compactado; (4) gravilha estabilizada; (5) pavimento em lajetas com juntas permeáveis. O coeficiente de escoamento do pavimento permeável deve ser ≤ 0,40. Apresentar peça desenhada com mapeamento das tipologias de pavimento e cálculo do rácio permeável/impermeável.",
+      "enabled": true,
+      "tags": [
+        "permeabilidade",
+        "pavimento",
+        "infiltração",
+        "SUDS",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-PERMEA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Pavimento Permeável em Estacionamento Exterior",
+      "description": "Os parques de estacionamento à superfície com mais de 10 lugares devem utilizar pavimento permeável ou semipermeável (grelha de enrelvamento, blocos de juntas abertas) em pelo menos 50% da área de estacionamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.surfaceParkingSpaces",
+          "operator": ">",
+          "value": 10
+        },
+        {
+          "field": "municipal.permeableParkingPercent",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Lugares de estacionamento à superfície: {municipal.surfaceParkingSpaces} | Pavimento permeável: {municipal.permeableParkingPercent}%",
+      "requiredValue": "Pavimento permeável ≥ 50% da área de estacionamento à superfície",
+      "remediation": "Substituir o pavimento impermeável do parque de estacionamento por soluções permeáveis em pelo menos 50% da área: (1) grelha de enrelvamento em PEAD reciclado; (2) blocos autoblocantes com juntas ≥ 8 mm preenchidas com areia; (3) gravilha estabilizada com geocélula. Prever sistema de tratamento das primeiras águas pluviais (separador de hidrocarbonetos) antes da infiltração no solo.",
+      "enabled": true,
+      "tags": [
+        "permeabilidade",
+        "estacionamento",
+        "pavimento",
+        "SUDS",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-SOLAR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGEU Art. 73.º — Direito de Insolação e Acesso Solar",
+      "description": "Os novos edifícios não devem reduzir a insolação dos edifícios vizinhos para menos de 2 horas de sol direto na fachada principal no dia de solstício de inverno (21 de dezembro), garantindo o direito de acesso solar.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.neighborSunHoursWinterSolstice",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.neighborSunHoursWinterSolstice",
+          "operator": "<",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Insolação do edifício vizinho no solstício de inverno: {municipal.neighborSunHoursWinterSolstice} h",
+      "requiredValue": "Insolação ≥ 2 h no solstício de inverno na fachada principal dos edifícios vizinhos",
+      "remediation": "Realizar estudo de sombras (shadow analysis) para o dia 21 de dezembro, demonstrando que a fachada principal dos edifícios vizinhos recebe pelo menos 2 horas de sol direto. Se o estudo demonstrar sombreamento excessivo: (1) reduzir a cércea do edifício; (2) recuar o edifício em relação ao limite do lote; (3) escalonar os pisos superiores. Apresentar estudo de insolação com software certificado (modelo 3D com coordenadas geográficas do local).",
+      "enabled": true,
+      "tags": [
+        "insolação",
+        "acesso-solar",
+        "sombreamento",
+        "RGEU",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-SOLAR-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 162/2019 — Proteção de Instalações Fotovoltaicas Existentes",
+      "description": "As novas construções não devem projetar sombra sobre instalações fotovoltaicas existentes nos edifícios vizinhos durante mais de 20% das horas de sol anuais, protegendo o investimento em energias renováveis.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.neighborHasSolarPanels",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.solarPanelShadowPercentAnnual",
+          "operator": ">",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "Sombreamento dos painéis vizinhos: {municipal.solarPanelShadowPercentAnnual}% das horas de sol anuais",
+      "requiredValue": "Sombreamento dos painéis fotovoltaicos vizinhos ≤ 20% das horas de sol anuais",
+      "remediation": "Realizar estudo de sombras anual (365 dias) sobre as instalações fotovoltaicas existentes nos edifícios vizinhos. Se o sombreamento exceder 20% das horas de sol anuais: (1) reduzir a cércea; (2) recuar os pisos superiores; (3) estudar soluções de compensação com o proprietário vizinho. A proteção aplica-se a instalações fotovoltaicas registadas no sistema SERUP antes da data do pedido de licenciamento.",
+      "enabled": true,
+      "tags": [
+        "acesso-solar",
+        "fotovoltaico",
+        "sombreamento",
+        "energias-renováveis",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-VISTA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Corredores Visuais Protegidos",
+      "description": "Em zonas identificadas no PDM como corredores visuais protegidos (vistas para o rio, mar, monumentos ou paisagem notável), os novos edifícios não devem obstruir as vistas públicas, respeitando os perfis de cércea decrescente definidos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInViewCorridor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.viewCorridorMaxHeight",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.proposedHeight",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Corredor visual: {municipal.isInViewCorridor} | Cércea proposta: {municipal.proposedHeight} m | Máximo: {municipal.viewCorridorMaxHeight} m",
+      "requiredValue": "Cércea ≤ perfil máximo do corredor visual (viewCorridorMaxHeight)",
+      "remediation": "Reduzir a cércea do edifício para o perfil máximo definido no corredor visual protegido pelo PDM. Consultar a planta de condicionantes do PDM para identificar o perfil de cércea decrescente aplicável. Em caso de dúvida, solicitar à câmara municipal um levantamento do perfil visual existente. O projeto pode explorar soluções de cobertura recuada ou escalonamento que preservem as vistas públicas.",
+      "enabled": true,
+      "tags": [
+        "corredor-visual",
+        "vistas",
+        "cércea",
+        "paisagem",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-VISTA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Preservação de Vistas sobre o Rio",
+      "description": "Nos lotes ribeirinhos classificados no PDM como corredores visuais sobre o rio, a implantação dos edifícios deve garantir uma abertura visual mínima de 30% da largura do lote, medida ao nível do espaço público.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isInRiverViewCorridor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.visualOpeningPercent",
+          "operator": "<",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "Abertura visual: {municipal.visualOpeningPercent}% da largura do lote",
+      "requiredValue": "Abertura visual ≥ 30% da largura do lote em corredor visual ribeirinho",
+      "remediation": "Reconfigurar a implantação do edifício para garantir uma abertura visual ≥ 30% da largura do lote, medida ao nível do espaço público. Soluções possíveis: (1) recuar parcialmente a fachada; (2) criar passagem coberta (arcada) ao nível do rés-do-chão; (3) dividir o volume edificado em dois corpos com espaço aberto entre eles. Apresentar cortes e simulações visuais (fotomontagens) demonstrando a preservação das vistas sobre o rio.",
+      "enabled": true,
+      "tags": [
+        "corredor-visual",
+        "rio",
+        "vistas",
+        "abertura-visual",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal de Imagem Urbana — Paleta Cromática Obrigatória",
+      "description": "Em centros históricos e zonas de proteção patrimonial, as fachadas dos edifícios devem utilizar exclusivamente as cores da paleta cromática municipal aprovada, preservando a identidade visual do conjunto urbano.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isInColorPaletteZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.facadeColorApproved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona de paleta cromática: {municipal.isInColorPaletteZone} | Cor aprovada: {municipal.facadeColorApproved}",
+      "requiredValue": "Cor de fachada aprovada pela câmara municipal (facadeColorApproved = true)",
+      "remediation": "Consultar a paleta cromática municipal disponível nos serviços de urbanismo da câmara municipal ou no sítio web do município. Selecionar cores de fachada dentro da paleta aprovada para a zona em causa. Submeter amostra de cor (referência NCS ou RAL) juntamente com o projeto de arquitetura. Em zonas de proteção de imóveis classificados, é também necessário parecer prévio da DGPC/DRC.",
+      "enabled": true,
+      "tags": [
+        "paleta-cromática",
+        "cor-fachada",
+        "centro-histórico",
+        "imagem-urbana",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COR-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Restrições de Materiais de Revestimento em Zona Histórica",
+      "description": "Em zonas de proteção patrimonial, os revestimentos de fachada devem ser compatíveis com os materiais tradicionais da envolvente (reboco pintado, azulejo, pedra aparente), sendo proibidos revestimentos em chapa metálica, ETICS de cor viva ou painéis compósitos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.isInHeritageProtectionZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.facadeMaterial",
+          "operator": "in",
+          "value": [
+            "chapa_metalica",
+            "painel_composito",
+            "etics_cor_viva",
+            "betao_aparente"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Material de fachada proposto: {municipal.facadeMaterial}",
+      "requiredValue": "Material de fachada compatível com zona patrimonial (reboco pintado, azulejo, pedra)",
+      "remediation": "Substituir o revestimento de fachada proposto por materiais compatíveis com a envolvente patrimonial: reboco pintado (à base de cal hidráulica), azulejo tradicional, pedra natural aparente, ou caixilharia em madeira/alumínio lacado de cor discreta. Submeter proposta de materiais e acabamentos à câmara municipal e, se aplicável, à DGPC/DRC para aprovação. Apresentar painel de amostras in situ.",
+      "enabled": true,
+      "tags": [
+        "materiais",
+        "fachada",
+        "zona-patrimonial",
+        "revestimento",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-PUBLI-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal de Publicidade — Limitação de Publicidade em Fachada Comercial",
+      "description": "A ocupação publicitária em fachadas comerciais (lettering, toldos, bandeirolas) não pode exceder 20% da área total da fachada do piso térreo e deve respeitar os limites de saliência e altura definidos no regulamento municipal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.facadeAdvertisingPercent",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "municipal.buildingUse",
+          "operator": "in",
+          "value": [
+            "comercial",
+            "servicos",
+            "misto"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Ocupação publicitária da fachada: {municipal.facadeAdvertisingPercent}%",
+      "requiredValue": "Publicidade em fachada ≤ 20% da área de fachada do piso térreo",
+      "remediation": "Reduzir a área de publicidade em fachada para um máximo de 20% da área total da fachada ao nível do piso térreo. A sinalética deve respeitar: (1) saliência máxima de 0,20 m para lettering aplicado na fachada; (2) saliência máxima de 1,00 m para bandeirolas (perpendiculares à fachada); (3) altura mínima livre sob toldos e bandeirolas de 2,50 m sobre o passeio. Submeter projeto de sinalética à câmara municipal para licenciamento.",
+      "enabled": true,
+      "tags": [
+        "publicidade",
+        "fachada-comercial",
+        "sinalética",
+        "regulamento-publicidade",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ESPLAN-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal de Ocupação do Espaço Público — Esplanadas",
+      "description": "A instalação de esplanadas (mesas e cadeiras em espaço público) requer licença municipal específica e não pode reduzir o passeio livre para peões a menos de 1,50 m de largura, devendo garantir acessibilidade a pessoas com mobilidade reduzida.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.hasOutdoorDiningArea",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.remainingSidewalkWidthMeters",
+          "operator": "<",
+          "value": 1.5
+        }
+      ],
+      "currentValueTemplate": "Largura livre do passeio após esplanada: {municipal.remainingSidewalkWidthMeters} m",
+      "requiredValue": "Largura livre do passeio ≥ 1,50 m após instalação da esplanada",
+      "remediation": "Redimensionar a esplanada para garantir uma largura livre de passeio ≥ 1,50 m para peões e pessoas com mobilidade reduzida (DL 163/2006). A esplanada não pode obstruir passagens de peões, acessos a edifícios, bocas de incêndio ou mobiliário urbano. Submeter pedido de licença de ocupação do espaço público à câmara municipal, com planta cotada e identificação do mobiliário (mesas, cadeiras, guarda-sóis, estrados).",
+      "enabled": true,
+      "tags": [
+        "esplanada",
+        "espaço-público",
+        "acessibilidade",
+        "passeio",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ARQUE-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 107/2001 — Levantamento Arqueológico Obrigatório",
+      "description": "Em zonas de sensibilidade arqueológica identificadas no PDM ou na Carta Arqueológica, os projetos que envolvam escavação ou movimentação de terras a profundidade superior a 0,50 m devem ser precedidos de trabalhos arqueológicos de diagnóstico (sondagens de avaliação).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInArchaeologicalZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.excavationDepthMeters",
+          "operator": ">",
+          "value": 0.5
+        },
+        {
+          "field": "municipal.archaeologicalSurveyDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona arqueológica: {municipal.isInArchaeologicalZone} | Profundidade escavação: {municipal.excavationDepthMeters} m | Levantamento: {municipal.archaeologicalSurveyDone}",
+      "requiredValue": "Levantamento arqueológico de diagnóstico concluído (archaeologicalSurveyDone = true)",
+      "remediation": "Contratar arqueólogo habilitado pela DGPC (Direção-Geral do Património Cultural) para realizar trabalhos arqueológicos de diagnóstico (sondagens mecânicas e manuais) antes do início das escavações. Submeter PATA (Plano de Trabalhos Arqueológicos) à DGPC para autorização prévia. Os trabalhos podem resultar em: (1) libertação do terreno; (2) escavação integral prévia à obra; (3) acompanhamento arqueológico durante a obra; (4) minimização com alteração do projeto. Os custos são suportados pelo promotor (Lei 107/2001, Art. 79.º).",
+      "enabled": true,
+      "tags": [
+        "arqueologia",
+        "sondagens",
+        "DGPC",
+        "escavação",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CONTAM-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 178/2006 — Avaliação de Contaminação do Solo",
+      "description": "Os terrenos com utilização industrial prévia (passada ou presente) que sejam objeto de reconversão urbanística devem ser sujeitos a estudo de caracterização de solos para deteção de contaminação, antes de qualquer licenciamento para uso residencial, escolar ou de saúde.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.previousLandUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "posto_combustivel",
+            "oficina",
+            "armazem_quimico",
+            "deposito_residuos"
+          ]
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "residencial",
+            "escolar",
+            "saude",
+            "creche",
+            "lar_idosos"
+          ]
+        },
+        {
+          "field": "municipal.soilContaminationAssessment",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Uso anterior: {municipal.previousLandUse} | Uso proposto: {municipal.proposedUse} | Avaliação: {municipal.soilContaminationAssessment}",
+      "requiredValue": "Avaliação de contaminação do solo concluída (soilContaminationAssessment = true)",
+      "remediation": "Contratar laboratório acreditado pelo IPAC para realizar estudo de caracterização de solos e águas subterrâneas, incluindo: (1) pesquisa de fase I (histórica e documental); (2) pesquisa de fase II (sondagens e análises químicas); (3) comparação com valores de referência do APA (Agência Portuguesa do Ambiente). Se forem detetados contaminantes acima dos limiares, elaborar plano de remediação (descontaminação) e submetê-lo à APA para aprovação antes do licenciamento municipal.",
+      "enabled": true,
+      "tags": [
+        "contaminação",
+        "solos",
+        "reconversão",
+        "industrial",
+        "remediação",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CONTAM-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 178/2006 — Certificação de Descontaminação de Solo",
+      "description": "Após a execução do plano de remediação de solos contaminados, o terreno só pode ser licenciado para o novo uso quando a APA emitir certificado de conclusão da descontaminação, confirmando que os valores de referência foram atingidos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.soilRemediationRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.soilRemediationCertified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Remediação necessária: {municipal.soilRemediationRequired} | Certificação APA: {municipal.soilRemediationCertified}",
+      "requiredValue": "Certificação de descontaminação emitida pela APA (soilRemediationCertified = true)",
+      "remediation": "Concluir as obras de remediação conforme o plano aprovado pela APA e realizar amostragem de verificação (confirmatory sampling) por laboratório acreditado. Submeter relatório final de remediação à APA demonstrando que os valores de referência para o uso pretendido foram atingidos. A APA emitirá certificado de conclusão que deve ser apresentado à câmara municipal como condição prévia ao licenciamento.",
+      "enabled": true,
+      "tags": [
+        "contaminação",
+        "remediação",
+        "certificação",
+        "APA",
+        "solos",
+        "PDM"
+      ]
     }
   ]
 }

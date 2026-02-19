@@ -2818,6 +2818,657 @@
         "garantia",
         "RJUE"
       ]
+    },
+    {
+      "id": "PDM-HOROB-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 86.º-A — Restrição de Horário de Obras em Zona Residencial",
+      "description": "Em zonas predominantemente residenciais, as obras de construção que produzam ruído (demolição, escavação, betonagem, serralharia) só podem decorrer em dias úteis entre as 08h00 e as 20h00, e aos sábados entre as 09h00 e as 13h00, sendo proibidas aos domingos e feriados.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.zoneClassification",
+          "operator": "in",
+          "value": [
+            "residencial",
+            "mista_predominancia_residencial",
+            "historica"
+          ]
+        },
+        {
+          "field": "municipal.constructionHoursCompliant",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona: {municipal.zoneClassification} | Conformidade horária: {municipal.constructionHoursCompliant}",
+      "requiredValue": "Horário de obra conforme regulamento municipal (constructionHoursCompliant = true)",
+      "remediation": "Ajustar o plano de trabalhos para respeitar os horários permitidos em zona residencial: dias úteis 08h00–20h00, sábados 09h00–13h00, proibido domingos e feriados. Para trabalhos noturnos ou em horário especial (p.ex. betonagens contínuas), requerer autorização especial à câmara municipal com justificação técnica e plano de mitigação do ruído. Informar os moradores vizinhos com antecedência mínima de 48 horas sobre trabalhos excecionais.",
+      "enabled": true,
+      "tags": [
+        "horário-obras",
+        "ruído",
+        "zona-residencial",
+        "estaleiro",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-HOROB-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / RGR (DL 9/2007) — Restrição de Ruído Noturno em Estaleiro",
+      "description": "Durante o período noturno (23h00–07h00), é proibida qualquer atividade de obra que produza ruído ambiente exterior superior a 45 dB(A) medido no recetor sensível mais próximo, nos termos do Regulamento Geral do Ruído.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.nightWorkPlanned",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.nightNoiseExemptionGranted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Trabalho noturno previsto: {municipal.nightWorkPlanned} | Isenção de ruído noturno: {municipal.nightNoiseExemptionGranted}",
+      "requiredValue": "Isenção de ruído noturno obtida ou trabalho noturno não previsto (nightNoiseExemptionGranted = true)",
+      "remediation": "Eliminar trabalhos noturnos do plano de obra ou requerer autorização especial à câmara municipal (Art. 15.º do DL 9/2007 — RGR). A autorização requer: (1) justificação técnica da impossibilidade de realizar os trabalhos em período diurno; (2) estudo acústico demonstrando que o ruído no recetor sensível não excede 45 dB(A); (3) plano de mitigação (barreiras acústicas, equipamento insonorizado). A autorização deve ser requerida com antecedência mínima de 15 dias.",
+      "enabled": true,
+      "tags": [
+        "ruído-noturno",
+        "RGR",
+        "estaleiro",
+        "período-noturno",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-VEPES-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 86.º — Restrição de Circulação de Veículos Pesados",
+      "description": "A circulação de veículos pesados (>3,5 t) de transporte de materiais e equipamentos de obra em vias urbanas residenciais pode ser restringida pelo município a determinados horários e itinerários, para minimizar o impacto no trânsito e na qualidade de vida dos residentes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.heavyVehicleRouteApproved",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.heavyVehicleAccessRequired",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Itinerário de veículos pesados aprovado: {municipal.heavyVehicleRouteApproved}",
+      "requiredValue": "Itinerário e horário de veículos pesados aprovado pela câmara municipal (heavyVehicleRouteApproved = true)",
+      "remediation": "Submeter à câmara municipal o plano de circulação de veículos pesados incluindo: (1) itinerário proposto com identificação das vias; (2) horários de circulação (tipicamente 09h30–16h30 para evitar horas de ponta); (3) tipo e peso dos veículos; (4) frequência estimada de viagens; (5) sinalização temporária necessária. A câmara pode impor itinerários alternativos, restrições horárias adicionais ou exigir acompanhamento policial para manobras em vias estreitas.",
+      "enabled": true,
+      "tags": [
+        "veículos-pesados",
+        "circulação",
+        "estaleiro",
+        "itinerário",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-VEPES-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / CME — Proteção de Pavimentos em Rotas de Veículos Pesados",
+      "description": "O empreiteiro é responsável pela reparação de danos causados nos pavimentos e infraestruturas viárias municipais pela circulação de veículos pesados associada à obra, devendo prestar caução ou seguro específico para este efeito.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.heavyVehicleAccessRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.pavementDamageBondPosted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Caução para danos em pavimentos: {municipal.pavementDamageBondPosted}",
+      "requiredValue": "Caução ou seguro para danos em pavimentos prestado (pavementDamageBondPosted = true)",
+      "remediation": "Prestar caução ou contratar seguro de responsabilidade civil para cobertura de danos em pavimentos e infraestruturas viárias causados pela circulação de veículos pesados. O valor da caução é determinado pela câmara municipal em função do itinerário, frequência e duração da obra. Realizar levantamento fotográfico do estado dos pavimentos antes do início da obra (vistoria ad quem) em conjunto com os serviços municipais.",
+      "enabled": true,
+      "tags": [
+        "veículos-pesados",
+        "pavimentos",
+        "caução",
+        "danos",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-ARQAC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 20.º-A — Acompanhamento Arqueológico de Obra",
+      "description": "Quando os trabalhos arqueológicos de diagnóstico determinam a necessidade de acompanhamento arqueológico permanente durante a fase de escavação, o promotor deve garantir a presença contínua de arqueólogo habilitado em obra.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.archaeologicalMonitoringRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.archaeologistOnSite",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Acompanhamento arqueológico exigido: {municipal.archaeologicalMonitoringRequired} | Arqueólogo em obra: {municipal.archaeologistOnSite}",
+      "requiredValue": "Arqueólogo habilitado presente em obra durante escavações (archaeologistOnSite = true)",
+      "remediation": "Contratar arqueólogo habilitado pela DGPC para acompanhamento permanente durante todas as operações de escavação e movimentação de terras. O arqueólogo deve: (1) estar presente durante todas as escavações mecânicas; (2) ter autoridade para suspender os trabalhos em caso de descoberta; (3) registar e comunicar achados à DGPC no prazo de 48 horas; (4) elaborar relatório final dos trabalhos. Os custos são da responsabilidade do promotor.",
+      "enabled": true,
+      "tags": [
+        "arqueologia",
+        "acompanhamento",
+        "escavação",
+        "DGPC",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-ARQAC-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / Lei 107/2001 — Achados Arqueológicos Fortuitos",
+      "description": "Em caso de descoberta fortuita de vestígios arqueológicos durante a obra (mesmo fora de zona arqueológica classificada), o empreiteiro deve suspender imediatamente os trabalhos no local e notificar a câmara municipal e a DGPC no prazo máximo de 48 horas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.hasExcavationWorks",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.fortuitousDiscoveryProtocolAcknowledged",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Obras de escavação: {municipal.hasExcavationWorks} | Protocolo de achados reconhecido: {municipal.fortuitousDiscoveryProtocolAcknowledged}",
+      "requiredValue": "Protocolo de achados fortuitos reconhecido pela equipa de obra (fortuitousDiscoveryProtocolAcknowledged = true)",
+      "remediation": "Incluir no Plano de Segurança e Saúde (PSS) e no Livro de Obra o protocolo de achados arqueológicos fortuitos: (1) suspensão imediata dos trabalhos na área da descoberta; (2) isolamento e proteção do local; (3) notificação à câmara municipal e à DGPC em 48 horas (Lei 107/2001, Art. 78.º); (4) registo fotográfico e topográfico; (5) não retomar trabalhos até autorização da DGPC. Dar formação à equipa de obra sobre identificação de vestígios (cerâmica, ossadas, estruturas em pedra).",
+      "enabled": true,
+      "tags": [
+        "arqueologia",
+        "achados-fortuitos",
+        "suspensão",
+        "DGPC",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-REABLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 60.º-A — Licenciamento Simplificado de Reabilitação",
+      "description": "As obras de reabilitação de edifícios localizados em ARU podem beneficiar de procedimento de licenciamento simplificado, com prazos reduzidos de apreciação (45 dias) e dispensa de determinadas consultas externas, nos termos do RJRU.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "reabilitacao",
+            "reconstrucao"
+          ]
+        },
+        {
+          "field": "municipal.simplifiedProcedureApplied",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em ARU: {municipal.isInARU} | Procedimento simplificado: {municipal.simplifiedProcedureApplied}",
+      "requiredValue": "Procedimento simplificado de reabilitação solicitado (simplifiedProcedureApplied = true)",
+      "remediation": "Requerer à câmara municipal o procedimento simplificado de licenciamento previsto para obras de reabilitação em ARU (Art. 60.º-A do DL 555/99, na redação do DL 10/2024). O procedimento simplificado reduz o prazo de apreciação para 45 dias e pode dispensar consultas externas. Juntar ao requerimento: (1) declaração de localização em ARU; (2) memória descritiva das obras de reabilitação; (3) compromisso de cumprimento dos requisitos mínimos de habitabilidade.",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "licenciamento-simplificado",
+        "ARU",
+        "RJRU",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-REABLIC-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / RJRU — Dispensa de Conformidade Total com RGEU em Reabilitação",
+      "description": "Em obras de reabilitação de edifícios existentes em ARU, a câmara municipal pode dispensar a conformidade integral com o RGEU (alturas de pé-direito, dimensões mínimas de compartimentos) quando tal se mostre materialmente impossível ou desproporcionado face ao edifício existente.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "==",
+          "value": "reabilitacao"
+        },
+        {
+          "field": "municipal.rgeuWaiverRequested",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em ARU: {municipal.isInARU} | Dispensa RGEU requerida: {municipal.rgeuWaiverRequested}",
+      "requiredValue": "Dispensa de conformidade RGEU requerida se aplicável (rgeuWaiverRequested = true)",
+      "remediation": "Se o edifício existente não cumpre integralmente o RGEU (pé-direito mínimo, dimensões de compartimentos, etc.) e a sua adequação é materialmente impossível ou desproporcionada, requerer à câmara municipal a dispensa de conformidade nos termos do regime excecional de reabilitação urbana (DL 53/2014). Juntar ao requerimento: (1) levantamento do existente; (2) justificação técnica da impossibilidade de cumprimento; (3) demonstração de condições mínimas de habitabilidade e segurança.",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "RGEU",
+        "dispensa",
+        "ARU",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-CONTOBJ-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 89.º-A — Avaliação de Contaminação em Obra de Demolição",
+      "description": "Antes de obras de demolição em edifícios industriais ou com utilização de materiais perigosos (amianto, tintas com chumbo), é obrigatória a realização de levantamento de materiais perigosos e plano de remoção segura, nos termos da legislação de resíduos de construção e demolição.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "demolicao",
+            "demolicao_parcial"
+          ]
+        },
+        {
+          "field": "municipal.hazardousMaterialSurveyDone",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.buildingAge",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "Tipo de operação: {municipal.operationType} | Idade edifício: {municipal.buildingAge} anos | Levantamento materiais perigosos: {municipal.hazardousMaterialSurveyDone}",
+      "requiredValue": "Levantamento de materiais perigosos concluído (hazardousMaterialSurveyDone = true)",
+      "remediation": "Contratar empresa especializada para realizar levantamento de materiais perigosos antes da demolição, incluindo: (1) identificação e mapeamento de materiais com amianto (MCA) — fibrocimento, isolamentos, pisos vinílicos; (2) tintas com chumbo; (3) PCBs em equipamentos elétricos; (4) depósitos de combustível enterrados. Elaborar Plano de Remoção de Materiais Perigosos e submetê-lo à APA. A remoção de amianto requer empresa licenciada (DL 266/2007) e notificação prévia à ACT.",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "materiais-perigosos",
+        "amianto",
+        "contaminação",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-CONTOBJ-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 46/2008 — Gestão de Resíduos de Construção e Demolição (RCD)",
+      "description": "Todas as obras de construção e demolição devem elaborar Plano de Prevenção e Gestão de RCD, garantindo a triagem em obra e o encaminhamento de pelo menos 70% (em peso) dos RCD para reciclagem ou valorização.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.rcdManagementPlanApproved",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "construcao_nova",
+            "demolicao",
+            "demolicao_parcial",
+            "reabilitacao",
+            "ampliacao"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Plano de Gestão de RCD aprovado: {municipal.rcdManagementPlanApproved}",
+      "requiredValue": "Plano de Prevenção e Gestão de RCD aprovado (rcdManagementPlanApproved = true)",
+      "remediation": "Elaborar Plano de Prevenção e Gestão de Resíduos de Construção e Demolição (PPGRCD) nos termos do DL 46/2008, incluindo: (1) estimativa das quantidades de RCD por tipo (LER); (2) metodologia de triagem em obra (contentores separados por fração); (3) identificação dos operadores licenciados de destino; (4) meta de valorização ≥ 70% em peso. Submeter o PPGRCD à câmara municipal juntamente com o projeto. Manter em obra o registo de guias de acompanhamento de RCD (e-GAR).",
+      "enabled": true,
+      "tags": [
+        "RCD",
+        "resíduos",
+        "reciclagem",
+        "triagem",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-REGURB-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 6.º-A — Isenção de Taxas em Regeneração Urbana",
+      "description": "As operações urbanísticas em ARU podem beneficiar de isenção ou redução das taxas municipais de urbanização (TMU), infraestruturas e compensações, como incentivo à regeneração urbana, mediante deliberação da assembleia municipal.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.tmuExemptionAvailable",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.tmuExemptionApplied",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em ARU: {municipal.isInARU} | Isenção TMU disponível: {municipal.tmuExemptionAvailable} | Aplicada: {municipal.tmuExemptionApplied}",
+      "requiredValue": "Isenção de TMU requerida em ARU (tmuExemptionApplied = true)",
+      "remediation": "Verificar no regulamento de taxas do município se existem isenções ou reduções de TMU para operações urbanísticas em ARU. Caso existam, requerer a isenção/redução no momento da submissão do pedido de licenciamento, juntando: (1) declaração de localização em ARU; (2) identificação das taxas a que se pretende a isenção; (3) memória descritiva demonstrando o contributo do projeto para a regeneração urbana. A isenção pode abranger TMU, taxa de infraestruturas, compensações urbanísticas e taxas de publicidade.",
+      "enabled": true,
+      "tags": [
+        "regeneração-urbana",
+        "TMU",
+        "isenção-taxas",
+        "ARU",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-REGURB-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / RJRU — Programa de Ação de Reabilitação Urbana",
+      "description": "Os promotores de operações de reabilitação em ARU com programa de ação aprovado pelo município podem beneficiar de expropriação facilitada, venda forçada e direito de preferência municipal, acelerando o processo de regeneração urbana.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.aruActionProgramExists",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.aruActionProgramConsulted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Programa de ação ARU: {municipal.aruActionProgramExists} | Consultado: {municipal.aruActionProgramConsulted}",
+      "requiredValue": "Programa de ação da ARU consultado para identificação de incentivos (aruActionProgramConsulted = true)",
+      "remediation": "Consultar o Programa de Ação da ARU aprovado pela câmara municipal para identificar: (1) incentivos financeiros e fiscais específicos do programa; (2) prioridades de intervenção; (3) possibilidade de apoio técnico municipal; (4) condições para acesso a fundos comunitários (IFRRU 2020 ou sucedâneo); (5) eventuais mecanismos de venda forçada ou expropriação aplicáveis a imóveis devolutos. O programa de ação está disponível nos serviços de urbanismo ou no sítio web do município.",
+      "enabled": true,
+      "tags": [
+        "regeneração-urbana",
+        "programa-ação",
+        "ARU",
+        "incentivos",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-SISLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 95/2019 — Declaração de Conformidade Sísmica no Licenciamento",
+      "description": "O projeto de estruturas submetido no processo de licenciamento deve incluir declaração de conformidade sísmica assinada pelo engenheiro de estruturas, atestando que o projeto cumpre o EC8 (NP EN 1998) para a zona sísmica do local.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.structuralProjectSubmitted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.seismicComplianceDeclaration",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Projeto de estruturas: {municipal.structuralProjectSubmitted} | Declaração sísmica: {municipal.seismicComplianceDeclaration}",
+      "requiredValue": "Declaração de conformidade sísmica assinada pelo engenheiro (seismicComplianceDeclaration = true)",
+      "remediation": "O engenheiro de estruturas responsável pelo projeto deve emitir declaração de conformidade sísmica nos termos do DL 95/2019 e do EC8 (NP EN 1998), indicando: (1) zona sísmica do local (Tipo 1 e Tipo 2); (2) classe de importância do edifício; (3) classe de ductilidade adotada; (4) aceleração de projeto; (5) tipo de solo de fundação. A declaração deve ser junta ao processo de licenciamento e assinada digitalmente com certificado da Ordem dos Engenheiros.",
+      "enabled": true,
+      "tags": [
+        "sismicidade",
+        "EC8",
+        "licenciamento",
+        "estruturas",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-SISLIC-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 95/2019 — Relatório Geotécnico Obrigatório em Zona Sísmica",
+      "description": "Em zonas sísmicas de risco moderado a elevado, o projeto de licenciamento deve incluir relatório de prospeção geotécnica para classificação do tipo de solo de fundação (A a E do EC8), necessário para a correta definição da ação sísmica de projeto.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.seismicZone",
+          "operator": "in",
+          "value": [
+            "1.1",
+            "1.2",
+            "1.3",
+            "1.4",
+            "2.1",
+            "2.2",
+            "2.3"
+          ]
+        },
+        {
+          "field": "municipal.geotechnicalReportSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona sísmica: {municipal.seismicZone} | Relatório geotécnico: {municipal.geotechnicalReportSubmitted}",
+      "requiredValue": "Relatório geotécnico com classificação de solo submetido (geotechnicalReportSubmitted = true)",
+      "remediation": "Contratar empresa de geotecnia para realizar prospeção do terreno (sondagens mecânicas, SPT, ensaios DPSH/CPT) e classificar o solo de fundação segundo as categorias do EC8 (Tipo A a E). O relatório deve incluir: (1) perfil geológico; (2) nível freático; (3) valor de Vs30 (velocidade das ondas de corte nos primeiros 30 m); (4) classificação do solo conforme Quadro NA.3.1 do NA do EC8. Submeter o relatório geotécnico juntamente com o projeto de estruturas.",
+      "enabled": true,
+      "tags": [
+        "geotecnia",
+        "sismicidade",
+        "solo-fundação",
+        "EC8",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-COSTLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 20.º / POOC — Parecer da APA para Construção em Zona Costeira",
+      "description": "O licenciamento de obras em zona costeira (faixa de 500 m desde a linha de costa) está sujeito a parecer vinculativo da APA — Agência Portuguesa do Ambiente, que avalia a conformidade com o POOC e os riscos de erosão costeira.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isCoastalZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.distanceToCoastlineMeters",
+          "operator": "<=",
+          "value": 500
+        },
+        {
+          "field": "municipal.apaCoastalOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à costa: {municipal.distanceToCoastlineMeters} m | Parecer APA: {municipal.apaCoastalOpinionObtained}",
+      "requiredValue": "Parecer da APA para zona costeira obtido (apaCoastalOpinionObtained = true)",
+      "remediation": "Submeter pedido de parecer à APA (Agência Portuguesa do Ambiente) antes ou em simultâneo com o pedido de licenciamento municipal. O pedido deve incluir: (1) localização exata com coordenadas geográficas; (2) distância à linha de costa; (3) projeto de arquitetura; (4) memória descritiva; (5) levantamento topográfico. O parecer da APA é vinculativo e avalia a conformidade com o POOC, os riscos de erosão e galgamento costeiro, e a preservação dos sistemas dunares.",
+      "enabled": true,
+      "tags": [
+        "zona-costeira",
+        "APA",
+        "POOC",
+        "parecer",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-RIPLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 20.º / Lei 58/2005 — Parecer da ARH para Construção em Domínio Hídrico",
+      "description": "O licenciamento de obras na proximidade de cursos de água (faixa de proteção ao domínio hídrico) está sujeito a parecer da ARH (Administração da Região Hidrográfica) competente, que avalia o impacto sobre os recursos hídricos e o risco de cheias.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWatercourseMeters",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.distanceToWatercourseMeters",
+          "operator": "<=",
+          "value": 50
+        },
+        {
+          "field": "municipal.arhOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância ao curso de água: {municipal.distanceToWatercourseMeters} m | Parecer ARH: {municipal.arhOpinionObtained}",
+      "requiredValue": "Parecer da ARH obtido para construção próxima de curso de água (arhOpinionObtained = true)",
+      "remediation": "Submeter pedido de parecer à ARH competente (integrada na APA) antes ou em simultâneo com o pedido de licenciamento municipal. O parecer avalia: (1) conformidade com a faixa de proteção ao domínio hídrico; (2) impacto sobre o regime hidrológico; (3) risco de cheias (carta de zonas inundáveis); (4) impacto sobre a qualidade da água; (5) necessidade de título de utilização dos recursos hídricos (TURH). O prazo de emissão do parecer é de 20 dias úteis.",
+      "enabled": true,
+      "tags": [
+        "domínio-hídrico",
+        "ARH",
+        "parecer",
+        "cheias",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-ESPDOC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 11.º / Portaria 113/2015 — Elementos Instrutórios para Esplanada",
+      "description": "O pedido de licença para instalação de esplanada em espaço público deve ser instruído com planta de localização, planta de implantação cotada, alçado da fachada com mobiliário, e memória descritiva dos materiais, conforme o regulamento municipal de ocupação do espaço público.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.hasOutdoorDiningArea",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.outdoorDiningLicenseSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Esplanada prevista: {municipal.hasOutdoorDiningArea} | Licença submetida: {municipal.outdoorDiningLicenseSubmitted}",
+      "requiredValue": "Pedido de licença de esplanada submetido (outdoorDiningLicenseSubmitted = true)",
+      "remediation": "Submeter pedido de licença de ocupação do espaço público para instalação de esplanada, incluindo: (1) planta de localização (escala 1:1000); (2) planta de implantação cotada (escala 1:100) com delimitação da esplanada e largura livre de passeio; (3) alçado da fachada com representação do mobiliário (mesas, cadeiras, guarda-sóis, estrados); (4) memória descritiva dos materiais e cores; (5) horário de funcionamento pretendido; (6) prova de seguro de responsabilidade civil. A licença é anual e renovável.",
+      "enabled": true,
+      "tags": [
+        "esplanada",
+        "licença",
+        "espaço-público",
+        "elementos-instrutórios",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-PSCONT-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 89.º-B / DL 178/2006 — Avaliação Ambiental Prévia em Reconversão de Solo Industrial",
+      "description": "No processo de licenciamento para reconversão urbanística de terrenos com utilização industrial prévia, a câmara municipal deve exigir relatório de avaliação ambiental do solo como elemento instrutório obrigatório, complementando o parecer da APA sobre a necessidade de descontaminação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.previousLandUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "posto_combustivel",
+            "oficina",
+            "armazem_quimico"
+          ]
+        },
+        {
+          "field": "municipal.environmentalSiteAssessmentSubmitted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "construcao_nova",
+            "loteamento",
+            "ampliacao"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Uso anterior do solo: {municipal.previousLandUse} | Avaliação ambiental submetida: {municipal.environmentalSiteAssessmentSubmitted}",
+      "requiredValue": "Relatório de avaliação ambiental do solo submetido com o processo de licenciamento (environmentalSiteAssessmentSubmitted = true)",
+      "remediation": "Contratar empresa de consultoria ambiental acreditada para elaborar relatório de avaliação ambiental do local (Environmental Site Assessment — ESA), incluindo: (1) Fase I — pesquisa histórica, documental e visual; (2) Fase II — amostragem e análise de solo e águas subterrâneas (se indicado pela Fase I). Submeter o relatório ESA como elemento instrutório do pedido de licenciamento. Se forem detetados níveis de contaminação acima dos valores de referência da APA, será necessário plano de remediação aprovado antes da emissão do alvará.",
+      "enabled": true,
+      "tags": [
+        "contaminação",
+        "solo-industrial",
+        "avaliação-ambiental",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-HOROB-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 86.º-A / CME — Restrição de Operações de Carga e Descarga em Estaleiro",
+      "description": "As operações de carga e descarga de materiais em estaleiro de obra localizado em zona residencial devem respeitar os horários autorizados e não podem ocupar a via pública sem licença de ocupação temporária emitida pela câmara municipal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.zoneClassification",
+          "operator": "in",
+          "value": [
+            "residencial",
+            "mista_predominancia_residencial"
+          ]
+        },
+        {
+          "field": "municipal.loadingUnloadingPlanApproved",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.requiresPublicSpaceForLoading",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Zona: {municipal.zoneClassification} | Plano de carga/descarga aprovado: {municipal.loadingUnloadingPlanApproved}",
+      "requiredValue": "Plano de carga e descarga aprovado pela câmara municipal (loadingUnloadingPlanApproved = true)",
+      "remediation": "Submeter à câmara municipal plano de operações de carga e descarga incluindo: (1) localização do ponto de carga/descarga (dentro do estaleiro ou em via pública); (2) horários pretendidos (tipicamente 09h00–17h00 em zona residencial); (3) tipo e dimensão dos veículos; (4) duração estimada de cada operação; (5) sinalização temporária e medidas de segurança. Se a operação exigir ocupação temporária da via pública, requerer licença de ocupação com antecedência mínima de 10 dias. Prever sinaleiro quando a operação afete a circulação rodoviária.",
+      "enabled": true,
+      "tags": [
+        "carga-descarga",
+        "estaleiro",
+        "zona-residencial",
+        "via-pública",
+        "RJUE"
+      ]
     }
   ]
 }

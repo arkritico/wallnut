@@ -1465,6 +1465,342 @@
       "remediation": "Implementar programa de comissionamento sazonal: (1) Inverno (novembro-dezembro): verificar caldeiras/bombas de calor, sistema de aquecimento, humidificação, recuperação de calor, setpoints de aquecimento, e estanquidade de portas/janelas; (2) Verão (maio-junho): verificar chillers, torres de arrefecimento, free-cooling, proteções solares, setpoints de arrefecimento, e sistema de desumidificação; (3) Ambas as estações: verificar caudais de ventilação, QAI, calibração de sensores, e consumos energéticos vs. valores de referência. Documentar e comparar com os resultados do comissionamento inicial para detetar degradação.",
       "enabled": true,
       "tags": ["comissionamento sazonal", "inverno", "verão", "desempenho", "EN 16798"]
+    },
+    {
+      "id": "HVAC-CHILLER-COP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / Ecodesign — COP Mínimo de Chillers Água-Água",
+      "description": "O COP do chiller água-água ({hvac.chillerCOP} kW/kW) é inferior ao mínimo de 5.0 exigido para chillers com condensação a água em condições nominais, indicando equipamento ineficiente ou degradado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.chillerCOP", "operator": "<", "value": 5.0 },
+        { "field": "hvac.chillerCondenserType", "operator": "==", "value": "water-cooled" }
+      ],
+      "currentValueTemplate": "COP = {hvac.chillerCOP}",
+      "requiredValue": "COP ≥ 5.0 para chillers água-água (condições nominais EN 14511)",
+      "remediation": "O chiller água-água deve atingir COP ≥ 5.0 em condições nominais (12/7°C no evaporador, 30/35°C no condensador). Soluções: (1) Substituir por chiller com compressor centrífugo magnético (COP 6.0-8.0). (2) Otimizar a temperatura de condensação (floating head pressure) — cada grau de redução melhora o COP em ~2%. (3) Verificar limpeza dos permutadores (fouling reduz COP). (4) Para chillers existentes, instalar VFD no compressor para melhorar eficiência em carga parcial.",
+      "enabled": true,
+      "tags": ["chiller", "COP", "água-água", "eficiência", "condensação"]
+    },
+    {
+      "id": "HVAC-CHILLER-COP-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — COP Mínimo de Chillers Ar-Água a Plena Carga",
+      "description": "O COP do chiller ar-água a plena carga ({hvac.airCooledChillerCOP}) é inferior ao mínimo de 2.8 exigido pelo RECS, indicando necessidade de substituição ou manutenção.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.airCooledChillerCOP", "operator": "<", "value": 2.8 },
+        { "field": "hvac.chillerCondenserType", "operator": "==", "value": "air-cooled" }
+      ],
+      "currentValueTemplate": "COP = {hvac.airCooledChillerCOP}",
+      "requiredValue": "COP ≥ 2.8 para chillers ar-água (condições nominais EN 14511)",
+      "remediation": "Substituir chiller ar-água com COP < 2.8 por equipamento de nova geração: (1) Chiller scroll inverter: COP 3.0-3.5. (2) Chiller parafuso inverter: COP 3.2-3.8. (3) Verificar limpeza das baterias de condensação — sujidade reduz COP em 10-20%. (4) Verificar carga de refrigerante — subcarga de 10% reduz COP em 15%. (5) Em clima português, considerar conversão para condensação a água (torre de arrefecimento) para ganho de COP de 30-50%.",
+      "enabled": true,
+      "tags": ["chiller", "COP", "ar-água", "eficiência", "RECS"]
+    },
+    {
+      "id": "HVAC-CT-TREAT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / DL 306/2007 — Controlo de Condutividade em Torres de Arrefecimento",
+      "description": "A torre de arrefecimento não possui sistema de purga automática por controlo de condutividade, resultando em concentração excessiva de sais minerais ({hvac.coolingTowerConductivity} µS/cm) que acelera a corrosão e incrustação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.coolingTowerConductivity", "operator": ">", "value": 2500 },
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.coolingTowerConductivity} µS/cm",
+      "requiredValue": "Condutividade ≤ 2500 µS/cm com purga automática",
+      "remediation": "Instalar sistema de purga automática com sensor de condutividade: (1) Sensor em linha na bacia da torre com setpoint de purga a 2500 µS/cm. (2) Electroválvula de purga comandada pelo controlador. (3) Ciclos de concentração alvo: 3-5× (reduz consumo de água em 60-80% vs. purga contínua). (4) Instalar contador de água de make-up para monitorizar perdas por evaporação e purga. (5) O tratamento químico deve ser ajustado ao ciclo de concentração: biocida, anticorrosivo e antincrustante doseados por bomba proporcional ao caudal de make-up.",
+      "enabled": true,
+      "tags": ["torre de arrefecimento", "condutividade", "purga", "tratamento água"]
+    },
+    {
+      "id": "HVAC-VAV-SIZE-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Dimensionamento de Caixas VAV",
+      "description": "As caixas de volume de ar variável (VAV) estão sobredimensionadas em mais de 30% ({hvac.vavOversizePercent}%), operando consistentemente abaixo de 40% da abertura, o que degrada o controlo de temperatura e gera ruído.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.vavOversizePercent", "operator": ">", "value": 30 },
+        { "field": "hvac.hasVAVSystem", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.vavOversizePercent}% sobredimensionamento VAV",
+      "requiredValue": "Sobredimensionamento de caixas VAV ≤ 30% face ao caudal de projeto",
+      "remediation": "Redimensionar ou substituir as caixas VAV sobredimensionadas: (1) A caixa VAV deve operar tipicamente entre 40% e 90% da abertura em condições normais. (2) Operação < 40% causa turbulência, ruído e perda de autoridade do controlador. (3) Selecionar o tamanho com base no caudal máximo de projeto + 10-15% de margem (não mais). (4) Para caixas existentes, reduzir o caudal máximo no controlador para limitar a abertura mínima a 30%. (5) Velocidade no pescoço: 3-6 m/s para baixo ruído, nunca > 10 m/s.",
+      "enabled": true,
+      "tags": ["VAV", "dimensionamento", "caudal variável", "controlo"]
+    },
+    {
+      "id": "HVAC-FCU-SELECT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Critérios de Seleção de Ventiloconvectores (FCU)",
+      "description": "Os ventiloconvectores instalados não estão selecionados para a velocidade média do ventilador, operando permanentemente em velocidade máxima com ruído excessivo ({hvac.fcuNoiseLevel} dB(A)) para cumprir a carga térmica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.fcuNoiseLevel", "operator": ">", "value": 35 },
+        { "field": "hvac.hasFCU", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.fcuNoiseLevel} dB(A) em velocidade máxima",
+      "requiredValue": "FCU selecionado para potência na velocidade média (≤ 35 dB(A) em escritórios)",
+      "remediation": "Os ventiloconvectores devem ser selecionados para fornecer a potência de projeto na velocidade média do ventilador: (1) A velocidade máxima serve como reserva para arranque rápido ou picos. (2) Na velocidade média: potência ≥ 100% da carga de projeto, ruído ≤ 35 dB(A) para escritórios, ≤ 30 dB(A) para quartos de hotel. (3) Verificar a potência no catálogo para as condições reais de água (não apenas condições nominais). (4) Para FCU de 2 tubos: verificar potência tanto em arrefecimento como em aquecimento. (5) Instalar válvula de 2 vias com atuador proporcional para cada FCU.",
+      "enabled": true,
+      "tags": ["ventiloconvector", "FCU", "ruído", "seleção", "dimensionamento"]
+    },
+    {
+      "id": "HVAC-AHU-FILT-01",
+      "regulationId": "recs-portaria-353a",
+      "article": "RECS / Portaria 353-A/2013 — Classe de Filtração em UTAs para Hospitais",
+      "description": "A UTA que serve espaços hospitalares não possui filtração HEPA (H13) como filtro final, conforme exigido para zonas protegidas (blocos operatórios, UCI, salas de isolamento).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hospitalFilterClass", "operator": "!=", "value": "H13" },
+        { "field": "hvac.spaceType", "operator": "==", "value": "operating-theatre" }
+      ],
+      "currentValueTemplate": "Filtro final: {hvac.hospitalFilterClass}",
+      "requiredValue": "Filtro HEPA H13 (eficiência ≥ 99.95%) obrigatório em blocos operatórios",
+      "remediation": "Instalar filtração HEPA H13 como filtro terminal nas UTAs que servem blocos operatórios e zonas protegidas: (1) Pré-filtro M5 + filtro intermédio F9 + filtro final H13 (3 estágios). (2) Filtros HEPA em caixas terminais junto ao difusor de insuflação (fluxo laminar). (3) Verificar estanquidade da instalação do filtro HEPA (ensaio com aerossol DOP/PAO conforme EN 1822-4). (4) Substituição quando ΔP atinge 2× ΔP inicial ou anualmente. (5) Manter pressão positiva no bloco operatório (+15 Pa vs. corredor).",
+      "enabled": true,
+      "tags": ["filtração", "HEPA", "hospital", "bloco operatório", "UTA"]
+    },
+    {
+      "id": "HVAC-DUCTLEAK-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 12237 — Classe de Estanquidade para Sistemas de Alta Pressão",
+      "description": "O sistema de condutas de alta pressão (> 1000 Pa) não cumpre a classe de estanquidade mínima C conforme EN 12237, resultando em fugas de ar significativas e perda de eficiência energética.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ductPressureClass", "operator": ">", "value": 1000 },
+        { "field": "hvac.ductLeakageClassMeasured", "operator": "!=", "value": "C" }
+      ],
+      "currentValueTemplate": "Pressão {hvac.ductPressureClass} Pa, Classe {hvac.ductLeakageClassMeasured}",
+      "requiredValue": "Classe C obrigatória para sistemas > 1000 Pa (EN 12237)",
+      "remediation": "Para sistemas de condutas de alta pressão (> 1000 Pa), garantir classe de estanquidade C: (1) Fugas máximas: 0.003 × p^0.65 L/(s·m²) a pressão de ensaio. (2) Utilizar condutas com juntas de classe C (vedante + junta mecânica). (3) Selar todas as uniões com mástique acrílico ou fita de alumínio reforçada. (4) Ensaiar 100% da rede de alta pressão (não apenas amostragem). (5) Fugas em classe C são ~3× menores que em classe A — economia energética de 5-15% em sistemas de alta pressão.",
+      "enabled": true,
+      "tags": ["estanquidade", "alta pressão", "EN 12237", "classe C", "condutas"]
+    },
+    {
+      "id": "HVAC-REFCHARGE-01",
+      "regulationId": "en-378",
+      "article": "RECS / EN 378-1 — Limite de Carga de Refrigerante em Sistemas Split",
+      "description": "A carga de refrigerante do sistema split ({hvac.splitRefrigerantCharge} kg) excede o limite prático para o volume do espaço servido, representando risco de asfixia ou inflamabilidade em caso de fuga total conforme EN 378-1.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.splitRefrigerantCharge", "operator": ">", "value": 0 },
+        { "field": "hvac.splitRefrigerantExceedsPL", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.splitRefrigerantCharge} kg ({hvac.refrigerantType})",
+      "requiredValue": "Carga ≤ PL × Volume do espaço (EN 378-1 Tabela C.1)",
+      "remediation": "A carga de refrigerante excede o limite prático para o espaço: (1) Reduzir a carga — utilizar circuito com tubagem de menor diâmetro ou comprimento. (2) Instalar detetor de refrigerante no espaço com alarme e ventilação de emergência. (3) Relocalizar a unidade interior para espaço de maior volume. (4) Considerar sistema hidráulico (chiller + ventiloconvectores) em alternativa ao split direto. (5) Para R-32 (A2L): PL = 0.061 kg/m³ — em sala de 20 m³ o limite é apenas 1.22 kg.",
+      "enabled": true,
+      "tags": ["refrigerante", "carga", "split", "EN 378", "segurança"]
+    },
+    {
+      "id": "HVAC-SPLIT-OUT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / Regulamento Municipal — Colocação de Unidades Exteriores Split",
+      "description": "A unidade exterior do sistema split não cumpre os requisitos de colocação: distância insuficiente da fachada ({hvac.outdoorUnitWallDistance} mm), obstrução do fluxo de ar do condensador, ou ausência de suporte anti-vibrátil.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.outdoorUnitWallDistance", "operator": "<", "value": 200 },
+        { "field": "hvac.hasOutdoorUnit", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Distância à parede: {hvac.outdoorUnitWallDistance} mm",
+      "requiredValue": "Distância ≥ 200 mm da parede posterior, ≥ 500 mm de obstruções laterais",
+      "remediation": "Garantir colocação correta da unidade exterior: (1) Distância mínima da parede posterior: 200 mm (verificar manual do fabricante). (2) Espaço livre lateral: ≥ 500 mm de cada lado. (3) Espaço livre frontal (descarga): ≥ 1000 mm sem obstruções. (4) Suporte anti-vibrátil (amortecedores de borracha) entre a unidade e a estrutura. (5) Drenagem de condensados canalizada (não para via pública). (6) Regulamento municipal: verificar exigências de integração arquitetónica (grelha, clausura acústica). (7) Orientação: evitar exposição solar direta prolongada (reduz COP em 5-10%).",
+      "enabled": true,
+      "tags": ["split", "unidade exterior", "colocação", "vibração", "condensador"]
+    },
+    {
+      "id": "HVAC-VRF-PIPE-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Comprimento Máximo de Tubagem VRF",
+      "description": "O comprimento equivalente da tubagem do sistema VRF ({hvac.vrfPipingLength} m) excede o limite máximo do fabricante, comprometendo o retorno de óleo ao compressor e a capacidade de arrefecimento/aquecimento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.vrfPipingLength", "operator": ">", "value": 165 },
+        { "field": "hvac.hasVRFSystem", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.vrfPipingLength} m equivalentes",
+      "requiredValue": "Comprimento total ≤ 165 m (típico), desnível ≤ 50 m (verificar fabricante)",
+      "remediation": "Respeitar os limites de comprimento de tubagem do sistema VRF: (1) Comprimento total máximo: tipicamente 165-200 m (verificar catálogo do fabricante específico). (2) Desnível máximo entre exterior e interior: 50 m (30 m para interior acima da exterior com R-32). (3) Desnível máximo entre interiores: 15-30 m. (4) Comprimento entre derivação e interior: ≤ 40 m. (5) Acima dos limites, aplicar fatores de correção de capacidade (perda de 5-15% por cada 10 m acima do limite recomendado). (6) Para instalações longas, considerar sistema hidráulico (VRF água) que elimina limitações de comprimento de refrigerante.",
+      "enabled": true,
+      "tags": ["VRF", "tubagem", "comprimento", "refrigerante", "dimensionamento"]
+    },
+    {
+      "id": "HVAC-HP-DEFROST-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Ciclo de Descongelação de Bombas de Calor",
+      "description": "A bomba de calor ar-água/ar-ar não possui sistema de descongelação eficiente, resultando em perdas de capacidade superiores a 20% e formação de gelo excessivo no evaporador durante períodos frios e húmidos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.heatPumpDefrostEfficiency", "operator": "<", "value": 80 },
+        { "field": "hvac.heatPumpType", "operator": "in", "value": ["air-to-air", "air-to-water"] }
+      ],
+      "currentValueTemplate": "Eficiência durante descongelação: {hvac.heatPumpDefrostEfficiency}%",
+      "requiredValue": "Eficiência de descongelação ≥ 80% (perda máxima de 20% durante ciclo de defrost)",
+      "remediation": "Otimizar o ciclo de descongelação da bomba de calor: (1) Utilizar descongelação inteligente (por demanda) em vez de temporizada — inicia apenas quando necessário com base em sensores de temperatura do evaporador e pressão de evaporação. (2) Minimizar a duração do ciclo de defrost (< 5 minutos). (3) Para bombas de calor ar-água: utilizar depósito de inércia (≥ 20 L/kW) para manter o fornecimento durante o defrost. (4) Em zonas com temperaturas frequentemente abaixo de 2°C e humidade > 80%, considerar bomba de calor com ciclo de defrost por gás quente. (5) Verificar espaçamento das alhetas do evaporador (≥ 2.5 mm para clima húmido).",
+      "enabled": true,
+      "tags": ["bomba de calor", "descongelação", "defrost", "eficiência", "inverno"]
+    },
+    {
+      "id": "HVAC-RADIANT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 / EN 1264 — Especificações de Painéis Radiantes",
+      "description": "O sistema de teto radiante instalado não cumpre os requisitos de assimetria radiante: diferença de temperatura radiante ({hvac.radiantAsymmetry}°C) entre teto e chão excede 5°C em modo de aquecimento, causando desconforto conforme EN 16798-1.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.radiantAsymmetry", "operator": ">", "value": 5 },
+        { "field": "hvac.hasRadiantPanel", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Assimetria radiante: {hvac.radiantAsymmetry}°C",
+      "requiredValue": "Assimetria radiante ≤ 5°C (teto quente) ou ≤ 14°C (teto frio) — EN 16798-1",
+      "remediation": "Reduzir a assimetria radiante do sistema de teto radiante: (1) Em aquecimento: limitar a temperatura superficial do teto a 27°C (escritórios) ou 29°C (zonas de passagem) conforme EN 1264-5. (2) Em arrefecimento: temperatura mínima do teto = ponto de orvalho + 1°C para evitar condensação. (3) Para piso radiante: temperatura superficial máxima 29°C (zona de permanência) e 35°C (zonas periféricas). (4) Dimensionar a potência específica em função da altura do teto e do Δt água-ambiente.",
+      "enabled": true,
+      "tags": ["teto radiante", "piso radiante", "assimetria", "conforto", "EN 1264"]
+    },
+    {
+      "id": "HVAC-DISPL-VENT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / REHVA — Design de Ventilação por Deslocamento",
+      "description": "O sistema de ventilação por deslocamento (displacement ventilation) instalado não cumpre as condições de projeto: velocidade de insuflação no difusor ({hvac.displacementSupplyVelocity} m/s) excede 0.5 m/s, comprometendo a estratificação e causando correntes de ar na zona de ocupação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.displacementSupplyVelocity", "operator": ">", "value": 0.5 },
+        { "field": "hvac.ventilationStrategy", "operator": "==", "value": "displacement" }
+      ],
+      "currentValueTemplate": "{hvac.displacementSupplyVelocity} m/s no difusor",
+      "requiredValue": "Velocidade ≤ 0.5 m/s no difusor de ventilação por deslocamento",
+      "remediation": "Ajustar o sistema de ventilação por deslocamento: (1) Velocidade no difusor: ≤ 0.5 m/s (idealmente 0.2-0.3 m/s). (2) Temperatura de insuflação: 18-20°C (Δt = 4-6°C abaixo do ambiente). (3) Difusores de chão ou parede de grande área (baixa velocidade). (4) Caudal dimensionado para renovação de 4-8 h⁻¹. (5) A estratificação vertical deve manter ar limpo na zona de respiração (0-1.8 m) e evacuar poluentes quentes pelo teto. (6) Ideal para espaços de pé direito elevado (> 3 m): auditórios, átrios, naves industriais.",
+      "enabled": true,
+      "tags": ["ventilação deslocamento", "displacement", "estratificação", "difusor"]
+    },
+    {
+      "id": "HVAC-DCV-CO2-01",
+      "regulationId": "recs-portaria-353a",
+      "article": "RECS / Portaria 353-A/2013 — Setpoints CO₂ para Ventilação por Demanda",
+      "description": "Os setpoints de CO₂ para controlo da ventilação por demanda (DCV) não estão corretamente configurados: o setpoint de arranque ({hvac.dcvCO2Setpoint} ppm) é superior a 800 ppm, resultando em ventilação insuficiente durante os primeiros períodos de ocupação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.dcvCO2Setpoint", "operator": ">", "value": 800 },
+        { "field": "hvac.hasDCVControl", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Setpoint DCV: {hvac.dcvCO2Setpoint} ppm",
+      "requiredValue": "Setpoint de arranque DCV: 800 ppm, máximo: 1000 ppm (Portaria 353-A/2013)",
+      "remediation": "Configurar corretamente os setpoints do sistema DCV: (1) Setpoint inferior (início de modulação): 800 ppm — o sistema começa a aumentar o caudal de ar novo. (2) Setpoint superior (caudal máximo): 1000 ppm — o sistema opera a caudal máximo de ar novo. (3) Caudal mínimo (CO₂ < 800 ppm): manter ventilação mínima de diluição (10% do caudal máximo ou caudal de material conforme Portaria 353-A). (4) Banda morta: 50-100 ppm para evitar oscilações. (5) Tempo de resposta da sonda NDIR: < 60 s. (6) Calibração da sonda: anual (ou semestral em ambientes exigentes).",
+      "enabled": true,
+      "tags": ["DCV", "CO2", "setpoint", "ventilação", "Portaria 353-A"]
+    },
+    {
+      "id": "HVAC-KITCHEN-MAKEUP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / ASHRAE 154 — Ar de Compensação para Extração de Cozinha",
+      "description": "O sistema de extração da cozinha profissional não possui ar de compensação (makeup air) adequado, criando pressão negativa excessiva ({hvac.kitchenNegativePressure} Pa) que dificulta a abertura de portas e causa infiltrações descontroladas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.kitchenNegativePressure", "operator": ">", "value": 7.5 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "kitchen" }
+      ],
+      "currentValueTemplate": "{hvac.kitchenNegativePressure} Pa de pressão negativa",
+      "requiredValue": "Pressão negativa ≤ 7.5 Pa (compensação de 80-90% do caudal de extração)",
+      "remediation": "Instalar sistema de ar de compensação (makeup air) para a cozinha profissional: (1) Caudal de compensação: 80-90% do caudal de extração (manter ligeira pressão negativa para conter odores). (2) Insuflação de compensação: parte pelo teto da cozinha (pré-tratado, velocidade baixa), parte pela sala de refeições adjacente (transferência). (3) Temperatura do ar de compensação: pré-aquecido no inverno (mínimo 15°C) e sem arrefecimento ativo no verão. (4) Não insuflar ar de compensação diretamente na zona de captação da hotte (reduz eficácia). (5) Dimensionar a hotte para capturar tanto a pluma convectiva como o ar de compensação sem transbordo.",
+      "enabled": true,
+      "tags": ["cozinha", "compensação", "makeup air", "extração", "hotte"]
+    },
+    {
+      "id": "HVAC-POOL-DEHUMID-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / DIN 4108 — Desumidificação de Piscinas Cobertas",
+      "description": "O sistema de desumidificação da piscina coberta não mantém a humidade relativa ({hvac.poolRelativeHumidity}%) dentro do intervalo aceitável de 50-65%, causando condensação na estrutura e desconforto dos ocupantes.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.poolRelativeHumidity", "operator": ">", "value": 65 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "swimming-pool" }
+      ],
+      "currentValueTemplate": "{hvac.poolRelativeHumidity}% HR na piscina",
+      "requiredValue": "Humidade relativa 50-65% em piscinas cobertas",
+      "remediation": "Controlar a humidade na piscina coberta: (1) Desumidificador por bomba de calor: recupera calor latente e sensível — solução mais eficiente (COP 4-6 para desumidificação). (2) Temperatura do ar: 2-3°C acima da temperatura da água (reduz evaporação). (3) Ventilação: 4-8 renovações/hora com ar exterior (desumidificação por diluição). (4) Cobrir a piscina fora das horas de utilização (reduz evaporação em 70-90%). (5) Velocidade do ar sobre o plano de água: < 0.3 m/s para minimizar evaporação. (6) Utilizar materiais resistentes à corrosão em todos os componentes AVAC: aço inox 316L, alumínio anodizado, plásticos técnicos.",
+      "enabled": true,
+      "tags": ["piscina", "desumidificação", "humidade", "condensação", "bomba de calor"]
+    },
+    {
+      "id": "HVAC-DATACENTER-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / ASHRAE TC 9.9 — Climatização de Centros de Dados",
+      "description": "O centro de dados não cumpre as condições ambientais da classe A1 ASHRAE: temperatura na entrada dos servidores ({hvac.dataCenterInletTemp}°C) está fora do intervalo recomendado de 18-27°C.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.dataCenterInletTemp", "operator": ">", "value": 27 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "data-center" }
+      ],
+      "currentValueTemplate": "{hvac.dataCenterInletTemp}°C na entrada dos servidores",
+      "requiredValue": "18-27°C na entrada dos racks (ASHRAE TC 9.9 classe A1)",
+      "remediation": "Otimizar a climatização do centro de dados: (1) Confinamento de corredores quentes/frios (hot aisle/cold aisle containment) para eliminar mistura de ar. (2) Temperatura de insuflação: 18-21°C no corredor frio. (3) Unidades CRAH (Computer Room Air Handler) com controlo de temperatura por rack ou fila. (4) Free-cooling: econizador de ar ou de água quando exterior < 18°C (potencial elevado em Portugal no inverno). (5) PUE (Power Usage Effectiveness) alvo: ≤ 1.4 para instalações existentes, ≤ 1.2 para novas. (6) Redundância N+1 ou 2N conforme nível Tier do datacenter.",
+      "enabled": true,
+      "tags": ["datacenter", "climatização", "ASHRAE", "PUE", "free-cooling"]
+    },
+    {
+      "id": "HVAC-CLEANROOM-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN ISO 14644-1 — Especificações AVAC para Salas Limpas",
+      "description": "O sistema AVAC da sala limpa não mantém a classificação de partículas alvo: concentração de partículas ≥ 0.5 µm ({hvac.cleanroomParticleCount} part/m³) excede o limite da classe ISO especificada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.cleanroomParticleCount", "operator": ">", "value": 352000 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "cleanroom" }
+      ],
+      "currentValueTemplate": "{hvac.cleanroomParticleCount} part/m³ (≥0.5 µm)",
+      "requiredValue": "ISO 7: ≤ 352.000, ISO 6: ≤ 35.200, ISO 5: ≤ 3.520 part/m³ (≥0.5 µm)",
+      "remediation": "Garantir conformidade do sistema AVAC da sala limpa: (1) Filtração terminal HEPA H14 (eficiência ≥ 99.995%) para ISO 5-7, ULPA U15 para ISO 4 ou inferior. (2) Renovações de ar: 20-60 h⁻¹ conforme classe ISO. (3) Fluxo de ar: laminar (unidirecional) para ISO 5 e inferior, turbulento (não-unidirecional) para ISO 6-8. (4) Pressão positiva: +15 Pa vs. zona adjacente, cascata de pressões entre zonas de diferentes classes. (5) Temperatura: 20±2°C, humidade: 45±10%. (6) Monitorização contínua de partículas com contadores a laser. (7) Ensaio de estanquidade dos filtros HEPA conforme EN ISO 14644-3.",
+      "enabled": true,
+      "tags": ["sala limpa", "cleanroom", "ISO 14644", "HEPA", "partículas"]
+    },
+    {
+      "id": "HVAC-OPERATINGTHEATRE-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / DIN 1946-4 — AVAC para Blocos Operatórios",
+      "description": "O sistema AVAC do bloco operatório não cumpre os requisitos de fluxo laminar, pressão positiva e renovações de ar: caudal ({hvac.operatingTheatreACH} h⁻¹) inferior ao mínimo de 20 h⁻¹.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.operatingTheatreACH", "operator": "<", "value": 20 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "operating-theatre" }
+      ],
+      "currentValueTemplate": "{hvac.operatingTheatreACH} h⁻¹",
+      "requiredValue": "≥ 20 h⁻¹ com fluxo laminar sobre a mesa operatória (DIN 1946-4)",
+      "remediation": "O bloco operatório requer sistema AVAC especializado: (1) Renovações de ar: ≥ 20 h⁻¹ (100% ar novo, sem recirculação). (2) Fluxo laminar (unidirecional): difusor de teto 3×3 m sobre a mesa operatória com velocidade 0.25-0.35 m/s. (3) Filtração: HEPA H14 no difusor terminal. (4) Pressão positiva: +25 Pa vs. corredor, cascata de pressões (sala operatória > antecâmara > corredor). (5) Temperatura: 18-24°C ajustável pelo cirurgião, humidade: 40-60%. (6) Classe ISO 5 na zona protegida (sobre a mesa), ISO 7 na periferia. (7) Monitorização contínua: partículas, pressão diferencial, temperatura, humidade.",
+      "enabled": true,
+      "tags": ["bloco operatório", "hospital", "fluxo laminar", "HEPA", "pressão positiva"]
+    },
+    {
+      "id": "HVAC-FUMEHOOD-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 / EN 14175 — Caudal de Ar em Hottes de Laboratório",
+      "description": "A velocidade facial da hotte de laboratório ({hvac.fumeHoodFaceVelocity} m/s) está fora do intervalo seguro de 0.4-0.6 m/s conforme EN 14175, comprometendo a contenção de vapores químicos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.fumeHoodFaceVelocity", "operator": "<", "value": 0.4 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "laboratory" }
+      ],
+      "currentValueTemplate": "{hvac.fumeHoodFaceVelocity} m/s",
+      "requiredValue": "0.4-0.6 m/s velocidade facial com guilhotina aberta a 500 mm (EN 14175)",
+      "remediation": "Ajustar o caudal de extração da hotte de laboratório: (1) Velocidade facial: 0.5 m/s (±0.1) com guilhotina aberta a 500 mm é o valor recomendado. (2) Velocidade < 0.4 m/s: contenção insuficiente — risco de exposição do operador. (3) Velocidade > 0.6 m/s: turbulência excessiva que pode extrair vapores para fora da hotte e aumentar consumo energético. (4) Instalar controlador VAV na hotte: ajusta o caudal em função da posição da guilhotina (mantém velocidade constante). (5) Monitorizar continuamente com anemómetro integrado e alarme visual/sonoro quando fora dos limites. (6) Ensaio de contenção conforme EN 14175-3 (teste SF6) obrigatório na instalação e anualmente.",
+      "enabled": true,
+      "tags": ["hotte", "laboratório", "EN 14175", "contenção", "velocidade facial"]
+    },
+    {
+      "id": "HVAC-SMOKE-CONTROL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / RT-SCIE Art. 155.º — Integração do Sistema de Controlo de Fumos com AVAC",
+      "description": "O sistema AVAC não possui integração com o sistema de controlo de fumos (desenfumagem), não garantindo o desligamento automático da ventilação normal e a ativação da desenfumagem em caso de incêndio conforme RT-SCIE e EN 12101.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasSmokeControlIntegration", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Sem integração AVAC/desenfumagem detetada",
+      "requiredValue": "Integração obrigatória: paragem AVAC normal + ativação desenfumagem em caso de incêndio",
+      "remediation": "Garantir integração do sistema AVAC com o controlo de fumos: (1) Encravamento: deteção de incêndio (SADI) deve comandar paragem automática de todas as UTAs e ventiladores de conforto da zona afetada em ≤ 60 s. (2) Registos corta-fogo motorizados: fecho automático em caso de alarme, alimentação de segurança (UPS ou bateria). (3) Ativação da desenfumagem: ventiladores de desenfumagem devem arrancar automaticamente, com alimentação elétrica independente (circuito de segurança). (4) Condutas: as condutas de desenfumagem não podem ser partilhadas com o sistema AVAC de conforto. (5) GTC: integrar sinais de estado (ventilador ON/OFF, posição de registos) na gestão técnica centralizada. (6) Ensaio semestral: teste funcional completo do cenário incêndio com verificação de tempos de resposta.",
+      "enabled": true,
+      "tags": ["controlo de fumos", "desenfumagem", "SCIE", "AVAC", "encravamento", "EN 12101"]
     }
   ]
 }

@@ -5147,7 +5147,11 @@
         {
           "field": "ited.individualNetwork.coaxType",
           "operator": "not_in",
-          "value": ["RG6", "classA+", "RG6_quad"]
+          "value": [
+            "RG6",
+            "classA+",
+            "RG6_quad"
+          ]
         }
       ],
       "currentValueTemplate": "Cabo coaxial: {ited.individualNetwork.coaxType}",
@@ -5474,7 +5478,11 @@
         {
           "field": "building.usage",
           "operator": "in",
-          "value": ["commercial", "mixed", "services"]
+          "value": [
+            "commercial",
+            "mixed",
+            "services"
+          ]
         }
       ],
       "currentValueTemplate": "{ited.ate.area} m² de ATE",
@@ -5504,7 +5512,10 @@
         {
           "field": "building.usage",
           "operator": "in",
-          "value": ["commercial", "services"]
+          "value": [
+            "commercial",
+            "services"
+          ]
         },
         {
           "field": "building.usableArea",
@@ -5768,7 +5779,11 @@
         {
           "field": "ited.ductBank.tubeType",
           "operator": "not_in",
-          "value": ["PVC_rigid", "PEAD_corrugated", "PEAD_smooth"]
+          "value": [
+            "PVC_rigid",
+            "PEAD_corrugated",
+            "PEAD_smooth"
+          ]
         }
       ],
       "currentValueTemplate": "Tipo de tubo: {ited.ductBank.tubeType}",
@@ -6343,7 +6358,10 @@
         {
           "field": "ited.fiber.connectorType",
           "operator": "not_in",
-          "value": ["SC/APC", "LC/APC"]
+          "value": [
+            "SC/APC",
+            "LC/APC"
+          ]
         },
         {
           "field": "ited.collectiveNetwork.hasFiber",
@@ -6391,6 +6409,1489 @@
         "condomínio",
         "ANACOM",
         "plano"
+      ]
+    },
+    {
+      "id": "ITED_051",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.1.1 — Infraestrutura para Antenas 5G em Cobertura de Edifício",
+      "description": "O projeto ITED não prevê infraestrutura de suporte para instalação de antenas 5G na cobertura do edifício. Em edifícios novos com mais de 4 pisos, devem ser previstos pontos de fixação, condutas e alimentação elétrica para futuras estações-base 5G.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fiveG.hasRooftopInfrastructure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.floors",
+          "operator": ">",
+          "value": 4
+        }
+      ],
+      "currentValueTemplate": "Infraestrutura 5G na cobertura: {ited.fiveG.hasRooftopInfrastructure}",
+      "requiredValue": "Infraestrutura preparada para antenas 5G em edifícios > 4 pisos",
+      "remediation": "Prever na cobertura do edifício: pontos de fixação estrutural para antenas (carga mínima 150 kg por ponto), condutas verticais de Ø63 mm desde o ATE até à cobertura, alimentação elétrica trifásica dedicada com proteção diferencial 30 mA, e espaço para equipamento de rádio (outdoor unit). Instalar tubos de passagem selados e impermeabilizados na laje de cobertura.",
+      "enabled": true,
+      "tags": [
+        "5G",
+        "antena",
+        "cobertura",
+        "infraestrutura",
+        "estação-base"
+      ]
+    },
+    {
+      "id": "ITED_052",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.1.2 — Condutas Verticais para Cabos de Antena 5G",
+      "description": "As condutas verticais previstas para cablagem de antenas 5G não cumprem o diâmetro mínimo de 63 mm. A conduta deve permitir a passagem de cabos de fibra óptica e cabos coaxiais de baixa perda para ligação das antenas ao equipamento de rádio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fiveG.verticalDuctDiameter",
+          "operator": "<",
+          "value": 63
+        },
+        {
+          "field": "ited.fiveG.hasRooftopInfrastructure",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Diâmetro da conduta 5G: {ited.fiveG.verticalDuctDiameter} mm",
+      "requiredValue": "≥ 63 mm de diâmetro para condutas verticais de antena 5G",
+      "remediation": "Instalar condutas verticais com diâmetro mínimo de 63 mm (Ø63) desde o ATE/sala de telecomunicações até à cobertura, dedicadas à cablagem de antenas 5G. As condutas devem ter caixas de passagem intermédias a cada 15 m de percurso vertical e raios de curvatura conformes. Prever pelo menos 2 condutas para redundância.",
+      "enabled": true,
+      "tags": [
+        "5G",
+        "conduta vertical",
+        "Ø63 mm",
+        "antena",
+        "cablagem"
+      ]
+    },
+    {
+      "id": "ITED_053",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 59.º-A — Acesso Multi-operador a Infraestrutura 5G",
+      "description": "A infraestrutura de suporte a antenas 5G na cobertura não prevê acesso multi-operador. O edifício deve garantir que pelo menos 3 operadores possam instalar equipamento de rádio de forma independente, conforme o princípio de acesso aberto do DL 123/2009.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fiveG.operatorSlots",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "ited.fiveG.hasRooftopInfrastructure",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{ited.fiveG.operatorSlots} posições de operador previstas",
+      "requiredValue": "≥ 3 posições independentes para operadores 5G",
+      "remediation": "Dimensionar a infraestrutura na cobertura para acomodar pelo menos 3 operadores independentes, cada um com: ponto de fixação de antena dedicado, conduta independente até ao ATE, espaço para equipamento outdoor (mínimo 0.5 m² por operador), e alimentação elétrica separada com contagem individual. Garantir separação física mínima de 1.5 m entre antenas de operadores distintos.",
+      "enabled": true,
+      "tags": [
+        "5G",
+        "multi-operador",
+        "acesso aberto",
+        "cobertura",
+        "ANACOM"
+      ]
+    },
+    {
+      "id": "ITED_054",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.2.1 — Small Cells — Pontos de Instalação em Zonas Comuns",
+      "description": "O projeto não prevê pontos de instalação para small cells (micro-estações 5G) nas zonas comuns do edifício. Em edifícios com mais de 8 pisos ou áreas comerciais, devem ser previstos pontos de ancoragem e alimentação para small cells.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.smallCell.hasInstallationPoints",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.floors",
+          "operator": ">",
+          "value": 8
+        }
+      ],
+      "currentValueTemplate": "Pontos para small cells: {ited.smallCell.hasInstallationPoints}",
+      "requiredValue": "Pontos de instalação de small cells previstos em edifícios > 8 pisos",
+      "remediation": "Prever pontos de instalação para small cells nos corredores ou zonas comuns, com espaçamento máximo de 30 m. Cada ponto deve dispor de: caixa de passagem com tomada de telecomunicações (fibra e cobre), tomada elétrica PoE+ ou alimentação direta 48 VDC, suporte de fixação no teto ou parede com capacidade para 5 kg, e acesso a conduta horizontal até ao riser vertical.",
+      "enabled": true,
+      "tags": [
+        "small cell",
+        "5G",
+        "zonas comuns",
+        "micro-estação",
+        "cobertura indoor"
+      ]
+    },
+    {
+      "id": "ITED_055",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.2.3 — Small Cells — Alimentação Elétrica Dedicada",
+      "description": "Os pontos de instalação para small cells não dispõem de alimentação elétrica dedicada. Cada small cell requer alimentação PoE++ (802.3bt, até 90 W) ou alimentação DC direta, com circuito protegido e contagem separada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.smallCell.hasDedicatedPower",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.smallCell.hasInstallationPoints",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Alimentação dedicada small cells: {ited.smallCell.hasDedicatedPower}",
+      "requiredValue": "Alimentação elétrica dedicada obrigatória para cada ponto de small cell",
+      "remediation": "Instalar circuito elétrico dedicado para alimentação das small cells, com disjuntor e diferencial independentes no QGBT. Cada ponto de small cell deve dispor de tomada elétrica protegida ou switch PoE++ (IEEE 802.3bt — 90 W). Prever UPS centralizada ou baterias locais para garantir continuidade de serviço durante falhas de energia.",
+      "enabled": true,
+      "tags": [
+        "small cell",
+        "alimentação",
+        "PoE++",
+        "802.3bt",
+        "energia"
+      ]
+    },
+    {
+      "id": "ITED_056",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.2.5 — Small Cells — Separação Mínima entre Unidades",
+      "description": "A distância entre small cells adjacentes é inferior ao mínimo recomendado de 15 m. Small cells demasiado próximas causam interferência co-canal e degradam a qualidade do sinal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.smallCell.minSeparationMeters",
+          "operator": "<",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "{ited.smallCell.minSeparationMeters} m entre small cells",
+      "requiredValue": "≥ 15 m de separação entre small cells adjacentes",
+      "remediation": "Reposicionar as small cells para garantir separação mínima de 15 m entre unidades adjacentes do mesmo operador. Para operadores distintos, manter separação mínima de 5 m. Efetuar estudo de cobertura RF (RF planning) para otimizar a localização, considerando atenuação de paredes e pisos.",
+      "enabled": true,
+      "tags": [
+        "small cell",
+        "separação",
+        "interferência",
+        "RF planning",
+        "cobertura"
+      ]
+    },
+    {
+      "id": "ITED_057",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.3.1 — DAS (Sistema de Antenas Distribuídas) — Projeto Obrigatório",
+      "description": "Edifícios com mais de 20.000 m² de área bruta ou com mais de 3 pisos subterrâneos devem dispor de projeto de DAS (Distributed Antenna System) para garantir cobertura celular em todos os espaços interiores, incluindo garagens e caves.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.das.hasProject",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.grossArea",
+          "operator": ">",
+          "value": 20000
+        }
+      ],
+      "currentValueTemplate": "Projeto DAS: {ited.das.hasProject}",
+      "requiredValue": "Projeto DAS obrigatório para edifícios > 20.000 m²",
+      "remediation": "Elaborar projeto de DAS (Distributed Antenna System) por projetista credenciado, incluindo: estudo de cobertura RF para todas as tecnologias celulares (4G/5G), dimensionamento do headend (unidade central), traçado das antenas remotas, cálculo do link budget, e especificação dos cabos coaxiais ou fibra óptica de interligação. O projeto deve prever cobertura em garagens, caves, elevadores e corredores.",
+      "enabled": true,
+      "tags": [
+        "DAS",
+        "antenas distribuídas",
+        "cobertura indoor",
+        "garagem",
+        "cave"
+      ]
+    },
+    {
+      "id": "ITED_058",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.3.3 — DAS — Nível Mínimo de Sinal em Zonas Subterrâneas",
+      "description": "O nível de sinal celular previsto nas zonas subterrâneas (garagens, caves) é inferior ao mínimo de −85 dBm. O DAS deve garantir cobertura celular adequada em todos os espaços subterrâneos do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.das.undergroundSignalLevel",
+          "operator": "<",
+          "value": -85
+        }
+      ],
+      "currentValueTemplate": "{ited.das.undergroundSignalLevel} dBm nas zonas subterrâneas",
+      "requiredValue": "≥ −85 dBm de nível de sinal celular em zonas subterrâneas",
+      "remediation": "Redimensionar o sistema DAS para garantir nível de sinal mínimo de −85 dBm (RSRP para 4G/5G) em todas as zonas subterrâneas. Adicionar antenas remotas nos pisos subterrâneos, verificar o link budget total e reduzir perdas nos cabos coaxiais. Se necessário, instalar amplificadores de linha (BDA — Bi-Directional Amplifier) nos pisos mais afastados do headend.",
+      "enabled": true,
+      "tags": [
+        "DAS",
+        "sinal celular",
+        "subterrâneo",
+        "garagem",
+        "RSRP"
+      ]
+    },
+    {
+      "id": "ITED_059",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.3.5 — DAS — Cobertura Obrigatória em Elevadores",
+      "description": "O sistema DAS não prevê cobertura celular no interior dos elevadores. Elevadores de edifícios com DAS devem dispor de antena dedicada na cabina para garantir comunicação de emergência e serviço celular contínuo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.das.hasElevatorCoverage",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.das.hasProject",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cobertura DAS em elevadores: {ited.das.hasElevatorCoverage}",
+      "requiredValue": "Cobertura DAS obrigatória nos elevadores",
+      "remediation": "Instalar antena omnidirecional de baixo perfil no teto da cabina de cada elevador, alimentada por cabo coaxial flexível com comprimento adequado ao curso do elevador. Utilizar cabo com loop de serviço na casa das máquinas. A antena deve cobrir as bandas celulares 700/800/1800/2100/2600/3500 MHz. Prever proteção mecânica do cabo no poço do elevador.",
+      "enabled": true,
+      "tags": [
+        "DAS",
+        "elevador",
+        "cobertura",
+        "antena",
+        "emergência"
+      ]
+    },
+    {
+      "id": "ITED_060",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.4.1 — Estudo de Cobertura Wi-Fi para Edifícios Comerciais",
+      "description": "Edifícios comerciais ou de serviços com área útil superior a 500 m² não dispõem de estudo de cobertura Wi-Fi. O estudo deve dimensionar o número e posição dos access points para garantir cobertura sem zonas mortas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.wifi.hasCoverageSurvey",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "services"
+          ]
+        },
+        {
+          "field": "building.usableArea",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "currentValueTemplate": "Estudo de cobertura Wi-Fi: {ited.wifi.hasCoverageSurvey}",
+      "requiredValue": "Estudo de cobertura Wi-Fi obrigatório para edifícios comerciais > 500 m²",
+      "remediation": "Elaborar estudo de cobertura Wi-Fi (Wi-Fi site survey) preditivo, incluindo: planta do edifício com materiais de construção, modelo de propagação indoor, posicionamento dos access points (APs), canais e potências, e mapa de cobertura prevista. O estudo deve garantir RSSI ≥ −65 dBm e SNR ≥ 25 dB em 95% da área útil. Prever redundância de APs em zonas críticas.",
+      "enabled": true,
+      "tags": [
+        "Wi-Fi",
+        "cobertura",
+        "site survey",
+        "access point",
+        "comercial"
+      ]
+    },
+    {
+      "id": "ITED_061",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.4.3 — Densidade de Access Points Wi-Fi",
+      "description": "A densidade de access points Wi-Fi prevista é inferior ao mínimo recomendado para a tipologia do espaço. Em open spaces comerciais, deve prever-se no mínimo 1 AP por cada 150 m² de área útil.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.wifi.apDensityPerSqm",
+          "operator": "<",
+          "value": 0.0067
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "services"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Densidade de APs: {ited.wifi.apDensityPerSqm} AP/m²",
+      "requiredValue": "≥ 1 AP por cada 150 m² (≥ 0.0067 AP/m²) em espaços comerciais",
+      "remediation": "Aumentar o número de access points Wi-Fi para garantir densidade mínima de 1 AP por 150 m² em open spaces. Em salas de reunião, prever 1 AP dedicado por cada sala com mais de 20 m². Utilizar APs Wi-Fi 6E (802.11ax) ou Wi-Fi 7 (802.11be) para maximizar a capacidade. Cada AP deve ter ponto de rede Cat. 6A com PoE+ (30 W).",
+      "enabled": true,
+      "tags": [
+        "Wi-Fi",
+        "access point",
+        "densidade",
+        "802.11ax",
+        "PoE"
+      ]
+    },
+    {
+      "id": "ITED_062",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.4.5 — Infraestrutura de Suporte Wi-Fi — Pontos de Rede no Teto",
+      "description": "Não estão previstos pontos de rede no teto para instalação de access points Wi-Fi. Cada ponto de AP deve ter tomada de rede Cat. 6A com alimentação PoE e caixa de passagem acessível no teto falso.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.wifi.hasCeilingNetworkPoints",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.wifi.hasCoverageSurvey",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pontos de rede no teto para Wi-Fi: {ited.wifi.hasCeilingNetworkPoints}",
+      "requiredValue": "Pontos de rede no teto obrigatórios para instalação de APs Wi-Fi",
+      "remediation": "Instalar pontos de rede Cat. 6A no teto falso nas posições definidas pelo estudo de cobertura Wi-Fi. Cada ponto deve incluir: cabo Cat. 6A ligado a switch PoE+ no bastidor do piso, caixa de passagem acessível, e espaço para fixação do AP. Deixar 3 m de folga de cabo no ponto de instalação para permitir ajustes de posição.",
+      "enabled": true,
+      "tags": [
+        "Wi-Fi",
+        "teto falso",
+        "ponto de rede",
+        "Cat. 6A",
+        "PoE"
+      ]
+    },
+    {
+      "id": "ITED_063",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.1 — Cablagem Estruturada Cat. 6A Mínima em Edifícios Novos",
+      "description": "A cablagem de par de cobre prevista não é de Categoria 6A ou superior. Para edifícios novos, o Manual ITED 4ª edição recomenda Cat. 6A como mínimo para suportar 10GBASE-T e futuras aplicações de rede.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.structuredCabling.copperCategory",
+          "operator": "ordinal_lt",
+          "value": "Cat6A",
+          "scale": [
+            "Cat5",
+            "Cat5e",
+            "Cat6",
+            "Cat6A",
+            "Cat7",
+            "Cat7A",
+            "Cat8"
+          ]
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Categoria de cablagem: {ited.structuredCabling.copperCategory}",
+      "requiredValue": "Cat. 6A ou superior para edifícios novos (suporte 10GBASE-T)",
+      "remediation": "Atualizar a especificação da cablagem de par de cobre para Cat. 6A (ISO/IEC 11801-1, Classe EA) em todo o edifício. A Cat. 6A suporta 10GBASE-T até 100 m, PoE++ (90 W) e tem melhor imunidade a alien crosstalk. Utilizar cabo F/UTP ou U/FTP Cat. 6A conforme o ambiente eletromagnético.",
+      "enabled": true,
+      "tags": [
+        "Cat. 6A",
+        "cablagem estruturada",
+        "10GBASE-T",
+        "par de cobre",
+        "ISO 11801"
+      ]
+    },
+    {
+      "id": "ITED_064",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.1.2 — Cat. 8 para Ligações em Data Centers e Salas Técnicas",
+      "description": "As ligações de cobre no data center ou sala técnica do edifício não utilizam Cat. 8 (Classe I ou II). Para ligações de curta distância (até 30 m) em ambientes de data center, a Cat. 8 é recomendada para suportar 25GBASE-T/40GBASE-T.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.structuredCabling.dataCenterCategory",
+          "operator": "ordinal_lt",
+          "value": "Cat8",
+          "scale": [
+            "Cat5",
+            "Cat5e",
+            "Cat6",
+            "Cat6A",
+            "Cat7",
+            "Cat7A",
+            "Cat8"
+          ]
+        },
+        {
+          "field": "ited.hasDataCenter",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Categoria no data center: {ited.structuredCabling.dataCenterCategory}",
+      "requiredValue": "Cat. 8 recomendada para ligações em data center (25G/40GBASE-T)",
+      "remediation": "Considerar Cat. 8 (ISO/IEC 11801-1, Classe I — Cat. 8.1, ou Classe II — Cat. 8.2) para ligações de curta distância (≤ 30 m) no data center ou sala técnica. Cat. 8.1 utiliza conectores RJ45 compatíveis e suporta 25GBASE-T. Cat. 8.2 utiliza conectores TERA/GG45. Para distâncias superiores a 30 m, manter Cat. 6A ou migrar para fibra óptica.",
+      "enabled": true,
+      "tags": [
+        "Cat. 8",
+        "data center",
+        "25GBASE-T",
+        "40GBASE-T",
+        "cablagem estruturada"
+      ]
+    },
+    {
+      "id": "ITED_065",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.2.3 — Cat. 6A vs Cat. 8 — Compatibilidade de Conectores",
+      "description": "O projeto mistura cablagem Cat. 6A e Cat. 8 sem garantir compatibilidade de conectores. Ligações Cat. 8.1 utilizam RJ45 (compatível com Cat. 6A), mas Cat. 8.2 utiliza conectores proprietários TERA ou GG45 que requerem adaptadores.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.structuredCabling.hasMixedCategories",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "ited.structuredCabling.connectorCompatibilityVerified",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Verificação de compatibilidade: {ited.structuredCabling.connectorCompatibilityVerified}",
+      "requiredValue": "Compatibilidade de conectores verificada em instalações mistas Cat. 6A/Cat. 8",
+      "remediation": "Verificar a compatibilidade de conectores em toda a instalação mista. Se utilizar Cat. 8.1 (Classe I), os conectores RJ45 são retro-compatíveis com Cat. 6A. Se utilizar Cat. 8.2 (Classe II), instalar adaptadores TERA→RJ45 nos pontos de transição. Documentar claramente a categoria de cada segmento no projeto e nas etiquetas de identificação.",
+      "enabled": true,
+      "tags": [
+        "Cat. 6A",
+        "Cat. 8",
+        "conectores",
+        "compatibilidade",
+        "RJ45"
+      ]
+    },
+    {
+      "id": "ITED_066",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.5.1 — Power over Ethernet — Budget de Potência do Switch",
+      "description": "O budget de potência PoE do switch de distribuição é insuficiente para alimentar todos os dispositivos ligados (APs Wi-Fi, câmaras IP, telefones VoIP, small cells). O budget total deve ter margem de segurança de 20% sobre o consumo previsto.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.poe.switchBudgetWatts",
+          "operator": "formula_lt",
+          "value": "ited.poe.totalLoadWatts * 1.2"
+        }
+      ],
+      "currentValueTemplate": "Budget PoE: {ited.poe.switchBudgetWatts} W (carga: {ited.poe.totalLoadWatts} W)",
+      "requiredValue": "Budget PoE ≥ 120% da carga total prevista",
+      "remediation": "Substituir ou adicionar switches PoE com budget de potência total ≥ 120% da carga prevista. Verificar que cada porta suporta a classe PoE necessária: PoE (15.4 W) para telefones VoIP, PoE+ (30 W) para APs Wi-Fi e câmaras PTZ, PoE++ Type 3 (60 W) para APs high-density, PoE++ Type 4 (90 W) para small cells. Considerar alimentação elétrica redundante no switch.",
+      "enabled": true,
+      "tags": [
+        "PoE",
+        "budget",
+        "potência",
+        "switch",
+        "alimentação"
+      ]
+    },
+    {
+      "id": "ITED_067",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.5.3 — PoE — Comprimento Máximo com Degradação Térmica",
+      "description": "O comprimento de cabos PoE em maço (bundle) excede o limite para a classe de potência utilizada. A corrente PoE causa aquecimento do cabo, reduzindo o comprimento máximo do canal abaixo dos 100 m regulamentares.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.poe.maxBundleLengthMeters",
+          "operator": ">",
+          "value": 90
+        },
+        {
+          "field": "ited.poe.poeClass",
+          "operator": "in",
+          "value": [
+            "Type3",
+            "Type4"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Comprimento máximo em maço: {ited.poe.maxBundleLengthMeters} m",
+      "requiredValue": "≤ 90 m para PoE Type 3/4 em maços de cabos",
+      "remediation": "Reduzir o comprimento máximo dos cabos PoE de alta potência (Type 3/4) para 90 m quando instalados em maço (bundle). A norma TIA-568.2-D especifica reduções de comprimento em função da temperatura e número de cabos no maço. Para maços com mais de 24 cabos PoE++, limitar a 75 m. Utilizar cabo Cat. 6A com condutores AWG23 para melhor dissipação térmica.",
+      "enabled": true,
+      "tags": [
+        "PoE",
+        "comprimento",
+        "temperatura",
+        "bundle",
+        "degradação térmica"
+      ]
+    },
+    {
+      "id": "ITED_068",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 8.5.5 — PoE — Secção Mínima dos Condutores",
+      "description": "A secção dos condutores do cabo de par de cobre utilizado para PoE é inferior ao recomendado. Para PoE++ (Type 3/4), é recomendado um mínimo de AWG23 (0.26 mm²) para reduzir a resistência e o aquecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.poe.conductorGaugeAWG",
+          "operator": ">",
+          "value": 23
+        },
+        {
+          "field": "ited.poe.poeClass",
+          "operator": "in",
+          "value": [
+            "Type3",
+            "Type4"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Secção do condutor: AWG{ited.poe.conductorGaugeAWG}",
+      "requiredValue": "≤ AWG23 (0.26 mm²) para PoE Type 3/Type 4",
+      "remediation": "Utilizar cabo Cat. 6A com condutores de secção AWG23 (0.26 mm²) ou superior para ligações PoE de alta potência (Type 3 e Type 4). Condutores AWG24 têm resistência 26% superior, gerando mais calor. Em percursos longos (> 70 m), considerar AWG22 (0.33 mm²). Nota: AWG menor = secção maior = melhor para PoE.",
+      "enabled": true,
+      "tags": [
+        "PoE",
+        "AWG",
+        "secção condutor",
+        "aquecimento",
+        "Cat. 6A"
+      ]
+    },
+    {
+      "id": "ITED_069",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.3 — Fibra Backbone — Dimensionamento Mínimo entre ATE e ATI de Piso",
+      "description": "O backbone de fibra óptica entre o ATE principal e os ATI de piso (distribuidores intermédios) não cumpre o mínimo de fibras por piso. Deve prever-se no mínimo 6 fibras monomodo OS2 por ATI de piso em edifícios comerciais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fiberBackbone.fibersPerFloorATI",
+          "operator": "<",
+          "value": 6
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "services"
+          ]
+        }
+      ],
+      "currentValueTemplate": "{ited.fiberBackbone.fibersPerFloorATI} fibras por ATI de piso",
+      "requiredValue": "≥ 6 fibras monomodo OS2 por ATI de piso em edifícios comerciais",
+      "remediation": "Dimensionar o backbone de fibra óptica com no mínimo 6 fibras monomodo OS2 por ATI de piso: 2 fibras para dados (rede de dados principal), 2 fibras para voz/VoIP, e 2 fibras de reserva para crescimento futuro. Em pisos com mais de 50 postos de trabalho, prever 12 fibras. Utilizar cabo tight-buffered com proteção anti-roedor no percurso vertical.",
+      "enabled": true,
+      "tags": [
+        "fibra backbone",
+        "dimensionamento",
+        "ATI de piso",
+        "OS2",
+        "comercial"
+      ]
+    },
+    {
+      "id": "ITED_070",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.4 — Fibra Backbone — Topologia e Redundância",
+      "description": "O backbone de fibra óptica não prevê redundância de percurso. Em edifícios com mais de 6 pisos, deve existir pelo menos um percurso de fibra alternativo (anel ou dupla estrela) para garantir resiliência.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fiberBackbone.hasRedundantPath",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.floors",
+          "operator": ">",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "Redundância de backbone: {ited.fiberBackbone.hasRedundantPath}",
+      "requiredValue": "Percurso redundante de fibra backbone para edifícios > 6 pisos",
+      "remediation": "Implementar redundância no backbone de fibra óptica através de topologia em anel (ring) ou dupla estrela. O segundo percurso deve utilizar coluna montante diferente da principal. Cada ATI de piso deve ter ligação de fibra por dois percursos fisicamente independentes. Configurar os switches para failover automático (LACP ou RSTP).",
+      "enabled": true,
+      "tags": [
+        "fibra backbone",
+        "redundância",
+        "anel",
+        "resiliência",
+        "topologia"
+      ]
+    },
+    {
+      "id": "ITED_071",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.8 — Fibra Backbone — Distância Máxima sem Amplificação",
+      "description": "A distância total do backbone de fibra óptica entre o ATE e o ATI mais afastado excede os 500 m sem amplificação ou regeneração. Para distâncias superiores, é necessário regenerador ou amplificador óptico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fiberBackbone.maxDistanceMeters",
+          "operator": ">",
+          "value": 500
+        },
+        {
+          "field": "ited.fiberBackbone.hasAmplification",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{ited.fiberBackbone.maxDistanceMeters} m de backbone sem amplificação",
+      "requiredValue": "≤ 500 m de backbone de fibra sem amplificação óptica",
+      "remediation": "Para distâncias de backbone superiores a 500 m, instalar regenerador óptico ou amplificador EDFA no ponto intermédio. Alternativamente, reposicionar o distribuidor principal para uma posição mais central no edifício, reduzindo a distância máxima. Verificar o budget óptico total considerando: atenuação da fibra (0.35 dB/km a 1310 nm), conectores (0.3 dB cada) e fusões (0.1 dB cada).",
+      "enabled": true,
+      "tags": [
+        "fibra backbone",
+        "distância",
+        "amplificação",
+        "EDFA",
+        "budget óptico"
+      ]
+    },
+    {
+      "id": "ITED_072",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2.1 — Ensaio OTDR Obrigatório para Fibra Óptica",
+      "description": "Não foi realizado ensaio OTDR (Optical Time Domain Reflectometer) obrigatório na fibra óptica da instalação. O ensaio OTDR é requisito de certificação para todas as fibras da rede coletiva e individual.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.testing.otdr.isPerformed",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.collectiveNetwork.hasFiber",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ensaio OTDR realizado: {ited.testing.otdr.isPerformed}",
+      "requiredValue": "Ensaio OTDR obrigatório em todas as fibras ópticas da instalação",
+      "remediation": "Realizar ensaio OTDR bidirecional em todas as fibras ópticas da instalação, nos comprimentos de onda 1310 nm e 1550 nm. O ensaio deve ser efetuado com equipamento calibrado (certificado de calibração válido) e registar: atenuação total, atenuação por evento (fusões, conectores), reflectância dos conectores, e comprimento real da fibra. Arquivar os traces OTDR no relatório de certificação.",
+      "enabled": true,
+      "tags": [
+        "OTDR",
+        "ensaio",
+        "fibra óptica",
+        "certificação",
+        "obrigatório"
+      ]
+    },
+    {
+      "id": "ITED_073",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2.3 — OTDR — Comprimentos de Onda de Teste",
+      "description": "O ensaio OTDR não foi realizado nos dois comprimentos de onda obrigatórios (1310 nm e 1550 nm). A medição a ambos os comprimentos de onda é necessária para detetar defeitos dependentes do comprimento de onda, como macro-curvas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.testing.otdr.wavelengthsTested",
+          "operator": "not_in",
+          "value": [
+            "1310_1550",
+            "both"
+          ]
+        },
+        {
+          "field": "ited.testing.otdr.isPerformed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Comprimentos de onda testados: {ited.testing.otdr.wavelengthsTested}",
+      "requiredValue": "Ensaio OTDR a 1310 nm e 1550 nm (ambos obrigatórios)",
+      "remediation": "Repetir o ensaio OTDR incluindo ambos os comprimentos de onda obrigatórios: 1310 nm (janela O-band, mais sensível a macro-curvas em fibras legacy) e 1550 nm (janela C-band, menor atenuação, usada para GPON/DWDM). Comparar os traces a ambos os comprimentos de onda para identificar macro-curvas (maior atenuação a 1550 nm) e eventos anómalos.",
+      "enabled": true,
+      "tags": [
+        "OTDR",
+        "1310 nm",
+        "1550 nm",
+        "comprimento de onda",
+        "macro-curva"
+      ]
+    },
+    {
+      "id": "ITED_074",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2.5 — OTDR — Ensaio Bidirecional Obrigatório",
+      "description": "O ensaio OTDR não foi realizado de forma bidirecional. A medição bidirecional é necessária para obter a atenuação real das fusões e conectores, eliminando o efeito da variação do diâmetro de campo modal (MFD) entre fibras.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.testing.otdr.isBidirectional",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.testing.otdr.isPerformed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ensaio OTDR bidirecional: {ited.testing.otdr.isBidirectional}",
+      "requiredValue": "Ensaio OTDR bidirecional obrigatório",
+      "remediation": "Realizar o ensaio OTDR a partir de ambas as extremidades da fibra e calcular a média aritmética das atenuações de cada evento. A medição bidirecional elimina resultados falsos (fusões com ganho aparente) causados pela diferença de MFD entre fibras. Registar os dois traces e a média no relatório de certificação.",
+      "enabled": true,
+      "tags": [
+        "OTDR",
+        "bidirecional",
+        "fusão",
+        "MFD",
+        "certificação"
+      ]
+    },
+    {
+      "id": "ITED_075",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.12 — Caixas de Fusão (Splice Enclosures) — Especificações Mínimas",
+      "description": "As caixas de fusão de fibra óptica não cumprem as especificações mínimas do Manual ITED. As caixas devem ter proteção IP adequada, capacidade para o número de fusões previsto e raio de curvatura mínimo garantido para as fibras.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.spliceEnclosure.isCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.collectiveNetwork.hasFiber",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Caixas de fusão conformes: {ited.spliceEnclosure.isCompliant}",
+      "requiredValue": "Caixas de fusão conformes às especificações ITED",
+      "remediation": "Substituir as caixas de fusão por modelos conformes: grau de proteção mínimo IP54 (IP68 para instalação subterrânea), raio de curvatura mínimo interno ≥ 30 mm para as fibras, capacidade para bandejas de fusão com proteção de cada fusão por manga termorretráctil, e entrada/saída de cabos com vedantes adequados. As bandejas devem permitir organização das fibras com reserva de pelo menos 1 m.",
+      "enabled": true,
+      "tags": [
+        "caixa de fusão",
+        "splice enclosure",
+        "IP54",
+        "fibra óptica",
+        "bandeja"
+      ]
+    },
+    {
+      "id": "ITED_076",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.12.3 — Splice Enclosure — Reserva de Fibra Mínima",
+      "description": "A reserva de fibra nas caixas de fusão é inferior ao mínimo de 1 metro por cada fibra. A reserva é necessária para permitir refazer fusões em caso de falha ou manutenção futura.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.spliceEnclosure.fiberReserveMeters",
+          "operator": "<",
+          "value": 1.0
+        }
+      ],
+      "currentValueTemplate": "Reserva de fibra: {ited.spliceEnclosure.fiberReserveMeters} m",
+      "requiredValue": "≥ 1.0 m de reserva de fibra por fusão em cada caixa",
+      "remediation": "Garantir uma reserva mínima de 1 metro de fibra em cada caixa de fusão, enrolada na bandeja de fusão com raio de curvatura ≥ 30 mm. A reserva permite refazer fusões defeituosas e ajustar comprimentos durante manutenção. Em caixas subterrâneas (câmaras de visita), prever reserva de 2 m.",
+      "enabled": true,
+      "tags": [
+        "caixa de fusão",
+        "reserva de fibra",
+        "manutenção",
+        "raio de curvatura",
+        "fusão"
+      ]
+    },
+    {
+      "id": "ITED_077",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.12.5 — Splice Enclosure — Proteção IP para Instalação Subterrânea",
+      "description": "As caixas de fusão instaladas em câmaras de visita subterrâneas não possuem grau de proteção IP68. Caixas subterrâneas estão sujeitas a inundação e devem ser totalmente estanques.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.spliceEnclosure.ipRating",
+          "operator": "ordinal_lt",
+          "value": "IP68",
+          "scale": [
+            "basic",
+            "standard",
+            "enhanced",
+            "premium"
+          ]
+        },
+        {
+          "field": "ited.spliceEnclosure.isUnderground",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção IP: {ited.spliceEnclosure.ipRating}",
+      "requiredValue": "IP68 para caixas de fusão em instalação subterrânea",
+      "remediation": "Substituir as caixas de fusão subterrâneas por modelos com grau de proteção IP68 (estanquidade total a submersão prolongada). As caixas devem ter: vedantes mecânicos de compressão nas entradas de cabos, material resistente a corrosão (polietileno ou aço inoxidável), e capacidade de suportar pressão de submersão até 1 bar. Testar a estanquidade após instalação.",
+      "enabled": true,
+      "tags": [
+        "caixa de fusão",
+        "IP68",
+        "subterrâneo",
+        "estanquidade",
+        "câmara de visita"
+      ]
+    },
+    {
+      "id": "ITED_078",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.5.3 — Patch Panel — Densidade Máxima por Unidade de Rack",
+      "description": "A densidade de portas no patch panel excede o máximo recomendado de 48 portas por 1U de rack para cobre e 24 portas por 1U para fibra. Densidades excessivas dificultam a gestão de cabos e a manutenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.patchPanel.copperPortsPer1U",
+          "operator": ">",
+          "value": 48
+        }
+      ],
+      "currentValueTemplate": "{ited.patchPanel.copperPortsPer1U} portas de cobre por 1U",
+      "requiredValue": "≤ 48 portas de cobre por 1U de rack",
+      "remediation": "Limitar a densidade do patch panel a 48 portas RJ45 por 1U de rack. Densidades superiores comprometem o raio de curvatura dos patch cords e dificultam a identificação e manutenção. Para instalações de grande densidade, utilizar patch panels angulados (angled) que facilitam o encaminhamento dos cabos. Prever organizador de cabos horizontal (1U) entre cada 2 patch panels.",
+      "enabled": true,
+      "tags": [
+        "patch panel",
+        "densidade",
+        "rack",
+        "1U",
+        "gestão de cabos"
+      ]
+    },
+    {
+      "id": "ITED_079",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.5.3.2 — Patch Panel de Fibra — Densidade Máxima",
+      "description": "A densidade de portas no patch panel de fibra óptica excede as 24 portas (12 adaptadores duplex LC) por 1U de rack. Densidades excessivas não permitem raio de curvatura adequado dos patch cords de fibra.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.patchPanel.fiberPortsPer1U",
+          "operator": ">",
+          "value": 24
+        }
+      ],
+      "currentValueTemplate": "{ited.patchPanel.fiberPortsPer1U} portas de fibra por 1U",
+      "requiredValue": "≤ 24 portas de fibra (12 duplex LC) por 1U de rack",
+      "remediation": "Limitar o patch panel de fibra a 24 portas (12 adaptadores duplex LC ou SC) por 1U de rack. Para maior densidade, utilizar patch panels modulares de 4U tipo gaveta (drawer), que permitem acesso frontal e mantêm raios de curvatura adequados. Os patch cords de fibra devem ter raio mínimo de curvatura de 15 mm (fibra bend-insensitive G.657.A2).",
+      "enabled": true,
+      "tags": [
+        "patch panel",
+        "fibra óptica",
+        "densidade",
+        "rack",
+        "LC duplex"
+      ]
+    },
+    {
+      "id": "ITED_080",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.8 — Gestão de Cabos na Coluna Montante (Riser)",
+      "description": "Os cabos na coluna montante (riser) não estão corretamente organizados e fixados. Os cabos devem ser fixados em braçadeiras ou calhas verticais com espaçamento máximo de 1.5 m e separação entre tipos (fibra, cobre, coaxial).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.riser.cableManagementCompliant",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Gestão de cabos no riser: {ited.riser.cableManagementCompliant}",
+      "requiredValue": "Organização e fixação de cabos conforme na coluna montante",
+      "remediation": "Organizar os cabos na coluna montante (riser) conforme os seguintes requisitos: fixação em braçadeiras ou calhas verticais com espaçamento máximo de 1.5 m, separação física entre cabos de fibra óptica, par de cobre e coaxial, identificação (etiquetas) a cada piso, e proteção anti-roedor nos troços inferiores. Os cabos de fibra devem estar no percurso mais protegido, afastados de fontes de calor.",
+      "enabled": true,
+      "tags": [
+        "riser",
+        "coluna montante",
+        "gestão de cabos",
+        "braçadeiras",
+        "organização"
+      ]
+    },
+    {
+      "id": "ITED_081",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.8.3 — Riser — Fixação Vertical para Cabos Pesados",
+      "description": "Os cabos de grande secção no riser (cabos de fibra multi-tubo ou feixes de cabos de cobre) não possuem fixação intermédia para suportar o peso próprio. Cabos com percurso vertical superior a 30 m requerem fixação adicional para evitar deformação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.riser.verticalRunMeters",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "ited.riser.hasIntermediateSupport",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Percurso vertical: {ited.riser.verticalRunMeters} m sem fixação intermédia",
+      "requiredValue": "Fixação intermédia obrigatória para percursos verticais > 30 m",
+      "remediation": "Instalar suportes de fixação intermédios (cable clamps ou cable grips) a cada 15 m de percurso vertical para cabos de cobre e a cada 10 m para cabos de fibra óptica. Os suportes devem distribuir o peso sem comprimir ou deformar os cabos. Para cabos de fibra, utilizar suportes com revestimento macio (borracha ou silicone). Em percursos superiores a 50 m, considerar ponto de ancoragem com caixa de passagem intermédia.",
+      "enabled": true,
+      "tags": [
+        "riser",
+        "fixação vertical",
+        "peso",
+        "suporte",
+        "cabo pesado"
+      ]
+    },
+    {
+      "id": "ITED_082",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.4 — Cablagem Horizontal — Comprimento Máximo do Canal",
+      "description": "O comprimento total do canal de cablagem horizontal (permanent link + patch cords) excede os 100 m regulamentares. O canal inclui o cabo permanente, os patch cords no bastidor e no posto de trabalho.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.horizontalCabling.maxChannelLengthMeters",
+          "operator": ">",
+          "value": 100
+        }
+      ],
+      "currentValueTemplate": "{ited.horizontalCabling.maxChannelLengthMeters} m de canal horizontal",
+      "requiredValue": "≤ 100 m de comprimento total do canal horizontal",
+      "remediation": "Reduzir o comprimento total do canal horizontal para ≤ 100 m, conforme ISO/IEC 11801-1. O canal é composto por: permanent link (máx. 90 m), patch cord no bastidor (máx. 5 m), e patch cord no posto de trabalho (máx. 5 m). Se o permanent link exceder 90 m, reposicionar o bastidor de piso ou instalar consolidation point intermédio. Nunca exceder 90 m de cabo permanente.",
+      "enabled": true,
+      "tags": [
+        "cablagem horizontal",
+        "comprimento máximo",
+        "100 metros",
+        "canal",
+        "ISO 11801"
+      ]
+    },
+    {
+      "id": "ITED_083",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.4.2 — Cablagem Horizontal — Permanent Link Máximo",
+      "description": "O comprimento do permanent link (cabo fixo entre o patch panel e a tomada do posto de trabalho) excede os 90 m. Os restantes 10 m do canal (100 m total) são reservados para patch cords e equipment cords.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.horizontalCabling.maxPermanentLinkMeters",
+          "operator": ">",
+          "value": 90
+        }
+      ],
+      "currentValueTemplate": "{ited.horizontalCabling.maxPermanentLinkMeters} m de permanent link",
+      "requiredValue": "≤ 90 m de permanent link na cablagem horizontal",
+      "remediation": "Reduzir o permanent link para ≤ 90 m. Se a distância entre o bastidor e o posto de trabalho mais afastado exceder 90 m, considerar: (1) reposicionar o bastidor para uma posição mais central, (2) instalar bastidor adicional (satellite closet), ou (3) utilizar consolidation point. Em nenhum caso se deve exceder 90 m de cabo instalado permanentemente.",
+      "enabled": true,
+      "tags": [
+        "permanent link",
+        "90 metros",
+        "cablagem horizontal",
+        "distância",
+        "bastidor"
+      ]
+    },
+    {
+      "id": "ITED_084",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.5.1 — Densidade de Tomadas no Posto de Trabalho (Work Area Outlet)",
+      "description": "A densidade de tomadas de telecomunicações nos postos de trabalho é inferior ao mínimo regulamentar. Cada posto de trabalho deve ter no mínimo 2 tomadas RJ45 (uma para dados, uma para voz/reserva) e 1 tomada de fibra óptica em edifícios comerciais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.workArea.outletsPerWorkstation",
+          "operator": "<",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "{ited.workArea.outletsPerWorkstation} tomada(s) por posto de trabalho",
+      "requiredValue": "≥ 2 tomadas RJ45 por posto de trabalho",
+      "remediation": "Instalar no mínimo 2 tomadas RJ45 Cat. 6A por cada posto de trabalho, em caixa de aparelhagem dupla. A primeira tomada destina-se a dados (rede Ethernet) e a segunda a voz (VoIP) ou serviço complementar. Em espaços comerciais premium, prever 3 tomadas (dados + voz + reserva) e 1 tomada de fibra óptica LC duplex para ligações de alta velocidade.",
+      "enabled": true,
+      "tags": [
+        "tomada",
+        "posto de trabalho",
+        "work area outlet",
+        "densidade",
+        "RJ45"
+      ]
+    },
+    {
+      "id": "ITED_085",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.5.3 — Densidade de Tomadas por Área Útil",
+      "description": "O rácio de tomadas de telecomunicações por área útil é inferior ao mínimo de 1 tomada dupla por cada 10 m² em espaços de escritório ou comércio.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.workArea.outletDensityPer10sqm",
+          "operator": "<",
+          "value": 1
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "services"
+          ]
+        }
+      ],
+      "currentValueTemplate": "{ited.workArea.outletDensityPer10sqm} tomada(s) dupla(s) por 10 m²",
+      "requiredValue": "≥ 1 tomada dupla por cada 10 m² em espaços de escritório/comércio",
+      "remediation": "Aumentar a densidade de tomadas de telecomunicações para no mínimo 1 tomada dupla RJ45 por cada 10 m² de área útil de escritório. Em zonas de open space com elevada densidade de postos de trabalho, prever 1 tomada dupla por 7 m². As tomadas devem estar posicionadas junto às zonas de trabalho previstas, a uma altura de 0.20-0.30 m do pavimento ou em colunas de serviço (power poles).",
+      "enabled": true,
+      "tags": [
+        "tomada",
+        "densidade",
+        "área útil",
+        "escritório",
+        "rácio"
+      ]
+    },
+    {
+      "id": "ITED_086",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.6.1 — Consolidation Point (CP) — Especificações",
+      "description": "O consolidation point (CP) instalado na cablagem horizontal não cumpre as especificações mínimas. O CP deve ser passivo (sem equipamento ativo), ter capacidade máxima de 12 ligações, e estar acessível para manutenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.consolidationPoint.isCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.consolidationPoint.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "CP conforme: {ited.consolidationPoint.isCompliant}",
+      "requiredValue": "Consolidation point conforme às especificações ITED/ISO 11801",
+      "remediation": "O consolidation point deve cumprir: (1) ser um ponto de ligação passivo sem equipamento ativo, (2) capacidade máxima de 12 ligações, (3) estar em caixa acessível no teto falso ou rodapé técnico, (4) permitir re-ligação sem afetar o permanent link, (5) estar a pelo menos 15 m da tomada do posto de trabalho. Não é permitido instalar mais do que 1 CP por canal horizontal.",
+      "enabled": true,
+      "tags": [
+        "consolidation point",
+        "CP",
+        "cablagem horizontal",
+        "passivo",
+        "ISO 11801"
+      ]
+    },
+    {
+      "id": "ITED_087",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.6.3 — Consolidation Point — Distância Mínima à Tomada Terminal",
+      "description": "O consolidation point está posicionado a menos de 15 m da tomada terminal do posto de trabalho. Esta distância mínima é necessária para garantir a performance do canal e evitar degradação de sinal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.consolidationPoint.distanceToOutletMeters",
+          "operator": "<",
+          "value": 15
+        },
+        {
+          "field": "ited.consolidationPoint.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{ited.consolidationPoint.distanceToOutletMeters} m do CP à tomada",
+      "requiredValue": "≥ 15 m entre o consolidation point e a tomada terminal",
+      "remediation": "Reposicionar o consolidation point para garantir distância mínima de 15 m à tomada terminal mais próxima. Esta distância minimiza o impacto das ligações adicionais (conectores) no desempenho do canal. Se não for possível manter 15 m, remover o CP e ligar diretamente ao patch panel do bastidor de piso.",
+      "enabled": true,
+      "tags": [
+        "consolidation point",
+        "distância",
+        "tomada",
+        "15 metros",
+        "canal"
+      ]
+    },
+    {
+      "id": "ITED_088",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.7.1 — Zone Cabling — Projeto para Espaços Flexíveis",
+      "description": "O projeto de cablagem para espaços flexíveis (open plan) não utiliza zone cabling design. O zone cabling permite reconfigurar facilmente os postos de trabalho sem alterar a cablagem fixa, utilizando zone outlets como pontos de distribuição.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.zoneCabling.isImplemented",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "services"
+          ]
+        },
+        {
+          "field": "ited.hasOpenPlanSpaces",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Zone cabling: {ited.zoneCabling.isImplemented}",
+      "requiredValue": "Zone cabling recomendado para espaços open plan flexíveis",
+      "remediation": "Implementar zone cabling design nos espaços de open plan, distribuindo zone outlets em grelha regular (tipicamente 6×6 m). Cada zone outlet alimenta 4-8 postos de trabalho via patch cords curtos (≤ 5 m). Os zone outlets são instalados em caixas de chão, colunas de serviço ou teto falso. Esta abordagem facilita mudanças de layout sem re-cablagem do permanent link.",
+      "enabled": true,
+      "tags": [
+        "zone cabling",
+        "open plan",
+        "flexibilidade",
+        "zone outlet",
+        "reconfiguração"
+      ]
+    },
+    {
+      "id": "ITED_089",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.7.3 — Zone Cabling — Máximo de Zone Outlets por Zona",
+      "description": "O número de postos de trabalho servidos por um único zone outlet excede o máximo recomendado de 12. Zone outlets com mais de 12 ligações tornam-se difíceis de gerir e exceder limites de preenchimento de condutas.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.zoneCabling.maxWorkstationsPerZone",
+          "operator": ">",
+          "value": 12
+        }
+      ],
+      "currentValueTemplate": "{ited.zoneCabling.maxWorkstationsPerZone} postos por zone outlet",
+      "requiredValue": "≤ 12 postos de trabalho por zone outlet",
+      "remediation": "Redistribuir os postos de trabalho para que cada zone outlet sirva no máximo 12 postos. Instalar zone outlets adicionais para equilibrar a carga. Cada zone outlet deve ter espaço para acomodar os patch cords (máx. 5 m) e estar acessível sem necessidade de ferramentas. Prever 25% de capacidade de reserva em cada zone outlet.",
+      "enabled": true,
+      "tags": [
+        "zone cabling",
+        "zone outlet",
+        "postos de trabalho",
+        "capacidade",
+        "distribuição"
+      ]
+    },
+    {
+      "id": "ITED_090",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.8.1 — MUTOA (Multi-User Telecommunications Outlet Assembly)",
+      "description": "O MUTOA (Multi-User Telecommunications Outlet Assembly) previsto no projeto não cumpre os requisitos mínimos. O MUTOA é uma assemblagem de tomadas para servir múltiplos utilizadores a partir de um único ponto de distribuição.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.mutoa.isCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.mutoa.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "MUTOA conforme: {ited.mutoa.isCompliant}",
+      "requiredValue": "MUTOA conforme às especificações TIA-568/ISO 11801",
+      "remediation": "O MUTOA deve cumprir: (1) estar em caixa de chão ou coluna de serviço acessível, (2) acomodar até 12 tomadas RJ45 por assemblagem, (3) os equipments cords do MUTOA às estações de trabalho não devem exceder 20 m, (4) o comprimento do permanent link deve ser reduzido proporcionalmente (máx. 70 m se equipment cord = 20 m). Identificar claramente cada porta do MUTOA com o respetivo canal.",
+      "enabled": true,
+      "tags": [
+        "MUTOA",
+        "multi-user",
+        "tomada",
+        "caixa de chão",
+        "TIA-568"
+      ]
+    },
+    {
+      "id": "ITED_091",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.8.3 — MUTOA — Comprimento de Equipment Cord Máximo",
+      "description": "O comprimento dos equipment cords (cabos entre o MUTOA e as estações de trabalho) excede o máximo de 20 m. Equipment cords mais longos comprometem a performance do canal e violam os limites de comprimento total.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.mutoa.maxEquipmentCordMeters",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "ited.mutoa.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Equipment cord: {ited.mutoa.maxEquipmentCordMeters} m",
+      "requiredValue": "≤ 20 m de equipment cord do MUTOA à estação de trabalho",
+      "remediation": "Reduzir o comprimento dos equipment cords do MUTOA para ≤ 20 m. O comprimento total do canal (permanent link + equipment cord + patch cord no bastidor) não deve exceder 100 m. Quando o equipment cord é de 20 m, o permanent link fica limitado a 70 m. Se necessário, reposicionar o MUTOA ou instalar MUTOA adicional mais próximo das estações de trabalho afetadas.",
+      "enabled": true,
+      "tags": [
+        "MUTOA",
+        "equipment cord",
+        "comprimento",
+        "20 metros",
+        "canal"
+      ]
+    },
+    {
+      "id": "ITED_092",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2.1 — TBB (Telecommunications Bonding Backbone)",
+      "description": "O edifício não dispõe de telecommunications bonding backbone (TBB) conforme especificado. O TBB é o condutor que interliga os barramentos de terra de telecomunicações (TGB) de cada piso ao barramento principal (TMGB) no ATE.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.bonding.hasTBB",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">=",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "TBB instalado: {ited.bonding.hasTBB}",
+      "requiredValue": "Telecommunications Bonding Backbone (TBB) obrigatório",
+      "remediation": "Instalar o TBB (Telecommunications Bonding Backbone) com condutor de cobre nu ou verde-amarelo, secção mínima de 6 mm² (16 mm² recomendado para edifícios > 8 pisos). O TBB liga o TMGB (Telecommunications Main Grounding Busbar) no ATE a cada TGB (Telecommunications Grounding Busbar) nos distribuidores de piso. Percurso o mais curto e direto possível, sem emendas.",
+      "enabled": true,
+      "tags": [
+        "TBB",
+        "bonding backbone",
+        "terra",
+        "TMGB",
+        "TGB"
+      ]
+    },
+    {
+      "id": "ITED_093",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2.3 — TBB — Secção Mínima do Condutor",
+      "description": "A secção do condutor do telecommunications bonding backbone (TBB) é inferior ao mínimo de 6 mm². Em edifícios com mais de 8 pisos, a secção mínima recomendada é de 16 mm².",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.bonding.tbbConductorSizeMM2",
+          "operator": "<",
+          "value": 6
+        },
+        {
+          "field": "ited.bonding.hasTBB",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Secção do TBB: {ited.bonding.tbbConductorSizeMM2} mm²",
+      "requiredValue": "≥ 6 mm² (≥ 16 mm² para edifícios > 8 pisos)",
+      "remediation": "Substituir o condutor do TBB por um de secção adequada: mínimo 6 mm² de cobre para edifícios até 8 pisos, ou 16 mm² para edifícios superiores a 8 pisos. O condutor deve ser contínuo (sem emendas), de cobre eletrolítico, isolado a verde-amarelo ou nu em tubo dedicado. Garantir ligações aparafusadas nos barramentos (não soldadas) e proteger contra corrosão.",
+      "enabled": true,
+      "tags": [
+        "TBB",
+        "secção condutor",
+        "6 mm²",
+        "16 mm²",
+        "cobre"
+      ]
+    },
+    {
+      "id": "ITED_094",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2.5 — Barramento Principal de Terra de Telecomunicações (TMGB)",
+      "description": "O barramento principal de terra de telecomunicações (TMGB — Telecommunications Main Grounding Busbar) no ATE não existe ou não está corretamente ligado ao barramento de terra geral do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.bonding.hasTMGB",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "TMGB instalado: {ited.bonding.hasTMGB}",
+      "requiredValue": "TMGB obrigatório no ATE, ligado ao barramento de terra do edifício",
+      "remediation": "Instalar barramento de terra de telecomunicações principal (TMGB) no ATE, em barra de cobre com dimensão mínima de 100×10 mm e comprimento adequado ao número de ligações. O TMGB deve ter ligação direta ao barramento de terra geral do edifício (BTE) com condutor de 16 mm² mínimo. Todas as blindagens de cabos, racks, equipamentos ativos e SPDs devem ligar ao TMGB.",
+      "enabled": true,
+      "tags": [
+        "TMGB",
+        "barramento terra",
+        "ATE",
+        "equipotencialidade",
+        "BTE"
+      ]
+    },
+    {
+      "id": "ITED_095",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.2 — Rácio de Preenchimento de Condutas (Pathway Fill Ratio)",
+      "description": "O rácio de preenchimento (fill ratio) das condutas de telecomunicações excede o máximo de 40%. O preenchimento excessivo dificulta a adição de novos cabos e pode causar danos durante a instalação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.pathway.fillRatioPercent",
+          "operator": ">",
+          "value": 40
+        }
+      ],
+      "currentValueTemplate": "{ited.pathway.fillRatioPercent}% de preenchimento da conduta",
+      "requiredValue": "≤ 40% de rácio de preenchimento das condutas",
+      "remediation": "Reduzir o rácio de preenchimento das condutas para ≤ 40% da secção interna. O rácio é calculado pela soma das secções dos cabos dividida pela secção interna útil da conduta. Se o rácio exceder 40%, instalar condutas adicionais ou de maior diâmetro. Para condutas com 1 cabo, aceita-se até 53%. Para 2 cabos, até 31%. Estes valores facilitam a instalação e permitem crescimento futuro.",
+      "enabled": true,
+      "tags": [
+        "conduta",
+        "fill ratio",
+        "preenchimento",
+        "40%",
+        "dimensionamento"
+      ]
+    },
+    {
+      "id": "ITED_096",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.2.3 — Pathway Fill Ratio — Calhas e Esteiras de Cabos",
+      "description": "O rácio de preenchimento das calhas ou esteiras de cabos (cable trays) excede o máximo de 50%. Calhas sobrecarregadas dificultam a manutenção e não permitem adição de novos cabos sem risco de dano.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.pathway.cableTrayFillRatioPercent",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "{ited.pathway.cableTrayFillRatioPercent}% de preenchimento da calha",
+      "requiredValue": "≤ 50% de preenchimento em calhas e esteiras de cabos",
+      "remediation": "Manter o preenchimento das calhas/esteiras de cabos abaixo de 50% da altura útil. Os cabos devem ficar alinhados e organizados, sem cruzamentos desnecessários. Separar cabos de telecomunicações de cabos de energia com divisória ou calha separada (separação mínima conforme regulamentação elétrica). Para edifícios em fase de projeto, dimensionar as calhas com reserva de 30% para futuro crescimento.",
+      "enabled": true,
+      "tags": [
+        "calha",
+        "esteira",
+        "cable tray",
+        "fill ratio",
+        "preenchimento"
+      ]
+    },
+    {
+      "id": "ITED_097",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2.3 — Firestop para Penetrações de Telecomunicações — Classificação EI",
+      "description": "O sistema de firestop utilizado nas penetrações de telecomunicações não possui classificação EI adequada. A classificação deve ser igual ou superior à compartimentação corta-fogo do elemento construtivo atravessado (parede ou laje).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fireStop.eiClassificationMinutes",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "ited.fireStop.hasFloorPenetrationSeals",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Classificação firestop: EI {ited.fireStop.eiClassificationMinutes}",
+      "requiredValue": "Classificação EI ≥ 60 minutos (ou conforme compartimentação do edifício)",
+      "remediation": "Substituir o sistema de firestop por um com classificação EI igual ou superior à da compartimentação do edifício (mínimo EI 60). Utilizar sistemas certificados (EN 1366-3) compostos por argamassa intumescente, almofadas corta-fogo ou colares intumescentes, conforme o tipo de penetração. O sistema deve ser re-selável para permitir adição futura de cabos. Manter registo fotográfico de cada penetração selada.",
+      "enabled": true,
+      "tags": [
+        "firestop",
+        "corta-fogo",
+        "EI 60",
+        "penetração",
+        "EN 1366-3"
+      ]
+    },
+    {
+      "id": "ITED_098",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2.5 — Firestop — Documentação e Rastreabilidade",
+      "description": "Não existe documentação das selagens corta-fogo nas penetrações de telecomunicações. Cada penetração selada deve ter registo fotográfico, identificação do produto utilizado, e localização documentada na planta do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fireStop.hasDocumentation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.fireStop.hasFloorPenetrationSeals",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Documentação firestop: {ited.fireStop.hasDocumentation}",
+      "requiredValue": "Documentação completa de todas as selagens corta-fogo",
+      "remediation": "Elaborar dossier de firestop incluindo para cada penetração: (1) localização exata (planta com coordenadas), (2) fotografia antes e depois da selagem, (3) tipo e marca do produto utilizado, (4) ficha técnica e certificado EI do produto, (5) data de instalação e responsável, (6) dimensão da penetração e número de cabos. O dossier deve ser arquivado no ATE e atualizado a cada intervenção na cablagem.",
+      "enabled": true,
+      "tags": [
+        "firestop",
+        "documentação",
+        "rastreabilidade",
+        "registo",
+        "selagem"
+      ]
+    },
+    {
+      "id": "ITED_099",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 61.º — Documentação do Projeto ITED — Peças Escritas",
+      "description": "O projeto ITED não contém todas as peças escritas obrigatórias. As peças escritas devem incluir: memória descritiva, condições técnicas, medições e orçamento, e caderno de encargos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.projectDocumentation.hasAllWrittenParts",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Peças escritas completas: {ited.projectDocumentation.hasAllWrittenParts}",
+      "requiredValue": "Todas as peças escritas obrigatórias no projeto ITED",
+      "remediation": "Completar o projeto ITED com todas as peças escritas obrigatórias: (1) Memória descritiva e justificativa — descrição da solução técnica, dimensionamento e fundamentação; (2) Condições técnicas especiais — especificações de materiais, equipamentos e ensaios; (3) Medições e orçamento — quantificação de todos os materiais e trabalhos; (4) Caderno de encargos — condições jurídicas e técnicas gerais. Todas as peças devem estar assinadas pelo projetista credenciado ANACOM.",
+      "enabled": true,
+      "tags": [
+        "documentação",
+        "projeto ITED",
+        "peças escritas",
+        "memória descritiva",
+        "ANACOM"
+      ]
+    },
+    {
+      "id": "ITED_100",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 61.º — Documentação do Projeto ITED — Peças Desenhadas",
+      "description": "O projeto ITED não contém todas as peças desenhadas obrigatórias. As peças desenhadas devem incluir: plantas com traçado de condutas e cablagem, esquemas de princípio, cortes e alçados com percursos verticais, e pormenores construtivos do ATE e ATI.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.projectDocumentation.hasAllDrawings",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Peças desenhadas completas: {ited.projectDocumentation.hasAllDrawings}",
+      "requiredValue": "Todas as peças desenhadas obrigatórias no projeto ITED",
+      "remediation": "Completar o projeto ITED com todas as peças desenhadas obrigatórias: (1) Planta de cada piso com traçado de condutas, caixas e tomadas (escala 1:100); (2) Esquema de princípio da rede (fibra, cobre, coaxial); (3) Cortes/alçados com percurso vertical da coluna montante; (4) Planta de cobertura com localização de antenas; (5) Pormenor construtivo do ATE e ATI (escala 1:20); (6) Esquema de ligações do ODF e patch panels. Todas as peças devem seguir a simbologia ITED normalizada e estar assinadas pelo projetista credenciado.",
+      "enabled": true,
+      "tags": [
+        "documentação",
+        "projeto ITED",
+        "peças desenhadas",
+        "plantas",
+        "simbologia"
       ]
     }
   ]
