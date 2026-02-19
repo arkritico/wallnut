@@ -4807,6 +4807,1497 @@
         "novo-licenciamento",
         "controlo-prévio"
       ]
+    },
+    {
+      "id": "RJUE-URBAN-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 2.º, n.º 1, al. i) — Operações de Urbanização",
+      "description": "As operações de urbanização (infraestruturas, arruamentos, espaços verdes) estão sujeitas a licenciamento municipal prévio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "urbanizacao"
+        },
+        {
+          "field": "licensing.hasUrbanizationPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Autorização de urbanização: {licensing.hasUrbanizationPermit}",
+      "requiredValue": "Licença de urbanização emitida pela câmara municipal",
+      "remediation": "Submeter pedido de licenciamento de operação de urbanização à câmara municipal competente, incluindo projeto de infraestruturas (redes viárias, águas, esgotos, eletricidade, telecomunicações e gás). O início de obras sem licença constitui contraordenação grave.",
+      "enabled": true,
+      "tags": [
+        "urbanização",
+        "infraestruturas",
+        "licenciamento",
+        "operação-urbanística"
+      ]
+    },
+    {
+      "id": "RJUE-URBAN-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 2.º, n.º 1, al. i) e Art. 4.º, n.º 2, al. a) — Operação de Loteamento",
+      "description": "A operação de loteamento, implicando a divisão de prédio em lotes para construção, requer licenciamento municipal com alvará.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.hasLoteamentoAlvara",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Alvará de loteamento: {licensing.hasLoteamentoAlvara}",
+      "requiredValue": "Alvará de loteamento emitido e registado",
+      "remediation": "Requerer licença de loteamento à câmara municipal, juntando o projeto de loteamento com definição dos lotes, áreas de cedência, infraestruturas e parâmetros urbanísticos. O alvará deve ser registado na conservatória do registo predial.",
+      "enabled": true,
+      "tags": [
+        "loteamento",
+        "alvará",
+        "divisão-lotes",
+        "operação-urbanística"
+      ]
+    },
+    {
+      "id": "RJUE-URBAN-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 2.º, al. a) a f) — Classificação de Operação de Edificação",
+      "description": "A operação de edificação deve ser classificada corretamente (construção nova, ampliação, alteração, reconstrução, conservação ou demolição) para determinar o procedimento de controlo prévio aplicável.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingOperationClassification",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "alteracao", "reconstrucao", "conservacao", "demolicao"]
+        }
+      ],
+      "currentValueTemplate": "Classificação: {licensing.buildingOperationClassification}",
+      "requiredValue": "Classificação da operação de edificação definida",
+      "remediation": "Classificar a operação de edificação de acordo com o Art. 2.º do RJUE. A classificação correta determina se o procedimento aplicável é licenciamento, comunicação prévia ou isenção de controlo prévio.",
+      "enabled": true,
+      "tags": [
+        "classificação",
+        "edificação",
+        "procedimento",
+        "controlo-prévio"
+      ]
+    },
+    {
+      "id": "RJUE-URBAN-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 5, al. e) — Operação de Alteração de Uso",
+      "description": "A alteração de uso de edifício ou fração que envolva realização de obras sujeitas a licenciamento requer autorização municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "alteracao_uso"
+        },
+        {
+          "field": "licensing.hasUseChangeAuthorization",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.useChangeRequiresWorks",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Autorização de alteração de uso: {licensing.hasUseChangeAuthorization}",
+      "requiredValue": "Autorização de alteração de uso emitida",
+      "remediation": "Submeter pedido de alteração de uso à câmara municipal, incluindo memória descritiva da nova utilização, projeto de alterações e comprovação do cumprimento das normas aplicáveis ao novo uso (RGEU, RJSCIE, acessibilidade).",
+      "enabled": true,
+      "tags": [
+        "alteração-uso",
+        "reconversão",
+        "licenciamento",
+        "operação-urbanística"
+      ]
+    },
+    {
+      "id": "RJUE-URBAN-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 2.º, n.º 1, al. j) e Art. 15.º — Reconversão Urbana",
+      "description": "Operações de reconversão urbana integradas em área urbana de génese ilegal (AUGI) requerem procedimento especial de licenciamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isInAUGI",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasReconversionPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Plano de reconversão AUGI: {licensing.hasReconversionPlan}",
+      "requiredValue": "Plano de reconversão aprovado ou em execução",
+      "remediation": "Verificar se a área está classificada como AUGI e se existe plano de reconversão aprovado nos termos da Lei 91/95. As obras em AUGI estão condicionadas ao cumprimento do plano de reconversão e à prestação de caução para infraestruturas.",
+      "enabled": true,
+      "tags": [
+        "AUGI",
+        "reconversão",
+        "génese-ilegal",
+        "operação-urbanística"
+      ]
+    },
+    {
+      "id": "RJUE-NULID-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 67.º, n.º 1 — Nulidade de Licença por Violação de PDM",
+      "description": "É nula a licença que viole o plano diretor municipal, o plano de urbanização ou o plano de pormenor em vigor.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.violatesPDM",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Violação do PDM: {licensing.violatesPDM}",
+      "requiredValue": "Licença em conformidade com os instrumentos de gestão territorial",
+      "remediation": "A nulidade pode ser declarada a todo o tempo pela câmara municipal, pelo tribunal administrativo ou pelo Ministério Público. Rever o projeto para garantir conformidade com o PDM, PU e PP em vigor.",
+      "enabled": true,
+      "tags": [
+        "nulidade",
+        "PDM",
+        "plano-diretor",
+        "invalidade"
+      ]
+    },
+    {
+      "id": "RJUE-NULID-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 67.º, n.º 2 — Processo de Anulação de Licença",
+      "description": "Os atos de licenciamento anuláveis podem ser anulados pela câmara municipal no prazo de um ano a contar da respetiva emissão.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasAnnullableDefect",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.licenseAgeDays",
+          "operator": "<=",
+          "value": 365
+        }
+      ],
+      "currentValueTemplate": "Licença com vício anulável, emitida há {licensing.licenseAgeDays} dias",
+      "requiredValue": "Licença isenta de vícios anuláveis ou prazo de anulação expirado",
+      "remediation": "Identificar e sanar o vício dentro do prazo de um ano. Caso a anulação seja inevitável, notificar o titular e os terceiros de boa-fé, ressalvando direitos adquiridos e eventuais indemnizações nos termos do CPA.",
+      "enabled": true,
+      "tags": [
+        "anulação",
+        "vício",
+        "prazo",
+        "CPA"
+      ]
+    },
+    {
+      "id": "RJUE-NULID-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 67.º, n.º 3 — Atos Anuláveis e Efeitos",
+      "description": "Os atos de licenciamento anuláveis que afetem direitos de terceiros mantêm efeitos até à declaração de invalidade, salvaguardando direitos adquiridos de boa-fé.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasAnnullableDefect",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.thirdPartyRightsAffected",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ato anulável com direitos de terceiros: {licensing.thirdPartyRightsAffected}",
+      "requiredValue": "Salvaguarda dos direitos de terceiros de boa-fé documentada",
+      "remediation": "Documentar todos os direitos de terceiros de boa-fé afetados antes de iniciar processo de anulação. Os atos anuláveis produzem efeitos jurídicos até à respetiva declaração de invalidade.",
+      "enabled": true,
+      "tags": [
+        "anulabilidade",
+        "terceiros",
+        "boa-fé",
+        "direitos-adquiridos"
+      ]
+    },
+    {
+      "id": "RJUE-NULID-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 68.º — Proteção de Direitos de Terceiros",
+      "description": "A emissão de licença não prejudica os direitos de terceiros, designadamente de natureza civil, que podem ser exercidos independentemente do procedimento administrativo.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.thirdPartyClaimPending",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Reclamação de terceiros pendente: {licensing.thirdPartyClaimPending}",
+      "requiredValue": "Direitos de terceiros identificados e acautelados",
+      "remediation": "Apesar de a licença estar emitida, verificar a existência de direitos de terceiros (servidões, direito de preferência, direito de superfície) que possam ser exercidos judicialmente. Aconselha-se parecer jurídico prévio ao início de obras.",
+      "enabled": true,
+      "tags": [
+        "terceiros",
+        "direitos-civis",
+        "servidões",
+        "proteção"
+      ]
+    },
+    {
+      "id": "RJUE-NULID-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 69.º — Impugnação Judicial de Atos de Licenciamento",
+      "description": "Os atos de licenciamento podem ser impugnados judicialmente no prazo de 3 meses a contar da notificação ou publicação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.judicialReviewPeriodOpen",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.licenseAgeDays",
+          "operator": "<=",
+          "value": 90
+        }
+      ],
+      "currentValueTemplate": "Licença emitida há {licensing.licenseAgeDays} dias — período de impugnação em curso",
+      "requiredValue": "Prazo de impugnação judicial decorrido ou decisão judicial favorável",
+      "remediation": "Durante o prazo de impugnação de 3 meses, recomenda-se cautela no início de obras de grande envergadura. Terceiros interessados podem requerer providência cautelar de suspensão da eficácia do ato ao tribunal administrativo.",
+      "enabled": true,
+      "tags": [
+        "impugnação",
+        "tribunal",
+        "prazo",
+        "suspensão"
+      ]
+    },
+    {
+      "id": "RJUE-CAUTEL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 102.º — Embargo de Obras Ilegais",
+      "description": "A câmara municipal pode embargar obras realizadas sem licença ou em desconformidade com a licença, ordenando a imediata paragem dos trabalhos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasEmbargoOrder",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.worksInProgress",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ordem de embargo ativa: {licensing.hasEmbargoOrder}",
+      "requiredValue": "Sem ordem de embargo ou embargo levantado",
+      "remediation": "Parar imediatamente todas as obras objeto de embargo. A desobediência a ordem de embargo constitui crime de desobediência qualificada (Art. 348.º do Código Penal). Requerer legalização junto da câmara municipal ou recorrer da decisão.",
+      "enabled": true,
+      "tags": [
+        "embargo",
+        "fiscalização",
+        "paragem-obras",
+        "cautelar"
+      ]
+    },
+    {
+      "id": "RJUE-CAUTEL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 102.º-A — Suspensão Preventiva de Obras",
+      "description": "A câmara pode ordenar a suspensão preventiva de obras quando existam indícios de desconformidade com o projeto aprovado, enquanto procede à fiscalização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasSuspensionOrder",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.worksInProgress",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ordem de suspensão preventiva: {licensing.hasSuspensionOrder}",
+      "requiredValue": "Sem ordem de suspensão ou suspensão levantada",
+      "remediation": "Suspender os trabalhos e aguardar a vistoria municipal. Disponibilizar o livro de obra, projeto aprovado e todos os documentos técnicos à equipa de fiscalização. A suspensão preventiva tem duração máxima de 30 dias.",
+      "enabled": true,
+      "tags": [
+        "suspensão",
+        "fiscalização",
+        "preventiva",
+        "cautelar"
+      ]
+    },
+    {
+      "id": "RJUE-CAUTEL-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 89.º, n.º 2 — Medidas Cautelares Interinas",
+      "description": "O presidente da câmara pode adotar medidas cautelares interinas (tapumes, escoramentos, vedações) para prevenir perigo para pessoas ou bens.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasInterimMeasures",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.interimMeasuresComplied",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Medidas cautelares interinas cumpridas: {licensing.interimMeasuresComplied}",
+      "requiredValue": "Todas as medidas cautelares interinas cumpridas",
+      "remediation": "Cumprir imediatamente as medidas cautelares interinas ordenadas (tapumes, escoramentos, vedações de segurança). O incumprimento pode dar lugar a execução coerciva por parte da câmara municipal, com custos imputados ao proprietário.",
+      "enabled": true,
+      "tags": [
+        "medidas-interinas",
+        "segurança",
+        "tapumes",
+        "escoramento"
+      ]
+    },
+    {
+      "id": "RJUE-CAUTEL-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 89.º, n.º 1 — Autorização de Obras Urgentes",
+      "description": "Em caso de perigo iminente para pessoas ou bens, o presidente da câmara pode autorizar obras urgentes sem procedimento de licenciamento prévio.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasUrgentWorksAuthorization",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.urgentWorksRegularized",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Obras urgentes regularizadas: {licensing.urgentWorksRegularized}",
+      "requiredValue": "Obras urgentes executadas e regularizadas no prazo de 60 dias",
+      "remediation": "Executar apenas as obras estritamente necessárias para eliminar o perigo iminente. Submeter pedido de regularização à câmara municipal no prazo de 60 dias após a conclusão das obras urgentes, incluindo relatório técnico e documentação fotográfica.",
+      "enabled": true,
+      "tags": [
+        "obras-urgentes",
+        "perigo-iminente",
+        "regularização",
+        "cautelar"
+      ]
+    },
+    {
+      "id": "RJUE-CAUTEL-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 89.º, n.º 3 — Resposta a Situação de Perigo",
+      "description": "Em situação de perigo para a segurança pública, o proprietário é obrigado a executar obras de conservação ou demolição no prazo fixado pela câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasDangerSituationNotice",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.dangerMitigationCompleted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Mitigação de perigo concluída: {licensing.dangerMitigationCompleted}",
+      "requiredValue": "Obras de conservação ou demolição executadas no prazo fixado",
+      "remediation": "Executar as obras de conservação ou demolição determinadas pela câmara municipal dentro do prazo fixado na notificação. O incumprimento permite a posse administrativa do imóvel e execução coerciva das obras, com custos a cargo do proprietário.",
+      "enabled": true,
+      "tags": [
+        "perigo",
+        "segurança-pública",
+        "conservação",
+        "demolição-coerciva"
+      ]
+    },
+    {
+      "id": "RJUE-COMUNI-01",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 4.º, n.º 4 — Âmbito da Comunicação Prévia",
+      "description": "São objeto de comunicação prévia as obras de reconstrução sem aumento de cércea ou de pisos, e as obras de urbanização em área abrangida por operação de loteamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["reconstrucao_sem_alteracao", "urbanizacao_em_loteamento"]
+        },
+        {
+          "field": "licensing.hasComunicacaoPrevia",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Comunicação prévia apresentada: {licensing.hasComunicacaoPrevia}",
+      "requiredValue": "Comunicação prévia submetida à câmara municipal",
+      "remediation": "Submeter comunicação prévia à câmara municipal, instruída com os elementos previstos na Portaria 113/2015, com antecedência mínima de 20 dias úteis relativamente à data pretendida para o início das obras.",
+      "enabled": true,
+      "tags": [
+        "comunicação-prévia",
+        "simplificação",
+        "dl-136-2014",
+        "reconstrução"
+      ]
+    },
+    {
+      "id": "RJUE-COMUNI-02",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 6.º-A — Operações Isentas de Controlo Prévio",
+      "description": "Estão isentas de controlo prévio as obras de conservação interior, de alteração interior sem modificação estrutural, e instalação de equipamentos técnicos (painéis solares, AC).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["conservacao_interior", "alteracao_interior_nao_estrutural", "equipamento_tecnico"]
+        },
+        {
+          "field": "licensing.hasUnnecessaryLicenseRequest",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pedido de licenciamento desnecessário: {licensing.hasUnnecessaryLicenseRequest}",
+      "requiredValue": "Operação isenta — licenciamento não necessário",
+      "remediation": "A operação está isenta de controlo prévio nos termos do Art. 6.º-A do RJUE (na redação do DL 136/2014). Não é necessário submeter pedido de licenciamento ou comunicação prévia. Conservar documentação técnica para eventual fiscalização.",
+      "enabled": true,
+      "tags": [
+        "isenção",
+        "controlo-prévio",
+        "conservação-interior",
+        "simplificação"
+      ]
+    },
+    {
+      "id": "RJUE-COMUNI-03",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 6.º — Operações Sujeitas Apenas a Notificação",
+      "description": "As obras de escassa relevância urbanística estão sujeitas apenas a mera notificação à câmara municipal, sem necessidade de procedimento de controlo prévio.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.isLowUrbanRelevance",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasNotificationOnly",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Notificação de obra de escassa relevância: {licensing.hasNotificationOnly}",
+      "requiredValue": "Notificação submetida à câmara municipal",
+      "remediation": "Submeter mera notificação à câmara municipal para obras de escassa relevância urbanística (muros até 1,80 m, estufas até 40 m², piscinas até 50 m²). A notificação não depende de apreciação municipal.",
+      "enabled": true,
+      "tags": [
+        "notificação",
+        "escassa-relevância",
+        "simplificação",
+        "dl-136-2014"
+      ]
+    },
+    {
+      "id": "RJUE-COMUNI-04",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 36.º-A — Deferimento Tácito da Comunicação Prévia",
+      "description": "A comunicação prévia considera-se tacitamente aceite se a câmara municipal não se pronunciar no prazo de 20 dias úteis após a receção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasComunicacaoPrevia",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.comunicacaoPreviaWaitDays",
+          "operator": ">=",
+          "value": 20
+        },
+        {
+          "field": "licensing.comunicacaoPreviaDecision",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Dias úteis desde comunicação: {licensing.comunicacaoPreviaWaitDays}",
+      "requiredValue": "Aprovação tácita após 20 dias úteis sem pronúncia",
+      "remediation": "Decorrido o prazo de 20 dias úteis sem pronúncia da câmara municipal, a comunicação prévia considera-se tacitamente aceite. Requerer certidão de aprovação tácita para efeitos de prova e início das obras.",
+      "enabled": true,
+      "tags": [
+        "deferimento-tácito",
+        "comunicação-prévia",
+        "prazo",
+        "dl-136-2014"
+      ]
+    },
+    {
+      "id": "RJUE-COMUNI-05",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 35.º — Documentação da Comunicação Prévia",
+      "description": "A comunicação prévia deve ser acompanhada dos projetos de arquitetura e especialidades, termos de responsabilidade dos autores e coordenador de projeto.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasComunicacaoPrevia",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.comunicacaoPreviaDocumentsComplete",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Documentação completa: {licensing.comunicacaoPreviaDocumentsComplete}",
+      "requiredValue": "Todos os documentos obrigatórios entregues",
+      "remediation": "Completar a instrução da comunicação prévia com: projeto de arquitetura, projetos de especialidades (se aplicável), termos de responsabilidade dos técnicos, certificado energético prévio, ficha de elementos estatísticos do INE e comprovativo do pagamento de taxas.",
+      "enabled": true,
+      "tags": [
+        "documentação",
+        "comunicação-prévia",
+        "instrução",
+        "projetos"
+      ]
+    },
+    {
+      "id": "RJUE-COORD-01",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 13.º-A — Protocolo de Coordenação Interinstitucional",
+      "description": "A câmara municipal deve assegurar a coordenação entre entidades consultadas no procedimento de licenciamento através de protocolo de coordenação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.requiresExternalConsultation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasCoordinationProtocol",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Protocolo de coordenação: {licensing.hasCoordinationProtocol}",
+      "requiredValue": "Consultas a entidades externas coordenadas via protocolo",
+      "remediation": "Solicitar à câmara municipal informação sobre o estado das consultas a entidades externas (APA, CCDR, DGPC, ICNF, etc.). O protocolo de coordenação garante que as consultas são simultâneas e não sequenciais, reduzindo os prazos.",
+      "enabled": true,
+      "tags": [
+        "coordenação",
+        "entidades-externas",
+        "consultas",
+        "protocolo"
+      ]
+    },
+    {
+      "id": "RJUE-COORD-02",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 13.º-B — Balcão Único Eletrónico",
+      "description": "Os procedimentos de controlo prévio devem ser tramitados através do balcão único eletrónico, garantindo a desmaterialização e transparência processual.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.submittedViaElectronicPortal",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.municipalityHasElectronicPortal",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Submissão eletrónica: {licensing.submittedViaElectronicPortal}",
+      "requiredValue": "Pedido tramitado via balcão único eletrónico",
+      "remediation": "Submeter o pedido de licenciamento ou comunicação prévia através do balcão único eletrónico do município. A tramitação eletrónica permite acompanhar o estado do processo, receber notificações e aceder a pareceres das entidades consultadas.",
+      "enabled": true,
+      "tags": [
+        "balcão-único",
+        "desmaterialização",
+        "eletrónico",
+        "dl-136-2014"
+      ]
+    },
+    {
+      "id": "RJUE-COORD-03",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 13.º, n.º 3 — Prazos de Consulta Simultânea",
+      "description": "As consultas a entidades externas devem ser realizadas simultaneamente, com prazo máximo de 20 dias úteis para pronúncia, sob pena de deferimento tácito.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.externalConsultationDays",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "licensing.externalConsultationPending",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Dias de consulta externa: {licensing.externalConsultationDays}",
+      "requiredValue": "Parecer emitido ou deferimento tácito após 20 dias úteis",
+      "remediation": "Decorridos 20 dias úteis sem pronúncia da entidade consultada, o parecer considera-se favorável por deferimento tácito (Art. 13.º, n.º 5 do RJUE). Requerer certidão de deferimento tácito para prosseguir com o procedimento.",
+      "enabled": true,
+      "tags": [
+        "consulta-simultânea",
+        "prazo",
+        "deferimento-tácito",
+        "entidades"
+      ]
+    },
+    {
+      "id": "RJUE-COORD-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º, n.º 6 — Resolução de Conflitos entre Entidades",
+      "description": "Em caso de conflito entre pareceres de entidades consultadas, prevalece o parecer da entidade com competência específica na matéria, podendo ser solicitada arbitragem à CCDR.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasConflictingOpinions",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.conflictResolved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Conflito entre pareceres: {licensing.hasConflictingOpinions}",
+      "requiredValue": "Conflito resolvido ou arbitragem solicitada",
+      "remediation": "Solicitar à câmara municipal que promova a conferência decisória entre entidades ou requeira arbitragem à CCDR (Comissão de Coordenação e Desenvolvimento Regional). A decisão da CCDR é vinculativa para todas as partes.",
+      "enabled": true,
+      "tags": [
+        "conflito",
+        "pareceres",
+        "CCDR",
+        "arbitragem"
+      ]
+    },
+    {
+      "id": "RJUE-COORD-05",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 8.º-A — Integração em Plataforma Digital",
+      "description": "Os municípios devem integrar os procedimentos de controlo prévio na plataforma eletrónica de tramitação, permitindo interoperabilidade com entidades da administração central.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.municipalityIntegratedPlatform",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.requiresExternalConsultation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Integração plataforma digital: {licensing.municipalityIntegratedPlatform}",
+      "requiredValue": "Município integrado na plataforma eletrónica nacional",
+      "remediation": "Verificar se o município opera a plataforma eletrónica de tramitação de procedimentos urbanísticos. A integração permite submissão digital, consultas automáticas a entidades e emissão eletrónica de alvarás e certidões.",
+      "enabled": true,
+      "tags": [
+        "plataforma-digital",
+        "interoperabilidade",
+        "e-government",
+        "dl-136-2014"
+      ]
+    },
+    {
+      "id": "RJUE-REABIL-01",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 14.º — Incentivos Fiscais em ARU",
+      "description": "Obras de reabilitação em ARU beneficiam de incentivos fiscais (IVA reduzido, isenção de IMI, dedução em IRS) desde que cumpram os requisitos de elegibilidade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasFiscalIncentiveApplication",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Pedido de incentivos fiscais: {licensing.hasFiscalIncentiveApplication}",
+      "requiredValue": "Requerimento de incentivos fiscais submetido com a candidatura",
+      "remediation": "Requerer os incentivos fiscais aplicáveis: IVA a 6% nas obras de reabilitação, isenção de IMI por 3 anos (renovável até 5), isenção de IMT na primeira aquisição pós-reabilitação, e dedução de 30% dos encargos em IRS. Juntar comprovativo de localização em ARU.",
+      "enabled": true,
+      "tags": [
+        "incentivos-fiscais",
+        "ARU",
+        "IVA",
+        "IMI",
+        "reabilitação"
+      ]
+    },
+    {
+      "id": "RJUE-REABIL-02",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 77.º-A (RJUE) — Licenciamento Simplificado em ARU",
+      "description": "As obras de reabilitação em ARU podem beneficiar de procedimento simplificado de licenciamento, com prazos reduzidos e dispensa de consultas não vinculativas.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.usesSimplifiedProcedure",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Procedimento simplificado: {licensing.usesSimplifiedProcedure}",
+      "requiredValue": "Procedimento simplificado de reabilitação em ARU ativado",
+      "remediation": "Requerer a aplicação do procedimento simplificado de licenciamento para reabilitação em ARU. O regime simplificado prevê prazos de apreciação de 45 dias, dispensa de consultas não vinculativas e possibilidade de comunicação prévia para obras sem alteração estrutural.",
+      "enabled": true,
+      "tags": [
+        "simplificação",
+        "ARU",
+        "reabilitação",
+        "prazos-reduzidos"
+      ]
+    },
+    {
+      "id": "RJUE-REABIL-03",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 15.º e Art. 51.º — Reabilitação de Edifício com Valor Patrimonial",
+      "description": "A reabilitação de edifícios classificados ou em vias de classificação como património requer parecer vinculativo da DGPC (Direção-Geral do Património Cultural).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.isClassifiedHeritage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasDGPCApproval",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Parecer DGPC: {licensing.hasDGPCApproval}",
+      "requiredValue": "Parecer vinculativo favorável da DGPC",
+      "remediation": "Requerer parecer vinculativo à DGPC (Direção-Geral do Património Cultural) para intervenções em imóveis classificados ou em vias de classificação. A intervenção deve respeitar a autenticidade, integridade e legibilidade do imóvel, conforme a Lei 107/2001.",
+      "enabled": true,
+      "tags": [
+        "património",
+        "DGPC",
+        "classificação",
+        "reabilitação-patrimonial"
+      ]
+    },
+    {
+      "id": "RJUE-REABIL-04",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 50.º — Obrigações Estruturais na Reabilitação",
+      "description": "A reabilitação de edifícios existentes deve garantir condições mínimas de segurança estrutural, mesmo quando dispensada do cumprimento integral das normas atuais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasStructuralAssessment",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Avaliação estrutural: {licensing.hasStructuralAssessment}",
+      "requiredValue": "Relatório de avaliação estrutural elaborado por engenheiro habilitado",
+      "remediation": "Realizar avaliação estrutural do edifício existente, incluindo: levantamento de patologias, ensaios de caracterização dos materiais, verificação da capacidade resistente e proposta de reforço quando necessário. O relatório deve ser assinado por engenheiro civil habilitado pela Ordem dos Engenheiros.",
+      "enabled": true,
+      "tags": [
+        "estrutural",
+        "reabilitação",
+        "segurança",
+        "avaliação"
+      ]
+    },
+    {
+      "id": "RJUE-REABIL-05",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 54.º — Reabilitação Faseada",
+      "description": "A reabilitação de edifícios pode ser executada por fases, devendo cada fase garantir condições de segurança e salubridade autónomas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isPhasedRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasPhasedRehabilitationPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Plano de faseamento: {licensing.hasPhasedRehabilitationPlan}",
+      "requiredValue": "Plano de faseamento aprovado pela câmara municipal",
+      "remediation": "Submeter plano de faseamento das obras de reabilitação, demonstrando que cada fase garante: segurança estrutural, condições de salubridade, acessibilidade e autonomia funcional. O plano deve incluir cronograma, estimativa orçamental por fase e condições de transição entre fases.",
+      "enabled": true,
+      "tags": [
+        "faseamento",
+        "reabilitação",
+        "plano",
+        "autonomia-funcional"
+      ]
+    },
+    {
+      "id": "RJUE-SANCION-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 98.º, n.º 3 — Metodologia de Cálculo de Coimas",
+      "description": "O cálculo das coimas por infrações urbanísticas deve considerar a gravidade da infração, o benefício económico obtido, a situação económica do infrator e a culpa.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasUrbanInfraction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.fineCalculationDocumented",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Cálculo de coima documentado: {licensing.fineCalculationDocumented}",
+      "requiredValue": "Metodologia de cálculo de coima devidamente fundamentada",
+      "remediation": "A coima deve ser calculada considerando: gravidade (leve, grave, muito grave), benefício económico do infrator, grau de culpa (dolo ou negligência), situação económica e antecedentes. Coimas variam de €500 a €200.000 para pessoas singulares e até €500.000 para pessoas coletivas.",
+      "enabled": true,
+      "tags": [
+        "coima",
+        "cálculo",
+        "infração",
+        "sancionatório"
+      ]
+    },
+    {
+      "id": "RJUE-SANCION-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 98.º-A — Agravamento por Reincidência",
+      "description": "A reincidência em contraordenações urbanísticas no prazo de 5 anos determina a agravação da coima em um terço nos seus limites mínimo e máximo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isRepeatOffender",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.previousInfractionYears",
+          "operator": "<=",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "Reincidência: {licensing.isRepeatOffender} — Infração anterior há {licensing.previousInfractionYears} anos",
+      "requiredValue": "Sem reincidência ou prazo de 5 anos decorrido",
+      "remediation": "Em caso de reincidência, a coima é agravada em 1/3 nos limites mínimo e máximo. Adicionalmente, pode ser aplicada a sanção acessória de interdição de exercício de atividade urbanística até 2 anos. Regularizar todas as situações pendentes para evitar acumulação de infrações.",
+      "enabled": true,
+      "tags": [
+        "reincidência",
+        "agravamento",
+        "coima",
+        "sanção-acessória"
+      ]
+    },
+    {
+      "id": "RJUE-SANCION-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 100.º — Identificação do Responsável pela Infração",
+      "description": "A responsabilidade pelas contraordenações urbanísticas recai sobre o dono de obra, o construtor, o técnico responsável ou o diretor de fiscalização, conforme a natureza da infração.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasUrbanInfraction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.responsiblePartyIdentified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Responsável identificado: {licensing.responsiblePartyIdentified}",
+      "requiredValue": "Responsável pela contraordenação identificado",
+      "remediation": "Identificar o responsável pela infração: dono de obra (omissão de licenciamento), construtor (execução em desconformidade), técnico autor do projeto (erros de projeto), diretor de fiscalização (falta de acompanhamento). A responsabilidade pode ser solidária quando há concurso de culpas.",
+      "enabled": true,
+      "tags": [
+        "responsabilidade",
+        "infração",
+        "dono-obra",
+        "construtor"
+      ]
+    },
+    {
+      "id": "RJUE-SANCION-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 99.º — Prescrição de Contraordenações Urbanísticas",
+      "description": "O procedimento por contraordenação urbanística prescreve no prazo de 3 anos a contar da data da prática da infração.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasUrbanInfraction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.infractionAgeDays",
+          "operator": ">=",
+          "value": 1095
+        }
+      ],
+      "currentValueTemplate": "Antiguidade da infração: {licensing.infractionAgeDays} dias",
+      "requiredValue": "Infração prescrita (mais de 3 anos) ou procedimento instaurado tempestivamente",
+      "remediation": "O prazo de prescrição de 3 anos (Art. 99.º do RJUE) pode ser interrompido pela notificação do arguido ou pela instauração do processo de contraordenação. Para infrações permanentes (obra ilegal em uso), o prazo conta-se a partir da cessação da infração.",
+      "enabled": true,
+      "tags": [
+        "prescrição",
+        "prazo",
+        "contraordenação",
+        "3-anos"
+      ]
+    },
+    {
+      "id": "RJUE-SANCION-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 101.º — Recurso de Decisões Sancionatórias",
+      "description": "Das decisões de aplicação de coimas e sanções acessórias cabe recurso para o tribunal administrativo competente no prazo de 20 dias úteis.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasSanctionDecision",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.sanctionAppealFiled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.sanctionDecisionDays",
+          "operator": "<=",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "Recurso interposto: {licensing.sanctionAppealFiled} — Dias desde decisão: {licensing.sanctionDecisionDays}",
+      "requiredValue": "Recurso interposto dentro do prazo ou decisão aceite",
+      "remediation": "Interpor recurso junto do tribunal administrativo competente no prazo de 20 dias úteis a contar da notificação da decisão sancionatória. O recurso tem efeito suspensivo quando a coima aplicada é superior a 5 UC (unidades de conta). Juntar fundamentação de facto e de direito.",
+      "enabled": true,
+      "tags": [
+        "recurso",
+        "tribunal",
+        "sanção",
+        "prazo-20-dias"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 7.º e DL 163/2006 — Requisitos Especiais para Edifícios Públicos",
+      "description": "Os edifícios públicos ou de uso público estão sujeitos a requisitos especiais de acessibilidade, segurança e funcionalidade, para além dos aplicáveis a edifícios privados.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingType",
+          "operator": "==",
+          "value": "publico"
+        },
+        {
+          "field": "licensing.meetsPublicBuildingRequirements",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Requisitos de edifício público: {licensing.meetsPublicBuildingRequirements}",
+      "requiredValue": "Todos os requisitos especiais de edifício público cumpridos",
+      "remediation": "Verificar o cumprimento integral dos requisitos especiais para edifícios públicos: acessibilidade (DL 163/2006), segurança contra incêndio (DL 220/2008 — utilização-tipo), eficiência energética (SCE), qualidade do ar interior (Portaria 353-A/2013) e condições acústicas (RRAE).",
+      "enabled": true,
+      "tags": [
+        "edifício-público",
+        "requisitos-especiais",
+        "acessibilidade",
+        "segurança"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 163/2006, Art. 2.º — Design Universal Obrigatório",
+      "description": "Os edifícios públicos devem ser projetados segundo princípios de design universal, garantindo acessibilidade a todas as pessoas independentemente das suas capacidades.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingType",
+          "operator": "==",
+          "value": "publico"
+        },
+        {
+          "field": "licensing.hasUniversalDesignCompliance",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Design universal: {licensing.hasUniversalDesignCompliance}",
+      "requiredValue": "Conformidade com DL 163/2006 — design universal",
+      "remediation": "O projeto deve incluir: percursos acessíveis (largura mínima 1,20 m), rampas com inclinação máxima 6%, instalações sanitárias acessíveis, sinalética tátil e em braille, sistemas de comunicação alternativos e lugares de estacionamento reservados (mínimo 1 por cada 20).",
+      "enabled": true,
+      "tags": [
+        "design-universal",
+        "acessibilidade",
+        "DL-163-2006",
+        "inclusão"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 118/2013, Art. 3.º — Certificação Energética de Edifícios Públicos",
+      "description": "Os edifícios públicos com área útil superior a 250 m² devem possuir certificado energético afixado em local visível e obter classificação mínima B-.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingType",
+          "operator": "==",
+          "value": "publico"
+        },
+        {
+          "field": "licensing.areaUtil",
+          "operator": ">",
+          "value": 250
+        },
+        {
+          "field": "licensing.energyCertificationClass",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Certificação energética: {licensing.energyCertificationClass}",
+      "requiredValue": "Certificação energética mínima B- para edifícios públicos",
+      "remediation": "Obter certificação energética através de perito qualificado pela ADENE. Edifícios públicos com área superior a 250 m² devem atingir classificação mínima B-. Afixar o certificado em local visível ao público e implementar plano de racionalização energética.",
+      "enabled": true,
+      "tags": [
+        "certificação-energética",
+        "SCE",
+        "ADENE",
+        "edifício-público"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 220/2008 e RT-SCIE — Segurança Contra Incêndio Reforçada",
+      "description": "Os edifícios públicos estão sujeitos a requisitos reforçados de segurança contra incêndio, incluindo categorias de risco superiores e medidas compensatórias adicionais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingType",
+          "operator": "==",
+          "value": "publico"
+        },
+        {
+          "field": "licensing.hasEnhancedFireSafety",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Segurança contra incêndio reforçada: {licensing.hasEnhancedFireSafety}",
+      "requiredValue": "Medidas de SCIE reforçadas implementadas para edifício público",
+      "remediation": "Implementar medidas reforçadas de SCIE: sistema automático de deteção de incêndio (SADI), sistema automático de extinção (sprinklers) quando aplicável, central de bombeiros, plano de emergência interno aprovado pela ANEPC, simulacros anuais e formação de delegados de segurança.",
+      "enabled": true,
+      "tags": [
+        "SCIE",
+        "incêndio",
+        "edifício-público",
+        "ANEPC"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 163/2006, Art. 9.º — Normas de Acessibilidade Pública",
+      "description": "Os espaços públicos e edifícios de atendimento ao público devem cumprir normas reforçadas de acessibilidade, incluindo comunicação acessível e serviços de apoio.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingType",
+          "operator": "==",
+          "value": "publico"
+        },
+        {
+          "field": "licensing.hasPublicAccessibilityAudit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Auditoria de acessibilidade: {licensing.hasPublicAccessibilityAudit}",
+      "requiredValue": "Auditoria de acessibilidade realizada e plano de ação definido",
+      "remediation": "Realizar auditoria de acessibilidade ao edifício público, verificando: acessos exteriores, átrios e corredores, escadas e elevadores, instalações sanitárias, balcões de atendimento (altura máxima 0,85 m), sinalética e sistemas de orientação. Elaborar plano de ação para corrigir não conformidades.",
+      "enabled": true,
+      "tags": [
+        "acessibilidade",
+        "auditoria",
+        "atendimento-público",
+        "DL-163-2006"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPOR-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º, n.º 1, al. d) — Licença para Estrutura Temporária",
+      "description": "A instalação de estruturas temporárias com duração superior a 30 dias requer autorização municipal, com definição do prazo máximo de permanência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasTemporaryStructure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.temporaryStructureDurationDays",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "licensing.hasTemporaryPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Duração da estrutura: {licensing.temporaryStructureDurationDays} dias — Autorização: {licensing.hasTemporaryPermit}",
+      "requiredValue": "Autorização municipal para estrutura temporária",
+      "remediation": "Requerer autorização municipal para a instalação da estrutura temporária, indicando: localização, dimensões, materiais, prazo de permanência e plano de remoção. A autorização pode impor condições de segurança, estética e impacto ambiental.",
+      "enabled": true,
+      "tags": [
+        "temporário",
+        "estrutura",
+        "autorização",
+        "prazo"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPOR-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º, n.º 1, al. d) e DL 309/2002 — Estruturas para Eventos",
+      "description": "As estruturas instaladas para eventos (palcos, tendas, bancadas) devem possuir projeto de estabilidade e certificação de segurança, mesmo sendo temporárias.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasEventStructure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasEventStructureSafetyCert",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Certificação de segurança: {licensing.hasEventStructureSafetyCert}",
+      "requiredValue": "Certificação de segurança da estrutura de evento emitida",
+      "remediation": "Obter certificação de segurança para a estrutura de evento, incluindo: projeto de estabilidade assinado por engenheiro, verificação de capacidade de carga, plano de montagem e desmontagem, seguro de responsabilidade civil e parecer dos bombeiros quando a lotação exceda 1.000 pessoas.",
+      "enabled": true,
+      "tags": [
+        "eventos",
+        "palcos",
+        "segurança",
+        "temporário"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPOR-03",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 15.º — Instalações Temporárias de Estaleiro",
+      "description": "As instalações temporárias de estaleiro de obra (contentores, vedações, gruas) devem cumprir o plano de segurança e saúde e não podem exceder a duração da obra.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasConstructionSiteInstallations",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.siteInstallationsInPSS",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Instalações de estaleiro no PSS: {licensing.siteInstallationsInPSS}",
+      "requiredValue": "Instalações temporárias previstas no PSS e aprovadas",
+      "remediation": "Incluir no plano de segurança e saúde (PSS) a descrição, localização e duração de todas as instalações temporárias de estaleiro. As instalações devem respeitar as condições de segurança, higiene e salubridade previstas no DL 273/2003 e ser removidas até à conclusão da obra.",
+      "enabled": true,
+      "tags": [
+        "estaleiro",
+        "PSS",
+        "contentores",
+        "temporário"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPOR-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º, n.º 2 — Autorização de Estrutura Sazonal",
+      "description": "As estruturas sazonais (esplanadas, quiosques de verão, mercados de Natal) requerem autorização municipal renovável, com indicação do período de funcionamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasSeasonalStructure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasSeasonalAuthorization",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Autorização sazonal: {licensing.hasSeasonalAuthorization}",
+      "requiredValue": "Autorização municipal para estrutura sazonal emitida",
+      "remediation": "Requerer autorização municipal para estrutura sazonal, indicando: período de funcionamento (datas de início e fim), localização, dimensões, utilização e compromisso de remoção integral no final do período. A autorização é renovável anualmente mediante novo requerimento.",
+      "enabled": true,
+      "tags": [
+        "sazonal",
+        "esplanada",
+        "autorização",
+        "temporário"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPOR-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 106.º — Demolição de Estruturas Temporárias em Infração",
+      "description": "As estruturas temporárias que ultrapassem o prazo autorizado ou que não possuam autorização são objeto de demolição coerciva por parte da câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasTemporaryStructure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.temporaryPermitExpired",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Autorização temporária expirada: {licensing.temporaryPermitExpired}",
+      "requiredValue": "Estrutura temporária removida ou autorização renovada",
+      "remediation": "Remover a estrutura temporária imediatamente ou requerer renovação da autorização municipal antes do termo do prazo. A câmara municipal pode ordenar a demolição coerciva com custos a cargo do proprietário, acrescidos de coima por contraordenação (Art. 98.º do RJUE).",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "estrutura-temporária",
+        "prazo-expirado",
+        "coerciva"
+      ]
+    },
+    {
+      "id": "RJUE-SUBTERR-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2 — Licença para Construção Subterrânea",
+      "description": "A construção de pisos subterrâneos (caves, parques de estacionamento, galerias técnicas) requer licenciamento municipal com projeto de especialidades completo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasUndergroundConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasUndergroundPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Licença de construção subterrânea: {licensing.hasUndergroundPermit}",
+      "requiredValue": "Licença de construção subterrânea emitida",
+      "remediation": "Submeter pedido de licenciamento para construção subterrânea, incluindo: projeto de estabilidade com cálculo de contenção periférica, projeto de impermeabilização, projeto de ventilação mecânica, projeto de drenagem e estudo geotécnico. A construção subterrânea está sempre sujeita a licenciamento, nunca a mera comunicação prévia.",
+      "enabled": true,
+      "tags": [
+        "subterrâneo",
+        "cave",
+        "estacionamento",
+        "licenciamento"
+      ]
+    },
+    {
+      "id": "RJUE-SUBTERR-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º e Norma EN 1997 (Eurocódigo 7) — Estudo Geológico-Geotécnico",
+      "description": "A construção subterrânea requer estudo geológico-geotécnico que caracterize o terreno e defina as condições de fundação e contenção periférica.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasUndergroundConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasGeotechnicalSurvey",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Estudo geotécnico: {licensing.hasGeotechnicalSurvey}",
+      "requiredValue": "Estudo geológico-geotécnico completo e aprovado",
+      "remediation": "Realizar estudo geológico-geotécnico por empresa certificada, incluindo: sondagens mecânicas, ensaios SPT, determinação do nível freático, caracterização geomecânica dos solos, análise de estabilidade de taludes e recomendações para contenção periférica e fundações. O estudo deve cumprir a EN 1997 (Eurocódigo 7).",
+      "enabled": true,
+      "tags": [
+        "geotécnico",
+        "sondagens",
+        "Eurocódigo-7",
+        "subterrâneo"
+      ]
+    },
+    {
+      "id": "RJUE-SUBTERR-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º — Deteção de Infraestruturas Enterradas",
+      "description": "Antes do início de escavações, é obrigatória a identificação e localização de todas as infraestruturas enterradas (redes de água, gás, eletricidade, telecomunicações) na área de intervenção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasUndergroundConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasUtilityDetectionSurvey",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Levantamento de infraestruturas: {licensing.hasUtilityDetectionSurvey}",
+      "requiredValue": "Levantamento de infraestruturas enterradas concluído",
+      "remediation": "Realizar levantamento de infraestruturas enterradas através de georradar (GPR) ou deteção eletromagnética. Solicitar cadastros de redes às concessionárias (água, gás, eletricidade, telecomunicações). O projeto deve prever a proteção ou o desvio das infraestruturas existentes, com autorização das respetivas entidades gestoras.",
+      "enabled": true,
+      "tags": [
+        "infraestruturas-enterradas",
+        "georradar",
+        "deteção",
+        "escavação"
+      ]
+    },
+    {
+      "id": "RJUE-SUBTERR-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º e RGEU Art. 69.º — Certificação de Impermeabilização",
+      "description": "Os pisos subterrâneos devem possuir sistema de impermeabilização certificado, com garantia mínima de 10 anos, ensaiado e aprovado antes da ocupação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasUndergroundConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasWaterproofingCertification",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Certificação de impermeabilização: {licensing.hasWaterproofingCertification}",
+      "requiredValue": "Sistema de impermeabilização certificado com garantia mínima de 10 anos",
+      "remediation": "Projetar e executar sistema de impermeabilização conforme as normas EN 13967 (membranas) e EN 1992-3 (estruturas de betão estanques). Obter certificação do fabricante com garantia mínima de 10 anos. Realizar ensaio de estanquidade antes do aterro ou pavimentação, documentando com relatório fotográfico e medições.",
+      "enabled": true,
+      "tags": [
+        "impermeabilização",
+        "certificação",
+        "estanquidade",
+        "subterrâneo"
+      ]
+    },
+    {
+      "id": "RJUE-SUBTERR-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "RGEU Art. 65.º e DL 220/2008 — Ventilação de Espaços Subterrâneos",
+      "description": "Os espaços subterrâneos devem possuir sistema de ventilação mecânica que garanta a qualidade do ar e a extração de fumos em caso de incêndio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasUndergroundConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasUndergroundVentilationSystem",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sistema de ventilação subterrânea: {licensing.hasUndergroundVentilationSystem}",
+      "requiredValue": "Sistema de ventilação mecânica dimensionado e aprovado",
+      "remediation": "Projetar sistema de ventilação mecânica para os espaços subterrâneos, cumprindo: renovação mínima de 300 m³/h por veículo (parques de estacionamento), deteção automática de CO e CO₂, sistema de desenfumagem conforme RT-SCIE e grupo gerador de emergência para funcionamento em caso de falha elétrica.",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "subterrâneo",
+        "desenfumagem",
+        "qualidade-ar"
+      ]
     }
   ]
 }

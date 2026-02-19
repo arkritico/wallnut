@@ -5138,6 +5138,1226 @@
         "fachada",
         "janelas"
       ]
+    },
+    {
+      "id": "ACUS-HOSP-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º, n.º 1 — Isolamento a Sons Aéreos em Quartos Hospitalares",
+      "description": "O isolamento a sons aéreos entre quartos hospitalares ({acoustic.hospitalRoomDnTw} dB) é inferior ao mínimo regulamentar. O RRAE exige D'nT,w ≥ 52 dB entre quartos de internamento para garantir privacidade e repouso dos doentes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hospitalRoomDnTw",
+          "operator": "<",
+          "value": 52
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar", "clínica"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.hospitalRoomDnTw} dB",
+      "requiredValue": "D'nT,w ≥ 52 dB",
+      "remediation": "Reforçar as paredes divisórias entre quartos hospitalares. Soluções recomendadas: paredes duplas com lã mineral de alta densidade (≥ 70 kg/m³), sistemas de gesso cartonado com dupla placa e isolamento de 80mm, ou paredes em alvenaria de bloco térmico ≥ 20cm com reboco em ambas as faces. Garantir continuidade do isolamento nas juntas laje-parede e na passagem de infraestruturas.",
+      "enabled": true,
+      "tags": ["hospital", "quartos", "sons aéreos", "isolamento", "internamento"]
+    },
+    {
+      "id": "ACUS-HOSP-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Nível de Ruído em Unidades de Cuidados Intensivos",
+      "description": "O nível de ruído de fundo na UCI ({acoustic.icuBackgroundNoise} dB(A)) excede o limite recomendado. Em unidades de cuidados intensivos, o ruído de fundo LAeq não deve ultrapassar 35 dB(A) durante o período noturno e 40 dB(A) durante o período diurno.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.icuBackgroundNoise",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar"]
+        },
+        {
+          "field": "acoustic.roomType",
+          "operator": "in",
+          "value": ["UCI", "cuidados-intensivos", "ICU"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.icuBackgroundNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A) noturno / 40 dB(A) diurno",
+      "remediation": "Reduzir o ruído de fundo na UCI: instalar equipamentos AVAC com baixo nível de potência sonora (NR 25-30), utilizar difusores de baixa velocidade, aplicar tratamento acústico absorvente no teto (αw ≥ 0.90), substituir alarmes sonoros por sistemas visuais quando possível, instalar portas com vedação acústica.",
+      "enabled": true,
+      "tags": ["hospital", "UCI", "cuidados intensivos", "ruído de fundo"]
+    },
+    {
+      "id": "ACUS-HOSP-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Ruído de Fundo em Blocos Operatórios",
+      "description": "O ruído de fundo no bloco operatório ({acoustic.operatingTheatreNoise} dB(A)) excede o limite aceitável. Nos blocos operatórios, o nível de ruído de fundo não deve ultrapassar NR 40 (aproximadamente 45 dB(A)) para permitir comunicação adequada entre a equipa cirúrgica.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.operatingTheatreNoise",
+          "operator": ">",
+          "value": 45
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar"]
+        },
+        {
+          "field": "acoustic.roomType",
+          "operator": "in",
+          "value": ["bloco-operatório", "cirurgia", "operating-theatre"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.operatingTheatreNoise} dB(A)",
+      "requiredValue": "NR 40 (LAeq ≤ 45 dB(A))",
+      "remediation": "Controlar o ruído no bloco operatório: dimensionar o sistema AVAC com difusores de fluxo laminar silenciosos, prever atenuadores nas condutas de insuflação e retorno, instalar silenciadores nos equipamentos de ventilação, aplicar teto absorvente acústico compatível com requisitos de higiene hospitalar (classe de limpeza adequada).",
+      "enabled": true,
+      "tags": ["hospital", "bloco operatório", "cirurgia", "ruído de fundo"]
+    },
+    {
+      "id": "ACUS-HOSP-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Sons de Percussão em Corredores Hospitalares",
+      "description": "O nível de sons de percussão nos corredores hospitalares ({acoustic.hospitalCorridorImpact} dB) excede o limite regulamentar. O RRAE exige L'nT,w ≤ 60 dB nos corredores de circulação de edifícios hospitalares para minimizar o ruído transmitido aos quartos de internamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hospitalCorridorImpact",
+          "operator": ">",
+          "value": 60
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar", "clínica"]
+        }
+      ],
+      "currentValueTemplate": "L'nT,w = {acoustic.hospitalCorridorImpact} dB",
+      "requiredValue": "L'nT,w ≤ 60 dB",
+      "remediation": "Tratar os pavimentos dos corredores hospitalares com revestimentos resilientes: linóleo acústico com espuma de base (ΔLw ≥ 18 dB), vinílico acústico hospitalar, ou sistema de pavimento flutuante com manta resiliente. Prever rodas silenciosas em equipamentos de transporte (camas, macas, carrinhos de medicação).",
+      "enabled": true,
+      "tags": ["hospital", "corredor", "sons de percussão", "impacto"]
+    },
+    {
+      "id": "ACUS-HOSP-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Isolamento de Salas de Equipamentos Hospitalares",
+      "description": "Não está verificado o isolamento acústico adequado da sala de equipamentos hospitalares (geradores de emergência, UPS, compressores de ar medicinal, centrais de vácuo). O ruído destes equipamentos pode comprometer o repouso dos doentes e o funcionamento de áreas sensíveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasHospitalEquipmentIsolation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar"]
+        },
+        {
+          "field": "acoustic.hasHospitalEquipmentRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "LAr,nT ≤ 35 dB(A) em zonas sensíveis adjacentes",
+      "remediation": "Isolar acusticamente as salas de equipamentos hospitalares: paredes de elevada massa (≥ 400 kg/m²), laje flutuante com apoios anti-vibráticos, porta acústica com Rw ≥ 35 dB, teto com absorção acústica. Todos os equipamentos devem ter apoios anti-vibráticos (molas ou elastómeros) e ligações flexíveis nas tubagens. Prever atenuadores nas aberturas de ventilação da sala técnica.",
+      "enabled": true,
+      "tags": ["hospital", "equipamentos", "isolamento", "sala técnica"]
+    },
+    {
+      "id": "ACUS-ESCOL-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º, n.º 1, alínea a) — Isolamento a Sons Aéreos em Salas de Aula",
+      "description": "O isolamento a sons aéreos entre salas de aula ({acoustic.classroomDnTw} dB) é inferior ao mínimo regulamentar. O RRAE exige D'nT,w ≥ 48 dB entre salas de aula de edifícios escolares para garantir condições adequadas de ensino.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.classroomDnTw",
+          "operator": "<",
+          "value": 48
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["escola", "escolar", "school", "educação"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.classroomDnTw} dB",
+      "requiredValue": "D'nT,w ≥ 48 dB",
+      "remediation": "Reforçar as paredes divisórias entre salas de aula. Soluções: paredes em alvenaria de tijolo ≥ 15cm com reboco em ambas as faces, sistemas de gesso cartonado com lã mineral (≥ 60mm), verificar a estanquidade na zona superior (ligação parede-teto) e na passagem de infraestruturas. Evitar portas alinhadas entre salas adjacentes.",
+      "enabled": true,
+      "tags": ["escola", "salas de aula", "sons aéreos", "isolamento"]
+    },
+    {
+      "id": "ACUS-ESCOL-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — Tempo de Reverberação em Salas de Aula",
+      "description": "O tempo de reverberação da sala de aula ({acoustic.classroomReverberationTime} s) excede o limite regulamentar. O RRAE exige T ≤ 0,8 s (500 Hz - 2 kHz) em salas de aula com volume até 250 m³, para garantir inteligibilidade da palavra adequada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.classroomReverberationTime",
+          "operator": ">",
+          "value": 0.8
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["escola", "escolar", "school", "educação"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.classroomReverberationTime} s",
+      "requiredValue": "T ≤ 0,8 s (500 Hz - 2 kHz)",
+      "remediation": "Aplicar tratamento acústico absorvente na sala de aula: teto acústico suspenso com painéis de fibra mineral (αw ≥ 0.85), painéis absorventes murais na parede de fundo (área ≥ 30% da parede), cortinas acústicas. Evitar superfícies paralelas refletoras. Calcular a área de absorção necessária pela fórmula de Sabine: A = 0,163 × V / T.",
+      "enabled": true,
+      "tags": ["escola", "reverberação", "inteligibilidade", "salas de aula"]
+    },
+    {
+      "id": "ACUS-ESCOL-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — Tratamento Acústico de Ginásios Escolares",
+      "description": "Não está previsto tratamento acústico adequado no ginásio escolar. Os ginásios e pavilhões desportivos escolares geram níveis de ruído elevados (tipicamente > 85 dB(A) durante atividades) que requerem absorção acústica e isolamento reforçado para espaços adjacentes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasGymAcousticTreatment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["escola", "escolar", "school"]
+        },
+        {
+          "field": "acoustic.hasGym",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Tratamento acústico absorvente e isolamento reforçado",
+      "remediation": "Aplicar tratamento acústico no ginásio: painéis absorventes resistentes a impacto nas paredes (até 3m de altura, αw ≥ 0.80), teto acústico com absorção (baffles ou painéis suspensos resistentes a bolas), D'nT,w ≥ 55 dB nas paredes de separação com salas de aula. Prever portas acústicas (Rw ≥ 30 dB) e vedação perimetral.",
+      "enabled": true,
+      "tags": ["escola", "ginásio", "absorção", "desporto"]
+    },
+    {
+      "id": "ACUS-ESCOL-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — Ruído de Fundo em Bibliotecas Escolares",
+      "description": "O nível de ruído de fundo na biblioteca escolar ({acoustic.libraryBackgroundNoise} dB(A)) excede o limite recomendado. Em bibliotecas e salas de estudo, o nível de ruído de fundo LAeq não deve ultrapassar 35 dB(A) para garantir condições adequadas de concentração.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.libraryBackgroundNoise",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["escola", "escolar", "school"]
+        },
+        {
+          "field": "acoustic.roomType",
+          "operator": "in",
+          "value": ["biblioteca", "sala-de-estudo", "library"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.libraryBackgroundNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A)",
+      "remediation": "Reduzir o ruído de fundo na biblioteca: verificar e atenuar o sistema AVAC (NR 30 máximo), aplicar teto acústico absorvente (αw ≥ 0.90), instalar portas com vedação acústica, afastar a biblioteca de fontes de ruído (ginásio, recreio, vias de tráfego). Prever janelas com vidro duplo se a fachada está exposta a ruído exterior.",
+      "enabled": true,
+      "tags": ["escola", "biblioteca", "ruído de fundo", "concentração"]
+    },
+    {
+      "id": "ACUS-ESCOL-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — Sons de Percussão em Corredores Escolares",
+      "description": "O nível de sons de percussão nos corredores escolares ({acoustic.schoolCorridorImpact} dB) excede o limite regulamentar. O RRAE exige L'nT,w ≤ 65 dB nos corredores de edifícios escolares para minimizar perturbação nas salas de aula.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.schoolCorridorImpact",
+          "operator": ">",
+          "value": 65
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["escola", "escolar", "school"]
+        }
+      ],
+      "currentValueTemplate": "L'nT,w = {acoustic.schoolCorridorImpact} dB",
+      "requiredValue": "L'nT,w ≤ 65 dB",
+      "remediation": "Tratar os pavimentos dos corredores escolares: aplicar revestimento resiliente (linóleo ou vinílico com subcamada acústica, ΔLw ≥ 15 dB), ou executar pavimento flutuante com manta de polietileno reticulado. Verificar ligação do pavimento à estrutura (evitar pontes acústicas). Em corredores sobre salas de aula, considerar teto falso com lã mineral na sala inferior.",
+      "enabled": true,
+      "tags": ["escola", "corredor", "sons de percussão", "impacto"]
+    },
+    {
+      "id": "ACUS-HOTEL-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Isolamento a Sons Aéreos entre Quartos de Hotel",
+      "description": "O isolamento a sons aéreos entre quartos de hotel ({acoustic.hotelRoomDnTw} dB) é inferior ao mínimo regulamentar. O RRAE exige D'nT,w ≥ 50 dB entre quartos de unidades hoteleiras para garantir conforto e privacidade dos hóspedes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hotelRoomDnTw",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hotel", "hoteleiro", "alojamento", "turismo"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.hotelRoomDnTw} dB",
+      "requiredValue": "D'nT,w ≥ 50 dB",
+      "remediation": "Reforçar o isolamento entre quartos de hotel: paredes divisórias com massa superficial ≥ 300 kg/m² ou sistema de gesso cartonado duplo com lã mineral de 80mm. Garantir continuidade do isolamento na zona do teto falso (prolongar a parede até à laje). Verificar isolamento nas portas de comunicação (se existirem) e na zona das instalações sanitárias back-to-back.",
+      "enabled": true,
+      "tags": ["hotel", "quartos", "sons aéreos", "isolamento"]
+    },
+    {
+      "id": "ACUS-HOTEL-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Sons de Percussão em Quartos de Hotel",
+      "description": "O nível de sons de percussão nos quartos de hotel ({acoustic.hotelRoomImpact} dB) excede o limite regulamentar. O RRAE exige L'nT,w ≤ 55 dB em quartos de unidades hoteleiras para proteger os hóspedes do ruído de impacto proveniente de pisos superiores e corredores.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hotelRoomImpact",
+          "operator": ">",
+          "value": 55
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hotel", "hoteleiro", "alojamento", "turismo"]
+        }
+      ],
+      "currentValueTemplate": "L'nT,w = {acoustic.hotelRoomImpact} dB",
+      "requiredValue": "L'nT,w ≤ 55 dB",
+      "remediation": "Melhorar o isolamento a sons de percussão: executar pavimento flutuante com manta resiliente (ΔLw ≥ 20 dB) nos pisos sobre quartos, aplicar revestimento resiliente (alcatifa, vinílico acústico) nos corredores de circulação, verificar dessolidarização da betonilha em relação às paredes e pilares. Em zonas de instalações sanitárias, prever base de duche com apoio resiliente.",
+      "enabled": true,
+      "tags": ["hotel", "quartos", "sons de percussão", "impacto"]
+    },
+    {
+      "id": "ACUS-HOTEL-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído em Áreas Comuns de Hotel",
+      "description": "O isolamento a sons aéreos entre áreas comuns do hotel (restaurante, bar, lobby) e os quartos ({acoustic.hotelCommonAreaDnTw} dB) é insuficiente. Deve garantir-se D'nT,w ≥ 55 dB entre zonas ruidosas comuns e quartos de hóspedes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hotelCommonAreaDnTw",
+          "operator": "<",
+          "value": 55
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hotel", "hoteleiro", "alojamento"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.hotelCommonAreaDnTw} dB",
+      "requiredValue": "D'nT,w ≥ 55 dB entre áreas comuns e quartos",
+      "remediation": "Reforçar a separação acústica entre áreas comuns e quartos: paredes de separação com Rw ≥ 58 dB, lajes com tratamento a sons de percussão e aéreos, portas acústicas nos acessos (Rw ≥ 32 dB). Considerar zonamento acústico: localizar quartos afastados de zonas de restauração e animação. Prever tetos e paredes com absorção acústica nas áreas comuns para reduzir o nível de ruído na fonte.",
+      "enabled": true,
+      "tags": ["hotel", "áreas comuns", "restaurante", "isolamento"]
+    },
+    {
+      "id": "ACUS-HOTEL-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Minibar e Equipamentos no Quarto",
+      "description": "O ruído do minibar ou equipamento de climatização do quarto ({acoustic.minibarNoise} dB(A)) excede o nível aceitável. O nível de ruído de equipamentos dentro do quarto de hotel não deve ultrapassar NR 25 (LAeq ≤ 30 dB(A)) para garantir conforto noturno.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.minibarNoise",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hotel", "hoteleiro", "alojamento"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.minibarNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 30 dB(A) (NR 25)",
+      "remediation": "Substituir o minibar por modelo silencioso (tecnologia Peltier/termoelétrico, sem compressor, LAeq < 25 dB(A)). Para unidades de climatização: especificar fan-coils com nível sonoro ≤ NR 25 na velocidade mínima, instalar sobre apoios anti-vibráticos, prever condutas com revestimento acústico interno. Evitar localização de equipamentos na cabeceira da cama.",
+      "enabled": true,
+      "tags": ["hotel", "minibar", "equipamentos", "ruído no quarto"]
+    },
+    {
+      "id": "ACUS-HOTEL-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Ventilação em Instalações Sanitárias de Hotel",
+      "description": "O ruído do sistema de ventilação das instalações sanitárias do quarto de hotel ({acoustic.hotelBathroomVentNoise} dB(A)) excede o nível aceitável. O extrator e a conduta de ventilação da casa de banho não devem gerar ruído superior a LAeq 35 dB(A) no interior do quarto.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hotelBathroomVentNoise",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hotel", "hoteleiro", "alojamento"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.hotelBathroomVentNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A) no quarto",
+      "remediation": "Reduzir o ruído de ventilação: instalar extrator silencioso (≤ 25 dB(A) a 3m), prever atenuador acústico na conduta entre a casa de banho e o quarto, utilizar condutas com revestimento acústico interno, dimensionar a velocidade do ar na conduta ≤ 3 m/s. Garantir vedação acústica na porta da casa de banho (grelha de transferência com atenuação).",
+      "enabled": true,
+      "tags": ["hotel", "ventilação", "casa de banho", "extrator"]
+    },
+    {
+      "id": "ACUS-AVAC-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Nível de Potência Sonora de Equipamentos AVAC",
+      "description": "O nível de potência sonora do equipamento AVAC ({acoustic.hvacNoiseRating} dB(A)) excede o nível especificado no projeto acústico. Os equipamentos AVAC devem ser selecionados com classificação de ruído adequada ao tipo de espaço servido (NR 25-40 conforme utilização).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hvacNoiseRating",
+          "operator": ">",
+          "value": 45
+        },
+        {
+          "field": "acoustic.hasHvacSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Lw = {acoustic.hvacNoiseRating} dB(A)",
+      "requiredValue": "Equipamento com NR adequado ao espaço servido",
+      "remediation": "Selecionar equipamentos AVAC com nível de potência sonora compatível com os requisitos acústicos: NR 25 para quartos e UCI, NR 30 para escritórios e salas de aula, NR 35 para restaurantes e comércio, NR 40 para ginásios e oficinas. Prever atenuadores acústicos na rede de condutas, apoios anti-vibráticos nos equipamentos e mangas flexíveis nas ligações.",
+      "enabled": true,
+      "tags": ["AVAC", "equipamentos", "potência sonora", "NR"]
+    },
+    {
+      "id": "ACUS-AVAC-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Ruído de Irradiação de Condutas AVAC",
+      "description": "O ruído irradiado pelas condutas AVAC ({acoustic.ductBreakoutNoise} dB(A)) excede os limites aceitáveis. A irradiação de ruído (breakout noise) das condutas de AVAC em espaços sensíveis deve ser controlada para não comprometer o isolamento acústico global.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.ductBreakoutNoise",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "acoustic.hasHvacDucts",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "LAeq irradiado = {acoustic.ductBreakoutNoise} dB(A)",
+      "requiredValue": "Ruído irradiado ≤ NR do espaço servido",
+      "remediation": "Controlar a irradiação de ruído das condutas: utilizar condutas retangulares de chapa com isolamento exterior (lã mineral + barreira acústica), substituir por condutas circulares (menor irradiação), reduzir a velocidade do ar nas condutas (≤ 5 m/s em zonas sensíveis), encaminhar condutas principais por zonas técnicas ou corredores. Em travessias de paredes acústicas, prever manga de selagem acústica.",
+      "enabled": true,
+      "tags": ["AVAC", "condutas", "irradiação", "breakout"]
+    },
+    {
+      "id": "ACUS-AVAC-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Nível de Ruído de Difusores Terminais",
+      "description": "O nível de ruído dos difusores terminais de AVAC ({acoustic.diffuserNoise} dB(A)) excede o limite para o tipo de espaço. O ruído regenerado nos difusores de insuflação e grelhas de retorno não deve ultrapassar o nível NR especificado para o compartimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.diffuserNoise",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "acoustic.hasHvacDiffusers",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "LAeq difusor = {acoustic.diffuserNoise} dB(A)",
+      "requiredValue": "Ruído de difusor ≤ NR do espaço - 5 dB",
+      "remediation": "Reduzir o ruído nos difusores terminais: aumentar o número de difusores para reduzir o caudal por unidade, selecionar difusores com baixo nível de ruído regenerado (Lw ≤ NR-10), instalar plenum acústico antes do difusor, reduzir a velocidade do ar no pescoço do difusor (≤ 2,5 m/s para NR 30, ≤ 3,5 m/s para NR 35). Evitar cotovelos e registos imediatamente antes dos difusores.",
+      "enabled": true,
+      "tags": ["AVAC", "difusores", "ruído regenerado", "terminal"]
+    },
+    {
+      "id": "ACUS-AVAC-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Isolamento de Sala de Bombas",
+      "description": "Não está verificado o isolamento acústico adequado da sala de bombas. As bombas de circulação (AVAC, incêndio, pressurização) são fontes significativas de ruído e vibração que requerem isolamento reforçado quando adjacentes a espaços sensíveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasPumpRoomIsolation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasPumpRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Isolamento reforçado da sala de bombas",
+      "remediation": "Isolar a sala de bombas: paredes com Rw ≥ 55 dB (dupla alvenaria ou betão ≥ 20cm), porta acústica Rw ≥ 35 dB, laje flutuante com sistema massa-mola (frequência de ressonância ≤ 8 Hz). Todas as bombas sobre bases inerciais com apoios anti-vibráticos, ligações flexíveis (mangas de borracha ou fole metálico) em todas as tubagens. Prever atenuadores nas aberturas de ventilação da sala.",
+      "enabled": true,
+      "tags": ["AVAC", "bombas", "isolamento", "sala técnica"]
+    },
+    {
+      "id": "ACUS-AVAC-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Distância de Afastamento de Torres de Arrefecimento",
+      "description": "A distância entre a torre de arrefecimento e os recetores sensíveis mais próximos ({acoustic.coolingTowerDistance} m) é insuficiente. Torres de arrefecimento são fontes de ruído significativas (tipicamente Lw 85-95 dB(A)) que requerem distância mínima de afastamento ou atenuação adicional.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.coolingTowerDistance",
+          "operator": "<",
+          "value": 15
+        },
+        {
+          "field": "acoustic.hasCoolingTower",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Distância = {acoustic.coolingTowerDistance} m",
+      "requiredValue": "Distância ≥ 15 m ou atenuação equivalente",
+      "remediation": "Aumentar a distância de afastamento da torre de arrefecimento ou implementar medidas de atenuação: barreira acústica envolvente (Rw ≥ 15 dB), orientação das aberturas de descarga para lado oposto aos recetores, seleção de ventiladores de baixa rotação, atenuadores na admissão e descarga de ar. Realizar cálculo de propagação para demonstrar cumprimento dos limites do RGR no recetor mais próximo.",
+      "enabled": true,
+      "tags": ["AVAC", "torre de arrefecimento", "distância", "ruído exterior"]
+    },
+    {
+      "id": "ACUS-VIBR-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "DL 96/2008 — Vibrações de Tráfego Rodoviário e Ferroviário",
+      "description": "Não está avaliado o impacte de vibrações provenientes do tráfego rodoviário ou ferroviário. Edifícios situados a menos de 25 m de vias com tráfego pesado intenso ou de linhas ferroviárias podem estar sujeitos a vibrações que comprometem o conforto acústico e estrutural.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasTrafficVibrationAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.distanceToTrafficSource",
+          "operator": "<",
+          "value": 25
+        }
+      ],
+      "requiredValue": "Avaliação de vibrações de tráfego obrigatória",
+      "remediation": "Realizar estudo de vibrações de tráfego segundo a norma NP ISO 4866. Medições in situ das vibrações (aceleração e velocidade de vibração). Se os limites forem excedidos: fundações indiretas com apoios anti-vibráticos, trincheiras de atenuação, pavimentos flutuantes nos pisos térreos. Em zonas ferroviárias, considerar laje flutuante integral do edifício sobre apoios de neoprene.",
+      "enabled": true,
+      "tags": ["vibrações", "tráfego", "ferroviário", "rodoviário"]
+    },
+    {
+      "id": "ACUS-VIBR-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "DL 96/2008 — Vibrações de Origem Industrial",
+      "description": "O nível de vibrações de origem industrial ({acoustic.industrialVibrationLevel} mm/s) no edifício excede os limites de conforto. Fontes industriais próximas (fábricas, pedreiras, instalações com maquinaria pesada) podem transmitir vibrações que comprometem o conforto habitacional.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.industrialVibrationLevel",
+          "operator": ">",
+          "value": 0.3
+        },
+        {
+          "field": "acoustic.nearIndustrialSource",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "v = {acoustic.industrialVibrationLevel} mm/s",
+      "requiredValue": "v ≤ 0,3 mm/s (conforto habitacional)",
+      "remediation": "Implementar medidas de atenuação de vibrações industriais: isolamento na fonte (apoios anti-vibráticos nos equipamentos emissores), trincheiras de vibração entre a fonte e o edifício (profundidade ≥ 1,5 m), fundações do edifício sobre sistema massa-mola. Verificar cumprimento da norma NP ISO 2631-2 (avaliação de vibrações em edifícios) e do critério de conforto do DL 9/2007.",
+      "enabled": true,
+      "tags": ["vibrações", "industrial", "limites", "conforto"]
+    },
+    {
+      "id": "ACUS-VIBR-03",
+      "regulationId": "dl-129-2002",
+      "article": "DL 129/2002 — Vibrações de Construção Civil",
+      "description": "As vibrações geradas pela obra de construção ({acoustic.constructionVibrationPPV} mm/s) excedem os limites de danos estruturais em edifícios vizinhos. O DL 129/2002 e a norma NP ISO 4866 estabelecem limites de velocidade de pico de partícula (PPV) para proteção de estruturas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.constructionVibrationPPV",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "project.hasConstructionPhase",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "PPV = {acoustic.constructionVibrationPPV} mm/s",
+      "requiredValue": "PPV ≤ 5 mm/s (edifícios correntes) / PPV ≤ 3 mm/s (edifícios sensíveis)",
+      "remediation": "Controlar as vibrações de construção: substituir cravação de estacas por furação (CFA ou hélice contínua), utilizar martelos hidráulicos com controlo de energia, implementar monitorização contínua de vibrações com sistema de alerta, realizar vistoria prévia aos edifícios vizinhos. Em zonas sensíveis (hospitais, monumentos), limitar PPV a 3 mm/s.",
+      "enabled": true,
+      "tags": ["vibrações", "construção", "PPV", "estruturas"]
+    },
+    {
+      "id": "ACUS-VIBR-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "DL 96/2008 — Proteção de Áreas Sensíveis a Vibrações",
+      "description": "Não está prevista proteção especial contra vibrações em áreas sensíveis do edifício. Laboratórios, estúdios de gravação, salas de cirurgia e áreas com equipamentos de precisão requerem critérios de vibração mais exigentes (VC-A a VC-E).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasVibrationSensitiveAreas",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "acoustic.hasVibrationProtection",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "requiredValue": "Critério de vibração adequado (VC-A a VC-E conforme uso)",
+      "remediation": "Definir critérios de vibração para áreas sensíveis segundo as curvas VC (Vibration Criteria): VC-A (50 μm/s) para microscópios e balanças, VC-C (12,5 μm/s) para equipamentos de metrologia, VC-E (3 μm/s) para litografia avançada. Implementar lajes flutuantes com baixa frequência de ressonância (≤ 5 Hz), apoios pneumáticos para equipamentos sensíveis, e separação estrutural das áreas sensíveis.",
+      "enabled": true,
+      "tags": ["vibrações", "áreas sensíveis", "laboratório", "VC"]
+    },
+    {
+      "id": "ACUS-VIBR-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Montagem Anti-Vibrática de Equipamentos",
+      "description": "Os equipamentos mecânicos do edifício não possuem montagem anti-vibrática adequada. Todos os equipamentos rotativos (motores, compressores, ventiladores, bombas) e de impacto devem ser montados sobre apoios anti-vibráticos dimensionados para a frequência de excitação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasAntiVibrationMounting",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasMechanicalEquipment",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Montagem anti-vibrática em todos os equipamentos mecânicos",
+      "remediation": "Dimensionar e instalar apoios anti-vibráticos em todos os equipamentos: molas de aço para equipamentos pesados e de baixa rotação (compressores, geradores), elastómeros (neoprene) para bombas e ventiladores de média rotação, apoios pneumáticos para equipamentos sensíveis. A frequência natural do sistema de apoio deve ser ≤ 1/3 da frequência de excitação. Prever bases inerciais (massa ≥ 2× massa do equipamento) para equipamentos com desequilíbrio dinâmico.",
+      "enabled": true,
+      "tags": ["vibrações", "anti-vibrático", "equipamentos", "montagem"]
+    },
+    {
+      "id": "ACUS-ENVOLV-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Índice de Redução Sonora da Fachada",
+      "description": "O índice de redução sonora ponderado da fachada ({acoustic.facadeRw} dB) é insuficiente para a exposição ao ruído exterior. A fachada deve garantir Rw adequado à classificação acústica da zona e ao nível de ruído ambiente exterior.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.facadeRw",
+          "operator": "<",
+          "value": 33
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional", "hotel", "hoteleiro", "escola", "escolar", "hospital", "hospitalar"]
+        }
+      ],
+      "currentValueTemplate": "Rw fachada = {acoustic.facadeRw} dB",
+      "requiredValue": "D2m,nT,w ≥ 33 dB (zona sensível) / ≥ 28 dB (zona mista)",
+      "remediation": "Reforçar o isolamento acústico da fachada: paredes exteriores com Rw ≥ 45 dB (dupla alvenaria com isolamento na caixa-de-ar), janelas com vidro duplo assimétrico (ex: 6+16+8 mm, Rw ≥ 35 dB), caixilharia com classe de permeabilidade ao ar ≥ 3, vedação perimetral das janelas. O elemento mais fraco da fachada (tipicamente a janela) condiciona o desempenho global.",
+      "enabled": true,
+      "tags": ["fachada", "isolamento", "envolvente", "Rw"]
+    },
+    {
+      "id": "ACUS-ENVOLV-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Classe Acústica de Janelas",
+      "description": "As janelas especificadas não possuem classificação acústica adequada à exposição ao ruído exterior. Em zonas com Lden > 65 dB(A), devem ser especificadas janelas com Rw ≥ 37 dB (classe acústica 3 ou superior segundo EN 14351-1).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.windowAcousticClass",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "acoustic.exteriorNoiseLevel",
+          "operator": ">",
+          "value": 65
+        }
+      ],
+      "currentValueTemplate": "Classe acústica = {acoustic.windowAcousticClass}",
+      "requiredValue": "Classe acústica ≥ 3 (Rw ≥ 37 dB) para Lden > 65 dB(A)",
+      "remediation": "Especificar janelas com classe acústica adequada: classe 2 (Rw 30-34 dB) para Lden 55-65 dB(A), classe 3 (Rw 35-39 dB) para Lden 65-75 dB(A), classe 4 (Rw ≥ 40 dB) para Lden > 75 dB(A). Utilizar vidro duplo assimétrico (espessuras diferentes nas duas chapas), caixilharia com vedação dupla (EPDM), e classe de permeabilidade ao ar ≥ 4. Em zonas muito ruidosas, considerar janela dupla.",
+      "enabled": true,
+      "tags": ["janelas", "classe acústica", "fachada", "vidro"]
+    },
+    {
+      "id": "ACUS-ENVOLV-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Tratamento Acústico de Aberturas de Ventilação",
+      "description": "As aberturas de ventilação na fachada não possuem tratamento acústico. Grelhas de ventilação natural ou admissão de ar sem atenuação acústica reduzem significativamente o isolamento global da fachada (perda de 5-15 dB).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasVentilationOpeningTreatment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasFacadeVentilationOpenings",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Grelhas acústicas com Dn,e,w ≥ 33 dB",
+      "remediation": "Substituir grelhas de ventilação simples por grelhas acústicas com atenuação certificada: Dn,e,w ≥ 33 dB para zonas sensíveis, Dn,e,w ≥ 27 dB para zonas mistas. Alternativas: admissão de ar por conduta acústica com silenciador, sistema de ventilação mecânica controlada (VMC) que permite eliminar aberturas na fachada, ou grelhas autorreguláveis acústicas com filtro. Verificar que o caudal de ventilação regulamentar (RECS) é mantido.",
+      "enabled": true,
+      "tags": ["ventilação", "grelhas acústicas", "fachada", "admissão de ar"]
+    },
+    {
+      "id": "ACUS-ENVOLV-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Isolamento Acústico da Cobertura",
+      "description": "O isolamento acústico da cobertura ({acoustic.roofRw} dB) é insuficiente. Coberturas leves (metálicas, madeira) expostas a ruído aéreo (tráfego, aeroporto) ou ruído de precipitação devem garantir isolamento acústico adequado ao tipo de utilização subjacente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.roofRw",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "acoustic.hasOccupiedSpaceBelowRoof",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rw cobertura = {acoustic.roofRw} dB",
+      "requiredValue": "Rw cobertura ≥ 30 dB (espaços ocupados)",
+      "remediation": "Reforçar o isolamento acústico da cobertura: adicionar massa (dupla chapa com manta viscoelástica), isolamento em lã mineral de elevada densidade (≥ 100mm, 80 kg/m³), teto falso suspenso com dupla placa de gesso e lã mineral. Para coberturas metálicas: anti-drumming (manta asfáltica ou spray anti-vibração na face inferior), subcamada de isolamento contínua. Verificar vedação acústica nos remates e penetrações.",
+      "enabled": true,
+      "tags": ["cobertura", "isolamento", "telhado", "envolvente"]
+    },
+    {
+      "id": "ACUS-ENVOLV-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º-8.º — Desempenho Acústico da Porta de Entrada",
+      "description": "A porta de entrada do edifício ou da fração ({acoustic.entranceDoorRw} dB) não garante o isolamento acústico mínimo. A porta de entrada é frequentemente o elemento mais fraco da envolvente, comprometendo o isolamento global do fogo.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.entranceDoorRw",
+          "operator": "<",
+          "value": 28
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "Rw porta = {acoustic.entranceDoorRw} dB",
+      "requiredValue": "Rw ≥ 28 dB (porta de entrada de fração)",
+      "remediation": "Especificar porta de entrada com desempenho acústico adequado: porta maciça ou com alma em favo de mel densa (Rw ≥ 28 dB), vedação perimetral em borracha EPDM (em todo o contorno), soleira com vedação automática (drop seal) ou varredoura acústica, dobradiças de 3 pontos para garantir compressão uniforme da vedação. Evitar grelhas de ventilação na porta sem atenuador acústico.",
+      "enabled": true,
+      "tags": ["porta", "entrada", "isolamento", "envolvente"]
+    },
+    {
+      "id": "ACUS-MISTO-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Separação Acústica Comércio-Habitação",
+      "description": "O isolamento a sons aéreos entre a zona comercial e a fração habitacional ({acoustic.commercialResidentialDnTw} dB) é inferior ao mínimo exigido. Em edifícios mistos, o RRAE exige D'nT,w ≥ 58 dB entre espaços comerciais/serviços e frações habitacionais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.commercialResidentialDnTw",
+          "operator": "<",
+          "value": 58
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["misto", "mixed-use", "comércio-habitação"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.commercialResidentialDnTw} dB",
+      "requiredValue": "D'nT,w ≥ 58 dB",
+      "remediation": "Reforçar a separação acústica entre pisos comerciais e habitacionais: laje maciça ≥ 25cm ou laje aligeirada com betonilha de regularização, teto falso acústico suspenso no piso comercial com dupla placa de gesso e lã mineral (≥ 100mm), pavimento flutuante no piso habitacional. Para paredes de separação: massa ≥ 500 kg/m² ou sistema duplo com caixa-de-ar ≥ 100mm preenchida com lã mineral. Garantir ausência de pontes acústicas nas infraestruturas comuns.",
+      "enabled": true,
+      "tags": ["misto", "comércio", "habitação", "separação acústica"]
+    },
+    {
+      "id": "ACUS-MISTO-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Restauração para Habitação",
+      "description": "O ruído transmitido do espaço de restauração para as frações habitacionais ({acoustic.restaurantToResidentialNoise} dB(A)) excede o limite regulamentar. Restaurantes e espaços de restauração em edifícios mistos devem garantir LAr,nT ≤ 32 dB(A) nos quartos e LAr,nT ≤ 35 dB(A) nas salas de estar das frações superiores.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.restaurantToResidentialNoise",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["misto", "mixed-use", "comércio-habitação"]
+        },
+        {
+          "field": "acoustic.hasRestaurant",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "LAr,nT = {acoustic.restaurantToResidentialNoise} dB(A)",
+      "requiredValue": "LAr,nT ≤ 32 dB(A) quartos / ≤ 35 dB(A) zonas de estar",
+      "remediation": "Isolar acusticamente o espaço de restauração: teto com isolamento reforçado (teto falso duplo com lã mineral ≥ 120mm), pavimento flutuante no piso habitacional superior, paredes laterais com contra-fachada acústica. Controlar o ruído na fonte: limitador de som no sistema de música, absorção acústica no restaurante (teto e paredes, αw ≥ 0.80), equipamentos de cozinha sobre apoios anti-vibráticos. Prever condicionamento acústico da conduta de exaustão da cozinha.",
+      "enabled": true,
+      "tags": ["misto", "restaurante", "habitação", "ruído"]
+    },
+    {
+      "id": "ACUS-MISTO-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Ginásio para Habitação",
+      "description": "O ruído e vibrações transmitidos do ginásio/health club para as frações habitacionais excedem os limites regulamentares. Ginásios em edifícios mistos são fontes críticas de ruído de impacto (musculação, aulas de grupo) e ruído aéreo (música amplificada).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasGymInMixedUse",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "acoustic.hasGymAcousticIsolation",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "requiredValue": "D'nT,w ≥ 58 dB e L'nT,w ≤ 50 dB",
+      "remediation": "Isolamento acústico reforçado para ginásios em edifícios mistos: pavimento flutuante de alta performance (manta de borracha reciclada ≥ 25mm + betonilha armada ≥ 70mm, ΔLw ≥ 25 dB), sistema box-in-box para salas de aulas de grupo com música amplificada, teto com isolamento reforçado (suspensão resiliente + dupla placa + lã mineral 120mm). Limitador de nível sonoro no sistema de som (LAeq ≤ 85 dB(A)). Equipamentos de musculação sobre plataformas anti-vibração.",
+      "enabled": true,
+      "tags": ["misto", "ginásio", "habitação", "impacto", "vibrações"]
+    },
+    {
+      "id": "ACUS-MISTO-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Ruído de Garagem em Edifício Misto",
+      "description": "O ruído transmitido da garagem para as frações habitacionais ({acoustic.parkingToResidentialNoise} dB(A)) excede o limite regulamentar. A garagem é fonte de ruído de impacto (veículos nas rampas e portões), ruído aéreo (motores, alarmes) e vibrações.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.parkingToResidentialNoise",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "acoustic.hasParkingGarage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["misto", "mixed-use", "comércio-habitação", "residential", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "LAr,nT = {acoustic.parkingToResidentialNoise} dB(A)",
+      "requiredValue": "LAr,nT ≤ 40 dB(A) em zonas habitacionais",
+      "remediation": "Controlar o ruído da garagem: laje de teto com isolamento acústico (betonilha flutuante no piso superior ou teto falso com suspensão resiliente na garagem), rampas com revestimento anti-vibrático, portões automáticos silenciosos (motor com apoio anti-vibração), absorção acústica no teto da garagem (painéis de lã mineral protegidos). Verificar isolamento das colunas de ventilação e das condutas de desenfumagem.",
+      "enabled": true,
+      "tags": ["misto", "garagem", "habitação", "ruído", "impacto"]
+    },
+    {
+      "id": "ACUS-MISTO-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º e RGR Art. 13.º — Estabelecimentos de Diversão Noturna em Edifícios Mistos",
+      "description": "Não está verificado o isolamento acústico adequado entre o estabelecimento de diversão noturna (bar, discoteca) e as frações habitacionais. Estes espaços geram níveis de ruído muito elevados (LAeq > 95 dB(A)) que requerem isolamento excecionalmente reforçado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasNightlifeEstablishment",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "acoustic.hasNightlifeIsolation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["misto", "mixed-use", "comércio-habitação"]
+        }
+      ],
+      "requiredValue": "D'nT,w ≥ 65 dB (recomendado para diversão noturna)",
+      "remediation": "Isolamento excecionalmente reforçado para estabelecimentos de diversão noturna: sistema box-in-box completo (paredes, teto e pavimento dessolidarizados da estrutura), D'nT,w ≥ 65 dB na envolvente da sala, pavimento flutuante de alta performance (ΔLw ≥ 30 dB), portas acústicas duplas com câmara intermédia (Rw ≥ 45 dB), sistema AVAC independente com atenuação reforçada. Realizar ensaio acústico pré-abertura. Instalar limitador de nível sonoro certificado com registo contínuo.",
+      "enabled": true,
+      "tags": ["misto", "diversão noturna", "discoteca", "isolamento reforçado"]
+    },
+    {
+      "id": "ACUS-PROJ-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 12.º do RGR / Portaria 232/2008 — Exigência de Projeto Acústico",
+      "description": "Não foi apresentado projeto de condicionamento acústico. O DL 96/2008 e a Portaria 232/2008 exigem a apresentação de projeto acústico para todos os edifícios sujeitos a licenciamento urbanístico, demonstrando conformidade com o RRAE.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasAcousticProject",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "project.requiresLicensing",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Projeto de condicionamento acústico obrigatório",
+      "remediation": "Elaborar projeto de condicionamento acústico por técnico competente, incluindo: memória descritiva e justificativa, cálculos de isolamento a sons aéreos e de percussão, verificação de conformidade com o RRAE para o tipo de edifício, especificação de soluções construtivas, peças desenhadas com indicação de elementos acústicos. O projeto deve ser submetido com o pedido de licenciamento na câmara municipal.",
+      "enabled": true,
+      "tags": ["projeto acústico", "licenciamento", "obrigatório"]
+    },
+    {
+      "id": "ACUS-PROJ-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE — Metodologia de Medição Acústica",
+      "description": "A metodologia de medição acústica utilizada não está em conformidade com as normas aplicáveis. Os ensaios acústicos devem seguir as normas NP EN ISO 16283 (medição in situ de isolamento sonoro) e NP EN ISO 3382 (tempo de reverberação).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.measurementMethodology",
+          "operator": "not_in",
+          "value": ["NP-EN-ISO-16283", "NP-EN-ISO-3382", "EN-ISO-16283", "ISO-16283"]
+        },
+        {
+          "field": "acoustic.hasMeasurements",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Medições conforme NP EN ISO 16283 e NP EN ISO 3382",
+      "remediation": "Realizar as medições acústicas de acordo com as normas aplicáveis: NP EN ISO 16283-1 (sons aéreos), NP EN ISO 16283-2 (sons de percussão), NP EN ISO 16283-3 (fachadas), NP EN ISO 3382-2 (tempo de reverberação). Utilizar equipamento de medição calibrado (classe 1), com certificado de calibração válido. O relatório deve incluir condições de medição, incerteza de medição e referência às normas utilizadas.",
+      "enabled": true,
+      "tags": ["medição", "metodologia", "normas", "ensaio"]
+    },
+    {
+      "id": "ACUS-PROJ-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE — Ensaio Acústico Pós-Construção",
+      "description": "Não está previsto ensaio acústico de verificação pós-construção. A medição in situ do isolamento sonoro deve ser realizada após a conclusão da obra e antes da emissão da licença de utilização, para confirmar o cumprimento dos requisitos do RRAE.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasPostConstructionTest",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "project.phase",
+          "operator": "in",
+          "value": ["construção", "obra", "construction", "pré-utilização"]
+        }
+      ],
+      "requiredValue": "Ensaio acústico pós-construção obrigatório",
+      "remediation": "Planear ensaio acústico de verificação pós-construção: medir D'nT,w entre frações (sons aéreos), L'nT,w (sons de percussão), D2m,nT,w (fachada) e T (tempo de reverberação, onde aplicável) segundo as normas NP EN ISO 16283. O ensaio deve ser realizado com o edifício concluído (revestimentos aplicados, janelas e portas instaladas). Prever margem de segurança de 3 dB no projeto para compensar incertezas de construção.",
+      "enabled": true,
+      "tags": ["ensaio", "pós-construção", "verificação", "licença de utilização"]
+    },
+    {
+      "id": "ACUS-PROJ-04",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE — Qualificação do Consultor Acústico",
+      "description": "O projeto acústico não indica as qualificações do técnico responsável. O projeto de condicionamento acústico deve ser elaborado por técnico com formação e experiência comprovada em acústica de edifícios, inscrito na ordem profissional competente.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.acousticConsultantQualification",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasAcousticProject",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Técnico qualificado em acústica de edifícios",
+      "remediation": "O projeto acústico deve ser elaborado por engenheiro civil, engenheiro mecânico ou engenheiro do ambiente com especialização em acústica, inscrito na Ordem dos Engenheiros ou na Ordem dos Engenheiros Técnicos. Verificar que o técnico possui experiência em projetos de condicionamento acústico e conhecimento atualizado da regulamentação (RRAE, RGR). O projeto deve ser assinado e conter declaração de conformidade regulamentar.",
+      "enabled": true,
+      "tags": ["consultor", "qualificação", "técnico", "projeto acústico"]
+    },
+    {
+      "id": "ACUS-PROJ-05",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE — Simulação Acústica Computacional",
+      "description": "Não foi realizada simulação acústica computacional para o projeto. Em edifícios complexos (salas de espetáculo, hospitais, escolas, edifícios mistos), a simulação acústica é recomendada para otimizar soluções e prever o comportamento acústico antes da construção.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.hasAcousticSimulation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar", "misto", "mixed-use", "auditório", "sala-de-espetáculos"]
+        }
+      ],
+      "requiredValue": "Simulação acústica recomendada para edifícios complexos",
+      "remediation": "Realizar simulação acústica computacional utilizando software validado (INSUL, BASTIAN, ODEON, CATT-Acoustic ou equivalente). A simulação deve incluir: modelação 3D do edifício, propriedades acústicas dos materiais, cálculo de isolamento sonoro entre compartimentos, previsão de tempo de reverberação, análise de transmissão marginal. Os resultados devem ser validados com medições in situ sempre que possível.",
+      "enabled": true,
+      "tags": ["simulação", "computacional", "software", "modelação acústica"]
+    },
+    {
+      "id": "RGR-URBAN-01",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 7.º — Mapa de Ruído Municipal",
+      "description": "Não está disponível o mapa de ruído municipal atualizado para a zona do projeto. O DL 9/2007 (Art. 7.º) exige que os municípios com mais de 100.000 habitantes elaborem e atualizem mapas de ruído estratégicos a cada 5 anos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasNoiseMap",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "project.municipalityPopulation",
+          "operator": ">",
+          "value": 100000
+        }
+      ],
+      "requiredValue": "Mapa de ruído estratégico atualizado (≤ 5 anos)",
+      "remediation": "Consultar o mapa de ruído municipal junto da câmara municipal ou no portal de dados abertos do município. Se o mapa de ruído não estiver disponível ou atualizado, solicitar à câmara municipal a informação sobre a classificação acústica da zona. Alternativamente, realizar medição de ruído ambiente no local do projeto para determinar os níveis Lden e Ln e verificar conformidade com os limites do RGR.",
+      "enabled": true,
+      "tags": ["mapa de ruído", "município", "RGR", "estratégico"]
+    },
+    {
+      "id": "RGR-URBAN-02",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 8.º — Plano de Ação de Ruído",
+      "description": "Não existe plano de ação de ruído para a zona onde o projeto se insere. O DL 9/2007 (Art. 8.º) exige a elaboração de planos de ação para reduzir o ruído ambiente nas zonas onde os limites são excedidos, com prioridade para aglomerações com mais de 100.000 habitantes.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.hasNoiseActionPlan",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.noiseZoneExceedsLimits",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Plano de ação de ruído municipal",
+      "remediation": "Verificar junto da câmara municipal se existe plano de ação de ruído para a zona. Se a zona excede os limites do RGR, o plano deve prever medidas de redução: reperfilamento viário, pavimentos silenciosos, barreiras acústicas, restrições de tráfego, regulamentação de atividades ruidosas. O projeto deve ter em conta as medidas previstas no plano de ação e antecipar eventuais melhorias no ambiente acústico.",
+      "enabled": true,
+      "tags": ["plano de ação", "ruído ambiente", "RGR", "município"]
+    },
+    {
+      "id": "RGR-URBAN-03",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 6.º — Designação de Zonas Tranquilas",
+      "description": "Não está verificada a existência de designação de zona tranquila no PDM para a envolvente do projeto. O DL 9/2007 prevê a designação de zonas tranquilas (em aglomerações e em campo aberto) que beneficiam de proteção reforçada contra o ruído.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.quietZoneDesignation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar", "escola", "escolar", "residential", "habitacional"]
+        }
+      ],
+      "requiredValue": "Verificação de designação de zona tranquila",
+      "remediation": "Consultar o PDM e os regulamentos municipais para verificar se o local do projeto está inserido ou próximo de uma zona tranquila designada. Zonas tranquilas em aglomerações: Lden ≤ 55 dB(A). Zonas tranquilas em campo aberto: áreas protegidas de ruído de tráfego e industrial. Se aplicável, o projeto deve respeitar as restrições adicionais impostas pela designação de zona tranquila.",
+      "enabled": true,
+      "tags": ["zona tranquila", "PDM", "proteção", "RGR"]
+    },
+    {
+      "id": "RGR-URBAN-04",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 10.º — Eficácia de Barreiras Acústicas",
+      "description": "A barreira acústica prevista não garante a atenuação necessária. A eficácia da barreira acústica ({acoustic.barrierAttenuation} dB) é inferior ao mínimo necessário para cumprir os limites do RGR no recetor protegido.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.barrierAttenuation",
+          "operator": "<",
+          "value": 10
+        },
+        {
+          "field": "acoustic.hasNoiseBarrier",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Atenuação = {acoustic.barrierAttenuation} dB",
+      "requiredValue": "Atenuação ≥ 10 dB (eficácia mínima recomendada)",
+      "remediation": "Otimizar a barreira acústica: aumentar a altura (cada metro adicional acima da linha de visão fonte-recetor aumenta ~3 dB de atenuação), prolongar lateralmente (evitar difração nas extremidades), utilizar material com massa superficial ≥ 20 kg/m² e sem fissuras, aplicar material absorvente no lado da fonte (αw ≥ 0.80). Verificar o dimensionamento por cálculo segundo a norma EN 1793 (desempenho intrínseco) e EN 1794 (requisitos mecânicos).",
+      "enabled": true,
+      "tags": ["barreira acústica", "atenuação", "ruído", "RGR"]
+    },
+    {
+      "id": "RGR-URBAN-05",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 3.º e 11.º — Limites de Exposição ao Ruído dos Recetores",
+      "description": "O nível de ruído ambiente no recetor ({acoustic.receptorLden} dB(A)) excede os limites de exposição do RGR. Os limites são: Lden ≤ 55 dB(A) e Ln ≤ 45 dB(A) em zonas sensíveis; Lden ≤ 65 dB(A) e Ln ≤ 55 dB(A) em zonas mistas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.receptorLden",
+          "operator": ">",
+          "value": 65
+        },
+        {
+          "field": "acoustic.noiseZone",
+          "operator": "in",
+          "value": ["zona-mista", "mista", "mixed"]
+        }
+      ],
+      "currentValueTemplate": "Lden = {acoustic.receptorLden} dB(A)",
+      "requiredValue": "Lden ≤ 65 dB(A) zona mista / ≤ 55 dB(A) zona sensível",
+      "remediation": "Implementar medidas de redução do ruído ambiente: barreiras acústicas, afastamento dos recetores, reperfilamento do terreno, isolamento reforçado da fachada exposta. Se os limites não podem ser cumpridos por medidas exteriores, reforçar o isolamento da envolvente do edifício para garantir níveis interiores aceitáveis. Documentar no estudo acústico as medidas adotadas e os resultados previstos.",
+      "enabled": true,
+      "tags": ["exposição", "Lden", "recetores", "limites", "RGR"]
+    },
+    {
+      "id": "RGR-ATIV-01",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 15.º — Restrição Horária de Atividades Ruidosas de Construção",
+      "description": "As atividades ruidosas de construção civil estão previstas fora do horário regulamentar. O RGR restringe as atividades ruidosas temporárias: dias úteis 08h-20h, sábados 08h-13h, proibidas aos domingos e feriados (exceto com licença especial).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.constructionHoursCompliant",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "project.hasConstructionPhase",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Obras: dias úteis 08h-20h, sábados 08h-13h",
+      "remediation": "Cumprir rigorosamente os horários de obra do RGR Art. 15.º. Para trabalhos urgentes ou inadiáveis fora do horário: solicitar licença especial à câmara municipal com antecedência mínima de 15 dias, apresentando justificação técnica, medidas de minimização de ruído e programa de trabalhos. Informar os vizinhos com antecedência e implementar barreiras acústicas temporárias.",
+      "enabled": true,
+      "tags": ["obras", "horário", "restrição", "construção", "RGR"]
+    },
+    {
+      "id": "RGR-ATIV-02",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 13.º — Emissão de Ruído Industrial",
+      "description": "O nível de emissão de ruído da instalação industrial ({acoustic.industrialEmission} dB(A)) excede os limites do RGR. Instalações industriais não devem causar um aumento superior a 5 dB(A) no nível de ruído ambiente residual nos recetores sensíveis mais próximos (critério de incomodidade).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.industrialEmission",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["industrial", "fábrica", "armazém-industrial"]
+        }
+      ],
+      "currentValueTemplate": "Ruído emergente = {acoustic.industrialEmission} dB(A) acima do residual",
+      "requiredValue": "Ruído particular ≤ ruído residual + 5 dB(A) (período diurno)",
+      "remediation": "Reduzir a emissão de ruído industrial: encapsular equipamentos ruidosos (compressores, geradores), instalar silenciadores em chaminés e exaustores, prever barreiras acústicas no perímetro industrial, substituir equipamentos antigos por modelos de baixa emissão, implementar manutenção preventiva. Realizar medição de ruído residual e verificar o critério de incomodidade do Art. 13.º do RGR.",
+      "enabled": true,
+      "tags": ["industrial", "emissão", "incomodidade", "RGR"]
+    },
+    {
+      "id": "RGR-ATIV-03",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 13.º — Ruído de Atividades Comerciais e de Serviços",
+      "description": "O ruído da atividade comercial ({acoustic.commercialActivityNoise} dB(A)) excede os limites de incomodidade do RGR. Atividades comerciais e de serviços (incluindo comércio de rua, oficinas, lavandarias) devem cumprir o critério de incomodidade e os limites de ruído da zona.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.commercialActivityNoise",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["comercial", "comércio", "serviços", "retail"]
+        }
+      ],
+      "currentValueTemplate": "Ruído emergente = {acoustic.commercialActivityNoise} dB(A) acima do residual",
+      "requiredValue": "Critério de incomodidade: ≤ +5 dB(A) (diurno) / ≤ +3 dB(A) (noturno)",
+      "remediation": "Controlar o ruído da atividade comercial: isolar acusticamente equipamentos (compressores de frio, sistemas AVAC, exaustores), encerrar portas durante funcionamento de equipamentos ruidosos, instalar silenciadores em exaustores e condutas de ventilação, limitar horários de carga/descarga a períodos diurnos, aplicar absorção acústica no interior do espaço comercial.",
+      "enabled": true,
+      "tags": ["comércio", "atividade", "incomodidade", "RGR"]
+    },
+    {
+      "id": "RGR-ATIV-04",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 15.º, n.º 2 — Licença para Eventos Especiais Ruidosos",
+      "description": "Não está prevista licença especial para evento ruidoso. Eventos com emissão sonora significativa (concertos, festivais, feiras, eventos desportivos ao ar livre) requerem licença especial de ruído emitida pela câmara municipal conforme o Art. 15.º do RGR.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasSpecialEventNoisePermit",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "project.hasSpecialEvents",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Licença especial de ruído para eventos",
+      "remediation": "Solicitar licença especial de ruído à câmara municipal com antecedência mínima de 15 dias. O pedido deve incluir: tipo e duração do evento, localização, níveis de ruído previstos, horário de funcionamento, medidas de minimização (orientação de altifalantes, limitadores de nível), plano de monitorização. A licença define os limites de ruído, horários e condições específicas. Informar previamente os moradores da zona.",
+      "enabled": true,
+      "tags": ["eventos", "licença", "ruído especial", "RGR"]
+    },
+    {
+      "id": "RGR-ATIV-05",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 13.º e 16.º — Monitorização de Ruído Ambiental",
+      "description": "Não está previsto programa de monitorização de ruído ambiental. Para atividades ruidosas permanentes (industriais, infraestruturas de transporte) e atividades com potencial de incomodidade, o RGR pode exigir monitorização contínua ou periódica dos níveis de ruído.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.hasNoiseMonitoringPlan",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.isNoisyActivity",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Programa de monitorização de ruído",
+      "remediation": "Implementar programa de monitorização de ruído: instalar estação de medição permanente ou realizar campanhas periódicas (mínimo semestral) nos recetores sensíveis mais próximos. Utilizar sonómetros classe 1 conforme NP EN 61672-1. O programa deve incluir: medição de Lden e Ln, identificação de componentes tonais e impulsivas (penalizações do RGR), comparação com limites e critério de incomodidade, registo e arquivo de resultados durante 5 anos.",
+      "enabled": true,
+      "tags": ["monitorização", "ruído ambiental", "medição", "RGR"]
     }
   ]
 }
