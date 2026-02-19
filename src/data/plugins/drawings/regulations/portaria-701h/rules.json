@@ -3419,6 +3419,1401 @@
         "urbanismo",
         "portaria-701h"
       ]
+    },
+    {
+      "id": "DRW-PROJ3D-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I — LOD do modelo 3D",
+      "description": "O modelo BIM deve cumprir o nível de desenvolvimento (LOD) adequado à fase de projeto: LOD 200 no estudo prévio, LOD 300 no projeto de execução e LOD 400/500 na construção e telas finais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.bimRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.modelLODLevel",
+          "operator": "<",
+          "value": 300
+        },
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        }
+      ],
+      "currentValueTemplate": "LOD atual: {drawings.modelLODLevel} | Fase: {drawings.projectPhase}",
+      "requiredValue": "LOD >= 300 para projeto de execução; LOD >= 400 para construção",
+      "remediation": "Desenvolver o modelo BIM ao nível de LOD adequado à fase de projeto. No projeto de execução, todos os elementos devem estar a LOD 300 (geometria precisa, quantidades e dimensões). Na fase de construção, elevar a LOD 400 com informação de fabrico e montagem.",
+      "enabled": true,
+      "tags": [
+        "bim",
+        "3d",
+        "lod",
+        "modelação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PROJ3D-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I — Relatório de clash detection",
+      "description": "O modelo federado deve ser acompanhado de relatório de clash detection documentado, com identificação dos conflitos detetados, resolução adotada e conflitos pendentes justificados.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.bimRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasClashDetectionReport",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Relatório de clash detection: {drawings.hasClashDetectionReport}",
+      "requiredValue": "Relatório de clash detection documentado e anexado ao projeto",
+      "remediation": "Produzir relatório de clash detection entre todas as especialidades do modelo federado, identificando: número total de conflitos, conflitos resolvidos com descrição da solução, conflitos pendentes com justificação técnica, e data da última verificação. Utilizar software certificado (Navisworks, Solibri ou equivalente).",
+      "enabled": true,
+      "tags": [
+        "bim",
+        "3d",
+        "clash",
+        "relatório",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PROJ3D-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I — Federação de modelos",
+      "description": "O modelo federado deve integrar todos os modelos disciplinares (arquitetura, estrutura, MEP) num único ficheiro de coordenação, com ponto de origem comum e unidades consistentes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.bimRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasFederatedModel",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Modelo federado disponível: {drawings.hasFederatedModel}",
+      "requiredValue": "Modelo federado com todas as especialidades integradas",
+      "remediation": "Criar modelo federado que integre os modelos disciplinares de todas as especialidades. Definir ponto de origem comum (shared coordinates), verificar consistência de unidades (metros), e garantir que todos os modelos estão georreferenciados ao mesmo sistema de coordenadas (PT-TM06/ETRS89).",
+      "enabled": true,
+      "tags": [
+        "bim",
+        "3d",
+        "federação",
+        "coordenação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PROJ3D-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I — Exportação IFC",
+      "description": "O modelo BIM deve ser exportado em formato IFC (Industry Foundation Classes) versão 2x3 ou 4, garantindo a interoperabilidade entre softwares e a preservação das propriedades dos elementos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.bimRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasIFCExport",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Exportação IFC disponível: {drawings.hasIFCExport}",
+      "requiredValue": "Ficheiro IFC (versão 2x3 ou 4) exportado e validado",
+      "remediation": "Exportar o modelo BIM em formato IFC 2x3 ou IFC4, verificando: mapeamento correto de entidades (IfcWall, IfcSlab, etc.), preservação de propriedades e materiais, inclusão de property sets normalizados, e validação com ferramenta certificada (BIM Collab, Solibri Model Checker). Incluir MVD (Model View Definition) adequado ao uso pretendido.",
+      "enabled": true,
+      "tags": [
+        "bim",
+        "3d",
+        "ifc",
+        "interoperabilidade",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PROJ3D-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I — Registo de auditoria do modelo",
+      "description": "O modelo BIM deve manter registo de auditoria (model audit trail) com histórico de alterações, versões, autor de cada modificação e data de cada revisão.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.bimRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasModelAuditTrail",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Registo de auditoria do modelo: {drawings.hasModelAuditTrail}",
+      "requiredValue": "Registo de auditoria com histórico de versões e alterações",
+      "remediation": "Implementar sistema de registo de auditoria no modelo BIM: log de alterações com identificação do autor, data e descrição da modificação; controlo de versões com numeração sequencial; registo de revisões formais com aprovação; e backup periódico do modelo. Utilizar plataforma CDE (Common Data Environment) para gestão documental.",
+      "enabled": true,
+      "tags": [
+        "bim",
+        "3d",
+        "auditoria",
+        "versões",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CALC-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º e Art. 12.º — Formato das memórias de cálculo",
+      "description": "As memórias de cálculo devem seguir formato normalizado, com identificação clara do projeto, especialidade, capítulos numerados e índice geral.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasCalculationMemory",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.calculationMemoryFormatted",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Formato normalizado: {drawings.calculationMemoryFormatted}",
+      "requiredValue": "Memória de cálculo com formato normalizado e índice",
+      "remediation": "Formatar as memórias de cálculo com: capa identificativa (projeto, especialidade, autor, data, revisão), índice geral, capítulos numerados sequencialmente, referências cruzadas aos desenhos, identificação das normas e regulamentos aplicados, e conclusões com resumo dos resultados.",
+      "enabled": true,
+      "tags": [
+        "cálculo",
+        "memória",
+        "formato",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CALC-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Pressupostos de cargas documentados",
+      "description": "As memórias de cálculo estrutural devem documentar todos os pressupostos de cargas adotados: cargas permanentes, sobrecargas, ação sísmica, vento e temperatura, conforme os Eurocódigos aplicáveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasStructuralCalc",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.loadAssumptionsDocumented",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pressupostos de cargas documentados: {drawings.loadAssumptionsDocumented}",
+      "requiredValue": "Todos os pressupostos de cargas identificados e justificados",
+      "remediation": "Documentar nas memórias de cálculo todos os pressupostos de cargas: cargas permanentes (peso próprio, revestimentos, paredes divisórias), sobrecargas (categoria de utilização conforme EC1), ação sísmica (zona sísmica, tipo de solo, coeficiente de comportamento), ação do vento (zona, rugosidade, orografia) e variações de temperatura. Referenciar os Eurocódigos e Anexos Nacionais aplicáveis.",
+      "enabled": true,
+      "tags": [
+        "cálculo",
+        "cargas",
+        "estrutura",
+        "eurocódigos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CALC-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Coeficientes de segurança",
+      "description": "Os coeficientes de segurança parciais aplicados devem estar explicitamente indicados nas memórias de cálculo, com referência à norma que os define.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasStructuralCalc",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.safetyFactorsNoted",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Coeficientes de segurança indicados: {drawings.safetyFactorsNoted}",
+      "requiredValue": "Coeficientes de segurança parciais explícitos com referência normativa",
+      "remediation": "Indicar explicitamente nas memórias de cálculo os coeficientes de segurança parciais utilizados: coeficientes de majoração de ações (γG, γQ, γE), coeficientes de minoração de resistências dos materiais (γc para betão, γs para aço, γM para alvenaria), e combinações de ações adotadas (ELU e ELS). Referenciar as tabelas dos Eurocódigos e Anexos Nacionais.",
+      "enabled": true,
+      "tags": [
+        "cálculo",
+        "segurança",
+        "coeficientes",
+        "eurocódigos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CALC-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Versão do software de cálculo",
+      "description": "As memórias de cálculo devem identificar o software utilizado, incluindo nome, versão, licença e métodos de cálculo empregues, para permitir verificação e reprodutibilidade dos resultados.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasStructuralCalc",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.calcSoftwareVersionReferenced",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Software de cálculo referenciado: {drawings.calcSoftwareVersionReferenced}",
+      "requiredValue": "Software de cálculo identificado com nome, versão e método",
+      "remediation": "Incluir nas memórias de cálculo a identificação do software utilizado: nome do programa (ex: Robot, SAP2000, CYPECAD), número de versão e atualização, número de licença, método de cálculo empregue (elementos finitos, pórtico equivalente, etc.), e referência a validações ou certificações do software. Incluir ficheiro de cálculo digital para verificação.",
+      "enabled": true,
+      "tags": [
+        "cálculo",
+        "software",
+        "versão",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CALC-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Assinatura de revisão dos cálculos",
+      "description": "As memórias de cálculo devem conter assinatura de revisão por técnico qualificado diferente do autor, com data de revisão e declaração de conformidade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasStructuralCalc",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.calcReviewSignature",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Revisão dos cálculos assinada: {drawings.calcReviewSignature}",
+      "requiredValue": "Assinatura de revisão por técnico independente",
+      "remediation": "Incluir nas memórias de cálculo folha de revisão assinada por técnico qualificado (engenheiro civil ou de estruturas) diferente do autor do cálculo. A revisão deve incluir: verificação dos pressupostos, validação dos modelos, confirmação dos resultados críticos, data da revisão e declaração de conformidade com os regulamentos aplicáveis.",
+      "enabled": true,
+      "tags": [
+        "cálculo",
+        "revisão",
+        "assinatura",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PORMENOR-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Pormenores de secções de paredes",
+      "description": "O projeto de execução deve incluir pormenores construtivos das secções de paredes, indicando todas as camadas constituintes, espessuras, materiais e ordem de aplicação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasWallSectionDetails",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pormenores de paredes: {drawings.hasWallSectionDetails}",
+      "requiredValue": "Pormenores de secção de todas as tipologias de parede",
+      "remediation": "Incluir pormenores construtivos de secção para cada tipologia de parede do projeto: parede exterior, parede interior divisória, parede de meação, parede corta-fogo. Indicar todas as camadas (reboco, isolamento, tijolo/bloco, caixa-de-ar, revestimento), espessuras individuais e total, materiais com referência comercial, e sequência de aplicação. Escala mínima 1:10 ou 1:5.",
+      "enabled": true,
+      "tags": [
+        "pormenor",
+        "paredes",
+        "secção",
+        "execução",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PORMENOR-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Pormenores de instalação de vãos",
+      "description": "Os desenhos de execução devem incluir pormenores de instalação de janelas e portas, com indicação de fixações, isolamento perimetral, soleira/peitoril e remates.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasWindowDoorInstallDetails",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pormenores de vãos: {drawings.hasWindowDoorInstallDetails}",
+      "requiredValue": "Pormenores de instalação de janelas e portas",
+      "remediation": "Incluir pormenores construtivos de instalação de vãos envidraçados e portas: fixação do aro ao tosco (mecânica ou química), isolamento perimetral (espuma PU e fita de estanquidade), soleira e peitoril com pendente e pingadeira, verga e padieira com pormenor de remate, e ligação ao sistema ETICS quando aplicável. Escala 1:5 ou 1:2.",
+      "enabled": true,
+      "tags": [
+        "pormenor",
+        "janelas",
+        "portas",
+        "vãos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PORMENOR-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Pormenores de junção de cobertura",
+      "description": "Os desenhos devem incluir pormenores das junções de cobertura: cumeeira, beirado, rincão, caleira e ligação à platibanda ou empena, com indicação da impermeabilização e ventilação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasRoofJunctionDetails",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pormenores de cobertura: {drawings.hasRoofJunctionDetails}",
+      "requiredValue": "Pormenores de junção de cobertura (cumeeira, beirado, caleira)",
+      "remediation": "Incluir pormenores construtivos de todas as junções de cobertura: cumeeira (ventilação e remate), beirado (pingadeira e sub-telha), rincão e laró (caleira de encaixe), ligação à platibanda (rufagem e impermeabilização), atravessamentos (chaminés, clarabóias). Indicar camadas de impermeabilização, isolamento térmico, barreira para-vapor e sistema de ventilação da cobertura. Escala 1:10 ou 1:5.",
+      "enabled": true,
+      "tags": [
+        "pormenor",
+        "cobertura",
+        "junção",
+        "impermeabilização",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PORMENOR-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Pormenores de impermeabilização de fundações",
+      "description": "Os desenhos devem incluir pormenores de impermeabilização das fundações e caves, com indicação do sistema de drenagem periférica, membranas e proteção mecânica.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasFoundationWaterproofDetails",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pormenores de impermeabilização de fundações: {drawings.hasFoundationWaterproofDetails}",
+      "requiredValue": "Pormenores de impermeabilização e drenagem de fundações",
+      "remediation": "Incluir pormenores de impermeabilização das fundações: membrana impermeabilizante (tipo, espessura e sobreposições), proteção mecânica (geotêxtil e placa de nódulos), sistema de drenagem periférica (tubo dreno, brita e geotêxtil filtrante), remate na transição parede-fundação, e caixa de visita para manutenção. Indicar nível freático e cota de drenagem. Escala 1:10 ou 1:5.",
+      "enabled": true,
+      "tags": [
+        "pormenor",
+        "fundações",
+        "impermeabilização",
+        "drenagem",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-PORMENOR-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e REH — Soluções de pontes térmicas",
+      "description": "Os desenhos devem incluir pormenores de resolução de pontes térmicas: ligação parede-laje, parede-pilar, parede-cobertura e contorno de vãos, com indicação dos valores de ψ (psi) lineares.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasThermalBridgeDetails",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pormenores de pontes térmicas: {drawings.hasThermalBridgeDetails}",
+      "requiredValue": "Pormenores de resolução de pontes térmicas com valores ψ",
+      "remediation": "Incluir pormenores construtivos de resolução de pontes térmicas planas e lineares: ligação parede exterior-laje (com isolamento pelo exterior ou rotura térmica), ligação parede-pilar (ETICS contínuo ou isolamento interior), contorno de vãos (aro térmico), ligação parede-cobertura e ligação parede-fundação. Indicar valores de coeficiente de transmissão térmica linear ψ para cada situação, conforme REH e Despacho 15793-K/2013.",
+      "enabled": true,
+      "tags": [
+        "pormenor",
+        "pontes térmicas",
+        "isolamento",
+        "REH",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INSTPRED-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e DR 23/95 — Plantas de redes de águas e esgotos",
+      "description": "O projeto deve incluir plantas das redes prediais de abastecimento de água e drenagem de águas residuais e pluviais, com indicação de diâmetros, materiais, pendentes e equipamentos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasPlumbingLayoutPlans",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Plantas de redes de águas: {drawings.hasPlumbingLayoutPlans}",
+      "requiredValue": "Plantas de redes de águas e esgotos com diâmetros e pendentes",
+      "remediation": "Incluir plantas das instalações de águas e esgotos com: traçado em planta de todas as redes (água fria, água quente, recirculação, residuais domésticas, pluviais), diâmetros de tubagem, material (PPR, PVC, multicamada), pendentes das redes gravíticas, posição de equipamentos sanitários, válvulas de seccionamento, caixas de visita e ligações à rede pública. Conforme DR 23/95 e normas EN 806 e EN 12056.",
+      "enabled": true,
+      "tags": [
+        "instalações",
+        "águas",
+        "esgotos",
+        "canalização",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INSTPRED-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e RSECE — Traçado de condutas AVAC",
+      "description": "O projeto deve incluir plantas com o traçado das condutas de AVAC (aquecimento, ventilação e ar condicionado), indicando secções, caudais, isolamento e equipamentos terminais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasHVACDuctRouting",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Traçado de condutas AVAC: {drawings.hasHVACDuctRouting}",
+      "requiredValue": "Plantas com traçado de condutas AVAC, secções e caudais",
+      "remediation": "Incluir plantas com traçado das condutas de AVAC: condutas de insuflação e retorno com secções (retangulares ou circulares), caudais em cada troço, isolamento térmico e acústico, registos corta-fogo, difusores e grelhas terminais, unidades de tratamento de ar (UTA/UTAN), chillers e caldeiras. Indicar pontos de medição e regulação. Conforme RSECE/SCE e RECS.",
+      "enabled": true,
+      "tags": [
+        "instalações",
+        "avac",
+        "condutas",
+        "ventilação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INSTPRED-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e RTIEBT — Distribuição elétrica",
+      "description": "O projeto deve incluir plantas de distribuição elétrica com indicação de quadros, circuitos, secções de cabos, proteções e tomadas/iluminação, conforme RTIEBT.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasElectricalDistribution",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Distribuição elétrica: {drawings.hasElectricalDistribution}",
+      "requiredValue": "Plantas de distribuição elétrica com quadros, circuitos e proteções",
+      "remediation": "Incluir plantas de distribuição elétrica com: localização de quadros elétricos (QE, QP), esquema unifilar, traçado de circuitos (iluminação, tomadas, equipamentos dedicados), secções de cabos e tipo de condutor, dispositivos de proteção (disjuntores, diferenciais), sistema de terras, e simbologia conforme IEC 60617. Conforme RTIEBT (Portaria 949-A/2006).",
+      "enabled": true,
+      "tags": [
+        "instalações",
+        "eletricidade",
+        "distribuição",
+        "RTIEBT",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INSTPRED-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e RT-SCIE — Sistemas de segurança contra incêndio",
+      "description": "O projeto deve incluir plantas com a implantação dos sistemas de segurança contra incêndio: deteção, alarme, extinção, desenfumagem e sinalização de emergência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasFireSafetySystemsLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Sistemas SCIE: {drawings.hasFireSafetySystemsLayout}",
+      "requiredValue": "Plantas com sistemas SCIE (deteção, extinção, desenfumagem)",
+      "remediation": "Incluir plantas com implantação dos sistemas SCIE: rede de deteção automática de incêndio (SADI) com posição de detetores e botões de alarme, central de incêndio, rede de extinção (sprinklers, extintores, carretéis, colunas secas/húmidas), sistema de desenfumagem (exutores, ventiladores, condutas), iluminação de emergência e sinalização de evacuação com indicação dos caminhos de fuga. Conforme RT-SCIE e Portaria 1532/2008.",
+      "enabled": true,
+      "tags": [
+        "instalações",
+        "incêndio",
+        "SCIE",
+        "segurança",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INSTPRED-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e ITED — Infraestruturas de telecomunicações",
+      "description": "O projeto deve incluir plantas com o traçado das infraestruturas de telecomunicações (ITED), incluindo tubagens, caixas, bastidores e cablagem estruturada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasTelecomCabling",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Infraestruturas ITED: {drawings.hasTelecomCabling}",
+      "requiredValue": "Plantas com infraestruturas ITED (tubagens, caixas, bastidores)",
+      "remediation": "Incluir plantas com traçado das infraestruturas ITED: tubagem de entrada (ATE), colunas montantes, tubagem individual, caixas de passagem e derivação, armários de telecomunicações (ATI), bastidores, tomadas de telecomunicações (RJ45, coaxial, fibra ótica), e pontos de acesso Wi-Fi. Indicar categorias de cablagem (Cat.6, Cat.6A) e tipos de fibra. Conforme Manual ITED 4.ª edição e Prescrições ANACOM.",
+      "enabled": true,
+      "tags": [
+        "instalações",
+        "telecomunicações",
+        "ITED",
+        "cablagem",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPA-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Mapa de acabamentos por compartimento",
+      "description": "O projeto deve incluir mapa de acabamentos (room finish schedule) com indicação dos revestimentos de pavimento, paredes e teto para cada compartimento, incluindo referências de materiais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasRoomFinishSchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de acabamentos: {drawings.hasRoomFinishSchedule}",
+      "requiredValue": "Mapa de acabamentos completo por compartimento",
+      "remediation": "Incluir mapa de acabamentos em formato tabular com: identificação do compartimento (nome e número), revestimento de pavimento (material, formato, cor, referência), revestimento de paredes (material, cor, altura de aplicação), revestimento de teto (material, cor), rodapé (material e altura), e observações especiais (zonas húmidas, áreas técnicas). Referenciar desenhos de planta correspondentes.",
+      "enabled": true,
+      "tags": [
+        "acabamentos",
+        "mapa",
+        "compartimentos",
+        "revestimentos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPA-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Mapa de portas",
+      "description": "O projeto deve incluir mapa de portas (door schedule) com identificação de cada porta, dimensões, material, tipo de abertura, ferragens e classificações de desempenho.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasDoorSchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de portas: {drawings.hasDoorSchedule}",
+      "requiredValue": "Mapa de portas completo com dimensões, materiais e classificações",
+      "remediation": "Incluir mapa de portas com: código de identificação (referência cruzada com plantas), dimensões do vão (largura x altura), material do aro e da folha, tipo de abertura (batente, correr, pivotante), sentido de abertura, classificação corta-fogo (quando aplicável, EI30/EI60), classificação acústica (Rw), tipo de fechadura e ferragens, acabamento superficial, e observações (acessibilidade, automatismo).",
+      "enabled": true,
+      "tags": [
+        "acabamentos",
+        "mapa",
+        "portas",
+        "vãos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPA-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Mapa de janelas",
+      "description": "O projeto deve incluir mapa de janelas (window schedule) com identificação de cada vão, dimensões, tipo de caixilharia, vidro, desempenho térmico e acústico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasWindowSchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de janelas: {drawings.hasWindowSchedule}",
+      "requiredValue": "Mapa de janelas com dimensões, caixilharia e desempenho",
+      "remediation": "Incluir mapa de janelas com: código de identificação (referência cruzada com alçados e plantas), dimensões do vão (largura x altura), altura do peitoril, material da caixilharia (alumínio, PVC, madeira), tipo de abertura (batente, oscilo-batente, correr), composição do vidro (duplo, triplo, laminado), coeficiente de transmissão térmica Uw (W/m².K), fator solar g, classificação acústica Rw, classe de permeabilidade ao ar e estanquidade à água.",
+      "enabled": true,
+      "tags": [
+        "acabamentos",
+        "mapa",
+        "janelas",
+        "caixilharia",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPA-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Mapa de ferragens (ironmongery schedule)",
+      "description": "O projeto de execução deve incluir mapa de ferragens com identificação de todas as ferragens de portas e janelas: puxadores, fechaduras, dobradiças, molas e acessórios.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasIronmongerySchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de ferragens: {drawings.hasIronmongerySchedule}",
+      "requiredValue": "Mapa de ferragens com especificação de todos os acessórios",
+      "remediation": "Incluir mapa de ferragens com: puxadores (tipo, material, acabamento), fechaduras (tipo: cilindro europeu, magnética, antipânico; classificação de segurança), dobradiças (tipo, material, número por folha), molas de retorno (hidráulica, braço articulado), batentes, vedantes, ferrolhos, olho mágico. Para portas corta-fogo, especificar ferragens com classificação CE. Indicar referência de fabricante e acabamento.",
+      "enabled": true,
+      "tags": [
+        "acabamentos",
+        "mapa",
+        "ferragens",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPA-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º — Mapa de cores e pinturas",
+      "description": "O projeto deve incluir mapa de cores e pinturas com indicação do sistema de pintura para cada superfície: tipo de tinta, número de demãos, cor (referência NCS ou RAL) e acabamento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": ["execução", "construção"]
+        },
+        {
+          "field": "drawings.hasPaintColorSchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de cores: {drawings.hasPaintColorSchedule}",
+      "requiredValue": "Mapa de cores com referências NCS/RAL e sistema de pintura",
+      "remediation": "Incluir mapa de cores e pinturas com: identificação da superfície (parede interior, teto, parede exterior, elementos metálicos, madeiras), tipo de tinta (plástica, esmalte, epóxi, intumescente), número de demãos e preparação do substrato (primário, betumação), cor com referência normalizada (NCS, RAL ou Pantone), acabamento (mate, acetinado, brilhante), e rendimento previsto. Para elementos metálicos e madeiras, indicar sistema de proteção completo.",
+      "enabled": true,
+      "tags": [
+        "acabamentos",
+        "mapa",
+        "cores",
+        "pintura",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VISINHOS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Limites de propriedade dos vizinhos",
+      "description": "Os desenhos de implantação devem identificar os limites de propriedade dos prédios confinantes, com indicação das distâncias do edifício proposto a cada limite.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasNeighborBoundaries",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Limites de propriedade vizinhos: {drawings.hasNeighborBoundaries}",
+      "requiredValue": "Limites de propriedades confinantes identificados nos desenhos",
+      "remediation": "Identificar nos desenhos de implantação os limites de propriedade de todos os prédios confinantes: limites frontal (com arruamento), laterais (vizinhos esquerdo e direito) e tardoz (fundo do lote). Indicar distâncias do edifício proposto a cada limite, verificando conformidade com os afastamentos mínimos do PDM. Incluir número de artigo matricial dos prédios confinantes quando disponível.",
+      "enabled": true,
+      "tags": [
+        "confrontações",
+        "vizinhos",
+        "limites",
+        "propriedade",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VISINHOS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Edifícios adjacentes existentes",
+      "description": "Os desenhos devem representar os edifícios adjacentes existentes, com indicação da sua volumetria, número de pisos e cércea, para avaliação do impacto visual e urbanístico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasAdjacentBuildingsShown",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Edifícios adjacentes representados: {drawings.hasAdjacentBuildingsShown}",
+      "requiredValue": "Edifícios adjacentes existentes representados nos desenhos",
+      "remediation": "Representar nos desenhos de implantação e cortes a volumetria dos edifícios adjacentes existentes: planta com contorno e afastamentos, alçados com cércea e número de pisos, cortes transversais mostrando relação de cotas. Indicar uso atual dos edifícios vizinhos (habitação, comércio, serviços) e estado de conservação quando relevante para a obra.",
+      "enabled": true,
+      "tags": [
+        "confrontações",
+        "vizinhos",
+        "edifícios",
+        "adjacentes",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VISINHOS-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Identificação de paredes meeiras",
+      "description": "Os desenhos devem identificar claramente as paredes meeiras (paredes partilhadas com edifícios adjacentes), com indicação da sua espessura, estado e responsabilidades construtivas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSharedWallIdentification",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Paredes meeiras identificadas: {drawings.hasSharedWallIdentification}",
+      "requiredValue": "Paredes meeiras claramente identificadas nos desenhos",
+      "remediation": "Identificar nos desenhos todas as paredes meeiras: localização em planta com simbologia específica, espessura medida ou estimada, material constituinte, estado de conservação (observado em vistoria), e classificação de desempenho acústico e térmico. Indicar necessidade de reforço ou tratamento nas paredes meeiras quando a intervenção proposta possa afetar a sua integridade estrutural.",
+      "enabled": true,
+      "tags": [
+        "confrontações",
+        "vizinhos",
+        "meeiras",
+        "paredes",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VISINHOS-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Cotas de altura nos limites",
+      "description": "Os desenhos devem indicar as cotas de altura (altimetria) nos limites do lote e dos edifícios confinantes, para verificação de cérceas máximas e relação com a envolvente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasBoundaryHeights",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Cotas de altura nos limites: {drawings.hasBoundaryHeights}",
+      "requiredValue": "Cotas altimétricos nos limites de propriedade e edifícios confinantes",
+      "remediation": "Indicar nos desenhos (cortes e alçados) as cotas de altura relevantes: cota de soleira do edifício proposto, cota de cumeeira ou platibanda, cotas de soleira e cumeeira dos edifícios confinantes, cota do arruamento, e alturas relativas. Verificar que a cércea proposta cumpre o PDM e não cria impacto negativo de sombreamento ou privacidade nos prédios vizinhos.",
+      "enabled": true,
+      "tags": [
+        "confrontações",
+        "vizinhos",
+        "altimetria",
+        "cérceas",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VISINHOS-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Marcação de servidões",
+      "description": "Os desenhos devem marcar todas as servidões existentes (passagem, vistas, escoamento de águas, infraestruturas), com indicação da sua natureza, largura e condicionantes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasEasementMarkings",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Servidões marcadas: {drawings.hasEasementMarkings}",
+      "requiredValue": "Servidões existentes marcadas nos desenhos",
+      "remediation": "Marcar nos desenhos todas as servidões que oneram ou beneficiam o prédio: servidões de passagem (largura e trajeto), servidões de vistas (distâncias mínimas conforme Código Civil art.º 1360.º e seguintes), servidões de escoamento de águas, servidões de infraestruturas (condutas, cabos, coletores), e servidões administrativas (domínio público, proteção a vias). Indicar a origem da servidão (legal, judicial ou voluntária) e condicionantes associadas.",
+      "enabled": true,
+      "tags": [
+        "confrontações",
+        "vizinhos",
+        "servidões",
+        "condicionantes",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPLANT-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Escala da planta de implantação",
+      "description": "A planta de implantação deve ser apresentada a escala 1:200 ou 1:500, conforme a dimensão do terreno, permitindo a leitura clara de todas as cotas e afastamentos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.implantationPlanScale",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "currentValueTemplate": "Escala da implantação: 1:{drawings.implantationPlanScale}",
+      "requiredValue": "Escala <= 1:500 (preferencialmente 1:200)",
+      "remediation": "Apresentar a planta de implantação a escala adequada: 1:200 para lotes urbanos e 1:500 para terrenos de maior dimensão. Garantir que a escala permite a leitura clara de todas as cotas de implantação, afastamentos aos limites, acessos e elementos exteriores. Incluir escala gráfica no desenho.",
+      "enabled": true,
+      "tags": [
+        "implantação",
+        "escala",
+        "planta",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPLANT-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Cotagem da implantação do edifício",
+      "description": "A planta de implantação deve incluir cotagem completa do edifício: dimensões exteriores, afastamentos a todos os limites do lote e distâncias a pontos de referência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasImplantationDimensions",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cotagem de implantação: {drawings.hasImplantationDimensions}",
+      "requiredValue": "Cotagem completa da implantação (dimensões e afastamentos)",
+      "remediation": "Incluir na planta de implantação cotagem completa: dimensões exteriores do edifício (comprimento e largura), afastamentos ao limite frontal, laterais (esquerdo e direito) e tardoz, distância a edifícios existentes, posição angular relativamente ao arruamento, e cotas de referência a marcos cadastrais ou geodésicos. Todas as cotas em metros com duas casas decimais.",
+      "enabled": true,
+      "tags": [
+        "implantação",
+        "cotagem",
+        "dimensões",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPLANT-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pontos de acesso ao lote",
+      "description": "A planta de implantação deve identificar todos os pontos de acesso ao lote: entrada pedonal, entrada de veículos, acesso de emergência e acessos de serviço, com dimensões e características.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasAccessPointsMarked",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pontos de acesso marcados: {drawings.hasAccessPointsMarked}",
+      "requiredValue": "Todos os pontos de acesso ao lote identificados",
+      "remediation": "Identificar na planta de implantação todos os pontos de acesso: entrada pedonal principal (largura mínima 0.90m conforme acessibilidade), entrada de veículos (largura e raio de curvatura), acesso de emergência para viaturas de socorro (largura ≥ 3.50m conforme RT-SCIE), e acessos de serviço (recolha de resíduos, manutenção). Indicar portões, barreiras e sistemas de controlo de acesso.",
+      "enabled": true,
+      "tags": [
+        "implantação",
+        "acessos",
+        "entradas",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPLANT-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pontos de ligação a infraestruturas",
+      "description": "A planta de implantação deve marcar os pontos de ligação às infraestruturas públicas: água, eletricidade, gás, telecomunicações e redes de saneamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasUtilityConnectionPoints",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Ligações a infraestruturas: {drawings.hasUtilityConnectionPoints}",
+      "requiredValue": "Pontos de ligação a todas as infraestruturas públicas marcados",
+      "remediation": "Marcar na planta de implantação os pontos de ligação a infraestruturas: ramal de abastecimento de água (com contador), ramal de eletricidade (portinhola e PT quando aplicável), ramal de gás (válvula de corte), caixa de entrada ITED (telecomunicações), ligação ao coletor de esgotos (domésticos e pluviais). Indicar profundidades, diâmetros e direção das redes públicas existentes. Referenciar as condições técnicas fornecidas pelas entidades gestoras.",
+      "enabled": true,
+      "tags": [
+        "implantação",
+        "infraestruturas",
+        "ligações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPLANT-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Curvas de nível e cotas topográficas",
+      "description": "A planta de implantação deve incluir as curvas de nível ou cotas topográficas do terreno natural e da plataforma de implantação, com referência ao datum altimétrico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasTopographicContours",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Curvas de nível: {drawings.hasTopographicContours}",
+      "requiredValue": "Curvas de nível ou cotas topográficas do terreno",
+      "remediation": "Incluir na planta de implantação a representação altimétrica do terreno: curvas de nível do terreno natural (equidistância de 0.50m ou 1.00m conforme declive), cotas da plataforma de implantação proposta, cotas de soleira, indicação de volumes de aterro e escavação, e referência ao datum altimétrico utilizado (cota geodésica ou cota relativa). Para terrenos com declive superior a 5%, incluir perfis longitudinais e transversais.",
+      "enabled": true,
+      "tags": [
+        "implantação",
+        "topografia",
+        "curvas de nível",
+        "altimetria",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ARRUAM-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Art. 12.º — Perfis transversais de arruamentos",
+      "description": "Os desenhos devem incluir perfis transversais dos arruamentos adjacentes e propostos, com indicação de larguras de faixa de rodagem, passeios, estacionamento e faixas verdes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasStreetProfiles",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Perfis de arruamentos: {drawings.hasStreetProfiles}",
+      "requiredValue": "Perfis transversais dos arruamentos com dimensões",
+      "remediation": "Incluir perfis transversais tipo dos arruamentos: largura total do perfil, faixa de rodagem (largura por via), passeios (largura mínima 1.50m para acessibilidade), faixas de estacionamento (paralelo, perpendicular ou oblíquo), faixas verdes e caldeiras de árvores, ciclovias quando aplicável. Indicar pendentes transversais (2% para drenagem), camadas de pavimento e infraestruturas enterradas. Escala 1:50 ou 1:100.",
+      "enabled": true,
+      "tags": [
+        "arruamentos",
+        "perfis",
+        "ruas",
+        "urbanização",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ARRUAM-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Art. 12.º — Pormenores de lancis e borduras",
+      "description": "Os desenhos devem incluir pormenores de lancis (meios-fios) e borduras, com indicação do tipo, dimensões, material e condições de assentamento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasCurbDetails",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Pormenores de lancis: {drawings.hasCurbDetails}",
+      "requiredValue": "Pormenores de lancis e borduras com especificações",
+      "remediation": "Incluir pormenores construtivos de lancis e borduras: tipo (lancil reto, curvo, rebaixado para acessibilidade), dimensões normalizadas, material (granito, betão pré-fabricado), fundação e leito de assentamento (betão e argamassa), juntas, e situações especiais (rebaixamento em passadeiras, transição de materiais, rampas de acesso). Escala 1:10 ou 1:20.",
+      "enabled": true,
+      "tags": [
+        "arruamentos",
+        "lancis",
+        "borduras",
+        "urbanização",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ARRUAM-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Art. 12.º — Sumidouros e drenagem pluvial",
+      "description": "Os desenhos devem indicar a posição dos sumidouros, sarjetas e grelhas de drenagem pluvial nos arruamentos, com ligação à rede de coletores.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasDrainageGullies",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Sumidouros e drenagem: {drawings.hasDrainageGullies}",
+      "requiredValue": "Posição de sumidouros e ligação à rede de drenagem",
+      "remediation": "Indicar nos desenhos de arruamentos: posição de sumidouros e sarjetas (espaçamento máximo conforme caudal de projeto), tipo de grelha (classe de carga D400 para faixa de rodagem, C250 para passeios), ligação aos coletores pluviais (diâmetro e pendente), caixas de visita com cotas de soleira e tampa, e sentido de escoamento das águas pluviais. Dimensionar conforme o período de retorno regulamentar (T=5 ou T=10 anos).",
+      "enabled": true,
+      "tags": [
+        "arruamentos",
+        "drenagem",
+        "sumidouros",
+        "pluvial",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ARRUAM-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Art. 12.º — Mobiliário urbano",
+      "description": "Os desenhos de arruamentos devem indicar a posição do mobiliário urbano: candeeiros, bancos, papeleiras, caldeiras de árvores, pilaretes e sinalização vertical.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasStreetFurniturePositions",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mobiliário urbano: {drawings.hasStreetFurniturePositions}",
+      "requiredValue": "Posições de mobiliário urbano indicadas nos desenhos",
+      "remediation": "Indicar nos desenhos de arruamentos a posição de todo o mobiliário urbano: iluminação pública (tipo de luminária, altura do poste, espaçamento), bancos e assentos, papeleiras, caldeiras de árvores (espécie, diâmetro), pilaretes e balizas, paragens de autocarro, sinalização vertical (trânsito e direcional), marcos de incêndio e marcos de correio. Verificar que o mobiliário não obstrui a largura livre de passagem nos passeios (mínimo 1.20m).",
+      "enabled": true,
+      "tags": [
+        "arruamentos",
+        "mobiliário",
+        "urbano",
+        "urbanização",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ARRUAM-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º, Art. 12.º e DL 163/2006 — Passadeiras acessíveis",
+      "description": "Os desenhos devem indicar a marcação de passadeiras com rebaixamento de passeios, piso tátil e condições de acessibilidade conforme DL 163/2006.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasAccessibleCrossingMarkings",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Passadeiras acessíveis: {drawings.hasAccessibleCrossingMarkings}",
+      "requiredValue": "Passadeiras com rebaixamento e piso tátil conforme DL 163/2006",
+      "remediation": "Indicar nos desenhos a marcação de passadeiras acessíveis: rebaixamento do passeio com rampa máxima de 8%, largura mínima da rampa de 1.50m, piso tátil direcional e de alerta (cor contrastante), alinhamento com passadeira pintada na faixa de rodagem, e proteção lateral quando necessário. Garantir continuidade do percurso acessível em ambos os lados da travessia. Conforme DL 163/2006 e normas técnicas de acessibilidade.",
+      "enabled": true,
+      "tags": [
+        "arruamentos",
+        "acessibilidade",
+        "passadeiras",
+        "DL163",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTALEIRO-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º e DL 273/2003 — Planta do estaleiro de obra",
+      "description": "O projeto deve incluir planta de organização do estaleiro de obra, com indicação das instalações sociais, escritórios, áreas de trabalho e circulações internas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSiteCompoundLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta do estaleiro: {drawings.hasSiteCompoundLayout}",
+      "requiredValue": "Planta de organização do estaleiro de obra",
+      "remediation": "Incluir planta de organização do estaleiro com: vedação perimetral (tipo e altura), portaria e controlo de acessos, instalações sociais (vestiários, refeitório, instalações sanitárias), escritório de obra, posto de primeiros socorros, zona de reunião de emergência, circulações pedonais e viárias internas (com sentidos de circulação), e identificação de todas as áreas funcionais. Escala 1:200 ou 1:500. Conforme DL 273/2003 e PSS.",
+      "enabled": true,
+      "tags": [
+        "estaleiro",
+        "organização",
+        "planta",
+        "segurança",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTALEIRO-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º e DL 273/2003 — Áreas de armazenamento de materiais",
+      "description": "A planta de estaleiro deve identificar as áreas de armazenamento de materiais, diferenciando materiais a granel, pré-fabricados, materiais perigosos e resíduos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasMaterialStorageAreas",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Áreas de armazenamento: {drawings.hasMaterialStorageAreas}",
+      "requiredValue": "Áreas de armazenamento de materiais identificadas",
+      "remediation": "Identificar na planta de estaleiro as áreas de armazenamento: zona de agregados e materiais a granel (com contenção), parque de armaduras de aço (com cobertura), armazém fechado para materiais sensíveis (cimento, tintas, impermeabilizantes), zona de pré-fabricados com área de manobra, parque de materiais perigosos (com bacia de retenção e sinalização), e parque de resíduos com separação por tipo (RCD, RSU, perigosos). Indicar capacidade e condições de acesso.",
+      "enabled": true,
+      "tags": [
+        "estaleiro",
+        "armazenamento",
+        "materiais",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTALEIRO-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º e DL 273/2003 — Raio de ação da grua",
+      "description": "A planta de estaleiro deve indicar o raio de ação da grua-torre, verificando que não invade propriedades vizinhas, vias públicas ou zonas de exclusão sem autorização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasCraneSwingRadius",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Raio de grua indicado: {drawings.hasCraneSwingRadius}",
+      "requiredValue": "Raio de ação da grua-torre com verificação de interferências",
+      "remediation": "Indicar na planta de estaleiro: posição da grua-torre (base e fixação), raio máximo de ação (lança), zona de contra-lança, capacidade de carga por raio (diagrama), altura sob gancho, e verificação de interferências com: propriedades vizinhas (necessidade de autorização para sobrevoo), linhas elétricas aéreas (distância mínima de segurança), vias públicas (autorização camarária), e outras gruas no estaleiro (zonas de sobreposição). Conforme DL 273/2003.",
+      "enabled": true,
+      "tags": [
+        "estaleiro",
+        "grua",
+        "raio",
+        "segurança",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTALEIRO-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º e DL 273/2003 — Acessos ao estaleiro",
+      "description": "A planta de estaleiro deve definir os acessos de entrada e saída de veículos e peões, com indicação de sinalização, controlo e condições de limpeza de rodados.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasSiteAccessEgress",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Acessos ao estaleiro: {drawings.hasSiteAccessEgress}",
+      "requiredValue": "Acessos de entrada e saída definidos com sinalização",
+      "remediation": "Definir na planta de estaleiro os acessos: entrada e saída de veículos pesados (separadas quando possível, com raio de viragem adequado), entrada pedonal com portaria, sistema de limpeza de rodados (lava-rodas ou rampa de limpeza), sinalização de entrada/saída na via pública (conforme código da estrada), horário de funcionamento, e medidas de controlo de poeiras e lamas na via pública. Indicar eventuais condicionamentos de tráfego e licenças de ocupação de via pública.",
+      "enabled": true,
+      "tags": [
+        "estaleiro",
+        "acessos",
+        "entrada",
+        "saída",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTALEIRO-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º e DL 273/2003 — Infraestruturas temporárias do estaleiro",
+      "description": "A planta de estaleiro deve indicar as infraestruturas temporárias: abastecimento de água, energia elétrica provisória, iluminação, drenagem provisória e telecomunicações.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasTemporaryUtilities",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Infraestruturas temporárias: {drawings.hasTemporaryUtilities}",
+      "requiredValue": "Infraestruturas temporárias do estaleiro indicadas",
+      "remediation": "Indicar na planta de estaleiro as infraestruturas temporárias: ponto de ligação de água provisória (com contador), quadro elétrico de obra (QEO) com localização e potência, iluminação de estaleiro (postes e projetores), rede de drenagem provisória (para controlo de águas pluviais e freáticas durante a construção), fossa séptica ou ligação provisória a saneamento, e ligação de telecomunicações. Indicar traçado de cabos e tubagens provisórias e medidas de proteção.",
+      "enabled": true,
+      "tags": [
+        "estaleiro",
+        "infraestruturas",
+        "temporárias",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VERMEL-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE — Dimensões as-built",
+      "description": "As telas finais devem incluir dimensões reais medidas em obra (as-built), com indicação dos desvios relativamente ao projeto aprovado e tolerâncias admissíveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "==",
+          "value": "telas finais"
+        },
+        {
+          "field": "drawings.hasAsBuiltDimensions",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Dimensões as-built: {drawings.hasAsBuiltDimensions}",
+      "requiredValue": "Dimensões reais medidas em obra com indicação de desvios",
+      "remediation": "Incluir nas telas finais as dimensões reais medidas em obra para todos os elementos principais: implantação (posição e dimensões do edifício), estrutura (secções de pilares, vigas, lajes), vãos (largura e altura efetivas), pé-direito por compartimento, e cotas altimétricas (soleira, pisos, cobertura). Indicar os desvios relativamente ao projeto aprovado e verificar que se encontram dentro das tolerâncias admissíveis (geralmente ±2cm para cotas de construção).",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "as-built",
+        "dimensões",
+        "medição",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VERMEL-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE — Marcação vermelho-amarelo",
+      "description": "As telas finais devem utilizar o sistema de cores vermelho-amarelo: vermelho para elementos demolidos/removidos e amarelo para elementos novos/alterados, permitindo identificação imediata das modificações.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "==",
+          "value": "telas finais"
+        },
+        {
+          "field": "drawings.hasRedYellowMarkings",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Marcação vermelho-amarelo: {drawings.hasRedYellowMarkings}",
+      "requiredValue": "Sistema vermelho (demolido) / amarelo (novo) aplicado",
+      "remediation": "Aplicar nas telas finais o sistema normalizado de cores: VERMELHO para elementos que foram demolidos, removidos ou alterados relativamente ao projeto aprovado; AMARELO para elementos novos, acrescentados ou modificados durante a construção. Os elementos que se mantêm conforme o projeto aprovado devem permanecer em cor preta. Incluir legenda explicativa do código de cores em cada folha.",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "vermelho",
+        "amarelo",
+        "alterações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VERMEL-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE — Registo de desvios",
+      "description": "As telas finais devem incluir registo de desvios (deviation register) com listagem de todas as alterações relativamente ao projeto aprovado, justificação técnica e aprovação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "==",
+          "value": "telas finais"
+        },
+        {
+          "field": "drawings.hasDeviationRegister",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Registo de desvios: {drawings.hasDeviationRegister}",
+      "requiredValue": "Registo de desvios com listagem e justificação das alterações",
+      "remediation": "Incluir nas telas finais registo de desvios em formato tabular: número sequencial, localização (piso, compartimento, elemento), descrição da alteração, justificação técnica, impacto nas condições do projeto aprovado (estrutural, térmica, acústica, SCIE), responsável pela decisão, data da alteração, e referência ao desenho atualizado. Classificar os desvios em: menores (sem impacto regulamentar), significativos (requerem comunicação à câmara) e essenciais (requerem aditamento ao projeto).",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "desvios",
+        "registo",
+        "alterações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VERMEL-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE — Verificação de medições",
+      "description": "As telas finais devem ser acompanhadas de documento de verificação de medições, confirmando que as dimensões registadas foram verificadas por técnico habilitado com instrumentação adequada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "==",
+          "value": "telas finais"
+        },
+        {
+          "field": "drawings.hasMeasurementVerification",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Verificação de medições: {drawings.hasMeasurementVerification}",
+      "requiredValue": "Documento de verificação de medições por técnico habilitado",
+      "remediation": "Incluir documento de verificação de medições assinado por técnico habilitado (engenheiro ou arquiteto), confirmando: instrumento de medição utilizado (distanciómetro laser, estação total, GNSS), precisão do equipamento, data das medições, pontos de controlo verificados, e declaração de conformidade das dimensões registadas nas telas finais. Para obras de maior dimensão, incluir relatório topográfico de verificação.",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "medições",
+        "verificação",
+        "topografia",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VERMEL-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE — Referência ao levantamento final",
+      "description": "As telas finais devem referenciar o levantamento topográfico final do edifício construído, com coordenadas georreferenciadas e ligação ao cadastro predial.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "==",
+          "value": "telas finais"
+        },
+        {
+          "field": "drawings.hasFinalSurveyReference",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Referência ao levantamento final: {drawings.hasFinalSurveyReference}",
+      "requiredValue": "Referência ao levantamento topográfico final georreferenciado",
+      "remediation": "Incluir nas telas finais referência ao levantamento topográfico final: identificação do topógrafo responsável (nome e cédula profissional), data do levantamento, sistema de coordenadas utilizado (PT-TM06/ETRS89), datum altimétrico, lista de vértices com coordenadas, implantação georreferenciada do edifício construído, e ligação ao cadastro predial (artigo matricial atualizado). O levantamento deve ser entregue em formato digital (DWG e SHP) para integração no SIG municipal.",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "levantamento",
+        "topografia",
+        "georreferenciação",
+        "portaria-701h"
+      ]
     }
   ]
 }
