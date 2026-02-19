@@ -3469,6 +3469,637 @@
         "via-pública",
         "RJUE"
       ]
+    },
+    {
+      "id": "PDM-ESCLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 20.º — Parecer Prévio para Edificação junto a Escola",
+      "description": "O licenciamento de atividades potencialmente incompatíveis (indústria, postos de combustível, diversão noturna) junto a estabelecimentos de ensino requer parecer prévio favorável da Direção-Geral dos Estabelecimentos Escolares (DGEstE) quando a distância seja inferior ao limiar definido no PDM.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToSchool",
+          "operator": "<",
+          "value": 200
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "posto_combustivel",
+            "bar_noturno",
+            "discoteca"
+          ]
+        },
+        {
+          "field": "municipal.schoolProximityOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à escola: {municipal.distanceToSchool} m | Parecer DGEstE: {municipal.schoolProximityOpinionObtained}",
+      "requiredValue": "Parecer prévio favorável da DGEstE obtido (schoolProximityOpinionObtained = true)",
+      "remediation": "Solicitar parecer prévio à DGEstE sobre a compatibilidade do uso proposto com a proximidade ao estabelecimento de ensino. A câmara municipal não pode emitir alvará de construção sem este parecer. O prazo de emissão do parecer é de 20 dias úteis (Art. 13.º do RJUE).",
+      "enabled": true,
+      "tags": [
+        "escola",
+        "parecer",
+        "DGEstE",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-HOSPLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 20.º — Parecer da ARS para Edificação junto a Hospital",
+      "description": "O licenciamento de atividades geradoras de ruído, vibrações ou emissões atmosféricas junto a unidades hospitalares requer parecer prévio favorável da Administração Regional de Saúde (ARS) quando a distância seja inferior ao limiar definido no PDM.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToHospital",
+          "operator": "<",
+          "value": 300
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "oficina_mecanica",
+            "discoteca",
+            "armazem_perigoso"
+          ]
+        },
+        {
+          "field": "municipal.healthAuthorityOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância ao hospital: {municipal.distanceToHospital} m | Parecer ARS: {municipal.healthAuthorityOpinionObtained}",
+      "requiredValue": "Parecer prévio favorável da ARS obtido (healthAuthorityOpinionObtained = true)",
+      "remediation": "Solicitar parecer prévio à Administração Regional de Saúde sobre a compatibilidade da atividade proposta com a proximidade à unidade hospitalar. Incluir estudo de impacte acústico e plano de mitigação. A câmara municipal não pode deferir o licenciamento sem este parecer (Art. 20.º do RJUE).",
+      "enabled": true,
+      "tags": [
+        "hospital",
+        "parecer",
+        "ARS",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-CEMLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 411/98 — Parecer Sanitário para Construção junto a Cemitério",
+      "description": "O licenciamento de edificação dentro da zona de influência de cemitério (100 m) requer parecer da autoridade de saúde pública (delegado de saúde) sobre as condições sanitárias, nomeadamente a proteção das águas subterrâneas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.distanceToCemetery",
+          "operator": "<",
+          "value": 100
+        },
+        {
+          "field": "municipal.healthOfficerOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância ao cemitério: {municipal.distanceToCemetery} m | Parecer sanitário: {municipal.healthOfficerOpinionObtained}",
+      "requiredValue": "Parecer do delegado de saúde obtido (healthOfficerOpinionObtained = true)",
+      "remediation": "Solicitar parecer à autoridade de saúde pública (delegado de saúde concelhio) sobre as condições sanitárias da edificação na proximidade do cemitério. O parecer deve abordar: qualidade das águas subterrâneas, risco de contaminação, e adequação do sistema de drenagem proposto. Juntar ao processo de licenciamento.",
+      "enabled": true,
+      "tags": [
+        "cemitério",
+        "parecer-sanitário",
+        "delegado-saúde",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-COMBLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 267/2002 — Licenciamento de Posto de Combustível",
+      "description": "A instalação de postos de abastecimento de combustível requer, para além da licença municipal, autorização da Direção-Geral de Energia e Geologia (DGEG) e parecer da ANPC sobre segurança contra incêndio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "posto_combustivel"
+        },
+        {
+          "field": "municipal.dgegAuthorizationObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Autorização DGEG: {municipal.dgegAuthorizationObtained}",
+      "requiredValue": "Autorização da DGEG obtida para instalação de posto de combustível (dgegAuthorizationObtained = true)",
+      "remediation": "Submeter pedido de autorização à DGEG para instalação de posto de combustível, incluindo: projeto de instalações de armazenamento, projeto de segurança contra incêndio (com parecer da ANPC), estudo de impacte ambiental (se aplicável), e comprovativo de cumprimento das distâncias de segurança. A DGEG e a câmara municipal devem ambas aprovar o projeto.",
+      "enabled": true,
+      "tags": [
+        "posto-combustível",
+        "DGEG",
+        "ANPC",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-TELLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 11/2003 — Licenciamento de Infraestrutura de Telecomunicações",
+      "description": "A instalação de torres e estações de telecomunicações requer comunicação prévia à câmara municipal e autorização da ANACOM, incluindo estudo de conformidade com os níveis de referência de campos eletromagnéticos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "torre_telecomunicacoes",
+            "estacao_base_movel",
+            "antena_telecomunicacoes"
+          ]
+        },
+        {
+          "field": "municipal.anacomAuthorizationObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Autorização ANACOM: {municipal.anacomAuthorizationObtained}",
+      "requiredValue": "Autorização da ANACOM obtida (anacomAuthorizationObtained = true)",
+      "remediation": "Submeter pedido de autorização à ANACOM com estudo de conformidade EMF (Portaria 1421/2004). Simultaneamente, apresentar comunicação prévia ou pedido de licenciamento à câmara municipal para a componente urbanística da infraestrutura (torre, mastro, plataforma). Ambas as autorizações são necessárias antes do início da instalação.",
+      "enabled": true,
+      "tags": [
+        "telecomunicações",
+        "ANACOM",
+        "licenciamento",
+        "comunicação-prévia",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-EOLLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 76/2016 — Licenciamento de Parque Eólico",
+      "description": "A instalação de parques eólicos com potência superior a 20 MW está sujeita a procedimento de AIA obrigatório. Para potências entre 1 e 20 MW, aplica-se AIA por definição casuística. O licenciamento municipal é cumulativo com a licença de produção da DGEG.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "parque_eolico"
+        },
+        {
+          "field": "municipal.windFarmCapacityMW",
+          "operator": ">",
+          "value": 1
+        },
+        {
+          "field": "municipal.aiaDecisionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Potência: {municipal.windFarmCapacityMW} MW | Decisão AIA: {municipal.aiaDecisionObtained}",
+      "requiredValue": "Decisão de AIA favorável ou condicionalmente favorável obtida (aiaDecisionObtained = true)",
+      "remediation": "Submeter estudo de impacte ambiental (EIA) à APA no âmbito do procedimento de AIA. O EIA deve incluir: impacte acústico, impacte sobre avifauna e quirópteros, impacte visual e paisagístico, impacte sobre o uso do solo, e medidas de mitigação e compensação. Após decisão favorável da AIA, submeter projeto à DGEG para licença de produção e à câmara municipal para licenciamento urbanístico.",
+      "enabled": true,
+      "tags": [
+        "eólica",
+        "AIA",
+        "DGEG",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-FOTLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 15/2022 — Licenciamento de Central Fotovoltaica",
+      "description": "As centrais fotovoltaicas com potência superior a 1 MW requerem licença de produção da DGEG e licenciamento municipal. Para potências superiores a 50 MW, é obrigatório procedimento de AIA.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "parque_fotovoltaico"
+        },
+        {
+          "field": "municipal.solarFarmCapacityMW",
+          "operator": ">",
+          "value": 1
+        },
+        {
+          "field": "municipal.dgegProductionLicenseObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Potência: {municipal.solarFarmCapacityMW} MW | Licença DGEG: {municipal.dgegProductionLicenseObtained}",
+      "requiredValue": "Licença de produção da DGEG obtida (dgegProductionLicenseObtained = true)",
+      "remediation": "Submeter pedido de licença de produção à DGEG nos termos do DL 15/2022 (regime de licenciamento de centrais de produção de energia renovável). Para potências > 50 MW, submeter previamente EIA à APA. O licenciamento municipal é cumulativo e deve ser obtido junto da câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "fotovoltaico",
+        "DGEG",
+        "licença-produção",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-CHIMLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 78/2004 — Licença de Emissão para Chaminé Industrial",
+      "description": "A instalação ou alteração de fontes de emissão atmosférica (chaminés industriais) requer título de emissão atmosférica emitido pela CCDR, para além do licenciamento municipal da edificação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.hasIndustrialChimney",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.atmosphericEmissionPermitObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Título de emissão atmosférica: {municipal.atmosphericEmissionPermitObtained}",
+      "requiredValue": "Título de emissão atmosférica emitido pela CCDR (atmosphericEmissionPermitObtained = true)",
+      "remediation": "Submeter pedido de título de emissão atmosférica à CCDR competente, nos termos do DL 78/2004. O pedido deve incluir: caracterização das emissões (caudal, concentração de poluentes, temperatura), projeto da chaminé (altura, diâmetro, velocidade de saída), e estudo de dispersão atmosférica se exigido. A câmara municipal deve condicionar o alvará à obtenção do título de emissão.",
+      "enabled": true,
+      "tags": [
+        "chaminé-industrial",
+        "emissão-atmosférica",
+        "CCDR",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-ETARLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 226-A/2007 — Título de Utilização para Descarga de ETAR",
+      "description": "A construção ou ampliação de ETAR requer título de utilização de recursos hídricos (TURH) emitido pela APA/ARH para a descarga de efluentes tratados, para além do licenciamento municipal da edificação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "etar"
+        },
+        {
+          "field": "municipal.waterResourcesPermitObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "TURH obtido: {municipal.waterResourcesPermitObtained}",
+      "requiredValue": "Título de utilização de recursos hídricos emitido pela APA/ARH (waterResourcesPermitObtained = true)",
+      "remediation": "Submeter pedido de título de utilização de recursos hídricos (TURH) à APA/ARH para autorização de descarga de efluentes tratados no meio hídrico recetor. O pedido deve incluir: projeto da ETAR, caracterização do efluente tratado, identificação do meio recetor, e estudo de capacidade de diluição. A câmara municipal deve condicionar o alvará à obtenção do TURH.",
+      "enabled": true,
+      "tags": [
+        "ETAR",
+        "TURH",
+        "descarga",
+        "APA",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-ALBLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 107/2009 — Parecer para Construção em Zona de Albufeira",
+      "description": "O licenciamento de qualquer edificação na zona de proteção de albufeira de águas públicas (500 m) requer parecer prévio vinculativo da APA/ARH, que avalia a compatibilidade com o Plano de Ordenamento de Albufeira.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToReservoir",
+          "operator": "<",
+          "value": 500
+        },
+        {
+          "field": "municipal.reservoirAuthorityOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à albufeira: {municipal.distanceToReservoir} m | Parecer APA/ARH: {municipal.reservoirAuthorityOpinionObtained}",
+      "requiredValue": "Parecer favorável da APA/ARH obtido (reservoirAuthorityOpinionObtained = true)",
+      "remediation": "Solicitar parecer prévio à APA/ARH para construção na zona de proteção da albufeira. A câmara municipal está impedida de deferir o licenciamento sem parecer favorável. O parecer avalia a compatibilidade com o Plano de Ordenamento de Albufeira (POA) e as condições de proteção da qualidade da água.",
+      "enabled": true,
+      "tags": [
+        "albufeira",
+        "parecer",
+        "APA",
+        "ARH",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-NATLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 140/99 — Parecer ICNF para Licenciamento em Rede Natura 2000",
+      "description": "O licenciamento municipal de qualquer operação urbanística em sítio da Rede Natura 2000 requer parecer prévio vinculativo do ICNF, que avalia a necessidade e adequação da avaliação de incidências ambientais (AIncA).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInNatura2000Site",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.icnfOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em sítio Natura 2000: {municipal.isInNatura2000Site} | Parecer ICNF: {municipal.icnfOpinionObtained}",
+      "requiredValue": "Parecer do ICNF obtido para licenciamento em Rede Natura 2000 (icnfOpinionObtained = true)",
+      "remediation": "Solicitar parecer ao ICNF sobre a operação urbanística proposta em sítio Natura 2000. O ICNF determinará se é necessária AIncA e, em caso afirmativo, o âmbito do estudo. A câmara municipal não pode emitir alvará sem parecer favorável do ICNF (prazo de 20 dias úteis, Art. 13.º do RJUE).",
+      "enabled": true,
+      "tags": [
+        "Natura-2000",
+        "ICNF",
+        "parecer",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-RENLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 166/2008 — Parecer CCDR para Licenciamento em REN",
+      "description": "O licenciamento municipal de operações urbanísticas em terrenos integrados na REN requer parecer prévio vinculativo da CCDR, que avalia a compatibilidade da operação com as condicionantes da REN.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInREN",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.ccdrRenOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em REN: {municipal.isInREN} | Parecer CCDR: {municipal.ccdrRenOpinionObtained}",
+      "requiredValue": "Parecer favorável da CCDR obtido para operação em REN (ccdrRenOpinionObtained = true)",
+      "remediation": "Solicitar parecer à CCDR competente sobre a compatibilidade da operação urbanística com as condicionantes da REN. A CCDR verificará se a ação é isenta (Anexo I do DL 166/2008), compatível (Anexo II) ou proibida. A câmara municipal não pode deferir o licenciamento sem parecer favorável da CCDR.",
+      "enabled": true,
+      "tags": [
+        "REN",
+        "CCDR",
+        "parecer",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-RANLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 73/2009 — Parecer DRAP para Licenciamento em RAN",
+      "description": "O licenciamento municipal de operações urbanísticas em terrenos integrados na RAN requer parecer prévio vinculativo da DRAP (Direção Regional de Agricultura e Pescas), que avalia a admissibilidade da utilização não agrícola.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInRAN",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.drapRanOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em RAN: {municipal.isInRAN} | Parecer DRAP: {municipal.drapRanOpinionObtained}",
+      "requiredValue": "Parecer favorável da DRAP obtido para operação em RAN (drapRanOpinionObtained = true)",
+      "remediation": "Solicitar parecer à DRAP competente sobre a admissibilidade da utilização não agrícola em solo RAN, nos termos do Art. 22.º do DL 73/2009. A câmara municipal não pode deferir o licenciamento sem parecer favorável da DRAP. O prazo de emissão do parecer é de 20 dias úteis.",
+      "enabled": true,
+      "tags": [
+        "RAN",
+        "DRAP",
+        "parecer",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-DOMLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / Lei 54/2005 — Parecer APA para Construção em Domínio Público Marítimo",
+      "description": "O licenciamento de qualquer estrutura no domínio público marítimo ou na faixa de proteção costeira requer parecer prévio vinculativo da APA e, quando aplicável, do POOC (Plano de Ordenamento da Orla Costeira).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToCoastline",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "municipal.apaCoastalOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à costa: {municipal.distanceToCoastline} m | Parecer APA: {municipal.apaCoastalOpinionObtained}",
+      "requiredValue": "Parecer favorável da APA para intervenção em DPM (apaCoastalOpinionObtained = true)",
+      "remediation": "Solicitar parecer à APA para intervenção no domínio público marítimo ou faixa de proteção costeira. Verificar compatibilidade com o POOC aplicável. A APA avaliará o risco de erosão costeira, impacte sobre ecossistemas dunares e litorais, e conformidade com a Estratégia Nacional de Gestão Integrada da Zona Costeira.",
+      "enabled": true,
+      "tags": [
+        "domínio-marítimo",
+        "APA",
+        "POOC",
+        "parecer",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-RIPLIC-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 226-A/2007 — Título de Utilização para Construção em Margem de Curso de Água",
+      "description": "A construção na margem de cursos de água (domínio público hídrico fluvial) requer título de utilização de recursos hídricos (TURH) emitido pela APA/ARH, para além do licenciamento municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWatercourse",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.isInPublicWaterDomain",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.waterDomainUtilizationTitleObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em DPH fluvial: {municipal.isInPublicWaterDomain} | TURH: {municipal.waterDomainUtilizationTitleObtained}",
+      "requiredValue": "Título de utilização do domínio público hídrico obtido (waterDomainUtilizationTitleObtained = true)",
+      "remediation": "Submeter pedido de título de utilização de recursos hídricos (TURH) à APA/ARH para construção na margem de curso de água. O pedido deve demonstrar que a construção não compromete o leito, margens e zona inundável do curso de água. A câmara municipal deve condicionar o alvará à obtenção do TURH.",
+      "enabled": true,
+      "tags": [
+        "domínio-hídrico",
+        "TURH",
+        "margem",
+        "APA",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-DENSLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 44.º — Verificação de Parâmetros Urbanísticos em Loteamento",
+      "description": "Na apreciação de pedido de licenciamento de operação de loteamento, a câmara municipal deve verificar a conformidade dos parâmetros urbanísticos propostos (densidade, taxa de cobertura, FAR) com os limites fixados no PDM e no programa da operação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "municipal.urbanParametersVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Parâmetros urbanísticos verificados: {municipal.urbanParametersVerified}",
+      "requiredValue": "Parâmetros urbanísticos (densidade, cobertura, FAR) verificados conforme PDM (urbanParametersVerified = true)",
+      "remediation": "Verificar e documentar a conformidade de todos os parâmetros urbanísticos do loteamento com o PDM: (1) densidade de construção (edifícios/ha); (2) taxa de cobertura por lote; (3) índice de área bruta de construção (FAR); (4) cércea máxima; (5) índice de implantação; (6) índice de utilização. Incluir memória de cálculo detalhada no processo de licenciamento.",
+      "enabled": true,
+      "tags": [
+        "loteamento",
+        "parâmetros-urbanísticos",
+        "densidade",
+        "FAR",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-FARLIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 44.º — Memória de Cálculo do FAR em Licenciamento",
+      "description": "O processo de licenciamento de edificação deve incluir memória de cálculo do índice de área bruta de construção (FAR), discriminando as áreas contabilizáveis e não contabilizáveis (garagens, arrumos, áreas técnicas), conforme o regulamento do PDM.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "municipal.operationType",
+          "operator": "in",
+          "value": [
+            "construcao_nova",
+            "ampliacao",
+            "loteamento"
+          ]
+        },
+        {
+          "field": "municipal.farCalculationIncluded",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Memória de cálculo FAR incluída: {municipal.farCalculationIncluded}",
+      "requiredValue": "Memória de cálculo do FAR incluída no processo (farCalculationIncluded = true)",
+      "remediation": "Incluir no processo de licenciamento memória de cálculo detalhada do FAR, discriminando: (1) área bruta de construção por piso; (2) áreas não contabilizáveis (garagens, arrumos em cave, varandas abertas, áreas técnicas), conforme definição do regulamento do PDM; (3) área do terreno/lote; (4) cálculo final do FAR. A ausência desta memória pode originar pedido de esclarecimento pela câmara, atrasando o processo.",
+      "enabled": true,
+      "tags": [
+        "FAR",
+        "memória-cálculo",
+        "ABC",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-AQULIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / Lei 58/2005 — Parecer APA para Construção em Perímetro de Proteção de Aquífero",
+      "description": "O licenciamento de qualquer operação urbanística em perímetro de proteção de captação de água subterrânea requer parecer prévio vinculativo da APA/ARH, que avalia a compatibilidade do uso proposto com a proteção do recurso hídrico subterrâneo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInAquiferProtectionZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.apaAquiferOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em perímetro de proteção de aquífero: {municipal.isInAquiferProtectionZone} | Parecer APA: {municipal.apaAquiferOpinionObtained}",
+      "requiredValue": "Parecer favorável da APA/ARH obtido (apaAquiferOpinionObtained = true)",
+      "remediation": "Solicitar parecer prévio à APA/ARH sobre a compatibilidade da operação urbanística com o perímetro de proteção de captação de água subterrânea. A câmara municipal não pode deferir o licenciamento sem parecer favorável. O parecer avaliará o risco de contaminação do aquífero face ao uso proposto.",
+      "enabled": true,
+      "tags": [
+        "aquífero",
+        "APA",
+        "ARH",
+        "parecer",
+        "licenciamento",
+        "RJUE"
+      ]
+    },
+    {
+      "id": "PDM-ETAPROX-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / Lei 58/2005 — Parecer da Entidade Gestora para Construção junto a ETA",
+      "description": "O licenciamento de atividades potencialmente contaminantes na proximidade de estações de tratamento de água (ETA) para consumo humano requer parecer da entidade gestora do sistema de abastecimento de água e da APA/ARH.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWaterTreatmentPlant",
+          "operator": "<",
+          "value": 200
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "armazem_perigoso",
+            "suinicultura",
+            "avicultura",
+            "posto_combustivel"
+          ]
+        },
+        {
+          "field": "municipal.waterUtilityOpinionObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à ETA: {municipal.distanceToWaterTreatmentPlant} m | Parecer entidade gestora: {municipal.waterUtilityOpinionObtained}",
+      "requiredValue": "Parecer da entidade gestora do abastecimento de água obtido (waterUtilityOpinionObtained = true)",
+      "remediation": "Solicitar parecer à entidade gestora do sistema de abastecimento de água (Águas de Portugal, serviço municipal ou concessionária) e à APA/ARH sobre a compatibilidade da atividade proposta com a proteção da ETA. A câmara municipal deve condicionar o licenciamento à obtenção deste parecer.",
+      "enabled": true,
+      "tags": [
+        "ETA",
+        "entidade-gestora",
+        "abastecimento-água",
+        "parecer",
+        "licenciamento",
+        "RJUE"
+      ]
     }
   ]
 }

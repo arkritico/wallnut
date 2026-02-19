@@ -8186,6 +8186,1391 @@
         "fluxo-específico",
         "meta"
       ]
+    },
+    {
+      "id": "RCD-SEGRCD-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º — Seguro de Responsabilidade Civil para Gestão de RCD",
+      "description": "O produtor de RCD é obrigado a dispor de seguro de responsabilidade civil que cubra danos ambientais decorrentes da gestão inadequada de resíduos de construção e demolição, com capital mínimo de 50.000€ para obras de classe 1 e 250.000€ para classes superiores.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasWasteInsurance",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Seguro de RC para RCD: {waste.hasWasteInsurance}",
+      "requiredValue": "Seguro de responsabilidade civil para gestão de RCD obrigatório",
+      "remediation": "Contratar seguro de responsabilidade civil para gestão de RCD: 1) Verificar classe da obra (alvará); 2) Capital mínimo: 50.000€ (classe 1), 100.000€ (classe 2-3), 250.000€ (classe 4+); 3) Cobertura deve incluir: danos ambientais, contaminação de solos, custos de descontaminação; 4) Apólice deve ser específica para RCD ou cláusula de extensão do seguro de obra; 5) Entregar cópia ao dono de obra antes do início dos trabalhos.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "responsabilidade-civil",
+        "RCD",
+        "obrigatório"
+      ]
+    },
+    {
+      "id": "RCD-SEGRCD-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º, n.º 2 — Capital Seguro Proporcional ao Volume de RCD",
+      "description": "O capital seguro deve ser proporcional ao volume estimado de RCD no PPG. Para obras que prevejam mais de 500 toneladas de RCD, o capital mínimo do seguro sobe para 500.000€, incluindo cobertura para transporte e destino final.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.estimatedWasteTonnes",
+          "operator": ">",
+          "value": 500
+        },
+        {
+          "field": "waste.insuranceCapitalEur",
+          "operator": "<",
+          "value": 500000
+        }
+      ],
+      "currentValueTemplate": "Capital seguro RCD: {waste.insuranceCapitalEur}€ (estimativa RCD: {waste.estimatedWasteTonnes} t)",
+      "requiredValue": "Capital seguro ≥500.000€ para obras com >500 t de RCD",
+      "remediation": "Aumentar capital do seguro de RCD: 1) Rever estimativa de RCD no PPG; 2) Se >500 t: renegociar apólice para capital ≥500.000€; 3) Incluir cláusulas de cobertura de transporte e operadores de destino final; 4) Verificar se apólice cobre subempreiteiros; 5) Atualizar seguro se volume estimado aumentar durante a obra.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "capital",
+        "volume-RCD",
+        "proporcional"
+      ]
+    },
+    {
+      "id": "RCD-SEGRCD-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º, n.º 3 — Seguro de Resíduos Perigosos em Obra",
+      "description": "Obras que envolvam remoção ou manuseamento de resíduos perigosos (amianto, PCB, tintas com chumbo) devem dispor de seguro específico adicional para riscos de contaminação, com cobertura mínima de 100.000€ por sinistro.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasHazardousWaste",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.hasHazardousWasteInsurance",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Seguro perigosos: {waste.hasHazardousWasteInsurance} (resíduos perigosos: {waste.hasHazardousWaste})",
+      "requiredValue": "Seguro específico para resíduos perigosos obrigatório",
+      "remediation": "Contratar seguro adicional para resíduos perigosos: 1) Identificar todos os fluxos perigosos na obra (amianto, PCB, chumbo, solventes); 2) Capital mínimo: 100.000€ por sinistro; 3) Cobertura deve incluir: descontaminação, monitorização ambiental pós-incidente, custos de saúde de trabalhadores expostos; 4) Apólice separada ou extensão do seguro de responsabilidade ambiental; 5) Manter vigente até encerramento de todas as e-GAR de resíduos perigosos.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "perigosos",
+        "contaminação",
+        "apólice"
+      ]
+    },
+    {
+      "id": "RCD-COORDRCD-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 15.º — Coordenador de Gestão de RCD",
+      "description": "Obras com valor superior a 500.000€ ou que produzam mais de 200 toneladas de RCD devem designar um coordenador de gestão de resíduos com formação específica em gestão de RCD, mínimo de 40 horas de formação certificada e 3 anos de experiência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasWasteCoordinator",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.projectValueEur",
+          "operator": ">",
+          "value": 500000
+        }
+      ],
+      "currentValueTemplate": "Coordenador de RCD: {waste.hasWasteCoordinator}",
+      "requiredValue": "Coordenador de gestão de RCD designado e qualificado",
+      "remediation": "Designar coordenador de gestão de RCD: 1) Qualificações mínimas: licenciatura em engenharia do ambiente, civil ou similar; 2) Formação certificada em gestão de RCD (≥40h, entidade acreditada DGERT); 3) Experiência mínima de 3 anos em gestão de resíduos em obra; 4) Conhecimento do DL 46/2008 e DL 102-D/2020; 5) Responsabilidades: supervisão de triagem, verificação de e-GAR, auditorias internas, comunicação com APA; 6) Incluir no plano de segurança e saúde.",
+      "enabled": true,
+      "tags": [
+        "coordenador",
+        "qualificações",
+        "formação",
+        "designação"
+      ]
+    },
+    {
+      "id": "RCD-COORDRCD-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 15.º, n.º 2 — Registo de Qualificações do Coordenador de RCD",
+      "description": "O coordenador de gestão de RCD deve possuir certificado de formação profissional válido (renovado a cada 3 anos), registo na Ordem dos Engenheiros ou Técnicos e comprovativo de experiência em gestão de pelo menos 3 obras com PPG aprovado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.coordinatorCertificateValid",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Certificado coordenador RCD: {waste.coordinatorCertificateValid}",
+      "requiredValue": "Certificado de formação válido e registado",
+      "remediation": "Verificar qualificações do coordenador: 1) Certificado de formação em gestão de RCD (entidade DGERT, ≥40h); 2) Validade do certificado (renovação a cada 3 anos); 3) Inscrição na Ordem dos Engenheiros ou ANET; 4) Portfolio de 3+ obras com PPG aprovado; 5) Formação adicional em resíduos perigosos se aplicável; 6) Manter cópia dos certificados no estaleiro; 7) Incluir identificação do coordenador no livro de obra.",
+      "enabled": true,
+      "tags": [
+        "coordenador",
+        "certificado",
+        "qualificações",
+        "validade"
+      ]
+    },
+    {
+      "id": "RCD-COORDRCD-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 22.º — Formação Contínua do Coordenador de Resíduos",
+      "description": "O coordenador de resíduos deve participar em ações de formação contínua anuais (mínimo 8 horas/ano) sobre atualizações legislativas, novas tecnologias de reciclagem, economia circular e boas práticas de gestão de RCD.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.coordinatorAnnualTrainingHours",
+          "operator": "<",
+          "value": 8
+        }
+      ],
+      "currentValueTemplate": "Formação anual do coordenador: {waste.coordinatorAnnualTrainingHours}h",
+      "requiredValue": "Mínimo 8h/ano de formação contínua",
+      "remediation": "Assegurar formação contínua do coordenador de resíduos: 1) Mínimo 8h/ano de formação certificada; 2) Temas recomendados: alterações legislativas (DL, Portarias), economia circular, novas tecnologias de triagem e reciclagem; 3) Participação em conferências do setor (ex: Conferência Nacional de Resíduos); 4) Formação online aceite se certificada; 5) Registar e arquivar certificados de participação; 6) Incluir plano de formação no relatório anual de gestão de RCD.",
+      "enabled": true,
+      "tags": [
+        "coordenador",
+        "formação-contínua",
+        "atualização",
+        "anual"
+      ]
+    },
+    {
+      "id": "RCD-REVPPG-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 4 — Revisão Periódica do PPG",
+      "description": "O Plano de Prevenção e Gestão de RCD deve ser revisto trimestralmente em obras com duração superior a 12 meses, ou sempre que haja alterações significativas ao projeto que impactem a produção de resíduos em mais de 20%.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.ppgReviewMonthsElapsed",
+          "operator": ">",
+          "value": 3
+        },
+        {
+          "field": "waste.projectDurationMonths",
+          "operator": ">",
+          "value": 12
+        }
+      ],
+      "currentValueTemplate": "Última revisão do PPG: há {waste.ppgReviewMonthsElapsed} meses",
+      "requiredValue": "Revisão do PPG a cada 3 meses (obras >12 meses)",
+      "remediation": "Rever o PPG trimestralmente: 1) Comparar estimativa inicial de RCD com produção real; 2) Atualizar códigos LER e quantidades previstas; 3) Verificar se operadores de destino final continuam licenciados; 4) Ajustar metodologias de triagem se taxas de desvio estiverem abaixo da meta; 5) Registar a revisão com data e responsável; 6) Comunicar alterações significativas à câmara municipal; 7) Anexar nova versão ao livro de obra.",
+      "enabled": true,
+      "tags": [
+        "PPG",
+        "revisão",
+        "trimestral",
+        "atualização"
+      ]
+    },
+    {
+      "id": "RCD-REVPPG-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 5 — Revisão do PPG por Alteração de Projeto",
+      "description": "Qualquer alteração ao projeto que implique variação superior a 20% na estimativa de RCD (por fluxo ou global) obriga à revisão imediata do PPG e comunicação à câmara municipal no prazo de 15 dias úteis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.ppgWasteVariationPercent",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "waste.ppgRevisedForVariation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Variação de RCD vs. PPG: {waste.ppgWasteVariationPercent}%",
+      "requiredValue": "PPG revisto se variação >20%",
+      "remediation": "Rever PPG imediatamente: 1) Calcular variação real vs. estimativa PPG por fluxo; 2) Se >20% (global ou fluxo específico): obrigatória revisão formal; 3) Atualizar quantidades estimadas com dados reais; 4) Rever capacidade de armazenamento e contentores; 5) Verificar disponibilidade de operadores de destino final; 6) Comunicar à câmara municipal no prazo de 15 dias úteis; 7) Obter nova aprovação se requerido; 8) Arquivar versão anterior e nova versão.",
+      "enabled": true,
+      "tags": [
+        "PPG",
+        "revisão",
+        "alteração-projeto",
+        "variação"
+      ]
+    },
+    {
+      "id": "RCD-AUDITCERT-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 49.º, n.º 5 — Auditoria de RCD por Entidade Terceira Certificada",
+      "description": "Obras de valor superior a 2.000.000€ devem ser auditadas por entidade terceira acreditada pelo IPAC para verificação da conformidade do sistema de gestão de RCD, incluindo triagem, registos, e-GAR e taxas de desvio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.projectValueEur",
+          "operator": ">",
+          "value": 2000000
+        },
+        {
+          "field": "waste.hasThirdPartyAudit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Auditoria terceira certificada: {waste.hasThirdPartyAudit}",
+      "requiredValue": "Auditoria por entidade acreditada IPAC obrigatória para obras >2M€",
+      "remediation": "Contratar auditoria de RCD por entidade certificada: 1) Selecionar entidade acreditada pelo IPAC (ISO 14001 ou ISO 19011); 2) Âmbito: conformidade com PPG, triagem em obra, registos e-GAR, taxas de desvio, armazenamento de perigosos; 3) Frequência: no mínimo no final da obra (antes da vistoria final); 4) Para obras >24 meses: auditoria intermédia obrigatória; 5) Relatório de auditoria deve ser entregue ao dono de obra e disponível para fiscalização.",
+      "enabled": true,
+      "tags": [
+        "auditoria",
+        "terceira-parte",
+        "IPAC",
+        "certificação"
+      ]
+    },
+    {
+      "id": "RCD-AUDITCERT-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 49.º, n.º 6 — Relatório de Auditoria e Ações Corretivas",
+      "description": "O relatório de auditoria de RCD por entidade terceira deve identificar não-conformidades, classificá-las por gravidade e estabelecer prazo para ações corretivas. Não-conformidades críticas devem ser resolvidas em 10 dias úteis.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.auditNonConformitiesOpen",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "waste.auditCorrectiveActionsDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Não-conformidades abertas: {waste.auditNonConformitiesOpen}",
+      "requiredValue": "Todas as não-conformidades de auditoria resolvidas",
+      "remediation": "Resolver não-conformidades de auditoria: 1) Classificar por gravidade: crítica (10 dias úteis), maior (30 dias), menor (60 dias); 2) Atribuir responsável por cada ação corretiva; 3) Implementar medidas imediatas para não-conformidades críticas (suspensão de atividades de risco se necessário); 4) Documentar evidências de resolução; 5) Solicitar verificação de fecho à entidade auditora; 6) Integrar lições aprendidas no PPG.",
+      "enabled": true,
+      "tags": [
+        "auditoria",
+        "não-conformidades",
+        "ações-corretivas",
+        "prazo"
+      ]
+    },
+    {
+      "id": "RCD-KPI-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 8 — KPI de Redução de Resíduos: Taxa de Desvio Global",
+      "description": "A meta de taxa de desvio de aterro para RCD é de 70% (em peso). Obras que não atinjam este KPI devem implementar plano de ação corretivo no prazo de 30 dias e reportar mensalmente à fiscalização.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.globalDiversionRate",
+          "operator": "<",
+          "value": 70
+        }
+      ],
+      "currentValueTemplate": "Taxa de desvio global: {waste.globalDiversionRate}%",
+      "requiredValue": "Taxa de desvio de aterro ≥70%",
+      "remediation": "Atingir meta de 70% de desvio: 1) Analisar fluxos com menor taxa de desvio; 2) Reforçar triagem em obra (contentor por fluxo); 3) Identificar novos operadores de reciclagem para fluxos deficitários; 4) Implementar campanhas de sensibilização com trabalhadores; 5) Rever fornecedores para reduzir embalagens; 6) Elaborar plano de ação corretivo com metas mensais; 7) Reportar evolução mensal ao dono de obra e fiscalização.",
+      "enabled": true,
+      "tags": [
+        "KPI",
+        "taxa-desvio",
+        "meta-70%",
+        "redução"
+      ]
+    },
+    {
+      "id": "RCD-KPI-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 9 — KPI de Resíduos por Unidade de Obra",
+      "description": "Deve ser monitorizado o indicador de geração de resíduos por unidade funcional da obra (kg/m², kg/fogo, kg/km). A meta de referência para construção nova é ≤60 kg/m² e o resultado deve ser reportado no relatório final de gestão de RCD.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.wastePerFunctionalUnit",
+          "operator": ">",
+          "value": 60
+        }
+      ],
+      "currentValueTemplate": "Resíduos por unidade funcional: {waste.wastePerFunctionalUnit} kg/m²",
+      "requiredValue": "≤60 kg/m² (meta de referência para construção nova)",
+      "remediation": "Reduzir resíduos por unidade funcional: 1) Medir e registar peso de RCD mensalmente; 2) Dividir pelo indicador funcional (m², fogos, km de via); 3) Comparar com benchmark setorial; 4) Se acima da meta: análise de Pareto por fluxo e por subempreiteiro; 5) Implementar medidas de prevenção (encomenda just-in-time, pré-fabricação, corte em fábrica); 6) Incluir resultado no relatório final de RCD; 7) Usar como critério de avaliação de subempreiteiros futuros.",
+      "enabled": true,
+      "tags": [
+        "KPI",
+        "kg/m²",
+        "unidade-funcional",
+        "benchmark"
+      ]
+    },
+    {
+      "id": "RCD-MARKETPLACE-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 10.º-A — Plataforma de Reutilização de Materiais de Construção",
+      "description": "Para obras com valor superior a 1.000.000€, deve ser consultada plataforma de reutilização de materiais de construção (marketplace) antes da encomenda de novos materiais, priorizando materiais recuperados de demolições ou excedentes de outras obras.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.projectValueEur",
+          "operator": ">",
+          "value": 1000000
+        },
+        {
+          "field": "waste.materialReuseMarketplaceConsulted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Consulta de marketplace de reutilização: {waste.materialReuseMarketplaceConsulted}",
+      "requiredValue": "Marketplace de reutilização consultado antes da aquisição de materiais",
+      "remediation": "Consultar marketplace de reutilização de materiais: 1) Registar na plataforma nacional de materiais de construção reutilizados; 2) Publicar materiais disponíveis de demolição/excedentes; 3) Pesquisar materiais reutilizados antes de encomendas novas (aço estrutural, portas, janelas, sanitários, pavimentos); 4) Documentar resultados da pesquisa (mesmo se negativa); 5) Incluir critério de materiais reutilizados no caderno de encargos; 6) Registar economia de custo e redução de resíduos obtida.",
+      "enabled": true,
+      "tags": [
+        "marketplace",
+        "reutilização",
+        "materiais",
+        "economia-circular"
+      ]
+    },
+    {
+      "id": "RCD-MARKETPLACE-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 10.º-B — Publicação de Excedentes de Materiais em Plataforma",
+      "description": "Materiais de construção em bom estado resultantes de demolição seletiva ou excedentes de obra devem ser publicados em plataforma de reutilização no prazo de 15 dias após a sua disponibilidade, antes de serem encaminhados como resíduo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasReusableSurplusMaterials",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.surplusPublishedOnMarketplace",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Excedentes publicados em marketplace: {waste.surplusPublishedOnMarketplace}",
+      "requiredValue": "Excedentes reutilizáveis publicados em plataforma no prazo de 15 dias",
+      "remediation": "Publicar excedentes em plataforma de reutilização: 1) Inventariar materiais reutilizáveis (portas, janelas, sanitários, perfis metálicos, pavimentos, telhas); 2) Fotografar e descrever cada lote (dimensões, estado, quantidade); 3) Publicar em plataforma de reutilização no prazo de 15 dias; 4) Definir preço ou oferta gratuita; 5) Manter publicação ativa durante 30 dias antes de encaminhar como resíduo; 6) Registar tentativa de reutilização no PPG; 7) Prioridade para doação a projetos sociais.",
+      "enabled": true,
+      "tags": [
+        "marketplace",
+        "excedentes",
+        "publicação",
+        "reutilização"
+      ]
+    },
+    {
+      "id": "RCD-DECONST-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º-A — Avaliação de Desconstrução vs. Demolição Convencional",
+      "description": "Antes de qualquer demolição, deve ser realizada avaliação técnica de desconstrução seletiva vs. demolição convencional. A desconstrução é obrigatória quando a taxa de recuperação de materiais reutilizáveis exceda 40% (em peso) do total do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.deconstructionAssessmentDone",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Avaliação desconstrução vs. demolição: {waste.deconstructionAssessmentDone}",
+      "requiredValue": "Avaliação de desconstrução seletiva obrigatória antes de demolição",
+      "remediation": "Realizar avaliação de desconstrução seletiva: 1) Inventário de materiais do edifício (auditoria pré-demolição); 2) Identificar materiais reutilizáveis (estrutura metálica, madeiras, caixilharias, sanitários, pavimentos); 3) Calcular taxa potencial de recuperação (peso reutilizável / peso total); 4) Se >40%: desconstrução seletiva obrigatória; 5) Elaborar plano de desconstrução com sequência de remoção; 6) Cronograma: desconstrução antes de demolição mecânica; 7) Orçamentar separadamente (desconstrução pode ser custo-neutra com venda de materiais).",
+      "enabled": true,
+      "tags": [
+        "desconstrução",
+        "demolição",
+        "avaliação",
+        "seletiva"
+      ]
+    },
+    {
+      "id": "RCD-DECONST-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º-B — Plano de Desconstrução Seletiva",
+      "description": "O plano de desconstrução seletiva deve detalhar a sequência de remoção de materiais (inversa à construção), medidas de segurança, destino de cada material recuperado e cronograma. Deve ser aprovado pelo coordenador de segurança.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.requiresSelectiveDeconstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.hasDeconstructionPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Plano de desconstrução: {waste.hasDeconstructionPlan}",
+      "requiredValue": "Plano de desconstrução seletiva aprovado",
+      "remediation": "Elaborar plano de desconstrução seletiva: 1) Sequência de remoção inversa à construção (acabamentos → instalações → divisórias → cobertura → estrutura); 2) Identificar equipamento necessário (grua, mini-escavadora, ferramentas manuais); 3) Medidas de segurança por fase; 4) Destino de cada material: reutilização direta, marketplace, reciclagem; 5) Cronograma detalhado com marcos; 6) Aprovação pelo coordenador de segurança; 7) Designar equipa especializada em desconstrução.",
+      "enabled": true,
+      "tags": [
+        "desconstrução",
+        "plano",
+        "sequência",
+        "seletiva"
+      ]
+    },
+    {
+      "id": "RCD-DECONST-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-E — Taxa de Recuperação em Desconstrução",
+      "description": "A desconstrução seletiva deve atingir uma taxa mínima de recuperação de materiais de 60% (em peso). O resultado deve ser documentado com pesagens certificadas e reportado no relatório final de gestão de RCD.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.deconstructionRecoveryRate",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "waste.isSelectiveDeconstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Taxa de recuperação na desconstrução: {waste.deconstructionRecoveryRate}%",
+      "requiredValue": "Taxa de recuperação ≥60% na desconstrução seletiva",
+      "remediation": "Melhorar taxa de recuperação: 1) Rever plano de desconstrução para identificar materiais não recuperados; 2) Aumentar tempo de desconstrução manual (reduzir demolição mecânica); 3) Melhorar armazenamento de materiais recuperados (proteção contra danos); 4) Encontrar destinos para fluxos de menor procura; 5) Registar pesagens de todos os materiais recuperados vs. demolidos; 6) Incluir resultado no relatório final com evidências fotográficas.",
+      "enabled": true,
+      "tags": [
+        "desconstrução",
+        "taxa-recuperação",
+        "meta",
+        "pesagens"
+      ]
+    },
+    {
+      "id": "RCD-MATPASS-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-C, n.º 2 — Passaporte de Materiais para Fim de Vida",
+      "description": "Edifícios novos com área superior a 1.000 m² devem possuir passaporte digital de materiais que inclua informação de fim de vida: potencial de reciclagem, instruções de desmontagem, códigos LER de cada componente e recomendações de gestão de RCD.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.projectAreaSqm",
+          "operator": ">",
+          "value": 1000
+        },
+        {
+          "field": "waste.hasEndOfLifeMaterialPassport",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Passaporte de materiais (fim de vida): {waste.hasEndOfLifeMaterialPassport}",
+      "requiredValue": "Passaporte digital de materiais com informação de fim de vida",
+      "remediation": "Criar passaporte de materiais para fim de vida: 1) Listar todos os materiais e componentes do edifício por elemento construtivo; 2) Para cada material: código LER, potencial de reciclagem (%), toxicidade, instruções de separação; 3) Incluir informação de ligações (mecânicas vs. químicas) e facilidade de desmontagem; 4) Formato digital (BIM integrado ou plataforma dedicada); 5) Atualizar em caso de renovações; 6) Entregar ao dono de obra com telas finais; 7) Registar em plataforma nacional de passaportes de edifícios.",
+      "enabled": true,
+      "tags": [
+        "passaporte-materiais",
+        "fim-de-vida",
+        "digital",
+        "LER"
+      ]
+    },
+    {
+      "id": "RCD-MATPASS-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-C, n.º 3 — Índice de Desconstrução no Passaporte",
+      "description": "O passaporte de materiais deve incluir um índice de desconstrução do edifício, classificado de A (facilmente desconstruível) a E (demolição convencional necessária), baseado no tipo de ligações, acessibilidade e homogeneidade dos materiais.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.deconstructionIndex",
+          "operator": "ordinal_lt",
+          "value": "C",
+          "scale": [
+            "E",
+            "D",
+            "C",
+            "B",
+            "A"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Índice de desconstrução: {waste.deconstructionIndex}",
+      "requiredValue": "Índice de desconstrução ≥C (recomendado ≥B)",
+      "remediation": "Melhorar índice de desconstrução do edifício: 1) Privilegiar ligações mecânicas (parafusos, encaixes) sobre químicas (colas, argamassas); 2) Usar materiais homogéneos em cada camada construtiva; 3) Garantir acessibilidade das ligações para desmontagem; 4) Evitar materiais compósitos inseparáveis; 5) Documentar sequência de desmontagem no passaporte; 6) Classificar segundo escala: A (>80% recuperável), B (60-80%), C (40-60%), D (20-40%), E (<20%).",
+      "enabled": true,
+      "tags": [
+        "passaporte-materiais",
+        "desconstrução",
+        "índice",
+        "classificação"
+      ]
+    },
+    {
+      "id": "RCD-CARBON-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-F — Pegada de Carbono da Gestão de RCD",
+      "description": "Obras com valor superior a 5.000.000€ devem calcular a pegada de carbono da gestão de resíduos, incluindo transporte, processamento, deposição em aterro e reciclagem. O cálculo deve seguir a metodologia EN 15978 e ser incluído no relatório final.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.projectValueEur",
+          "operator": ">",
+          "value": 5000000
+        },
+        {
+          "field": "waste.hasCarbonFootprintCalculation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Cálculo de pegada de carbono RCD: {waste.hasCarbonFootprintCalculation}",
+      "requiredValue": "Pegada de carbono da gestão de RCD calculada (obras >5M€)",
+      "remediation": "Calcular pegada de carbono da gestão de RCD: 1) Seguir metodologia EN 15978 (módulo C — fim de vida); 2) Contabilizar: transporte de resíduos (km × t × fator emissão), processamento em central de triagem, deposição em aterro (metano evitado/emitido), créditos de reciclagem; 3) Usar fatores de emissão do inventário nacional; 4) Comparar cenários: aterro vs. reciclagem vs. reutilização; 5) Identificar medidas de redução (proximidade de operadores, otimização logística); 6) Incluir no relatório de sustentabilidade da obra.",
+      "enabled": true,
+      "tags": [
+        "carbono",
+        "pegada",
+        "EN 15978",
+        "sustentabilidade"
+      ]
+    },
+    {
+      "id": "RCD-CARBON-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-G — Meta de Redução de Emissões na Gestão de RCD",
+      "description": "A gestão de RCD deve procurar minimizar as emissões de CO₂, privilegiando operadores de reciclagem próximos (raio de 50 km), veículos de transporte de baixas emissões e maximizando a taxa de reciclagem sobre deposição em aterro.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.averageWasteTransportDistanceKm",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Distância média de transporte de RCD: {waste.averageWasteTransportDistanceKm} km",
+      "requiredValue": "Distância média de transporte de RCD ≤50 km (recomendado)",
+      "remediation": "Reduzir emissões de transporte de RCD: 1) Mapear operadores de reciclagem num raio de 50 km; 2) Privilegiar operadores mais próximos mesmo que custo unitário seja ligeiramente superior; 3) Consolidar cargas para maximizar carga útil dos veículos; 4) Considerar triagem em obra para reduzir volume transportado; 5) Avaliar possibilidade de reciclagem in situ (britagem de betão, reutilização de terras); 6) Registar distâncias e calcular emissões evitadas.",
+      "enabled": true,
+      "tags": [
+        "carbono",
+        "transporte",
+        "distância",
+        "emissões"
+      ]
+    },
+    {
+      "id": "RCD-LOGIST-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 18.º-A — Plano de Logística de Resíduos em Obra",
+      "description": "Obras com mais de 5 contentores de resíduos em simultâneo devem ter um plano de logística de resíduos que inclua: mapa de localização de contentores, circuitos de recolha interna, frequência de evacuação e gestão de acessos para veículos de recolha.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.activeContainerCount",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "waste.hasWasteLogisticsPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Plano de logística de resíduos: {waste.hasWasteLogisticsPlan} (contentores: {waste.activeContainerCount})",
+      "requiredValue": "Plano de logística de resíduos obrigatório (>5 contentores)",
+      "remediation": "Elaborar plano de logística de resíduos: 1) Mapa de estaleiro com localização de contentores por fluxo; 2) Circuitos de recolha interna (minimizar distâncias de transporte manual); 3) Frequência de evacuação por fluxo (diária, semanal, quando cheio); 4) Gestão de acessos: percurso de veículos de recolha, manobras, horários; 5) Plano de contingência: contentor cheio, avaria, derrame; 6) Atualizar quando layout do estaleiro mudar; 7) Afixar em local visível no estaleiro.",
+      "enabled": true,
+      "tags": [
+        "logística",
+        "contentores",
+        "plano",
+        "estaleiro"
+      ]
+    },
+    {
+      "id": "RCD-LOGIST-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 18.º-B — Otimização de Rotas de Transporte de RCD",
+      "description": "O transporte de RCD deve ser otimizado para minimizar viagens em vazio, maximizar carga útil e reduzir impacto em vias urbanas. Obras urbanas devem planear recolhas fora das horas de ponta (antes das 7h ou após as 20h).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.isUrbanSite",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.hasOptimizedTransportSchedule",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Otimização de transporte de RCD: {waste.hasOptimizedTransportSchedule}",
+      "requiredValue": "Planeamento de rotas otimizadas para obras urbanas",
+      "remediation": "Otimizar logística de transporte de RCD: 1) Planear recolhas fora de horas de ponta (antes das 7h ou após as 20h em zona urbana); 2) Consolidar cargas: esperar enchimento de contentor (≥80% capacidade); 3) Negociar com transportador rotas com retorno carregado; 4) Verificar restrições municipais de circulação de pesados; 5) Registar carga útil real vs. capacidade para cada viagem; 6) Calcular custo por tonelada transportada; 7) Considerar compactação em obra para reduzir volume.",
+      "enabled": true,
+      "tags": [
+        "logística",
+        "transporte",
+        "otimização",
+        "urbano"
+      ]
+    },
+    {
+      "id": "RCD-SKIP-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 19.º-A — Colocação de Contentores Skip na Via Pública",
+      "description": "A colocação de contentores skip (multibenne) na via pública requer licença municipal. Os contentores devem ter sinalização refletora, iluminação noturna, identificação do produtor e operador, e não podem permanecer mais de 72 horas sem recolha.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasSkipContainersOnPublicRoad",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.skipContainerMunicipalLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Licença municipal para skip na via pública: {waste.skipContainerMunicipalLicense}",
+      "requiredValue": "Licença municipal obrigatória para contentores skip na via pública",
+      "remediation": "Obter licença municipal para contentores skip: 1) Requerer licença de ocupação de via pública à câmara municipal (prazo: 15 dias antes); 2) Identificação no contentor: nome do produtor, operador licenciado, n.º de alvará, telefone; 3) Sinalização refletora obrigatória (faixas brancas e vermelhas); 4) Iluminação noturna (luz âmbar intermitente); 5) Recolha obrigatória em 72h (ou multa); 6) Não obstruir passeios, acessos de emergência ou bocas de incêndio; 7) Cobertura com rede ou lona se risco de dispersão.",
+      "enabled": true,
+      "tags": [
+        "skip",
+        "contentor",
+        "via-pública",
+        "licença-municipal"
+      ]
+    },
+    {
+      "id": "RCD-SKIP-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 19.º-B — Especificações de Contentores Skip para RCD",
+      "description": "Os contentores skip para RCD devem ter capacidade mínima de 5 m³, estrutura reforçada, sistema de fecho/cobertura e identificação do código LER do fluxo a que se destinam. Contentores para resíduos perigosos devem ser estanques e com bacia de retenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.skipContainersCompliant",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Conformidade de contentores skip: {waste.skipContainersCompliant}",
+      "requiredValue": "Contentores skip conformes com especificações de RCD",
+      "remediation": "Verificar conformidade de contentores skip: 1) Capacidade mínima: 5 m³ (recomendado: 7-10 m³ para inertes); 2) Estrutura reforçada para carga de RCD (betão, cerâmicos); 3) Cobertura ou rede para evitar dispersão de poeiras e leves; 4) Identificação: código LER, tipo de resíduo, sinalética de cores; 5) Para perigosos: estanqueidade, bacia de retenção, tampa com fecho; 6) Manutenção regular: verificar corrosão, fissuras, sistema de elevação; 7) Certificação do fabricante.",
+      "enabled": true,
+      "tags": [
+        "skip",
+        "especificações",
+        "contentores",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "RCD-CHUTE-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 20.º — Condutas de Resíduos em Edifícios em Altura",
+      "description": "Edifícios com mais de 5 pisos em demolição ou reabilitação devem utilizar condutas de resíduos (waste chutes) para descarga controlada de RCD. As condutas devem ter sistema de supressão de poeiras, proteção contra queda de objetos e contentor de receção fechado na base.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.buildingFloors",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "waste.hasWasteChute",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isDemolitionOrRehab",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Conduta de resíduos: {waste.hasWasteChute} (pisos: {waste.buildingFloors})",
+      "requiredValue": "Conduta de resíduos obrigatória para edifícios >5 pisos",
+      "remediation": "Instalar conduta de resíduos (waste chute): 1) Diâmetro mínimo: 500 mm (resíduos gerais), 800 mm (inertes); 2) Material: tubular metálico ou PEAD reforçado; 3) Sistema de supressão de poeiras (pulverização de água) em cada ponto de carga; 4) Portinhola de carga com fecho em cada piso; 5) Proteção contra queda de objetos (rede ou tela na abertura); 6) Contentor fechado na base com capacidade ≥10 m³; 7) Zona de exclusão de 3 m em redor da base; 8) Inspeção semanal da conduta.",
+      "enabled": true,
+      "tags": [
+        "conduta",
+        "waste-chute",
+        "edifícios-altura",
+        "poeiras"
+      ]
+    },
+    {
+      "id": "RCD-CHUTE-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 20.º, n.º 2 — Manutenção e Inspeção de Condutas de Resíduos",
+      "description": "As condutas de resíduos devem ser inspecionadas semanalmente para verificar integridade estrutural, funcionamento do sistema de supressão de poeiras e estado das portinholas. Registos de inspeção devem ser mantidos no estaleiro.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasWasteChute",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.wasteChuteInspectionUpToDate",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Inspeção de conduta em dia: {waste.wasteChuteInspectionUpToDate}",
+      "requiredValue": "Inspeção semanal da conduta de resíduos",
+      "remediation": "Manter programa de inspeção de conduta: 1) Inspeção semanal por técnico qualificado; 2) Verificar: integridade de segmentos, vedação de juntas, funcionamento de portinholas; 3) Testar sistema de supressão de poeiras; 4) Verificar estado do contentor de receção na base; 5) Registar inspeção em formulário datado e assinado; 6) Reparar defeitos em 24h; 7) Suspender utilização se risco de colapso ou fuga de poeiras; 8) Manter registos no estaleiro por 3 anos.",
+      "enabled": true,
+      "tags": [
+        "conduta",
+        "inspeção",
+        "manutenção",
+        "registo"
+      ]
+    },
+    {
+      "id": "RCD-MIXPEN-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º-A — Penalização por Mistura de Resíduos Não Segregados",
+      "description": "A entrega de RCD misturados (sem triagem) a operador licenciado está sujeita a sobretaxa de 50% sobre o custo de receção. Resíduos perigosos misturados com não perigosos implicam classificação de todo o lote como perigoso, com custos correspondentes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasMixedWasteLoads",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.mixedWasteTriageDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Cargas de resíduos misturados: {waste.hasMixedWasteLoads}",
+      "requiredValue": "Triagem obrigatória — resíduos não misturados",
+      "remediation": "Eliminar cargas de resíduos misturados: 1) Reforçar triagem em obra com contentor por fluxo; 2) Formar trabalhadores sobre segregação correta; 3) Fiscalizar subempreiteiros que misturam resíduos; 4) Se mistura detetada: triagem secundária antes do transporte; 5) Nunca misturar perigosos com não perigosos (todo o lote classificado como perigoso = custo 5-10x superior); 6) Calcular custo da sobretaxa de 50% para demonstrar benefício económico da triagem; 7) Incluir cláusula de penalização nos contratos de subempreitada.",
+      "enabled": true,
+      "tags": [
+        "mistura",
+        "penalização",
+        "triagem",
+        "sobretaxa"
+      ]
+    },
+    {
+      "id": "RCD-MIXPEN-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º-B — Cálculo de Penalização por Contaminação de Lote",
+      "description": "Se um lote de RCD inertes for contaminado com resíduos perigosos (mesmo em pequena quantidade), todo o lote é reclassificado como perigoso. O custo de gestão aumenta de ~15€/t (inerte) para ~150-300€/t (perigoso), mais coima de 2.500€ a 44.890€.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasContaminatedInertLoads",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Lotes inertes contaminados: {waste.hasContaminatedInertLoads}",
+      "requiredValue": "Zero lotes inertes contaminados por resíduos perigosos",
+      "remediation": "Prevenir contaminação de lotes inertes: 1) Separação física rigorosa entre zona de inertes e perigosos; 2) Barreira impermeável entre contentores; 3) Formação específica sobre materiais perigosos (amianto, tintas com chumbo, solventes); 4) Inspeção visual de cada carga antes de transporte; 5) Se contaminação detetada: isolar lote, classificar como perigoso, documentar; 6) Custo de referência: inerte 15€/t → perigoso 150-300€/t; 7) Coima: 2.500€ a 44.890€ por infração.",
+      "enabled": true,
+      "tags": [
+        "contaminação",
+        "lote",
+        "reclassificação",
+        "coima"
+      ]
+    },
+    {
+      "id": "RCD-LICOP-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 21.º — Verificação de Licenciamento de Operadores de RCD",
+      "description": "Antes de contratar qualquer operador de gestão de RCD (transporte, triagem, reciclagem, deposição), o produtor deve verificar a validade da licença ambiental, alvará de operador e registo no SIRER/SILiAmb. Licenças devem estar vigentes durante toda a obra.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.allOperatorsLicenseVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Verificação de licenças de operadores: {waste.allOperatorsLicenseVerified}",
+      "requiredValue": "Todos os operadores de RCD com licença verificada e válida",
+      "remediation": "Verificar licenciamento de todos os operadores de RCD: 1) Solicitar cópia da licença ambiental (CCDR/APA); 2) Verificar alvará de operador de resíduos (categorias autorizadas); 3) Confirmar registo no SIRER/SILiAmb (consulta online); 4) Verificar se códigos LER autorizados cobrem os fluxos da obra; 5) Confirmar validade da licença durante todo o período da obra; 6) Manter cópia das licenças no estaleiro; 7) Repetir verificação a cada 6 meses para obras longas; 8) Não subcontratar operadores sem licença — responsabilidade solidária do produtor.",
+      "enabled": true,
+      "tags": [
+        "operador",
+        "licença",
+        "verificação",
+        "SIRER"
+      ]
+    },
+    {
+      "id": "RCD-LICOP-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 21.º, n.º 2 — Verificação de Licença de Transportador de RCD",
+      "description": "Os transportadores de RCD devem possuir alvará de transportador de resíduos emitido pela APA/CCDR, seguro de responsabilidade civil e veículos com identificação visível do operador. A guia e-GAR deve acompanhar cada transporte.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.transporterLicenseVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Licença de transportador verificada: {waste.transporterLicenseVerified}",
+      "requiredValue": "Transportador com alvará de resíduos válido e verificado",
+      "remediation": "Verificar licença do transportador: 1) Alvará de transportador de resíduos (APA/CCDR) — consultar no SILiAmb; 2) Seguro de responsabilidade civil para transporte de resíduos; 3) Veículos identificados com nome do operador e n.º de alvará; 4) Para resíduos perigosos: licença ADR (mercadorias perigosas), formação dos motoristas; 5) Cada transporte acompanhado de e-GAR preenchida; 6) Manter registo de todos os transportes (data, quantidade, destino, e-GAR); 7) Verificação semestral da validade do alvará.",
+      "enabled": true,
+      "tags": [
+        "transportador",
+        "licença",
+        "alvará",
+        "e-GAR"
+      ]
+    },
+    {
+      "id": "RCD-TRANSFRONT-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 62.º — Movimentos Transfronteiriços de RCD",
+      "description": "A transferência de RCD para fora de Portugal (exportação) ou a importação de resíduos para valorização requer notificação prévia à APA e autorização conforme o Regulamento (CE) n.º 1013/2006. Resíduos perigosos necessitam de consentimento prévio do país de destino.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasTransboundaryMovement",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.transboundaryPermitObtained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Autorização de movimento transfronteiriço: {waste.transboundaryPermitObtained}",
+      "requiredValue": "Autorização de movimento transfronteiriço de resíduos obtida",
+      "remediation": "Obter autorização de movimento transfronteiriço: 1) Verificar se Regulamento (CE) 1013/2006 se aplica (lista verde ou lista âmbar); 2) Lista verde (não perigosos para valorização): procedimento de informação simplificado; 3) Lista âmbar (perigosos ou para eliminação): notificação prévia à APA (formulário de notificação, contrato com destinatário, garantia financeira); 4) Obter consentimento do país de destino (prazo: 30 dias úteis); 5) Garantia financeira ou seguro para cobrir custos de repatriamento; 6) Manter documentação de acompanhamento durante todo o transporte.",
+      "enabled": true,
+      "tags": [
+        "transfronteiriço",
+        "exportação",
+        "APA",
+        "Regulamento 1013/2006"
+      ]
+    },
+    {
+      "id": "RCD-TRANSFRONT-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 62.º, n.º 3 — Garantia Financeira para Movimento Transfronteiriço",
+      "description": "O notificador de movimentos transfronteiriços de resíduos deve constituir garantia financeira ou seguro equivalente que cubra os custos de transporte, valorização/eliminação e armazenamento por 90 dias, no caso de o movimento não poder ser concluído.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasTransboundaryMovement",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.transboundaryFinancialGuarantee",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Garantia financeira transfronteiriço: {waste.transboundaryFinancialGuarantee}",
+      "requiredValue": "Garantia financeira constituída para movimento transfronteiriço",
+      "remediation": "Constituir garantia financeira para movimento transfronteiriço: 1) Calcular valor: custos de transporte + valorização/eliminação + armazenamento 90 dias; 2) Modalidades: garantia bancária, seguro de caução ou depósito; 3) Apresentar à APA com a notificação; 4) Garantia deve cobrir repatriamento em caso de falha; 5) Vigência: até confirmação de receção e tratamento pelo destinatário; 6) Atualizar valor se quantidade ou custos alterarem; 7) Libertação da garantia após fecho da notificação pela APA.",
+      "enabled": true,
+      "tags": [
+        "transfronteiriço",
+        "garantia-financeira",
+        "seguro",
+        "notificação"
+      ]
+    },
+    {
+      "id": "RCD-REEE-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 35.º — Resíduos de Equipamentos Elétricos e Eletrónicos em Obras",
+      "description": "Equipamentos elétricos e eletrónicos removidos durante demolição ou reabilitação (quadros elétricos, aparelhos de AVAC, elevadores, sistemas de iluminação) são classificados como REEE e devem ser encaminhados para operadores licenciados de REEE, separados dos restantes RCD.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasREEEFromConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.reeeProperlySegregated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Segregação de REEE: {waste.reeeProperlySegregated}",
+      "requiredValue": "REEE segregados e encaminhados para operador REEE licenciado",
+      "remediation": "Gerir REEE de obras corretamente: 1) Identificar todos os equipamentos elétricos/eletrónicos antes da demolição; 2) Remover intactos quando possível (não misturar com inertes); 3) Classificar por categoria REEE (grande eletrodoméstico, AVAC, iluminação, TIC); 4) Contentor dedicado para REEE (protegido de intempéries e vandalismo); 5) Encaminhar para operador licenciado de REEE (consultar lista da ERP Portugal/Electrão); 6) Registar em e-GAR específica com códigos LER 16 02 ou 20 01 35*/36; 7) Nunca depositar REEE em contentor de inertes ou resíduos indiferenciados.",
+      "enabled": true,
+      "tags": [
+        "REEE",
+        "equipamentos-elétricos",
+        "segregação",
+        "demolição"
+      ]
+    },
+    {
+      "id": "RCD-REEE-04",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 35.º, n.º 3 — Preparação para Reutilização de REEE de Construção",
+      "description": "Antes de classificar equipamentos elétricos removidos de obras como resíduo, deve ser avaliada a possibilidade de preparação para reutilização. Equipamentos funcionais ou reparáveis devem ser encaminhados para centros de preparação para reutilização certificados.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.hasREEEFromConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.reeeReuseAssessmentDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Avaliação de reutilização de REEE: {waste.reeeReuseAssessmentDone}",
+      "requiredValue": "Avaliação de reutilização de REEE realizada",
+      "remediation": "Avaliar reutilização de REEE: 1) Inventariar equipamentos com teste de funcionamento; 2) Separar equipamentos funcionais de avariados; 3) Equipamentos funcionais: encaminhar para centros de preparação para reutilização; 4) Contactar entidades sociais para doação (IPSS, escolas); 5) Equipamentos AVAC em bom estado: possível revenda no mercado de segunda mão; 6) Documentar decisão para cada equipamento (reutilizar/reciclar); 7) Registar no relatório de gestão de RCD.",
+      "enabled": true,
+      "tags": [
+        "REEE",
+        "reutilização",
+        "avaliação",
+        "preparação"
+      ]
+    },
+    {
+      "id": "RCD-FLUOR-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 36.º — Gestão de Lâmpadas Fluorescentes e com Mercúrio",
+      "description": "Lâmpadas fluorescentes, de descarga e LED removidas de edifícios são resíduos perigosos (LER 20 01 21* — mercúrio) e devem ser recolhidas intactas, armazenadas em embalagens anti-quebra e encaminhadas para operador licenciado específico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasFluorescentTubesRemoved",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.fluorescentTubesProperStorage",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Armazenamento de lâmpadas fluorescentes: {waste.fluorescentTubesProperStorage}",
+      "requiredValue": "Lâmpadas fluorescentes em embalagem anti-quebra e operador licenciado",
+      "remediation": "Gerir lâmpadas fluorescentes corretamente: 1) Remover intactas (não partir — libertam mercúrio); 2) Armazenar em caixas anti-quebra verticais (embalagens originais ou contentores específicos); 3) Zona de armazenamento coberta e ventilada; 4) Se partida: ventilar área, recolher com EPI (luvas, máscara), selar em contentor estanque; 5) Classificar como LER 20 01 21* (perigoso — mercúrio); 6) Encaminhar para operador licenciado (Electrão, ERP ou similar); 7) Registar em e-GAR; 8) Nunca depositar no contentor de resíduos indiferenciados.",
+      "enabled": true,
+      "tags": [
+        "lâmpadas",
+        "fluorescentes",
+        "mercúrio",
+        "perigoso"
+      ]
+    },
+    {
+      "id": "RCD-FLUOR-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 36.º, n.º 2 — Quantidade Mínima para Recolha de Lâmpadas",
+      "description": "A recolha de lâmpadas fluorescentes deve ser solicitada quando a acumulação atinja 50 unidades ou 3 meses de armazenamento (o que ocorrer primeiro). O armazenamento prolongado aumenta o risco de quebra e libertação de mercúrio.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.fluorescentTubeStorageMonths",
+          "operator": ">",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "Tempo de armazenamento de lâmpadas: {waste.fluorescentTubeStorageMonths} meses",
+      "requiredValue": "Recolha de lâmpadas em ≤3 meses ou 50 unidades",
+      "remediation": "Solicitar recolha de lâmpadas atempadamente: 1) Máximo 3 meses de armazenamento ou 50 unidades acumuladas; 2) Contactar operador licenciado para recolha (Electrão, ERP Portugal); 3) Recolha gratuita para quantidades ≥50 unidades em muitos casos; 4) Para menores quantidades: entregar em ponto de recolha Electrão mais próximo; 5) Registar data de início de acumulação; 6) Manter inventário de unidades armazenadas; 7) Incluir alerta no calendário de gestão de RCD.",
+      "enabled": true,
+      "tags": [
+        "lâmpadas",
+        "recolha",
+        "prazo",
+        "acumulação"
+      ]
+    },
+    {
+      "id": "RCD-REFRIG-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 38.º — Recuperação de Gases Refrigerantes em Demolição",
+      "description": "Antes da remoção de equipamentos de AVAC (ar condicionado, bombas de calor, chillers), os gases refrigerantes (HFC, HCFC, CFC) devem ser recuperados por técnico certificado (Regulamento UE 517/2014 — gases fluorados). É proibida a libertação intencional de gases refrigerantes para a atmosfera.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasRefrigerantEquipment",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.refrigerantGasRecovered",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Recuperação de gás refrigerante: {waste.refrigerantGasRecovered}",
+      "requiredValue": "Gases refrigerantes recuperados por técnico certificado antes da remoção",
+      "remediation": "Recuperar gases refrigerantes antes de demolição: 1) Identificar todos os equipamentos com gases refrigerantes (AVAC, frigoríficos, bombas de calor); 2) Contratar técnico certificado (Regulamento UE 517/2014, certificação CENTERM/APIRAC); 3) Recuperação antes de qualquer desmontagem do equipamento; 4) Gases recuperados: armazenar em garrafas certificadas, encaminhar para regeneração ou destruição; 5) Registar tipo de gás, quantidade recuperada e destino; 6) Certificado de recuperação emitido pelo técnico; 7) Proibida a ventilação intencional — coima até 37.500€.",
+      "enabled": true,
+      "tags": [
+        "refrigerante",
+        "gás-fluorado",
+        "AVAC",
+        "recuperação"
+      ]
+    },
+    {
+      "id": "RCD-REFRIG-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 38.º, n.º 3 — Certificação de Técnico de Gases Fluorados",
+      "description": "O técnico responsável pela recuperação de gases refrigerantes deve possuir certificação válida conforme Regulamento UE 517/2014 (categoria I ou II), emitida por entidade certificadora reconhecida. O certificado deve ser verificado antes do início dos trabalhos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasRefrigerantEquipment",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.refrigerantTechnicianCertified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Técnico de gases fluorados certificado: {waste.refrigerantTechnicianCertified}",
+      "requiredValue": "Técnico com certificação UE 517/2014 (categoria I ou II)",
+      "remediation": "Verificar certificação do técnico de gases fluorados: 1) Solicitar certificado de técnico de gases fluorados (Reg. UE 517/2014); 2) Categoria I: todos os equipamentos; Categoria II: até 3 kg de gás; 3) Certificado emitido por CENTERM, APIRAC ou entidade equivalente reconhecida pela APA; 4) Verificar validade do certificado; 5) Confirmar que equipamento de recuperação está calibrado e certificado; 6) Manter cópia do certificado no estaleiro; 7) Incluir no registo de qualificações de subempreiteiros.",
+      "enabled": true,
+      "tags": [
+        "refrigerante",
+        "certificação",
+        "técnico",
+        "UE 517/2014"
+      ]
+    },
+    {
+      "id": "RCD-CHUMBO-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 12.º-A — Remoção de Tintas com Chumbo",
+      "description": "Em edifícios construídos antes de 1978, deve ser realizado teste de presença de chumbo nas tintas antes de raspagem, lixagem ou decapagem. Tintas com chumbo (>0,06% em peso) são resíduo perigoso (LER 08 01 11*) e requerem procedimentos específicos de remoção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.buildingYearBuilt",
+          "operator": "<",
+          "value": 1978
+        },
+        {
+          "field": "waste.leadPaintTestDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Teste de chumbo em tintas: {waste.leadPaintTestDone} (edifício: {waste.buildingYearBuilt})",
+      "requiredValue": "Teste de chumbo obrigatório em edifícios pré-1978",
+      "remediation": "Testar tintas para chumbo antes da intervenção: 1) Em edifícios pré-1978: teste obrigatório antes de raspagem/lixagem; 2) Métodos de teste: kit XRF portátil (resultado imediato) ou análise laboratorial; 3) Limite: >0,06% em peso ou >1,0 mg/cm² = positivo; 4) Se positivo: procedimento de remoção húmida (sem lixagem a seco); 5) EPI: máscara FFP3 com filtro P100, fato descartável, luvas; 6) Zona confinada com depressurização; 7) Resíduos classificados como LER 08 01 11* (perigoso); 8) Encaminhar para operador de perigosos licenciado.",
+      "enabled": true,
+      "tags": [
+        "chumbo",
+        "tintas",
+        "teste",
+        "pré-1978"
+      ]
+    },
+    {
+      "id": "RCD-CHUMBO-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 12.º-B — Procedimento de Remoção Segura de Tintas com Chumbo",
+      "description": "A remoção de tintas com chumbo deve seguir procedimento específico: método húmido ou decapagem química (nunca lixagem a seco), zona confinada, EPI adequado, monitorização de poeiras de chumbo no ar e vigilância médica dos trabalhadores expostos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasLeadPaint",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.leadPaintRemovalProcedureApproved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Procedimento de remoção de chumbo aprovado: {waste.leadPaintRemovalProcedureApproved}",
+      "requiredValue": "Procedimento de remoção de tintas com chumbo aprovado e implementado",
+      "remediation": "Implementar procedimento seguro de remoção de tintas com chumbo: 1) Nunca lixar a seco (gera poeiras de chumbo inaláveis); 2) Métodos aprovados: decapagem química, remoção húmida com raspador, pistola de calor (<370°C); 3) Zona confinada com cortinas plásticas e depressurização (filtro HEPA); 4) EPI: respirador com filtro P100, fato Tyvek, luvas, óculos; 5) Monitorização de chumbo no ar (limite: 0,05 mg/m³); 6) Vigilância médica: plumbémia antes e após trabalhos; 7) Resíduos: contentor selado, LER 08 01 11*; 8) Descontaminação de ferramentas e área de trabalho.",
+      "enabled": true,
+      "tags": [
+        "chumbo",
+        "remoção",
+        "procedimento",
+        "segurança"
+      ]
+    },
+    {
+      "id": "RCD-CHUMBO-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 12.º-C — Remoção de Canalizações de Chumbo",
+      "description": "Canalizações de chumbo encontradas em edifícios antigos devem ser removidas na totalidade durante reabilitações, classificadas como LER 17 04 03 (chumbo) e encaminhadas para operador licenciado de metais. É proibida a reutilização de tubagens de chumbo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasLeadPipes",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.leadPipesRemoved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Canalizações de chumbo removidas: {waste.leadPipesRemoved}",
+      "requiredValue": "Canalizações de chumbo removidas e encaminhadas para reciclagem",
+      "remediation": "Remover canalizações de chumbo: 1) Identificar todas as tubagens de chumbo (abastecimento de água, drenagem antiga); 2) Remover na totalidade (não manter troços); 3) Classificar como LER 17 04 03 (chumbo); 4) Armazenar separadamente de outros metais; 5) Encaminhar para operador de reciclagem de metais licenciado; 6) Proibida reutilização em qualquer aplicação; 7) Substituir por tubagens de cobre, PEX ou multicamada; 8) Registar quantidade (kg) no PPG; 9) e-GAR obrigatória para transporte.",
+      "enabled": true,
+      "tags": [
+        "chumbo",
+        "canalizações",
+        "remoção",
+        "LER 17 04 03"
+      ]
+    },
+    {
+      "id": "RCD-PCB-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 13.º-A — Identificação de Materiais com PCB em Edifícios",
+      "description": "Edifícios construídos entre 1950 e 1985 devem ser inspecionados para presença de materiais contendo PCB (policlorobifenilos): selantes de juntas, condensadores de iluminação fluorescente, tintas e revestimentos. O inventário de PCB é obrigatório antes de demolição.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.buildingYearBuilt",
+          "operator": "between",
+          "value": [
+            1950,
+            1985
+          ]
+        },
+        {
+          "field": "waste.pcbInventoryDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Inventário de PCB: {waste.pcbInventoryDone} (edifício: {waste.buildingYearBuilt})",
+      "requiredValue": "Inventário de materiais com PCB obrigatório (edifícios 1950-1985)",
+      "remediation": "Realizar inventário de PCB: 1) Aplicável a edifícios construídos ou renovados entre 1950-1985; 2) Inspecionar: selantes de juntas (fachadas, caixilharias), condensadores de balastros de lâmpadas fluorescentes, tintas anti-corrosão, pavimentos de vinil; 3) Recolher amostras representativas (mínimo 10g por tipo de material); 4) Análise laboratorial por laboratório acreditado (cromatografia gasosa); 5) Limite: >50 ppm = contaminado com PCB; 6) Documentar localização e quantidade de materiais positivos; 7) Incluir no plano de demolição/reabilitação; 8) Comunicar resultados à APA se concentração >50 ppm.",
+      "enabled": true,
+      "tags": [
+        "PCB",
+        "inventário",
+        "edifícios-antigos",
+        "1950-1985"
+      ]
+    },
+    {
+      "id": "RCD-PCB-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 13.º-B — Manuseamento e Remoção de Materiais com PCB",
+      "description": "A remoção de materiais com PCB requer procedimentos específicos: equipa especializada, zona confinada, EPI de nível C, dupla embalagem estanque e transporte por operador ADR. O destino final é incineração em alta temperatura (>1100°C).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasPCBMaterials",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.pcbRemovalProcedureApproved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Procedimento de remoção de PCB: {waste.pcbRemovalProcedureApproved}",
+      "requiredValue": "Procedimento de remoção de PCB aprovado e empresa especializada contratada",
+      "remediation": "Implementar remoção segura de PCB: 1) Contratar empresa especializada em resíduos perigosos com PCB; 2) Zona confinada com cortinas plásticas e depressurização; 3) EPI nível C: fato Tyvek/Saranex, máscara com filtro orgânico, luvas de nitrilo duplas; 4) Remover material contaminado sem quebrar/cortar (minimizar libertação); 5) Dupla embalagem estanque (saco plástico + contentor rígido); 6) Classificar como LER 17 09 02* (RCD contendo PCB); 7) Transporte ADR por operador licenciado; 8) Destino: incineração em alta temperatura (>1100°C); 9) Comunicar à APA quantidade removida.",
+      "enabled": true,
+      "tags": [
+        "PCB",
+        "remoção",
+        "perigoso",
+        "incineração"
+      ]
+    },
+    {
+      "id": "RCD-PCB-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 45.º — Condensadores de PCB em Balastros de Iluminação",
+      "description": "Os balastros de lâmpadas fluorescentes fabricados antes de 1986 podem conter condensadores com PCB. Devem ser removidos intactos, testados e, se positivos para PCB, classificados como LER 16 02 09* e encaminhados para destruição.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasFluorescentBallasts",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.ballastPCBTestDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Teste de PCB em balastros: {waste.ballastPCBTestDone}",
+      "requiredValue": "Balastros de lâmpadas testados para PCB",
+      "remediation": "Testar balastros para PCB: 1) Identificar balastros de lâmpadas fluorescentes pré-1986; 2) Remover intactos (não abrir); 3) Verificar placa de identificação (fabricante, ano); 4) Se sem identificação: assumir como potencialmente com PCB e testar; 5) Teste: enviar amostra de condensador a laboratório acreditado; 6) Se positivo (>50 ppm): classificar como LER 16 02 09*; 7) Armazenar em contentor estanque; 8) Encaminhar para operador licenciado de PCB; 9) Registar em e-GAR como resíduo perigoso.",
+      "enabled": true,
+      "tags": [
+        "PCB",
+        "balastros",
+        "condensadores",
+        "fluorescentes"
+      ]
+    },
+    {
+      "id": "RCD-KPI-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 10 — KPI de Custo de Gestão de RCD por m²",
+      "description": "O custo total de gestão de RCD (triagem, transporte, receção, taxas) deve ser monitorizado como KPI, expresso em €/m² de construção. A meta de referência é ≤5€/m² para construção nova e ≤15€/m² para demolição/reabilitação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.wasteManagementCostPerSqm",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "Custo de gestão de RCD: {waste.wasteManagementCostPerSqm} €/m²",
+      "requiredValue": "≤5€/m² (construção nova) ou ≤15€/m² (reabilitação/demolição)",
+      "remediation": "Otimizar custo de gestão de RCD: 1) Detalhar custos por componente: triagem, transporte, receção, taxas, mão de obra; 2) Comparar com benchmarks: nova ≤5€/m², reabilitação ≤15€/m²; 3) Medidas de redução: melhorar triagem em obra (evitar sobretaxa de mistura), negociar contratos de volume com operadores, otimizar frequência de recolha; 4) Valorização de materiais: metais e madeira limpa têm valor positivo; 5) Registar custos mensalmente; 6) Incluir como indicador no relatório de obra.",
+      "enabled": true,
+      "tags": [
+        "KPI",
+        "custo",
+        "€/m²",
+        "benchmark"
+      ]
+    },
+    {
+      "id": "RCD-MARKETPLACE-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 10.º-C — Registo de Materiais Reutilizados no Relatório Final",
+      "description": "O relatório final de gestão de RCD deve incluir um capítulo sobre materiais reutilizados: quantidade (peso e volume), tipo, origem, poupança financeira estimada e redução de emissões de CO₂ correspondente.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.reusedMaterialsDocumented",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Materiais reutilizados documentados: {waste.reusedMaterialsDocumented}",
+      "requiredValue": "Materiais reutilizados documentados no relatório final",
+      "remediation": "Documentar materiais reutilizados: 1) Listar todos os materiais reutilizados ou incorporados de segunda mão; 2) Para cada material: tipo, quantidade (kg e m³), origem (demolição própria, marketplace, doação); 3) Calcular poupança financeira: custo de material novo vs. reutilizado; 4) Calcular redução de CO₂: emissões evitadas de fabrico e transporte; 5) Fotografar e documentar aplicação; 6) Incluir como capítulo no relatório final de gestão de RCD; 7) Contribui para certificação de sustentabilidade (BREEAM, LEED).",
+      "enabled": true,
+      "tags": [
+        "marketplace",
+        "reutilização",
+        "relatório-final",
+        "documentação"
+      ]
+    },
+    {
+      "id": "RCD-LOGIST-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 18.º-C — Gestão de Picos de Produção de RCD",
+      "description": "O plano de logística de resíduos deve prever picos de produção de RCD (fases de demolição, escavação, acabamentos) com capacidade adicional de contentores, frequência de recolha aumentada e área de armazenamento temporário de reserva.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.peakWasteCapacityPlanned",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Planeamento de picos de RCD: {waste.peakWasteCapacityPlanned}",
+      "requiredValue": "Capacidade de pico de RCD planeada no plano de logística",
+      "remediation": "Planear capacidade para picos de RCD: 1) Identificar fases com maior produção de RCD (demolição, escavação, acabamentos); 2) Estimar volumes de pico (pode ser 3-5x a média); 3) Prever contentores adicionais (reserva de 30%); 4) Negociar com transportador recolhas diárias durante picos; 5) Definir área de armazenamento temporário de reserva; 6) Antecipar necessidades de triagem adicional; 7) Incluir cenários de pico no cronograma de gestão de RCD; 8) Comunicar antecipadamente a operadores de destino final.",
+      "enabled": true,
+      "tags": [
+        "logística",
+        "picos",
+        "capacidade",
+        "planeamento"
+      ]
+    },
+    {
+      "id": "RCD-CARBON-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-H — Relatório de Pegada de Carbono da Gestão de RCD",
+      "description": "O relatório de pegada de carbono da gestão de RCD deve comparar pelo menos dois cenários (gestão atual vs. cenário ótimo) e quantificar as emissões evitadas pela reciclagem e reutilização em relação à deposição integral em aterro.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.hasCarbonFootprintCalculation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.carbonScenarioComparisonDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Comparação de cenários de carbono: {waste.carbonScenarioComparisonDone}",
+      "requiredValue": "Relatório com comparação de cenários de carbono",
+      "remediation": "Elaborar comparação de cenários de carbono: 1) Cenário 1: gestão atual (taxas reais de reciclagem, distâncias de transporte); 2) Cenário 2: deposição integral em aterro (baseline); 3) Cenário 3: gestão ótima (maximização de reciclagem e reutilização local); 4) Quantificar emissões evitadas (tCO₂eq) por cenário; 5) Calcular créditos de reciclagem (substituição de materiais virgens); 6) Incluir gráficos comparativos no relatório; 7) Identificar medidas custo-eficazes de redução adicional; 8) Usar fatores do inventário nacional de emissões.",
+      "enabled": true,
+      "tags": [
+        "carbono",
+        "cenários",
+        "relatório",
+        "emissões-evitadas"
+      ]
+    },
+    {
+      "id": "RCD-SKIP-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 19.º-C — Proibição de Excesso de Carga em Contentores Skip",
+      "description": "É proibido o enchimento de contentores skip acima da borda superior (overfilling). O material não pode exceder o plano superior do contentor em mais de 10 cm. Contentores sobrecarregados devem ser rejeitados pelo transportador e não podem circular na via pública.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasOverfilledContainers",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Contentores com excesso de carga: {waste.hasOverfilledContainers}",
+      "requiredValue": "Zero contentores com excesso de carga",
+      "remediation": "Prevenir excesso de carga em contentores: 1) Marcar linha de enchimento máximo nos contentores (10 cm abaixo da borda); 2) Instruir trabalhadores sobre limite de enchimento; 3) Verificar enchimento antes de solicitar recolha; 4) Se sobrecarregado: redistribuir material para outro contentor; 5) Transportador deve recusar carga em excesso (segurança rodoviária); 6) Para materiais volumosos: usar contentor de maior capacidade; 7) Incluir verificação de enchimento na checklist diária; 8) Registar ocorrências de excesso de carga.",
+      "enabled": true,
+      "tags": [
+        "skip",
+        "excesso-carga",
+        "overfilling",
+        "segurança"
+      ]
     }
   ]
 }

@@ -5597,6 +5597,1060 @@
         "solos",
         "PDM"
       ]
+    },
+    {
+      "id": "PDM-ESCOLA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Zona de Proteção a Estabelecimento de Ensino",
+      "description": "O PDM pode definir zonas de proteção em torno de estabelecimentos de ensino (escolas, creches, jardins-de-infância), proibindo usos incompatíveis (indústria, postos de combustível, bares noturnos) dentro de um raio mínimo, tipicamente 100 a 300 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToSchool",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.schoolBufferMin",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "posto_combustivel",
+            "bar_noturno",
+            "oficina_mecanica",
+            "armazem_perigoso"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Distância à escola mais próxima: {municipal.distanceToSchool} m | Uso proposto: {municipal.proposedUse}",
+      "requiredValue": "Distância ≥ {municipal.schoolBufferMin} m de estabelecimento de ensino para o uso proposto",
+      "remediation": "O uso proposto é incompatível com a proximidade a um estabelecimento de ensino. Relocalizar a atividade para fora da zona de proteção escolar definida no PDM ou alterar o uso proposto para uma atividade compatível (comércio de proximidade, serviços, habitação).",
+      "enabled": true,
+      "tags": [
+        "escola",
+        "zona-proteção",
+        "zonamento",
+        "equipamento-ensino",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ESCOLA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Restrição de Tráfego Pesado junto a Escolas",
+      "description": "Nas zonas de proteção escolar, o PDM pode restringir operações que gerem tráfego pesado significativo, exigindo estudo de impacte no tráfego quando a distância ao estabelecimento de ensino seja inferior ao limiar definido.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.distanceToSchool",
+          "operator": "<",
+          "value": 200
+        },
+        {
+          "field": "municipal.generatesHeavyTraffic",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.trafficImpactStudySubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à escola: {municipal.distanceToSchool} m | Gera tráfego pesado: {municipal.generatesHeavyTraffic}",
+      "requiredValue": "Estudo de impacte no tráfego submetido (trafficImpactStudySubmitted = true) quando a < 200 m de escola",
+      "remediation": "Elaborar estudo de impacte no tráfego demonstrando que a operação não compromete a segurança rodoviária na envolvente escolar. O estudo deve incluir: contagens de tráfego, simulação de movimentos de pesados, horários de operação (evitando entradas/saídas escolares), e medidas de mitigação (sinalização, passadeiras elevadas, limitação de horário).",
+      "enabled": true,
+      "tags": [
+        "escola",
+        "tráfego-pesado",
+        "impacte",
+        "segurança-rodoviária",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-HOSPIT-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Zona de Proteção a Unidade Hospitalar",
+      "description": "O PDM pode definir zonas de proteção em torno de unidades hospitalares e centros de saúde, restringindo usos que produzam ruído excessivo, vibrações, emissões atmosféricas ou tráfego incompatível com a atividade hospitalar, tipicamente num raio de 150 a 500 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToHospital",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.hospitalBufferMin",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "oficina_mecanica",
+            "discoteca",
+            "bar_noturno",
+            "armazem_perigoso"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Distância ao hospital: {municipal.distanceToHospital} m | Uso proposto: {municipal.proposedUse}",
+      "requiredValue": "Distância ≥ {municipal.hospitalBufferMin} m de unidade hospitalar para o uso proposto",
+      "remediation": "O uso proposto é incompatível com a zona de proteção hospitalar definida no PDM. Relocalizar a atividade para fora do raio de proteção ou alterar o uso proposto para atividade compatível. Se não for possível, requerer à câmara municipal parecer sobre medidas de mitigação (insonorização, filtros, restrição horária) que possam viabilizar a coexistência.",
+      "enabled": true,
+      "tags": [
+        "hospital",
+        "zona-proteção",
+        "zonamento",
+        "equipamento-saúde",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-HOSPIT-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGR — Nível de Ruído Máximo junto a Hospital",
+      "description": "Nas zonas de proteção hospitalar, o nível de ruído ambiente diurno não pode exceder 55 dB(A) e o noturno 45 dB(A), conforme o Regulamento Geral do Ruído (DL 9/2007) para zonas sensíveis.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.distanceToHospital",
+          "operator": "<",
+          "value": 300
+        },
+        {
+          "field": "municipal.predictedNoiseLevelDay",
+          "operator": ">",
+          "value": 55
+        }
+      ],
+      "currentValueTemplate": "Nível de ruído previsto (diurno): {municipal.predictedNoiseLevelDay} dB(A) | Distância ao hospital: {municipal.distanceToHospital} m",
+      "requiredValue": "Nível de ruído diurno ≤ 55 dB(A) e noturno ≤ 45 dB(A) em zona sensível hospitalar",
+      "remediation": "O nível de ruído previsto excede o limite para zona sensível hospitalar. Implementar medidas de mitigação acústica: barreiras sonoras, insonorização de equipamentos, restrição de horário de atividades ruidosas. Realizar estudo de impacte acústico por entidade acreditada e submeter à câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "hospital",
+        "ruído",
+        "zona-sensível",
+        "RGR",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CEMIT-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 411/98 — Distância Mínima a Cemitério",
+      "description": "O PDM deve respeitar a zona de proteção sanitária aos cemitérios, com uma faixa non aedificandi mínima de 50 m em torno do perímetro do cemitério, conforme o DL 411/98 (regime jurídico da remoção, transporte e inumação de cadáveres).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToCemetery",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.distanceToCemetery",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Distância ao cemitério: {municipal.distanceToCemetery} m",
+      "requiredValue": "Distância ≥ 50 m do perímetro do cemitério (DL 411/98)",
+      "remediation": "A edificação situa-se dentro da zona de proteção sanitária do cemitério (50 m). Recuar a edificação para fora desta faixa. A zona non aedificandi de 50 m é uma servidão administrativa que não admite exceções, salvo para equipamentos diretamente associados ao cemitério (capela, ossário, crematório).",
+      "enabled": true,
+      "tags": [
+        "cemitério",
+        "buffer",
+        "zona-sanitária",
+        "servidão",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CEMIT-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 411/98 — Restrição de Captação de Água junto a Cemitério",
+      "description": "Não são permitidas captações de água subterrânea (furos, poços) dentro de um raio de 100 m do perímetro de cemitérios, por razões de proteção sanitária e qualidade da água.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToCemetery",
+          "operator": "<",
+          "value": 100
+        },
+        {
+          "field": "municipal.hasWaterAbstractionPoint",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Distância ao cemitério: {municipal.distanceToCemetery} m | Captação de água: {municipal.hasWaterAbstractionPoint}",
+      "requiredValue": "Captação de água proibida a < 100 m de cemitério",
+      "remediation": "Relocalizar o ponto de captação de água subterrânea para fora do raio de 100 m do perímetro do cemitério, conforme as normas sanitárias aplicáveis. Consultar a APA e a autoridade de saúde para verificação das condições hidrogeológicas.",
+      "enabled": true,
+      "tags": [
+        "cemitério",
+        "captação-água",
+        "sanitário",
+        "servidão",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COMBUST-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 267/2002 — Afastamento Mínimo de Posto de Combustível a Edifícios Sensíveis",
+      "description": "Os postos de abastecimento de combustível devem respeitar distâncias mínimas de segurança a edifícios de utilização coletiva (escolas, hospitais, lares, centros comerciais), tipicamente 50 a 100 m conforme o tipo de instalação e capacidade de armazenamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "posto_combustivel"
+        },
+        {
+          "field": "municipal.distanceToSensitiveBuilding",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.petrolStationSetbackMin",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Distância ao edifício sensível mais próximo: {municipal.distanceToSensitiveBuilding} m",
+      "requiredValue": "Distância ≥ {municipal.petrolStationSetbackMin} m de edifícios sensíveis",
+      "remediation": "O posto de combustível não cumpre a distância mínima de segurança a edifícios sensíveis. Relocalizar a instalação ou redimensionar a capacidade de armazenamento para que se apliquem distâncias de segurança menores. Consultar o regime de instalação e funcionamento de postos de combustível (DL 267/2002, alterado pelo DL 195/2008) e os requisitos da ANPC.",
+      "enabled": true,
+      "tags": [
+        "posto-combustível",
+        "afastamento",
+        "segurança",
+        "equipamento-sensível",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COMBUST-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 267/2002 — Afastamento de Posto de Combustível a Limite de Propriedade",
+      "description": "Os reservatórios de combustível enterrados devem manter um afastamento mínimo de 10 m ao limite da propriedade e de 15 m a edifícios habitacionais vizinhos, conforme a regulamentação de segurança contra incêndio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "posto_combustivel"
+        },
+        {
+          "field": "municipal.fuelTankDistanceToPropertyLine",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.fuelTankDistanceToPropertyLine",
+          "operator": "<",
+          "value": 10
+        }
+      ],
+      "currentValueTemplate": "Distância do reservatório ao limite: {municipal.fuelTankDistanceToPropertyLine} m",
+      "requiredValue": "Reservatórios de combustível ≥ 10 m do limite de propriedade",
+      "remediation": "Relocalizar os reservatórios de combustível enterrados para que fiquem a pelo menos 10 m do limite de propriedade e 15 m de edifícios habitacionais vizinhos. Submeter planta de implantação atualizada à câmara municipal e obter parecer favorável da ANPC.",
+      "enabled": true,
+      "tags": [
+        "posto-combustível",
+        "reservatório",
+        "afastamento",
+        "segurança-incêndio",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-TELECOM-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 11/2003 — Afastamento de Torre de Telecomunicações a Edifícios",
+      "description": "As estações de radiocomunicações e torres de telecomunicações devem respeitar distâncias mínimas a edifícios residenciais e equipamentos sensíveis, conforme o DL 11/2003 e as orientações da ANACOM. A distância mínima típica é de 50 a 100 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "torre_telecomunicacoes",
+            "estacao_base_movel",
+            "antena_telecomunicacoes"
+          ]
+        },
+        {
+          "field": "municipal.distanceToResidentialBuilding",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.telecomSetbackMin",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Distância ao edifício residencial mais próximo: {municipal.distanceToResidentialBuilding} m",
+      "requiredValue": "Distância ≥ {municipal.telecomSetbackMin} m de edifícios residenciais",
+      "remediation": "A torre de telecomunicações não cumpre a distância mínima a edifícios residenciais. Relocalizar a infraestrutura ou propor solução alternativa (antena em cobertura de edifício existente, micro-células). Obter parecer favorável da ANACOM e submeter estudo de conformidade com os níveis de referência de campos eletromagnéticos (Portaria 1421/2004).",
+      "enabled": true,
+      "tags": [
+        "telecomunicações",
+        "torre",
+        "afastamento",
+        "ANACOM",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-TELECOM-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Portaria 1421/2004 — Níveis de Exposição a Campos Eletromagnéticos",
+      "description": "A instalação de estações de telecomunicações deve demonstrar que os níveis de campo eletromagnético na envolvente habitada não excedem os valores de referência da Portaria 1421/2004, mediante estudo técnico submetido à ANACOM.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "torre_telecomunicacoes",
+            "estacao_base_movel",
+            "antena_telecomunicacoes"
+          ]
+        },
+        {
+          "field": "municipal.emfComplianceStudySubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Estudo de conformidade EMF submetido: {municipal.emfComplianceStudySubmitted}",
+      "requiredValue": "Estudo de conformidade com níveis de referência EMF submetido (emfComplianceStudySubmitted = true)",
+      "remediation": "Contratar laboratório acreditado para realizar estudo de previsão de níveis de campo eletromagnético (EMF) na envolvente da estação. O estudo deve demonstrar conformidade com os valores de referência da Portaria 1421/2004 e ser submetido à ANACOM e à câmara municipal como elemento instrutório.",
+      "enabled": true,
+      "tags": [
+        "telecomunicações",
+        "EMF",
+        "campo-eletromagnético",
+        "ANACOM",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-EOLICA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 76/2016 — Afastamento de Aerogerador a Habitação",
+      "description": "Os aerogeradores (turbinas eólicas) devem manter uma distância mínima a edifícios habitacionais, tipicamente equivalente a 10 vezes o diâmetro do rotor ou no mínimo 500 m, para garantir proteção contra ruído, efeito de sombra intermitente (shadow flicker) e segurança estrutural.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "parque_eolico"
+        },
+        {
+          "field": "municipal.windTurbineDistanceToHousing",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.windTurbineDistanceToHousing",
+          "operator": "<",
+          "value": 500
+        }
+      ],
+      "currentValueTemplate": "Distância do aerogerador à habitação mais próxima: {municipal.windTurbineDistanceToHousing} m",
+      "requiredValue": "Distância ≥ 500 m (ou 10× diâmetro do rotor) de edifícios habitacionais",
+      "remediation": "O aerogerador situa-se demasiado próximo de habitações. Relocalizar a turbina para cumprir o afastamento mínimo de 500 m (ou 10 vezes o diâmetro do rotor, se superior). Alternativamente, realizar estudo de impacte acústico e de shadow flicker demonstrando níveis aceitáveis, sujeito a parecer favorável da câmara municipal e da APA.",
+      "enabled": true,
+      "tags": [
+        "eólica",
+        "aerogerador",
+        "afastamento",
+        "habitação",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-EOLICA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 76/2016 — Restrição de Parque Eólico em Área Protegida",
+      "description": "A instalação de parques eólicos em áreas protegidas, Rede Natura 2000 ou zonas classificadas pelo PDM como de elevado valor paisagístico requer avaliação de incidências ambientais (AIncA) ou avaliação de impacte ambiental (AIA) e parecer do ICNF.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "parque_eolico"
+        },
+        {
+          "field": "municipal.isInProtectedArea",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.environmentalImpactAssessmentApproved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em área protegida: {municipal.isInProtectedArea} | AIA/AIncA aprovada: {municipal.environmentalImpactAssessmentApproved}",
+      "requiredValue": "AIA/AIncA aprovada para instalação em área protegida (environmentalImpactAssessmentApproved = true)",
+      "remediation": "Submeter estudo de avaliação de incidências ambientais (AIncA) ou, se aplicável, procedimento de AIA à APA. Obter parecer favorável do ICNF relativamente ao impacte sobre habitats e espécies protegidas (particularmente avifauna e quirópteros). O parecer ICNF é vinculativo para a decisão municipal.",
+      "enabled": true,
+      "tags": [
+        "eólica",
+        "área-protegida",
+        "AIA",
+        "ICNF",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-FOTOV-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Uso do Solo para Parque Fotovoltaico",
+      "description": "A instalação de parques fotovoltaicos de grande escala (> 1 MW) só é permitida em categorias de solo compatíveis definidas no PDM (solo rústico — espaços de exploração de recursos energéticos ou espaços de ocupação mista). A instalação em solo classificado como RAN ou REN requer parecer específico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "parque_fotovoltaico"
+        },
+        {
+          "field": "municipal.landUseCategoryAllowsSolar",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Uso proposto: {municipal.proposedUse} | Categoria de solo permite solar: {municipal.landUseCategoryAllowsSolar}",
+      "requiredValue": "Categoria de solo compatível com instalação fotovoltaica (landUseCategoryAllowsSolar = true)",
+      "remediation": "A categoria de solo definida no PDM não permite a instalação de parque fotovoltaico. Requerer à câmara municipal a reclassificação do solo ou identificar parcela alternativa em categoria compatível (espaço de exploração de recursos energéticos). Se o terreno estiver em RAN, obter parecer da DRAP nos termos do Art. 22.º do DL 73/2009.",
+      "enabled": true,
+      "tags": [
+        "fotovoltaico",
+        "solar",
+        "uso-solo",
+        "energia-renovável",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-FOTOV-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Impacte Paisagístico de Parque Fotovoltaico",
+      "description": "Parques fotovoltaicos com área superior a 5 ha devem incluir plano de integração paisagística com cortina vegetal perimetral e manutenção de corredores ecológicos, conforme exigências do PDM e parecer da CCDR.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "parque_fotovoltaico"
+        },
+        {
+          "field": "municipal.solarFarmAreaHa",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "municipal.landscapeIntegrationPlanSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área do parque: {municipal.solarFarmAreaHa} ha | Plano de integração paisagística: {municipal.landscapeIntegrationPlanSubmitted}",
+      "requiredValue": "Plano de integração paisagística submetido (landscapeIntegrationPlanSubmitted = true)",
+      "remediation": "Elaborar plano de integração paisagística incluindo: cortina vegetal autóctone perimetral, manutenção de corredores ecológicos, modelação do terreno para minimizar impacte visual, e plano de desativação e recuperação do solo. Submeter à câmara municipal e à CCDR como elemento instrutório.",
+      "enabled": true,
+      "tags": [
+        "fotovoltaico",
+        "paisagem",
+        "integração-paisagística",
+        "CCDR",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CHAMIN-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 78/2004 — Altura Mínima de Chaminé Industrial",
+      "description": "As chaminés industriais devem ter altura suficiente para garantir a dispersão adequada de efluentes gasosos, não podendo ser inferior a 10 m acima do solo nem inferior à altura dos edifícios num raio de 50 m, conforme o DL 78/2004 (regime de emissões atmosféricas).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.hasIndustrialChimney",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.chimneyHeightAboveGround",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.chimneyHeightAboveGround",
+          "operator": "<",
+          "value": 10
+        }
+      ],
+      "currentValueTemplate": "Altura da chaminé: {municipal.chimneyHeightAboveGround} m",
+      "requiredValue": "Altura da chaminé ≥ 10 m acima do solo e acima dos edifícios num raio de 50 m",
+      "remediation": "Aumentar a altura da chaminé industrial para cumprir o mínimo de 10 m acima do solo e a cota dos edifícios envolventes num raio de 50 m. Realizar estudo de dispersão atmosférica se a APA ou a câmara municipal o exigirem. A chaminé deve cumprir os requisitos técnicos do DL 78/2004 e da Portaria 263/2005.",
+      "enabled": true,
+      "tags": [
+        "chaminé-industrial",
+        "altura",
+        "emissões",
+        "dispersão",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-CHAMIN-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 78/2004 — Chaminé Industrial Acima da Cércea Envolvente",
+      "description": "A chaminé industrial deve ultrapassar a cércea máxima dos edifícios existentes num raio de 50 m por pelo menos 3 m, para evitar efeito de recirculação dos efluentes gasosos junto às fachadas habitadas (efeito de esteira aerodinâmica).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "municipal.hasIndustrialChimney",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.chimneyExceedsSurroundingRoofline",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Chaminé ultrapassa cércea envolvente: {municipal.chimneyExceedsSurroundingRoofline}",
+      "requiredValue": "Chaminé ≥ 3 m acima da cércea dos edifícios num raio de 50 m (chimneyExceedsSurroundingRoofline = true)",
+      "remediation": "Elevar a chaminé para que ultrapasse em pelo menos 3 m a cércea máxima dos edifícios num raio de 50 m. Realizar estudo de modelação de dispersão atmosférica (modelo gaussiano ou CFD) para confirmar que os níveis de imissão na envolvente habitada cumprem os valores-limite do DL 102/2010.",
+      "enabled": true,
+      "tags": [
+        "chaminé-industrial",
+        "cércea",
+        "dispersão",
+        "emissões",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ETAR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Faixa de Proteção a ETAR",
+      "description": "O PDM deve definir uma faixa de proteção (buffer) em torno de estações de tratamento de águas residuais (ETAR), proibindo usos residenciais e equipamentos sensíveis dentro de um raio mínimo, tipicamente de 200 a 500 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWasteTreatmentFacility",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.wasteTreatmentBufferMin",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "escola",
+            "hospital",
+            "lar_idosos",
+            "creche"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Distância à ETAR: {municipal.distanceToWasteTreatmentFacility} m | Uso proposto: {municipal.proposedUse}",
+      "requiredValue": "Distância ≥ {municipal.wasteTreatmentBufferMin} m da ETAR para uso sensível",
+      "remediation": "A edificação com uso sensível situa-se dentro da faixa de proteção à ETAR. Relocalizar o edifício para fora do raio de proteção ou alterar o uso para atividade compatível (industrial, agrícola, armazenamento). Se necessário, consultar a entidade gestora do sistema de águas residuais e a câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "ETAR",
+        "buffer",
+        "tratamento-águas",
+        "zona-proteção",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ETAR-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Faixa de Proteção a Aterro Sanitário",
+      "description": "O PDM deve definir faixa non aedificandi em torno de aterros sanitários e estações de transferência de resíduos, proibindo construção habitacional num raio mínimo de 500 m, por razões sanitárias e ambientais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToLandfill",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.distanceToLandfill",
+          "operator": "<",
+          "value": 500
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "==",
+          "value": "habitacao"
+        }
+      ],
+      "currentValueTemplate": "Distância ao aterro sanitário: {municipal.distanceToLandfill} m | Uso: {municipal.proposedUse}",
+      "requiredValue": "Distância ≥ 500 m de aterro sanitário para uso habitacional",
+      "remediation": "A habitação situa-se dentro da faixa de proteção ao aterro sanitário. Não é permitida construção habitacional a menos de 500 m. Relocalizar o edifício ou alterar o uso proposto. Para usos não habitacionais, consultar a câmara municipal e a APA sobre condições de admissibilidade.",
+      "enabled": true,
+      "tags": [
+        "aterro",
+        "resíduos",
+        "buffer",
+        "zona-proteção",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ETA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 58/2005 — Zona de Proteção a Estação de Tratamento de Água",
+      "description": "As estações de tratamento de água (ETA) para consumo humano devem ter uma zona de proteção que impeça usos contaminantes (industrial, agrícola intensivo, depósito de resíduos) num raio mínimo, tipicamente de 100 a 300 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWaterTreatmentPlant",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.waterTreatmentBufferMin",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "industrial",
+            "armazem_perigoso",
+            "aterro",
+            "suinicultura",
+            "avicultura"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Distância à ETA: {municipal.distanceToWaterTreatmentPlant} m | Uso proposto: {municipal.proposedUse}",
+      "requiredValue": "Distância ≥ {municipal.waterTreatmentBufferMin} m da ETA para uso potencialmente contaminante",
+      "remediation": "O uso proposto é potencialmente contaminante e situa-se dentro da zona de proteção à estação de tratamento de água. Relocalizar a atividade para fora do raio de proteção. A contaminação de captações de água para consumo humano constitui infração gravíssima nos termos da Lei da Água (Lei 58/2005).",
+      "enabled": true,
+      "tags": [
+        "ETA",
+        "tratamento-água",
+        "zona-proteção",
+        "contaminação",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-ALBUF-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 107/2009 — Zona de Proteção de Albufeira de Águas Públicas",
+      "description": "As albufeiras de águas públicas classificadas dispõem de uma zona de proteção de 500 m medida na horizontal a partir da linha de pleno armazenamento (NPA), onde são proibidas edificações não autorizadas, conforme o DL 107/2009.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToReservoir",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.distanceToReservoir",
+          "operator": "<",
+          "value": 500
+        },
+        {
+          "field": "municipal.reservoirProtectionZoneApproval",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à albufeira: {municipal.distanceToReservoir} m | Aprovação zona proteção: {municipal.reservoirProtectionZoneApproval}",
+      "requiredValue": "Aprovação da APA/ARH para construção em zona de proteção de albufeira (reservoirProtectionZoneApproval = true)",
+      "remediation": "A edificação situa-se na zona de proteção da albufeira (500 m do NPA). Requerer parecer à APA/ARH para verificar se a construção é admissível nos termos do Plano de Ordenamento de Albufeira aplicável. São proibidas atividades que possam deteriorar a qualidade da água ou comprometer a estabilidade das margens.",
+      "enabled": true,
+      "tags": [
+        "albufeira",
+        "reservatório",
+        "zona-proteção",
+        "NPA",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-AQUIF-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 58/2005 — Zona de Proteção de Aquífero",
+      "description": "Os perímetros de proteção de captações de água subterrânea para consumo humano (aquíferos protegidos) são definidos por portaria e incluem zonas de proteção imediata, intermédia e alargada, com restrições crescentes de uso do solo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInAquiferProtectionZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.aquiferProtectionLevel",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Em zona de proteção de aquífero: {municipal.isInAquiferProtectionZone} | Nível: {municipal.aquiferProtectionLevel}",
+      "requiredValue": "Uso do solo compatível com o nível de proteção do aquífero definido no PDM",
+      "remediation": "O terreno situa-se em perímetro de proteção de captação de água subterrânea. Na zona de proteção imediata é proibida qualquer atividade. Na zona intermédia são interditas atividades potencialmente poluentes (indústria, pecuária, depósito de resíduos, postos de combustível, cemitérios). Consultar a portaria de delimitação do perímetro e obter parecer da APA/ARH.",
+      "enabled": true,
+      "tags": [
+        "aquífero",
+        "proteção",
+        "água-subterrânea",
+        "captação",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-AQUIF-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 58/2005 — Proibição de Atividades Poluentes em Zona de Proteção Imediata de Aquífero",
+      "description": "Na zona de proteção imediata de captação de água subterrânea (tipicamente 20–50 m), é proibida qualquer edificação, atividade agrícola, depósito de materiais ou intervenção no solo que possa contaminar o aquífero.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.aquiferProtectionLevel",
+          "operator": "==",
+          "value": "imediata"
+        }
+      ],
+      "currentValueTemplate": "Nível de proteção: {municipal.aquiferProtectionLevel}",
+      "requiredValue": "Nenhuma edificação ou atividade permitida em zona de proteção imediata",
+      "remediation": "O terreno está na zona de proteção imediata de captação de água subterrânea — é proibida qualquer construção ou atividade. Relocalizar o projeto para fora desta zona. A zona de proteção imediata é inviolável e não admite exceções.",
+      "enabled": true,
+      "tags": [
+        "aquífero",
+        "proteção-imediata",
+        "proibição",
+        "captação",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-NATURA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 140/99 — Restrições em Sítio da Rede Natura 2000",
+      "description": "Em sítios classificados da Rede Natura 2000 (SIC e ZPE), qualquer projeto suscetível de afetar significativamente os valores naturais deve ser submetido a avaliação de incidências ambientais (AIncA) nos termos do DL 140/99, com parecer vinculativo do ICNF.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInNatura2000Site",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.naturaIncidenceAssessmentApproved",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em sítio Natura 2000: {municipal.isInNatura2000Site} | AIncA aprovada: {municipal.naturaIncidenceAssessmentApproved}",
+      "requiredValue": "AIncA aprovada pelo ICNF para projeto em Rede Natura 2000 (naturaIncidenceAssessmentApproved = true)",
+      "remediation": "Submeter avaliação de incidências ambientais (AIncA) ao ICNF, demonstrando que o projeto não afeta a integridade dos habitats e espécies protegidos no sítio Natura 2000. Se a AIncA concluir impacte significativo, o projeto só pode prosseguir por razões imperativas de reconhecido interesse público e com medidas compensatórias aprovadas pela Comissão Europeia.",
+      "enabled": true,
+      "tags": [
+        "Natura-2000",
+        "AIncA",
+        "ICNF",
+        "área-protegida",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-NATURA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 140/99 — Habitats Prioritários em Rede Natura 2000",
+      "description": "Se o projeto afeta habitats prioritários (listados no Anexo I da Diretiva Habitats com asterisco), o limiar de justificação é mais exigente: apenas razões de saúde pública, segurança ou benefício ambiental primordial podem justificar a intervenção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInNatura2000Site",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.affectsPriorityHabitat",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Em sítio Natura 2000: {municipal.isInNatura2000Site} | Afeta habitat prioritário: {municipal.affectsPriorityHabitat}",
+      "requiredValue": "Projeto não afeta habitat prioritário, ou justificação excecional aprovada pela CE",
+      "remediation": "O projeto afeta habitat prioritário da Rede Natura 2000. Redesenhar o projeto para evitar o habitat prioritário. Se inevitável, a justificação está limitada a razões de saúde ou segurança pública, ou benefícios ambientais primordiais, e requer parecer da Comissão Europeia (Art. 6.º, n.º 4 da Diretiva Habitats). Medidas compensatórias de escala proporcional são obrigatórias.",
+      "enabled": true,
+      "tags": [
+        "Natura-2000",
+        "habitat-prioritário",
+        "Diretiva-Habitats",
+        "ICNF",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-RENCON-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 166/2008 — Condicionantes da REN por Tipo de Área Integrada",
+      "description": "Os terrenos integrados na REN estão sujeitos a condicionantes específicas por tipo de área (leitos de cursos de água, zonas ameaçadas por cheias, zonas de infiltração máxima, áreas de instabilidade de vertentes, faixas de proteção costeira, etc.). O uso admissível depende do tipo de área REN.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInREN",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.renAreaType",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.renCompatibilityVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em REN: {municipal.isInREN} | Tipo de área: {municipal.renAreaType} | Compatibilidade verificada: {municipal.renCompatibilityVerified}",
+      "requiredValue": "Compatibilidade com condicionantes REN verificada pela CCDR (renCompatibilityVerified = true)",
+      "remediation": "Submeter pedido de parecer à CCDR competente, identificando o tipo de área REN abrangido e as ações previstas. Verificar se a operação se enquadra nas ações compatíveis previstas no Anexo II do DL 166/2008 (alterado pelo DL 124/2019). As ações isentas estão listadas no Anexo I. Para todas as restantes, é necessário parecer favorável da CCDR.",
+      "enabled": true,
+      "tags": [
+        "REN",
+        "condicionantes",
+        "CCDR",
+        "tipo-área",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-RANCON-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 73/2009 — Utilizações Não Agrícolas em Solo RAN",
+      "description": "Em solo integrado na RAN, apenas as utilizações não agrícolas expressamente previstas no Art. 22.º do DL 73/2009 são admissíveis, e requerem parecer favorável da entidade regional da RAN (DRAP), incluindo demonstração da inexistência de alternativa viável fora da RAN.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.isInRAN",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "municipal.ranNonAgriculturalUseApproval",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "municipal.proposedUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "industrial",
+            "comercial",
+            "turismo",
+            "energia_renovavel",
+            "infraestrutura"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Em RAN: {municipal.isInRAN} | Uso proposto: {municipal.proposedUse} | Aprovação DRAP: {municipal.ranNonAgriculturalUseApproval}",
+      "requiredValue": "Parecer favorável da DRAP para utilização não agrícola em solo RAN (ranNonAgriculturalUseApproval = true)",
+      "remediation": "Submeter pedido de utilização não agrícola à DRAP competente, demonstrando: (1) enquadramento no Art. 22.º do DL 73/2009; (2) inexistência de alternativa viável fora da RAN; (3) minimização da área afetada; (4) compromisso de recuperação do solo agrícola após cessação do uso. A DRAP tem 20 dias para emitir parecer.",
+      "enabled": true,
+      "tags": [
+        "RAN",
+        "uso-não-agrícola",
+        "DRAP",
+        "parecer",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-DOMMAR-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 54/2005 — Domínio Público Marítimo",
+      "description": "A faixa do domínio público marítimo (DPM) estende-se até 50 m para o interior a partir da linha de máxima preia-mar de águas vivas equinociais (LMPAVE). É proibida qualquer edificação nesta faixa, salvo estruturas de apoio balnear devidamente licenciadas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToCoastline",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.distanceToCoastline",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "municipal.maritimeDomainLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância à LMPAVE: {municipal.distanceToCoastline} m | Licença DPM: {municipal.maritimeDomainLicense}",
+      "requiredValue": "Edificação fora do DPM (≥ 50 m da LMPAVE) ou licença de utilização do DPM obtida",
+      "remediation": "A edificação situa-se no domínio público marítimo. É proibida qualquer construção permanente nesta faixa. Recuar o edifício para fora do DPM (> 50 m da LMPAVE). Para estruturas de apoio balnear ou outras utilizações temporárias, requerer licença de utilização do DPM à APA e à câmara municipal, nos termos da Lei 54/2005.",
+      "enabled": true,
+      "tags": [
+        "domínio-marítimo",
+        "DPM",
+        "LMPAVE",
+        "faixa-costeira",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-DOMRIP-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 54/2005 — Domínio Público Hídrico Fluvial (Margem)",
+      "description": "Os cursos de água navegáveis ou flutuáveis têm uma margem de domínio público de 30 m; os restantes cursos de água têm margem de 10 m. É proibida a construção nas margens do domínio público hídrico sem título de utilização emitido pela APA/ARH.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.distanceToWatercourse",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.watercourseMarginWidth",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.domainPublicWaterLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Distância ao curso de água: {municipal.distanceToWatercourse} m | Largura margem DPH: {municipal.watercourseMarginWidth} m | Licença: {municipal.domainPublicWaterLicense}",
+      "requiredValue": "Edificação fora da margem do DPH ou título de utilização emitido pela APA/ARH",
+      "remediation": "A edificação situa-se na margem do domínio público hídrico fluvial. Recuar o edifício para fora da margem (30 m para cursos navegáveis/flutuáveis, 10 m para os restantes). Se absolutamente necessário construir na margem, requerer título de utilização do domínio público hídrico à APA/ARH, nos termos da Lei 54/2005 e do DL 226-A/2007.",
+      "enabled": true,
+      "tags": [
+        "domínio-hídrico",
+        "margem",
+        "curso-água",
+        "DPH",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-DENSCALC-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Cálculo da Densidade de Construção (Edifícios/ha)",
+      "description": "A densidade de construção (número de edifícios por hectare) proposta numa operação de loteamento não pode exceder o valor máximo definido no PDM para a categoria de solo. A densidade é calculada dividindo o número total de edifícios pela área bruta do loteamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.proposedBuildingDensity",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.maxBuildingDensity",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Densidade proposta: {municipal.proposedBuildingDensity} edifícios/ha",
+      "requiredValue": "Densidade ≤ {municipal.maxBuildingDensity} edifícios/ha (limite PDM)",
+      "remediation": "Reduzir o número de edifícios propostos no loteamento para que a densidade não exceda o máximo fixado no PDM. Alternativas: aumentar a área dos lotes individuais, prever mais espaços verdes e de utilização coletiva, ou agrupar fogos em edifícios multifamiliares em vez de moradias isoladas.",
+      "enabled": true,
+      "tags": [
+        "densidade",
+        "edifícios-hectare",
+        "loteamento",
+        "cálculo",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-COBERT-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Taxa de Cobertura do Lote (Plot Coverage Ratio)",
+      "description": "A taxa de cobertura do lote (rácio entre a área de implantação do edifício e a área total do lote) não pode exceder o valor máximo definido no PDM. É distinta do índice de implantação quando calculada ao nível do lote individual em operação de loteamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.plotCoverageRatio",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.maxPlotCoverageRatio",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Taxa de cobertura: {municipal.plotCoverageRatio}",
+      "requiredValue": "Taxa de cobertura ≤ {municipal.maxPlotCoverageRatio} (limite PDM)",
+      "remediation": "Reduzir a área de implantação do edifício para que a taxa de cobertura (área de implantação / área do lote) não exceda o máximo fixado no PDM. Considerar: recuar o edifício das confrontações, reduzir a pegada do edifício aumentando o número de pisos (se a cércea o permitir), ou eliminar anexos e coberturas acessórias.",
+      "enabled": true,
+      "tags": [
+        "cobertura",
+        "lote",
+        "implantação",
+        "índice",
+        "PDM"
+      ]
+    },
+    {
+      "id": "PDM-IAB-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Índice de Área Bruta de Construção (FAR / Floor Area Ratio)",
+      "description": "O índice de área bruta de construção (rácio entre a área bruta total de todos os pisos e a área do lote ou terreno) — equivalente ao Floor Area Ratio (FAR) — não pode exceder o valor máximo definido no PDM para a categoria de solo e zona.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "municipal.floorAreaRatio",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "municipal.maxFloorAreaRatio",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "FAR proposto: {municipal.floorAreaRatio}",
+      "requiredValue": "FAR ≤ {municipal.maxFloorAreaRatio} (limite PDM)",
+      "remediation": "Reduzir a área bruta de construção total (soma de todos os pisos) para que o FAR não exceda o máximo fixado no PDM. Alternativas: reduzir o número de pisos, reduzir a área por piso, ou excluir áreas técnicas que o regulamento municipal permita não contabilizar (garagens, arrumos em cave, varandas abertas).",
+      "enabled": true,
+      "tags": [
+        "FAR",
+        "floor-area-ratio",
+        "índice-construção",
+        "ABC",
+        "PDM"
+      ]
     }
   ]
 }

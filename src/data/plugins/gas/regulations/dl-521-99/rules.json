@@ -9257,6 +9257,1206 @@
       "remediation": "Solicitar à empresa distribuidora os certificados de conformidade da qualidade do gás fornecido (composição, poder calorífico, índice de Wobbe, teor de impurezas) com periodicidade semestral. Arquivar os certificados em pasta dedicada, mantendo os registos por um período mínimo de 5 anos. Os registos devem estar disponíveis para consulta pela DGEG em inspeções.",
       "enabled": true,
       "tags": ["qualidade", "registos", "certificados", "distribuidora", "arquivo"]
+    },
+    {
+      "id": "GAS-ISOV-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 80.º -- Espaçamento de Válvulas de Isolamento na Rede",
+      "description": "A rede de distribuição de gás no interior do edifício deve dispor de válvulas de isolamento (seccionamento) espaçadas a no máximo 25 m em troços horizontais contínuos, permitindo o isolamento de secções para manutenção sem cortar o fornecimento a todo o edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.network.isolationValveSpacingM",
+          "operator": ">",
+          "value": 25
+        },
+        {
+          "field": "gas.network.horizontalRunLengthM",
+          "operator": ">",
+          "value": 25
+        }
+      ],
+      "currentValueTemplate": "{gas.network.isolationValveSpacingM} m",
+      "requiredValue": "<= 25 m de espaçamento entre válvulas de isolamento",
+      "remediation": "Instalar válvulas de isolamento (seccionamento) adicionais na rede de gás para que o espaçamento máximo entre válvulas consecutivas não exceda 25 m em troços horizontais contínuos. As válvulas devem ser de fácil acesso, manobráveis manualmente (1/4 de volta) e identificadas com etiqueta indicando o troço que seccionam.",
+      "enabled": true,
+      "tags": ["rede", "válvula isolamento", "seccionamento", "espaçamento", "manutenção"]
+    },
+    {
+      "id": "GAS-ISOV-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 47.º -- Válvula de Isolamento por Piso",
+      "description": "Em edifícios com mais de 3 pisos servidos por gás, deve existir uma válvula de isolamento no início da coluna montante de cada piso, acessível a partir das zonas comuns.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.network.hasPerFloorIsolationValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.building.numberOfFloorsWithGas",
+          "operator": ">",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "{gas.network.hasPerFloorIsolationValve}",
+      "requiredValue": "Válvula de isolamento por piso na coluna montante",
+      "remediation": "Instalar válvula de isolamento de esfera (1/4 de volta) no início da derivação de cada piso a partir da coluna montante, em local acessível a partir das zonas comuns do edifício. A válvula deve ser de manobra rápida, identificada com etiqueta do piso correspondente e protegida contra manipulação não autorizada (cadeado ou caixa com chave).",
+      "enabled": true,
+      "tags": ["rede", "válvula isolamento", "piso", "coluna montante", "edifício"]
+    },
+    {
+      "id": "GAS-MATCOMP-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 81.º -- Compatibilidade de Materiais de Tubagem",
+      "description": "Não é permitida a ligação direta entre tubagens de cobre e tubagens de aço galvanizado na rede de gás, devido à corrosão galvânica. A transição deve ser feita com junta dielétrica ou acessório de transição em bronze ou latão.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.materials.hasDielectricJointAtTransitions",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.materials.hasCopperToGalvanizedSteelJoint",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.materials.hasDielectricJointAtTransitions}",
+      "requiredValue": "Junta dielétrica ou acessório de transição em todas as transições cobre/aço galvanizado",
+      "remediation": "Instalar juntas dielétricas certificadas ou acessórios de transição em bronze/latão em todos os pontos de transição entre tubagem de cobre e aço galvanizado. A junta dielétrica deve isolar eletricamente os dois metais para prevenir corrosão galvânica. Verificar que os acessórios de transição cumprem a EN 1254 (cobre) e EN 10255 (aço).",
+      "enabled": true,
+      "tags": ["materiais", "compatibilidade", "corrosão galvânica", "junta dielétrica", "transição"]
+    },
+    {
+      "id": "GAS-MATCOMP-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 48.º -- Tubagem de Polietileno Apenas Enterrada",
+      "description": "A tubagem de polietileno (PE) para gás só é permitida em instalação enterrada, a uma profundidade mínima de 0,60 m. É proibida a sua utilização à vista, embutida em paredes ou no interior de edifícios.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.materials.hasPEPipeAboveGround",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.materials.pipeTypes",
+          "operator": "in",
+          "value": ["PE80", "PE100"]
+        }
+      ],
+      "currentValueTemplate": "{gas.materials.hasPEPipeAboveGround}",
+      "requiredValue": "Tubagem PE exclusivamente em instalação enterrada (profundidade >= 0,60 m)",
+      "remediation": "Remover toda a tubagem de polietileno instalada à vista ou embutida em paredes e substituir por tubagem de cobre (EN 1057) ou aço (EN 10255) conforme aplicável. A tubagem de PE só é admitida em rede enterrada, a profundidade mínima de 0,60 m sob pavimentos exteriores, com banda de sinalização a 0,30 m acima da geratriz superior.",
+      "enabled": true,
+      "tags": ["materiais", "polietileno", "PE", "enterrada", "proibição"]
+    },
+    {
+      "id": "GAS-MATCOMP-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 81.º-A -- Tubagem Flexível Inox Certificada",
+      "description": "A tubagem flexível corrugada em aço inoxidável (CSST) utilizada em instalações de gás deve ser certificada conforme EN 15266 e possuir revestimento exterior de proteção contra contacto com materiais incompatíveis.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.materials.csst.isCertifiedEN15266",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.materials.csst.isUsed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.materials.csst.isCertifiedEN15266}",
+      "requiredValue": "Tubagem CSST certificada EN 15266 com revestimento de proteção",
+      "remediation": "Substituir tubagem CSST não certificada por tubagem corrugada em aço inoxidável com certificação EN 15266. Verificar que a tubagem possui revestimento exterior (amarelo para gás) e que todas as ligações utilizam acessórios do mesmo fabricante. A tubagem CSST deve ser ligada à terra (bonding) conforme EN 62305 para proteção contra descargas atmosféricas.",
+      "enabled": true,
+      "tags": ["materiais", "CSST", "inox flexível", "EN 15266", "certificação"]
+    },
+    {
+      "id": "GAS-APPCLEAR-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 82.º -- Distância de Aparelhos a Gás a Combustíveis",
+      "description": "Todos os aparelhos a gás devem manter uma distância mínima de 200 mm a materiais combustíveis (madeira, têxteis, plásticos) nas laterais e de 300 mm na parte superior, salvo indicação mais restritiva do fabricante.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.appliance.clearanceToCombustiblesLateralMm",
+          "operator": "<",
+          "value": 200
+        },
+        {
+          "field": "gas.appliance.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.appliance.clearanceToCombustiblesLateralMm} mm (lateral)",
+      "requiredValue": ">= 200 mm lateral e >= 300 mm superior a materiais combustíveis",
+      "remediation": "Reposicionar o aparelho a gás ou remover materiais combustíveis para garantir a distância mínima de 200 mm nas laterais e 300 mm acima do aparelho. Se a distância regulamentar não for praticável, instalar barreira de proteção térmica incombustível (classe A1 conforme EN 13501-1) entre o aparelho e o material combustível.",
+      "enabled": true,
+      "tags": ["aparelho", "distância", "combustíveis", "segurança", "proteção térmica"]
+    },
+    {
+      "id": "GAS-APPCLEAR-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 49.º -- Distância Posterior de Aparelhos a Gás",
+      "description": "A distância entre a face posterior de qualquer aparelho a gás e a parede deve ser no mínimo de 25 mm para permitir ventilação e acesso para manutenção, salvo aparelhos concebidos para instalação encostada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.appliance.rearClearanceMm",
+          "operator": "<",
+          "value": 25
+        },
+        {
+          "field": "gas.appliance.isDesignedForFlushMount",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.appliance.rearClearanceMm} mm",
+      "requiredValue": ">= 25 mm de distância posterior à parede",
+      "remediation": "Afastar o aparelho a gás da parede para garantir um espaçamento mínimo de 25 mm na face posterior. Este espaço é necessário para circulação de ar e acesso para manutenção. Consultar o manual do fabricante para distâncias específicas, que podem ser superiores ao mínimo regulamentar.",
+      "enabled": true,
+      "tags": ["aparelho", "distância", "parede", "ventilação", "manutenção"]
+    },
+    {
+      "id": "GAS-WHHEIGHT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 83.º -- Altura de Instalação do Esquentador",
+      "description": "O esquentador a gás deve ser instalado com a base do aparelho a uma altura mínima de 1,20 m do pavimento e com a parte superior a no máximo 1,80 m do pavimento, para facilitar operação e manutenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.installationHeightBottomM",
+          "operator": "<",
+          "value": 1.2
+        },
+        {
+          "field": "gas.waterHeater.type",
+          "operator": "==",
+          "value": "instantaneous"
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.installationHeightBottomM} m",
+      "requiredValue": ">= 1,20 m de altura da base ao pavimento",
+      "remediation": "Reposicionar o esquentador para que a base do aparelho fique a uma altura mínima de 1,20 m do pavimento acabado. A parte superior não deve exceder 1,80 m para garantir acessibilidade para operação dos comandos e manutenção. Em caso de instalação em armário técnico, respeitar as mesmas cotas.",
+      "enabled": true,
+      "tags": ["esquentador", "altura", "instalação", "acessibilidade", "ergonomia"]
+    },
+    {
+      "id": "GAS-WHHEIGHT-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 50.º -- Caldeira Mural: Altura Mínima",
+      "description": "A caldeira mural a gás deve ser instalada a uma altura mínima de 0,30 m do pavimento (base do aparelho) e a distância mínima de 0,10 m do teto para permitir a ligação da conduta de evacuação de gases.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.wallMountedHeightFromFloorM",
+          "operator": "<",
+          "value": 0.3
+        },
+        {
+          "field": "gas.waterHeater.type",
+          "operator": "==",
+          "value": "wall_mounted_boiler"
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.wallMountedHeightFromFloorM} m",
+      "requiredValue": ">= 0,30 m do pavimento e >= 0,10 m do teto",
+      "remediation": "Reposicionar a caldeira mural para que a base fique a no mínimo 0,30 m do pavimento acabado e a parte superior a no mínimo 0,10 m do teto. Verificar que a parede de suporte tem capacidade para o peso do aparelho em funcionamento (com água). Utilizar suportes de fixação homologados pelo fabricante.",
+      "enabled": true,
+      "tags": ["caldeira mural", "altura", "instalação", "pavimento", "teto"]
+    },
+    {
+      "id": "GAS-WHHEIGHT-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 83.º-A -- Esquentador em Instalações Sanitárias: Proibição",
+      "description": "É proibida a instalação de esquentadores ou caldeiras a gás de circuito aberto (tipo A ou B) em instalações sanitárias (casas de banho), quartos ou espaços sem ventilação direta ao exterior.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.installedInBathroom",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.waterHeater.circuitType",
+          "operator": "in",
+          "value": ["typeA", "typeB"]
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.installedInBathroom}",
+      "requiredValue": "Esquentador tipo A/B proibido em instalações sanitárias",
+      "remediation": "Relocalizar o esquentador ou caldeira de circuito aberto para um compartimento com ventilação direta ao exterior (cozinha, lavandaria, varanda fechada ou espaço técnico dedicado). Alternativamente, substituir por aparelho de circuito estanque (tipo C) que pode ser instalado em qualquer compartimento, incluindo instalações sanitárias.",
+      "enabled": true,
+      "tags": ["esquentador", "casa de banho", "proibição", "circuito aberto", "segurança"]
+    },
+    {
+      "id": "GAS-COOKTOP-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 84.º -- Ventilação para Placa de Fogão a Gás",
+      "description": "O compartimento onde está instalada uma placa de fogão (cooktop) a gás deve dispor de ventilação permanente com secção mínima de 100 cm² e sistema de extração mecânica (exaustor) com caudal mínimo de 300 m³/h.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.cooktop.roomVentilationAreaCm2",
+          "operator": "<",
+          "value": 100
+        },
+        {
+          "field": "gas.cooktop.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.cooktop.roomVentilationAreaCm2} cm²",
+      "requiredValue": ">= 100 cm² de ventilação permanente no compartimento",
+      "remediation": "Instalar abertura de ventilação permanente com secção livre mínima de 100 cm² no compartimento da placa de fogão a gás, comunicando diretamente com o exterior. Adicionalmente, instalar exaustor com caudal mínimo de 300 m³/h posicionado sobre a placa de fogão, com conduta de extração para o exterior (não recirculação). A grelha de ventilação deve ser inobstruível.",
+      "enabled": true,
+      "tags": ["fogão", "cooktop", "ventilação", "extração", "cozinha"]
+    },
+    {
+      "id": "GAS-COOKTOP-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 51.º -- Exaustor sobre Placa de Fogão a Gás",
+      "description": "O exaustor instalado sobre uma placa de fogão a gás deve estar posicionado a uma altura de 0,65 m a 0,75 m acima da superfície de cozedura, e a conduta de extração deve ter diâmetro mínimo de 125 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.cooktop.extractorHeightAboveSurfaceM",
+          "operator": "<",
+          "value": 0.65
+        },
+        {
+          "field": "gas.cooktop.hasExtractor",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.cooktop.extractorHeightAboveSurfaceM} m",
+      "requiredValue": "Exaustor a 0,65–0,75 m acima da superfície de cozedura",
+      "remediation": "Ajustar a altura do exaustor para que fique entre 0,65 m e 0,75 m acima da superfície de cozedura da placa de fogão a gás. Alturas inferiores a 0,65 m criam risco de incêndio; alturas superiores a 0,75 m reduzem a eficácia da captação de vapores e produtos de combustão. A conduta de extração deve ter diâmetro mínimo de 125 mm e ligar ao exterior.",
+      "enabled": true,
+      "tags": ["fogão", "cooktop", "exaustor", "altura", "conduta extração"]
+    },
+    {
+      "id": "GAS-COOKTOP-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 84.º-A -- Abertura de Compensação para Extração Mecânica",
+      "description": "Quando a cozinha dispõe de extração mecânica (exaustor) com caudal superior a 200 m³/h, deve existir uma abertura de compensação de ar de entrada com secção livre calculada para evitar depressão excessiva no compartimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.cooktop.hasMakeupAirOpening",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.cooktop.extractorFlowRateM3h",
+          "operator": ">",
+          "value": 200
+        }
+      ],
+      "currentValueTemplate": "{gas.cooktop.hasMakeupAirOpening}",
+      "requiredValue": "Abertura de compensação de ar dimensionada para o caudal de extração",
+      "remediation": "Instalar abertura de compensação de ar de entrada (grelha auto-regulável ou abertura fixa) com secção livre calculada para o caudal do exaustor. Regra prática: mínimo de 4 cm² por m³/h de caudal de extração. A abertura evita depressão excessiva que pode inverter a tiragem de aparelhos a gás e provocar retorno de gases de combustão para o interior.",
+      "enabled": true,
+      "tags": ["fogão", "cooktop", "compensação", "depressão", "tiragem"]
+    },
+    {
+      "id": "GAS-OVEN-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 85.º -- Folgas de Instalação do Forno a Gás",
+      "description": "O forno a gás encastrado deve respeitar uma folga mínima de 5 mm nas laterais e de 10 mm na traseira em relação ao nicho de encastramento, para permitir ventilação e dissipação de calor.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.oven.lateralClearanceMm",
+          "operator": "<",
+          "value": 5
+        },
+        {
+          "field": "gas.oven.isBuiltIn",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.oven.lateralClearanceMm} mm",
+      "requiredValue": ">= 5 mm folga lateral e >= 10 mm folga traseira",
+      "remediation": "Ajustar o nicho de encastramento ou o posicionamento do forno para garantir folgas mínimas de 5 mm nas laterais e 10 mm na traseira. As folgas são essenciais para a circulação de ar de arrefecimento e para prevenir sobreaquecimento dos materiais adjacentes. Consultar o manual do fabricante para dimensões exatas do nicho recomendado.",
+      "enabled": true,
+      "tags": ["forno", "encastramento", "folga", "ventilação", "calor"]
+    },
+    {
+      "id": "GAS-OVEN-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 52.º -- Forno a Gás: Distância a Materiais Combustíveis em Coluna",
+      "description": "O forno a gás instalado em coluna de encastramento deve manter uma distância mínima de 50 mm a qualquer superfície combustível (madeira, melamina, MDF) nos lados, fundo e topo do nicho.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.oven.clearanceToCombustibleInColumnMm",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "gas.oven.isInColumnUnit",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.oven.clearanceToCombustibleInColumnMm} mm",
+      "requiredValue": ">= 50 mm de distância a superfícies combustíveis na coluna",
+      "remediation": "Forrar o interior do nicho de encastramento em coluna com painel incombustível (classe A1 ou A2-s1,d0 conforme EN 13501-1) ou garantir a distância mínima de 50 mm entre o forno e qualquer superfície combustível. Prever ventilação na parte inferior e superior da coluna com aberturas mínimas de 50 cm² cada.",
+      "enabled": true,
+      "tags": ["forno", "coluna", "combustível", "encastramento", "proteção"]
+    },
+    {
+      "id": "GAS-OVEN-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 85.º-A -- Ligação Flexível do Forno a Gás",
+      "description": "A ligação do forno a gás encastrado à rede de gás deve ser efetuada com tubo flexível metálico certificado (EN 14800), com comprimento máximo de 1,50 m e acessível para inspeção sem necessidade de desmontar o mobiliário.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.oven.flexibleConnectionCertified",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.oven.isBuiltIn",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.oven.flexibleConnectionCertified}",
+      "requiredValue": "Ligação flexível certificada EN 14800 (máx. 1,50 m)",
+      "remediation": "Substituir a ligação flexível do forno por tubo flexível metálico certificado conforme EN 14800, com comprimento máximo de 1,50 m. A ligação deve ser acessível para inspeção visual sem necessidade de desmontar o mobiliário envolvente. Verificar a validade do tubo (geralmente 5 anos) e substituir quando expirado.",
+      "enabled": true,
+      "tags": ["forno", "ligação flexível", "EN 14800", "acessibilidade", "certificação"]
+    },
+    {
+      "id": "GAS-FPLACE-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 86.º -- Revestimento Interior da Chaminé para Lareira a Gás",
+      "description": "A chaminé que serve uma lareira a gás deve possuir tubo interior (liner) em aço inoxidável ou alumínio resistente à corrosão, com secção adequada ao caudal de gases de combustão do aparelho.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.fireplace.chimneyHasLiner",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.fireplace.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireplace.chimneyHasLiner}",
+      "requiredValue": "Chaminé com tubo interior (liner) em aço inoxidável ou alumínio",
+      "remediation": "Instalar tubo interior (liner) na chaminé da lareira a gás em aço inoxidável AISI 316L ou alumínio certificado para gás. O diâmetro do liner deve ser dimensionado para o caudal de gases de combustão do aparelho (mínimo 100 mm para potências até 15 kW). O liner deve ser contínuo desde a boca do aparelho até ao cimo da chaminé, sem juntas horizontais.",
+      "enabled": true,
+      "tags": ["lareira", "chaminé", "liner", "aço inoxidável", "evacuação"]
+    },
+    {
+      "id": "GAS-FPLACE-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 53.º -- Isolamento Térmico da Chaminé de Lareira a Gás",
+      "description": "O tubo interior (liner) da chaminé de lareira a gás deve ser isolado termicamente com material incombustível quando a distância entre o liner e materiais combustíveis da estrutura do edifício for inferior a 50 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.fireplace.chimneyLinerInsulated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.fireplace.linerToCombustibleDistanceMm",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "{gas.fireplace.linerToCombustibleDistanceMm} mm",
+      "requiredValue": "Isolamento térmico do liner quando distância a combustíveis < 50 mm",
+      "remediation": "Isolar o tubo interior (liner) da chaminé com manta de lã mineral de rocha (classe A1) com espessura mínima de 25 mm quando a distância a materiais combustíveis for inferior a 50 mm. Alternativamente, aumentar a distância entre o liner e os materiais combustíveis para um mínimo de 50 mm. Verificar a integridade do isolamento durante as inspeções periódicas.",
+      "enabled": true,
+      "tags": ["lareira", "chaminé", "isolamento", "liner", "proteção térmica"]
+    },
+    {
+      "id": "GAS-FPLACE-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 86.º-A -- Tiragem e Terminal da Chaminé de Lareira a Gás",
+      "description": "A chaminé da lareira a gás deve garantir tiragem natural mínima de 3 Pa em condições de funcionamento normal. O terminal deve elevar-se pelo menos 0,40 m acima da cumeeira ou de qualquer obstáculo num raio de 8 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.fireplace.chimneyDraftPa",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "gas.fireplace.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireplace.chimneyDraftPa} Pa",
+      "requiredValue": ">= 3 Pa de tiragem natural; terminal >= 0,40 m acima da cumeeira",
+      "remediation": "Verificar a tiragem da chaminé com anemómetro de depressão. Se inferior a 3 Pa, avaliar: altura insuficiente do terminal (elevar para >= 0,40 m acima da cumeeira), secção inadequada do liner (redimensionar), obstruções internas (limpar), ou perdas de estanquidade (reparar). Instalar terminal anti-vento normalizado no cimo da chaminé.",
+      "enabled": true,
+      "tags": ["lareira", "chaminé", "tiragem", "terminal", "cumeeira"]
+    },
+    {
+      "id": "GAS-BBQ-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 87.º -- Instalação de Churrasqueira a Gás em Exterior",
+      "description": "A churrasqueira (barbecue) a gás de instalação fixa no exterior deve estar posicionada a no mínimo 1,00 m de materiais combustíveis (vedações em madeira, vegetação, toldos) e a 3,00 m de aberturas do edifício (janelas, portas).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.barbecue.distanceToCombustiblesM",
+          "operator": "<",
+          "value": 1.0
+        },
+        {
+          "field": "gas.barbecue.isFixedOutdoor",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.barbecue.distanceToCombustiblesM} m",
+      "requiredValue": ">= 1,00 m de combustíveis e >= 3,00 m de aberturas do edifício",
+      "remediation": "Reposicionar a churrasqueira a gás para garantir uma distância mínima de 1,00 m a qualquer material combustível e de 3,00 m a aberturas do edifício (janelas, portas, grelhas de ventilação). Se a distância a combustíveis não for praticável, instalar barreira incombustível (muro, painel em aço ou betão) entre a churrasqueira e o material combustível.",
+      "enabled": true,
+      "tags": ["churrasqueira", "barbecue", "exterior", "distância", "combustíveis"]
+    },
+    {
+      "id": "GAS-BBQ-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 54.º -- Válvula de Corte Rápido para Churrasqueira a Gás",
+      "description": "A alimentação de gás a churrasqueira fixa exterior deve incluir válvula de corte rápido (1/4 de volta) acessível sem necessidade de se aproximar do aparelho em caso de emergência, a uma distância mínima de 1,50 m.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.barbecue.hasRemoteShutoffValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.barbecue.isFixedOutdoor",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.barbecue.hasRemoteShutoffValve}",
+      "requiredValue": "Válvula de corte rápido acessível a >= 1,50 m da churrasqueira",
+      "remediation": "Instalar válvula de corte rápido (esfera, 1/4 de volta) na tubagem de alimentação de gás da churrasqueira, posicionada a no mínimo 1,50 m do aparelho e em local facilmente acessível em caso de emergência. A válvula deve ser manobrada sem ferramentas e identificada com placa 'CORTE DE GÁS -- CHURRASQUEIRA'.",
+      "enabled": true,
+      "tags": ["churrasqueira", "barbecue", "válvula corte", "emergência", "segurança"]
+    },
+    {
+      "id": "GAS-POOL-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 88.º -- Posicionamento do Aquecedor de Piscina a Gás",
+      "description": "O aquecedor de piscina a gás deve ser instalado no exterior ou em compartimento técnico ventilado, a uma distância mínima de 1,50 m do bordo da piscina e a 3,00 m de qualquer ponto de água projetada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.poolHeater.distanceToPoolEdgeM",
+          "operator": "<",
+          "value": 1.5
+        },
+        {
+          "field": "gas.poolHeater.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.poolHeater.distanceToPoolEdgeM} m",
+      "requiredValue": ">= 1,50 m do bordo da piscina e >= 3,00 m de água projetada",
+      "remediation": "Reposicionar o aquecedor de piscina a gás para garantir distância mínima de 1,50 m do bordo da piscina e 3,00 m de qualquer ponto onde a água possa ser projetada (jatos, cascatas, trampolins). O aparelho deve estar em local ventilado, protegido da incidência direta de água e com acesso para manutenção. Prever base de betão elevada no mínimo 100 mm do solo.",
+      "enabled": true,
+      "tags": ["piscina", "aquecedor", "distância", "posicionamento", "exterior"]
+    },
+    {
+      "id": "GAS-POOL-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 55.º -- Ventilação do Compartimento do Aquecedor de Piscina",
+      "description": "Quando o aquecedor de piscina a gás estiver instalado em compartimento fechado (casa das máquinas), este deve dispor de ventilação permanente com secção mínima de 6 cm² por kW de potência nominal e taxa de renovação de ar de 5 volumes/hora.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.poolHeater.roomVentilationCm2PerKw",
+          "operator": "<",
+          "value": 6
+        },
+        {
+          "field": "gas.poolHeater.isInEnclosedRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.poolHeater.roomVentilationCm2PerKw} cm²/kW",
+      "requiredValue": ">= 6 cm²/kW de ventilação permanente e 5 renovações/hora",
+      "remediation": "Redimensionar as aberturas de ventilação do compartimento do aquecedor de piscina para cumprir o mínimo de 6 cm² por kW de potência nominal. Instalar abertura inferior (admissão) e superior (exaustão) comunicando diretamente com o exterior. Se a ventilação natural for insuficiente, instalar ventilação mecânica com detetor de CO acoplado. Garantir taxa mínima de 5 renovações de ar por hora.",
+      "enabled": true,
+      "tags": ["piscina", "aquecedor", "ventilação", "casa máquinas", "renovação ar"]
+    },
+    {
+      "id": "GAS-POOL-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 88.º-A -- Proteção Anticorrosão do Aquecedor de Piscina",
+      "description": "O aquecedor de piscina a gás e as suas ligações devem ser protegidos contra a corrosão provocada pelo cloro e produtos químicos de tratamento da água, com materiais resistentes ou revestimento adequado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.poolHeater.hasCorrosionProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.poolHeater.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.poolHeater.hasCorrosionProtection}",
+      "requiredValue": "Proteção anticorrosão contra cloro e químicos de tratamento",
+      "remediation": "Verificar que o aquecedor de piscina possui permutador de calor em material resistente à corrosão (cuproníquel, titânio ou aço inoxidável AISI 316). As ligações de gás na proximidade da piscina devem ser em aço inoxidável ou cobre com proteção exterior. Manter o aquecedor afastado do armazenamento de produtos químicos (mínimo 1,00 m). Inspecionar semestralmente sinais de corrosão.",
+      "enabled": true,
+      "tags": ["piscina", "aquecedor", "corrosão", "cloro", "proteção"]
+    },
+    {
+      "id": "GAS-GENER-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 89.º -- Alimentação de Gás ao Gerador de Emergência",
+      "description": "A alimentação de gás natural ao gerador de emergência deve incluir válvula de corte automática por sismo (EN 14382), válvula manual de seccionamento e regulador de pressão dedicado, com bypass para manutenção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.generator.hasSeismicShutoffValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.generator.fuelType",
+          "operator": "==",
+          "value": "natural_gas"
+        }
+      ],
+      "currentValueTemplate": "{gas.generator.hasSeismicShutoffValve}",
+      "requiredValue": "Válvula sísmica, manual e regulador de pressão na alimentação de gás",
+      "remediation": "Instalar na tubagem de alimentação de gás ao gerador: (1) válvula de corte sísmico automática certificada EN 14382, (2) válvula de seccionamento manual de esfera (1/4 de volta), (3) regulador de pressão dedicado com pressão de saída ajustada ao gerador, (4) bypass com válvulas para manutenção do regulador sem interrupção. Todas as ligações devem ser em aço ou cobre com juntas verificadas por ensaio de estanquidade.",
+      "enabled": true,
+      "tags": ["gerador", "alimentação gás", "válvula sísmica", "regulador", "emergência"]
+    },
+    {
+      "id": "GAS-GENER-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 56.º -- Ventilação do Compartimento do Gerador a Gás",
+      "description": "O compartimento do gerador a gás deve dispor de ventilação permanente dimensionada para o caudal de ar de combustão do motor mais o caudal de arrefecimento, com secção mínima total de 10 cm² por kW de potência elétrica.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.generator.roomVentilationCm2PerKw",
+          "operator": "<",
+          "value": 10
+        },
+        {
+          "field": "gas.generator.isInEnclosedRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.generator.roomVentilationCm2PerKw} cm²/kW",
+      "requiredValue": ">= 10 cm²/kW de ventilação permanente no compartimento do gerador",
+      "remediation": "Redimensionar as aberturas de ventilação do compartimento do gerador para um mínimo de 10 cm² por kW de potência elétrica nominal. A ventilação deve assegurar: ar de combustão para o motor, arrefecimento do radiador e diluição de fugas de gás. Instalar grelhas de admissão na parte inferior e exaustão na parte superior, ambas comunicando com o exterior.",
+      "enabled": true,
+      "tags": ["gerador", "ventilação", "compartimento", "combustão", "arrefecimento"]
+    },
+    {
+      "id": "GAS-INDBURN-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 90.º -- Queimador Industrial: Dispositivos de Segurança",
+      "description": "Os queimadores industriais a gás devem possuir: deteção de chama por ionização ou UV, válvula de segurança dupla (double block and bleed), programador de arranque automático e pressostato de gás de mínima.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.industrialBurner.hasDoubleBlockAndBleed",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.industrialBurner.thermalPowerKw",
+          "operator": ">",
+          "value": 70
+        }
+      ],
+      "currentValueTemplate": "{gas.industrialBurner.hasDoubleBlockAndBleed}",
+      "requiredValue": "Válvula dupla (double block and bleed), deteção de chama, pressostato e programador",
+      "remediation": "Equipar o queimador industrial a gás (potência > 70 kW) com: (1) rampa de gás com duas válvulas de segurança em série e válvula de fuga intermédia (double block and bleed) conforme EN 676, (2) detetor de chama por ionização ou UV com tempo de segurança <= 3 s, (3) programador de arranque automático com pré-varrimento, (4) pressostato de gás de mínima e de máxima. Testar mensalmente os dispositivos de segurança.",
+      "enabled": true,
+      "tags": ["industrial", "queimador", "segurança", "double block", "deteção chama"]
+    },
+    {
+      "id": "GAS-INDBURN-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 57.º -- Pré-varrimento do Queimador Industrial",
+      "description": "O ciclo de arranque do queimador industrial a gás deve incluir fase de pré-varrimento com duração mínima de 30 segundos, assegurando pelo menos 5 renovações de ar na câmara de combustão antes da ignição.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.industrialBurner.prePurgeDurationSeconds",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "gas.industrialBurner.thermalPowerKw",
+          "operator": ">",
+          "value": 70
+        }
+      ],
+      "currentValueTemplate": "{gas.industrialBurner.prePurgeDurationSeconds} s",
+      "requiredValue": ">= 30 segundos de pré-varrimento (mín. 5 renovações de ar)",
+      "remediation": "Programar o controlador do queimador para efetuar pré-varrimento com duração mínima de 30 segundos antes de cada tentativa de ignição. O caudal de ar durante o pré-varrimento deve assegurar pelo menos 5 renovações do volume da câmara de combustão e condutas. Após falha de chama, o ciclo de pré-varrimento deve ser repetido integralmente antes de nova tentativa de ignição.",
+      "enabled": true,
+      "tags": ["industrial", "queimador", "pré-varrimento", "purga", "ignição"]
+    },
+    {
+      "id": "GAS-INDBURN-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 90.º-A -- Registo de Manutenção do Queimador Industrial",
+      "description": "Os queimadores industriais a gás devem ter livro de manutenção atualizado com registo de todas as intervenções, ajustes de combustão, ensaios de segurança e leituras de emissões (CO, NOx).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.industrialBurner.hasMaintenanceLog",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.industrialBurner.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.industrialBurner.hasMaintenanceLog}",
+      "requiredValue": "Livro de manutenção atualizado com registos de intervenções e emissões",
+      "remediation": "Criar e manter livro de manutenção do queimador industrial com registo de: data e tipo de cada intervenção, parâmetros de combustão ajustados (pressão de gás, caudal de ar, CO₂%), valores de emissões medidos (CO em ppm, NOx em mg/Nm³), resultado dos ensaios de dispositivos de segurança (válvulas, detetor de chama, pressostatos) e identificação do técnico responsável. Conservar os registos por um mínimo de 10 anos.",
+      "enabled": true,
+      "tags": ["industrial", "queimador", "manutenção", "registo", "emissões"]
+    },
+    {
+      "id": "GAS-WELD-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 91.º -- Posto de Soldadura: Alimentação de Gás",
+      "description": "O posto de soldadura a gás deve dispor de válvula anti-retorno (check valve) e dispositivo anti-retrocesso de chama (flashback arrestor) em cada ligação de gás combustível e de oxigénio, imediatamente a montante do maçarico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.weldingStation.hasFlashbackArrestors",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.weldingStation.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.weldingStation.hasFlashbackArrestors}",
+      "requiredValue": "Dispositivos anti-retrocesso de chama em ambas as ligações (gás e oxigénio)",
+      "remediation": "Instalar dispositivos anti-retrocesso de chama (flashback arrestors) certificados conforme EN 730-1 em ambas as mangueiras (gás combustível e oxigénio), imediatamente a montante do maçarico. Adicionalmente, instalar válvulas anti-retorno a jusante dos reguladores de pressão das garrafas. Verificar o estado dos dispositivos antes de cada utilização e substituir após qualquer retrocesso de chama.",
+      "enabled": true,
+      "tags": ["soldadura", "anti-retrocesso", "flashback", "maçarico", "segurança"]
+    },
+    {
+      "id": "GAS-WELD-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 58.º -- Ventilação do Posto de Soldadura a Gás",
+      "description": "O posto de soldadura a gás deve dispor de ventilação mecânica localizada (extração por hotte ou braço aspirante) com caudal mínimo de 500 m³/h, complementada por ventilação geral do espaço com taxa mínima de 10 renovações/hora.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.weldingStation.localExtractionFlowM3h",
+          "operator": "<",
+          "value": 500
+        },
+        {
+          "field": "gas.weldingStation.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.weldingStation.localExtractionFlowM3h} m³/h",
+      "requiredValue": ">= 500 m³/h de extração localizada e 10 renovações/hora gerais",
+      "remediation": "Instalar sistema de extração localizada (hotte, braço aspirante ou mesa aspirante) posicionado o mais próximo possível do ponto de soldadura, com caudal mínimo de 500 m³/h. Complementar com ventilação geral do espaço de trabalho garantindo taxa mínima de 10 renovações de ar por hora. Monitorizar a qualidade do ar com detetor de CO.",
+      "enabled": true,
+      "tags": ["soldadura", "ventilação", "extração", "hotte", "qualidade ar"]
+    },
+    {
+      "id": "GAS-WELD-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 91.º-A -- Distância de Segurança do Posto de Soldadura",
+      "description": "O posto de soldadura a gás deve estar posicionado a uma distância mínima de 5,00 m de materiais inflamáveis ou explosivos armazenados, e a 3,00 m de garrafas de gás que não estejam em uso.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.weldingStation.distanceToFlammablesM",
+          "operator": "<",
+          "value": 5.0
+        },
+        {
+          "field": "gas.weldingStation.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.weldingStation.distanceToFlammablesM} m",
+      "requiredValue": ">= 5,00 m de inflamáveis/explosivos; >= 3,00 m de garrafas inativas",
+      "remediation": "Reposicionar o posto de soldadura ou os materiais inflamáveis/explosivos para garantir distância mínima de 5,00 m. As garrafas de gás não utilizadas devem estar a pelo menos 3,00 m do posto de trabalho, com válvulas fechadas e carapuças de proteção colocadas. Se a distância mínima não for praticável, instalar barreira corta-fogo (parede ou biombo metálico) entre o posto e os materiais.",
+      "enabled": true,
+      "tags": ["soldadura", "distância", "inflamáveis", "segurança", "garrafas"]
+    },
+    {
+      "id": "GAS-CAGE-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 92.º -- Jaula de Armazenamento de Garrafas de Gás",
+      "description": "As garrafas de gás armazenadas no exterior devem estar contidas em jaula metálica ventilada, com paredes em rede metálica (malha máx. 50 mm), porta com cadeado e sinalização de perigo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.cylinderStorage.hasVentilatedCage",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.cylinderStorage.numberOfCylinders",
+          "operator": ">",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "{gas.cylinderStorage.hasVentilatedCage}",
+      "requiredValue": "Jaula metálica ventilada com cadeado e sinalização para > 2 garrafas",
+      "remediation": "Instalar jaula metálica para armazenamento de garrafas de gás com: paredes em rede metálica (malha máx. 50 mm) para ventilação natural permanente, pavimento nivelado e antiderrapante, correntes ou barras de fixação para impedir a queda das garrafas, porta com cadeado, sinalização de perigo ('Gás Inflamável', 'Proibido Fumar', 'Proibido Chamas Nuas'). A jaula deve estar a >= 2,00 m de ralos, caves ou aberturas abaixo do nível do solo.",
+      "enabled": true,
+      "tags": ["garrafas", "jaula", "armazenamento", "sinalização", "ventilação"]
+    },
+    {
+      "id": "GAS-CAGE-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 59.º -- Separação de Garrafas Cheias e Vazias",
+      "description": "Na jaula de armazenamento, as garrafas cheias devem ser separadas das garrafas vazias, com identificação clara de cada zona. As garrafas de gases incompatíveis (GPL e oxigénio, por exemplo) devem estar em compartimentos separados.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.cylinderStorage.hasFullEmptySeparation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.cylinderStorage.numberOfCylinders",
+          "operator": ">",
+          "value": 4
+        }
+      ],
+      "currentValueTemplate": "{gas.cylinderStorage.hasFullEmptySeparation}",
+      "requiredValue": "Separação de garrafas cheias/vazias e gases incompatíveis",
+      "remediation": "Organizar a jaula de armazenamento com zonas claramente identificadas: 'CHEIAS' e 'VAZIAS', com separação física (divisória ou distância mínima de 1,00 m). As garrafas de gases incompatíveis (combustíveis vs. comburentes) devem estar em compartimentos separados com distância mínima de 3,00 m ou parede corta-fogo intermédia. Afixar sinalização indicando o tipo de gás em cada compartimento.",
+      "enabled": true,
+      "tags": ["garrafas", "jaula", "separação", "cheias", "vazias", "incompatíveis"]
+    },
+    {
+      "id": "GAS-MANIF-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 93.º -- Sala de Manifold de Gás",
+      "description": "A sala de manifold (colector de distribuição) de gás em edifícios com consumo superior a 50 m³/h deve ser exclusiva para equipamento de gás, com acesso restrito, ventilação permanente e deteção de gás com alarme.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.manifoldRoom.isExclusiveForGas",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.consumption.maxFlowM3h",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "{gas.manifoldRoom.isExclusiveForGas}",
+      "requiredValue": "Sala exclusiva para manifold com ventilação e deteção de gás",
+      "remediation": "Destinar compartimento exclusivo para o manifold de gás. A sala deve ter: porta com fechadura de acesso restrito (chave em caixa de vidro de emergência), ventilação permanente alta e baixa com secção mínima de 400 cm² cada, detetor de gás com alarme sonoro e visual e corte automático, iluminação ATEX, sinalização exterior ('Sala de Gás -- Acesso Restrito -- Proibido Fumar'). Não armazenar materiais na sala do manifold.",
+      "enabled": true,
+      "tags": ["manifold", "sala técnica", "ventilação", "deteção", "acesso restrito"]
+    },
+    {
+      "id": "GAS-MANIF-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 60.º -- Dimensionamento do Manifold de Gás",
+      "description": "O manifold (colector de distribuição) de gás deve ser dimensionado para o caudal máximo simultâneo previsto, com válvulas de seccionamento individuais por ramal de saída e manómetro de pressão instalado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.manifoldRoom.hasIndividualBranchValves",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.manifoldRoom.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.manifoldRoom.hasIndividualBranchValves}",
+      "requiredValue": "Válvulas de seccionamento individuais e manómetro no manifold",
+      "remediation": "Equipar o manifold com válvula de seccionamento de esfera em cada ramal de saída, identificada com etiqueta do destino (piso, fração ou aparelho servido). Instalar manómetro de pressão a montante do manifold com escala adequada à pressão de serviço. Prever tomada de pressão para ligação de equipamento de teste. O manifold deve ser em aço ou cobre, com suportes adequados ao peso e às dilatações térmicas.",
+      "enabled": true,
+      "tags": ["manifold", "dimensionamento", "válvulas", "manómetro", "ramais"]
+    },
+    {
+      "id": "GAS-DECOMP-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 94.º -- Ruído da Estação de Descompressão de Gás",
+      "description": "A estação de descompressão (redução de pressão) de gás deve cumprir limites de ruído de 45 dB(A) no período noturno e 55 dB(A) no período diurno, medidos no recetor mais sensível (habitações).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.decompressionStation.noiseNightDbA",
+          "operator": ">",
+          "value": 45
+        },
+        {
+          "field": "gas.decompressionStation.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.decompressionStation.noiseNightDbA} dB(A) (noturno)",
+      "requiredValue": "<= 45 dB(A) noturno e <= 55 dB(A) diurno no recetor sensível",
+      "remediation": "Implementar medidas de atenuação sonora na estação de descompressão: instalar silenciadores no regulador de pressão, encapsular equipamentos ruidosos com painéis fonoabsorventes, instalar juntas antivibráticas nas tubagens, e se necessário, construir barreira acústica perimetral. Efetuar medição de ruído por entidade acreditada conforme o Regulamento Geral do Ruído (DL 9/2007).",
+      "enabled": true,
+      "tags": ["descompressão", "ruído", "dB(A)", "atenuação", "DL 9/2007"]
+    },
+    {
+      "id": "GAS-DECOMP-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 61.º -- Distância da Estação de Descompressão a Habitações",
+      "description": "A estação de descompressão de gás deve estar localizada a uma distância mínima de 10,00 m de habitações, escolas, hospitais e outros edifícios de ocupação sensível, salvo se estiver em compartimento insonorizado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.decompressionStation.distanceToSensitiveBuildingsM",
+          "operator": "<",
+          "value": 10.0
+        },
+        {
+          "field": "gas.decompressionStation.isInSoundproofedRoom",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.decompressionStation.distanceToSensitiveBuildingsM} m",
+      "requiredValue": ">= 10,00 m de edifícios sensíveis ou compartimento insonorizado",
+      "remediation": "Reposicionar a estação de descompressão para distância mínima de 10,00 m de edifícios de ocupação sensível. Se a distância não for praticável, instalar a estação em compartimento insonorizado com isolamento mínimo de Rw 40 dB, ventilação adequada e acesso para manutenção. Efetuar estudo acústico prévio por técnico de acústica certificado.",
+      "enabled": true,
+      "tags": ["descompressão", "distância", "habitações", "insonorização", "edifícios sensíveis"]
+    },
+    {
+      "id": "GAS-ROW-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 95.º -- Faixa de Servidão da Conduta de Gás",
+      "description": "A conduta de gás enterrada deve respeitar uma faixa de servidão (right-of-way) com largura mínima de 1,00 m para cada lado do eixo da tubagem, na qual é proibida a construção de estruturas permanentes e a plantação de árvores de grande porte.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.pipeline.rightOfWayWidthM",
+          "operator": "<",
+          "value": 1.0
+        },
+        {
+          "field": "gas.pipeline.isBuried",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.pipeline.rightOfWayWidthM} m (cada lado do eixo)",
+      "requiredValue": ">= 1,00 m de faixa de servidão para cada lado do eixo",
+      "remediation": "Garantir que a faixa de servidão da conduta de gás enterrada tenha largura mínima de 1,00 m para cada lado do eixo da tubagem. Remover estruturas permanentes, árvores de grande porte e materiais pesados da faixa de servidão. Instalar marcos de sinalização à superfície identificando o traçado da conduta. Registar a servidão na Conservatória do Registo Predial quando aplicável.",
+      "enabled": true,
+      "tags": ["conduta", "servidão", "faixa", "enterrada", "construção proibida"]
+    },
+    {
+      "id": "GAS-ROW-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 62.º -- Sinalização da Conduta Enterrada",
+      "description": "A conduta de gás enterrada deve ser sinalizada com banda de aviso em PVC amarelo com a inscrição 'ATENÇÃO -- CONDUTA DE GÁS' colocada a 0,30 m acima da geratriz superior da tubagem ao longo de todo o traçado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.pipeline.hasWarningTapeInstalled",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipeline.isBuried",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.pipeline.hasWarningTapeInstalled}",
+      "requiredValue": "Banda de aviso amarela instalada 0,30 m acima da tubagem",
+      "remediation": "Instalar banda de aviso em PVC amarelo com largura mínima de 150 mm e inscrição repetida 'ATENÇÃO -- CONDUTA DE GÁS' a 0,30 m acima da geratriz superior da tubagem enterrada, ao longo de todo o traçado. A banda deve ser detetável por equipamento eletrónico de deteção (banda com fio metálico incorporado para condutas em PE). Nos cruzamentos e mudanças de direção, colocar marcos de sinalização à superfície.",
+      "enabled": true,
+      "tags": ["conduta", "sinalização", "banda aviso", "enterrada", "traçado"]
+    },
+    {
+      "id": "GAS-SDEPTH-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 96.º -- Profundidade da Ligação de Serviço de Gás",
+      "description": "A ligação de serviço de gás (ramal entre a rede pública e o edifício) deve estar enterrada a uma profundidade mínima de 0,60 m sob passeios e de 0,80 m sob vias de tráfego rodoviário, medida da geratriz superior da tubagem.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.serviceConnection.depthUnderSidewalkM",
+          "operator": "<",
+          "value": 0.6
+        },
+        {
+          "field": "gas.serviceConnection.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.serviceConnection.depthUnderSidewalkM} m",
+      "requiredValue": ">= 0,60 m sob passeios e >= 0,80 m sob vias de tráfego",
+      "remediation": "Recolocar a ligação de serviço de gás à profundidade regulamentar: mínimo de 0,60 m sob passeios e espaços pedonais, e mínimo de 0,80 m sob vias de tráfego rodoviário (medida da geratriz superior da tubagem à superfície). Assentar a tubagem sobre leito de areia com espessura mínima de 0,10 m e cobrir com areia até 0,10 m acima da geratriz superior. Colocar banda de sinalização a 0,30 m acima da tubagem.",
+      "enabled": true,
+      "tags": ["ligação serviço", "profundidade", "enterrada", "passeio", "via tráfego"]
+    },
+    {
+      "id": "GAS-SDEPTH-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 63.º -- Proteção Mecânica da Ligação de Serviço",
+      "description": "A ligação de serviço de gás, no troço em que a profundidade mínima não pode ser garantida (travessias de muros, entradas de edifícios), deve ser protegida mecanicamente com manga de aço ou tubo de proteção em PVC rígido.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.serviceConnection.hasMechanicalProtectionAtShallowPoints",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.serviceConnection.hasShallowSections",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.serviceConnection.hasMechanicalProtectionAtShallowPoints}",
+      "requiredValue": "Proteção mecânica (manga ou tubo) nos troços de profundidade insuficiente",
+      "remediation": "Instalar manga de proteção em aço ou tubo de PVC rígido (classe SN8 mínimo) nos troços da ligação de serviço onde a profundidade mínima regulamentar não pode ser garantida. A manga deve ultrapassar a zona desprotegida em pelo menos 0,50 m para cada lado. Selar as extremidades da manga com material flexível para evitar entrada de água mas permitir ventilação.",
+      "enabled": true,
+      "tags": ["ligação serviço", "proteção mecânica", "manga", "profundidade", "travessia"]
+    },
+    {
+      "id": "GAS-METPROT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 97.º -- Proteção do Contador de Gás Contra Veículos",
+      "description": "O contador de gás instalado no exterior, em zona acessível a veículos, deve ser protegido por barreira física (poste de proteção, guarda metálica ou muro) capaz de resistir ao impacto de um veículo ligeiro.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.meter.hasVehicleImpactProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.meter.isInVehicleAccessibleArea",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.meter.hasVehicleImpactProtection}",
+      "requiredValue": "Barreira de proteção contra impacto de veículos no contador",
+      "remediation": "Instalar barreira de proteção física junto ao contador de gás: postes de proteção em aço (mín. 100 mm de diâmetro, cravados 0,50 m no solo e 0,60 m acima do solo, preenchidos com betão), guarda metálica ou muro de betão. A barreira deve estar posicionada a no mínimo 0,30 m do armário do contador e cobrir toda a extensão do armário. Pintar a barreira com cor de alta visibilidade (amarelo RAL 1023).",
+      "enabled": true,
+      "tags": ["contador", "proteção", "veículos", "impacto", "barreira"]
+    },
+    {
+      "id": "GAS-METPROT-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 64.º -- Armário do Contador Resistente a Impacto",
+      "description": "O armário (nicho) do contador de gás em fachada ou limite de propriedade deve ser construído em material resistente a impacto (aço, betão ou polímero reforçado) com classificação mínima IK08.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.meter.cabinetImpactRatingIK",
+          "operator": "<",
+          "value": 8
+        },
+        {
+          "field": "gas.meter.isExterior",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "IK0{gas.meter.cabinetImpactRatingIK}",
+      "requiredValue": ">= IK08 de resistência ao impacto",
+      "remediation": "Substituir o armário do contador por um modelo com classificação de resistência ao impacto mínima IK08 (conforme EN 62262). O armário deve ser ventilado (mín. 50 cm² de abertura), dotado de fechadura normalizada da distribuidora, e permitir a leitura do contador sem abertura da porta (visor ou contador com telemetria). Materiais recomendados: aço galvanizado 1,5 mm, polímero reforçado com fibra de vidro, ou betão pré-fabricado.",
+      "enabled": true,
+      "tags": ["contador", "armário", "impacto", "IK08", "resistência"]
+    },
+    {
+      "id": "GAS-CONVREQ-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 98.º -- Requisitos para Conversão Gás Natural / GPL",
+      "description": "A conversão de uma instalação de GPL para gás natural (ou vice-versa) exige novo projeto aprovado pela DGEG, substituição de reguladores de pressão, verificação da compatibilidade dos aparelhos e novo ensaio de estanquidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.conversion.hasNewDGEGProject",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.networkConversionPerformed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.hasNewDGEGProject}",
+      "requiredValue": "Novo projeto DGEG aprovado para conversão de rede GPL/gás natural",
+      "remediation": "Contratar técnico credenciado para elaborar novo projeto de gás a submeter à DGEG, contemplando: redimensionamento da rede (GPL e gás natural têm densidades e poderes caloríficos diferentes), substituição de reguladores de pressão (GPL: 37 mbar ou 50 mbar; GN: 20 mbar), verificação e conversão de cada aparelho pelo fabricante ou entidade acreditada, novo ensaio de estanquidade e comissionamento integral da instalação.",
+      "enabled": true,
+      "tags": ["conversão", "GPL", "gás natural", "DGEG", "projeto"]
+    },
+    {
+      "id": "GAS-CONVREQ-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 65.º -- Redimensionamento da Rede na Conversão",
+      "description": "Na conversão de GPL para gás natural, a rede de tubagem deve ser verificada e, se necessário, redimensionada, uma vez que o gás natural requer diâmetros superiores para o mesmo débito calorífico devido ao menor poder calorífico volumétrico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.conversion.networkResizingVerified",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.fromGasType",
+          "operator": "==",
+          "value": "LPG"
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.networkResizingVerified}",
+      "requiredValue": "Verificação e redimensionamento da rede para gás natural",
+      "remediation": "Efetuar cálculo de dimensionamento da rede existente para gás natural, considerando: poder calorífico superior do gás natural (~11,0 kWh/m³ vs. ~28,5 kWh/m³ do propano), pressão de serviço (20 mbar para GN), perdas de carga admissíveis e simultaneidade dos aparelhos. Se os diâmetros existentes forem insuficientes, substituir os troços subdimensionados. Documentar o cálculo no projeto de conversão.",
+      "enabled": true,
+      "tags": ["conversão", "redimensionamento", "diâmetros", "GPL", "gás natural"]
+    },
+    {
+      "id": "GAS-CONVREQ-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 98.º-A -- Pressão de Serviço na Conversão",
+      "description": "Após a conversão de GPL para gás natural, a pressão de serviço regulada deve ser ajustada para 20 mbar (gás natural) em vez dos 37 mbar (butano) ou 50 mbar (propano) do GPL, com verificação de todos os reguladores.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.conversion.operatingPressureAdjusted",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.networkConversionPerformed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.operatingPressureAdjusted}",
+      "requiredValue": "Pressão de serviço ajustada para 20 mbar (GN) com reguladores substituídos",
+      "remediation": "Substituir todos os reguladores de pressão da instalação por modelos calibrados para gás natural (pressão de saída 20 mbar). Verificar que cada aparelho recebe a pressão de serviço correta na boquilha de ligação. Ajustar os injetores dos aparelhos convertidos para o caudal de gás natural correspondente à potência nominal. Realizar ensaio de pressão e verificação de combustão após o ajuste.",
+      "enabled": true,
+      "tags": ["conversão", "pressão", "regulador", "20 mbar", "ajuste"]
+    },
+    {
+      "id": "GAS-WARR-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 99.º -- Documentação de Garantia da Instalação de Gás",
+      "description": "O instalador credenciado deve fornecer ao proprietário documentação de garantia da instalação de gás com prazo mínimo de 2 anos, cobrindo defeitos de material e de execução da rede de tubagens e acessórios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.warranty.hasInstallerWarrantyDocument",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isNewOrRenovated",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.warranty.hasInstallerWarrantyDocument}",
+      "requiredValue": "Documentação de garantia do instalador (mín. 2 anos)",
+      "remediation": "Solicitar ao instalador credenciado a emissão de certificado de garantia da instalação de gás, com prazo mínimo de 2 anos a contar da data de comissionamento. A garantia deve cobrir: defeitos de material das tubagens e acessórios, defeitos de execução das juntas e ligações, correto dimensionamento da rede, e funcionamento dos dispositivos de segurança. O documento deve incluir identificação do instalador, número de credenciação DGEG, data de conclusão e condições de garantia.",
+      "enabled": true,
+      "tags": ["garantia", "documentação", "instalador", "2 anos", "defeitos"]
+    },
+    {
+      "id": "GAS-WARR-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 66.º -- Garantia dos Aparelhos a Gás Instalados",
+      "description": "A documentação entregue ao proprietário deve incluir as garantias individuais de cada aparelho a gás instalado, com identificação do modelo, número de série, data de instalação e condições de garantia do fabricante.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.warranty.hasApplianceWarrantyDocuments",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.appliance.numberOfInstalled",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "{gas.warranty.hasApplianceWarrantyDocuments}",
+      "requiredValue": "Garantias individuais de todos os aparelhos a gás arquivadas",
+      "remediation": "Reunir e arquivar a documentação de garantia de cada aparelho a gás instalado: certificado de garantia do fabricante, manual de utilização e manutenção, declaração de conformidade CE, ficha técnica com número de série e modelo. Organizar em pasta dedicada junto ao dossier da instalação de gás. Registar a data de instalação de cada aparelho para controlo da validade da garantia.",
+      "enabled": true,
+      "tags": ["garantia", "aparelhos", "fabricante", "documentação", "arquivo"]
+    },
+    {
+      "id": "GAS-WARR-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 99.º-A -- Dossier Técnico Completo da Instalação",
+      "description": "O instalador deve entregar ao proprietário o dossier técnico completo da instalação de gás, incluindo: projeto aprovado, telas finais, relatório de ensaio de estanquidade, certificado de comissionamento, garantias e manual de operação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.warranty.hasTechnicalDossier",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isNewOrRenovated",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.warranty.hasTechnicalDossier}",
+      "requiredValue": "Dossier técnico completo entregue ao proprietário",
+      "remediation": "Exigir ao instalador a entrega do dossier técnico completo, que deve incluir: (1) cópia do projeto aprovado pela DGEG, (2) telas finais (as-built) com traçado real da tubagem, (3) relatório de ensaio de estanquidade com valores registados, (4) certificado de comissionamento, (5) certificados de garantia da instalação e dos aparelhos, (6) manual de operação e manutenção, (7) lista de contactos de emergência. Conservar o dossier durante toda a vida útil da instalação.",
+      "enabled": true,
+      "tags": ["garantia", "dossier técnico", "telas finais", "comissionamento", "entrega"]
     }
   ]
 }

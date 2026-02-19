@@ -9411,6 +9411,1791 @@
         "FTH",
         "primeiro-adquirente"
       ]
+    },
+    {
+      "id": "RJUE-TAXA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 116.º — Taxa de Licenciamento de Construção",
+      "description": "A emissão de alvará de licença de construção está sujeita ao pagamento de taxas municipais, cujo cálculo depende da área bruta de construção e do tipo de operação urbanística.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "licensing.permitFeePaid",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Taxa de licenciamento paga: {licensing.permitFeePaid}",
+      "requiredValue": "Taxa de emissão de alvará integralmente paga",
+      "remediation": "Calcular a taxa de licenciamento de acordo com o regulamento municipal de taxas e tabela de taxas do município. A taxa é determinada em função da área bruta de construção (m²), tipologia de uso e localização. O alvará só é emitido após comprovativo de pagamento.",
+      "enabled": true,
+      "tags": [
+        "taxa",
+        "licenciamento",
+        "alvará",
+        "pagamento",
+        "regulamento-municipal"
+      ]
+    },
+    {
+      "id": "RJUE-TAXA-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 116.º, n.º 2 — Cálculo de Taxa por Área de Construção",
+      "description": "A taxa de licenciamento é calculada por metro quadrado de área bruta de construção, podendo variar entre zonas do município conforme definido no regulamento municipal de taxas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.grossConstructionAreaM2",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "licensing.permitFeeCalculated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área bruta: {licensing.grossConstructionAreaM2} m² | Taxa calculada: {licensing.permitFeeCalculated}",
+      "requiredValue": "Cálculo de taxa por m² conforme regulamento municipal",
+      "remediation": "Obter junto da câmara municipal o valor da taxa por m² aplicável à zona urbanística do projeto. Multiplicar pela área bruta de construção total (incluindo caves e anexos). Verificar se existem majorações ou reduções aplicáveis ao tipo de operação.",
+      "enabled": true,
+      "tags": [
+        "taxa",
+        "cálculo",
+        "área-bruta",
+        "regulamento-municipal",
+        "m2"
+      ]
+    },
+    {
+      "id": "RJUE-TAXA-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 116.º, n.º 3 — Taxa de Admissão de Comunicação Prévia",
+      "description": "A comunicação prévia está igualmente sujeita ao pagamento de taxa, embora com valores inferiores aos do licenciamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.controlType",
+          "operator": "==",
+          "value": "comunicacao_previa"
+        },
+        {
+          "field": "licensing.comunicacaoPreviaFeePaid",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Tipo de controlo: {licensing.controlType} | Taxa paga: {licensing.comunicacaoPreviaFeePaid}",
+      "requiredValue": "Taxa de comunicação prévia paga",
+      "remediation": "Efetuar o pagamento da taxa de comunicação prévia conforme tabela municipal. O valor é geralmente inferior à taxa de licenciamento, mas a sua falta impede a admissão do procedimento.",
+      "enabled": true,
+      "tags": [
+        "taxa",
+        "comunicação-prévia",
+        "admissão",
+        "pagamento"
+      ]
+    },
+    {
+      "id": "RJUE-TRIBUTL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 113.º — Imposto Municipal sobre Imóveis (IMI) — Notificação de Construção Nova",
+      "description": "A conclusão de construção nova obriga à inscrição do prédio na matriz predial e início de tributação em IMI, devendo o titular notificar a Autoridade Tributária.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.taxAuthorityNotified",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.occupancyPermitIssued",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Construção nova concluída | AT notificada: {licensing.taxAuthorityNotified}",
+      "requiredValue": "Autoridade Tributária notificada para inscrição matricial",
+      "remediation": "Após emissão de autorização de utilização, declarar o prédio junto da Autoridade Tributária (AT) no prazo de 60 dias para inscrição na matriz predial urbana. A falta de inscrição constitui infração tributária e impede a escritura de compra e venda.",
+      "enabled": true,
+      "tags": [
+        "IMI",
+        "imposto",
+        "autoridade-tributária",
+        "matriz-predial",
+        "notificação"
+      ]
+    },
+    {
+      "id": "RJUE-TRIBUTL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 113.º — Taxa Municipal de Urbanização (TMU)",
+      "description": "As operações de loteamento e obras de urbanização estão sujeitas à Taxa Municipal de Urbanização (TMU), calculada em função do impacto urbanístico e das infraestruturas a fornecer pelo município.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": [
+            "loteamento",
+            "obras_urbanizacao",
+            "construcao_nova"
+          ]
+        },
+        {
+          "field": "licensing.tmuPaid",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Operação: {licensing.operationType} | TMU paga: {licensing.tmuPaid}",
+      "requiredValue": "Taxa Municipal de Urbanização integralmente liquidada",
+      "remediation": "Calcular a TMU conforme regulamento municipal, considerando: área de construção, índice de impermeabilização, infraestruturas a cargo do município (arruamentos, redes de água, esgotos, eletricidade). O alvará não é emitido sem comprovativo de pagamento ou acordo de pagamento em prestações.",
+      "enabled": true,
+      "tags": [
+        "TMU",
+        "urbanização",
+        "taxa",
+        "infraestruturas",
+        "loteamento"
+      ]
+    },
+    {
+      "id": "RJUE-TRIBUTL-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 116.º-A — Isenção de Taxas para Reabilitação Urbana",
+      "description": "Operações urbanísticas em Áreas de Reabilitação Urbana (ARU) podem beneficiar de isenção ou redução de taxas municipais.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.taxExemptionRequested",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em ARU: {licensing.isInARU} | Isenção requerida: {licensing.taxExemptionRequested}",
+      "requiredValue": "Pedido de isenção/redução de taxas apresentado",
+      "remediation": "Requerer isenção ou redução de taxas municipais junto da câmara, comprovando a localização em ARU e a natureza de reabilitação da intervenção. As isenções podem abranger TMU, taxa de alvará e taxa de ocupação de via pública.",
+      "enabled": true,
+      "tags": [
+        "isenção",
+        "taxas",
+        "ARU",
+        "reabilitação",
+        "benefícios"
+      ]
+    },
+    {
+      "id": "RJUE-INFRAL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 25.º — Cálculo de Compensação por Infraestruturas",
+      "description": "Nos loteamentos, o promotor é responsável pelo custo das infraestruturas internas. Para infraestruturas de ligação à rede municipal, é devida compensação ao município.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.infrastructureLevyCalculated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Loteamento | Compensação calculada: {licensing.infrastructureLevyCalculated}",
+      "requiredValue": "Compensação por infraestruturas calculada e acordada",
+      "remediation": "Calcular o encargo com infraestruturas de ligação conforme regulamento municipal. Inclui: arruamentos, passeios, redes de água, saneamento, eletricidade, gás, telecomunicações e iluminação pública. Apresentar orçamento detalhado e obter acordo prévio com a câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "infraestruturas",
+        "compensação",
+        "loteamento",
+        "redes",
+        "encargo"
+      ]
+    },
+    {
+      "id": "RJUE-INFRAL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 25.º, n.º 3 — Caução para Infraestruturas",
+      "description": "A execução das infraestruturas pelo promotor é garantida por caução, cujo valor deve cobrir o custo total das obras de urbanização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.infrastructureBondPosted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.infrastructureLevyCalculated",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Caução infraestruturas: {licensing.infrastructureBondPosted}",
+      "requiredValue": "Caução prestada no valor total das obras de urbanização",
+      "remediation": "Prestar caução a favor do município no valor correspondente ao custo total das obras de urbanização previstas. A caução pode ser prestada mediante garantia bancária, seguro-caução, depósito em dinheiro ou hipoteca sobre imóveis livres de ónus. O alvará de loteamento não é emitido sem caução válida.",
+      "enabled": true,
+      "tags": [
+        "caução",
+        "infraestruturas",
+        "garantia-bancária",
+        "urbanização"
+      ]
+    },
+    {
+      "id": "RJUE-INFRAL-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 25.º, n.º 4 — Receção Provisória de Infraestruturas",
+      "description": "Após conclusão das obras de urbanização, deve proceder-se à receção provisória das infraestruturas pelo município, com vistoria técnica.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.infrastructureWorksComplete",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.provisionalReceptionDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Obras concluídas: {licensing.infrastructureWorksComplete} | Receção provisória: {licensing.provisionalReceptionDone}",
+      "requiredValue": "Receção provisória das infraestruturas efetuada",
+      "remediation": "Requerer vistoria de receção provisória à câmara municipal. A vistoria verifica a conformidade das infraestruturas com o projeto aprovado. Após receção provisória, inicia-se o prazo de garantia (mínimo 5 anos) durante o qual o promotor é responsável pela reparação de defeitos.",
+      "enabled": true,
+      "tags": [
+        "receção-provisória",
+        "infraestruturas",
+        "vistoria",
+        "garantia"
+      ]
+    },
+    {
+      "id": "RJUE-ACOMP-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 44.º — Cedências e Áreas Compensatórias",
+      "description": "Nas operações de loteamento, o promotor deve ceder ao município terrenos para espaços verdes, equipamentos e infraestruturas, conforme parâmetros de dimensionamento definidos no RJIGT.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.cessionAreaCalculated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Cedências calculadas: {licensing.cessionAreaCalculated}",
+      "requiredValue": "Áreas de cedência definidas conforme parâmetros urbanísticos",
+      "remediation": "Calcular as áreas de cedência obrigatória conforme Portaria 216-B/2008: espaços verdes (28 m²/fogo), equipamentos (35 m²/fogo) e estacionamento público. As cedências devem constar do projeto de loteamento e ser formalizadas no alvará.",
+      "enabled": true,
+      "tags": [
+        "cedências",
+        "áreas-compensatórias",
+        "espaços-verdes",
+        "equipamentos",
+        "loteamento"
+      ]
+    },
+    {
+      "id": "RJUE-ACOMP-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 44.º, n.º 4 — Compensação em Numerário por Cedências",
+      "description": "Quando a cedência em espécie não é possível ou adequada, é devida compensação em numerário ao município, calculada com base no valor do terreno.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": [
+            "loteamento",
+            "construcao_nova"
+          ]
+        },
+        {
+          "field": "licensing.cessionInKindPossible",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.monetaryCompensationPaid",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Cedência em espécie possível: {licensing.cessionInKindPossible} | Compensação paga: {licensing.monetaryCompensationPaid}",
+      "requiredValue": "Compensação em numerário calculada e liquidada",
+      "remediation": "Requerer à câmara municipal o cálculo da compensação em numerário substitutiva da cedência. O valor é calculado com base no custo de aquisição de terreno equivalente na zona, acrescido dos custos de infraestruturação. O pagamento pode ser fracionado conforme acordo com o município.",
+      "enabled": true,
+      "tags": [
+        "compensação",
+        "numerário",
+        "cedências",
+        "substituição"
+      ]
+    },
+    {
+      "id": "RJUE-CONTR-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 55.º — Contrato de Urbanização",
+      "description": "O promotor e o município podem celebrar contrato de urbanização que define as obrigações recíprocas relativas à execução de infraestruturas e cedências.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.numberOfLots",
+          "operator": ">=",
+          "value": 10
+        },
+        {
+          "field": "licensing.urbanizationContractSigned",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Lotes: {licensing.numberOfLots} | Contrato urbanização: {licensing.urbanizationContractSigned}",
+      "requiredValue": "Contrato de urbanização celebrado para loteamentos de grande dimensão",
+      "remediation": "Negociar e celebrar contrato de urbanização com a câmara municipal, definindo: faseamento das obras de urbanização, prazos de execução, responsabilidades de cada parte, mecanismos de receção de infraestruturas e condições de libertação de caução.",
+      "enabled": true,
+      "tags": [
+        "contrato-urbanização",
+        "promotor",
+        "município",
+        "obrigações"
+      ]
+    },
+    {
+      "id": "RJUE-CONTR-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 55.º, n.º 2 — Acordo de Contribuição do Promotor",
+      "description": "O contrato de urbanização pode prever contribuições do promotor para equipamentos coletivos e infraestruturas que excedam as necessidades diretas do loteamento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "loteamento"
+        },
+        {
+          "field": "licensing.grossConstructionAreaM2",
+          "operator": ">",
+          "value": 5000
+        },
+        {
+          "field": "licensing.developerContributionAgreed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área: {licensing.grossConstructionAreaM2} m² | Contribuição acordada: {licensing.developerContributionAgreed}",
+      "requiredValue": "Contribuição do promotor para infraestruturas comunitárias negociada",
+      "remediation": "Negociar com o município a contribuição para infraestruturas e equipamentos de interesse público (escolas, centros de saúde, espaços desportivos) que sirvam o loteamento. A contribuição pode ser em espécie (execução direta) ou em numerário.",
+      "enabled": true,
+      "tags": [
+        "contribuição-promotor",
+        "equipamentos-coletivos",
+        "infraestruturas",
+        "negociação"
+      ]
+    },
+    {
+      "id": "RJUE-CONTR-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 55.º, n.º 3 — Registo do Contrato de Urbanização",
+      "description": "O contrato de urbanização deve ser registado na conservatória do registo predial para oponibilidade a terceiros adquirentes de lotes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.urbanizationContractSigned",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.urbanizationContractRegistered",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Contrato assinado: {licensing.urbanizationContractSigned} | Registado: {licensing.urbanizationContractRegistered}",
+      "requiredValue": "Contrato de urbanização registado na conservatória",
+      "remediation": "Registar o contrato de urbanização na conservatória do registo predial competente. O registo garante a oponibilidade das obrigações a terceiros adquirentes de lotes e protege tanto o município como os futuros proprietários.",
+      "enabled": true,
+      "tags": [
+        "contrato-urbanização",
+        "registo-predial",
+        "conservatória",
+        "oponibilidade"
+      ]
+    },
+    {
+      "id": "RJUE-INSP-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º — Fases de Fiscalização Municipal da Obra",
+      "description": "A câmara municipal fiscaliza a execução das obras em diversas fases, podendo realizar vistorias para verificar a conformidade com o projeto aprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "licensing.worksInProgress",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.inspectionScheduleSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Obra em curso | Plano de inspeção: {licensing.inspectionScheduleSubmitted}",
+      "requiredValue": "Cronograma de vistorias municipais definido e comunicado",
+      "remediation": "Comunicar à câmara municipal o início de obra e propor cronograma de vistorias de fiscalização. As fases típicas de inspeção incluem: fundações, estrutura, impermeabilização, instalações técnicas e acabamentos. A câmara pode realizar vistorias a qualquer momento.",
+      "enabled": true,
+      "tags": [
+        "fiscalização",
+        "vistoria",
+        "fases-obra",
+        "câmara-municipal",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "RJUE-INSP-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º, n.º 2 — Comunicação de Início de Obra à Câmara",
+      "description": "O titular do alvará deve comunicar à câmara municipal o início dos trabalhos com antecedência mínima de 5 dias úteis, para que esta possa programar as ações de fiscalização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "licensing.constructionStartNotified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Início de obra comunicado: {licensing.constructionStartNotified}",
+      "requiredValue": "Comunicação de início de obra efetuada com 5 dias úteis de antecedência",
+      "remediation": "Enviar comunicação escrita à câmara municipal com antecedência mínima de 5 dias úteis antes do início dos trabalhos, identificando: data prevista de início, diretor de obra, diretor de fiscalização e coordenador de segurança.",
+      "enabled": true,
+      "tags": [
+        "início-obra",
+        "comunicação",
+        "câmara-municipal",
+        "antecedência"
+      ]
+    },
+    {
+      "id": "RJUE-FUND-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-A — Vistoria de Fundações",
+      "description": "A execução das fundações deve ser inspecionada antes do prosseguimento para a fase de estrutura, verificando a conformidade com o projeto de estabilidade e o relatório geotécnico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.foundationPhaseComplete",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.foundationInspectionPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Fundações concluídas | Inspeção: {licensing.foundationInspectionPassed}",
+      "requiredValue": "Vistoria de fundações aprovada pelo diretor de fiscalização",
+      "remediation": "Solicitar ao diretor de fiscalização a vistoria das fundações antes de iniciar a estrutura. Verificar: conformidade com projeto de estabilidade, cotas de fundação, qualidade do solo de apoio, armaduras, recobrimentos e betonagem. Registar no livro de obra e comunicar à câmara se exigido.",
+      "enabled": true,
+      "tags": [
+        "fundações",
+        "inspeção",
+        "estabilidade",
+        "geotecnia",
+        "livro-obra"
+      ]
+    },
+    {
+      "id": "RJUE-FUND-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-A, n.º 2 — Ensaios de Solo nas Fundações",
+      "description": "Quando o relatório geotécnico o exige, devem ser realizados ensaios de carga ou de compactação do solo de fundação, com resultados registados no livro de obra.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.geotechnicalReportRequiresSoilTests",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.soilTestsPerformed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ensaios exigidos: {licensing.geotechnicalReportRequiresSoilTests} | Realizados: {licensing.soilTestsPerformed}",
+      "requiredValue": "Ensaios de solo realizados e resultados conformes",
+      "remediation": "Realizar os ensaios de solo prescritos no relatório geotécnico (ensaio de carga em placa, SPT, penetrómetro dinâmico) antes do enchimento das fundações. Registar resultados no livro de obra e comparar com os parâmetros de projeto.",
+      "enabled": true,
+      "tags": [
+        "ensaios-solo",
+        "geotecnia",
+        "fundações",
+        "livro-obra",
+        "compactação"
+      ]
+    },
+    {
+      "id": "RJUE-ESTRU-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-B — Vistoria de Estrutura (Betão Armado / Aço)",
+      "description": "A execução da estrutura resistente deve ser inspecionada em fases críticas: pilares, vigas, lajes e paredes estruturais, verificando armaduras, cofragens e ensaios de betão.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.structuralFrameComplete",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.structuralFrameInspectionPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Estrutura concluída | Inspeção: {licensing.structuralFrameInspectionPassed}",
+      "requiredValue": "Vistoria estrutural aprovada com ensaios de betão conformes",
+      "remediation": "Realizar vistoria da estrutura pelo diretor de fiscalização e engenheiro de estruturas. Verificar: armaduras (diâmetros, espaçamento, recobrimento), cofragens, escoramento, ensaios de provetes de betão (resistência mínima conforme projeto), ligações soldadas em estrutura metálica. Registar no livro de obra.",
+      "enabled": true,
+      "tags": [
+        "estrutura",
+        "inspeção",
+        "betão-armado",
+        "armaduras",
+        "ensaios"
+      ]
+    },
+    {
+      "id": "RJUE-ESTRU-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-B, n.º 2 — Ensaios de Provetes de Betão",
+      "description": "Devem ser realizados ensaios de resistência à compressão em provetes de betão conforme NP EN 12390, com resultados compatíveis com a classe de betão especificada no projeto de estabilidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.structuralMaterial",
+          "operator": "in",
+          "value": [
+            "betao_armado",
+            "betao_pre_esforco"
+          ]
+        },
+        {
+          "field": "licensing.concreteTestReportsAvailable",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Material estrutural: {licensing.structuralMaterial} | Ensaios betão: {licensing.concreteTestReportsAvailable}",
+      "requiredValue": "Relatórios de ensaio de provetes de betão disponíveis e conformes",
+      "remediation": "Assegurar a colheita de provetes de betão em obra conforme NP EN 12390 e enviar a laboratório acreditado pelo IPAC. A frequência mínima é de 1 conjunto de 3 provetes por 100 m³ de betão. Os resultados devem igualar ou exceder a classe de resistência do projeto (ex: C25/30).",
+      "enabled": true,
+      "tags": [
+        "ensaios-betão",
+        "provetes",
+        "NP-EN-12390",
+        "resistência",
+        "laboratório"
+      ]
+    },
+    {
+      "id": "RJUE-IMPER-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-C — Vistoria de Impermeabilização",
+      "description": "A impermeabilização de coberturas, caves e paredes enterradas deve ser inspecionada antes do recobrimento, garantindo a conformidade com o projeto e a ausência de defeitos visíveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.waterproofingPhaseComplete",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.waterproofingInspectionPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Impermeabilização concluída | Inspeção: {licensing.waterproofingInspectionPassed}",
+      "requiredValue": "Vistoria de impermeabilização aprovada antes do recobrimento",
+      "remediation": "Realizar vistoria de impermeabilização antes de cobrir com proteção mecânica ou térmica. Verificar: membranas contínuas e sem perfurações, sobreposições conformes (mínimo 10 cm), remates em platibandas e pontos singulares (ralos, chaminés, juntas de dilatação). Efetuar teste de estanquidade com lâmina de água durante 48h. Registar no livro de obra.",
+      "enabled": true,
+      "tags": [
+        "impermeabilização",
+        "inspeção",
+        "cobertura",
+        "cave",
+        "estanquidade"
+      ]
+    },
+    {
+      "id": "RJUE-IMPER-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º-C, n.º 2 — Teste de Estanquidade",
+      "description": "Antes do recobrimento da impermeabilização, deve ser realizado teste de estanquidade com lâmina de água por período mínimo de 48 horas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.waterproofingPhaseComplete",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.watertightnessTestPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Teste estanquidade: {licensing.watertightnessTestPassed}",
+      "requiredValue": "Teste de estanquidade realizado e aprovado (mínimo 48h)",
+      "remediation": "Executar teste de estanquidade com lâmina de água de pelo menos 5 cm de altura durante um mínimo de 48 horas. Inspecionar por baixo e nas zonas envolventes. Se forem detetadas infiltrações, reparar e repetir o teste. Documentar com fotografias e registo no livro de obra.",
+      "enabled": true,
+      "tags": [
+        "estanquidade",
+        "teste",
+        "impermeabilização",
+        "48h",
+        "infiltrações"
+      ]
+    },
+    {
+      "id": "RJUE-SCINC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 2 — Vistoria de Segurança contra Incêndio antes da Utilização",
+      "description": "Antes da emissão de autorização de utilização, os edifícios devem obter parecer favorável da ANEPC (ex-ANPC) em matéria de segurança contra incêndio em edifícios (SCIE).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.requiresFireSafetyApproval",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.fireSafetyInspectionPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "SCIE exigido | Inspeção SCIE: {licensing.fireSafetyInspectionPassed}",
+      "requiredValue": "Parecer favorável da ANEPC para segurança contra incêndio",
+      "remediation": "Requerer vistoria SCIE à ANEPC (Autoridade Nacional de Emergência e Proteção Civil). A vistoria verifica: meios de evacuação, sinalização, extintores, rede de incêndio armada, deteção automática, controlo de fumos, compartimentação corta-fogo e resistência ao fogo das estruturas. Sem parecer favorável, a autorização de utilização não pode ser emitida.",
+      "enabled": true,
+      "tags": [
+        "SCIE",
+        "incêndio",
+        "ANEPC",
+        "vistoria",
+        "autorização-utilização"
+      ]
+    },
+    {
+      "id": "RJUE-SCINC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 2, al. b) — Medidas de Autoproteção contra Incêndio",
+      "description": "Os edifícios sujeitos a SCIE devem ter as medidas de autoproteção implementadas e documentadas antes da vistoria de utilização.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.requiresFireSafetyApproval",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.selfProtectionMeasuresImplemented",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Medidas autoproteção: {licensing.selfProtectionMeasuresImplemented}",
+      "requiredValue": "Medidas de autoproteção SCIE implementadas e documentadas",
+      "remediation": "Elaborar e implementar as medidas de autoproteção conforme RT-SCIE: registos de segurança, procedimentos de prevenção, plano de prevenção, procedimentos em caso de emergência, plano de emergência interno e simulacros. A documentação deve estar disponível no edifício para a vistoria da ANEPC.",
+      "enabled": true,
+      "tags": [
+        "autoproteção",
+        "SCIE",
+        "plano-emergência",
+        "prevenção",
+        "simulacros"
+      ]
+    },
+    {
+      "id": "RJUE-CERTENG-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 3 — Certificado Energético para Autorização de Utilização",
+      "description": "A emissão de autorização de utilização de edifícios novos ou sujeitos a grande intervenção está condicionada à apresentação de certificado energético SCE emitido por perito qualificado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.energyCertificateIssued",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Certificado energético: {licensing.energyCertificateIssued}",
+      "requiredValue": "Certificado energético SCE emitido e registado na ADENE",
+      "remediation": "Contratar perito qualificado (PQ) inscrito na ADENE para emissão do certificado energético final (pós-construção). O certificado deve refletir as condições reais de construção e confirmar o cumprimento dos requisitos mínimos do REH (DL 118/2013). O número do certificado SCE deve ser indicado no pedido de autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "certificado-energético",
+        "SCE",
+        "ADENE",
+        "REH",
+        "utilização"
+      ]
+    },
+    {
+      "id": "RJUE-CERTENG-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 3, al. b) — Classe Energética Mínima",
+      "description": "Edifícios novos de habitação devem obter classe energética mínima B- no certificado SCE, conforme REH.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.buildingUse",
+          "operator": "==",
+          "value": "habitacao"
+        },
+        {
+          "field": "licensing.energyCertificateIssued",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.energyClassMeetsMinimum",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Classe energética conforme mínimo: {licensing.energyClassMeetsMinimum}",
+      "requiredValue": "Classe energética igual ou superior a B-",
+      "remediation": "Verificar que o certificado energético final atribui classe B- ou superior. Caso a classe seja inferior, identificar e implementar medidas de melhoria: reforço de isolamento térmico, substituição de envidraçados, instalação de sistemas renováveis (painéis solares, bomba de calor). Solicitar novo certificado após melhorias.",
+      "enabled": true,
+      "tags": [
+        "classe-energética",
+        "B-",
+        "REH",
+        "melhoria",
+        "isolamento"
+      ]
+    },
+    {
+      "id": "RJUE-ACUST-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 4 — Ensaio Acústico antes da Utilização",
+      "description": "Edifícios de habitação devem cumprir os requisitos acústicos do RRAE (DL 96/2008), podendo ser exigidos ensaios in situ de isolamento sonoro antes da autorização de utilização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "misto"
+          ]
+        },
+        {
+          "field": "licensing.acousticTestRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.acousticTestPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ensaio acústico exigido | Resultado: {licensing.acousticTestPassed}",
+      "requiredValue": "Ensaios acústicos in situ conformes com RRAE (DL 96/2008)",
+      "remediation": "Realizar ensaios acústicos in situ por entidade acreditada pelo IPAC: isolamento a sons aéreos (D'nT,w ≥ 50 dB entre fogos), isolamento a sons de percussão (L'nT,w ≤ 60 dB), isolamento de fachada (D2m,nT,w ≥ 28 dB). Se os valores não cumprirem, implementar correções (isolamento adicional, pavimentos flutuantes, tratamento de pontes acústicas).",
+      "enabled": true,
+      "tags": [
+        "acústica",
+        "ensaio",
+        "RRAE",
+        "isolamento-sonoro",
+        "DL-96-2008"
+      ]
+    },
+    {
+      "id": "RJUE-ACUST-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 4, al. b) — Relatório Acústico para Licenciamento",
+      "description": "O projeto de condicionamento acústico deve ser apresentado com o pedido de licenciamento, demonstrando o cumprimento previsional dos requisitos do RRAE.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "misto",
+            "servicos"
+          ]
+        },
+        {
+          "field": "licensing.acousticProjectSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Projeto acústico: {licensing.acousticProjectSubmitted}",
+      "requiredValue": "Projeto de condicionamento acústico apresentado",
+      "remediation": "Elaborar projeto de condicionamento acústico por engenheiro acreditado, demonstrando o cumprimento previsional dos limites do RRAE. Incluir cálculos de isolamento a sons aéreos, percussão e fachada, especificação de soluções construtivas e pormenores de execução.",
+      "enabled": true,
+      "tags": [
+        "acústica",
+        "projeto",
+        "RRAE",
+        "licenciamento",
+        "condicionamento"
+      ]
+    },
+    {
+      "id": "RJUE-ASBUILT-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 7 — Levantamento As-Built",
+      "description": "Com o pedido de autorização de utilização deve ser apresentado levantamento topográfico as-built, refletindo a obra efetivamente executada, incluindo implantação, cotas e volumetria final.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.asBuiltSurveySubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Levantamento as-built: {licensing.asBuiltSurveySubmitted}",
+      "requiredValue": "Levantamento topográfico as-built submetido à câmara",
+      "remediation": "Contratar topógrafo habilitado para realizar levantamento as-built da obra concluída. O levantamento deve incluir: implantação real do edifício, cotas altimétricas (soleira, cumeeira, platibandas), perímetro de construção, áreas de impermeabilização e confrontações. Apresentar em formato digital (DWG/DXF) e papel à escala adequada.",
+      "enabled": true,
+      "tags": [
+        "as-built",
+        "levantamento",
+        "topografia",
+        "implantação",
+        "autorização-utilização"
+      ]
+    },
+    {
+      "id": "RJUE-ASBUILT-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 7, al. b) — Telas Finais (Desenhos As-Built)",
+      "description": "As telas finais dos projetos de arquitetura e especialidades, refletindo a obra tal como executada, devem acompanhar o pedido de autorização de utilização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.asBuiltDrawingsSubmitted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Telas finais: {licensing.asBuiltDrawingsSubmitted}",
+      "requiredValue": "Telas finais de arquitetura e especialidades entregues",
+      "remediation": "Elaborar telas finais de todos os projetos: arquitetura, estabilidade, redes de água e esgotos, eletricidade, gás, AVAC, telecomunicações e segurança contra incêndio. As telas devem refletir exatamente a obra executada, incluindo todas as alterações aprovadas durante a construção. Entregar em formato digital e papel.",
+      "enabled": true,
+      "tags": [
+        "telas-finais",
+        "as-built",
+        "arquitetura",
+        "especialidades",
+        "utilização"
+      ]
+    },
+    {
+      "id": "RJUE-DOSSIER-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 8 — Compilação do Dossier Técnico da Obra",
+      "description": "Deve ser compilado dossier técnico da obra contendo todos os documentos relevantes: projetos, telas finais, ensaios, certificados, declarações de conformidade e termos de responsabilidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.technicalDossierCompiled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Dossier técnico: {licensing.technicalDossierCompiled}",
+      "requiredValue": "Dossier técnico da obra compilado e completo",
+      "remediation": "Compilar o dossier técnico contendo: alvará de construção, projetos aprovados e telas finais, termos de responsabilidade dos técnicos, ensaios de materiais (betão, aço, impermeabilização), certificados de conformidade dos equipamentos (elevadores, AVAC, SCIE), declarações de conformidade das instalações (CERTIEL, gás), livro de obra encerrado e fotografias da execução.",
+      "enabled": true,
+      "tags": [
+        "dossier-técnico",
+        "compilação",
+        "certificados",
+        "ensaios",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "RJUE-DOSSIER-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 8, al. b) — Declarações de Conformidade das Instalações",
+      "description": "O dossier técnico deve incluir declarações de conformidade das instalações elétricas (CERTIEL), de gás, de telecomunicações (ITED) e de água/esgotos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.electricalCertificationAvailable",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Certificação CERTIEL: {licensing.electricalCertificationAvailable}",
+      "requiredValue": "Declarações de conformidade de todas as instalações técnicas",
+      "remediation": "Obter: certificado CERTIEL para instalações elétricas, certificado de inspeção de gás por entidade inspetora, certificado ITED para telecomunicações, declaração de conformidade das redes de água e esgotos. Todas as certificações devem ser emitidas por entidades acreditadas e referir o endereço exato da obra.",
+      "enabled": true,
+      "tags": [
+        "CERTIEL",
+        "gás",
+        "ITED",
+        "instalações",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "RJUE-DOSSIER-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 8, al. c) — Encerramento do Livro de Obra",
+      "description": "O livro de obra deve ser encerrado pelo diretor de obra e pelo diretor de fiscalização, com declaração de conclusão conforme o projeto aprovado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.constructionComplete",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.siteLogBookClosed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Livro de obra encerrado: {licensing.siteLogBookClosed}",
+      "requiredValue": "Livro de obra encerrado com declaração de conformidade",
+      "remediation": "O diretor de obra e o diretor de fiscalização devem encerrar o livro de obra com declaração de que a construção foi executada em conformidade com o projeto aprovado e respetivas condições de licenciamento. O livro de obra encerrado deve integrar o dossier técnico.",
+      "enabled": true,
+      "tags": [
+        "livro-obra",
+        "encerramento",
+        "diretor-obra",
+        "fiscalização",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "RJUE-MANUAL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 9 — Manual de Utilização do Edifício",
+      "description": "Edifícios novos de habitação devem dispor de manual de utilização e manutenção do edifício, a entregar aos proprietários/condóminos com informações sobre funcionamento, manutenção e garantias.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "misto"
+          ]
+        },
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.buildingUserManualPrepared",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Manual de utilização: {licensing.buildingUserManualPrepared}",
+      "requiredValue": "Manual de utilização e manutenção do edifício elaborado",
+      "remediation": "Elaborar manual de utilização e manutenção contendo: descrição geral do edifício, instruções de utilização das instalações (AVAC, elevadores, portões automáticos), plano de manutenção preventiva (impermeabilização, fachadas, cobertura), fichas técnicas dos equipamentos, contactos de assistência técnica e garantias dos construtores e fornecedores.",
+      "enabled": true,
+      "tags": [
+        "manual-utilização",
+        "manutenção",
+        "habitação",
+        "condóminos",
+        "garantias"
+      ]
+    },
+    {
+      "id": "RJUE-MANUAL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 9, al. b) — Plano de Manutenção Preventiva",
+      "description": "O manual do edifício deve incluir plano de manutenção preventiva com periodicidade das intervenções em elementos construtivos e equipamentos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.buildingUserManualPrepared",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.maintenancePlanIncluded",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Manual elaborado | Plano manutenção: {licensing.maintenancePlanIncluded}",
+      "requiredValue": "Plano de manutenção preventiva incluído no manual",
+      "remediation": "Incluir no manual plano de manutenção com periodicidade: inspeção de cobertura (anual), limpeza de caleiras (semestral), manutenção de elevadores (mensal), revisão de AVAC (semestral), inspeção de instalação de gás (bienal), verificação de extintores (anual), pintura de fachadas (5-10 anos), inspeção de estrutura (10-15 anos).",
+      "enabled": true,
+      "tags": [
+        "manutenção-preventiva",
+        "plano",
+        "periodicidade",
+        "cobertura",
+        "equipamentos"
+      ]
+    },
+    {
+      "id": "RJUE-COND-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-A — Constituição de Propriedade Horizontal",
+      "description": "A constituição de propriedade horizontal para edifícios com frações autónomas requer autorização de utilização emitida e título constitutivo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasMultipleUnits",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.horizontalPropertyConstituted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.occupancyPermitIssued",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Frações autónomas: {licensing.hasMultipleUnits} | PH constituída: {licensing.horizontalPropertyConstituted}",
+      "requiredValue": "Propriedade horizontal constituída por escritura pública",
+      "remediation": "Após emissão de autorização de utilização, constituir a propriedade horizontal mediante escritura pública ou documento particular autenticado. O título constitutivo deve identificar: cada fração autónoma (tipo, permilagem, fim a que se destina), partes comuns do edifício, regulamento do condomínio. Apresentar certidão da câmara confirmando conformidade com projeto aprovado.",
+      "enabled": true,
+      "tags": [
+        "propriedade-horizontal",
+        "condomínio",
+        "frações",
+        "escritura",
+        "título-constitutivo"
+      ]
+    },
+    {
+      "id": "RJUE-COND-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-A, n.º 2 — Regulamento do Condomínio",
+      "description": "O regulamento do condomínio deve ser elaborado e registado juntamente com o título constitutivo da propriedade horizontal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasMultipleUnits",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.condominiumRegulationApproved",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.horizontalPropertyConstituted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "PH constituída | Regulamento: {licensing.condominiumRegulationApproved}",
+      "requiredValue": "Regulamento do condomínio aprovado e registado",
+      "remediation": "Elaborar regulamento do condomínio conforme Código Civil (Art. 1418.º e seguintes), definindo: regras de utilização das partes comuns, encargos de conservação, fundo de reserva (mínimo 10% das quotas), regras de convivência, competências da administração e assembleia de condóminos. Registar na conservatória com o título constitutivo.",
+      "enabled": true,
+      "tags": [
+        "regulamento-condomínio",
+        "partes-comuns",
+        "fundo-reserva",
+        "administração"
+      ]
+    },
+    {
+      "id": "RJUE-COND-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-A, n.º 3 — Permilagem e Afetação das Frações",
+      "description": "O título constitutivo da propriedade horizontal deve indicar a permilagem de cada fração e o uso permitido (habitação, comércio, serviços), conforme autorização de utilização.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasMultipleUnits",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.unitPermilagesDefined",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Permilagens definidas: {licensing.unitPermilagesDefined}",
+      "requiredValue": "Permilagens e afetações de todas as frações definidas",
+      "remediation": "Calcular a permilagem de cada fração autónoma com base no valor relativo (área, localização, acabamentos). A soma de todas as permilagens deve ser 1000. O uso de cada fração deve corresponder ao autorizado na autorização de utilização. Qualquer alteração posterior de uso requer nova autorização municipal.",
+      "enabled": true,
+      "tags": [
+        "permilagem",
+        "frações",
+        "afetação",
+        "uso",
+        "propriedade-horizontal"
+      ]
+    },
+    {
+      "id": "RJUE-REGPRED-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-B — Registo Predial do Edifício",
+      "description": "A descrição predial do edifício deve ser atualizada na conservatória do registo predial após a conclusão da obra e emissão de autorização de utilização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitIssued",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.propertyRegistrationUpdated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Registo predial atualizado: {licensing.propertyRegistrationUpdated}",
+      "requiredValue": "Descrição predial atualizada na conservatória",
+      "remediation": "Requerer atualização da descrição predial na conservatória do registo predial competente, apresentando: autorização de utilização, certidão da câmara municipal, caderneta predial atualizada, título constitutivo (se propriedade horizontal) e planta do edifício. O registo é obrigatório para qualquer transmissão futura do imóvel.",
+      "enabled": true,
+      "tags": [
+        "registo-predial",
+        "conservatória",
+        "descrição",
+        "propriedade",
+        "transmissão"
+      ]
+    },
+    {
+      "id": "RJUE-REGPRED-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-B, n.º 2 — Registo de Frações Autónomas",
+      "description": "Cada fração autónoma em propriedade horizontal deve ter descrição própria na conservatória do registo predial.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasMultipleUnits",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.horizontalPropertyConstituted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.allUnitsRegistered",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "PH constituída | Frações registadas: {licensing.allUnitsRegistered}",
+      "requiredValue": "Todas as frações autónomas registadas individualmente",
+      "remediation": "Requerer na conservatória do registo predial a abertura de descrição individual para cada fração autónoma, com base no título constitutivo da propriedade horizontal. Cada fração terá número de descrição próprio, essencial para a venda individual e para efeitos de registo de hipoteca.",
+      "enabled": true,
+      "tags": [
+        "registo-predial",
+        "frações",
+        "descrição-individual",
+        "conservatória"
+      ]
+    },
+    {
+      "id": "RJUE-REGPRED-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-B, n.º 3 — Averbamento de Autorização de Utilização",
+      "description": "A autorização de utilização deve ser averbada na descrição predial do imóvel para efeitos de publicidade registral.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitIssued",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.occupancyPermitRegistered",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Autorização utilização averbada: {licensing.occupancyPermitRegistered}",
+      "requiredValue": "Autorização de utilização averbada no registo predial",
+      "remediation": "Apresentar na conservatória do registo predial requerimento de averbamento da autorização de utilização, acompanhado de certidão da câmara municipal. O averbamento é essencial para a venda do imóvel e para comprovar a legalidade da construção junto de entidades financeiras e notários.",
+      "enabled": true,
+      "tags": [
+        "averbamento",
+        "autorização-utilização",
+        "registo-predial",
+        "publicidade"
+      ]
+    },
+    {
+      "id": "RJUE-ATRIB-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-C — Notificação à Autoridade Tributária",
+      "description": "Após a emissão de autorização de utilização, o titular deve comunicar à Autoridade Tributária para atualização da caderneta predial e início de tributação em IMI.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitIssued",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.taxAuthorityPropertyDeclared",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Declaração AT: {licensing.taxAuthorityPropertyDeclared}",
+      "requiredValue": "Declaração Modelo 1 do IMI apresentada à AT",
+      "remediation": "Apresentar na repartição de finanças ou no Portal das Finanças a Declaração Modelo 1 do IMI no prazo de 60 dias após a emissão de autorização de utilização. A declaração inicia o processo de avaliação patrimonial do imóvel. A falta de declaração constitui contraordenação tributária e impede a obtenção de caderneta predial atualizada, necessária para escrituras.",
+      "enabled": true,
+      "tags": [
+        "autoridade-tributária",
+        "IMI",
+        "modelo-1",
+        "caderneta-predial",
+        "avaliação"
+      ]
+    },
+    {
+      "id": "RJUE-ATRIB-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-C, n.º 2 — Avaliação Patrimonial do Imóvel",
+      "description": "A Autoridade Tributária procede à avaliação do valor patrimonial tributário (VPT) do imóvel, que serve de base ao IMI e ao IMT em futuras transmissões.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.taxAuthorityPropertyDeclared",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.patrimonialValuationComplete",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Declaração entregue | Avaliação: {licensing.patrimonialValuationComplete}",
+      "requiredValue": "Avaliação patrimonial tributária concluída pela AT",
+      "remediation": "Após entrega da Declaração Modelo 1, a AT procede à avaliação patrimonial no prazo de 90 dias. Verificar a notificação da avaliação e confirmar que os dados estão corretos (área, localização, acabamentos, idade). Se discordar do VPT atribuído, pode requerer segunda avaliação no prazo de 30 dias após notificação.",
+      "enabled": true,
+      "tags": [
+        "VPT",
+        "avaliação-patrimonial",
+        "AT",
+        "IMI",
+        "segunda-avaliação"
+      ]
+    },
+    {
+      "id": "RJUE-SEGFIN-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-D — Seguro de Construção e Obra",
+      "description": "O titular do alvará deve manter seguro de responsabilidade civil para danos causados a terceiros durante a execução da obra, conforme exigido pelo RJUE.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "licensing.constructionInsuranceActive",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.worksInProgress",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Seguro RC obra: {licensing.constructionInsuranceActive}",
+      "requiredValue": "Seguro de responsabilidade civil de obra válido e ativo",
+      "remediation": "Subscrever seguro de responsabilidade civil que cubra danos causados a terceiros durante a execução da obra (queda de materiais, danos em edifícios vizinhos, lesões corporais). O capital mínimo deve ser adequado à dimensão da obra. Manter a apólice e comprovativo de pagamento do prémio disponíveis em obra.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "responsabilidade-civil",
+        "obra",
+        "terceiros",
+        "danos"
+      ]
+    },
+    {
+      "id": "RJUE-SEGFIN-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-D, n.º 2 — Seguro de Acidentes de Trabalho",
+      "description": "Todos os trabalhadores em obra devem estar cobertos por seguro de acidentes de trabalho, conforme Lei 98/2009.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.worksInProgress",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.workAccidentInsuranceActive",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Seguro acidentes trabalho: {licensing.workAccidentInsuranceActive}",
+      "requiredValue": "Seguro de acidentes de trabalho válido para todos os trabalhadores",
+      "remediation": "Verificar que o empreiteiro e todos os subempreiteiros possuem seguro de acidentes de trabalho válido que cubra todos os trabalhadores em obra. O seguro é obrigatório por lei (Lei 98/2009) e a sua falta constitui contraordenação muito grave. Manter cópias das apólices e folhas de férias atualizadas no estaleiro.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "acidentes-trabalho",
+        "trabalhadores",
+        "Lei-98-2009",
+        "obrigatório"
+      ]
+    },
+    {
+      "id": "RJUE-SEGFIN-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º-D, n.º 3 — Seguro Decenal de Construção",
+      "description": "Para edifícios de habitação, deve ser contratado seguro decenal que cubra vícios ou defeitos da construção que afetem a solidez e segurança do edifício por período de 10 anos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "misto"
+          ]
+        },
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.decennialInsuranceSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Seguro decenal entregue: {licensing.decennialInsuranceSubmitted}",
+      "requiredValue": "Apólice de seguro decenal apresentada com pedido de utilização",
+      "remediation": "Contratar seguro decenal de construção junto de seguradora autorizada pela ASF. O seguro deve cobrir: vícios estruturais, defeitos de impermeabilização, defeitos de fundações e quaisquer defeitos que comprometam a solidez ou segurança do edifício. A apólice deve acompanhar o pedido de autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "seguro-decenal",
+        "10-anos",
+        "vícios",
+        "solidez",
+        "ASF"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º — Vistoria Final para Autorização de Utilização",
+      "description": "A autorização de utilização é precedida de vistoria municipal que verifica a conformidade da obra com o projeto aprovado e as condições de habitabilidade, salubridade e segurança.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.finalInspectionPassed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Vistoria final: {licensing.finalInspectionPassed}",
+      "requiredValue": "Vistoria final aprovada pela câmara municipal",
+      "remediation": "A câmara municipal realiza vistoria final no prazo de 30 dias após o requerimento. A comissão de vistoria verifica: conformidade com projeto aprovado, condições de habitabilidade e salubridade, cumprimento das normas de segurança, acessibilidades e conclusão de todas as obras previstas no alvará.",
+      "enabled": true,
+      "tags": [
+        "vistoria-final",
+        "autorização-utilização",
+        "habitabilidade",
+        "conformidade",
+        "câmara"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 2 — Composição da Comissão de Vistoria",
+      "description": "A vistoria final é realizada por comissão composta por técnicos municipais e, quando necessário, representantes de entidades externas (ANEPC, saúde, acessibilidades).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.finalInspectionScheduled",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Vistoria agendada: {licensing.finalInspectionScheduled}",
+      "requiredValue": "Vistoria final agendada com entidades competentes",
+      "remediation": "A comissão de vistoria é nomeada pela câmara e pode incluir: técnico de urbanismo, engenheiro municipal, representante da ANEPC (segurança contra incêndio), delegado de saúde, técnico de acessibilidades. Garantir que todas as especialidades relevantes foram notificadas para participar na vistoria.",
+      "enabled": true,
+      "tags": [
+        "comissão-vistoria",
+        "técnicos",
+        "ANEPC",
+        "saúde",
+        "acessibilidades"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 3 — Verificação de Acessibilidades na Vistoria Final",
+      "description": "A vistoria final deve verificar o cumprimento das normas de acessibilidade (DL 163/2006) em edifícios abertos ao público ou de habitação coletiva.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "misto",
+            "servicos",
+            "comercio"
+          ]
+        },
+        {
+          "field": "licensing.accessibilityComplianceVerified",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Acessibilidades verificadas: {licensing.accessibilityComplianceVerified}",
+      "requiredValue": "Conformidade com DL 163/2006 verificada na vistoria",
+      "remediation": "Verificar antes da vistoria: rampas de acesso (inclinação máxima 6%), largura de portas (≥ 87 cm), dimensões de elevadores acessíveis, instalações sanitárias adaptadas, sinalização tátil, estacionamento reservado. O incumprimento pode impedir a emissão de autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "acessibilidades",
+        "DL-163-2006",
+        "vistoria",
+        "rampas",
+        "mobilidade-reduzida"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 4 — Verificação de Instalações Técnicas na Vistoria Final",
+      "description": "Na vistoria final são verificadas as instalações técnicas: eletricidade, gás, água, esgotos, AVAC, elevadores e telecomunicações, devendo todas ter certificação válida.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.allTechnicalInstallationsCertified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Instalações técnicas certificadas: {licensing.allTechnicalInstallationsCertified}",
+      "requiredValue": "Todas as instalações técnicas certificadas por entidades competentes",
+      "remediation": "Reunir certificações de todas as instalações técnicas antes da vistoria: CERTIEL (eletricidade), inspeção de gás (entidade inspetora acreditada), ITED (telecomunicações), certificado de elevadores (entidade inspetora), certificado AVAC (técnico RECS/REH). Apresentar os certificados à comissão de vistoria.",
+      "enabled": true,
+      "tags": [
+        "instalações-técnicas",
+        "CERTIEL",
+        "elevadores",
+        "AVAC",
+        "certificação"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 5 — Verificação de Espaços Exteriores na Vistoria Final",
+      "description": "A vistoria final deve verificar a conclusão e conformidade dos espaços exteriores: arranjos exteriores, estacionamento, vedações, redes de infraestruturas exteriores e ligações às redes públicas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.exteriorWorksComplete",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Espaços exteriores concluídos: {licensing.exteriorWorksComplete}",
+      "requiredValue": "Arranjos exteriores e infraestruturas concluídos conforme projeto",
+      "remediation": "Concluir todos os trabalhos exteriores antes da vistoria: pavimentação de estacionamento e acessos, plantação de espaços verdes previstos, vedações e muros, ligação a redes públicas (água, esgotos, eletricidade, gás, telecomunicações), iluminação exterior e sinalização. A falta de conclusão dos exteriores pode resultar em vistoria desfavorável.",
+      "enabled": true,
+      "tags": [
+        "espaços-exteriores",
+        "arranjos",
+        "estacionamento",
+        "redes-públicas",
+        "vistoria"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-06",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 6 — Verificação de Condições de Salubridade",
+      "description": "A vistoria final verifica as condições de salubridade: ventilação, iluminação natural, impermeabilidade das paredes e cobertura, funcionamento das redes de água e esgotos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.salubrityConditionsVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Salubridade verificada: {licensing.salubrityConditionsVerified}",
+      "requiredValue": "Condições de salubridade verificadas e conformes",
+      "remediation": "Verificar antes da vistoria: ventilação natural e/ou mecânica em todos os compartimentos, iluminação natural adequada (área de vãos ≥ 1/10 da área do compartimento), ausência de humidades e infiltrações, funcionamento correto da rede de água (pressão e caudal), rede de esgotos (escoamento e estanquidade) e sistema de ventilação de esgotos.",
+      "enabled": true,
+      "tags": [
+        "salubridade",
+        "ventilação",
+        "iluminação",
+        "humidades",
+        "esgotos"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-07",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 7 — Termo de Responsabilidade do Diretor de Obra",
+      "description": "O pedido de autorização de utilização deve ser acompanhado de termo de responsabilidade do diretor de obra declarando que a construção foi executada em conformidade com o projeto aprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.directorOfWorksDeclarationSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Termo responsabilidade DO: {licensing.directorOfWorksDeclarationSubmitted}",
+      "requiredValue": "Termo de responsabilidade do diretor de obra submetido",
+      "remediation": "O diretor de obra (engenheiro civil ou arquiteto inscrito na respetiva ordem profissional) deve subscrever termo de responsabilidade declarando: conformidade da obra com o projeto aprovado, cumprimento das normas técnicas aplicáveis e das condições do alvará. O termo deve ser acompanhado de cópia do cartão da ordem profissional válido.",
+      "enabled": true,
+      "tags": [
+        "termo-responsabilidade",
+        "diretor-obra",
+        "conformidade",
+        "ordem-profissional"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-08",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 8 — Termo de Responsabilidade do Diretor de Fiscalização",
+      "description": "O pedido de autorização de utilização deve incluir termo de responsabilidade do diretor de fiscalização declarando que acompanhou a obra e que esta se encontra conforme.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.supervisorDeclarationSubmitted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Termo responsabilidade DF: {licensing.supervisorDeclarationSubmitted}",
+      "requiredValue": "Termo de responsabilidade do diretor de fiscalização submetido",
+      "remediation": "O diretor de fiscalização deve subscrever termo de responsabilidade declarando: acompanhamento efetivo da obra, verificação da conformidade com o projeto aprovado, verificação da qualidade dos materiais e da execução. Deve anexar relatório sintético das inspeções realizadas durante a construção.",
+      "enabled": true,
+      "tags": [
+        "termo-responsabilidade",
+        "diretor-fiscalização",
+        "acompanhamento",
+        "qualidade"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-09",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 3.º (DL 136/2014) — Deferimento Tácito de Autorização de Utilização",
+      "description": "Se a câmara municipal não realizar a vistoria no prazo de 30 dias após o requerimento, a autorização de utilização considera-se tacitamente deferida, desde que acompanhada de todos os documentos exigidos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.daysSinceOccupancyRequest",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "licensing.finalInspectionScheduled",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Dias desde pedido: {licensing.daysSinceOccupancyRequest} | Vistoria agendada: {licensing.finalInspectionScheduled}",
+      "requiredValue": "Deferimento tácito por decurso do prazo de 30 dias",
+      "remediation": "Se decorreram mais de 30 dias desde o requerimento de autorização de utilização sem que a câmara tenha realizado vistoria ou comunicado decisão, pode invocar-se o deferimento tácito nos termos do DL 136/2014. Requerer certidão de deferimento tácito à câmara municipal para efeitos de registo predial e escrituras.",
+      "enabled": true,
+      "tags": [
+        "deferimento-tácito",
+        "prazo",
+        "30-dias",
+        "DL-136-2014",
+        "utilização"
+      ]
+    },
+    {
+      "id": "RJUE-VISTF-10",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º, n.º 10 — Documentação Exigida na Vistoria Final — Checklist Completo",
+      "description": "A vistoria final exige a apresentação de documentação completa: telas finais, certificações, ensaios, seguros, certificado energético, ficha técnica de habitação e livro de obra encerrado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.occupancyPermitRequested",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.fullDocumentationForInspection",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Documentação completa para vistoria: {licensing.fullDocumentationForInspection}",
+      "requiredValue": "Toda a documentação exigida reunida e disponível",
+      "remediation": "Reunir antes da vistoria final: (1) telas finais de arquitetura e especialidades, (2) certificado CERTIEL, (3) certificado de gás, (4) certificado ITED, (5) certificado energético SCE, (6) parecer SCIE/ANEPC, (7) ficha técnica de habitação, (8) seguro decenal, (9) livro de obra encerrado, (10) termos de responsabilidade DO e DF, (11) levantamento as-built, (12) ensaios de betão e materiais.",
+      "enabled": true,
+      "tags": [
+        "checklist",
+        "vistoria-final",
+        "documentação",
+        "completo",
+        "autorização-utilização"
+      ]
     }
   ]
 }
