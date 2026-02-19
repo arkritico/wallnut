@@ -31,6 +31,7 @@ interface BrowsePath {
   projectScope: "new" | "rehab" | null; // null = all
   specialty: string | null;      // plugin ID
   subTopic: string | null;       // tag-derived sub-topic
+  regulationId: string | null;   // filter to specific regulation (from 3D click)
 }
 
 // ============================================================
@@ -81,6 +82,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     projectScope: null,
     specialty: null,
     subTopic: null,
+    regulationId: null,
   });
 
   // ForceGraph3D loaded dynamically (no SSR)
@@ -147,6 +149,9 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
 
     // Sub-topic filter
     if (path.subTopic && node.subTopic !== path.subTopic) return false;
+
+    // Regulation filter (from 3D click)
+    if (path.regulationId && node.regulationId !== path.regulationId) return false;
 
     return true;
   }, []);
@@ -337,21 +342,60 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   // ── Click handler ─────────────────────────────────────────
   const handleNodeClick = useCallback((node: FGNode) => {
     const n = node as unknown as GraphNode;
+
     if (n.type === "regulation") {
+      // Always expand the regulation's rules in the 3D graph
       setExpandedRegulations(prev => {
         const next = new Set(prev);
-        next.has(n.regulationId!) ? next.delete(n.regulationId!) : next.add(n.regulationId!);
+        next.add(n.regulationId!);
         return next;
       });
-    }
-    if (n.type === "specialty") {
-      setBrowsePath(prev => ({
-        ...prev,
-        specialty: prev.specialty === n.specialtyId ? null : n.specialtyId!,
+      // Navigate sidebar to show this regulation's rules
+      setBrowsePath({
+        buildingType: null,
+        projectScope: null,
+        specialty: n.specialtyId,
         subTopic: null,
-      }));
+        regulationId: n.regulationId!,
+      });
     }
+
+    if (n.type === "specialty") {
+      // Navigate sidebar to this specialty's rules
+      setBrowsePath({
+        buildingType: null,
+        projectScope: null,
+        specialty: n.specialtyId,
+        subTopic: null,
+        regulationId: null,
+      });
+      // Expand all regulations for this specialty
+      if (graphData) {
+        const regIds = graphData.nodes
+          .filter(nd => nd.type === "regulation" && nd.specialtyId === n.specialtyId)
+          .map(nd => nd.regulationId!)
+          .filter(Boolean);
+        setExpandedRegulations(prev => {
+          const next = new Set(prev);
+          regIds.forEach(id => next.add(id));
+          return next;
+        });
+      }
+    }
+
+    if (n.type === "rule") {
+      // Navigate to this rule's specialty + regulation context
+      setBrowsePath({
+        buildingType: null,
+        projectScope: null,
+        specialty: n.specialtyId,
+        subTopic: null,
+        regulationId: n.regulationId!,
+      });
+    }
+
     setSelectedNode(n);
+
     if (fgRef.current && node.x != null && node.y != null && node.z != null) {
       const distance = n.type === "specialty" ? 200 : n.type === "regulation" ? 120 : 60;
       fgRef.current.cameraPosition(
@@ -360,7 +404,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
         800,
       );
     }
-  }, []);
+  }, [graphData]);
 
   const linkColor = useCallback((link: GraphLink) => link.type === "cross-specialty" ? "#ff6b6b" : "#2a2a3a", []);
   const linkWidth = useCallback((link: GraphLink) => link.type === "cross-specialty" ? 2 : 0.3, []);
@@ -384,25 +428,32 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const crumbs: Array<{ label: string; onClick: () => void }> = [];
     crumbs.push({
       label: "Todos",
-      onClick: () => setBrowsePath({ buildingType: null, projectScope: null, specialty: null, subTopic: null }),
+      onClick: () => setBrowsePath({ buildingType: null, projectScope: null, specialty: null, subTopic: null, regulationId: null }),
     });
     if (browsePath.buildingType) {
       crumbs.push({
         label: BUILDING_TYPE_LABELS[browsePath.buildingType] || browsePath.buildingType,
-        onClick: () => setBrowsePath(prev => ({ ...prev, projectScope: null, specialty: null, subTopic: null })),
+        onClick: () => setBrowsePath(prev => ({ ...prev, projectScope: null, specialty: null, subTopic: null, regulationId: null })),
       });
     }
     if (browsePath.projectScope) {
       crumbs.push({
         label: PROJECT_SCOPE_LABELS[browsePath.projectScope],
-        onClick: () => setBrowsePath(prev => ({ ...prev, specialty: null, subTopic: null })),
+        onClick: () => setBrowsePath(prev => ({ ...prev, specialty: null, subTopic: null, regulationId: null })),
       });
     }
     if (browsePath.specialty) {
       const spec = specialties.find(s => s.specialtyId === browsePath.specialty);
       crumbs.push({
         label: spec?.label ?? browsePath.specialty,
-        onClick: () => setBrowsePath(prev => ({ ...prev, subTopic: null })),
+        onClick: () => setBrowsePath(prev => ({ ...prev, subTopic: null, regulationId: null })),
+      });
+    }
+    if (browsePath.regulationId) {
+      const regNode = graphData?.nodes.find(n => n.type === "regulation" && n.regulationId === browsePath.regulationId && n.specialtyId === browsePath.specialty);
+      crumbs.push({
+        label: regNode?.shortRef || regNode?.label || browsePath.regulationId,
+        onClick: () => {},
       });
     }
     if (browsePath.subTopic) {
@@ -412,10 +463,12 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
       });
     }
     return crumbs;
-  }, [browsePath, specialties]);
+  }, [browsePath, specialties, graphData]);
 
   // ── Determine current tree level ──────────────────────────
-  const currentLevel = !browsePath.buildingType ? "buildingType"
+  // When a regulation is selected (from 3D click), jump straight to rules
+  const currentLevel = browsePath.regulationId ? "rules"
+    : !browsePath.buildingType ? "buildingType"
     : !browsePath.projectScope ? "projectScope"
     : !browsePath.specialty ? "specialty"
     : !browsePath.subTopic ? "subTopic"
@@ -466,7 +519,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo de Edif\u00edcio</label>
               </div>
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, buildingType: "_all" }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, buildingType: "_all", regulationId: null }))}
                 className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 bg-gray-800/50 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
               >
                 <span>Todos os tipos</span>
@@ -475,7 +528,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
               {buildingTypeOptions.map(opt => (
                 <button
                   key={opt.value}
-                  onClick={() => setBrowsePath(prev => ({ ...prev, buildingType: opt.value }))}
+                  onClick={() => setBrowsePath(prev => ({ ...prev, buildingType: opt.value, regulationId: null }))}
                   className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
                 >
                   <span>{opt.label}</span>
@@ -493,7 +546,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">\u00c2mbito do Projeto</label>
               </div>
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: null, specialty: null, subTopic: null }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: null, specialty: null, subTopic: null, regulationId: null }))}
                 className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 bg-gray-800/50 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
               >
                 <span>Todos (novo + reabilita\u00e7\u00e3o)</span>
@@ -504,7 +557,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 return (
                   <button
                     key={scope}
-                    onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: scope }))}
+                    onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: scope, regulationId: null }))}
                     className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
                   >
                     <span>{PROJECT_SCOPE_LABELS[scope]}</span>
@@ -514,7 +567,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
               })}
               {/* Skip button */}
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: null }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: null, regulationId: null }))}
                 className="w-full text-left px-3 py-1.5 text-xs rounded-lg mt-2 text-gray-600 hover:text-gray-400 transition-colors"
               >
                 Saltar \u2192 escolher especialidade
@@ -532,7 +585,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
               {specialtyOptions.map(opt => (
                 <button
                   key={opt.value}
-                  onClick={() => setBrowsePath(prev => ({ ...prev, specialty: opt.value }))}
+                  onClick={() => setBrowsePath(prev => ({ ...prev, specialty: opt.value, regulationId: null }))}
                   className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
                 >
                   <div className="flex items-center gap-2">
@@ -553,7 +606,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Sub-tema</label>
               </div>
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, subTopic: "_all" }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, subTopic: "_all", regulationId: null }))}
                 className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 bg-gray-800/50 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
               >
                 <span>Todos os temas</span>
@@ -562,7 +615,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
               {subTopicOptions.slice(0, 30).map(opt => (
                 <button
                   key={opt.value}
-                  onClick={() => setBrowsePath(prev => ({ ...prev, subTopic: opt.value }))}
+                  onClick={() => setBrowsePath(prev => ({ ...prev, subTopic: opt.value, regulationId: null }))}
                   className="w-full text-left px-3 py-2 text-sm rounded-lg mb-0.5 text-gray-400 hover:bg-gray-800 transition-colors flex items-center justify-between"
                 >
                   <span className="truncate">{opt.label}</span>
@@ -751,8 +804,8 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
 
         {/* Selected node detail panel */}
         {selectedNode && (
-          <div className="absolute top-4 left-4 w-80 bg-gray-900/95 backdrop-blur-sm rounded-xl border border-gray-700 z-20 shadow-2xl max-h-[70vh] overflow-y-auto">
-            <div className="flex items-start justify-between p-4 pb-2">
+          <div className="absolute top-4 left-4 w-96 bg-gray-900/95 backdrop-blur-sm rounded-xl border border-gray-700 z-20 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-900/95 backdrop-blur-sm flex items-start justify-between p-4 pb-2 border-b border-gray-800">
               <div className="flex items-center gap-2 min-w-0">
                 <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: selectedNode.color }} />
                 <h3 className="font-semibold text-white text-sm truncate">
@@ -764,7 +817,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
               </button>
             </div>
 
-            <div className="px-4 pb-4 text-sm">
+            <div className="px-4 pb-4 pt-3 text-sm">
               {selectedNode.type === "specialty" && (
                 <>
                   <p className="text-gray-400 text-xs mb-2">Especialidade</p>
@@ -776,30 +829,17 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 <>
                   <p className="text-gray-400 text-xs mb-2">Regulamento</p>
                   <p className="text-gray-300 mb-1">{selectedNode.label}</p>
-                  {selectedNode.legalForce && <p className="text-gray-500 text-xs mb-1">For\u00e7a legal: {selectedNode.legalForce}</p>}
-                  <p className="text-gray-500 text-xs">{selectedNode.rulesCount} regras</p>
-                  <button
-                    onClick={() => {
-                      setExpandedRegulations(prev => {
-                        const next = new Set(prev);
-                        next.has(selectedNode.regulationId!) ? next.delete(selectedNode.regulationId!) : next.add(selectedNode.regulationId!);
-                        return next;
-                      });
-                    }}
-                    className="mt-2 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
-                  >
-                    {expandedRegulations.has(selectedNode.regulationId!)
-                      ? <><ChevronDown className="w-3 h-3" /> Colapsar regras</>
-                      : <><ChevronRight className="w-3 h-3" /> Expandir regras</>
-                    }
-                  </button>
+                  {selectedNode.legalForce && <p className="text-gray-500 text-xs mb-1">Forca legal: {selectedNode.legalForce}</p>}
+                  <p className="text-gray-500 text-xs mb-2">{selectedNode.rulesCount} regras</p>
+                  <p className="text-[10px] text-blue-400">Regras visiveis na barra lateral</p>
                 </>
               )}
               {selectedNode.type === "rule" && (
                 <>
+                  {/* Header: severity + article */}
                   <div className="flex items-center gap-2 mb-2">
                     <span
-                      className="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase"
+                      className="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
                       style={{
                         backgroundColor: SEVERITY_COLORS[selectedNode.severity!] + "22",
                         color: SEVERITY_COLORS[selectedNode.severity!],
@@ -807,14 +847,18 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                     >
                       {selectedNode.severity}
                     </span>
-                    <span className="text-gray-500 text-xs">{selectedNode.conditionsCount} condi\u00e7\u00f5es</span>
+                    {selectedNode.article && (
+                      <span className="text-gray-400 text-xs font-medium">{selectedNode.article}</span>
+                    )}
                   </div>
-                  {selectedNode.article && <p className="text-gray-300 text-xs font-medium mb-1">{selectedNode.article}</p>}
+
+                  {/* Description */}
                   {selectedNode.description && (
-                    <p className="text-gray-400 text-xs leading-relaxed mb-2">{selectedNode.description}</p>
+                    <p className="text-gray-300 text-xs leading-relaxed mb-3">{selectedNode.description}</p>
                   )}
-                  {/* Browsing metadata */}
-                  <div className="flex flex-wrap gap-1 mb-2">
+
+                  {/* Scope badges */}
+                  <div className="flex flex-wrap gap-1 mb-3">
                     {selectedNode.applicableTypes && selectedNode.applicableTypes.length > 0 ? (
                       selectedNode.applicableTypes.map(t => (
                         <span key={t} className="px-1.5 py-0.5 bg-blue-900/30 text-blue-400 rounded text-[10px]">
@@ -826,20 +870,66 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                     )}
                     {selectedNode.projectScope !== "all" && (
                       <span className="px-1.5 py-0.5 bg-purple-900/30 text-purple-400 rounded text-[10px]">
-                        {selectedNode.projectScope === "new" ? "Constru\u00e7\u00e3o nova" : "Reabilita\u00e7\u00e3o"}
+                        {selectedNode.projectScope === "new" ? "Construcao nova" : "Reabilitacao"}
                       </span>
                     )}
                   </div>
+
+                  {/* Conditions — the actual rule logic */}
+                  {selectedNode.conditions && selectedNode.conditions.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                        Condicoes ({selectedNode.conditions.length})
+                      </p>
+                      <div className="bg-gray-800/60 rounded-lg p-2 flex flex-col gap-1.5">
+                        {selectedNode.conditions.map((cond, i) => (
+                          <div key={i} className="text-[11px] font-mono leading-snug">
+                            <span className="text-cyan-400">{cond.field}</span>
+                            {" "}
+                            <span className="text-yellow-400">{cond.operator}</span>
+                            {" "}
+                            <span className="text-green-400">
+                              {cond.formula
+                                ? cond.formula
+                                : typeof cond.value === "object"
+                                  ? JSON.stringify(cond.value)
+                                  : String(cond.value)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Required value */}
+                  {selectedNode.requiredValue && (
+                    <div className="mb-3">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Valor requerido</p>
+                      <p className="text-xs text-gray-300 bg-gray-800/40 rounded px-2 py-1">{selectedNode.requiredValue}</p>
+                    </div>
+                  )}
+
+                  {/* Remediation */}
+                  {selectedNode.remediation && (
+                    <div className="mb-3">
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Remediacao</p>
+                      <p className="text-xs text-emerald-400/80 bg-emerald-900/10 rounded px-2 py-1.5 leading-relaxed">
+                        {selectedNode.remediation}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Tags */}
                   {selectedNode.tags && selectedNode.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {selectedNode.tags.slice(0, 8).map(tag => (
-                        <span key={tag} className="px-1.5 py-0.5 bg-gray-800 text-gray-500 rounded text-[10px]">
-                          {tag}
-                        </span>
-                      ))}
-                      {selectedNode.tags.length > 8 && (
-                        <span className="text-gray-600 text-[10px]">+{selectedNode.tags.length - 8}</span>
-                      )}
+                    <div>
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Tags</p>
+                      <div className="flex flex-wrap gap-1">
+                        {selectedNode.tags.map(tag => (
+                          <span key={tag} className="px-1.5 py-0.5 bg-gray-800 text-gray-500 rounded text-[10px]">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </>

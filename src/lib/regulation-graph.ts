@@ -34,6 +34,10 @@ export interface GraphNode {
   applicableTypes?: string[];     // e.g. ["residential"] — empty = universal
   projectScope?: "new" | "rehab" | "all";
   subTopic?: string;              // derived from tags
+  // Full rule data (for detail display)
+  conditions?: Array<{ field: string; operator: string; value: unknown; formula?: string }>;
+  remediation?: string;
+  requiredValue?: string;
 }
 
 export interface GraphLink {
@@ -296,6 +300,14 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
           applicableTypes: extractApplicableTypes(rule),
           projectScope: extractProjectScope(rule),
           subTopic: extractSubTopic(rule),
+          conditions: rule.conditions.map(c => ({
+            field: c.field,
+            operator: c.operator,
+            value: c.value,
+            ...(c.formula ? { formula: c.formula } : {}),
+          })),
+          remediation: rule.remediation,
+          requiredValue: rule.requiredValue,
         });
 
         // Regulation → rule link
