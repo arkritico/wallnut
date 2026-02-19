@@ -4814,6 +4814,806 @@
         "georreferenciação",
         "portaria-701h"
       ]
+    },
+    {
+      "id": "DRW-SEGSIS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC8 — Zona sísmica nos desenhos",
+      "description": "As peças desenhadas de estabilidade devem identificar claramente a zona sísmica aplicável ao local da obra, conforme o zonamento sísmico do Eurocódigo 8 e Anexo Nacional.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSeismicZoneIdentification",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Zona sísmica identificada: {drawings.hasSeismicZoneIdentification}",
+      "requiredValue": "Identificação obrigatória da zona sísmica (tipo 1 e tipo 2)",
+      "remediation": "Incluir nos desenhos de estabilidade a identificação da zona sísmica aplicável ao local (ação sísmica tipo 1 e tipo 2), com referência ao Anexo Nacional do EC8, indicando a aceleração de referência agR, o tipo de terreno, e os coeficientes de importância adotados. Incluir mapa de zonamento sísmico na memória descritiva do projeto de estabilidade.",
+      "enabled": true,
+      "tags": [
+        "sísmica",
+        "zona sísmica",
+        "eurocódigo 8",
+        "estabilidade",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SEGSIS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC8 — Posição das juntas sísmicas",
+      "description": "Os desenhos estruturais devem indicar claramente a posição, largura e detalhes construtivos de todas as juntas sísmicas (juntas de dilatação sísmica) previstas no edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSeismicJointPositions",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Juntas sísmicas marcadas: {drawings.hasSeismicJointPositions}",
+      "requiredValue": "Posição e detalhe das juntas sísmicas obrigatórios",
+      "remediation": "Representar nas plantas e cortes estruturais a posição exata de todas as juntas sísmicas, indicando: largura mínima calculada conforme EC8 §4.4.2.7 (dmax ≥ 0,005·h para cada corpo), material de preenchimento (poliestireno expandido, selante flexível), detalhes de impermeabilização, e continuidade de acabamentos. Incluir pormenores construtivos a escala 1:10 ou 1:20.",
+      "enabled": true,
+      "tags": [
+        "sísmica",
+        "juntas",
+        "estrutura",
+        "pormenor",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SEGSIS-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC8 — Identificação de paredes estruturais resistentes ao sismo",
+      "description": "As peças desenhadas devem distinguir claramente as paredes estruturais resistentes à ação sísmica das paredes de compartimentação, com simbologia e legenda adequadas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasStructuralWallIdentification",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Paredes estruturais identificadas: {drawings.hasStructuralWallIdentification}",
+      "requiredValue": "Identificação obrigatória de paredes resistentes ao sismo",
+      "remediation": "Identificar nas plantas estruturais todas as paredes resistentes à ação sísmica mediante simbologia diferenciada (hachura específica ou código de cores), incluindo: paredes de betão armado (espessura, armadura), paredes de alvenaria confinada ou armada (tipo de bloco, armadura, conectores), núcleos de rigidez (caixas de escada e elevador). Incluir legenda explicativa e referência cruzada com as peças de cálculo.",
+      "enabled": true,
+      "tags": [
+        "sísmica",
+        "paredes estruturais",
+        "estabilidade",
+        "identificação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SEGSIS-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC8 — Caminho de forças sísmicas",
+      "description": "Os desenhos estruturais devem representar o caminho de transmissão das forças sísmicas desde a cobertura até às fundações, demonstrando a continuidade do sistema resistente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasSeismicLoadPath",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Caminho de forças sísmicas: {drawings.hasSeismicLoadPath}",
+      "requiredValue": "Diagrama do caminho de forças sísmicas recomendado",
+      "remediation": "Incluir nos desenhos estruturais um diagrama esquemático do caminho de transmissão das forças sísmicas (load path), mostrando: diafragmas horizontais (lajes), elementos verticais resistentes (pilares, paredes, contraventamentos), ligações entre elementos, transmissão às fundações. Evidenciar a continuidade vertical dos elementos resistentes e a capacidade dos diafragmas para redistribuir as forças horizontais. Identificar eventuais descontinuidades (pisos vazados, recuos, mezaninos) e as soluções adotadas.",
+      "enabled": true,
+      "tags": [
+        "sísmica",
+        "caminho de forças",
+        "estabilidade",
+        "diagrama",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SEGSIS-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC8 — Áreas de risco de liquefação",
+      "description": "Em zonas com potencial risco de liquefação, os desenhos de fundações devem identificar as áreas afetadas e as medidas de mitigação adotadas, conforme EC8 §4.1.3.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.seismicZoneType",
+          "operator": "in",
+          "value": ["1.1", "1.2", "1.3", "2.1", "2.2"]
+        },
+        {
+          "field": "drawings.hasLiquefactionRiskAreas",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Risco de liquefação analisado: {drawings.hasLiquefactionRiskAreas}",
+      "requiredValue": "Identificação de áreas de risco de liquefação em zonas sísmicas relevantes",
+      "remediation": "Para terrenos em zonas sísmicas com solos potencialmente liquefactíveis (areias soltas saturadas, siltes não plásticos), incluir nos desenhos de fundações: delimitação das áreas com risco de liquefação baseada no estudo geotécnico (ensaios SPT, CPT), profundidade das camadas vulneráveis, nível freático, e medidas de mitigação adotadas (compactação dinâmica, colunas de brita, estacas atravessando a camada liquefactível, substituição de solo). Referenciar o relatório geotécnico e os critérios do EC8 §4.1.3.",
+      "enabled": true,
+      "tags": [
+        "sísmica",
+        "liquefação",
+        "fundações",
+        "geotecnia",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-HIDR-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DR 23/95 — Rede de abastecimento de água",
+      "description": "O projeto deve incluir planta com o traçado completo da rede de abastecimento de água, incluindo ramais, contadores, válvulas e dimensionamento dos tubos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasWaterSupplyLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Rede de abastecimento de água: {drawings.hasWaterSupplyLayout}",
+      "requiredValue": "Planta da rede de abastecimento de água obrigatória",
+      "remediation": "Incluir planta da rede de abastecimento de água a escala adequada (1:50 ou 1:100), com indicação de: traçado completo das canalizações (água fria e quente), diâmetros e material dos tubos, localização dos contadores e válvulas de seccionamento, posição dos dispositivos de utilização (torneiras, fluxómetros, autoclismos), pressões de serviço, caudais de cálculo, e ligação à rede pública. Incluir esquema isométrico ou axonométrico da rede conforme DR 23/95.",
+      "enabled": true,
+      "tags": [
+        "hidráulica",
+        "abastecimento",
+        "água",
+        "rede predial",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-HIDR-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DR 23/95 — Rede de drenagem de águas residuais",
+      "description": "O projeto deve incluir planta com a rede de drenagem de águas residuais domésticas, indicando traçado, diâmetros, pendentes, caixas de inspeção e ligação ao coletor público.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasDrainageNetworkPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Rede de drenagem: {drawings.hasDrainageNetworkPlan}",
+      "requiredValue": "Planta da rede de drenagem de águas residuais obrigatória",
+      "remediation": "Incluir planta da rede de drenagem de águas residuais a escala 1:50 ou 1:100, com: traçado dos ramais de descarga, tubos de queda e coletores prediais, diâmetros e material, pendentes (mínimo 1% para coletores), caixas de inspeção (posição, dimensões, cotas de soleira), sifões e ventilação, ligação à câmara de ramal de ligação e ao coletor público municipal. Incluir perfis longitudinais dos coletores enterrados conforme DR 23/95.",
+      "enabled": true,
+      "tags": [
+        "hidráulica",
+        "drenagem",
+        "águas residuais",
+        "esgoto",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-HIDR-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DR 23/95 — Localização de marcos de incêndio e bocas de incêndio",
+      "description": "As peças desenhadas devem indicar a posição dos marcos de incêndio exteriores e das bocas de incêndio armadas interiores, com distâncias e zonas de cobertura.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasFireHydrantPositions",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Posição de hidrantes: {drawings.hasFireHydrantPositions}",
+      "requiredValue": "Localização de marcos e bocas de incêndio obrigatória",
+      "remediation": "Indicar nas plantas de implantação e de piso a localização de: marcos de incêndio exteriores (distância máxima conforme RT-SCIE), bocas de incêndio armadas tipo teatro ou tipo carretel (raio de ação, posição nos caminhos de evacuação), coluna seca ou húmida (se aplicável), reserva de água para combate a incêndio (capacidade e localização do reservatório), grupo de bombagem. Incluir simbologia normalizada conforme NP 182 e cotas de implantação.",
+      "enabled": true,
+      "tags": [
+        "hidráulica",
+        "incêndio",
+        "hidrantes",
+        "bocas de incêndio",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-HIDR-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DR 23/95 — Rede de drenagem de águas pluviais",
+      "description": "O projeto deve incluir planta com a rede de drenagem de águas pluviais, incluindo caleiras, tubos de queda, coletores pluviais e ligação à rede pública ou sistema de infiltração.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasRainwaterSystemLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Rede de águas pluviais: {drawings.hasRainwaterSystemLayout}",
+      "requiredValue": "Planta da rede de drenagem de águas pluviais obrigatória",
+      "remediation": "Incluir planta da rede de drenagem de águas pluviais a escala adequada, com: caleiras e algerozes (dimensões, pendentes), tubos de queda pluviais (diâmetro, posição nas fachadas), coletores enterrados (diâmetro, pendentes, material), caixas de visita pluviais, dispositivos de primeira lavagem (first flush), sistemas de retenção ou infiltração (se exigidos pelo PDM), bacia de retenção (se aplicável), e ponto de ligação à rede pública pluvial ou linha de água. Separação total das redes pluvial e residual conforme DR 23/95.",
+      "enabled": true,
+      "tags": [
+        "hidráulica",
+        "águas pluviais",
+        "drenagem",
+        "caleiras",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-HIDR-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DL 152/97 — Localização do sistema de tratamento de águas residuais",
+      "description": "Quando não exista ligação a rede pública de saneamento, os desenhos devem indicar a localização e configuração do sistema de tratamento de águas residuais (ETAR, fossa séptica, leito de infiltração).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasPublicSewerConnection",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "drawings.hasWastewaterTreatmentLocation",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Sistema de tratamento: {drawings.hasWastewaterTreatmentLocation}",
+      "requiredValue": "Localização do sistema de tratamento de águas residuais quando sem rede pública",
+      "remediation": "Incluir na planta de implantação a localização do sistema de tratamento de águas residuais: tipo de sistema (fossa séptica + trincheira de infiltração, ETAR compacta, sistema de fitodepuração), dimensões do sistema, distâncias a edifícios, limites de propriedade e captações de água (mínimo 20m), configuração das caixas e câmaras, ponto de descarga final (linha de água, solo). Incluir pormenores construtivos e ficha técnica do equipamento conforme DL 152/97 e normas da APA.",
+      "enabled": true,
+      "tags": [
+        "hidráulica",
+        "tratamento",
+        "águas residuais",
+        "fossa séptica",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ATERRO-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o — Perfis de escavação",
+      "description": "Os desenhos de movimentos de terra devem incluir perfis de escavação detalhados, com indicação das cotas do terreno natural, cotas de projeto, taludes e volumes de escavação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasExcavationProfiles",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Perfis de escavação: {drawings.hasExcavationProfiles}",
+      "requiredValue": "Perfis de escavação com cotas e volumes obrigatórios",
+      "remediation": "Incluir perfis transversais e longitudinais de escavação a escala adequada (1:100 ou 1:200), com: cotas do terreno natural (a partir do levantamento topográfico), cotas de projeto (plataformas, fundações), inclinação dos taludes de escavação (conforme estudo geotécnico), sistema de contenção provisória (se necessário), faseamento da escavação, volumes de escavação por camada (cálculo por perfis ou modelação 3D), classificação do solo escavado, e destino dos materiais (reutilização, depósito, vazadouro licenciado).",
+      "enabled": true,
+      "tags": [
+        "movimentos de terra",
+        "escavação",
+        "perfis",
+        "cotas",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ATERRO-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o — Especificações de compactação de aterros",
+      "description": "Os desenhos devem especificar os requisitos de compactação dos aterros, incluindo grau de compactação, espessura de camadas e critérios de aceitação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasFillCompactionSpecs",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Especificações de compactação: {drawings.hasFillCompactionSpecs}",
+      "requiredValue": "Especificações de compactação de aterros obrigatórias",
+      "remediation": "Incluir nos desenhos de movimentos de terra as especificações de compactação: grau de compactação mínimo (≥95% Proctor Modificado para zonas estruturais, ≥90% para zonas não estruturais), espessura máxima de camadas (20-30cm), tipo de solo admissível para aterro (classificação ASTM D2487), teor de humidade ótimo, equipamento de compactação recomendado, ensaios de controlo (frequência e critérios de aceitação), e tratamento da superfície de contacto entre camadas. Referenciar o Caderno de Encargos e normas LNEC.",
+      "enabled": true,
+      "tags": [
+        "movimentos de terra",
+        "compactação",
+        "aterro",
+        "especificações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ATERRO-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC7 — Pormenores de muros de suporte",
+      "description": "Os desenhos devem incluir pormenores construtivos detalhados dos muros de suporte, com armadura, geometria, drenagem e especificações dos materiais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasRetainingWalls",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasRetainingWallDetails",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenores de muros de suporte: {drawings.hasRetainingWallDetails}",
+      "requiredValue": "Pormenores construtivos de muros de suporte obrigatórios",
+      "remediation": "Incluir pormenores construtivos dos muros de suporte a escala 1:20 ou 1:50, com: secção transversal cotada (sapata, paramento, contrafortes), armadura completa (longitudinal, transversal, arranques, empalmes), classe do betão e aço, recobrimentos, juntas de dilatação (espaçamento máximo 15m), barbacãs e sistema de drenagem posterior, impermeabilização do paramento enterrado, e verificação da estabilidade (deslizamento, derrubamento, capacidade portante) conforme EC7. Incluir diagrama de impulsos e modelo de cálculo.",
+      "enabled": true,
+      "tags": [
+        "movimentos de terra",
+        "muros de suporte",
+        "pormenor",
+        "estrutura",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ATERRO-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC7 — Pormenores de pregagens e ancoragens",
+      "description": "Quando o projeto preveja pregagens (soil nails) ou ancoragens, os desenhos devem incluir pormenores de implantação, geometria, comprimento e ensaios de carga.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasSoilNailsOrAnchors",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasSoilNailAnchorDetails",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenores de pregagens/ancoragens: {drawings.hasSoilNailAnchorDetails}",
+      "requiredValue": "Pormenores de pregagens e ancoragens obrigatórios quando aplicável",
+      "remediation": "Incluir nos desenhos: planta com implantação das pregagens ou ancoragens (malha, espaçamento horizontal e vertical), corte longitudinal com inclinação e comprimento livre e de selagem, diâmetro do furo e da barra/cabo, tipo de aço e proteção anticorrosiva, calda de injeção (composição e pressão), placa de repartição e cabeça de ancoragem, programa de ensaios de carga (ensaios de adequabilidade e de receção conforme EN 1537), e faseamento de execução. Incluir ficha técnica do sistema e referência ao EC7.",
+      "enabled": true,
+      "tags": [
+        "movimentos de terra",
+        "pregagens",
+        "ancoragens",
+        "contenção",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ATERRO-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EC7 — Drenagem posterior de muros de suporte",
+      "description": "Os desenhos de muros de suporte devem incluir o detalhe do sistema de drenagem posterior, evitando a acumulação de pressões hidrostáticas sobre a estrutura.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasRetainingWalls",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasRetainingWallDrainage",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Drenagem posterior: {drawings.hasRetainingWallDrainage}",
+      "requiredValue": "Sistema de drenagem posterior de muros de suporte obrigatório",
+      "remediation": "Incluir nos pormenores dos muros de suporte o sistema de drenagem posterior: camada drenante vertical (brita envolvida em geotêxtil ou geocompósito drenante), dreno longitudinal na base (tubo perfurado Ø110-160mm em meia-cana de brita), saídas de água (barbacãs Ø75mm espaçadas a 3m max, a 20cm acima do terreno exterior), impermeabilização do paramento enterrado (emulsão betuminosa + membrana), e ligação ao sistema de drenagem geral do terreno. Detalhar em corte a escala 1:10 ou 1:20.",
+      "enabled": true,
+      "tags": [
+        "movimentos de terra",
+        "drenagem",
+        "muros de suporte",
+        "impermeabilização",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-RENDER-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / Art. 11.o RJUE — Perspetivas 3D para licenciamento",
+      "description": "O processo de licenciamento deve incluir perspetivas tridimensionais do edifício proposto, mostrando as fachadas principais e a volumetria no contexto envolvente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.has3DPerspectives",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Perspetivas 3D: {drawings.has3DPerspectives}",
+      "requiredValue": "Perspetivas tridimensionais para apreciação da volumetria",
+      "remediation": "Incluir no processo de licenciamento perspetivas 3D renderizadas mostrando: volumetria geral do edifício (mínimo 2 ângulos diferentes), fachada principal e fachada voltada à via pública, relação volumétrica com os edifícios adjacentes (quando aplicável), materialidade e cor das fachadas, cobertura, e integração com o terreno (cotas de soleira e arranjos exteriores). As perspetivas devem ser realistas e em formato A3 ou superior para adequada leitura pelo técnico municipal.",
+      "enabled": true,
+      "tags": [
+        "visualização",
+        "3D",
+        "perspetivas",
+        "licenciamento",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-RENDER-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / RJUE — Fotomontagem de integração urbana",
+      "description": "Para empreendimentos em zonas sensíveis ou de interesse patrimonial, devem ser apresentadas fotomontagens demonstrando a integração do edifício na envolvente urbana existente.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.urbanSensitiveZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasPhotomontage",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Fotomontagem: {drawings.hasPhotomontage}",
+      "requiredValue": "Fotomontagem de integração urbana recomendada em zonas sensíveis",
+      "remediation": "Elaborar fotomontagens de integração urbana sobrepondo o modelo 3D do edifício proposto em fotografias reais da envolvente, mostrando: vista a partir da via pública principal (ponto de vista do peão), vista panorâmica mostrando a relação com a silhueta urbana existente, integração cromática e de materialidade com os edifícios adjacentes. As fotomontagens devem ser realizadas com câmara calibrada (distância focal conhecida) para garantir a correta proporção e perspetiva. Incluir mínimo 2 fotomontagens de ângulos complementares.",
+      "enabled": true,
+      "tags": [
+        "visualização",
+        "fotomontagem",
+        "integração urbana",
+        "património",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-RENDER-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o — Especificação de materiais e cores nos renders",
+      "description": "As visualizações 3D devem incluir referências precisas aos materiais e cores especificados, com códigos NCS, RAL ou referência a amostras do fabricante.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasRendersWithMaterialSpecs",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Especificação de materiais nos renders: {drawings.hasRendersWithMaterialSpecs}",
+      "requiredValue": "Renders com referência a materiais e códigos de cor",
+      "remediation": "Complementar as perspetivas 3D com quadro de materiais e cores, indicando para cada superfície visível: tipo de material (reboco pintado, pedra natural, revestimento cerâmico, alumínio lacado, vidro), referência comercial ou tipo genérico, código de cor (sistema NCS, RAL, ou Pantone), acabamento (mate, cetim, brilhante, texturado). Incluir amostras de cor impressas no documento e legenda associada às perspetivas. Para pedra natural, indicar a origem e tipo (granito, calcário, xisto).",
+      "enabled": true,
+      "tags": [
+        "visualização",
+        "materiais",
+        "cores",
+        "especificação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-RENDER-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / RGEU — Estudo de sombras projetadas",
+      "description": "O projeto deve incluir diagramas de sombras projetadas pelo edifício proposto sobre as propriedades vizinhas e espaço público, para os solstícios e equinócios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasShadowStudy",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Estudo de sombras: {drawings.hasShadowStudy}",
+      "requiredValue": "Diagramas de sombras projetadas obrigatórios",
+      "remediation": "Elaborar estudo de sombras projetadas pelo edifício proposto, incluindo: diagramas de sombras para o solstício de inverno (21 dezembro — situação mais desfavorável), solstício de verão (21 junho), e equinócios (21 março/setembro), nos horários de 9h, 12h e 15h (hora solar). Representar em planta de implantação as sombras projetadas sobre terrenos e edifícios adjacentes. Verificar o cumprimento do RGEU Art. 59.o (mínimo 2h de insolação direta nos compartimentos habitáveis no solstício de inverno). Incluir latitude e orientação do edifício.",
+      "enabled": true,
+      "tags": [
+        "visualização",
+        "sombras",
+        "insolação",
+        "estudo solar",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-RENDER-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / RGEU Art. 59.o — Análise de acesso solar",
+      "description": "O projeto deve incluir análise de acesso solar dos compartimentos habitáveis, demonstrando o cumprimento das exigências regulamentares de insolação mínima.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasSolarAccessAnalysis",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Análise de acesso solar: {drawings.hasSolarAccessAnalysis}",
+      "requiredValue": "Análise de acesso solar para compartimentos habitáveis",
+      "remediation": "Elaborar análise de acesso solar demonstrando que todos os compartimentos habitáveis (quartos e salas) recebem insolação direta mínima conforme RGEU Art. 59.o: pelo menos 2 horas de sol direto no solstício de inverno. Incluir: diagrama solar estereográfico para a latitude do local, carta de obstruções para cada fachada relevante (edifícios e topografia envolvente), horas de insolação direta por compartimento (tabela resumo), e identificação de eventuais compartimentos que não cumpram o requisito com proposta de soluções (reposicionamento de vãos, aumento de área envidraçada).",
+      "enabled": true,
+      "tags": [
+        "visualização",
+        "acesso solar",
+        "insolação",
+        "RGEU",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INCEND-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DL 220/2008 — Delimitação de compartimentos corta-fogo",
+      "description": "As peças desenhadas de segurança contra incêndio devem delimitar claramente todos os compartimentos corta-fogo, indicando a classe de resistência ao fogo dos elementos de compartimentação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasFireCompartmentBoundaries",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Compartimentos corta-fogo: {drawings.hasFireCompartmentBoundaries}",
+      "requiredValue": "Delimitação de compartimentos corta-fogo obrigatória",
+      "remediation": "Delimitar nas plantas de SCIE todos os compartimentos corta-fogo com linha específica (traço-ponto grosso, cor vermelha ou magenta), indicando: classe de resistência ao fogo dos elementos de compartimentação (paredes EI 30/60/90/120, portas EI ou E conforme RT-SCIE), área máxima de cada compartimento (verificação conforme utilização-tipo e categoria de risco), selagem corta-fogo das travessias de tubagens e cabos (tipo e classe), e registo corta-fogo nas condutas de AVAC. Incluir legenda com código de cores e simbologia.",
+      "enabled": true,
+      "tags": [
+        "incêndio",
+        "compartimentação",
+        "corta-fogo",
+        "SCIE",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INCEND-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DL 220/2008 — Plantas de evacuação",
+      "description": "O projeto de SCIE deve incluir plantas de evacuação para cada piso, com indicação dos caminhos de evacuação, saídas de emergência, distâncias de percurso e lotação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasEvacuationRoutePlans",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Plantas de evacuação: {drawings.hasEvacuationRoutePlans}",
+      "requiredValue": "Plantas de evacuação por piso obrigatórias",
+      "remediation": "Incluir planta de evacuação para cada piso, com: caminhos de evacuação principais e alternativos (setas indicativas em verde), saídas de emergência (posição e largura — UP conforme RT-SCIE), distâncias de percurso (máximo conforme utilização-tipo: 15m em impasse, 30m com saídas alternativas), lotação de cada compartimento, localização dos extintores e bocas de incêndio ao longo dos percursos, iluminação de emergência, sinalização de segurança (blocos autónomos), ponto de encontro exterior. Verificar as larguras mínimas: 1 UP = 0,90m, 2 UP = 1,40m.",
+      "enabled": true,
+      "tags": [
+        "incêndio",
+        "evacuação",
+        "saídas",
+        "caminhos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INCEND-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DL 220/2008 — Planta do sistema de deteção de incêndio",
+      "description": "O projeto de SCIE deve incluir planta com o layout completo do sistema automático de deteção de incêndio (SADI), incluindo detetores, botões de alarme, sirenes e central.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasFireDetectionLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Sistema de deteção de incêndio: {drawings.hasFireDetectionLayout}",
+      "requiredValue": "Planta do sistema de deteção de incêndio obrigatória",
+      "remediation": "Incluir planta do SADI para cada piso, com: tipo e posição dos detetores (óticos de fumo, termovelocimétricos, lineares — conforme EN 54), área de cobertura de cada detetor (raio máximo conforme tipo e altura do teto), botões de alarme manual (junto às saídas, a 1,5m do pavimento, máximo 30m de percurso), sirenes e difusores de alarme (interior e exterior), central de deteção de incêndio (CDI — posição na receção ou posto de segurança), cablagem (percurso e tipo de cabo resistente ao fogo), zonas de deteção (agrupamento lógico por compartimentos). Simbologia conforme NP 182.",
+      "enabled": true,
+      "tags": [
+        "incêndio",
+        "deteção",
+        "SADI",
+        "alarme",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INCEND-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DL 220/2008 — Layout de zonas de sprinklers",
+      "description": "Quando exigido sistema de extinção automática por água (sprinklers), os desenhos devem incluir o layout das zonas, posição dos aspersores, e esquema hidráulico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.requiresSprinklerSystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasSprinklerZoneLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Layout de sprinklers: {drawings.hasSprinklerZoneLayout}",
+      "requiredValue": "Layout de zonas de sprinklers obrigatório quando exigido",
+      "remediation": "Incluir planta do sistema de sprinklers para cada piso, com: delimitação das zonas de proteção, tipo de aspersores (pendente, upright, sidewall — conforme EN 12845), espaçamento entre aspersores (máximo conforme classe de risco), distância às paredes, área de cobertura por aspersor, pontos de alimentação (posto de controlo e alarme), esquema hidráulico simplificado (diâmetros das tubagens principais), válvula de alarme, grupo de bombagem (caudal e pressão), reserva de água dedicada. Indicar classe de risco do edifício (LH, OH1-OH4, HHP) conforme EN 12845.",
+      "enabled": true,
+      "tags": [
+        "incêndio",
+        "sprinklers",
+        "extinção automática",
+        "zonas",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-INCEND-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / DL 220/2008 — Zonas de controlo de fumo",
+      "description": "Os desenhos de SCIE devem identificar as zonas de controlo de fumo (desenfumagem), indicando os sistemas de admissão de ar e extração de fumo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSmokeControlZones",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Zonas de controlo de fumo: {drawings.hasSmokeControlZones}",
+      "requiredValue": "Identificação das zonas de controlo de fumo obrigatória",
+      "remediation": "Incluir nas plantas de SCIE a identificação das zonas de controlo de fumo (desenfumagem), com: delimitação dos cantões de fumo (barreiras de cantonamento — máximo 1600m² ou 60m de comprimento), posição e dimensionamento das aberturas de admissão de ar novo (inferior) e extração de fumo (superior), tipo de sistema (natural por exutores, mecânico por ventiladores, ou misto), comando automático e manual dos dispositivos, área útil de exutores ou caudal dos ventiladores (1% da área do cantão para natural, ou cálculo conforme EN 12101), e alimentação elétrica de segurança para sistemas mecânicos. Aplicável a vias de evacuação, locais de risco B e C, e pisos enterrados.",
+      "enabled": true,
+      "tags": [
+        "incêndio",
+        "desenfumagem",
+        "controlo de fumo",
+        "cantões",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ELETMEC-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / EN 81-20 — Dimensões do poço e casa de máquinas do elevador",
+      "description": "Os desenhos devem incluir as dimensões detalhadas do poço do elevador, casa de máquinas (se aplicável), e folgas regulamentares, conforme EN 81-20.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasElevatorShaftDimensions",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Dimensões do poço de elevador: {drawings.hasElevatorShaftDimensions}",
+      "requiredValue": "Dimensões do poço e casa de máquinas do elevador obrigatórias",
+      "remediation": "Incluir nos desenhos de arquitetura e estrutura as dimensões do poço do elevador: largura e profundidade internas (conforme modelo selecionado e EN 81-20), profundidade do fosso (mínimo 1,20m para elevadores sem casa de máquinas), altura livre de superação acima do último piso (mínimo conforme EN 81-20 — tipicamente 3,60m), espessura das paredes do poço (betão armado mínimo 20cm), posição e dimensões das portas de patamar, ventilação do poço (mínimo 1% da secção ou 0,035m²), ponto de força e iluminação do fosso, e casa de máquinas se aplicável (dimensões mínimas, acesso, ventilação, capacidade de carga do pavimento ≥5000N/m²).",
+      "enabled": true,
+      "tags": [
+        "eletromecânicas",
+        "elevador",
+        "poço",
+        "dimensões",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ELETMEC-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o — Layout da sala do gerador de emergência",
+      "description": "O projeto deve incluir planta com o layout da sala do gerador de emergência, incluindo dimensões, ventilação, depósito de combustível e acessibilidade para manutenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasEmergencyGenerator",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasGeneratorRoomLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Layout da sala do gerador: {drawings.hasGeneratorRoomLayout}",
+      "requiredValue": "Layout da sala do gerador de emergência obrigatório quando aplicável",
+      "remediation": "Incluir planta e corte da sala do gerador de emergência, com: dimensões internas (folga mínima de 1m em todos os lados para manutenção), base antivibratória e maciço de fundação (dimensões e peso), grelhas de admissão de ar (dimensionamento conforme potência do gerador), conduta de extração de gases de escape (percurso, material resistente ao calor, saída acima da cobertura), depósito de combustível (capacidade, bacia de retenção 110%, ventilação), quadro de transferência automática (ATS — posição), cablagem de potência até ao QGBT, porta de acesso (largura mínima para passagem do gerador), proteção acústica (isolamento para ≤85dB(A) no exterior).",
+      "enabled": true,
+      "tags": [
+        "eletromecânicas",
+        "gerador",
+        "emergência",
+        "sala técnica",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ELETMEC-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o — Layout da sala de UPS",
+      "description": "Quando o projeto preveja sistema de alimentação ininterrupta (UPS), os desenhos devem incluir o layout da sala de UPS, com dimensões, ventilação, e capacidade de carga do pavimento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasUPSSystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasUPSRoomLayout",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Layout da sala de UPS: {drawings.hasUPSRoomLayout}",
+      "requiredValue": "Layout da sala de UPS obrigatório quando aplicável",
+      "remediation": "Incluir planta da sala de UPS com: dimensões internas (folga mínima de 0,80m à frente dos equipamentos para manutenção), posição dos módulos UPS e baterias (com peso total para verificação da capacidade de carga do pavimento — tipicamente >1000 kg/m²), ventilação/climatização (controlo de temperatura 15-25°C, extração de hidrogénio das baterias conforme EN 50272-2), quadro de bypass manual, cablagem de entrada e saída (percurso em esteira ou calha), sistema de deteção de incêndio (detetor de fumo), iluminação de emergência, porta de acesso (largura mínima 0,90m, resistência ao fogo EI30).",
+      "enabled": true,
+      "tags": [
+        "eletromecânicas",
+        "UPS",
+        "alimentação ininterrupta",
+        "sala técnica",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ELETMEC-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o / RTIEBT — Localização do quadro geral de baixa tensão",
+      "description": "Os desenhos devem indicar a localização do quadro geral de baixa tensão (QGBT) e do posto de transformação (se aplicável), com acessibilidade e distâncias regulamentares.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasMainElectricalPanelLocation",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Localização do QGBT: {drawings.hasMainElectricalPanelLocation}",
+      "requiredValue": "Localização do quadro geral de baixa tensão obrigatória",
+      "remediation": "Indicar nas plantas a localização do QGBT e demais quadros elétricos, com: posição no edifício (sala técnica dedicada ou armário técnico), dimensões do quadro e espaço frontal livre (mínimo 0,70m conforme RTIEBT), ventilação da sala (natural ou forçada), porta de acesso (largura mínima 0,80m, com fecho e sinalização), posto de transformação (se potência >100kVA — dimensões conforme normas do distribuidor EDP), portinhola e caixa de contagem, percurso da alimentação desde o PT ou ramal de entrada, terras de proteção e serviço (elétrodo de terra, barramento), e esquema unifilar geral. Cumprir RTIEBT (Regras Técnicas de Instalações Elétricas de Baixa Tensão).",
+      "enabled": true,
+      "tags": [
+        "eletromecânicas",
+        "QGBT",
+        "quadro elétrico",
+        "RTIEBT",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ELETMEC-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.o — Arquitetura do sistema de gestão técnica centralizada",
+      "description": "Quando o projeto preveja sistema de gestão técnica centralizada (GTC/BMS), os desenhos devem incluir o diagrama de arquitetura do sistema, com controladores, redes e pontos monitorizados.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasBMSSystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasBMSArchitectureDiagram",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Arquitetura GTC/BMS: {drawings.hasBMSArchitectureDiagram}",
+      "requiredValue": "Diagrama de arquitetura do sistema GTC/BMS obrigatório quando aplicável",
+      "remediation": "Incluir diagrama de arquitetura do sistema de gestão técnica centralizada (GTC/BMS), com: estação central de supervisão (posição no edifício — tipicamente na sala de segurança ou gestão técnica), controladores de campo (DDC) — quantidade, localização e sistemas controlados (AVAC, iluminação, energia, elevadores, SCIE, controlo de acessos), rede de comunicação (protocolo BACnet, Modbus, KNX — topologia e percurso de cablagem), lista de pontos monitorizados e comandados (I/O — entradas/saídas analógicas e digitais), integração com outros sistemas (SCIE, CCTV, controlo de acessos), interface com o utilizador (supervisão gráfica, alarmes, registos históricos).",
+      "enabled": true,
+      "tags": [
+        "eletromecânicas",
+        "GTC",
+        "BMS",
+        "gestão técnica",
+        "portaria-701h"
+      ]
     }
   ]
 }

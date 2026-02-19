@@ -6067,6 +6067,726 @@
       "remediation": "Documentar o procedimento de isolamento do fornecimento de gás com a sequência: 1) Fechar válvula de corte de emergência (1/4 de volta - perpendicular à tubagem), 2) Verificar que todos os aparelhos estão desligados, 3) Confirmar corte efetivo (ausência de chama nos queimadores), 4) Ventilar todos os compartimentos durante mínimo 15 minutos, 5) Verificar ausência de gás com detetor portátil antes de restabelecer o fornecimento.",
       "enabled": true,
       "tags": ["emergência", "isolamento", "procedimento", "sequência", "ventilação"]
+    },
+    {
+      "id": "GAS-HOSP-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 60.º -- Instalações Hospitalares",
+      "description": "As instalações hospitalares devem dispor de alimentação de gás redundante, com dupla rampa de redução e regulação, assegurando o fornecimento contínuo mesmo em caso de falha de uma das linhas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.hospital.hasRedundantGasSupply",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.type",
+          "operator": "==",
+          "value": "hospital"
+        }
+      ],
+      "currentValueTemplate": "{gas.hospital.hasRedundantGasSupply}",
+      "requiredValue": "Alimentação de gás redundante com dupla rampa",
+      "remediation": "Instalar sistema de alimentação de gás com dupla rampa de regulação e redução em paralelo, com comutação automática. Cada rampa deve ser capaz de assegurar 100% do caudal necessário. Prever manómetros em cada rampa e alarme de falha na central técnica.",
+      "enabled": true,
+      "tags": ["hospital", "redundância", "dupla rampa", "fornecimento contínuo", "segurança"]
+    },
+    {
+      "id": "GAS-HOSP-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 61.º -- Alarme de Gás Medicinal",
+      "description": "As instalações de gás medicinal em hospitais devem dispor de sistema de alarme centralizado com indicação visual e sonora na central técnica e nos postos de enfermagem, alertando para anomalias de pressão ou fuga.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.hospital.hasMedicalGasAlarm",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hospital.hasMedicalGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.hospital.hasMedicalGasAlarm}",
+      "requiredValue": "Sistema de alarme centralizado para gases medicinais",
+      "remediation": "Instalar central de alarme de gases medicinais com painéis repetidores nos postos de enfermagem de cada piso. O sistema deve monitorizar pressão de linha, nível de reserva e deteção de fugas. Alarmes sonoros devem atingir mínimo 75 dB e visuais devem ser visíveis a 3 metros. Prever alimentação elétrica de emergência (UPS).",
+      "enabled": true,
+      "tags": ["hospital", "alarme", "gás medicinal", "central técnica", "enfermagem"]
+    },
+    {
+      "id": "GAS-HOSP-03",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 35.º -- Armazenamento de Garrafas",
+      "description": "O armazenamento de garrafas de gás em hospitais deve realizar-se em compartimento próprio, ventilado, com separação entre garrafas cheias e vazias, e distância mínima de 5 metros de fontes de ignição.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.hospital.hasDedicatedCylinderStorage",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hospital.hasCylinderStorage",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.hospital.hasDedicatedCylinderStorage}",
+      "requiredValue": "Compartimento dedicado e ventilado para garrafas de gás",
+      "remediation": "Providenciar compartimento dedicado para armazenamento de garrafas com: ventilação natural ou forçada (mínimo 6 renovações/hora), separação física entre garrafas cheias e vazias, sinalética de perigo, extintor de pó químico ABC, distância mínima de 5 m de fontes de ignição, e acesso restrito a pessoal autorizado.",
+      "enabled": true,
+      "tags": ["hospital", "garrafas", "armazenamento", "ventilação", "segurança"]
+    },
+    {
+      "id": "GAS-HOSP-04",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 62.º -- Corte de Emergência por Zona",
+      "description": "Em hospitais, cada zona funcional (bloco operatório, UCI, internamento) deve possuir válvula de corte de emergência de gás independente, acessível ao pessoal técnico e devidamente sinalizada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.hospital.hasZoneEmergencyShutoff",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.type",
+          "operator": "==",
+          "value": "hospital"
+        }
+      ],
+      "currentValueTemplate": "{gas.hospital.hasZoneEmergencyShutoff}",
+      "requiredValue": "Válvulas de corte de emergência por zona funcional",
+      "remediation": "Instalar válvulas de corte de emergência de gás em cada zona funcional do hospital (bloco operatório, UCI, internamento, laboratórios, cozinha, central térmica). As válvulas devem ser de 1/4 de volta, sinalizadas com placas normalizadas e acessíveis sem necessidade de ferramentas. Elaborar planta com localização de todas as válvulas de zona.",
+      "enabled": true,
+      "tags": ["hospital", "emergência", "válvula corte", "zona", "sinalização"]
+    },
+    {
+      "id": "GAS-HOSP-05",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 63.º -- Fornecimento ao Bloco Operatório",
+      "description": "O fornecimento de gás ao bloco operatório deve ser realizado por rede dedicada com filtragem, regulação de pressão independente e válvula de seccionamento à entrada de cada sala, com indicação de pressão visível.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.hospital.operatingTheatre.hasDedicatedSupply",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hospital.operatingTheatre.hasGasSupply",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.hospital.operatingTheatre.hasDedicatedSupply}",
+      "requiredValue": "Rede de gás dedicada ao bloco operatório com regulação independente",
+      "remediation": "Instalar rede de gás dedicada ao bloco operatório com: filtros de partículas e bactérias na linha, regulador de pressão independente com manómetro de leitura direta, válvula de seccionamento à entrada de cada sala cirúrgica, e alarme local de pressão baixa. A tubagem deve ser em cobre desoxidado ou aço inoxidável AISI 316L.",
+      "enabled": true,
+      "tags": ["hospital", "bloco operatório", "rede dedicada", "regulação", "pressão"]
+    },
+    {
+      "id": "GAS-LABORT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 64.º -- Extração em Laboratórios",
+      "description": "Os laboratórios com aparelhos a gás devem dispor de sistema de extração localizada (hotte) com caudal mínimo de 30 renovações de ar por hora e insuflação de ar de compensação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.laboratory.hasLocalExtraction",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.hasGasAppliances",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.hasLocalExtraction}",
+      "requiredValue": "Sistema de extração localizada com mínimo 30 renovações/hora",
+      "remediation": "Instalar sistema de extração localizada (hotte de laboratório) sobre cada posto de trabalho com gás, com caudal mínimo de 30 renovações/hora. Garantir admissão de ar de compensação para evitar depressão excessiva. O sistema de extração deve funcionar de forma contínua durante a utilização do gás e durante 15 minutos após a cessação.",
+      "enabled": true,
+      "tags": ["laboratório", "extração", "hotte", "ventilação", "renovações"]
+    },
+    {
+      "id": "GAS-LABORT-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 36.º -- Segurança de Bicos Bunsen",
+      "description": "Os bicos Bunsen em laboratórios devem dispor de válvula de segurança individual com corte por ausência de chama (termopar) e mangueira flexível de comprimento máximo de 1,5 m com ligação roscada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.laboratory.bunsenBurners.hasSafetyValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.bunsenBurners.count",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.bunsenBurners.hasSafetyValve}",
+      "requiredValue": "Válvula de segurança com termopar em cada bico Bunsen",
+      "remediation": "Equipar cada bico Bunsen com válvula de segurança por termopar que efetue o corte automático do gás em caso de extinção acidental da chama. A ligação deve ser por mangueira flexível de comprimento máximo 1,5 m, com acessórios roscados (não utilizar abraçadeiras). Substituir mangueiras com mais de 5 anos de utilização.",
+      "enabled": true,
+      "tags": ["laboratório", "bico Bunsen", "termopar", "segurança", "mangueira"]
+    },
+    {
+      "id": "GAS-LABORT-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 65.º -- Fixação de Garrafas em Laboratórios",
+      "description": "As garrafas de gás em laboratórios devem estar fixadas à parede ou à bancada por corrente ou cinta metálica a 2/3 da sua altura, impedindo a queda ou o deslocamento acidental.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.laboratory.cylindersSecured",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.hasCylinders",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.cylindersSecured}",
+      "requiredValue": "Garrafas de gás fixadas com corrente ou cinta a 2/3 da altura",
+      "remediation": "Fixar todas as garrafas de gás à parede ou à bancada por meio de corrente ou cinta metálica posicionada a 2/3 da altura da garrafa. Garrafas de reserva devem ter a cápsula de proteção da válvula colocada. Não armazenar garrafas de gases incompatíveis lado a lado. Manter garrafas afastadas de fontes de calor (mín. 1,5 m de radiadores e aparelhos a gás).",
+      "enabled": true,
+      "tags": ["laboratório", "garrafas", "fixação", "corrente", "segurança"]
+    },
+    {
+      "id": "GAS-LABORT-04",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 66.º -- Deteção de Fugas em Laboratórios",
+      "description": "Os laboratórios com instalação de gás canalizado devem dispor de detetores de fuga de gás ligados ao sistema de alarme do edifício, com acionamento automático da extração de emergência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.laboratory.hasLeakDetectionSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.hasPipedGas",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.hasLeakDetectionSystem}",
+      "requiredValue": "Sistema de deteção de fugas ligado ao alarme com extração automática",
+      "remediation": "Instalar detetores de fuga de gás em cada laboratório com gás canalizado, calibrados para o tipo de gás utilizado. Os detetores devem estar ligados ao sistema central de alarme do edifício e acionar automaticamente a extração de emergência ao atingir 20% do LII (Limite Inferior de Inflamabilidade). Realizar calibração semestral dos detetores.",
+      "enabled": true,
+      "tags": ["laboratório", "deteção", "fuga", "alarme", "extração emergência"]
+    },
+    {
+      "id": "GAS-LABORT-05",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 37.º -- Corte de Emergência em Laboratórios",
+      "description": "Cada laboratório deve dispor de botão de corte de emergência do gás junto à porta de saída, de cor vermelha, devidamente identificado e acessível sem necessidade de ferramentas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.laboratory.hasEmergencyShutoffButton",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.hasGasAppliances",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.hasEmergencyShutoffButton}",
+      "requiredValue": "Botão de corte de emergência junto à porta de saída do laboratório",
+      "remediation": "Instalar botão de corte de emergência de gás junto à porta de saída principal de cada laboratório, a uma altura entre 0,80 m e 1,20 m do pavimento. O botão deve ser de cor vermelha, com sinalética normalizada, e acionar eletroválvula de corte normalmente fechada na conduta de alimentação do laboratório. Testar o funcionamento mensalmente.",
+      "enabled": true,
+      "tags": ["laboratório", "emergência", "botão corte", "porta saída", "eletroválvula"]
+    },
+    {
+      "id": "GAS-RESIST-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 67.º -- Atravessamentos Corta-Fogo",
+      "description": "As penetrações de tubagens de gás em paredes e pavimentos resistentes ao fogo devem ser seladas com material intumescente ou corta-fogo, mantendo a mesma classe de resistência ao fogo do elemento atravessado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.fireResistance.pipeFireSealedPenetrations",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipework.crossesFireCompartments",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireResistance.pipeFireSealedPenetrations}",
+      "requiredValue": "Atravessamentos selados com material intumescente corta-fogo",
+      "remediation": "Selar todos os atravessamentos de tubagens de gás em paredes e pavimentos classificados com resistência ao fogo, utilizando material intumescente certificado (EN 1366-3). A selagem deve manter a mesma classe de resistência ao fogo do elemento construtivo (mínimo EI 60 para paredes de compartimentação e EI 90 para paredes de meação). Documentar a localização e tipo de selagem aplicada.",
+      "enabled": true,
+      "tags": ["resistência fogo", "atravessamento", "intumescente", "compartimentação", "selagem"]
+    },
+    {
+      "id": "GAS-RESIST-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 38.º -- Proteção de Tubagens ao Fogo",
+      "description": "As tubagens de gás que atravessem zonas com risco de incêndio ou sem proteção direta de sprinklers devem receber revestimento de proteção ao fogo com classificação mínima de R 60.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.fireResistance.hasFireProtectionCoating",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipework.routesThroughFireRiskZones",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireResistance.hasFireProtectionCoating}",
+      "requiredValue": "Revestimento de proteção ao fogo R 60 nas tubagens em zonas de risco",
+      "remediation": "Aplicar revestimento de proteção ao fogo (argamassa projetada, manta intumescente ou coquilha de lã de rocha com espessura adequada) nas tubagens de gás que atravessem zonas de risco de incêndio. O revestimento deve assegurar classificação mínima R 60 (60 minutos de resistência). Utilizar materiais certificados segundo EN 13381-4. Identificar as tubagens protegidas com etiquetas visíveis.",
+      "enabled": true,
+      "tags": ["resistência fogo", "revestimento", "proteção", "R60", "tubagem"]
+    },
+    {
+      "id": "GAS-RESIST-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 68.º -- Corte Automático em Compartimento de Incêndio",
+      "description": "Na fronteira de cada compartimento de incêndio que contenha tubagem de gás deve existir válvula de corte automático acionada pelo sistema de deteção de incêndio, impedindo o fluxo de gás para a zona sinistrada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.fireResistance.hasAutoShutoffAtFireCompartment",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipework.crossesFireCompartments",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireResistance.hasAutoShutoffAtFireCompartment}",
+      "requiredValue": "Válvula de corte automático na fronteira do compartimento de incêndio",
+      "remediation": "Instalar eletroválvula de corte normalmente fechada na tubagem de gás em cada fronteira de compartimento de incêndio, comandada pelo SADI (Sistema Automático de Deteção de Incêndio). A válvula deve fechar automaticamente em caso de alarme de incêndio no compartimento. Prever rearme manual apenas por pessoal autorizado. Testar trimestralmente a integração com o SADI.",
+      "enabled": true,
+      "tags": ["resistência fogo", "compartimento incêndio", "corte automático", "SADI", "eletroválvula"]
+    },
+    {
+      "id": "GAS-RESIST-04",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 39.º -- Separação do Contador ao Fogo",
+      "description": "O contador de gás deve estar instalado em nicho ou armário com resistência ao fogo mínima EI 60, com ventilação para o exterior e porta com fecho de acesso restrito.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.fireResistance.meterFireRatedEnclosure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.metering.installedInBuilding",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireResistance.meterFireRatedEnclosure}",
+      "requiredValue": "Nicho ou armário do contador com resistência ao fogo EI 60",
+      "remediation": "Instalar o contador de gás em nicho ou armário construído com materiais de classe de resistência ao fogo mínima EI 60. O armário deve dispor de ventilação direta para o exterior (aberturas superior e inferior, cada uma com área mínima de 150 cm²). A porta deve ter fecho com chave triangular normalizada. Não armazenar outros materiais no interior do armário do contador.",
+      "enabled": true,
+      "tags": ["resistência fogo", "contador", "EI 60", "nicho", "ventilação"]
+    },
+    {
+      "id": "GAS-RESIST-05",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 69.º -- Afastamento de Vias de Evacuação",
+      "description": "As tubagens de gás não devem atravessar caixas de escada, vias de evacuação ou câmaras corta-fogo. Quando inevitável, devem ser protegidas em manga corta-fogo com resistência mínima EI 90.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.fireResistance.pipesAwayFromEscapeRoutes",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipework.routesThroughEscapeRoutes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.fireResistance.pipesAwayFromEscapeRoutes}",
+      "requiredValue": "Tubagens de gás afastadas ou protegidas (EI 90) nas vias de evacuação",
+      "remediation": "Redirecionar as tubagens de gás para evitar a passagem por caixas de escada, vias de evacuação e câmaras corta-fogo. Quando o desvio for tecnicamente inviável, encerrar a tubagem em manga corta-fogo contínua com classificação mínima EI 90, sem juntas nem acessórios no troço protegido. A manga deve ser inspecionável e devidamente sinalizada. Documentar a justificação técnica para a impossibilidade de desvio.",
+      "enabled": true,
+      "tags": ["resistência fogo", "evacuação", "caixa escada", "manga corta-fogo", "EI 90"]
+    },
+    {
+      "id": "GAS-MANUT2-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 70.º -- Ensaio Anual de Estanquidade",
+      "description": "A instalação de gás deve ser submetida a ensaio de estanquidade anual, realizado por entidade credenciada, com registo de resultados e certificado de conformidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.maintenance.annualTightnessTestDate",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.maintenance.annualTightnessTestDate}",
+      "requiredValue": "Ensaio de estanquidade anual com certificado válido",
+      "remediation": "Contratar entidade credenciada pela DGEG para realizar ensaio de estanquidade anual da instalação de gás. O ensaio deve ser efetuado com manómetro de precisão a 1,5 vezes a pressão de serviço durante mínimo 15 minutos. Conservar o certificado de conformidade durante 5 anos. Corrigir imediatamente qualquer fuga detetada antes de restabelecer o serviço.",
+      "enabled": true,
+      "tags": ["manutenção", "estanquidade", "anual", "certificado", "credenciada"]
+    },
+    {
+      "id": "GAS-MANUT2-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 40.º -- Revisão de Queimadores",
+      "description": "Os queimadores de gás devem ser revistos e afinados anualmente por técnico qualificado, incluindo verificação da combustão, limpeza dos injetores e controlo das seguranças.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.maintenance.burnerServiceWithinYear",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.appliances.hasBurners",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.maintenance.burnerServiceWithinYear}",
+      "requiredValue": "Revisão anual dos queimadores por técnico qualificado",
+      "remediation": "Contratar técnico qualificado para revisão anual de todos os queimadores de gás, incluindo: limpeza de injetores e elétrodos de ignição, verificação do caudal de gás e regulação da relação ar/gás, controlo do funcionamento das seguranças (termopar, ionização, pressóstato), verificação das juntas e ligações. Registar a intervenção no livro de manutenção.",
+      "enabled": true,
+      "tags": ["manutenção", "queimadores", "revisão anual", "afinação", "combustão"]
+    },
+    {
+      "id": "GAS-MANUT2-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 71.º -- Análise de Gases de Combustão",
+      "description": "Deve ser realizada análise de gases de combustão (CO, CO₂, O₂, temperatura) em todos os aparelhos a gás com evacuação de produtos de combustão, com periodicidade mínima anual.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.maintenance.flueGasAnalysisWithinYear",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.appliances.hasFlueConnectedAppliances",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.maintenance.flueGasAnalysisWithinYear}",
+      "requiredValue": "Análise de gases de combustão anual com valores conformes",
+      "remediation": "Realizar análise de gases de combustão com analisador portátil calibrado, medindo: CO (máx. 100 ppm no ambiente), CO₂, O₂, temperatura dos gases e rendimento de combustão. Registar os valores e comparar com os limites regulamentares. Afinar o queimador se os valores de CO excederem 50 ppm nos gases ou o rendimento for inferior ao declarado pelo fabricante. Conservar os relatórios durante 5 anos.",
+      "enabled": true,
+      "tags": ["manutenção", "análise combustão", "CO", "CO₂", "rendimento"]
+    },
+    {
+      "id": "GAS-MANUT2-04",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 41.º -- Substituição de Termopares",
+      "description": "Os termopares dos aparelhos a gás devem ser verificados anualmente e substituídos preventivamente a cada 5 anos ou sempre que o tempo de resposta ultrapasse 60 segundos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.maintenance.thermocoupleReplacementSchedule",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.appliances.hasThermocoupleDevices",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.maintenance.thermocoupleReplacementSchedule}",
+      "requiredValue": "Plano de substituição de termopares (máx. 5 anos)",
+      "remediation": "Estabelecer plano de verificação anual e substituição preventiva dos termopares: medir a tensão de saída (mín. 10 mV sob chama) e o tempo de resposta (corte em máx. 60 s após extinção da chama). Substituir os termopares a cada 5 anos, independentemente do estado aparente. Utilizar termopares originais do fabricante ou equivalentes certificados. Registar as substituições no livro de manutenção.",
+      "enabled": true,
+      "tags": ["manutenção", "termopar", "substituição", "5 anos", "verificação"]
+    },
+    {
+      "id": "GAS-MANUT2-05",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 72.º -- Plano de Manutenção de Válvulas",
+      "description": "As válvulas de corte, regulação e segurança da instalação de gás devem estar incluídas num plano de manutenção preventiva, com verificação semestral do funcionamento e lubrificação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.maintenance.hasValveMaintenanceSchedule",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.maintenance.hasValveMaintenanceSchedule}",
+      "requiredValue": "Plano de manutenção preventiva semestral de válvulas",
+      "remediation": "Elaborar plano de manutenção preventiva de todas as válvulas da instalação de gás, com periodicidade semestral. O plano deve incluir: manobra completa de cada válvula (abertura e fecho), verificação da estanquidade da sede e do empanque, lubrificação dos componentes mecânicos, verificação do estado da maneta ou volante, e registo de cada intervenção. Substituir válvulas que apresentem fuga ou dificuldade de manobra.",
+      "enabled": true,
+      "tags": ["manutenção", "válvulas", "plano preventivo", "semestral", "lubrificação"]
+    },
+    {
+      "id": "GAS-DOCUMENT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 73.º -- Certificado de Instalação",
+      "description": "Toda a instalação de gás deve possuir certificado de instalação emitido pela entidade inspetora, atestando a conformidade com o projeto aprovado e a legislação em vigor.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.documentation.hasInstallationCertificate",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.documentation.hasInstallationCertificate}",
+      "requiredValue": "Certificado de instalação de gás emitido por entidade inspetora",
+      "remediation": "Solicitar inspeção da instalação de gás por entidade inspetora reconhecida pela DGEG para obtenção do certificado de instalação. O certificado deve atestar a conformidade com o projeto aprovado, a execução segundo as normas aplicáveis (DL 521/99, Portaria 361/98, NP 1037) e a aprovação no ensaio de estanquidade. Conservar o original do certificado junto ao contador de gás.",
+      "enabled": true,
+      "tags": ["documentação", "certificado", "instalação", "entidade inspetora", "DGEG"]
+    },
+    {
+      "id": "GAS-DOCUMENT-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 42.º -- Livro de Manutenção",
+      "description": "A instalação de gás deve dispor de livro de manutenção atualizado, com registo cronológico de todas as intervenções de manutenção, inspeções e reparações efetuadas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.documentation.hasMaintenanceLogbook",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.documentation.hasMaintenanceLogbook}",
+      "requiredValue": "Livro de manutenção atualizado da instalação de gás",
+      "remediation": "Criar e manter livro de manutenção da instalação de gás com registo cronológico de: inspeções periódicas, ensaios de estanquidade, revisões de queimadores, análises de combustão, substituição de componentes, reparações e anomalias detetadas. Cada registo deve incluir data, descrição da intervenção, identificação do técnico e resultado. O livro deve estar acessível junto ao quadro de contagem.",
+      "enabled": true,
+      "tags": ["documentação", "livro manutenção", "registo", "intervenções", "cronológico"]
+    },
+    {
+      "id": "GAS-DOCUMENT-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 74.º -- Garantias dos Aparelhos",
+      "description": "Devem ser conservados os certificados de garantia, manuais de utilização e fichas técnicas de todos os aparelhos a gás instalados, durante a vida útil do equipamento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.documentation.hasApplianceWarrantyRecords",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.appliances.count",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "{gas.documentation.hasApplianceWarrantyRecords}",
+      "requiredValue": "Certificados de garantia e fichas técnicas dos aparelhos a gás",
+      "remediation": "Reunir e arquivar para cada aparelho a gás instalado: certificado de garantia do fabricante, manual de utilização e instalação, ficha técnica com dados de potência e consumo, declaração de conformidade CE, e certificado de instalação emitido pelo técnico instalador. Manter os documentos acessíveis durante toda a vida útil do equipamento, junto ao livro de manutenção.",
+      "enabled": true,
+      "tags": ["documentação", "garantia", "fichas técnicas", "manuais", "arquivo"]
+    },
+    {
+      "id": "GAS-DOCUMENT-04",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 43.º -- Certificação de Segurança",
+      "description": "A instalação de gás deve possuir certificação de segurança válida, renovada periodicamente (a cada 5 anos para instalações domésticas e a cada 2 anos para comerciais/industriais).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.documentation.hasValidSafetyCertification",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.documentation.hasValidSafetyCertification}",
+      "requiredValue": "Certificação de segurança de gás válida e atualizada",
+      "remediation": "Solicitar inspeção periódica à entidade inspetora para renovação da certificação de segurança da instalação de gás. Periodicidade: 5 anos para instalações domésticas, 2 anos para comerciais e industriais. A inspeção inclui verificação de estanquidade, estado das tubagens e acessórios, funcionamento das seguranças dos aparelhos e condições de ventilação e evacuação de gases. Não é permitido o fornecimento de gás sem certificação válida.",
+      "enabled": true,
+      "tags": ["documentação", "certificação", "segurança", "renovação", "inspeção periódica"]
+    },
+    {
+      "id": "GAS-DOCUMENT-05",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 75.º -- Afixação de Contactos de Emergência",
+      "description": "Junto ao contador de gás ou à entrada da instalação deve estar afixado quadro com os contactos de emergência: distribuidora de gás, bombeiros (112), entidade inspetora e técnico de manutenção.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.documentation.hasEmergencyContactDisplay",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.documentation.hasEmergencyContactDisplay}",
+      "requiredValue": "Quadro de contactos de emergência afixado junto ao contador",
+      "remediation": "Afixar quadro de contactos de emergência em local visível junto ao contador de gás ou entrada da instalação, incluindo: número de emergência geral (112), contacto de emergência da distribuidora de gás (24h), contacto da entidade inspetora, contacto do técnico de manutenção responsável e instruções básicas em caso de fuga (fechar válvula, ventilar, não acionar interruptores, evacuar). Manter os contactos atualizados.",
+      "enabled": true,
+      "tags": ["documentação", "contactos", "emergência", "afixação", "distribuidor"]
+    },
+    {
+      "id": "GAS-RENOV-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 76.º -- Aparelhos Preparados para Hidrogénio",
+      "description": "Em novas instalações ou renovações, os aparelhos a gás devem ser compatíveis com misturas de gás natural e hidrogénio até 20% (H2-ready), conforme a estratégia nacional de descarbonização.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.renewables.appliancesH2Ready",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isNewOrRenovated",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.renewables.appliancesH2Ready}",
+      "requiredValue": "Aparelhos compatíveis com mistura de até 20% hidrogénio",
+      "remediation": "Na seleção de novos aparelhos a gás, dar preferência a equipamentos certificados como H2-ready (compatíveis com mistura de até 20% de hidrogénio no gás natural). Verificar junto do fabricante a declaração de compatibilidade com hidrogénio. Para aparelhos existentes, consultar o fabricante sobre a possibilidade de adaptação (kits de conversão de injetores e juntas).",
+      "enabled": true,
+      "tags": ["renováveis", "hidrogénio", "H2-ready", "descarbonização", "compatibilidade"]
+    },
+    {
+      "id": "GAS-RENOV-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 44.º -- Compatibilidade com Biogás",
+      "description": "As instalações que recebam biogás ou gás natural renovável devem verificar a compatibilidade dos materiais das tubagens e dos aparelhos com a composição variável do gás, nomeadamente o teor de H₂S e siloxanos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.renewables.biogasCompatibilityVerified",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.renewables.receivesBiogas",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.renewables.biogasCompatibilityVerified}",
+      "requiredValue": "Verificação de compatibilidade da instalação com biogás",
+      "remediation": "Solicitar ao fornecedor de biogás a ficha de composição do gás (poder calorífico, índice de Wobbe, teor de H₂S, CO₂, siloxanos e humidade). Verificar a compatibilidade dos materiais das tubagens (cobre e aço são geralmente compatíveis; polietileno apenas na rede enterrada). Confirmar com os fabricantes dos aparelhos a adequação dos queimadores à gama de índice de Wobbe do biogás fornecido.",
+      "enabled": true,
+      "tags": ["renováveis", "biogás", "compatibilidade", "H₂S", "índice Wobbe"]
+    },
+    {
+      "id": "GAS-RENOV-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 77.º -- Bomba de Calor Híbrida",
+      "description": "A instalação de sistema híbrido bomba de calor + caldeira a gás deve prever controlo integrado que priorize a bomba de calor e utilize a caldeira apenas como apoio, com válvula de três vias motorizada.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.renewables.hybridHeatPumpIntegrated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.renewables.hasHybridHeatPumpBoiler",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.renewables.hybridHeatPumpIntegrated}",
+      "requiredValue": "Sistema de controlo integrado bomba de calor/caldeira a gás",
+      "remediation": "Instalar controlador integrado que gira automaticamente a prioridade de funcionamento entre a bomba de calor (fonte renovável) e a caldeira a gás (apoio). O controlo deve basear-se na temperatura exterior e no COP da bomba de calor, acionando a caldeira apenas quando a bomba de calor não consegue assegurar a potência necessária. Prever válvula de três vias motorizada para comutação hidráulica e interface de monitorização remota.",
+      "enabled": true,
+      "tags": ["renováveis", "bomba calor", "híbrido", "caldeira", "controlo integrado"]
+    },
+    {
+      "id": "GAS-RENOV-04",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 45.º -- Micro-Cogeração a Gás",
+      "description": "A instalação de sistemas de micro-cogeração (micro-CHP) a gás deve cumprir os requisitos de ventilação, evacuação de gases e ligação à rede elétrica, com potência térmica até 50 kW.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.renewables.microCHPCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.renewables.hasMicroCHP",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.renewables.microCHPCompliant}",
+      "requiredValue": "Instalação de micro-CHP conforme requisitos de ventilação e evacuação",
+      "remediation": "A instalação de micro-CHP a gás deve contemplar: compartimento com ventilação mínima de 20 renovações/hora, conduta de evacuação de gases de combustão dimensionada para o caudal do motor/turbina, ligação à rede elétrica com proteção anti-islanding (IEEE 1547), insonorização adequada (máx. 45 dB(A) no exterior), e contrato de manutenção com o fabricante. Potência térmica máxima de 50 kW para enquadramento como micro-cogeração.",
+      "enabled": true,
+      "tags": ["renováveis", "micro-CHP", "cogeração", "ventilação", "rede elétrica"]
+    },
+    {
+      "id": "GAS-RENOV-05",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 78.º -- Células de Combustível a Gás",
+      "description": "A instalação de células de combustível alimentadas a gás natural deve incluir reformador catalítico, sistema de gestão térmica e ligação ao quadro elétrico com proteção diferencial dedicada.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.renewables.fuelCellCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.renewables.hasFuelCell",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.renewables.fuelCellCompliant}",
+      "requiredValue": "Instalação de célula de combustível conforme requisitos técnicos",
+      "remediation": "A instalação de célula de combustível a gás natural deve incluir: reformador catalítico para conversão do gás natural em hidrogénio, sistema de gestão térmica para aproveitamento do calor residual (ligação ao sistema de AQS ou aquecimento), ligação ao quadro elétrico com proteção diferencial dedicada de 30 mA, ventilação do compartimento (mín. 10 renovações/hora) e sensor de hidrogénio com corte automático do gás em caso de fuga.",
+      "enabled": true,
+      "tags": ["renováveis", "célula combustível", "reformador", "hidrogénio", "gestão térmica"]
     }
   ]
 }

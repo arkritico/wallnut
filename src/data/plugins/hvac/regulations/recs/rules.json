@@ -982,6 +982,489 @@
       "remediation": "Instalar variadores de frequência (VFD) nas bombas circuladoras com potência > 0.75 kW. O controlo deve ser por pressão diferencial variável no coletor ou no ponto mais desfavorável. Em sistemas de caudal variável (com válvulas de 2 vias), o VFD reduz o consumo em 50-70% face a velocidade fixa. Garantir que as bombas possuem classificação de eficiência IE3 ou IE4 conforme o Regulamento EU 547/2012.",
       "enabled": true,
       "tags": ["bombas", "VFD", "eficiência energética", "caudal variável"]
+    },
+
+    {
+      "id": "HVAC-CHILLER-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — EER Mínimo de Chillers",
+      "description": "O EER do chiller instalado ({hvac.chillerEER}) é inferior ao mínimo regulamentar de 2.8 para chillers de compressão e 0.7 para chillers de absorção, conforme requisitos de eficiência do RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.chillerEER", "operator": "<", "value": 2.8 },
+        { "field": "hvac.chillerType", "operator": "==", "value": "compression" }
+      ],
+      "currentValueTemplate": "EER = {hvac.chillerEER}",
+      "requiredValue": "EER ≥ 2.8 (compressão), ≥ 0.7 (absorção) — RECS",
+      "remediation": "Substituir o chiller por equipamento com EER ≥ 2.8 (compressão) ou ≥ 0.7 (absorção). Privilegiar chillers com compressores de parafuso ou centrífugos com variação de velocidade. Verificar o SEER (eficiência sazonal) e o IPLV (Integrated Part Load Value) para avaliação mais representativa. Considerar chillers com condensação a água para EER superiores (4.5-6.0).",
+      "enabled": true,
+      "tags": ["chiller", "EER", "eficiência", "arrefecimento", "RECS"]
+    },
+    {
+      "id": "HVAC-CHILLER-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Redundância de Chillers",
+      "description": "O edifício com potência de arrefecimento superior a 200 kW ({hvac.installedCoolingPower} kW) dispõe de apenas um chiller, sem redundância. O RECS recomenda redundância N+1 para garantir continuidade do serviço.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.installedCoolingPower", "operator": ">", "value": 200 },
+        { "field": "hvac.chillerCount", "operator": "<", "value": 2 }
+      ],
+      "currentValueTemplate": "{hvac.chillerCount} chiller(s), {hvac.installedCoolingPower} kW",
+      "requiredValue": "Mínimo 2 chillers (redundância N+1) para potência > 200 kW",
+      "remediation": "Instalar pelo menos dois chillers em paralelo com capacidade combinada para cobrir a carga de projeto. A configuração recomendada é 2 × 60-70% da carga total, permitindo operação em carga parcial com maior eficiência e manutenção sem interrupção do serviço. Prever sequenciação automática de chillers na GTC. Para hospitais e centros de dados, exigir redundância N+1 independentemente da potência.",
+      "enabled": true,
+      "tags": ["chiller", "redundância", "continuidade", "dimensionamento"]
+    },
+    {
+      "id": "HVAC-CHILLER-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Economizador Free-Cooling em Chillers",
+      "description": "O sistema de arrefecimento com potência ≥ 100 kW ({hvac.installedCoolingPower} kW) não dispõe de economizador (free-cooling), desperdiçando o potencial de arrefecimento gratuito quando a temperatura exterior é favorável.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 100 },
+        { "field": "hvac.hasFreeCooling", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedCoolingPower} kW, sem free-cooling",
+      "requiredValue": "Economizador free-cooling obrigatório para potência ≥ 100 kW",
+      "remediation": "Instalar sistema de free-cooling no chiller ou na UTA: free-cooling direto por ar exterior (economizador na UTA com bypass do recuperador), free-cooling indireto por permutador água-ar, ou free-cooling integrado no chiller (permutador adicional no circuito de condensação). O free-cooling deve ser ativado automaticamente quando a temperatura exterior desce abaixo do setpoint de arrefecimento menos 2°C. Em Portugal, o potencial de free-cooling é significativo entre outubro e maio.",
+      "enabled": true,
+      "tags": ["chiller", "free-cooling", "economizador", "eficiência energética"]
+    },
+    {
+      "id": "HVAC-CHILLER-04",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / DL 306/2007 — Tratamento de Água em Torres de Arrefecimento",
+      "description": "A torre de arrefecimento do sistema de condensação do chiller não possui tratamento de água documentado, representando risco de Legionella e degradação do equipamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true },
+        { "field": "hvac.hasCoolingTowerWaterTreatment", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Torre de arrefecimento sem tratamento de água",
+      "requiredValue": "Tratamento de água obrigatório em torres de arrefecimento (DL 306/2007)",
+      "remediation": "Implementar programa de tratamento de água na torre de arrefecimento: doseamento automático de biocida (cloro ou bromo), inibidor de corrosão e anti-incrustante. Realizar análises microbiológicas mensais (Legionella trimestral). Manter a condutividade da água de recirculação controlada por purga automática. Limpar a bacia e o enchimento semestralmente. Documentar todas as operações no registo da torre conforme DL 306/2007 e normas de prevenção de Legionella.",
+      "enabled": true,
+      "tags": ["torre de arrefecimento", "Legionella", "tratamento de água", "biocida"]
+    },
+    {
+      "id": "HVAC-CHILLER-05",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Eficiência em Carga Parcial de Chillers (IPLV)",
+      "description": "O IPLV (Integrated Part Load Value) do chiller ({hvac.chillerIPLV}) é inferior ao valor recomendado de 4.0, indicando desempenho inadequado em carga parcial — condição em que o chiller opera a maior parte do ano.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.chillerIPLV", "operator": "<", "value": 4.0 },
+        { "field": "hvac.chillerType", "operator": "==", "value": "compression" }
+      ],
+      "currentValueTemplate": "IPLV = {hvac.chillerIPLV}",
+      "requiredValue": "IPLV ≥ 4.0 (compressão com condensação a ar), ≥ 6.0 (condensação a água)",
+      "remediation": "Selecionar chiller com IPLV elevado, privilegiando compressores com variação de velocidade (inverter ou compressor magnético). Chillers com condensação a água atingem IPLV > 8.0. Para melhorar o IPLV de instalações existentes, considerar: instalação de variador de frequência no compressor, otimização da temperatura de condensação (floating head pressure), e sequenciação inteligente de múltiplos chillers na GTC.",
+      "enabled": true,
+      "tags": ["chiller", "IPLV", "carga parcial", "eficiência", "compressor"]
+    },
+
+    {
+      "id": "HVAC-SOLAR-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Arrefecimento Solar (Solar Cooling)",
+      "description": "O edifício de serviços com carga de arrefecimento significativa ({hvac.installedCoolingPower} kW) e área de cobertura disponível não avaliou a viabilidade de arrefecimento solar (solar cooling), conforme boas práticas do RECS para integração de energia renovável nos sistemas AVAC.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.installedCoolingPower", "operator": ">", "value": 50 },
+        { "field": "hvac.solarCoolingAssessed", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Arrefecimento solar não avaliado",
+      "requiredValue": "Avaliação de viabilidade de solar cooling para potências > 50 kW",
+      "remediation": "Realizar estudo de viabilidade técnico-económica de arrefecimento solar. Tecnologias disponíveis: chiller de absorção alimentado por coletores solares térmicos de tubos de vácuo (≥ 80°C), chiller de adsorção (60-90°C) com coletores planos de alto rendimento, ou sistema DEC (Desiccant Evaporative Cooling). A coincidência entre a disponibilidade solar e a carga de arrefecimento torna esta solução particularmente interessante em Portugal. Área indicativa: 3-5 m² de coletor por kW de arrefecimento.",
+      "enabled": true,
+      "tags": ["solar cooling", "arrefecimento solar", "absorção", "energia renovável"]
+    },
+    {
+      "id": "HVAC-SOLAR-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Pré-Aquecimento Solar do Ar de Ventilação",
+      "description": "O sistema de ventilação mecânica com caudal ≥ 5.000 m³/h ({hvac.freshAirFlow} m³/h) não utiliza pré-aquecimento solar do ar novo, desperdiçando o potencial de coletores solares de ar para redução do consumo de aquecimento.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.freshAirFlow", "operator": ">=", "value": 5000 },
+        { "field": "hvac.hasSolarAirPreheating", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.freshAirFlow} m³/h, sem pré-aquecimento solar",
+      "requiredValue": "Avaliação de pré-aquecimento solar do ar para caudais ≥ 5.000 m³/h",
+      "remediation": "Avaliar a instalação de coletores solares de ar (transpired solar collectors) na fachada Sul para pré-aquecer o ar de ventilação. Estes sistemas podem elevar a temperatura do ar novo em 10-20°C durante o inverno. Área indicativa: 1 m² por 50-80 m³/h de caudal. Integrar com a UTA através de conduta dedicada com registo motorizado para bypass no verão. Particularmente eficaz em edifícios industriais, desportivos e escolares com grandes caudais de ar novo.",
+      "enabled": true,
+      "tags": ["solar", "pré-aquecimento", "ar novo", "ventilação", "fachada"]
+    },
+    {
+      "id": "HVAC-SOLAR-04",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Solar Térmico para Chiller de Absorção",
+      "description": "O edifício com chiller de absorção não dispõe de campo de coletores solares térmicos para alimentação do gerador, dependendo exclusivamente de caldeira a gás para fornecer calor ao ciclo de absorção.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.chillerType", "operator": "==", "value": "absorption" },
+        { "field": "hvac.hasSolarThermalForAbsorption", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Chiller de absorção sem alimentação solar",
+      "requiredValue": "Campo solar térmico para alimentação do gerador de absorção",
+      "remediation": "Instalar campo de coletores solares térmicos de tubos de vácuo para alimentar o gerador do chiller de absorção. Para chillers de simples efeito: temperatura de alimentação 80-100°C (coletores de tubos de vácuo). Para duplo efeito: 150-180°C (coletores concentradores parabólicos). Dimensionamento indicativo: 4-6 m² de coletor por kW de potência frigorífica. Prever depósito de inércia (40-60 L/m² de coletor) e caldeira de apoio para períodos sem sol. O sistema híbrido solar-gás maximiza a fração renovável.",
+      "enabled": true,
+      "tags": ["solar térmico", "absorção", "chiller", "energia renovável", "tubos de vácuo"]
+    },
+    {
+      "id": "HVAC-SOLAR-05",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Fotovoltaico para Alimentação AVAC",
+      "description": "O edifício de serviços com consumo AVAC significativo ({hvac.annualHVACElectricity} kWh/ano) não avaliou a instalação de sistema fotovoltaico para autoconsumo dedicado à alimentação dos equipamentos AVAC.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.annualHVACElectricity", "operator": ">", "value": 20000 },
+        { "field": "hvac.hasPVForHVAC", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.annualHVACElectricity} kWh/ano AVAC, sem PV",
+      "requiredValue": "Avaliação de sistema PV para autoconsumo AVAC (consumo > 20.000 kWh/ano)",
+      "remediation": "Instalar sistema fotovoltaico para autoconsumo com prioridade de alimentação dos equipamentos AVAC (chillers, bombas, ventiladores). A coincidência temporal entre produção PV e consumo de arrefecimento é elevada em Portugal (pico solar = pico de arrefecimento). Dimensionamento indicativo: 1 kWp por 1.500 kWh/ano de consumo AVAC. Prever sistema de gestão de energia (EMS) para otimizar o autoconsumo. Considerar armazenamento em bateria para maximizar a taxa de autoconsumo. Regime legal: UPAC (Unidade de Produção para Autoconsumo) conforme DL 162/2019.",
+      "enabled": true,
+      "tags": ["fotovoltaico", "PV", "autoconsumo", "AVAC", "energia renovável"]
+    },
+    {
+      "id": "HVAC-SOLAR-06",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Armazenamento Solar Sazonal para AVAC",
+      "description": "O edifício com sistema solar térmico de grande dimensão (> 100 m² de coletores) não avaliou a viabilidade de armazenamento térmico sazonal para transferir calor do verão para a estação de aquecimento.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.solarCollectorArea", "operator": ">", "value": 100 },
+        { "field": "hvac.hasSeasonalStorage", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.solarCollectorArea} m² de coletores, sem armazenamento sazonal",
+      "requiredValue": "Avaliação de armazenamento sazonal para campos solares > 100 m²",
+      "remediation": "Avaliar a viabilidade de armazenamento térmico sazonal: depósito de água de grande volume (TTES — Tank Thermal Energy Storage), armazenamento em furos geotérmicos (BTES — Borehole Thermal Energy Storage), ou armazenamento em aquíferos (ATES). O BTES é a solução mais comum em Portugal: excedente solar de verão armazenado no solo para aquecimento no inverno. Dimensionamento: 1.5-3 m³ de armazenamento por m² de coletor. Temperatura de armazenamento: 40-80°C. Viável para conjuntos residenciais, hospitais e edifícios de grande dimensão.",
+      "enabled": true,
+      "tags": ["armazenamento sazonal", "solar térmico", "BTES", "ATES", "geotermia"]
+    },
+
+    {
+      "id": "HVAC-CTRL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS Art. 14.º — Funções Mínimas do BMS/GTC",
+      "description": "O sistema de Gestão Técnica Centralizada (GTC/BMS) instalado não inclui todas as funções mínimas obrigatórias: monitorização, controlo, alarmes, registo histórico e gestão de horários, conforme exigido pelo RECS para edifícios com potência ≥ 100 kW.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasGTCSystem", "operator": "exists", "value": null },
+        { "field": "hvac.gtcMinimumFunctions", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "GTC com funções incompletas",
+      "requiredValue": "GTC com todas as funções mínimas RECS: monitorização, controlo, alarmes, registo, horários",
+      "remediation": "Atualizar o sistema GTC/BMS para incluir: (1) monitorização de temperaturas, humidades, pressões e caudais em todos os equipamentos e zonas; (2) controlo automático de setpoints, sequenciação de equipamentos e modulação de válvulas/registos; (3) gestão de alarmes com notificação por email/SMS; (4) registo histórico de dados com retenção mínima de 3 anos; (5) gestão de horários de funcionamento e setback noturno/fim de semana. Protocolo recomendado: BACnet IP conforme EN ISO 16484.",
+      "enabled": true,
+      "tags": ["BMS", "GTC", "automação", "funções mínimas", "RECS"]
+    },
+    {
+      "id": "HVAC-CTRL-02",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Controlo Individual de Temperatura por Zona",
+      "description": "O edifício não dispõe de controlo individual de temperatura por zona térmica. A EN 16798-1 exige que cada zona com requisitos térmicos distintos possua sensor e controlador de temperatura independente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasZoneTemperatureControl", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hotel"] }
+      ],
+      "currentValueTemplate": "Sem controlo individual de temperatura por zona",
+      "requiredValue": "Controlo individual de temperatura em cada zona térmica (EN 16798-1)",
+      "remediation": "Instalar sensor de temperatura e controlador em cada zona térmica. Definir zonas por: orientação solar, utilização, horário de ocupação e carga interna. Cada zona deve ter atuador próprio (válvula de 2 vias em ventiloconvectores, registo VAV em condutas). O controlador de zona ajusta o caudal ou a potência para manter o setpoint de 20-22°C (inverno) ou 24-26°C (verão). Ligação ao BMS para supervisão centralizada e gestão de setpoints por horário.",
+      "enabled": true,
+      "tags": ["controlo", "zona", "temperatura", "EN 16798", "sensor"]
+    },
+    {
+      "id": "HVAC-CTRL-03",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Ventilação Controlada por Demanda (DCV)",
+      "description": "O sistema de ventilação de espaços com ocupação variável não dispõe de controlo por demanda (DCV — Demand Controlled Ventilation) com base em sondas de CO₂, resultando em ventilação excessiva ou insuficiente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasDCVControl", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVariableOccupancy", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sem controlo DCV em espaços de ocupação variável",
+      "requiredValue": "DCV com sondas CO₂ em espaços de ocupação variável (Portaria 353-A/2013)",
+      "remediation": "Instalar sistema de ventilação controlada por demanda (DCV): sondas de CO₂ (NDIR) em cada zona de ocupação variável, controladores que modulam o caudal de ar novo entre um mínimo (desocupado) e máximo (ocupação plena). Setpoints: arranque ventilação a 800 ppm, caudal máximo a 1000 ppm. Integrar com registos VAV ou variadores de frequência nos ventiladores da UTA. O DCV reduz o consumo de ventilação em 30-60% face ao caudal fixo.",
+      "enabled": true,
+      "tags": ["DCV", "CO2", "ventilação", "ocupação", "eficiência energética"]
+    },
+    {
+      "id": "HVAC-CTRL-04",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Programação Horária e Setback",
+      "description": "O sistema AVAC não possui programação horária nem redução automática de setpoints (setback) durante períodos de não-ocupação, operando continuamente a plena carga e desperdiçando energia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSchedulingSetback", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "school"] }
+      ],
+      "currentValueTemplate": "Sem programação horária nem setback",
+      "requiredValue": "Programação horária e setback obrigatórios (RECS)",
+      "remediation": "Configurar no BMS/GTC: (1) Horários de funcionamento por zona e dia da semana; (2) Setback de aquecimento para 16°C fora do horário de ocupação; (3) Setup de arrefecimento para 30°C fora do horário; (4) Redução de caudal de ventilação para o mínimo higiénico (ou desligar) fora da ocupação; (5) Arranque otimizado (optimal start) que antecipa o arranque para atingir o setpoint no início da ocupação. Economia estimada: 15-25% do consumo anual AVAC.",
+      "enabled": true,
+      "tags": ["programação", "setback", "horário", "eficiência energética", "BMS"]
+    },
+    {
+      "id": "HVAC-CTRL-05",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Deteção e Diagnóstico de Avarias (FDD)",
+      "description": "O sistema GTC/BMS não inclui funcionalidade de deteção e diagnóstico automático de avarias (FDD — Fault Detection and Diagnostics), impedindo a identificação precoce de ineficiências e falhas nos equipamentos AVAC.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 100 },
+        { "field": "hvac.hasFDDSystem", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedHVACPower} kW, sem sistema FDD",
+      "requiredValue": "Sistema FDD recomendado para instalações ≥ 100 kW",
+      "remediation": "Implementar módulo de FDD (Fault Detection and Diagnostics) no BMS/GTC para: deteção de válvulas bloqueadas, sensores descalibrados, desvios de setpoint prolongados, aquecimento e arrefecimento simultâneos, caudais inadequados, eficiência degradada de chillers e caldeiras, e fugas em condutas. O FDD utiliza regras baseadas em dados históricos e modelos de desempenho esperado. Economia estimada: 5-15% do consumo AVAC pela correção precoce de avarias. Norma de referência: ASHRAE Guideline 36.",
+      "enabled": true,
+      "tags": ["FDD", "diagnóstico", "avarias", "BMS", "eficiência"]
+    },
+
+    {
+      "id": "HVAC-DUCT2-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 12237 — Classe de Estanquidade de Condutas",
+      "description": "As condutas do sistema AVAC possuem classe de estanquidade ({hvac.ductLeakageClassMeasured}) inferior à classe mínima exigida. Sistemas de baixa pressão: mín. Classe A; média/alta pressão: mín. Classe B; sistemas críticos (hospitais, salas limpas): Classe C.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ductLeakageClassMeasured", "operator": "<", "value": "A" },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Classe {hvac.ductLeakageClassMeasured}",
+      "requiredValue": "≥ Classe A (baixa pressão), ≥ Classe B (média/alta pressão), ≥ Classe C (críticos)",
+      "remediation": "Melhorar a estanquidade das condutas: utilizar condutas com juntas vedantes certificadas, aplicar mástique ou fita de alumínio em todas as junções, e realizar ensaio de estanquidade conforme EN 12237. Fugas máximas admissíveis: Classe A — 0.027 × p^0.65 L/(s·m²), Classe B — 0.009 × p^0.65, Classe C — 0.003 × p^0.65 (a 400 Pa). O ensaio deve ser realizado em 10% da rede (mínimo) antes da colocação do isolamento.",
+      "enabled": true,
+      "tags": ["estanquidade", "condutas", "EN 12237", "ensaio", "classe"]
+    },
+    {
+      "id": "HVAC-DUCT2-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Espessura de Isolamento de Condutas Exteriores",
+      "description": "A espessura do isolamento térmico das condutas que passam em espaços não climatizados ou exterior ({hvac.exteriorDuctInsulation} mm) é inferior ao mínimo de 40 mm exigido para minimizar perdas térmicas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.exteriorDuctInsulation", "operator": "<", "value": 40 },
+        { "field": "hvac.hasExteriorDucts", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.exteriorDuctInsulation} mm (condutas exteriores)",
+      "requiredValue": "≥ 40 mm em espaços não climatizados, ≥ 50 mm no exterior",
+      "remediation": "Aplicar isolamento térmico com espessura mínima de 40 mm em condutas que passam por espaços não climatizados (garagens, arrecadações, tetos falsos não isolados) e 50 mm em condutas no exterior. Utilizar lã mineral de rocha (λ ≤ 0.035 W/(m·K)) com revestimento de chapa de alumínio ou PVC no exterior para proteção mecânica e contra intempéries. Em condutas de arrefecimento, incluir barreira de vapor contínua para evitar condensações.",
+      "enabled": true,
+      "tags": ["isolamento", "condutas", "exterior", "espessura", "eficiência"]
+    },
+    {
+      "id": "HVAC-DUCT2-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / SCIE — Registos Corta-Fogo: Periodicidade de Ensaio",
+      "description": "Os registos corta-fogo (RCF) instalados nas condutas AVAC não possuem ensaio de funcionamento documentado nos últimos 6 meses, conforme exigido pelo Regulamento SCIE e plano de manutenção RECS.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasFireDampers", "operator": "exists", "value": null },
+        { "field": "hvac.fireDamperTestUpToDate", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ensaio de RCF desatualizado",
+      "requiredValue": "Ensaio de funcionamento dos RCF a cada 6 meses (SCIE)",
+      "remediation": "Realizar ensaio de funcionamento de todos os registos corta-fogo (RCF) a cada 6 meses. O ensaio inclui: verificação do fecho completo da lâmina, teste do fusível térmico (inspeção visual), teste do atuador motorizado (ativação pela central de incêndio), verificação da sinalização de estado (aberto/fechado) no BMS/GTC. Documentar cada ensaio com data, resultado e técnico responsável. Substituir imediatamente RCF que não fechem corretamente. Certificação conforme EN 15650.",
+      "enabled": true,
+      "tags": ["registos corta-fogo", "SCIE", "ensaio", "manutenção", "incêndio"]
+    },
+    {
+      "id": "HVAC-DUCT2-04",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Comprimento Máximo de Condutas Flexíveis",
+      "description": "O comprimento das condutas flexíveis instaladas ({hvac.flexDuctLength} m) excede o máximo recomendado de 1.5 m, causando perda de carga excessiva e potencial acumulação de sujidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.flexDuctLength", "operator": ">", "value": 1.5 }
+      ],
+      "currentValueTemplate": "{hvac.flexDuctLength} m de conduta flexível",
+      "requiredValue": "≤ 1.5 m de conduta flexível por ligação (RECS / boas práticas)",
+      "remediation": "Limitar o comprimento de condutas flexíveis a um máximo de 1.5 m por ligação (entre a conduta rígida e o difusor/grelha). Substituir troços flexíveis longos por condutas rígidas com curvas e transições adequadas. As condutas flexíveis devem ser completamente esticadas (sem folga nem torções), fixas com abraçadeiras metálicas, e de classe de reação ao fogo adequada (mín. B-s1, d0). A perda de carga de uma conduta flexível é 3-5× superior à de uma conduta rígida equivalente.",
+      "enabled": true,
+      "tags": ["condutas flexíveis", "perda de carga", "comprimento", "instalação"]
+    },
+    {
+      "id": "HVAC-DUCT2-05",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Espaçamento de Suportes de Condutas",
+      "description": "O espaçamento dos suportes de condutas ({hvac.ductSupportSpacing} m) excede os limites recomendados, podendo causar deformação, vibração e desalinhamento da rede de condutas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ductSupportSpacing", "operator": ">", "value": 3.0 }
+      ],
+      "currentValueTemplate": "{hvac.ductSupportSpacing} m entre suportes",
+      "requiredValue": "≤ 2.5 m (condutas circulares), ≤ 3.0 m (condutas retangulares reforçadas)",
+      "remediation": "Corrigir o espaçamento dos suportes de condutas: máximo 2.5 m para condutas circulares, 3.0 m para condutas retangulares com reforço, e 1.5-2.0 m para condutas retangulares sem reforço (lado maior > 750 mm). Os suportes devem incluir isolamento anti-vibração (borracha ou cortiça) quando fixos à estrutura do edifício. Prever suportes adicionais junto a curvas, tês, reduções e equipamentos. Em troços verticais, prever abraçadeiras de fixação a cada 2.0 m.",
+      "enabled": true,
+      "tags": ["suportes", "condutas", "espaçamento", "instalação", "vibração"]
+    },
+
+    {
+      "id": "HVAC-PUMP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EU 547/2012 — Classe de Eficiência de Bombas (IE3+)",
+      "description": "As bombas circuladoras do sistema AVAC ({hvac.pumpEfficiencyClass}) não cumprem a classe de eficiência mínima IE3 exigida pelo Regulamento EU 547/2012 para motores elétricos de potência ≥ 0.75 kW.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.pumpEfficiencyClass", "operator": "not_in", "value": ["IE3", "IE4", "IE5"] },
+        { "field": "hvac.pumpPower", "operator": ">=", "value": 0.75 }
+      ],
+      "currentValueTemplate": "Classe {hvac.pumpEfficiencyClass}",
+      "requiredValue": "≥ IE3 (motores ≥ 0.75 kW), IE4 recomendado — EU 547/2012",
+      "remediation": "Substituir as bombas circuladoras por modelos com motor de classe de eficiência IE3 (mínimo obrigatório) ou IE4 (recomendado). Para bombas de pequena potência (< 0.75 kW), utilizar circuladores de rotor húmido com índice EEI ≤ 0.23 conforme Regulamento EU 641/2009. A partir de julho 2023, motores de 75-200 kW exigem classe IE4. Considerar bombas com motor de ímanes permanentes (IE5) para máxima eficiência.",
+      "enabled": true,
+      "tags": ["bombas", "eficiência", "IE3", "IE4", "motor elétrico"]
+    },
+    {
+      "id": "HVAC-PUMP-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Variador de Velocidade em Bombas Circuladoras",
+      "description": "As bombas circuladoras do sistema AVAC com potência ≥ 1.1 kW ({hvac.pumpPower} kW) em circuitos de caudal variável não possuem variador de frequência (VFD), resultando em desperdício energético significativo em carga parcial.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.pumpPower", "operator": ">=", "value": 1.1 },
+        { "field": "hvac.pumpHasVFD", "operator": "==", "value": false },
+        { "field": "hvac.circuitType", "operator": "==", "value": "variable-flow" }
+      ],
+      "currentValueTemplate": "Bomba {hvac.pumpPower} kW sem VFD em circuito de caudal variável",
+      "requiredValue": "VFD obrigatório em bombas ≥ 1.1 kW com caudal variável (RECS)",
+      "remediation": "Instalar variadores de frequência (VFD) em todas as bombas circuladoras com potência ≥ 1.1 kW em circuitos de caudal variável. O controlo deve ser por pressão diferencial: sensor no ponto mais desfavorável do circuito, com setpoint de pressão variável (reduz a pressão à medida que o caudal diminui). Para circuitos primários (caudal constante), o VFD não é necessário. Economia estimada com VFD: 50-70% do consumo da bomba. O VFD prolonga também a vida útil da bomba pela redução de arranques bruscos.",
+      "enabled": true,
+      "tags": ["bombas", "VFD", "variador de frequência", "caudal variável", "eficiência"]
+    },
+    {
+      "id": "HVAC-PUMP-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Verificação da Altura Manométrica das Bombas",
+      "description": "A altura manométrica da bomba instalada ({hvac.pumpHead} kPa) excede em mais de 20% a altura manométrica calculada para o circuito, indicando sobredimensionamento e consumo excessivo de energia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.pumpHeadExcess", "operator": ">", "value": 20 }
+      ],
+      "currentValueTemplate": "Excesso de altura manométrica: {hvac.pumpHeadExcess}%",
+      "requiredValue": "Altura manométrica da bomba ≤ 120% do valor calculado",
+      "remediation": "Recalcular a perda de carga do circuito hidráulico (tubagens, válvulas, permutadores, acessórios) e selecionar bomba com altura manométrica dentro de 10-20% do valor calculado. Se a bomba existente estiver sobredimensionada: (1) instalar VFD para limitar a velocidade máxima, (2) substituir o impulsor por um de diâmetro menor, ou (3) substituir a bomba por modelo adequado. O sobredimensionamento de bombas é a causa mais comum de desperdício energético em sistemas hidráulicos AVAC.",
+      "enabled": true,
+      "tags": ["bombas", "altura manométrica", "sobredimensionamento", "perda de carga"]
+    },
+    {
+      "id": "HVAC-PUMP-04",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Válvulas de Equilíbrio Hidráulico",
+      "description": "O circuito hidráulico AVAC não dispõe de válvulas de equilíbrio (balancing valves) nos ramais, resultando em desequilíbrio de caudais entre as unidades terminais e desconforto nos espaços.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasBalancingValves", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Sem válvulas de equilíbrio hidráulico",
+      "requiredValue": "Válvulas de equilíbrio em todos os ramais do circuito hidráulico AVAC",
+      "remediation": "Instalar válvulas de equilíbrio hidráulico (estáticas ou dinâmicas) em todos os ramais do circuito AVAC. Válvulas estáticas (STAD, Caleffi): permitem regulação manual do caudal e medição de caudal/pressão. Válvulas dinâmicas (STAP, PICV): mantêm o caudal constante independentemente da variação de pressão — recomendadas em circuitos de caudal variável. Realizar o equilíbrio hidráulico por método proporcional conforme a norma. Documentar todos os caudais medidos e regulados no relatório de equilíbrio.",
+      "enabled": true,
+      "tags": ["equilíbrio hidráulico", "válvulas", "caudal", "bombas", "comissionamento"]
+    },
+    {
+      "id": "HVAC-PUMP-05",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Dimensionamento de Bombas Circuladoras",
+      "description": "A bomba circuladora está sobredimensionada em mais de 25% relativamente ao caudal de projeto ({hvac.pumpOversizeFactor}%), operando de forma ineficiente na curva de rendimento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.pumpOversizeFactor", "operator": ">", "value": 25 }
+      ],
+      "currentValueTemplate": "Sobredimensionamento: {hvac.pumpOversizeFactor}% acima do caudal de projeto",
+      "requiredValue": "Dimensionamento da bomba dentro de 10-15% do ponto de projeto",
+      "remediation": "Selecionar a bomba circuladora para operar no ponto de melhor rendimento (BEP — Best Efficiency Point) para as condições de projeto (caudal e altura manométrica calculados). A bomba deve operar entre 80-110% do BEP. Se sobredimensionada: substituir o impulsor, instalar VFD, ou substituir a bomba. Para circuitos de caudal variável, selecionar a bomba para que o BEP corresponda a 70-80% da carga máxima (condição de operação mais frequente). Consultar a curva QH do fabricante para verificação.",
+      "enabled": true,
+      "tags": ["bombas", "dimensionamento", "BEP", "rendimento", "sobredimensionamento"]
+    },
+
+    {
+      "id": "HVAC-COMISS-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Plano de Comissionamento AVAC",
+      "description": "A instalação AVAC com potência ≥ 50 kW ({hvac.installedHVACPower} kW) não dispõe de plano de comissionamento (Cx) documentado, impedindo a verificação sistemática do desempenho dos sistemas conforme o projeto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 },
+        { "field": "hvac.hasCommissioningPlan", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.installedHVACPower} kW, sem plano de comissionamento",
+      "requiredValue": "Plano de comissionamento obrigatório para instalações ≥ 50 kW",
+      "remediation": "Elaborar plano de comissionamento (Cx) conforme ASHRAE Guideline 0 e EN 16775, incluindo: (1) lista de verificação pré-funcional de todos os equipamentos; (2) procedimentos de teste funcional (FPT — Functional Performance Tests) para cada sistema; (3) critérios de aceitação para temperaturas, caudais, pressões e eficiências; (4) cronograma de testes; (5) responsabilidades do agente de comissionamento, instalador e projetista. O plano deve ser elaborado na fase de projeto e executado antes da receção provisória da obra.",
+      "enabled": true,
+      "tags": ["comissionamento", "plano Cx", "verificação", "receção", "RECS"]
+    },
+    {
+      "id": "HVAC-COMISS-02",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Relatório de Equilíbrio Aeráulico (TAB Air)",
+      "description": "A instalação AVAC não possui relatório de equilíbrio aeráulico (TAB — Testing, Adjusting and Balancing) que comprove que os caudais de insuflação e extração em cada zona correspondem aos valores de projeto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasAirBalancingReport", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Sem relatório de equilíbrio aeráulico",
+      "requiredValue": "Relatório TAB aeráulico obrigatório (RECS)",
+      "remediation": "Realizar equilíbrio aeráulico (TAB) por empresa especializada certificada: (1) medir caudais de ar em todas as grelhas de insuflação e retorno com anemómetro calibrado; (2) ajustar registos de caudal até que cada zona receba ±10% do caudal de projeto; (3) medir o caudal total da UTA e comparar com projeto; (4) verificar pressões estáticas nos pontos críticos da rede; (5) documentar todos os resultados no relatório TAB com identificação dos pontos de medição, valores medidos vs. projeto, e regulações efetuadas. Referência: AABC National Standards / NEBB Procedural Standards.",
+      "enabled": true,
+      "tags": ["equilíbrio aeráulico", "TAB", "caudais", "comissionamento", "medição"]
+    },
+    {
+      "id": "HVAC-COMISS-03",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Relatório de Equilíbrio Hidráulico (TAB Water)",
+      "description": "A instalação AVAC não possui relatório de equilíbrio hidráulico que comprove que os caudais de água nos circuitos de aquecimento e arrefecimento correspondem aos valores de projeto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasWaterBalancingReport", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Sem relatório de equilíbrio hidráulico",
+      "requiredValue": "Relatório TAB hidráulico obrigatório (RECS)",
+      "remediation": "Realizar equilíbrio hidráulico por empresa especializada: (1) medir caudais de água em cada ramal com caudalímetro ultrassónico ou nas válvulas de equilíbrio (método Kv); (2) ajustar as válvulas de equilíbrio até que cada ramal receba ±10% do caudal de projeto; (3) medir o caudal e pressão diferencial nas bombas; (4) verificar o Δt (diferença de temperatura ida-retorno) em cada unidade terminal; (5) documentar no relatório com esquema hidráulico, pontos de medição, valores medidos vs. projeto, e posição final das válvulas. Método: proporcional conforme CIBSE Code B.",
+      "enabled": true,
+      "tags": ["equilíbrio hidráulico", "TAB", "caudais", "comissionamento", "válvulas"]
+    },
+    {
+      "id": "HVAC-COMISS-04",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Verificação de Controlos e Automação",
+      "description": "A instalação AVAC não possui documentação de verificação funcional dos controlos e automação (BMS/GTC), incluindo teste de sequências de controlo, setpoints, alarmes e interbloqueios.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasControlsVerification", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasGTCSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Sem verificação funcional de controlos",
+      "requiredValue": "Verificação funcional de controlos e automação obrigatória (RECS)",
+      "remediation": "Realizar verificação funcional completa dos controlos e automação: (1) testar cada sequência de controlo (arranque, paragem, modulação, sequenciação de equipamentos); (2) verificar todos os setpoints e a resposta dos controladores; (3) testar todos os alarmes e interbloqueios de segurança; (4) verificar a calibração de sensores (temperatura ±0.5°C, humidade ±3%, pressão ±2%); (5) testar o comportamento em modo de emergência (incêndio, falha de energia); (6) documentar cada teste com resultado e assinatura do técnico. Referência: ASHRAE Guideline 36 para sequências de controlo.",
+      "enabled": true,
+      "tags": ["controlos", "automação", "verificação", "BMS", "comissionamento"]
+    },
+    {
+      "id": "HVAC-COMISS-05",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Comissionamento Sazonal",
+      "description": "A instalação AVAC não possui procedimento de comissionamento sazonal, com verificação de desempenho tanto na estação de aquecimento como na estação de arrefecimento, conforme recomendado pela EN 16798-1.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasSeasonalCommissioning", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "currentValueTemplate": "Sem comissionamento sazonal",
+      "requiredValue": "Comissionamento sazonal em aquecimento e arrefecimento (EN 16798-1)",
+      "remediation": "Implementar programa de comissionamento sazonal: (1) Inverno (novembro-dezembro): verificar caldeiras/bombas de calor, sistema de aquecimento, humidificação, recuperação de calor, setpoints de aquecimento, e estanquidade de portas/janelas; (2) Verão (maio-junho): verificar chillers, torres de arrefecimento, free-cooling, proteções solares, setpoints de arrefecimento, e sistema de desumidificação; (3) Ambas as estações: verificar caudais de ventilação, QAI, calibração de sensores, e consumos energéticos vs. valores de referência. Documentar e comparar com os resultados do comissionamento inicial para detetar degradação.",
+      "enabled": true,
+      "tags": ["comissionamento sazonal", "inverno", "verão", "desempenho", "EN 16798"]
     }
   ]
 }
