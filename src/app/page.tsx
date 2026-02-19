@@ -78,8 +78,12 @@ const EvmDashboard = dynamic(() => import("@/components/EvmDashboard"), {
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar EVM...</div>,
 });
+const RegulationGraph = dynamic(() => import("@/components/RegulationGraph"), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar grafo 3D...</div>,
+});
 
-type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations" | "unified" | "viewer" | "fourd" | "evm";
+type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations" | "unified" | "viewer" | "fourd" | "evm" | "graph";
 
 const REGULATION_BADGES = [
   "Codigo Civil", "RGEU", "Eurocodigos EC0-EC8", "SCIE + NT01-NT22",
@@ -907,9 +911,18 @@ export default function Home() {
                 <ChevronLeft className="w-4 h-4" />
                 {t.back}
               </button>
-              <h1 className="text-3xl font-bold text-gray-900 mt-4 mb-2">
-                {lang === "pt" ? "Gestão de Regulamentos" : "Regulations Management"}
-              </h1>
+              <div className="flex items-center justify-between mt-4 mb-2">
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {lang === "pt" ? "Gestão de Regulamentos" : "Regulations Management"}
+                </h1>
+                <button
+                  onClick={() => setView("graph")}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="8" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7"/><line x1="7.5" y1="8.5" x2="10.5" y2="16"/><line x1="15" y1="10.5" x2="13.5" y2="16"/></svg>
+                  {lang === "pt" ? "Ver Grafo 3D" : "View 3D Graph"}
+                </button>
+              </div>
               <p className="text-gray-600">
                 {lang === "pt"
                   ? "Visão geral de todos os regulamentos por especialidade. Clique numa especialidade para adicionar novos regulamentos."
@@ -961,6 +974,29 @@ export default function Home() {
               </div>
             )}
           </div>
+        </main>
+      )}
+      {/* 3D Regulation Graph */}
+      {view === "graph" && (
+        <main className="h-screen bg-gray-900 flex flex-col">
+          <div className="px-4 py-3 bg-gray-800 border-b border-gray-700 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setView("regulations")}
+                className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t.back}
+              </button>
+              <h1 className="text-lg font-bold text-white">
+                {lang === "pt" ? "Grafo de Regulamentos" : "Regulation Graph"}
+              </h1>
+            </div>
+            <span className="text-xs text-gray-500">
+              {lang === "pt" ? "Rodar: arrastar | Zoom: scroll | Pan: shift+arrastar" : "Rotate: drag | Zoom: scroll | Pan: shift+drag"}
+            </span>
+          </div>
+          <RegulationGraph className="flex-1" />
         </main>
       )}
       {/* 3D IFC Viewer */}
