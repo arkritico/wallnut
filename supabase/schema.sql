@@ -24,14 +24,62 @@ CREATE INDEX IF NOT EXISTS idx_projects_updated_at ON public.projects(updated_at
 -- RLS policies
 ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
 
+-- ── SECURITY DEFINER helpers ──────────────────────────────
+-- These break the circular RLS dependency between projects
+-- and project_members (each table's policies referenced the
+-- other, causing PostgREST 500 errors).
+
+CREATE OR REPLACE FUNCTION public.is_project_owner(p_project_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.projects
+    WHERE id = p_project_id AND user_id = auth.uid()
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.can_access_project(p_project_id UUID, p_user_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.projects
+    WHERE id = p_project_id AND user_id = p_user_id
+  )
+  OR EXISTS (
+    SELECT 1 FROM public.project_members
+    WHERE project_id = p_project_id AND user_id = p_user_id
+  );
+$$;
+
+CREATE OR REPLACE FUNCTION public.can_edit_project(p_project_id UUID, p_user_id UUID)
+RETURNS BOOLEAN
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.projects
+    WHERE id = p_project_id AND user_id = p_user_id
+  )
+  OR EXISTS (
+    SELECT 1 FROM public.project_members
+    WHERE project_id = p_project_id AND user_id = p_user_id
+    AND role IN ('owner', 'reviewer')
+  );
+$$;
+
+-- ── Project policies (use SECURITY DEFINER helpers) ───────
+
 CREATE POLICY "Users can view accessible projects"
   ON public.projects FOR SELECT
   USING (
-    auth.uid() = user_id
-    OR EXISTS (
-      SELECT 1 FROM public.project_members pm
-      WHERE pm.project_id = id AND pm.user_id = auth.uid()
-    )
+    public.can_access_project(id, auth.uid())
   );
 
 CREATE POLICY "Users can insert own projects"
@@ -41,12 +89,7 @@ CREATE POLICY "Users can insert own projects"
 CREATE POLICY "Users can update accessible projects"
   ON public.projects FOR UPDATE
   USING (
-    auth.uid() = user_id
-    OR EXISTS (
-      SELECT 1 FROM public.project_members pm
-      WHERE pm.project_id = id AND pm.user_id = auth.uid()
-      AND pm.role IN ('owner', 'reviewer')
-    )
+    public.can_edit_project(id, auth.uid())
   );
 
 CREATE POLICY "Users can delete own projects"
@@ -126,46 +169,29 @@ CREATE INDEX IF NOT EXISTS idx_project_members_user_id ON public.project_members
 
 ALTER TABLE public.project_members ENABLE ROW LEVEL SECURITY;
 
+-- Uses SECURITY DEFINER helpers to avoid circular RLS dependency
 CREATE POLICY "Members can view project members"
   ON public.project_members FOR SELECT
   USING (
-    EXISTS (
-      SELECT 1 FROM public.projects p
-      WHERE p.id = project_id AND (
-        p.user_id = auth.uid()
-        OR EXISTS (
-          SELECT 1 FROM public.project_members pm2
-          WHERE pm2.project_id = project_id AND pm2.user_id = auth.uid()
-        )
-      )
-    )
+    public.can_access_project(project_id, auth.uid())
   );
 
 CREATE POLICY "Owners can manage members"
   ON public.project_members FOR INSERT
   WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM public.projects p
-      WHERE p.id = project_id AND p.user_id = auth.uid()
-    )
+    public.is_project_owner(project_id)
   );
 
 CREATE POLICY "Owners can update members"
   ON public.project_members FOR UPDATE
   USING (
-    EXISTS (
-      SELECT 1 FROM public.projects p
-      WHERE p.id = project_id AND p.user_id = auth.uid()
-    )
+    public.is_project_owner(project_id)
   );
 
 CREATE POLICY "Owners can remove members"
   ON public.project_members FOR DELETE
   USING (
-    EXISTS (
-      SELECT 1 FROM public.projects p
-      WHERE p.id = project_id AND p.user_id = auth.uid()
-    )
+    public.is_project_owner(project_id)
   );
 
 -- ============================================================

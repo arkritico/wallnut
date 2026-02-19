@@ -206,7 +206,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Apply to all routes except static files and _next internals
-    "/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.json|icons/).*)",
+    // Skip middleware for static assets, _next internals, and WASM/worker files
+    "/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.json|icons/|wasm/|.*\\.(?:wasm|mjs)$).*)",
   ],
 };
