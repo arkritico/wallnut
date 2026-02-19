@@ -5032,6 +5032,1366 @@
         "arquivo",
         "registo"
       ]
+    },
+    {
+      "id": "ITED_001",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.1 — Fibra Óptica Monomodo OS2 em Rede Coletiva",
+      "description": "A rede coletiva de fibra óptica não utiliza fibra monomodo OS2 conforme exigido pelo Manual ITED 4ª edição. Toda a cablagem de fibra óptica na rede coletiva (do ATE ao ATI) deve ser OS2 (ITU-T G.652.D).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.collectiveNetwork.fiberType",
+          "operator": "!=",
+          "value": "OS2"
+        },
+        {
+          "field": "ited.collectiveNetwork.hasFiber",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Tipo de fibra na rede coletiva: {ited.collectiveNetwork.fiberType}",
+      "requiredValue": "Fibra monomodo OS2 (ITU-T G.652.D) obrigatória na rede coletiva",
+      "remediation": "Substituir a cablagem de fibra óptica da rede coletiva por fibra monomodo OS2 conforme ITU-T G.652.D. O cabo deve ser tight-buffered ou loose-tube com proteção adequada ao percurso vertical (coluna montante).",
+      "enabled": true,
+      "tags": [
+        "fibra óptica",
+        "OS2",
+        "rede coletiva",
+        "monomodo",
+        "G.652.D"
+      ]
+    },
+    {
+      "id": "ITED_002",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.2 — Número Mínimo de Fibras por Fração",
+      "description": "O número de fibras ópticas previstas por fração autónoma é inferior ao mínimo regulamentar. Cada fração deve dispor de, no mínimo, 2 fibras ópticas monomodo na rede coletiva.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fibersPerDwelling",
+          "operator": "<",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "{ited.fibersPerDwelling} fibra(s) por fração",
+      "requiredValue": "≥ 2 fibras ópticas monomodo por fração autónoma",
+      "remediation": "Prever no mínimo 2 fibras ópticas monomodo OS2 por fração autónoma na rede coletiva, desde o ODF do ATE até ao ATI da fração. A segunda fibra serve como reserva para redundância ou serviços adicionais.",
+      "enabled": true,
+      "tags": [
+        "fibra óptica",
+        "fração",
+        "mínimo",
+        "rede coletiva"
+      ]
+    },
+    {
+      "id": "ITED_003",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.5 — Atenuação Máxima da Fibra Óptica a 1310 nm",
+      "description": "A atenuação da fibra óptica no percurso ATE-ATI excede o limite máximo permitido a 1310 nm. A atenuação total (incluindo conectores e fusões) não deve ultrapassar 1.5 dB.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fiberAttenuation1310nm",
+          "operator": ">",
+          "value": 1.5
+        }
+      ],
+      "currentValueTemplate": "{ited.fiberAttenuation1310nm} dB a 1310 nm",
+      "requiredValue": "≤ 1.5 dB de atenuação total a 1310 nm (ATE→ATI)",
+      "remediation": "Reduzir a atenuação total do percurso de fibra óptica. Verificar a qualidade das fusões (≤ 0.1 dB cada) e conectores (≤ 0.3 dB cada). Rever o percurso para eliminar curvas apertadas ou esmagamentos. Repetir o ensaio OTDR após correção.",
+      "enabled": true,
+      "tags": [
+        "fibra óptica",
+        "atenuação",
+        "1310 nm",
+        "OTDR",
+        "ensaio"
+      ]
+    },
+    {
+      "id": "ITED_004",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.5 — Atenuação Máxima da Fibra Óptica a 1550 nm",
+      "description": "A atenuação da fibra óptica no percurso ATE-ATI excede o limite máximo permitido a 1550 nm. A atenuação total (incluindo conectores e fusões) não deve ultrapassar 1.0 dB.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fiberAttenuation1550nm",
+          "operator": ">",
+          "value": 1.0
+        }
+      ],
+      "currentValueTemplate": "{ited.fiberAttenuation1550nm} dB a 1550 nm",
+      "requiredValue": "≤ 1.0 dB de atenuação total a 1550 nm (ATE→ATI)",
+      "remediation": "Reduzir a atenuação total do percurso de fibra óptica a 1550 nm. Inspecionar fusões e conectores, verificar raios de curvatura e eliminar possíveis macro-curvas. Efetuar ensaio OTDR bidirecional para localizar pontos de perda excessiva.",
+      "enabled": true,
+      "tags": [
+        "fibra óptica",
+        "atenuação",
+        "1550 nm",
+        "OTDR",
+        "ensaio"
+      ]
+    },
+    {
+      "id": "ITED_005",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.2 — Cabo Coaxial RG6 na Rede Individual CATV",
+      "description": "O tipo de cabo coaxial utilizado na rede individual CATV não é RG6 (ou equivalente de classe A+). O Manual ITED 4ª edição exige cabo coaxial de classe A+ (tipo RG6) na rede individual para garantir largura de banda até 2150 MHz.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.individualNetwork.coaxType",
+          "operator": "not_in",
+          "value": ["RG6", "classA+", "RG6_quad"]
+        }
+      ],
+      "currentValueTemplate": "Cabo coaxial: {ited.individualNetwork.coaxType}",
+      "requiredValue": "Cabo coaxial classe A+ (RG6) até 2150 MHz na rede individual",
+      "remediation": "Substituir o cabo coaxial da rede individual por cabo de classe A+ (tipo RG6 ou superior) com blindagem quádrupla, impedância 75 Ω e largura de banda até 2150 MHz. Garantir que os conectores são do tipo F de compressão.",
+      "enabled": true,
+      "tags": [
+        "coaxial",
+        "RG6",
+        "CATV",
+        "classe A+",
+        "rede individual"
+      ]
+    },
+    {
+      "id": "ITED_006",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.4 — Atenuação do Cabo Coaxial a 2150 MHz",
+      "description": "A atenuação do cabo coaxial na rede de CATV excede o limite máximo a 2150 MHz. A atenuação não deve ultrapassar 28 dB/100 m para cabo de classe A+.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.coaxAttenuation2150MHz",
+          "operator": ">",
+          "value": 28
+        }
+      ],
+      "currentValueTemplate": "{ited.coaxAttenuation2150MHz} dB/100 m a 2150 MHz",
+      "requiredValue": "≤ 28 dB/100 m a 2150 MHz (cabo classe A+)",
+      "remediation": "Utilizar cabo coaxial de classe A+ com atenuação certificada ≤ 28 dB/100 m a 2150 MHz. Verificar se os troços de cabo não excedem os comprimentos máximos indicados no projeto. Se necessário, reposicionar amplificadores de sinal.",
+      "enabled": true,
+      "tags": [
+        "coaxial",
+        "atenuação",
+        "2150 MHz",
+        "CATV",
+        "classe A+"
+      ]
+    },
+    {
+      "id": "ITED_007",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.4 — Ventilação do ATE",
+      "description": "O ATE (Armário de Telecomunicações de Edifício) não possui ventilação adequada. O ATE deve dispor de ventilação natural ou forçada para dissipar o calor gerado pelos equipamentos ativos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.ate.hasVentilation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.ate.hasActiveEquipment",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ventilação do ATE: {ited.ate.hasVentilation}",
+      "requiredValue": "Ventilação obrigatória no ATE com equipamento ativo",
+      "remediation": "Prever ventilação no ATE através de grelhas de ventilação (natural) ou ventiladores com termóstato (forçada). A temperatura interior não deve exceder 40 °C. Para armários rack, instalar ventiladores no topo com entrada de ar na base.",
+      "enabled": true,
+      "tags": [
+        "ATE",
+        "ventilação",
+        "temperatura",
+        "equipamento ativo"
+      ]
+    },
+    {
+      "id": "ITED_008",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.4.2 — Temperatura Máxima na Sala/Armário de Telecomunicações",
+      "description": "A temperatura prevista no espaço de telecomunicações excede o máximo recomendado de 40 °C. Temperaturas elevadas reduzem a vida útil dos equipamentos e podem causar falhas de serviço.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.telecomRoom.maxTemperature",
+          "operator": ">",
+          "value": 40
+        }
+      ],
+      "currentValueTemplate": "{ited.telecomRoom.maxTemperature} °C",
+      "requiredValue": "≤ 40 °C no interior do espaço de telecomunicações",
+      "remediation": "Instalar sistema de climatização ou ventilação forçada na sala/armário de telecomunicações para manter a temperatura abaixo de 40 °C. Considerar ar condicionado dedicado para salas com múltiplos equipamentos ativos. Monitorizar a temperatura com sensor e alarme.",
+      "enabled": true,
+      "tags": [
+        "temperatura",
+        "ventilação",
+        "sala telecomunicações",
+        "climatização"
+      ]
+    },
+    {
+      "id": "ITED_009",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.5 — Rack de Telecomunicações 19\" no ATE",
+      "description": "Em edifícios com mais de 32 frações autónomas, o ATE deve ser equipado com bastidor (rack) de 19\" normalizado para alojamento organizado dos equipamentos de telecomunicações.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.ate.hasRack19inch",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">",
+          "value": 32
+        }
+      ],
+      "currentValueTemplate": "Rack 19\": {ited.ate.hasRack19inch}",
+      "requiredValue": "Rack 19\" obrigatório para edifícios com > 32 frações",
+      "remediation": "Instalar bastidor (rack) normalizado de 19\" no ATE, com altura mínima de 42U para edifícios grandes. O rack deve ter painéis de gestão de cabos, régua de energia elétrica dedicada e ventilação adequada. Prever espaço para ODF, patch panels e equipamentos de operadores.",
+      "enabled": true,
+      "tags": [
+        "rack",
+        "19 polegadas",
+        "ATE",
+        "bastidor",
+        "equipamento"
+      ]
+    },
+    {
+      "id": "ITED_010",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.5.2 — Altura Mínima do Rack no ATE",
+      "description": "A altura do rack de telecomunicações no ATE é inferior ao mínimo recomendado para o número de frações autónomas do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.ate.rackHeightU",
+          "operator": "<",
+          "value": 20
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">",
+          "value": 8
+        }
+      ],
+      "currentValueTemplate": "{ited.ate.rackHeightU} U",
+      "requiredValue": "≥ 20U para edifícios com mais de 8 frações",
+      "remediation": "Substituir o bastidor por um rack com altura mínima de 20U para edifícios com mais de 8 frações. Para edifícios com mais de 32 frações, prever rack de 42U. Considerar espaço para ODF, painéis de interligação de cobre e coaxial, e reserva de 30% para crescimento futuro.",
+      "enabled": true,
+      "tags": [
+        "rack",
+        "altura",
+        "ATE",
+        "dimensionamento"
+      ]
+    },
+    {
+      "id": "ITED_011",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2.1 — Dimensionamento de Caminhos de Cabos",
+      "description": "A taxa de ocupação dos caminhos de cabos (esteiras/calhas) excede 60%. A ocupação máxima recomendada é de 60% para permitir futuras ampliações e facilitar a manutenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.cableTray.occupancyRate",
+          "operator": ">",
+          "value": 60
+        }
+      ],
+      "currentValueTemplate": "{ited.cableTray.occupancyRate}% de ocupação",
+      "requiredValue": "≤ 60% de taxa de ocupação dos caminhos de cabos",
+      "remediation": "Redimensionar os caminhos de cabos (esteiras, calhas ou leitos de cabos) para que a taxa de ocupação não exceda 60%. Calcular a secção total dos cabos e dimensionar o caminho de cabos com margem de 40% para ampliações futuras e facilidade de instalação.",
+      "enabled": true,
+      "tags": [
+        "caminhos de cabos",
+        "esteira",
+        "calha",
+        "ocupação",
+        "dimensionamento"
+      ]
+    },
+    {
+      "id": "ITED_012",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2.3 — Separação entre Cabos de Telecomunicações e Energia",
+      "description": "Não está garantida a separação mínima entre cabos de telecomunicações e cabos de energia elétrica nos caminhos de cabos. A separação é obrigatória para evitar interferências eletromagnéticas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.cableTray.hasEMCSeparation",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Separação EMC: {ited.cableTray.hasEMCSeparation}",
+      "requiredValue": "Separação obrigatória entre cabos de telecomunicações e energia",
+      "remediation": "Garantir separação mínima de 30 cm entre cabos de telecomunicações e cabos de energia em percursos paralelos, ou utilizar caminhos de cabos separados (divisórias metálicas ou calhas independentes). Em cruzamentos, manter ângulo de 90° entre os cabos. Para percursos em calha partilhada, utilizar divisória metálica contínua.",
+      "enabled": true,
+      "tags": [
+        "EMC",
+        "separação",
+        "energia",
+        "interferência",
+        "caminhos de cabos"
+      ]
+    },
+    {
+      "id": "ITED_013",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2 — Ligação Equipotencial de Telecomunicações",
+      "description": "Os equipamentos e armários de telecomunicações não estão ligados ao barramento de terra equipotencial do edifício. A ligação equipotencial é obrigatória para proteção contra descargas atmosféricas e contactos indiretos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.grounding.hasBondingConnection",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ligação equipotencial: {ited.grounding.hasBondingConnection}",
+      "requiredValue": "Ligação ao barramento de terra equipotencial obrigatória",
+      "remediation": "Estabelecer ligação equipotencial entre todos os armários de telecomunicações (ATE, ATI) e o barramento de terra principal do edifício. Utilizar condutor de cobre com secção mínima de 6 mm² (verde/amarelo). A resistência da ligação à terra não deve exceder 1 Ω.",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "equipotencial",
+        "ligação",
+        "proteção",
+        "barramento"
+      ]
+    },
+    {
+      "id": "ITED_014",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2.2 — Secção do Condutor de Terra para Telecomunicações",
+      "description": "A secção do condutor de terra que liga os armários de telecomunicações ao barramento equipotencial é inferior ao mínimo regulamentar de 6 mm².",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.grounding.conductorSectionMm2",
+          "operator": "<",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "{ited.grounding.conductorSectionMm2} mm²",
+      "requiredValue": "≥ 6 mm² de secção do condutor de terra (Cu)",
+      "remediation": "Substituir o condutor de terra por condutor de cobre isolado (verde/amarelo) com secção mínima de 6 mm². Para edifícios com mais de 8 pisos ou com sistema de para-raios, considerar secção de 16 mm². Assegurar continuidade elétrica em todo o percurso.",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "condutor",
+        "secção",
+        "6 mm²",
+        "cobre"
+      ]
+    },
+    {
+      "id": "ITED_015",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.3 — Proteção contra Descargas Atmosféricas em Antenas",
+      "description": "O sistema de antenas de telecomunicações no topo do edifício não dispõe de proteção contra descargas atmosféricas (para-raios ou ligação ao sistema de proteção existente).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.antenna.hasLightningProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.antenna.hasRooftopAntenna",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção contra descargas: {ited.antenna.hasLightningProtection}",
+      "requiredValue": "Proteção contra descargas atmosféricas obrigatória para antenas",
+      "remediation": "Instalar proteção contra descargas atmosféricas para as antenas de telecomunicações no topo do edifício. Ligar o mastro da antena ao sistema de proteção contra raios (SPDA) do edifício ou ao barramento de terra principal. Instalar descarregadores de sobretensão (SPD) na entrada dos cabos coaxiais no ATE.",
+      "enabled": true,
+      "tags": [
+        "antena",
+        "para-raios",
+        "descarga atmosférica",
+        "SPDA",
+        "proteção"
+      ]
+    },
+    {
+      "id": "ITED_016",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.3.2 — Descarregadores de Sobretensão (SPD) na Entrada de Antena",
+      "description": "Não estão instalados descarregadores de sobretensão (SPD) na entrada dos cabos de antena no ATE. Os SPD protegem os equipamentos contra sobretensões induzidas por descargas atmosféricas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.antenna.hasSPD",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.antenna.hasRooftopAntenna",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Descarregadores SPD: {ited.antenna.hasSPD}",
+      "requiredValue": "SPD obrigatório na entrada dos cabos de antena no ATE",
+      "remediation": "Instalar descarregadores de sobretensão (SPD) coaxiais na entrada dos cabos de antena no ATE, antes da ligação aos amplificadores ou repartidores. Os SPD devem ter ligação direta ao barramento de terra do ATE com condutor de secção adequada.",
+      "enabled": true,
+      "tags": [
+        "SPD",
+        "sobretensão",
+        "antena",
+        "descarregador",
+        "proteção"
+      ]
+    },
+    {
+      "id": "ITED_017",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.2.3 — Requisitos do ATE em Edifícios Comerciais",
+      "description": "Em edifícios com uso comercial ou misto (serviços/comércio), o ATE deve ter dimensões superiores ao mínimo residencial para acomodar equipamentos adicionais de operadores e redes empresariais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.ate.area",
+          "operator": "<",
+          "value": 3.0
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": ["commercial", "mixed", "services"]
+        }
+      ],
+      "currentValueTemplate": "{ited.ate.area} m² de ATE",
+      "requiredValue": "≥ 3.0 m² de ATE para edifícios comerciais/mistos",
+      "remediation": "Redimensionar o ATE para uma área mínima de 3.0 m² em edifícios comerciais ou de uso misto. Prever espaço adicional para racks de operadores, UPS, equipamento de rede empresarial e painéis de gestão. A sala deve ter porta com fechadura, iluminação adequada e tomada elétrica dedicada.",
+      "enabled": true,
+      "tags": [
+        "ATE",
+        "comercial",
+        "misto",
+        "dimensionamento",
+        "empresarial"
+      ]
+    },
+    {
+      "id": "ITED_018",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.2.5 — Sala de Telecomunicações em Grandes Edifícios Comerciais",
+      "description": "Edifícios comerciais com área útil superior a 5000 m² devem dispor de sala de telecomunicações dedicada (não apenas armário), com acesso restrito e condições de segurança adequadas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.hasDedicatedTelecomRoom",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.usage",
+          "operator": "in",
+          "value": ["commercial", "services"]
+        },
+        {
+          "field": "building.usableArea",
+          "operator": ">",
+          "value": 5000
+        }
+      ],
+      "currentValueTemplate": "Sala dedicada: {ited.hasDedicatedTelecomRoom}",
+      "requiredValue": "Sala de telecomunicações dedicada para edifícios comerciais > 5000 m²",
+      "remediation": "Projetar sala de telecomunicações dedicada com: área mínima de 12 m², porta corta-fogo com fechadura, climatização independente, iluminação ≥ 500 lux, piso técnico elevado, alimentação elétrica dedicada com UPS, e sistema de deteção de incêndio. A sala deve ser acessível para técnicos autorizados.",
+      "enabled": true,
+      "tags": [
+        "sala telecomunicações",
+        "comercial",
+        "dedicada",
+        "segurança",
+        "grandes edifícios"
+      ]
+    },
+    {
+      "id": "ITED_019",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.4.1 — Distribuição em Edifícios Multifamiliares — Topologia Estrela",
+      "description": "A distribuição de cabos na rede coletiva de um edifício multifamiliar não segue a topologia em estrela obrigatória. Todos os cabos devem partir do ATE até cada ATI sem derivações intermédias.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.collectiveNetwork.topology",
+          "operator": "!=",
+          "value": "star"
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">=",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Topologia: {ited.collectiveNetwork.topology}",
+      "requiredValue": "Topologia em estrela obrigatória na rede coletiva",
+      "remediation": "Reformular a rede coletiva para topologia em estrela, com todos os cabos (fibra, cobre e coaxial) partindo individualmente do ATE até cada ATI de fração. Não são permitidas derivações em cascata (bus) na rede coletiva de par de cobre e fibra óptica. A topologia estrela garante independência entre frações.",
+      "enabled": true,
+      "tags": [
+        "topologia",
+        "estrela",
+        "rede coletiva",
+        "multifamiliar",
+        "distribuição"
+      ]
+    },
+    {
+      "id": "ITED_020",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.4.3 — Splitter Óptico — Rácio Máximo de Divisão",
+      "description": "O rácio de divisão do splitter óptico na rede coletiva excede o máximo recomendado de 1:64. Rácios superiores comprometem o budget óptico e a qualidade do serviço.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.opticalSplitter.splitRatio",
+          "operator": ">",
+          "value": 64
+        }
+      ],
+      "currentValueTemplate": "Rácio de divisão: 1:{ited.opticalSplitter.splitRatio}",
+      "requiredValue": "≤ 1:64 de rácio de divisão no splitter óptico",
+      "remediation": "Substituir o splitter óptico por um com rácio de divisão máximo de 1:64. Se o número de frações exigir maior divisão, utilizar splitters em cascata com verificação do budget óptico total. A perda de inserção do splitter 1:64 é de aproximadamente 21 dB.",
+      "enabled": true,
+      "tags": [
+        "splitter",
+        "óptico",
+        "rácio",
+        "divisão",
+        "PON"
+      ]
+    },
+    {
+      "id": "ITED_021",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.4.3.2 — Perda de Inserção do Splitter Óptico",
+      "description": "A perda de inserção do splitter óptico excede os valores máximos da norma. A perda deve ser verificada e registada nos ensaios de certificação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.opticalSplitter.insertionLoss",
+          "operator": ">",
+          "value": 21.5
+        }
+      ],
+      "currentValueTemplate": "{ited.opticalSplitter.insertionLoss} dB de perda de inserção",
+      "requiredValue": "Perda de inserção conforme especificação do fabricante (máx. 21.5 dB para 1:64)",
+      "remediation": "Substituir o splitter óptico por um componente certificado com perda de inserção dentro dos limites especificados. Verificar a uniformidade da divisão entre portas (desvio máximo ≤ 1.5 dB). Utilizar splitters PLC (Planar Lightwave Circuit) para melhor uniformidade.",
+      "enabled": true,
+      "tags": [
+        "splitter",
+        "perda de inserção",
+        "óptico",
+        "PLC",
+        "certificação"
+      ]
+    },
+    {
+      "id": "ITED_022",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.8 — Raio Mínimo de Curvatura de Fibra Óptica",
+      "description": "O raio de curvatura da fibra óptica é inferior ao mínimo especificado. Um raio de curvatura demasiado pequeno causa atenuação excessiva e pode danificar a fibra permanentemente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fiber.bendRadiusMm",
+          "operator": "<",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "{ited.fiber.bendRadiusMm} mm de raio de curvatura",
+      "requiredValue": "≥ 30 mm de raio mínimo de curvatura (fibra monomodo padrão)",
+      "remediation": "Corrigir os percursos de fibra óptica para garantir raio de curvatura mínimo de 30 mm em condições estáticas (sem tensão). Durante a instalação (condições dinâmicas), o raio mínimo deve ser de 60 mm. Utilizar fibra bend-insensitive (G.657.A2 ou B3) em troços com curvatura apertada inevitável.",
+      "enabled": true,
+      "tags": [
+        "fibra óptica",
+        "raio de curvatura",
+        "bend radius",
+        "G.657",
+        "instalação"
+      ]
+    },
+    {
+      "id": "ITED_023",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.6 — Raio Mínimo de Curvatura de Cabo de Par de Cobre",
+      "description": "O raio de curvatura do cabo de par de cobre (UTP/FTP) é inferior ao mínimo regulamentar. Para cabos Cat. 6 o raio mínimo de curvatura é de 4× o diâmetro externo do cabo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.copperCable.bendRadiusCompliant",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Conformidade do raio de curvatura: {ited.copperCable.bendRadiusCompliant}",
+      "requiredValue": "Raio mínimo ≥ 4× diâmetro externo do cabo (Cat. 6)",
+      "remediation": "Corrigir os troços de cabo de par de cobre para respeitar o raio mínimo de curvatura de 4 vezes o diâmetro externo do cabo (aproximadamente 25 mm para Cat. 6). Em pontos de mudança de direção, utilizar acessórios de encaminhamento adequados. Para cabos Cat. 6A blindados, o raio mínimo é de 8× o diâmetro.",
+      "enabled": true,
+      "tags": [
+        "par de cobre",
+        "raio de curvatura",
+        "Cat. 6",
+        "UTP",
+        "FTP"
+      ]
+    },
+    {
+      "id": "ITED_024",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.4 — Conformidade EMC da Infraestrutura de Telecomunicações",
+      "description": "A infraestrutura de telecomunicações não cumpre os requisitos de compatibilidade eletromagnética (EMC). A cablagem e equipamentos devem estar protegidos contra interferências eletromagnéticas conforme a Diretiva EMC 2014/30/UE.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.emc.isCompliant",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Conformidade EMC: {ited.emc.isCompliant}",
+      "requiredValue": "Conformidade EMC obrigatória (Diretiva 2014/30/UE)",
+      "remediation": "Garantir conformidade EMC da infraestrutura de telecomunicações: utilizar cabos blindados (FTP/STP) em zonas com fontes de interferência, manter separação mínima entre cabos de telecomunicações e fontes EMI (motores, quadros elétricos, elevadores), e assegurar continuidade das blindagens nos conectores e painéis.",
+      "enabled": true,
+      "tags": [
+        "EMC",
+        "compatibilidade eletromagnética",
+        "interferência",
+        "blindagem",
+        "Diretiva 2014/30/UE"
+      ]
+    },
+    {
+      "id": "ITED_025",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.1.1 — Ponto de Entrada do Edifício (PE)",
+      "description": "O ponto de entrada (PE) do edifício para telecomunicações não está identificado ou não cumpre os requisitos mínimos. O PE deve garantir a transição segura dos cabos exteriores para o interior do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.buildingEntry.isCompliant",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ponto de entrada conforme: {ited.buildingEntry.isCompliant}",
+      "requiredValue": "Ponto de entrada (PE) regulamentar e identificado",
+      "remediation": "Definir e construir ponto de entrada do edifício conforme regulamentar: travessia estanque através da parede exterior, tubo de proteção com curva de água para impedir infiltrações, selagem adequada, e identificação visível. O PE deve ser acessível para manutenção e permitir a entrada de cabos de múltiplos operadores.",
+      "enabled": true,
+      "tags": [
+        "ponto de entrada",
+        "edifício",
+        "PE",
+        "estanquicidade",
+        "operadores"
+      ]
+    },
+    {
+      "id": "ITED_026",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.1.2 — Número Mínimo de Tubos no Ponto de Entrada",
+      "description": "O número de tubos no ponto de entrada do edifício é inferior ao mínimo regulamentar. Devem existir pelo menos 3 tubos para permitir acesso multi-operador.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.buildingEntry.numberOfTubes",
+          "operator": "<",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "{ited.buildingEntry.numberOfTubes} tubo(s) no PE",
+      "requiredValue": "≥ 3 tubos no ponto de entrada do edifício",
+      "remediation": "Instalar no mínimo 3 tubos de entrada (Ø50 mm cada) no ponto de entrada do edifício, destinados a operadores distintos. Os tubos devem estar selados, identificados e com inclinação para exterior para evitar entrada de água. Prever reserva de pelo menos 1 tubo adicional para futuras necessidades.",
+      "enabled": true,
+      "tags": [
+        "ponto de entrada",
+        "tubos",
+        "multi-operador",
+        "Ø50 mm"
+      ]
+    },
+    {
+      "id": "ITED_027",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.3.1 — Proteção Exterior de Cabos de Telecomunicações",
+      "description": "Os cabos de telecomunicações instalados no exterior do edifício não dispõem de proteção UV e mecânica adequada. Cabos expostos ao exterior devem ter revestimento resistente a radiação ultravioleta, intempéries e impactos mecânicos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.outdoorCable.hasUVProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.outdoorCable.hasOutdoorRoutes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção UV: {ited.outdoorCable.hasUVProtection}",
+      "requiredValue": "Cabos exteriores com proteção UV e mecânica obrigatória",
+      "remediation": "Substituir os cabos exteriores por cabos com classificação outdoor (revestimento PE negro resistente a UV). Cabos que percorrem fachadas devem ser instalados em calha ou tubo de proteção mecânica. Para percursos aéreos, utilizar cabo autossustentado ou cabo com fiador metálico.",
+      "enabled": true,
+      "tags": [
+        "outdoor",
+        "proteção UV",
+        "cabos exteriores",
+        "intempéries",
+        "mecânica"
+      ]
+    },
+    {
+      "id": "ITED_028",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.3 — Especificações dos Tubos de Condutas",
+      "description": "Os tubos das condutas de telecomunicações não cumprem as especificações mínimas. Os tubos devem ser em PVC rígido (classe de resistência adequada) ou PEAD corrugado com guia de enfiação incorporada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.ductBank.tubeType",
+          "operator": "not_in",
+          "value": ["PVC_rigid", "PEAD_corrugated", "PEAD_smooth"]
+        }
+      ],
+      "currentValueTemplate": "Tipo de tubo: {ited.ductBank.tubeType}",
+      "requiredValue": "PVC rígido ou PEAD corrugado/liso com guia de enfiação",
+      "remediation": "Utilizar tubos de PVC rígido (classe SN4 ou superior) ou PEAD corrugado/liso de dupla parede para as condutas de telecomunicações. Todos os tubos devem ter guia de enfiação incorporada (fio de aço ou nylon). Garantir que os tubos são estanques nos pontos de junção com as caixas de passagem.",
+      "enabled": true,
+      "tags": [
+        "condutas",
+        "tubos",
+        "PVC",
+        "PEAD",
+        "guia de enfiação"
+      ]
+    },
+    {
+      "id": "ITED_029",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.5 — Profundidade Mínima de Enterramento de Condutas",
+      "description": "A profundidade de enterramento das condutas de telecomunicações é inferior ao mínimo regulamentar de 0.60 m em zonas não transitáveis ou 0.80 m em zonas transitáveis por veículos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.ductBank.burialDepth",
+          "operator": "<",
+          "value": 0.6
+        },
+        {
+          "field": "ited.ductBank.hasUndergroundRoutes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{ited.ductBank.burialDepth} m de profundidade",
+      "requiredValue": "≥ 0.60 m (não transitável) ou ≥ 0.80 m (transitável por veículos)",
+      "remediation": "Aumentar a profundidade de enterramento das condutas para no mínimo 0.60 m em zonas pedonais e 0.80 m em zonas transitáveis por veículos. Colocar banda de aviso ('Atenção — Telecomunicações') 0.20 m acima das condutas. Em passagens sob estradas, utilizar proteção mecânica adicional (tubo de betão ou aço).",
+      "enabled": true,
+      "tags": [
+        "condutas",
+        "enterramento",
+        "profundidade",
+        "proteção mecânica"
+      ]
+    },
+    {
+      "id": "ITED_030",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4.1 — Tensão Máxima de Puxamento de Cabos",
+      "description": "A tensão de puxamento prevista para a instalação de cabos excede o limite máximo especificado pelo fabricante. Tensão excessiva pode danificar os condutores ou a fibra óptica permanentemente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.cablePull.maxTensionN",
+          "operator": ">",
+          "value": 110
+        },
+        {
+          "field": "ited.cablePull.cableType",
+          "operator": "==",
+          "value": "fiber"
+        }
+      ],
+      "currentValueTemplate": "{ited.cablePull.maxTensionN} N de tensão de puxamento",
+      "requiredValue": "≤ 110 N para cabo de fibra óptica (verificar especificação do fabricante)",
+      "remediation": "Reduzir a tensão de puxamento respeitando os limites do fabricante (tipicamente ≤ 110 N para cabos de fibra óptica). Utilizar lubrificante de cabos, reduzir o comprimento dos troços de puxamento, e instalar caixas de junção intermédias em percursos longos. Monitorizar a tensão com dinamómetro durante a instalação.",
+      "enabled": true,
+      "tags": [
+        "puxamento",
+        "tensão",
+        "fibra óptica",
+        "instalação",
+        "dinamómetro"
+      ]
+    },
+    {
+      "id": "ITED_031",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4.2 — Tensão Máxima de Puxamento de Cabo de Cobre",
+      "description": "A tensão de puxamento prevista para a instalação de cabos de cobre excede o limite máximo. Para cabo UTP Cat. 6, a tensão não deve ultrapassar 110 N (25 lbf).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.cablePull.maxTensionN",
+          "operator": ">",
+          "value": 110
+        },
+        {
+          "field": "ited.cablePull.cableType",
+          "operator": "==",
+          "value": "copper_utp"
+        }
+      ],
+      "currentValueTemplate": "{ited.cablePull.maxTensionN} N de tensão de puxamento",
+      "requiredValue": "≤ 110 N (25 lbf) para cabo UTP Cat. 6",
+      "remediation": "Limitar a tensão de puxamento a 110 N (25 lbf) para cabos UTP Cat. 6. Para troços longos, dividir o puxamento em secções com caixas de passagem intermédias. Utilizar lubrificante compatível com o revestimento do cabo e monitorizar a tensão com dinamómetro.",
+      "enabled": true,
+      "tags": [
+        "puxamento",
+        "tensão",
+        "UTP",
+        "Cat. 6",
+        "110 N"
+      ]
+    },
+    {
+      "id": "ITED_032",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.6 — Proteção contra Incêndio na Sala de Telecomunicações",
+      "description": "A sala de telecomunicações não dispõe de proteção contra incêndio adequada. Deve existir deteção automática de incêndio e meios de primeira intervenção (extintor).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.telecomRoom.hasFireProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.hasDedicatedTelecomRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção contra incêndio: {ited.telecomRoom.hasFireProtection}",
+      "requiredValue": "Deteção de incêndio e extintor obrigatórios na sala de telecomunicações",
+      "remediation": "Instalar detetor automático de incêndio (ótico ou iónico) na sala de telecomunicações, ligado à central de deteção do edifício. Colocar extintor de CO₂ (classe B/E) junto à porta de acesso. Em salas com equipamento crítico, considerar sistema de extinção automática por gás inerte (FM-200 ou Novec 1230).",
+      "enabled": true,
+      "tags": [
+        "incêndio",
+        "deteção",
+        "extintor",
+        "sala telecomunicações",
+        "CO₂"
+      ]
+    },
+    {
+      "id": "ITED_033",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.6.2 — Reação ao Fogo dos Cabos em Caminhos de Evacuação",
+      "description": "Os cabos de telecomunicações instalados em caminhos de evacuação não cumprem a classe de reação ao fogo mínima. Devem ser utilizados cabos com classificação Cca-s1,d1,a1 ou superior em caminhos de evacuação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.cable.evacuationRouteFireClass",
+          "operator": "reaction_class_lt",
+          "value": "Cca"
+        },
+        {
+          "field": "ited.cable.hasEvacuationRoutes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Classe de reação ao fogo: {ited.cable.evacuationRouteFireClass}",
+      "requiredValue": "≥ Cca-s1,d1,a1 para cabos em caminhos de evacuação (Regulamento CPR)",
+      "remediation": "Substituir os cabos de telecomunicações em caminhos de evacuação por cabos com classificação mínima Cca-s1,d1,a1 conforme o Regulamento de Produtos da Construção (CPR — EU 305/2011). Verificar o certificado de desempenho (DoP) dos cabos e manter registo da documentação.",
+      "enabled": true,
+      "tags": [
+        "reação ao fogo",
+        "CPR",
+        "Cca",
+        "evacuação",
+        "segurança contra incêndio"
+      ]
+    },
+    {
+      "id": "ITED_034",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.6 — Alimentação Elétrica Dedicada para Telecomunicações",
+      "description": "O ATE/sala de telecomunicações não dispõe de circuito elétrico dedicado e independente do quadro geral do edifício. A alimentação elétrica dedicada é necessária para equipamentos ativos de telecomunicações.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.ate.hasDedicatedPowerCircuit",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.ate.hasActiveEquipment",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Circuito elétrico dedicado: {ited.ate.hasDedicatedPowerCircuit}",
+      "requiredValue": "Circuito elétrico dedicado obrigatório para ATE com equipamento ativo",
+      "remediation": "Instalar circuito elétrico dedicado para o ATE/sala de telecomunicações, com proteção diferencial e disjuntor independente no quadro geral do edifício. Prever tomadas elétricas suficientes (mínimo 4 tomadas Schuko) e régua de energia para o rack. O circuito deve ser identificado no quadro elétrico.",
+      "enabled": true,
+      "tags": [
+        "alimentação elétrica",
+        "circuito dedicado",
+        "ATE",
+        "tomadas",
+        "equipamento ativo"
+      ]
+    },
+    {
+      "id": "ITED_035",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.6.2 — UPS para Equipamentos Críticos de Telecomunicações",
+      "description": "Não existe UPS (fonte de alimentação ininterrupta) para os equipamentos críticos de telecomunicações em edifícios com mais de 32 frações ou em edifícios comerciais/serviços.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.ate.hasUPS",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">",
+          "value": 32
+        }
+      ],
+      "currentValueTemplate": "UPS instalada: {ited.ate.hasUPS}",
+      "requiredValue": "UPS recomendada para edifícios com > 32 frações ou uso comercial",
+      "remediation": "Instalar UPS (Uninterruptible Power Supply) no ATE/sala de telecomunicações com autonomia mínima de 30 minutos. A UPS deve alimentar amplificadores CATV, switches de rede ativos e equipamento de operadores. Dimensionar a potência com margem de 30% sobre o consumo atual. Prever monitorização remota do estado da UPS.",
+      "enabled": true,
+      "tags": [
+        "UPS",
+        "backup",
+        "alimentação ininterrupta",
+        "equipamento crítico"
+      ]
+    },
+    {
+      "id": "ITED_036",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2 — Etiquetagem de Cabos de Telecomunicações",
+      "description": "Os cabos de telecomunicações não estão devidamente etiquetados. Todos os cabos devem ter identificação permanente nas extremidades e nas caixas de passagem, indicando origem, destino e tipo de serviço.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.labeling.hasCableLabels",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Etiquetagem de cabos: {ited.labeling.hasCableLabels}",
+      "requiredValue": "Etiquetagem obrigatória em todas as extremidades dos cabos",
+      "remediation": "Etiquetar todos os cabos de telecomunicações nas duas extremidades e nos pontos de passagem. Utilizar etiquetas permanentes (impressas, não manuscritas) com código alfanumérico que identifique: tipo de cabo, origem, destino e serviço. Seguir o esquema de cores e nomenclatura definido no projeto ITED.",
+      "enabled": true,
+      "tags": [
+        "etiquetagem",
+        "identificação",
+        "cabos",
+        "documentação"
+      ]
+    },
+    {
+      "id": "ITED_037",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.2.3 — Etiquetagem dos Painéis de Interligação (Patch Panels)",
+      "description": "Os painéis de interligação (patch panels) no ATE e ATI não estão devidamente identificados. Cada porta deve ter etiqueta permanente com código correspondente à tomada de telecomunicações de destino.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.labeling.hasPatchPanelLabels",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Etiquetagem de patch panels: {ited.labeling.hasPatchPanelLabels}",
+      "requiredValue": "Identificação obrigatória de todas as portas dos patch panels",
+      "remediation": "Identificar cada porta dos patch panels no ATE e ATI com etiqueta permanente indicando: código da tomada de destino, tipo de serviço (dados, voz, CATV) e fração autónoma correspondente. Utilizar sistema de numeração consistente com o projeto ITED. Manter esquema de ligações atualizado junto ao painel.",
+      "enabled": true,
+      "tags": [
+        "etiquetagem",
+        "patch panel",
+        "ATE",
+        "ATI",
+        "identificação"
+      ]
+    },
+    {
+      "id": "ITED_038",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.3 — Telas Finais da Instalação ITED",
+      "description": "Não foram produzidas telas finais (as-built) da instalação de telecomunicações. As telas finais são obrigatórias e devem refletir fielmente a instalação executada, incluindo percursos de tubagem, caixas e cablagem.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.documentation.hasAsBuiltDrawings",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Telas finais: {ited.documentation.hasAsBuiltDrawings}",
+      "requiredValue": "Telas finais (as-built) obrigatórias",
+      "remediation": "Produzir telas finais da instalação ITED que reflitam a instalação realmente executada. As telas devem incluir: plantas com percursos de tubagem e cablagem, identificação de caixas e armários, esquemas de ligações, e legenda completa. As telas finais devem ser entregues ao dono de obra e arquivadas no ATE.",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "as-built",
+        "documentação",
+        "obrigatório"
+      ]
+    },
+    {
+      "id": "ITED_039",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 62.º — Requisitos ITED para Edifícios Residenciais Unifamiliares",
+      "description": "A moradia unifamiliar não cumpre os requisitos ITED mínimos. Moradias unifamiliares devem dispor de ATI, tubagem dedicada e pelo menos 2 tomadas de telecomunicações por divisão principal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.residential.meetsMinimumRequirements",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.type",
+          "operator": "==",
+          "value": "single_family"
+        }
+      ],
+      "currentValueTemplate": "Requisitos mínimos ITED: {ited.residential.meetsMinimumRequirements}",
+      "requiredValue": "Cumprimento dos requisitos ITED mínimos para moradias unifamiliares",
+      "remediation": "Garantir os requisitos ITED mínimos para moradia unifamiliar: ATI com ODF e patch panel, tubagem dedicada de telecomunicações (Ø25 mm mínimo), pelo menos 2 tomadas de telecomunicações por divisão principal (sala, quartos, escritório), ponto de entrada com 2 tubos, e ligação de terra ao barramento equipotencial.",
+      "enabled": true,
+      "tags": [
+        "residencial",
+        "unifamiliar",
+        "moradia",
+        "requisitos mínimos",
+        "ATI"
+      ]
+    },
+    {
+      "id": "ITED_040",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.3.2 — ATI para Frações com Área Superior a 200 m²",
+      "description": "Frações autónomas com área útil superior a 200 m² devem dispor de ATI secundário (sub-ATI) para reduzir os comprimentos de cablagem e garantir desempenho adequado da rede individual.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fraction.hasSecondaryATI",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.fraction.usableArea",
+          "operator": ">",
+          "value": 200
+        }
+      ],
+      "currentValueTemplate": "ATI secundário: {ited.fraction.hasSecondaryATI}",
+      "requiredValue": "ATI secundário recomendado para frações > 200 m²",
+      "remediation": "Instalar ATI secundário (sub-ATI) em frações com área superior a 200 m², posicionado de modo a que nenhum ponto de utilização fique a mais de 50 m do ATI mais próximo. O sub-ATI deve ter interligação em fibra e/ou cobre Cat. 6 ao ATI principal da fração.",
+      "enabled": true,
+      "tags": [
+        "ATI",
+        "secundário",
+        "grandes frações",
+        "sub-ATI",
+        "200 m²"
+      ]
+    },
+    {
+      "id": "ITED_041",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.4.5 — Distribuição em Edifícios Multifamiliares — Coluna Montante",
+      "description": "A coluna montante de telecomunicações não está dimensionada para o número de frações do edifício. O número de tubos na coluna montante deve permitir a passagem de todos os cabos previstos com taxa de ocupação ≤ 50%.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.riser.occupancyRate",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "{ited.riser.occupancyRate}% de ocupação na coluna montante",
+      "requiredValue": "≤ 50% de taxa de ocupação na coluna montante",
+      "remediation": "Redimensionar a coluna montante de telecomunicações para uma taxa de ocupação máxima de 50%. Calcular o número de tubos necessários com base no número de frações e tipos de cabo (fibra, cobre, coaxial). Prever tubos de reserva para futuras ampliações. A coluna deve ser acessível por caixas de passagem em cada piso.",
+      "enabled": true,
+      "tags": [
+        "coluna montante",
+        "riser",
+        "ocupação",
+        "dimensionamento",
+        "tubos"
+      ]
+    },
+    {
+      "id": "ITED_042",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.1.7 — Raio Mínimo de Curvatura de Condutas/Tubos",
+      "description": "Os tubos de condutas de telecomunicações apresentam raio de curvatura inferior ao mínimo regulamentar. O raio interior de curvatura deve ser pelo menos 6 vezes o diâmetro exterior do tubo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.duct.bendRadiusCompliant",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Raio de curvatura das condutas: {ited.duct.bendRadiusCompliant}",
+      "requiredValue": "Raio interior ≥ 6× diâmetro exterior do tubo",
+      "remediation": "Corrigir os troços de conduta para garantir raio interior de curvatura mínimo de 6 vezes o diâmetro exterior do tubo. Em mudanças de direção de 90°, utilizar curvas pré-fabricadas com raio adequado em vez de dobrar o tubo. Em condutas embebidas, prever caixas de passagem nas mudanças de direção.",
+      "enabled": true,
+      "tags": [
+        "condutas",
+        "raio de curvatura",
+        "tubos",
+        "curvas",
+        "instalação"
+      ]
+    },
+    {
+      "id": "ITED_043",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.2.4 — Resistência da Terra de Telecomunicações",
+      "description": "A resistência da ligação à terra de telecomunicações excede o valor máximo permitido de 10 Ω. Uma resistência de terra elevada compromete a proteção contra descargas e sobretensões.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.grounding.earthResistanceOhm",
+          "operator": ">",
+          "value": 10
+        }
+      ],
+      "currentValueTemplate": "{ited.grounding.earthResistanceOhm} Ω",
+      "requiredValue": "≤ 10 Ω de resistência de terra para telecomunicações",
+      "remediation": "Melhorar a ligação à terra de telecomunicações para obter resistência ≤ 10 Ω. Verificar a ligação ao elétrodo de terra do edifício, apertar todas as ligações e eliminar corrosão. Se necessário, instalar elétrodo de terra adicional (varetas de cobre) ou melhorar a condutividade do solo com enchimento de bentonite. Registar a medição no relatório de ensaios.",
+      "enabled": true,
+      "tags": [
+        "terra",
+        "resistência",
+        "10 Ω",
+        "elétrodo",
+        "medição"
+      ]
+    },
+    {
+      "id": "ITED_044",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 7.3.3 — Mastro de Antena — Ligação à Terra",
+      "description": "O mastro de antena de telecomunicações no topo do edifício não tem ligação direta ao sistema de proteção contra descargas atmosféricas. Todo o hardware metálico da antena deve estar ligado à terra.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.antenna.mastGrounded",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.antenna.hasRooftopAntenna",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Mastro ligado à terra: {ited.antenna.mastGrounded}",
+      "requiredValue": "Ligação do mastro da antena ao SPDA/terra obrigatória",
+      "remediation": "Ligar o mastro da antena ao sistema de proteção contra descargas atmosféricas (SPDA) do edifício ou diretamente ao barramento de terra principal, utilizando condutor de cobre nu com secção mínima de 16 mm². A ligação deve ser contínua e verificável. Instalar braçadeira de terra no mastro em material inoxidável.",
+      "enabled": true,
+      "tags": [
+        "antena",
+        "mastro",
+        "terra",
+        "SPDA",
+        "descarga atmosférica"
+      ]
+    },
+    {
+      "id": "ITED_045",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 3.4.3 — Iluminação na Sala/Armário de Telecomunicações",
+      "description": "A sala ou armário de telecomunicações não dispõe de iluminação adequada. É necessário um nível mínimo de iluminação de 300 lux para permitir intervenções de manutenção e instalação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.telecomRoom.illuminationLux",
+          "operator": "<",
+          "value": 300
+        }
+      ],
+      "currentValueTemplate": "{ited.telecomRoom.illuminationLux} lux",
+      "requiredValue": "≥ 300 lux de iluminação na sala/armário de telecomunicações",
+      "remediation": "Instalar iluminação com nível mínimo de 300 lux no plano de trabalho da sala/armário de telecomunicações. Utilizar luminárias com proteção IP adequada ao local. Prever iluminação de emergência (bloco autónomo) para garantir visibilidade em caso de falha de energia.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "sala telecomunicações",
+        "300 lux",
+        "manutenção"
+      ]
+    },
+    {
+      "id": "ITED_046",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 65.º — Acesso Multi-operador à Infraestrutura ITED",
+      "description": "A infraestrutura ITED não garante o princípio de acesso multi-operador. O edifício deve permitir que qualquer operador licenciado possa aceder ao ATE e prestar serviços às frações autónomas, sem discriminação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.multiOperator.hasAccess",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">=",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Acesso multi-operador: {ited.multiOperator.hasAccess}",
+      "requiredValue": "Acesso multi-operador obrigatório (DL 123/2009, Art. 65.º)",
+      "remediation": "Garantir que a infraestrutura ITED permite o acesso de múltiplos operadores de telecomunicações: o ATE deve ter espaço para equipamento de pelo menos 3 operadores, os tubos de entrada devem permitir a passagem de cabos de operadores distintos, e o condomínio não pode impedir o acesso de operadores licenciados.",
+      "enabled": true,
+      "tags": [
+        "multi-operador",
+        "acesso",
+        "ATE",
+        "operadores",
+        "DL 123/2009"
+      ]
+    },
+    {
+      "id": "ITED_047",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 6.1.2 — Registo de Ensaios de Certificação",
+      "description": "Não existe registo completo dos ensaios de certificação da instalação ITED. Os resultados de todos os ensaios obrigatórios (OTDR, NEXT, Return Loss, nível CATV) devem ser documentados e arquivados.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.documentation.hasTestRecords",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Registo de ensaios: {ited.documentation.hasTestRecords}",
+      "requiredValue": "Registo completo de ensaios de certificação obrigatório",
+      "remediation": "Documentar todos os ensaios de certificação ITED em relatório técnico, incluindo: ensaios OTDR (fibra óptica), NEXT e Return Loss (par de cobre), níveis de sinal CATV, continuidade de terra, e resistência de isolamento. Cada ensaio deve identificar o equipamento utilizado (marca, modelo, número de série e data de calibração). Arquivar os relatórios no ATE e entregar cópia ao dono de obra.",
+      "enabled": true,
+      "tags": [
+        "ensaios",
+        "certificação",
+        "OTDR",
+        "NEXT",
+        "documentação"
+      ]
+    },
+    {
+      "id": "ITED_048",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.2.5 — Selagem Corta-fogo em Passagens entre Pisos",
+      "description": "As passagens de cabos de telecomunicações entre pisos (trespasses) não estão seladas com material corta-fogo. A selagem é obrigatória para manter a compartimentação corta-fogo do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.fireStop.hasFloorPenetrationSeals",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Selagem corta-fogo: {ited.fireStop.hasFloorPenetrationSeals}",
+      "requiredValue": "Selagem corta-fogo obrigatória em todas as passagens entre pisos",
+      "remediation": "Aplicar selagem corta-fogo certificada em todas as passagens de cabos de telecomunicações entre pisos (trespasses na laje). Utilizar material intumescente ou argamassa corta-fogo com classificação EI 60 ou superior, conforme a compartimentação do edifício. Reefetivar a selagem após cada intervenção na cablagem.",
+      "enabled": true,
+      "tags": [
+        "corta-fogo",
+        "selagem",
+        "trespasse",
+        "compartimentação",
+        "EI 60"
+      ]
+    },
+    {
+      "id": "ITED_049",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.10 — Conector de Fibra Óptica — Tipo SC/APC",
+      "description": "Os conectores de fibra óptica na infraestrutura ITED não são do tipo SC/APC conforme recomendado. O conector SC/APC (angular polished) é o padrão para redes PON e minimiza reflexões.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fiber.connectorType",
+          "operator": "not_in",
+          "value": ["SC/APC", "LC/APC"]
+        },
+        {
+          "field": "ited.collectiveNetwork.hasFiber",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Conector de fibra: {ited.fiber.connectorType}",
+      "requiredValue": "Conectores SC/APC (ou LC/APC) para fibra monomodo",
+      "remediation": "Substituir os conectores de fibra óptica por conectores SC/APC (verde) nas terminações do ODF e nos ATI. O polimento angular (APC — 8°) reduz a reflexão para ≤ −60 dB, essencial para serviços GPON/XGS-PON. Em espaços reduzidos, aceita-se LC/APC. Todos os adaptadores e pigtails devem ser compatíveis.",
+      "enabled": true,
+      "tags": [
+        "fibra óptica",
+        "conector",
+        "SC/APC",
+        "LC/APC",
+        "ODF"
+      ]
+    },
+    {
+      "id": "ITED_050",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 73.º — Plano de Manutenção da Infraestrutura ITED",
+      "description": "Não existe plano de manutenção preventiva da infraestrutura ITED do edifício. O condomínio é responsável pela manutenção periódica da infraestrutura de telecomunicações nas partes comuns.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.maintenance.hasPreventivePlan",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">=",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Plano de manutenção: {ited.maintenance.hasPreventivePlan}",
+      "requiredValue": "Plano de manutenção preventiva obrigatório para infraestrutura ITED",
+      "remediation": "Elaborar plano de manutenção preventiva da infraestrutura ITED que inclua: inspeção visual anual do ATE e caixas de passagem, verificação de ligações de terra e continuidade, limpeza dos conectores ópticos, teste de funcionalidade dos amplificadores CATV, e atualização da documentação. O condomínio deve contratar instalador credenciado pela ANACOM para as intervenções de manutenção.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "preventiva",
+        "condomínio",
+        "ANACOM",
+        "plano"
+      ]
     }
   ]
 }
