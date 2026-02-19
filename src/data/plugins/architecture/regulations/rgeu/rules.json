@@ -4,7 +4,7 @@
   "extractedBy": "claude-regulatory-expansion",
   "extractedAt": "2026-02-17",
   "version": "2.0",
-  "totalRules": 61,
+  "totalRules": 111,
   "coverage": {
     "regulations": [
       "DL 38 382/1951 (RGEU) — Arts. 46.º-72.º",
@@ -934,6 +934,766 @@
       "remediation": "Mesmo em reabilitação com dispensa RGEU, o pé-direito não pode ser inferior a 2.40 m e devem ser garantidas condições mínimas de salubridade conforme Art. 53.º do RJRU.",
       "enabled": true,
       "tags": ["reabilitação", "salubridade", "pé-direito", "RJRU"]
+    },
+
+    {
+      "id": "ARQ-FACH2-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Durabilidade de Materiais de Fachada",
+      "description": "Os materiais de revestimento da fachada devem ter durabilidade comprovada e resistência aos agentes atmosféricos, com vida útil mínima de 30 anos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeMaterialDurabilityYears", "operator": "<", "value": 30 }
+      ],
+      "currentValueTemplate": "{architecture.facadeMaterialDurabilityYears} anos",
+      "requiredValue": "≥ 30 anos de durabilidade comprovada",
+      "remediation": "Utilizar materiais de revestimento de fachada com durabilidade comprovada (≥ 30 anos), resistentes à acção dos agentes atmosféricos, radiação UV e poluição conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["fachada", "durabilidade", "materiais", "revestimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-FACH2-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Drenagem de Fachada",
+      "description": "A fachada deve dispor de sistema de drenagem adequado, com pingadeiras, capeamentos e remates que impeçam a acumulação e infiltração de água.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeHasDrainageSystem", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sistema de drenagem de fachada obrigatório",
+      "remediation": "Prever pingadeiras nos peitoris, capeamentos nos muretes e remates adequados em todos os elementos salientes da fachada para garantir drenagem eficaz conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["fachada", "drenagem", "pingadeira", "impermeabilização", "RGEU"]
+    },
+    {
+      "id": "ARQ-FACH2-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Continuidade Térmica da Fachada",
+      "description": "A fachada deve garantir continuidade do isolamento térmico, evitando pontes térmicas planas nos elementos estruturais (pilares, vigas, lajes).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeHasThermalContinuity", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Continuidade térmica sem pontes térmicas",
+      "remediation": "Garantir a continuidade do isolamento térmico na fachada, tratando todas as pontes térmicas planas (pilares, vigas, caixas de estore) conforme Art. 56.º do RGEU e regulamentação térmica aplicável.",
+      "enabled": true,
+      "tags": ["fachada", "isolamento", "ponte térmica", "continuidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-FACH2-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Resistência ao Fogo da Fachada",
+      "description": "Os materiais de revestimento da fachada devem possuir classificação de reacção ao fogo adequada, não inferior a B-s2,d0 para edifícios com altura superior a 28m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.facadeFireResistanceCompliant", "operator": "==", "value": false },
+        { "field": "architecture.buildingHeight", "operator": ">", "value": 28 }
+      ],
+      "requiredValue": "Reacção ao fogo ≥ B-s2,d0 (edifícios > 28m)",
+      "remediation": "Utilizar materiais de revestimento de fachada com classificação de reacção ao fogo adequada (mínimo B-s2,d0 para edifícios > 28 m) conforme regulamentação de segurança contra incêndio.",
+      "enabled": true,
+      "tags": ["fachada", "incêndio", "reacção ao fogo", "materiais", "RGEU"]
+    },
+    {
+      "id": "ARQ-FACH2-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Profundidade do Embrasamento de Janelas",
+      "description": "O embrasamento (ombreira) das janelas deve ter profundidade mínima de 0.10m para protecção contra infiltrações e melhoria estética.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.windowRevealDepth", "operator": "<", "value": 0.10 }
+      ],
+      "currentValueTemplate": "{architecture.windowRevealDepth} m",
+      "requiredValue": "≥ 0.10 m de profundidade",
+      "remediation": "Garantir que o embrasamento das janelas tem profundidade mínima de 0.10 m, proporcionando protecção contra escorrências de água e sombreamento adequado conforme boas práticas do RGEU.",
+      "enabled": true,
+      "tags": ["fachada", "janela", "embrasamento", "ombreira", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ISOL-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 63.º — Isolamento Acústico entre Fogos",
+      "description": "O isolamento acústico a sons aéreos entre fogos contíguos (DnT,w) deve ser igual ou superior a 50 dB conforme RRAE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.interDwellingAcousticInsulation", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "DnT,w = {architecture.interDwellingAcousticInsulation} dB",
+      "requiredValue": "DnT,w ≥ 50 dB",
+      "remediation": "Aumentar o isolamento acústico a sons aéreos entre fogos para DnT,w ≥ 50 dB, utilizando paredes duplas com caixa de ar ou soluções equivalentes conforme RRAE e Art. 63.º do RGEU.",
+      "enabled": true,
+      "tags": ["isolamento", "acústico", "sons aéreos", "fogos", "RRAE", "RGEU"]
+    },
+    {
+      "id": "ARQ-ISOL-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Isolamento Térmico Mínimo da Cobertura",
+      "description": "A cobertura deve ter isolamento térmico com coeficiente de transmissão térmica (U) não superior a 0.40 W/(m².K) para a zona climática aplicável.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.roofThermalTransmittance", "operator": ">", "value": 0.40 }
+      ],
+      "currentValueTemplate": "U = {architecture.roofThermalTransmittance} W/(m².K)",
+      "requiredValue": "U ≤ 0.40 W/(m².K)",
+      "remediation": "Reforçar o isolamento térmico da cobertura para garantir U ≤ 0.40 W/(m².K), conforme regulamentação térmica (REH) e Arts. 53.º-55.º do RGEU.",
+      "enabled": true,
+      "tags": ["isolamento", "térmico", "cobertura", "transmitância", "REH", "RGEU"]
+    },
+    {
+      "id": "ARQ-ISOL-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 63.º — Isolamento a Sons de Percussão no Pavimento",
+      "description": "O nível de pressão sonora de percussão padronizado (L'nT,w) nos pavimentos entre fogos deve ser igual ou inferior a 60 dB.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.floorImpactSoundLevel", "operator": ">", "value": 60 }
+      ],
+      "currentValueTemplate": "L'nT,w = {architecture.floorImpactSoundLevel} dB",
+      "requiredValue": "L'nT,w ≤ 60 dB",
+      "remediation": "Melhorar o isolamento a sons de percussão nos pavimentos entre fogos para L'nT,w ≤ 60 dB, utilizando pavimentos flutuantes, mantas resilientes ou soluções equivalentes conforme RRAE.",
+      "enabled": true,
+      "tags": ["isolamento", "acústico", "percussão", "pavimento", "RRAE", "RGEU"]
+    },
+    {
+      "id": "ARQ-ISOL-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Redução Sonora da Fachada",
+      "description": "O índice de redução sonora aparente da fachada (D2m,nT,w) deve ser igual ou superior a 28 dB em zonas sensíveis e 33 dB em zonas mistas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeSoundReduction", "operator": "<", "value": 28 }
+      ],
+      "currentValueTemplate": "D2m,nT,w = {architecture.facadeSoundReduction} dB",
+      "requiredValue": "D2m,nT,w ≥ 28 dB (zona sensível) / ≥ 33 dB (zona mista)",
+      "remediation": "Aumentar o índice de redução sonora da fachada através de caixilharia com melhor desempenho acústico e/ou vidros duplos conforme RRAE.",
+      "enabled": true,
+      "tags": ["isolamento", "acústico", "fachada", "caixilharia", "RRAE", "RGEU"]
+    },
+    {
+      "id": "ARQ-ISOL-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 63.º — Tratamento Acústico de Ductos Técnicos",
+      "description": "Os ductos e courettes de instalações técnicas devem ter tratamento acústico adequado para impedir a transmissão de ruído entre fogos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.serviceShaftAcousticTreatment", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Tratamento acústico obrigatório em ductos técnicos",
+      "remediation": "Aplicar tratamento acústico nos ductos e courettes de instalações técnicas (água, esgotos, ventilação), incluindo material absorvente e selagem de travessias conforme RRAE e Art. 63.º do RGEU.",
+      "enabled": true,
+      "tags": ["isolamento", "acústico", "ducto", "courette", "instalações", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-AGUA-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 53.º — Sistema de Impermeabilização da Cobertura",
+      "description": "A cobertura deve dispor de sistema de impermeabilização adequado, com membrana contínua, remates perimetrais e pontos singulares devidamente tratados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.roofWaterproofingSystem", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sistema de impermeabilização completo na cobertura",
+      "remediation": "Instalar sistema de impermeabilização na cobertura com membrana contínua (tela asfáltica, PVC ou TPO), remates em platibandas, juntas de dilatação e pontos singulares conforme Arts. 53.º-55.º do RGEU.",
+      "enabled": true,
+      "tags": ["impermeabilização", "cobertura", "membrana", "tela", "RGEU"]
+    },
+    {
+      "id": "ARQ-AGUA-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 58.º — Impermeabilização Enterrada",
+      "description": "Todas as paredes e lajes enterradas devem ter impermeabilização exterior com membrana drenante e sistema de drenagem perimetral.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.belowGradeWaterproofing", "operator": "==", "value": false },
+        { "field": "architecture.hasBasement", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Impermeabilização enterrada obrigatória",
+      "remediation": "Aplicar impermeabilização exterior em todas as paredes e lajes enterradas, com membrana drenante, geodreno perimetral e sistema de bombagem se necessário conforme Art. 58.º do RGEU.",
+      "enabled": true,
+      "tags": ["impermeabilização", "enterrada", "cave", "drenagem", "RGEU"]
+    },
+    {
+      "id": "ARQ-AGUA-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Impermeabilização de Instalações Sanitárias",
+      "description": "O pavimento e as paredes das instalações sanitárias devem ter impermeabilização contínua, com tela ou membrana líquida, até altura mínima de 0.20m nas paredes e 1.80m na zona de duche.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.bathroomWaterproofing", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Impermeabilização de IS obrigatória",
+      "remediation": "Aplicar impermeabilização contínua no pavimento e paredes das IS (membrana líquida ou tela), com subida nas paredes ≥ 0.20 m e ≥ 1.80 m na zona de duche/banheira conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["impermeabilização", "instalação sanitária", "membrana", "RGEU"]
+    },
+    {
+      "id": "ARQ-AGUA-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 53.º — Impermeabilização de Terraços Acessíveis",
+      "description": "Os terraços acessíveis devem dispor de impermeabilização com dupla tela, protecção mecânica e pendentes mínimas de 1.5% para drenagem.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.terraceWaterproofing", "operator": "==", "value": false },
+        { "field": "architecture.hasAccessibleTerrace", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Impermeabilização de terraço obrigatória",
+      "remediation": "Aplicar impermeabilização com dupla tela nos terraços acessíveis, com protecção mecânica, camada drenante e pendentes mínimas de 1.5% para os pontos de drenagem conforme Art. 53.º do RGEU.",
+      "enabled": true,
+      "tags": ["impermeabilização", "terraço", "drenagem", "pendente", "RGEU"]
+    },
+    {
+      "id": "ARQ-AGUA-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Protecção da Fachada contra Chuva Batida",
+      "description": "A fachada deve garantir estanquidade à água da chuva, com revestimento adequado, caixilharia com classificação de estanquidade e remates impermeáveis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeRainProtection", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Protecção contra chuva batida obrigatória",
+      "remediation": "Garantir estanquidade da fachada à chuva batida, com revestimento exterior impermeável, caixilharia com classificação de estanquidade adequada (mín. classe 7A) e remates nos pontos singulares conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["impermeabilização", "fachada", "chuva", "estanquidade", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ESTAC2-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 58.º — Ventilação de Garagens",
+      "description": "As garagens devem dispor de ventilação natural ou mecânica que garanta renovação de ar suficiente para diluição de monóxido de carbono (mín. 300 m³/h por veículo).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.garageVentilationSystem", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Ventilação de garagem obrigatória (≥ 300 m³/h por veículo)",
+      "remediation": "Instalar sistema de ventilação na garagem (natural com aberturas ≥ 2.5% da área ou mecânica com ≥ 300 m³/h por veículo) com detecção de CO conforme regulamentação de segurança e Art. 58.º do RGEU.",
+      "enabled": true,
+      "tags": ["estacionamento", "garagem", "ventilação", "CO", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAC2-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 58.º — Saída de Emergência da Garagem",
+      "description": "As garagens com área superior a 200 m² devem dispor de, pelo menos, uma saída de emergência independente da rampa de veículos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.garageHasEmergencyExit", "operator": "==", "value": false },
+        { "field": "architecture.garageArea", "operator": ">", "value": 200 }
+      ],
+      "requiredValue": "Saída de emergência independente obrigatória",
+      "remediation": "Prever pelo menos uma saída de emergência na garagem, independente da rampa de veículos, com sinalização e iluminação de emergência conforme regulamentação de segurança contra incêndio.",
+      "enabled": true,
+      "tags": ["estacionamento", "garagem", "emergência", "saída", "incêndio", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAC2-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 58.º — Resistência ao Fogo da Garagem",
+      "description": "As paredes e tectos da garagem devem ter resistência ao fogo mínima de REI 120 para garagens com área > 200 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.garageFireResistance", "operator": "==", "value": false },
+        { "field": "architecture.garageArea", "operator": ">", "value": 200 }
+      ],
+      "requiredValue": "Resistência ao fogo REI 120 obrigatória",
+      "remediation": "Garantir que as paredes e tectos da garagem cumprem a resistência ao fogo mínima de REI 120, com portas corta-fogo nas comunicações com o edifício conforme regulamentação SCIE.",
+      "enabled": true,
+      "tags": ["estacionamento", "garagem", "incêndio", "resistência", "SCIE", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAC2-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 60.º — Infraestrutura para Veículos Eléctricos",
+      "description": "Em edifícios novos com mais de 10 lugares de estacionamento, deve ser prevista infraestrutura de canalização para carregamento de veículos eléctricos em pelo menos 20% dos lugares.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.evChargingInfrastructure", "operator": "==", "value": false },
+        { "field": "architecture.parkingSpaces", "operator": ">", "value": 10 }
+      ],
+      "requiredValue": "Infraestrutura EV em ≥ 20% dos lugares",
+      "remediation": "Prever infraestrutura de canalização eléctrica (tubagem e quadro eléctrico preparado) para carregamento de veículos eléctricos em pelo menos 20% dos lugares de estacionamento conforme legislação vigente.",
+      "enabled": true,
+      "tags": ["estacionamento", "veículos eléctricos", "carregamento", "infraestrutura", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAC2-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 60.º — Estacionamento para Motociclos",
+      "description": "Em edifícios com mais de 20 lugares de estacionamento automóvel, devem ser previstos lugares para motociclos na proporção mínima de 1 por cada 10 lugares automóveis.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.motorcycleParkingProvided", "operator": "==", "value": false },
+        { "field": "architecture.parkingSpaces", "operator": ">", "value": 20 }
+      ],
+      "requiredValue": "1 lugar de motociclo por cada 10 automóveis",
+      "remediation": "Prever lugares de estacionamento para motociclos na proporção mínima de 1 por cada 10 lugares automóveis, com dimensões mínimas de 1.00 m × 2.50 m conforme regulamento municipal.",
+      "enabled": true,
+      "tags": ["estacionamento", "motociclos", "garagem", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ACES-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 46.º — Largura Mínima de Escadas Comuns (1.20m)",
+      "description": "A largura dos lanços de escadas comuns ({architecture.commonStairWidth}m) deve ser igual ou superior a 1.20 m para garantir evacuação segura.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.commonStairWidth", "operator": "<", "value": 1.20 },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.commonStairWidth} m",
+      "requiredValue": "≥ 1.20 m",
+      "remediation": "Aumentar a largura dos lanços de escadas comuns para o mínimo de 1.20 m, garantindo evacuação segura dos ocupantes conforme Art. 46.º do RGEU.",
+      "enabled": true,
+      "tags": ["acessos", "escadas", "largura", "evacuação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACES-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Área Mínima do Átrio de Entrada",
+      "description": "O átrio de entrada do edifício multifamiliar ({architecture.entranceLobbyArea}m²) deve ter área mínima de 6 m² para permitir circulação adequada.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.entranceLobbyArea", "operator": "<", "value": 6.0 },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.entranceLobbyArea} m²",
+      "requiredValue": "≥ 6 m²",
+      "remediation": "Aumentar a área do átrio de entrada para o mínimo de 6 m², permitindo acesso confortável às escadas, elevador e caixas de correio conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["acessos", "átrio", "entrada", "circulação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACES-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Largura Mínima de Corredores Comuns (1.10m)",
+      "description": "A largura dos corredores de circulação comum ({architecture.commonCorridorWidth}m) deve ser igual ou superior a 1.10 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.commonCorridorWidth", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "{architecture.commonCorridorWidth} m",
+      "requiredValue": "≥ 1.10 m",
+      "remediation": "Aumentar a largura dos corredores de circulação comum para o mínimo de 1.10 m, garantindo passagem livre e acessibilidade conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["acessos", "corredor", "largura", "circulação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACES-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 46.º — Sinalização de Saídas de Emergência",
+      "description": "Todas as saídas de emergência e percursos de evacuação devem estar sinalizados com blocos autónomos de iluminação de emergência conforme SCIE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.emergencyExitSignage", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Sinalização de emergência obrigatória",
+      "remediation": "Instalar sinalização de saídas de emergência com blocos autónomos de iluminação, visíveis a partir de qualquer ponto dos percursos de evacuação conforme regulamentação SCIE.",
+      "enabled": true,
+      "tags": ["acessos", "emergência", "sinalização", "evacuação", "SCIE", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACES-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Iluminação Natural do Átrio",
+      "description": "O átrio de entrada e zonas comuns devem dispor de iluminação natural, preferencialmente por vão envidraçado ou claraboia.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.lobbyHasNaturalLight", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Iluminação natural preferencial no átrio",
+      "remediation": "Prever iluminação natural no átrio de entrada através de vão envidraçado, claraboia ou outro dispositivo que permita entrada de luz natural conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["acessos", "átrio", "iluminação", "natural", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-REAB2-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 51.º — Avaliação Estrutural Prévia à Reabilitação",
+      "description": "Antes de qualquer intervenção de reabilitação, deve ser realizada avaliação do estado de conservação estrutural do edifício por técnico qualificado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.hasStructuralAssessment", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Avaliação estrutural obrigatória",
+      "remediation": "Realizar avaliação do estado de conservação estrutural por engenheiro de estruturas antes de iniciar obras de reabilitação, incluindo levantamento de patologias e ensaios conforme Art. 51.º do RJRU.",
+      "enabled": true,
+      "tags": ["reabilitação", "estrutural", "avaliação", "conservação", "RJRU", "RGEU"]
+    },
+    {
+      "id": "ARQ-REAB2-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 52.º — Preservação de Materiais Patrimoniais",
+      "description": "Em edifícios classificados ou em zona de protecção, os materiais e elementos construtivos originais com valor patrimonial devem ser preservados ou restaurados.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.heritageMaterialPreservation", "operator": "==", "value": false },
+        { "field": "architecture.isClassifiedBuilding", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Preservação de materiais patrimoniais obrigatória",
+      "remediation": "Preservar ou restaurar materiais e elementos construtivos originais com valor patrimonial (cantarias, azulejos, estuques, carpintarias), recorrendo a técnicas compatíveis conforme Art. 52.º do RJRU e legislação de património.",
+      "enabled": true,
+      "tags": ["reabilitação", "património", "materiais", "preservação", "RJRU", "RGEU"]
+    },
+    {
+      "id": "ARQ-REAB2-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 51.º — Melhoria Energética em Reabilitação",
+      "description": "As intervenções de reabilitação devem incluir medidas de melhoria do desempenho energético, nomeadamente reforço de isolamento térmico e substituição de caixilharia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.energyUpgradeInRehab", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Melhoria energética obrigatória em reabilitação",
+      "remediation": "Incluir medidas de melhoria energética na reabilitação: reforço de isolamento térmico (paredes, cobertura), substituição de caixilharia e instalação de sistemas eficientes conforme REH e Art. 51.º do RJRU.",
+      "enabled": true,
+      "tags": ["reabilitação", "energia", "isolamento", "eficiência", "REH", "RGEU"]
+    },
+    {
+      "id": "ARQ-REAB2-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 51.º — Avaliação de Vulnerabilidade Sísmica",
+      "description": "Em reabilitações significativas (custo > 25% do valor do edifício), deve ser realizada avaliação da vulnerabilidade sísmica e, se necessário, reforço estrutural.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.seismicAssessmentDone", "operator": "==", "value": false },
+        { "field": "architecture.isSignificantRehab", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Avaliação sísmica obrigatória em reabilitações significativas",
+      "remediation": "Realizar avaliação da vulnerabilidade sísmica por engenheiro especialista e propor medidas de reforço estrutural quando necessário, conforme Eurocódigo 8 e Art. 51.º do RJRU.",
+      "enabled": true,
+      "tags": ["reabilitação", "sísmica", "vulnerabilidade", "reforço", "Eurocódigo", "RGEU"]
+    },
+    {
+      "id": "ARQ-REAB2-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 53.º — Requisitos de Reconversão de Uso",
+      "description": "A reconversão de uso (ex.: armazém para habitação) deve cumprir todos os requisitos regulamentares do novo uso, incluindo áreas mínimas, iluminação e ventilação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "architecture.isAdaptiveReuse", "operator": "==", "value": true },
+        { "field": "architecture.adaptiveReuseCompliance", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Conformidade com requisitos do novo uso",
+      "remediation": "Garantir que a reconversão de uso cumpre todos os requisitos regulamentares do novo uso pretendido, incluindo áreas mínimas, pé-direito, iluminação natural, ventilação e acessibilidade conforme RGEU e Art. 53.º do RJRU.",
+      "enabled": true,
+      "tags": ["reabilitação", "reconversão", "uso", "adaptação", "RJRU", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-COND-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Compartimento de Resíduos Sólidos",
+      "description": "O edifício multifamiliar deve dispor de compartimento de resíduos sólidos ventilado, com pavimento lavável e ponto de água, acessível aos moradores.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasRefuseRoom", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Compartimento de resíduos obrigatório",
+      "remediation": "Prever compartimento de resíduos sólidos no edifício, com ventilação natural ou mecânica, pavimento lavável, ponto de água e capacidade para contentores de separação selectiva conforme regulamentação municipal.",
+      "enabled": true,
+      "tags": ["condomínio", "resíduos", "lixo", "áreas comuns", "RGEU"]
+    },
+    {
+      "id": "ARQ-COND-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Arrecadação para Bicicletas",
+      "description": "Em edifícios novos multifamiliares com mais de 6 fogos, deve ser previsto espaço para estacionamento de bicicletas com acesso fácil ao exterior.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasBicycleStorage", "operator": "==", "value": false },
+        { "field": "architecture.numberOfDwellings", "operator": ">", "value": 6 }
+      ],
+      "requiredValue": "Espaço para bicicletas recomendado (> 6 fogos)",
+      "remediation": "Prever espaço para estacionamento de bicicletas no edifício, com acesso fácil ao exterior, suportes adequados e capacidade mínima de 1 lugar por fogo conforme boas práticas de mobilidade sustentável.",
+      "enabled": true,
+      "tags": ["condomínio", "bicicletas", "mobilidade", "áreas comuns", "RGEU"]
+    },
+    {
+      "id": "ARQ-COND-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Caixas de Correio Normalizadas",
+      "description": "O edifício multifamiliar deve dispor de caixas de correio normalizadas (EN 13724) instaladas em zona comum acessível, com uma caixa por fogo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasNormalizedMailboxes", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Caixas de correio normalizadas (1 por fogo)",
+      "remediation": "Instalar caixas de correio normalizadas (EN 13724) no átrio de entrada ou zona acessível do exterior, com uma caixa por fogo e identificação alfanumérica conforme regulamentação postal.",
+      "enabled": true,
+      "tags": ["condomínio", "caixas de correio", "correio", "áreas comuns", "RGEU"]
+    },
+    {
+      "id": "ARQ-COND-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Iluminação de Áreas Comuns",
+      "description": "As áreas comuns do edifício (átrio, escadas, corredores, garagem) devem ter iluminação artificial adequada com temporizadores ou sensores de presença.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.commonAreaLighting", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Iluminação de áreas comuns obrigatória",
+      "remediation": "Instalar iluminação artificial adequada em todas as áreas comuns (átrio, escadas, corredores, garagem), com temporizadores ou sensores de presença para eficiência energética conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["condomínio", "iluminação", "áreas comuns", "eficiência", "RGEU"]
+    },
+    {
+      "id": "ARQ-COND-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Compartimento de Serviços do Edifício",
+      "description": "O edifício multifamiliar deve dispor de compartimento técnico para instalações de serviços (quadro eléctrico geral, contadores, telecomunicações).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasBuildingServiceRoom", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Compartimento de serviços obrigatório",
+      "remediation": "Prever compartimento de serviços do edifício para alojamento do quadro eléctrico geral, contadores de água, gás e electricidade, e equipamentos de telecomunicações conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["condomínio", "serviços", "compartimento técnico", "áreas comuns", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-TERR2-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 57.º — Carga Estrutural de Varandas",
+      "description": "As varandas e terraços devem ser dimensionados para uma sobrecarga mínima de 3.0 kN/m² (varanda de habitação) ou conforme Eurocódigo 1.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.balconyDesignLoad", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "{architecture.balconyDesignLoad} kN/m²",
+      "requiredValue": "≥ 3.0 kN/m² (Eurocódigo 1)",
+      "remediation": "Dimensionar varandas e terraços para sobrecarga mínima de 3.0 kN/m² conforme Eurocódigo 1 (EN 1991-1-1), considerando cargas permanentes adicionais de revestimentos e guarda-corpos.",
+      "enabled": true,
+      "tags": ["terraço", "varanda", "carga", "estrutural", "Eurocódigo", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERR2-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 57.º — Privacidade entre Varandas Contíguas",
+      "description": "As varandas contíguas entre fogos diferentes devem dispor de separação opaca com altura mínima de 1.60m para garantir privacidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.balconyPrivacyScreenHeight", "operator": "<", "value": 1.60 },
+        { "field": "architecture.hasAdjacentBalconies", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.balconyPrivacyScreenHeight} m",
+      "requiredValue": "≥ 1.60 m de separação opaca",
+      "remediation": "Instalar separação opaca entre varandas contíguas de fogos diferentes, com altura mínima de 1.60 m, garantindo privacidade visual conforme Art. 57.º do RGEU.",
+      "enabled": true,
+      "tags": ["terraço", "varanda", "privacidade", "separação", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERR2-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 53.º — Drenagem de Floreiras",
+      "description": "As floreiras integradas em varandas e terraços devem ter sistema de drenagem próprio, com impermeabilização e escoamento para a rede pluvial.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.planterDrainageSystem", "operator": "==", "value": false },
+        { "field": "architecture.hasIntegratedPlanters", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Drenagem de floreiras obrigatória",
+      "remediation": "Prever sistema de drenagem nas floreiras integradas, com furos de escoamento, camada drenante, impermeabilização e ligação à rede pluvial para evitar infiltrações conforme Art. 53.º do RGEU.",
+      "enabled": true,
+      "tags": ["terraço", "varanda", "floreira", "drenagem", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERR2-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 53.º — Pendente de Drenagem de Varandas",
+      "description": "O pavimento das varandas e terraços deve ter pendente mínima de 1.5% para drenagem eficaz das águas pluviais, direccionada para os ralos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.balconyFloorSlope", "operator": "<", "value": 1.5 }
+      ],
+      "currentValueTemplate": "{architecture.balconyFloorSlope}%",
+      "requiredValue": "≥ 1.5% de pendente",
+      "remediation": "Garantir pendente mínima de 1.5% no pavimento de varandas e terraços, direccionada para os ralos de drenagem, evitando acumulação de água conforme Art. 53.º do RGEU.",
+      "enabled": true,
+      "tags": ["terraço", "varanda", "pendente", "drenagem", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERR2-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 49.º — Altura do Guarda-Corpo em Terraços",
+      "description": "A altura do guarda-corpo em terraços acessíveis ({architecture.terraceGuardHeight}m) deve ser igual ou superior a 1.10 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.terraceGuardHeight", "operator": "<", "value": 1.10 },
+        { "field": "architecture.hasAccessibleTerrace", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.terraceGuardHeight} m",
+      "requiredValue": "≥ 1.10 m",
+      "remediation": "Aumentar a altura do guarda-corpo nos terraços acessíveis para o mínimo de 1.10 m, sem aberturas que permitam a passagem de uma esfera de 0.12 m conforme regulamentação de segurança.",
+      "enabled": true,
+      "tags": ["terraço", "guarda-corpo", "altura", "segurança", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-INST-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Compartimento de Contadores Eléctricos",
+      "description": "O edifício deve dispor de compartimento próprio para contadores eléctricos, ventilado, com acesso pela zona comum e dimensões conforme RTIEBT.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasElectricalMeterRoom", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Compartimento de contadores eléctricos obrigatório",
+      "remediation": "Prever compartimento de contadores eléctricos no edifício, com ventilação, porta corta-fogo, acesso pela zona comum e dimensões conformes com RTIEBT e regulamentação do distribuidor.",
+      "enabled": true,
+      "tags": ["instalações", "electricidade", "contadores", "compartimento", "RTIEBT", "RGEU"]
+    },
+    {
+      "id": "ARQ-INST-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Localização de Contadores de Água",
+      "description": "Os contadores de água devem estar localizados em zona comum acessível para leitura, preferencialmente no piso de entrada ou em armário na fachada.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.waterMeterAccessible", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Contadores de água em zona acessível",
+      "remediation": "Instalar contadores de água em zona comum acessível para leitura (armário na fachada, caixa de visita ou compartimento técnico no piso de entrada) conforme regulamentação da entidade gestora.",
+      "enabled": true,
+      "tags": ["instalações", "água", "contadores", "localização", "RGEU"]
+    },
+    {
+      "id": "ARQ-INST-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Ventilação do Compartimento de Gás",
+      "description": "O compartimento ou armário de contadores de gás deve ser ventilado permanentemente, com aberturas inferior e superior de área livre mínima de 200 cm² cada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.gasMeterVentilation", "operator": "==", "value": false },
+        { "field": "architecture.hasGasSupply", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Ventilação permanente do compartimento de gás",
+      "remediation": "Garantir ventilação permanente no compartimento de contadores de gás, com abertura inferior e superior de área livre mínima de 200 cm² cada, conforme regulamentação de gás (DL 521/99).",
+      "enabled": true,
+      "tags": ["instalações", "gás", "ventilação", "contadores", "segurança", "RGEU"]
+    },
+    {
+      "id": "ARQ-INST-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Acesso a Ductos Técnicos",
+      "description": "Os ductos e courettes de instalações técnicas devem ter portas de visita ou painéis amovíveis em cada piso para permitir manutenção e reparação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.technicalShaftAccess", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Acesso a ductos técnicos em cada piso",
+      "remediation": "Prever portas de visita ou painéis amovíveis nos ductos técnicos em cada piso, com dimensões mínimas de 0.40 m × 0.40 m para permitir manutenção e reparação das instalações conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["instalações", "ducto", "courette", "manutenção", "acesso", "RGEU"]
+    },
+    {
+      "id": "ARQ-INST-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Compartimento de Telecomunicações (ITED)",
+      "description": "O edifício deve dispor de armário de telecomunicações do edifício (ATE) conforme regulamento ITED, com dimensões adequadas ao número de fogos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasTelecomRoom", "operator": "==", "value": false },
+        { "field": "architecture.isMultifamily", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Armário de telecomunicações (ATE) obrigatório",
+      "remediation": "Prever armário de telecomunicações do edifício (ATE) conforme regulamento ITED, com dimensões adequadas ao número de fogos e equipamentos de distribuição de redes conforme DL 123/2009.",
+      "enabled": true,
+      "tags": ["instalações", "telecomunicações", "ITED", "ATE", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-DIM-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima de Quarto (10.5 m²)",
+      "description": "A área do quarto ({architecture.bedroomArea}m²) é inferior ao mínimo regulamentar de 10.5 m² para o quarto principal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.bedroomArea", "operator": "<", "value": 10.5 },
+        { "field": "architecture.isMainBedroom", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.bedroomArea} m²",
+      "requiredValue": "≥ 10.5 m²",
+      "remediation": "Aumentar a área do quarto principal para o mínimo de 10.5 m², com dimensão linear mínima de 2.70 m conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["dimensionamento", "quarto", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-DIM-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima de Cozinha (6 m²)",
+      "description": "A área da cozinha ({architecture.kitchenAreaMeasured}m²) é inferior ao mínimo regulamentar de 6 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.kitchenAreaMeasured", "operator": "<", "value": 6.0 }
+      ],
+      "currentValueTemplate": "{architecture.kitchenAreaMeasured} m²",
+      "requiredValue": "≥ 6.0 m²",
+      "remediation": "Aumentar a área da cozinha para o mínimo de 6.0 m², com largura mínima de 2.10 m e espaço para bancada, fogão, lava-loiça e frigorífico conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["dimensionamento", "cozinha", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-DIM-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Área Mínima de Instalação Sanitária (3.5 m²)",
+      "description": "A área da instalação sanitária completa ({architecture.wcAreaMeasured}m²) é inferior ao mínimo de 3.5 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.wcAreaMeasured", "operator": "<", "value": 3.5 }
+      ],
+      "currentValueTemplate": "{architecture.wcAreaMeasured} m²",
+      "requiredValue": "≥ 3.5 m²",
+      "remediation": "Aumentar a área da instalação sanitária completa para o mínimo de 3.5 m², com espaço para sanita, lavatório e base de duche ou banheira conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["dimensionamento", "instalação sanitária", "WC", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-DIM-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima da Sala de Estar (12 m²)",
+      "description": "A área da sala de estar ({architecture.livingAreaMeasured}m²) é inferior ao mínimo regulamentar de 12 m² para fogos T1+.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.livingAreaMeasured", "operator": "<", "value": 12.0 },
+        { "field": "architecture.numberOfBedrooms", "operator": ">=", "value": 1 }
+      ],
+      "currentValueTemplate": "{architecture.livingAreaMeasured} m²",
+      "requiredValue": "≥ 12.0 m² (T1+)",
+      "remediation": "Aumentar a área da sala de estar para o mínimo de 12.0 m² (fogos T1+), com dimensão linear mínima de 3.0 m conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["dimensionamento", "sala", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-DIM-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Área Mínima de Arrumos (2 m²)",
+      "description": "A área do compartimento de arrumos/despensa ({architecture.storageAreaMeasured}m²) é inferior ao mínimo de 2 m².",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.storageAreaMeasured", "operator": "<", "value": 2.0 },
+        { "field": "architecture.hasStorageRoom", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.storageAreaMeasured} m²",
+      "requiredValue": "≥ 2.0 m²",
+      "remediation": "Aumentar a área do compartimento de arrumos/despensa para o mínimo de 2.0 m² conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["dimensionamento", "arrumos", "despensa", "área mínima", "RGEU"]
     }
   ]
 }

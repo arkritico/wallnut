@@ -4862,6 +4862,1211 @@
         "manga",
         "humidade"
       ]
+    },
+    {
+      "id": "GAS-AQS-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 48.º",
+      "description": "O esquentador a gás deve garantir um caudal mínimo de água quente de 10 l/min para uma elevação de temperatura de 25°C, assegurando o conforto e a funcionalidade da instalação sanitária.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.flowRateLpm",
+          "operator": "<",
+          "value": 10
+        },
+        {
+          "field": "gas.waterHeater.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.flowRateLpm} l/min",
+      "requiredValue": ">= 10 l/min para ΔT de 25°C",
+      "remediation": "Substituir o esquentador por um modelo com caudal mínimo de 10 l/min (ΔT 25°C). Verificar a potência nominal do aparelho e a pressão de alimentação de água para garantir o caudal exigido.",
+      "enabled": true,
+      "tags": ["AQS", "esquentador", "caudal", "água quente"]
+    },
+    {
+      "id": "GAS-AQS-02",
+      "regulationId": "dl-521-99",
+      "article": "Art. 49.º",
+      "description": "O esquentador ou caldeira mural a gás de circuito aberto (tipo A ou B) deve possuir conduta de evacuação de gases de combustão ligada a chaminé regulamentar ou a terminal de parede aprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.hasFlueConnection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.waterHeater.circuitType",
+          "operator": "in",
+          "value": ["typeA", "typeB"]
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.hasFlueConnection}",
+      "requiredValue": "Conduta de evacuação de gases ligada a chaminé ou terminal aprovado",
+      "remediation": "Instalar conduta de evacuação de gases de combustão em material resistente à corrosão e ao calor, ligada a chaminé vertical regulamentar ou a terminal de parede conforme NP 1037-1. Verificar o tiragem e estanquidade da ligação.",
+      "enabled": true,
+      "tags": ["AQS", "esquentador", "conduta", "evacuação", "chaminé"]
+    },
+    {
+      "id": "GAS-AQS-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 50.º",
+      "description": "O esquentador a gás deve respeitar uma distância mínima de 0,40 m a materiais combustíveis (mobiliário, cortinas, revestimentos) em todas as direções laterais e superiores.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.clearanceToCombustiblesMm",
+          "operator": "<",
+          "value": 400
+        },
+        {
+          "field": "gas.waterHeater.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.clearanceToCombustiblesMm} mm",
+      "requiredValue": ">= 400 mm de distância a materiais combustíveis",
+      "remediation": "Reposicionar o esquentador ou remover os materiais combustíveis da zona envolvente para garantir uma distância mínima de 400 mm em todas as direções laterais e superiores. Aplicar proteção térmica quando a distância regulamentar não for praticável.",
+      "enabled": true,
+      "tags": ["AQS", "esquentador", "distância", "combustíveis", "segurança"]
+    },
+    {
+      "id": "GAS-AQS-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 51.º",
+      "description": "Nas instalações de AQS centralizadas, deve ser instalada uma válvula misturadora termostática à saída do depósito de água quente para limitar a temperatura de distribuição a um máximo de 50°C, prevenindo queimaduras.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.hasThermostatic MixingValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.waterHeater.isCentralized",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.hasThermostaticMixingValve}",
+      "requiredValue": "Válvula misturadora termostática instalada (limite 50°C)",
+      "remediation": "Instalar válvula misturadora termostática certificada à saída do depósito de AQS, regulada para uma temperatura máxima de distribuição de 50°C. Verificar o correto funcionamento e calibração periódica da válvula.",
+      "enabled": true,
+      "tags": ["AQS", "termostática", "válvula misturadora", "queimaduras", "50°C"]
+    },
+    {
+      "id": "GAS-AQS-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 52.º",
+      "description": "O depósito de AQS alimentado por caldeira a gás deve manter a água armazenada a uma temperatura mínima de 60°C (ciclo anti-Legionella) para prevenir a proliferação de Legionella pneumophila.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.waterHeater.storageTemperatureC",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "gas.waterHeater.hasStorageTank",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.waterHeater.storageTemperatureC} °C",
+      "requiredValue": ">= 60°C no depósito de armazenamento",
+      "remediation": "Programar a caldeira ou o controlador do depósito para manter a temperatura de armazenamento a um mínimo de 60°C. Implementar ciclo semanal anti-Legionella a 70°C durante 30 minutos. Verificar e documentar as temperaturas periodicamente.",
+      "enabled": true,
+      "tags": ["AQS", "Legionella", "temperatura", "depósito", "saúde pública"]
+    },
+    {
+      "id": "GAS-AQUEC-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 30.º",
+      "description": "A casa da caldeira ou compartimento de instalação de caldeira a gás com potência superior a 30 kW deve dispor de ventilação permanente dimensionada para o caudal de ar de combustão e ventilação geral.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.boiler.roomHasPermanentVentilation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.boiler.thermalPowerKw",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "{gas.boiler.roomHasPermanentVentilation}",
+      "requiredValue": "Ventilação permanente na casa da caldeira (potência > 30 kW)",
+      "remediation": "Instalar aberturas de ventilação permanente (alta e baixa) no compartimento da caldeira, dimensionadas conforme a potência instalada. A abertura inferior deve ter no mínimo 6 cm² por kW de potência instalada. A abertura superior deve ter pelo menos metade da área da inferior.",
+      "enabled": true,
+      "tags": ["aquecimento", "caldeira", "ventilação", "casa da caldeira", "combustão"]
+    },
+    {
+      "id": "GAS-AQUEC-02",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 31.º",
+      "description": "O diâmetro da conduta de evacuação de gases da caldeira deve ser igual ou superior ao diâmetro da boca de saída de gases do aparelho, nunca inferior a 80 mm para potências até 30 kW.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.boiler.flueDiameterMm",
+          "operator": "<",
+          "value": 80
+        },
+        {
+          "field": "gas.boiler.thermalPowerKw",
+          "operator": "<=",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "{gas.boiler.flueDiameterMm} mm",
+      "requiredValue": ">= 80 mm para caldeiras até 30 kW",
+      "remediation": "Substituir a conduta de evacuação de gases por uma com diâmetro mínimo de 80 mm (caldeiras até 30 kW) ou igual ao diâmetro da boca de saída do aparelho, o que for maior. Verificar a estanquidade de todas as juntas e a inclinação ascendente mínima de 3%.",
+      "enabled": true,
+      "tags": ["aquecimento", "caldeira", "conduta", "diâmetro", "evacuação"]
+    },
+    {
+      "id": "GAS-AQUEC-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 32.º",
+      "description": "O compartimento de instalação de caldeira a gás de circuito aberto deve ter abertura de admissão de ar de combustão direta do exterior com secção livre mínima de 6 cm² por kW de potência nominal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.boiler.hasCombustionAirSupply",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.boiler.circuitType",
+          "operator": "in",
+          "value": ["typeA", "typeB"]
+        }
+      ],
+      "currentValueTemplate": "{gas.boiler.hasCombustionAirSupply}",
+      "requiredValue": "Admissão de ar de combustão direta do exterior (6 cm²/kW)",
+      "remediation": "Instalar abertura de admissão de ar de combustão comunicando diretamente com o exterior, com secção livre mínima de 6 cm² por kW de potência nominal da caldeira. A abertura deve ser inobstruível e protegida com grelha anti-intrusão.",
+      "enabled": true,
+      "tags": ["aquecimento", "caldeira", "ar combustão", "admissão", "exterior"]
+    },
+    {
+      "id": "GAS-AQUEC-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 33.º",
+      "description": "A caldeira a gás deve estar equipada com válvula de segurança calibrada para a pressão máxima de serviço do circuito de aquecimento, com descarga visível e canalizada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.boiler.hasSafetyValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.boiler.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.boiler.hasSafetyValve}",
+      "requiredValue": "Válvula de segurança calibrada e com descarga canalizada",
+      "remediation": "Instalar válvula de segurança certificada EN 1268 no circuito primário da caldeira, calibrada para a pressão máxima de serviço (tipicamente 3 bar). A descarga deve ser canalizada para ponto visível e seguro, sem possibilidade de obstrução.",
+      "enabled": true,
+      "tags": ["aquecimento", "caldeira", "válvula segurança", "pressão", "descarga"]
+    },
+    {
+      "id": "GAS-AQUEC-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 34.º",
+      "description": "As caldeiras de condensação a gás devem possuir sistema de drenagem de condensados ligado à rede de esgotos, com sifão e neutralizador de pH quando exigido pelo fabricante.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.boiler.hasCondensateDrain",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.boiler.isCondensingType",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.boiler.hasCondensateDrain}",
+      "requiredValue": "Drenagem de condensados com sifão ligada à rede de esgotos",
+      "remediation": "Instalar sistema de drenagem de condensados com sifão para impedir o retorno de gases de esgoto. Ligar a drenagem à rede de águas residuais domésticas. Instalar neutralizador de pH se exigido pelo fabricante (condensados com pH entre 3 e 5). Verificar o escoamento livre e a ausência de obstruções.",
+      "enabled": true,
+      "tags": ["aquecimento", "caldeira condensação", "condensados", "drenagem", "neutralizador"]
+    },
+    {
+      "id": "GAS-COMER-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 55.º",
+      "description": "As cozinhas comerciais com aparelhos a gás devem dispor de sistema de extração mecânica com caudal mínimo de 25 renovações de ar por hora, com hotte sobre cada aparelho de cocção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.commercial.kitchen.hasExtractionSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercial.kitchen.hasGasAppliances",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.commercial.kitchen.hasExtractionSystem}",
+      "requiredValue": "Sistema de extração mecânica com mínimo 25 renovações/hora",
+      "remediation": "Instalar sistema de extração mecânica na cozinha comercial com caudal dimensionado para pelo menos 25 renovações de ar por hora. Cada aparelho de cocção a gás deve ter hotte de captação com filtros de gordura. Garantir a admissão de ar de compensação equivalente ao caudal extraído.",
+      "enabled": true,
+      "tags": ["comercial", "cozinha", "extração", "ventilação", "hotte"]
+    },
+    {
+      "id": "GAS-COMER-02",
+      "regulationId": "dl-521-99",
+      "article": "Art. 56.º",
+      "description": "Na entrada de cada fração comercial com instalação de gás deve existir válvula de corte geral acessível, devidamente identificada e de manobra rápida (1/4 de volta).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.commercial.hasEntranceShutOffValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercial.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.commercial.hasEntranceShutOffValve}",
+      "requiredValue": "Válvula de corte geral na entrada da fração comercial",
+      "remediation": "Instalar válvula de corte geral de gás de 1/4 de volta na entrada da fração comercial, em local acessível e devidamente identificada com sinalética normalizada. A válvula deve ser operável sem necessidade de ferramentas especiais.",
+      "enabled": true,
+      "tags": ["comercial", "válvula corte", "entrada", "acessibilidade", "segurança"]
+    },
+    {
+      "id": "GAS-COMER-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 57.º",
+      "description": "Estabelecimentos comerciais com potência instalada a gás superior a 70 kW devem possuir sistema de deteção de gás com alarme sonoro e visual, e corte automático do fornecimento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.commercial.hasGasAlarmSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercial.totalPowerKw",
+          "operator": ">",
+          "value": 70
+        }
+      ],
+      "currentValueTemplate": "{gas.commercial.hasGasAlarmSystem}",
+      "requiredValue": "Sistema de deteção e alarme de gás com corte automático",
+      "remediation": "Instalar sistema de deteção de gás com central de alarme, detetores nos compartimentos com aparelhos a gás e eletroválvula de corte automático. O sistema deve emitir alarme sonoro (>85 dB) e visual. Contratar manutenção periódica semestral do sistema de deteção.",
+      "enabled": true,
+      "tags": ["comercial", "alarme", "deteção", "corte automático", "potência"]
+    },
+    {
+      "id": "GAS-COMER-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 58.º",
+      "description": "O contador de gás em instalações comerciais deve ser dimensionado para o caudal máximo simultâneo previsto, com calibre mínimo G4 para potências até 30 kW e G6 para potências até 70 kW.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.commercial.meterSizeAdequate",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercial.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.commercial.meterSize}",
+      "requiredValue": "Contador dimensionado para caudal máximo simultâneo (G4/G6 conforme potência)",
+      "remediation": "Verificar o dimensionamento do contador de gás face à potência total instalada e ao caudal máximo simultâneo. Solicitar à empresa distribuidora a substituição do contador por calibre adequado: G4 até 30 kW, G6 até 70 kW, G10 ou superior acima de 70 kW.",
+      "enabled": true,
+      "tags": ["comercial", "contador", "dimensionamento", "caudal", "calibre"]
+    },
+    {
+      "id": "GAS-COMER-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 59.º",
+      "description": "Os estabelecimentos comerciais com instalação de gás devem possuir procedimento documentado de corte de emergência, afixado em local visível e do conhecimento de todos os colaboradores.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.commercial.hasEmergencyProcedure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercial.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.commercial.hasEmergencyProcedure}",
+      "requiredValue": "Procedimento de emergência documentado e afixado",
+      "remediation": "Elaborar procedimento escrito de corte de emergência de gás, incluindo: localização das válvulas de corte, sequência de operações, contactos de emergência (bombeiros, empresa distribuidora, técnico responsável). Afixar em local visível junto à entrada e à cozinha. Formar todos os colaboradores anualmente.",
+      "enabled": true,
+      "tags": ["comercial", "emergência", "procedimento", "formação", "sinalética"]
+    },
+    {
+      "id": "GAS-SOLAR-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 60.º",
+      "description": "Em sistemas solares térmicos com apoio a gás, a caldeira de apoio deve ser dimensionada para cobrir 100% das necessidades de AQS quando a contribuição solar for insuficiente, com arranque automático.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.solarHybrid.gasBackupCovers100Percent",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.solarHybrid.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.solarHybrid.gasBackupCovers100Percent}",
+      "requiredValue": "Apoio a gás dimensionado para 100% das necessidades de AQS",
+      "remediation": "Verificar o dimensionamento da caldeira de apoio a gás para cobrir a totalidade das necessidades de AQS do edifício. O sistema de controlo deve garantir o arranque automático da caldeira quando a temperatura do depósito solar descer abaixo do valor de referência (tipicamente 45°C).",
+      "enabled": true,
+      "tags": ["solar", "híbrido", "apoio gás", "dimensionamento", "AQS"]
+    },
+    {
+      "id": "GAS-SOLAR-02",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 61.º",
+      "description": "O sistema híbrido solar-gás deve possuir controlador integrado que gere a prioridade solar e o arranque do apoio a gás, evitando o funcionamento simultâneo desnecessário dos dois sistemas.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.solarHybrid.hasIntegratedController",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.solarHybrid.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.solarHybrid.hasIntegratedController}",
+      "requiredValue": "Controlador integrado de gestão solar-gás",
+      "remediation": "Instalar controlador integrado que monitorize a temperatura do depósito solar e do circuito de apoio a gás. O controlador deve dar prioridade à energia solar e apenas acionar a caldeira a gás quando necessário, otimizando o consumo energético.",
+      "enabled": true,
+      "tags": ["solar", "híbrido", "controlador", "prioridade", "eficiência"]
+    },
+    {
+      "id": "GAS-SOLAR-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 62.º",
+      "description": "O circuito solar com apoio de caldeira a gás deve possuir proteção anticongelamento, quer por fluido térmico com glicol quer por sistema de drenagem automática (drain-back).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.solarHybrid.hasAntiFreezeProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.solarHybrid.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.solarHybrid.hasAntiFreezeProtection}",
+      "requiredValue": "Proteção anticongelamento no circuito solar",
+      "remediation": "Garantir proteção anticongelamento no circuito primário solar: utilizar fluido térmico com mistura de propilenoglicol adequada à zona climática (tipicamente 30-40%) ou instalar sistema drain-back. Verificar anualmente a concentração do glicol e o pH do fluido.",
+      "enabled": true,
+      "tags": ["solar", "anticongelamento", "glicol", "drain-back", "proteção"]
+    },
+    {
+      "id": "GAS-SOLAR-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 63.º",
+      "description": "O vaso de expansão do circuito solar integrado com caldeira a gás deve ser dimensionado para absorver a dilatação do fluido e a vaporização nos coletores em situação de estagnação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.solarHybrid.expansionVesselSizedCorrectly",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.solarHybrid.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.solarHybrid.expansionVesselSizedCorrectly}",
+      "requiredValue": "Vaso de expansão dimensionado para estagnação",
+      "remediation": "Redimensionar o vaso de expansão do circuito solar para absorver o volume de vaporização dos coletores em situação de estagnação, acrescido da dilatação normal do fluido. Utilizar a fórmula: V = (Vfluido × β) + Vvapor + Vreserva. Substituir o vaso se o volume atual for insuficiente.",
+      "enabled": true,
+      "tags": ["solar", "vaso expansão", "estagnação", "dimensionamento", "segurança"]
+    },
+    {
+      "id": "GAS-SOLAR-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 64.º",
+      "description": "O sistema de controlo do conjunto solar-gás deve garantir prioridade absoluta à energia solar, impedindo o arranque da caldeira a gás enquanto a temperatura do acumulador solar for superior ao valor de referência.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.solarHybrid.hasSolarPriorityControl",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.solarHybrid.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.solarHybrid.hasSolarPriorityControl}",
+      "requiredValue": "Controlo de prioridade solar implementado",
+      "remediation": "Configurar o sistema de controlo para dar prioridade absoluta à energia solar. A caldeira a gás só deve arrancar quando a temperatura do acumulador solar descer abaixo do set-point definido (tipicamente 40-45°C) e a irradiação solar for insuficiente para recuperação em tempo útil.",
+      "enabled": true,
+      "tags": ["solar", "prioridade", "controlo", "eficiência energética", "gás apoio"]
+    },
+    {
+      "id": "GAS-REDE-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 20.º",
+      "description": "O dimensionamento da rede de distribuição interna de gás deve ser efetuado por cálculo hidráulico, considerando o caudal simultâneo, comprimento equivalente e perda de carga admissível.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.network.hasPipeSizingCalculation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.network.hasPipeSizingCalculation}",
+      "requiredValue": "Cálculo hidráulico de dimensionamento documentado",
+      "remediation": "Realizar cálculo hidráulico de dimensionamento da rede interna de gás conforme Portaria 361/98, considerando: caudais nominais dos aparelhos, fator de simultaneidade, comprimentos equivalentes (incluindo acessórios), velocidade máxima admissível (20 m/s) e perda de carga máxima total.",
+      "enabled": true,
+      "tags": ["rede", "dimensionamento", "cálculo", "hidráulico", "tubagem"]
+    },
+    {
+      "id": "GAS-REDE-02",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 21.º",
+      "description": "A perda de carga total na rede de distribuição interna de gás não deve exceder 1,5 mbar desde o contador até ao aparelho mais desfavorável.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.network.maxPressureDropMbar",
+          "operator": ">",
+          "value": 1.5
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.network.maxPressureDropMbar} mbar",
+      "requiredValue": "<= 1,5 mbar de perda de carga total",
+      "remediation": "Recalcular e redimensionar os troços da rede interna de gás para que a perda de carga total entre o contador e o aparelho mais desfavorável não exceda 1,5 mbar. Aumentar o diâmetro dos troços críticos ou reduzir o número de acessórios (curvas, tês) no percurso.",
+      "enabled": true,
+      "tags": ["rede", "perda de carga", "1.5 mbar", "pressão", "dimensionamento"]
+    },
+    {
+      "id": "GAS-REDE-03",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 22.º",
+      "description": "As tubagens interiores de gás devem ser em cobre (EN 1057), aço (EN 10255) ou aço inoxidável (EN 10312), com os tratamentos de superfície e ligações adequados ao tipo de gás.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.network.pipeMaterialCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.network.pipeMaterial}",
+      "requiredValue": "Cobre EN 1057, aço EN 10255 ou aço inoxidável EN 10312",
+      "remediation": "Substituir troços de tubagem em material não conforme por cobre (EN 1057, desoxidado ao fósforo), aço sem costura ou com costura (EN 10255), ou aço inoxidável (EN 10312). As ligações em cobre devem ser por brasagem forte (> 450°C). É proibido o uso de PVC ou polietileno no interior de edifícios.",
+      "enabled": true,
+      "tags": ["rede", "material", "tubagem", "cobre", "aço", "norma"]
+    },
+    {
+      "id": "GAS-REDE-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 23.º",
+      "description": "As tubagens de gás devem ser fixadas com suportes espaçados de acordo com o diâmetro: máximo 1,5 m para diâmetros até 22 mm, 2,0 m para diâmetros de 22-42 mm, e 3,0 m para diâmetros superiores.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.network.pipeSupportSpacingCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.network.pipeSupportSpacingCompliant}",
+      "requiredValue": "Suportes espaçados conforme diâmetro da tubagem",
+      "remediation": "Instalar suportes de fixação da tubagem de gás respeitando os espaçamentos máximos: 1,5 m para Ø ≤ 22 mm, 2,0 m para 22 < Ø ≤ 42 mm, 3,0 m para Ø > 42 mm. Os suportes devem permitir a dilatação térmica e não danificar o revestimento da tubagem. Fixar adicionalmente antes e depois de cada mudança de direção.",
+      "enabled": true,
+      "tags": ["rede", "suportes", "espaçamento", "fixação", "tubagem"]
+    },
+    {
+      "id": "GAS-REDE-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 24.º",
+      "description": "As tubagens de gás visíveis devem ser identificadas por pintura em cor amarela ocre (RAL 1024) ou por fita adesiva amarela com a inscrição 'GÁS', em todo o seu percurso.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.network.hasIdentificationMarking",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.network.hasIdentificationMarking}",
+      "requiredValue": "Tubagem pintada em amarelo ocre (RAL 1024) ou com fita 'GÁS'",
+      "remediation": "Pintar todas as tubagens de gás visíveis em cor amarelo ocre (RAL 1024) ou aplicar fita adesiva de identificação com a inscrição 'GÁS' a intervalos regulares (máximo 5 m e em cada mudança de direção). Nos troços embutidos, colocar fita de sinalização no revestimento indicando a presença da tubagem.",
+      "enabled": true,
+      "tags": ["rede", "identificação", "pintura", "amarelo", "RAL 1024", "sinalética"]
+    },
+    {
+      "id": "GAS-PROT-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 35.º",
+      "description": "A instalação de gás deve possuir eletroválvula de corte automático na entrada da rede interior, acionada pelo sistema de deteção de gás ou por botão de emergência acessível.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.safety.hasAutomaticShutOffValve",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.safety.hasAutomaticShutOffValve}",
+      "requiredValue": "Eletroválvula de corte automático na entrada da rede",
+      "remediation": "Instalar eletroválvula de corte automático (normalmente fechada) na entrada da rede interior de gás, após o contador. A eletroválvula deve ser comandada pelo sistema de deteção de gás e/ou por botão de emergência manual acessível. Verificar a rearme manual após atuação.",
+      "enabled": true,
+      "tags": ["proteção", "eletroválvula", "corte automático", "segurança", "entrada"]
+    },
+    {
+      "id": "GAS-PROT-02",
+      "regulationId": "dl-521-99",
+      "article": "Art. 36.º",
+      "description": "Edifícios com instalação coletiva de gás devem dispor de sistema de deteção de fugas de gás nas zonas comuns (coretes, caves, garagens), com transmissão de alarme para a portaria ou central de segurança.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.safety.hasLeakDetectionSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isCollective",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.safety.hasLeakDetectionSystem}",
+      "requiredValue": "Sistema de deteção de fugas nas zonas comuns com transmissão de alarme",
+      "remediation": "Instalar detetores de gás nas zonas comuns do edifício (coretes verticais, caves, garagens, casas de contadores) ligados a central de alarme com transmissão para a portaria ou central de segurança. Os detetores devem ser calibrados semestralmente e testados mensalmente.",
+      "enabled": true,
+      "tags": ["proteção", "deteção", "fugas", "zonas comuns", "alarme", "coletiva"]
+    },
+    {
+      "id": "GAS-PROT-03",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 37.º",
+      "description": "O sistema de deteção de gás deve ativar automaticamente a ventilação de emergência do compartimento quando a concentração de gás atingir 10% do Limite Inferior de Explosividade (LIE).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.safety.hasEmergencyVentilationActivation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.safety.hasLeakDetectionSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.safety.hasEmergencyVentilationActivation}",
+      "requiredValue": "Ventilação de emergência automática a 10% do LIE",
+      "remediation": "Configurar o sistema de deteção para ativar a ventilação mecânica de emergência quando a concentração de gás atingir 10% do LIE (1º limiar). O corte de gás deve ocorrer a 20% do LIE (2º limiar). Verificar a ligação entre a central de deteção e o quadro de comando da ventilação de emergência.",
+      "enabled": true,
+      "tags": ["proteção", "ventilação emergência", "LIE", "deteção", "automático"]
+    },
+    {
+      "id": "GAS-PROT-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 38.º",
+      "description": "As travessias de tubagens de gás em paredes e pavimentos corta-fogo devem manter a resistência ao fogo do elemento atravessado, mediante selagem com material intumescente certificado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.safety.hasFireResistantPipePenetrations",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.network.hasFireRatedWallCrossings",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.safety.hasFireResistantPipePenetrations}",
+      "requiredValue": "Selagem corta-fogo nas travessias de elementos resistentes ao fogo",
+      "remediation": "Selar todas as travessias de tubagens de gás em paredes e pavimentos com classificação de resistência ao fogo utilizando sistemas intumescentes certificados (colares, almofadas ou mástique corta-fogo). A selagem deve manter a classe de resistência ao fogo do elemento (EI 60, EI 90 ou EI 120 conforme aplicável).",
+      "enabled": true,
+      "tags": ["proteção", "corta-fogo", "travessias", "intumescente", "resistência fogo"]
+    },
+    {
+      "id": "GAS-PROT-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 39.º",
+      "description": "Todas as juntas e ligações da rede de distribuição de gás devem ser estanques, executadas por brasagem forte (cobre), soldadura (aço) ou roscadas com vedante adequado (aço), proibindo-se juntas com estopa ou fita de teflon em instalações definitivas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.safety.allJointsGasTight",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.safety.allJointsGasTight}",
+      "requiredValue": "Todas as juntas estanques por brasagem forte, soldadura ou roscado com vedante",
+      "remediation": "Verificar a estanquidade de todas as juntas da rede de gás. As ligações em cobre devem ser por brasagem forte (temperatura de fusão > 450°C). As ligações em aço devem ser soldadas ou roscadas com vedante anaeróbico aprovado para gás. Substituir qualquer junta executada com estopa ou fita de teflon.",
+      "enabled": true,
+      "tags": ["proteção", "juntas", "estanquidade", "brasagem", "soldadura", "vedante"]
+    },
+    {
+      "id": "GAS-ENSAIO-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 40.º",
+      "description": "Antes da entrada em serviço, a rede de gás deve ser submetida a ensaio de pressão a 1,5 vezes a pressão máxima de serviço (mínimo 50 mbar para baixa pressão), durante o tempo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.testing.pressureTestAt1_5xOperating",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.testing.pressureTestAt1_5xOperating}",
+      "requiredValue": "Ensaio de pressão a 1,5x a pressão de serviço (mín. 50 mbar)",
+      "remediation": "Realizar ensaio de pressão com ar ou gás inerte (azoto) a 1,5 vezes a pressão máxima de serviço (mínimo 50 mbar para redes de baixa pressão). Utilizar manómetro com resolução mínima de 0,1 mbar. Registar pressão inicial, duração e pressão final. A queda de pressão deve ser nula.",
+      "enabled": true,
+      "tags": ["ensaio", "pressão", "1.5x", "verificação", "comissionamento"]
+    },
+    {
+      "id": "GAS-ENSAIO-02",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 41.º",
+      "description": "O ensaio de estanquidade da rede de gás deve ter uma duração mínima de 15 minutos para instalações até 10 metros de tubagem, e proporcionalmente mais longo para instalações maiores.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.testing.leakTestDurationMinutes",
+          "operator": "<",
+          "value": 15
+        },
+        {
+          "field": "gas.testing.leakTestPerformed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.testing.leakTestDurationMinutes} minutos",
+      "requiredValue": ">= 15 minutos de duração do ensaio",
+      "remediation": "Repetir o ensaio de estanquidade com duração mínima de 15 minutos (instalações até 10 m). Para instalações maiores, acrescentar 1 minuto por cada metro adicional de tubagem. Durante o ensaio, a pressão deve manter-se constante. Se houver queda de pressão, localizar e reparar a fuga antes de repetir o ensaio.",
+      "enabled": true,
+      "tags": ["ensaio", "estanquidade", "duração", "15 minutos", "fuga"]
+    },
+    {
+      "id": "GAS-ENSAIO-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 42.º",
+      "description": "O resultado do ensaio de estanquidade deve ser documentado em relatório técnico assinado pelo instalador credenciado, incluindo valores de pressão, duração, temperatura ambiente e resultado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.testing.hasTightnessTestDocumentation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.testing.leakTestPerformed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.testing.hasTightnessTestDocumentation}",
+      "requiredValue": "Relatório técnico do ensaio de estanquidade assinado",
+      "remediation": "Elaborar relatório técnico do ensaio de estanquidade incluindo: identificação da instalação, data, pressão de ensaio, duração, temperatura ambiente, instrumento utilizado (marca, modelo, calibração), pressão inicial e final, resultado (aprovado/reprovado). O relatório deve ser assinado pelo técnico instalador credenciado pela DGEG.",
+      "enabled": true,
+      "tags": ["ensaio", "documentação", "relatório", "estanquidade", "técnico"]
+    },
+    {
+      "id": "GAS-ENSAIO-04",
+      "regulationId": "dl-521-99",
+      "article": "Art. 43.º",
+      "description": "A colocação em serviço (comissionamento) da instalação de gás só pode ser efetuada por técnico credenciado pela DGEG, após aprovação do ensaio de estanquidade e verificação de todos os aparelhos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.testing.commissioningByCredentialedTech",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.testing.commissioningByCredentialedTech}",
+      "requiredValue": "Comissionamento por técnico DGEG após ensaio aprovado",
+      "remediation": "Contratar técnico credenciado pela DGEG para a colocação em serviço da instalação. O comissionamento inclui: purga da rede, verificação de estanquidade com gás, regulação de pressão, teste de funcionamento de cada aparelho, verificação da combustão e emissão do certificado de conformidade.",
+      "enabled": true,
+      "tags": ["ensaio", "comissionamento", "DGEG", "técnico credenciado", "serviço"]
+    },
+    {
+      "id": "GAS-ENSAIO-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 44.º",
+      "description": "A instalação de gás deve ser submetida a inspeção de segurança anual por entidade inspetora reconhecida ou técnico credenciado, com emissão de relatório de inspeção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.testing.annualInspectionUpToDate",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.testing.annualInspectionUpToDate}",
+      "requiredValue": "Inspeção anual de segurança atualizada",
+      "remediation": "Agendar inspeção anual de segurança da instalação de gás por entidade inspetora reconhecida pela DGEG ou técnico credenciado. A inspeção deve verificar: estanquidade da rede, ventilação dos compartimentos, estado dos aparelhos, funcionamento dos dispositivos de segurança, evacuação de gases de combustão. Manter o relatório de inspeção arquivado por 5 anos.",
+      "enabled": true,
+      "tags": ["ensaio", "inspeção anual", "segurança", "relatório", "periódica"]
+    },
+    {
+      "id": "GAS-CONV-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 65.º",
+      "description": "A conversão de aparelhos a gás de um tipo de combustível para outro (ex.: GPL para gás natural) só pode ser efetuada mediante certificação do fabricante ou de entidade acreditada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.conversion.hasManufacturerCertification",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.performed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.hasManufacturerCertification}",
+      "requiredValue": "Certificação do fabricante ou entidade acreditada para conversão",
+      "remediation": "Obter certificação do fabricante do aparelho para a conversão de tipo de gás. Se o fabricante não disponibilizar kit de conversão, a conversão deve ser certificada por entidade acreditada pelo IPAC. Não é permitida a conversão artesanal ou sem documentação de conformidade.",
+      "enabled": true,
+      "tags": ["conversão", "certificação", "fabricante", "GPL", "gás natural"]
+    },
+    {
+      "id": "GAS-CONV-02",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 66.º",
+      "description": "Após a conversão de combustível, o técnico deve documentar todos os ajustes efetuados ao queimador, incluindo: pressão de injeção, caudal de gás, análise de combustão e regulação do ar primário.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.conversion.hasBurnerAdjustmentDocumentation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.performed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.hasBurnerAdjustmentDocumentation}",
+      "requiredValue": "Documentação dos ajustes do queimador após conversão",
+      "remediation": "Documentar todos os ajustes efetuados ao queimador durante a conversão: pressão de injeção (mbar), diâmetro dos injetores instalados, caudal de gás (m³/h), análise de combustão (CO, CO₂, O₂, rendimento), regulação do ar primário. Arquivar a documentação junto ao livro de manutenção do aparelho.",
+      "enabled": true,
+      "tags": ["conversão", "queimador", "ajustes", "documentação", "combustão"]
+    },
+    {
+      "id": "GAS-CONV-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 67.º",
+      "description": "Antes da conversão, deve ser verificada a compatibilidade do aparelho e de todos os seus componentes com o novo tipo de gás, incluindo regulador, válvulas, termopar e controlador de chama.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.conversion.gasTypeCompatibilityVerified",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.planned",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.gasTypeCompatibilityVerified}",
+      "requiredValue": "Compatibilidade com novo tipo de gás verificada",
+      "remediation": "Verificar junto do fabricante a compatibilidade total do aparelho com o novo tipo de gás. Confirmar que existem injetores, mola de regulador e componentes de segurança (termopar, controlador de chama, válvula de segurança) compatíveis. Se algum componente não for compatível, substituir o aparelho.",
+      "enabled": true,
+      "tags": ["conversão", "compatibilidade", "tipo gás", "componentes", "verificação"]
+    },
+    {
+      "id": "GAS-CONV-04",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 68.º",
+      "description": "Após a conversão de combustível, deve ser efetuada inspeção de segurança completa ao aparelho, incluindo ensaio de estanquidade, análise de combustão e verificação dos dispositivos de segurança.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.conversion.postConversionInspectionDone",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.performed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.postConversionInspectionDone}",
+      "requiredValue": "Inspeção de segurança pós-conversão efetuada",
+      "remediation": "Realizar inspeção de segurança completa após conversão: ensaio de estanquidade da ligação de gás, análise de combustão (CO < 100 ppm, CO₂ dentro dos limites do gás), verificação de todos os dispositivos de segurança (termopar, controlador de chama, pressostato), teste de funcionamento em todas as posições de regulação.",
+      "enabled": true,
+      "tags": ["conversão", "inspeção", "segurança", "pós-conversão", "combustão"]
+    },
+    {
+      "id": "GAS-CONV-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 69.º",
+      "description": "Após a conversão de tipo de gás, a chapa de características (nameplate) do aparelho deve ser atualizada com indicação do novo tipo de gás, data da conversão e identificação do técnico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.conversion.nameplateUpdated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.conversion.performed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.conversion.nameplateUpdated}",
+      "requiredValue": "Chapa de características atualizada após conversão",
+      "remediation": "Atualizar a chapa de características do aparelho com: novo tipo de gás (ex.: G20, G30, G31), pressão de alimentação, data da conversão, nome e número de credenciação do técnico que efetuou a conversão. A etiqueta deve ser indelével e colocada junto à chapa original do fabricante.",
+      "enabled": true,
+      "tags": ["conversão", "chapa características", "nameplate", "atualização", "identificação"]
+    },
+    {
+      "id": "GAS-MEDID-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 25.º",
+      "description": "O contador de gás deve estar instalado em local acessível para leitura e manutenção, com espaço livre mínimo de 0,60 m em frente ao contador e iluminação adequada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.metering.meterLocationAccessible",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.metering.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.metering.meterLocationAccessible}",
+      "requiredValue": "Contador acessível com 0,60 m de espaço livre frontal",
+      "remediation": "Reposicionar o contador de gás ou libertar o espaço envolvente para garantir acesso livre mínimo de 0,60 m em frente ao mostrador. O local deve ter iluminação adequada (natural ou artificial) e não pode estar obstruído por materiais, equipamentos ou mobiliário.",
+      "enabled": true,
+      "tags": ["medição", "contador", "acessibilidade", "leitura", "espaço livre"]
+    },
+    {
+      "id": "GAS-MEDID-02",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 26.º",
+      "description": "O compartimento ou armário do contador de gás deve possuir ventilação permanente com secção livre mínima de 150 cm² (abertura inferior e superior), impedindo a acumulação de gás em caso de fuga.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.metering.meterCompartmentVentilated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.metering.isInEnclosure",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.metering.meterCompartmentVentilated}",
+      "requiredValue": "Ventilação permanente do armário com >= 150 cm² de secção livre",
+      "remediation": "Instalar aberturas de ventilação permanente no armário ou compartimento do contador de gás: abertura inferior e superior com secção livre mínima de 150 cm² cada. As aberturas devem comunicar diretamente com o exterior ou com zona ventilada. Não obstruir as aberturas de ventilação.",
+      "enabled": true,
+      "tags": ["medição", "contador", "ventilação", "armário", "150 cm²"]
+    },
+    {
+      "id": "GAS-MEDID-03",
+      "regulationId": "dl-521-99",
+      "article": "Art. 27.º",
+      "description": "O contador de gás deve ser protegido contra choques mecânicos, intempéries e acessos não autorizados, mediante armário com porta fechada à chave (contadores exteriores) ou localização protegida (contadores interiores).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.metering.meterProtectedFromDamage",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.metering.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.metering.meterProtectedFromDamage}",
+      "requiredValue": "Contador protegido contra choques, intempéries e acessos não autorizados",
+      "remediation": "Instalar o contador em armário resistente com porta fechada à chave (acesso pela distribuidora e proprietário). Proteger contra incidência direta de sol, chuva e choques mecânicos. Em garagens ou zonas de circulação, instalar proteção física (barreira ou pilaretes) para evitar embate de veículos.",
+      "enabled": true,
+      "tags": ["medição", "contador", "proteção", "armário", "segurança"]
+    },
+    {
+      "id": "GAS-MEDID-04",
+      "regulationId": "dl-521-99",
+      "article": "Art. 28.º",
+      "description": "Em edifícios de habitação coletiva, cada fração autónoma deve dispor de contador individual de gás, permitindo a medição independente do consumo de cada utilizador.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.metering.individualMeteringPerApartment",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isCollective",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.building.type",
+          "operator": "==",
+          "value": "residential_collective"
+        }
+      ],
+      "currentValueTemplate": "{gas.metering.individualMeteringPerApartment}",
+      "requiredValue": "Contador individual por fração autónoma",
+      "remediation": "Instalar contador individual de gás para cada fração autónoma do edifício de habitação coletiva. Os contadores devem estar agrupados em bateria num local acessível (casa dos contadores) ou em armários individuais por piso. Cada contador deve estar claramente identificado com o número da fração.",
+      "enabled": true,
+      "tags": ["medição", "contador individual", "coletiva", "fração", "habitação"]
+    },
+    {
+      "id": "GAS-MEDID-05",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 29.º",
+      "description": "O contador de gás deve estar acessível para leitura pela empresa distribuidora sem necessidade de entrada na fração privada, preferencialmente em zona comum ou fachada do edifício.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.metering.meterReadingAccessFromCommonArea",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isCollective",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.metering.meterReadingAccessFromCommonArea}",
+      "requiredValue": "Acesso ao contador para leitura sem entrada na fração privada",
+      "remediation": "Reposicionar o contador de gás para zona comum do edifício (casa dos contadores, corredor, fachada) que permita leitura pela empresa distribuidora sem necessidade de acesso à fração privada. Alternativa: instalar sistema de telemetria (leitura remota) se a relocação não for praticável.",
+      "enabled": true,
+      "tags": ["medição", "contador", "leitura", "acesso", "zona comum", "telemetria"]
+    },
+    {
+      "id": "GAS-EMERG-01",
+      "regulationId": "dl-521-99",
+      "article": "Art. 45.º",
+      "description": "A válvula de corte de emergência de gás deve estar localizada no exterior do edifício ou em zona comum acessível, a uma distância máxima de 1 metro da entrada da tubagem no edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.emergency.shutOffValveLocationCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergency.shutOffValveLocation}",
+      "requiredValue": "Válvula de emergência no exterior ou zona comum, a <= 1 m da entrada",
+      "remediation": "Instalar ou reposicionar a válvula de corte de emergência no exterior do edifício ou em zona comum acessível, a no máximo 1 metro da entrada da tubagem de gás no edifício. A válvula deve ser de 1/4 de volta, com manípulo claramente visível e identificada com sinalética normalizada.",
+      "enabled": true,
+      "tags": ["emergência", "válvula corte", "localização", "exterior", "acessível"]
+    },
+    {
+      "id": "GAS-EMERG-02",
+      "regulationId": "dl-521-99",
+      "article": "Art. 46.º",
+      "description": "A válvula de corte de emergência de gás deve estar permanentemente acessível sem necessidade de chave, ferramenta ou remoção de obstáculos, a uma altura entre 0,80 m e 1,50 m do pavimento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.emergency.valveAccessibilityCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.emergency.shutOffValveExists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergency.valveHeightM}",
+      "requiredValue": "Válvula acessível sem ferramentas, entre 0,80 m e 1,50 m de altura",
+      "remediation": "Garantir que a válvula de corte de emergência está permanentemente acessível: remover quaisquer obstáculos, garantir que não requer chave ou ferramenta para operar, verificar a altura de instalação (entre 0,80 m e 1,50 m do pavimento). Manter um perímetro livre de 0,60 m em redor da válvula.",
+      "enabled": true,
+      "tags": ["emergência", "válvula", "acessibilidade", "altura", "desobstrução"]
+    },
+    {
+      "id": "GAS-EMERG-03",
+      "regulationId": "portaria-361-98",
+      "article": "Art. 47.º",
+      "description": "Junto à válvula de corte de emergência deve existir sinalética normalizada indicando a localização da válvula, instruções de operação e o contacto de emergência da empresa distribuidora.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.emergency.hasEmergencySignage",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.emergency.shutOffValveExists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergency.hasEmergencySignage}",
+      "requiredValue": "Sinalética normalizada junto à válvula de emergência",
+      "remediation": "Instalar sinalética normalizada junto à válvula de corte de emergência de gás, incluindo: placa identificativa 'CORTE DE GÁS - EMERGÊNCIA', instruções de operação (sentido de fecho), contacto de emergência da empresa distribuidora (112 e número da distribuidora). A sinalética deve ser em material resistente e legível a 3 metros.",
+      "enabled": true,
+      "tags": ["emergência", "sinalética", "instruções", "contacto", "identificação"]
+    },
+    {
+      "id": "GAS-EMERG-04",
+      "regulationId": "dl-521-99",
+      "article": "Art. 48.º",
+      "description": "O procedimento de emergência de gás deve incluir a notificação imediata aos bombeiros (112) e à empresa distribuidora, devendo os contactos estar afixados junto a cada válvula de corte.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.emergency.hasFireBrigadeNotificationProcedure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergency.hasFireBrigadeNotificationProcedure}",
+      "requiredValue": "Procedimento de notificação de bombeiros e distribuidora afixado",
+      "remediation": "Elaborar e afixar junto a cada válvula de corte de gás o procedimento de notificação de emergência: 1) Fechar a válvula de corte, 2) Ventilar o local abrindo janelas, 3) Não acionar interruptores elétricos, 4) Ligar 112 (bombeiros) e número de emergência da distribuidora, 5) Evacuar o local. Manter os contactos atualizados.",
+      "enabled": true,
+      "tags": ["emergência", "bombeiros", "notificação", "procedimento", "112"]
+    },
+    {
+      "id": "GAS-EMERG-05",
+      "regulationId": "dl-521-99",
+      "article": "Art. 49.º",
+      "description": "O procedimento de isolamento do fornecimento de gás deve definir claramente a sequência de operações: corte da válvula de emergência, verificação do corte efetivo, ventilação do local e confirmação da ausência de gás.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.emergency.hasIsolationProcedure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergency.hasIsolationProcedure}",
+      "requiredValue": "Procedimento de isolamento de gás documentado",
+      "remediation": "Documentar o procedimento de isolamento do fornecimento de gás com a sequência: 1) Fechar válvula de corte de emergência (1/4 de volta - perpendicular à tubagem), 2) Verificar que todos os aparelhos estão desligados, 3) Confirmar corte efetivo (ausência de chama nos queimadores), 4) Ventilar todos os compartimentos durante mínimo 15 minutos, 5) Verificar ausência de gás com detetor portátil antes de restabelecer o fornecimento.",
+      "enabled": true,
+      "tags": ["emergência", "isolamento", "procedimento", "sequência", "ventilação"]
     }
   ]
 }
