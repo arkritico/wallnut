@@ -171,9 +171,9 @@ describe("analyzeProject — total plugin rules", () => {
       (sum, m) => sum + m.totalRules, 0,
     );
 
-    // Allow a range to accommodate plugin updates: 2000-3500
+    // Allow a range to accommodate plugin updates: 2000-4000
     expect(totalRulesSum).toBeGreaterThanOrEqual(2000);
-    expect(totalRulesSum).toBeLessThanOrEqual(3500);
+    expect(totalRulesSum).toBeLessThanOrEqual(4000);
   });
 });
 

@@ -1,7 +1,7 @@
 {
   "pluginId": "gas",
-  "version": "1.0.0",
-  "description": "Mapeamento de campos para regras de instalações de gás (DL 521/99, Portaria 361/98)",
+  "version": "2.0.0",
+  "description": "Mapeamento de campos para regras de instalações de gás (DL 521/99, Portaria 361/98, NP 1037-1/2, EN 1775)",
   "fields": [
     {
       "_group": "Dados Gerais da Instalação",
@@ -34,7 +34,9 @@
       "type": "select",
       "options": [
         { "value": "individual", "label": "Individual" },
-        { "value": "collective", "label": "Coletiva" }
+        { "value": "collective", "label": "Coletiva" },
+        { "value": "new", "label": "Nova" },
+        { "value": "existing", "label": "Existente" }
       ],
       "sources": ["form"],
       "required": false,
@@ -97,17 +99,42 @@
     },
     {
       "_group": "Dados Gerais da Instalação",
+      "field": "gas.pressureClassification",
+      "label": "Classificação de pressão",
+      "type": "select",
+      "options": [
+        { "value": "low", "label": "Baixa pressão (≤ 50 mbar)" },
+        { "value": "medium", "label": "Média pressão (50-400 mbar)" },
+        { "value": "high", "label": "Alta pressão (> 400 mbar)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "low" },
+      "description": "Classificação de pressão da instalação conforme Portaria 361/98 Art. 5.º"
+    },
+    {
+      "_group": "Dados Gerais da Instalação",
+      "field": "gas.numberOfFloors",
+      "label": "Número de pisos servidos",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número de pisos do edifício servidos pela instalação de gás"
+    },
+
+    {
+      "_group": "Pressão e Regulação",
       "field": "gas.utilizationPressure",
       "label": "Pressão de utilização",
       "type": "number",
       "unit": "mbar",
       "sources": ["form"],
       "required": false,
-      "defaults": { "natural_gas": 21, "lpg_bottled": 30, "lpg_piped": 30 },
-      "description": "Pressão de utilização da instalação de gás nos aparelhos (tipicamente 21 mbar para GN, 30 mbar para GPL)"
+      "defaults": { "natural_gas": 21, "lpg_bottled": 30, "lpg_piped": 37 },
+      "description": "Pressão de utilização da instalação de gás nos aparelhos"
     },
     {
-      "_group": "Dados Gerais da Instalação",
+      "_group": "Pressão e Regulação",
       "field": "gas.totalPressureDrop",
       "label": "Perda de carga total da instalação",
       "type": "number",
@@ -117,7 +144,7 @@
       "description": "Perda de carga total admissível na instalação interior de gás"
     },
     {
-      "_group": "Dados Gerais da Instalação",
+      "_group": "Pressão e Regulação",
       "field": "gas.hasPressureRegulator",
       "label": "Existência de regulador de pressão",
       "type": "boolean",
@@ -126,21 +153,82 @@
       "defaults": { "_default": true },
       "description": "Indica se existe regulador de pressão na instalação de gás"
     },
+    {
+      "_group": "Pressão e Regulação",
+      "field": "gas.networkPressureExceedsUtilization",
+      "label": "Pressão de rede superior à de utilização",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a pressão da rede de distribuição excede a pressão de utilização dos aparelhos"
+    },
+    {
+      "_group": "Pressão e Regulação",
+      "field": "gas.hasPressureReliefValve",
+      "label": "Válvula de alívio de pressão",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de válvula de alívio de pressão no sistema GPL canalizado"
+    },
+    {
+      "_group": "Pressão e Regulação",
+      "field": "gas.riserMaxPressure",
+      "label": "Pressão máxima na coluna montante",
+      "type": "number",
+      "unit": "mbar",
+      "sources": ["form"],
+      "required": false,
+      "description": "Pressão máxima de operação na coluna montante coletiva"
+    },
 
     {
       "_group": "Aparelhos e Equipamentos",
       "field": "gas.applianceType",
-      "label": "Tipo de aparelho a gás",
+      "label": "Tipo de aparelho a gás (classificação)",
+      "type": "select",
+      "options": [
+        { "value": "type_A", "label": "Tipo A (sem conduta — fogão)" },
+        { "value": "type_B", "label": "Tipo B (circuito aberto — esquentador/caldeira)" },
+        { "value": "type_C", "label": "Tipo C (circuito estanque)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Classificação do aparelho a gás conforme tipo de circuito de combustão"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.applianceCategory",
+      "label": "Categoria do aparelho",
       "type": "select",
       "options": [
         { "value": "cooktop", "label": "Placa / Fogão" },
         { "value": "water_heater", "label": "Esquentador" },
         { "value": "boiler", "label": "Caldeira" },
-        { "value": "oven", "label": "Forno" }
+        { "value": "condensing_boiler", "label": "Caldeira de condensação" },
+        { "value": "oven", "label": "Forno" },
+        { "value": "space_heater", "label": "Aquecedor ambiente" }
       ],
       "sources": ["form"],
       "required": false,
-      "description": "Tipo de aparelho de utilização de gás instalado no local"
+      "description": "Categoria funcional do aparelho a gás instalado"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.applianceLocation",
+      "label": "Localização do aparelho",
+      "type": "select",
+      "options": [
+        { "value": "kitchen", "label": "Cozinha" },
+        { "value": "bathroom", "label": "Casa de banho" },
+        { "value": "laundry", "label": "Lavandaria" },
+        { "value": "technical_room", "label": "Local técnico" },
+        { "value": "bedroom", "label": "Quarto" },
+        { "value": "garage", "label": "Garagem" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Compartimento onde o aparelho a gás está instalado"
     },
     {
       "_group": "Aparelhos e Equipamentos",
@@ -151,7 +239,9 @@
         { "value": "kitchen", "label": "Cozinha" },
         { "value": "bathroom", "label": "Casa de banho" },
         { "value": "garage", "label": "Garagem" },
-        { "value": "laundry", "label": "Lavandaria" }
+        { "value": "laundry", "label": "Lavandaria" },
+        { "value": "basement", "label": "Cave" },
+        { "value": "technical_room", "label": "Sala técnica" }
       ],
       "sources": ["form"],
       "required": false,
@@ -162,10 +252,49 @@
       "field": "gas.roomVolume",
       "label": "Volume do compartimento",
       "type": "number",
-      "unit": "m\u00b3",
+      "unit": "m³",
       "sources": ["form"],
       "required": false,
-      "description": "Volume do compartimento onde se encontram os aparelhos a gás (mínimos definidos por tipo de aparelho)"
+      "description": "Volume do compartimento onde se encontram os aparelhos a gás"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.roomWindowArea",
+      "label": "Área da janela do compartimento",
+      "type": "number",
+      "unit": "m²",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área da janela (vão envidraçado) do compartimento com aparelho tipo B"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.appliancePowerKW",
+      "label": "Potência do aparelho",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência nominal do aparelho a gás (kW)"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.totalPowerInRoom",
+      "label": "Potência total no compartimento",
+      "type": "number",
+      "unit": "kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Potência total de todos os aparelhos a gás no mesmo compartimento"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.numberOfAppliances",
+      "label": "Número de aparelhos a gás",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número total de aparelhos a gás na instalação"
     },
     {
       "_group": "Aparelhos e Equipamentos",
@@ -177,15 +306,108 @@
       "defaults": { "_default": false },
       "description": "Indica se existe separação física adequada entre aparelhos a gás no mesmo compartimento"
     },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasCEMarking",
+      "label": "Marcação CE do aparelho",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o aparelho possui marcação CE e compatibilidade com o tipo de gás"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.applianceWallClearance",
+      "label": "Afastamento do aparelho à parede",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância mínima entre o aparelho a gás e paredes laterais"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasThermalCutoff",
+      "label": "Corte térmico de segurança",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de dispositivo de corte térmico automático (> 95°C)"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasGasCooktop",
+      "label": "Existência de placa/fogão a gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe placa ou fogão a gás instalado"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasBoiler",
+      "label": "Existência de caldeira a gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe caldeira a gás instalada"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasWaterHeater",
+      "label": "Existência de esquentador a gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe esquentador a gás instalado"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.isCondensingBoiler",
+      "label": "Caldeira de condensação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a caldeira é de condensação (requer drenagem de condensados)"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.hasCondensateDrain",
+      "label": "Drenagem de condensados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de ligação de drenagem de condensados ao esgoto"
+    },
+    {
+      "_group": "Aparelhos e Equipamentos",
+      "field": "gas.simultaneousUseFactor",
+      "label": "Fator de simultaneidade",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "1": 1.0, "2": 1.0, "3": 0.9, "4": 0.8 },
+      "description": "Fator de utilização simultânea para dimensionamento (1.0 para 1-2 aparelhos)"
+    },
 
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.hasVentilation",
+      "label": "Existência de ventilação adequada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o compartimento tem ventilação adequada conforme NP 1037-1/2"
+    },
     {
       "_group": "Ventilação e Exaustão",
       "field": "gas.ventilationType",
       "label": "Tipo de ventilação",
       "type": "select",
       "options": [
-        { "value": "natural", "label": "Natural" },
-        { "value": "mechanical", "label": "Mecânica" }
+        { "value": "natural", "label": "Natural (NP 1037-1)" },
+        { "value": "mechanical", "label": "Mecânica (NP 1037-2)" },
+        { "value": "hybrid", "label": "Híbrida" }
       ],
       "sources": ["form"],
       "required": false,
@@ -196,7 +418,7 @@
       "field": "gas.ventilationAreaLower",
       "label": "Área de ventilação inferior (admissão)",
       "type": "number",
-      "unit": "cm\u00b2",
+      "unit": "cm²",
       "sources": ["form"],
       "required": false,
       "description": "Área da abertura de ventilação inferior para admissão de ar comburente"
@@ -206,20 +428,79 @@
       "field": "gas.ventilationAreaUpper",
       "label": "Área de ventilação superior (evacuação)",
       "type": "number",
-      "unit": "cm\u00b2",
+      "unit": "cm²",
       "sources": ["form"],
       "required": false,
-      "description": "Área da abertura de ventilação superior para evacuação de gases de combustão"
+      "description": "Área da abertura de ventilação superior para evacuação de gases"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.ovenVentilationArea",
+      "label": "Área de ventilação dedicada ao forno",
+      "type": "number",
+      "unit": "cm²",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área da abertura de ventilação dedicada ao forno a gás (mínimo 50 cm²)"
     },
     {
       "_group": "Ventilação e Exaustão",
       "field": "gas.mechanicalExtractionRate",
       "label": "Caudal de extração mecânica",
       "type": "number",
-      "unit": "m\u00b3/h",
+      "unit": "m³/h",
       "sources": ["form"],
       "required": false,
       "description": "Caudal de extração mecânica do compartimento com aparelhos a gás"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.airFlowRatePerKW",
+      "label": "Caudal de ar por kW de potência",
+      "type": "number",
+      "unit": "m³/h por kW",
+      "sources": ["form"],
+      "required": false,
+      "description": "Caudal de ar de combustão por kW de potência instalada"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.airRenewalRate",
+      "label": "Taxa de renovação de ar",
+      "type": "number",
+      "unit": "vol/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Taxa de renovação de ar do compartimento (volumes por hora)"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.ductAirVelocity",
+      "label": "Velocidade do ar nas condutas",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "description": "Velocidade do ar nas condutas de ventilação mecânica"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.garageVentilationRate",
+      "label": "Taxa de ventilação da garagem",
+      "type": "number",
+      "unit": "vol/h",
+      "sources": ["form"],
+      "required": false,
+      "description": "Taxa de renovação de ar da garagem com tubagens de gás (mínimo 6 vol/h)"
+    },
+    {
+      "_group": "Ventilação e Exaustão",
+      "field": "gas.hasMechanicalVentilationOnly",
+      "label": "Ventilação exclusivamente mecânica",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o compartimento só tem ventilação mecânica (sem natural)"
     },
 
     {
@@ -230,11 +511,21 @@
       "options": [
         { "value": "copper", "label": "Cobre" },
         { "value": "steel", "label": "Aço" },
-        { "value": "polyethylene", "label": "Polietileno" }
+        { "value": "polyethylene", "label": "Polietileno" },
+        { "value": "multilayer", "label": "Multicamada" }
       ],
       "sources": ["form"],
       "required": false,
-      "description": "Material das tubagens da instalação de gás (cobre e aço para interior; polietileno para exterior enterrado)"
+      "description": "Material das tubagens da instalação de gás"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.interiorPipeMaterial",
+      "label": "Material das tubagens interiores",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Material específico das tubagens interiores"
     },
     {
       "_group": "Tubagens e Materiais",
@@ -263,8 +554,8 @@
       "type": "string",
       "sources": ["form"],
       "required": false,
-      "defaults": { "_default": "EN 1057" },
-      "description": "Norma de conformidade das tubagens de cobre (tipicamente EN 1057)"
+      "defaults": { "_default": "EN_1057" },
+      "description": "Norma de conformidade das tubagens de cobre (EN 1057)"
     },
     {
       "_group": "Tubagens e Materiais",
@@ -273,8 +564,28 @@
       "type": "string",
       "sources": ["form"],
       "required": false,
-      "defaults": { "_default": "EN 10255" },
-      "description": "Norma de conformidade das tubagens de aço (tipicamente EN 10255)"
+      "defaults": { "_default": "EN_10255" },
+      "description": "Norma de conformidade das tubagens de aço (EN 10255)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.connectionFittingStandard",
+      "label": "Norma dos acessórios roscados",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "EN_10226" },
+      "description": "Norma dos acessórios de ligação roscados (EN 10226)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.gasVelocity",
+      "label": "Velocidade do gás na tubagem",
+      "type": "number",
+      "unit": "m/s",
+      "sources": ["form"],
+      "required": false,
+      "description": "Velocidade do gás na tubagem (máx. 6 m/s GN, 4 m/s GPL)"
     },
     {
       "_group": "Tubagens e Materiais",
@@ -284,7 +595,136 @@
       "unit": "m",
       "sources": ["form"],
       "required": false,
-      "description": "Comprimento do tubo flexível de ligação ao aparelho — máximo 1,50 m conforme regulamento"
+      "description": "Comprimento do tubo flexível de ligação ao aparelho — máximo 1,50 m"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.flexTubeExpired",
+      "label": "Tubo flexível fora do prazo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o tubo flexível de borracha está fora do prazo de validade"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.peInstallation",
+      "label": "Localização da tubagem PE",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Localização da instalação de polietileno (apenas exterior enterrado)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.pipeLocation",
+      "label": "Localização da tubagem",
+      "type": "select",
+      "options": [
+        { "value": "interior", "label": "Interior" },
+        { "value": "exterior", "label": "Exterior" },
+        { "value": "embedded", "label": "Embutida" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Localização geral da tubagem"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.embeddedPipeDepth",
+      "label": "Profundidade da tubagem embutida",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Profundidade da tubagem embutida na parede (mínimo 30 mm)"
+    },
+    {
+      "_group": "Tubagens e Materiais",
+      "field": "gas.hasEmbeddedProtection",
+      "label": "Proteção da tubagem embutida",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de manga de proteção não combustível na tubagem embutida"
+    },
+
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.copperSupportIntervalH",
+      "label": "Intervalo de suporte cobre horizontal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Intervalo entre suportes de tubagem de cobre horizontal (máx. 1,5 m)"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.copperSupportIntervalV",
+      "label": "Intervalo de suporte cobre vertical",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Intervalo entre suportes de tubagem de cobre vertical (máx. 2,0 m)"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.steelSupportIntervalH",
+      "label": "Intervalo de suporte aço horizontal",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Intervalo entre suportes de tubagem de aço horizontal (máx. 2,0 m)"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.steelSupportIntervalV",
+      "label": "Intervalo de suporte aço vertical",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Intervalo entre suportes de tubagem de aço vertical (máx. 3,0 m)"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.pipeSlope",
+      "label": "Inclinação da tubagem",
+      "type": "number",
+      "unit": "%",
+      "sources": ["form"],
+      "required": false,
+      "description": "Inclinação da tubagem para drenagem de condensados (mínimo 1%)"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.hasExpansionCompensation",
+      "label": "Compensação de dilatação",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de compensação de dilatação térmica nas mudanças de direção"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.supportOnMovableElements",
+      "label": "Suportes em elementos amovíveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem suportes de tubagem fixados em elementos amovíveis (proibido)"
+    },
+    {
+      "_group": "Suporte e Fixação de Tubagens",
+      "field": "gas.hasCorrosionProtection",
+      "label": "Proteção anticorrosão nos apoios",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de proteção contra corrosão nos pontos de apoio e travessia"
     },
 
     {
@@ -295,7 +735,7 @@
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": false },
-      "description": "Indica se existe sistema de evacuação de produtos de combustão (chaminé ou conduta de fumos)"
+      "description": "Indica se existe sistema de evacuação de produtos de combustão"
     },
     {
       "_group": "Chaminé e Condutas de Fumos",
@@ -326,7 +766,486 @@
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": 0.5 },
-      "description": "Altura da chaminé acima da cumeeira do telhado — mínimo 0,50 m"
+      "description": "Altura da chaminé acima da cumeeira do telhado — mínimo 0,40 m"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueDraftPressure",
+      "label": "Tiragem da chaminé",
+      "type": "number",
+      "unit": "Pa",
+      "sources": ["form"],
+      "required": false,
+      "description": "Pressão de tiragem na base da chaminé (mínimo 3 Pa)"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueDistanceToObstacle",
+      "label": "Distância da chaminé a obstáculos",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância do remate da chaminé a obstáculos (mínimo 0,60 m)"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueDistanceToWindow",
+      "label": "Distância da chaminé a janelas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância do remate da chaminé a janelas e portas (mínimo 0,40 m)"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueMaterial",
+      "label": "Material da conduta de fumos",
+      "type": "select",
+      "options": [
+        { "value": "stainless_steel", "label": "Aço inoxidável" },
+        { "value": "aluminum", "label": "Alumínio" },
+        { "value": "ceramic", "label": "Cerâmica" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Material da conduta de fumos (inox ou alumínio para condensação)"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.flueWallThickness",
+      "label": "Espessura da parede da conduta",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Espessura mínima da parede da conduta de fumos (mínimo 0,4 mm)"
+    },
+    {
+      "_group": "Chaminé e Condutas de Fumos",
+      "field": "gas.concentricFlueTerminalDistance",
+      "label": "Distância terminal concêntrico a aberturas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância do terminal concêntrico (tipo C) a aberturas (mínimo 0,30 m)"
+    },
+
+    {
+      "_group": "Distâncias de Segurança",
+      "field": "gas.distanceToPipesCrossing",
+      "label": "Distância a canalizações (cruzamento)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância a outras canalizações em cruzamento perpendicular (mín. 30 mm)"
+    },
+    {
+      "_group": "Distâncias de Segurança",
+      "field": "gas.distanceToPipesParallel",
+      "label": "Distância a canalizações (paralelo)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância a outras canalizações em paralelo sem separação (mín. 50 mm)"
+    },
+    {
+      "_group": "Distâncias de Segurança",
+      "field": "gas.distanceToPipesParallelWithSep",
+      "label": "Distância a canalizações (paralelo com separação)",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância a outras canalizações em paralelo com separação física (mín. 100 mm)"
+    },
+    {
+      "_group": "Distâncias de Segurança",
+      "field": "gas.distanceToElectricalEquipment",
+      "label": "Distância a equipamentos elétricos",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância a tomadas, interruptores e derivações (mín. 30 mm)"
+    },
+    {
+      "_group": "Distâncias de Segurança",
+      "field": "gas.distanceToElectricalPanel",
+      "label": "Distância a quadros elétricos",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância a quadros elétricos (mín. 200 mm)"
+    },
+    {
+      "_group": "Distâncias de Segurança",
+      "field": "gas.distanceToCombustibles",
+      "label": "Distância a materiais combustíveis",
+      "type": "number",
+      "unit": "mm",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância de aparelhos a gás a materiais combustíveis (mín. 200 mm)"
+    },
+
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplStorageLocation",
+      "label": "Local de armazenamento GPL",
+      "type": "select",
+      "options": [
+        { "value": "exterior_ventilated", "label": "Exterior ventilado" },
+        { "value": "interior", "label": "Interior" },
+        { "value": "basement", "label": "Cave/subsolo" },
+        { "value": "garage", "label": "Garagem" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Local onde as garrafas/reservatório de GPL estão armazenados"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplBottleWeight",
+      "label": "Peso da garrafa de GPL",
+      "type": "number",
+      "unit": "kg",
+      "sources": ["form"],
+      "required": false,
+      "description": "Peso máximo da garrafa de GPL (máximo 45 kg residencial)"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplBottleCount",
+      "label": "Número de garrafas de GPL",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Número de garrafas de GPL armazenadas na fração (máximo 2)"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplBottleUpright",
+      "label": "Garrafa GPL na posição vertical",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a garrafa de GPL está armazenada na posição vertical (obrigatório)"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplBottleDistanceToHeat",
+      "label": "Distância garrafa GPL a fontes de calor",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância da garrafa GPL a fontes de calor (mínimo 1,5 m)"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplReservoirCapacity",
+      "label": "Capacidade do reservatório GPL",
+      "type": "number",
+      "unit": "L",
+      "sources": ["form"],
+      "required": false,
+      "description": "Capacidade do reservatório exterior de GPL canalizado"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplReservoirDistanceToBuilding",
+      "label": "Distância reservatório GPL ao edifício",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância do reservatório GPL ao edifício (3m < 1000L; 5m ≥ 1000L)"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplNearDrains",
+      "label": "GPL próximo de ralos/caves",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se garrafas GPL estão próximas de ralos, sumidouros ou caves"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplInBasement",
+      "label": "GPL instalado em cave/subsolo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se GPL está instalado em cave ou piso abaixo do nível do solo (proibido)"
+    },
+    {
+      "_group": "GPL — Armazenamento e Garrafas",
+      "field": "gas.gplSafetyZoneClear",
+      "label": "Zona de segurança do reservatório GPL",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a zona de segurança do reservatório GPL está livre de fontes de ignição"
+    },
+
+    {
+      "_group": "Monóxido de Carbono (CO)",
+      "field": "gas.hasCODetector",
+      "label": "Existência de detetor de CO",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe detetor de monóxido de carbono (CO) no compartimento"
+    },
+    {
+      "_group": "Monóxido de Carbono (CO)",
+      "field": "gas.coDetectorHeight",
+      "label": "Altura de instalação do detetor CO",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Altura de instalação do detetor de CO (recomendado 1,5 m)"
+    },
+    {
+      "_group": "Monóxido de Carbono (CO)",
+      "field": "gas.coDetectorDistance",
+      "label": "Distância detetor CO ao aparelho",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Distância do detetor de CO ao aparelho a gás (máximo 3 m)"
+    },
+    {
+      "_group": "Monóxido de Carbono (CO)",
+      "field": "gas.coDetectorStandard",
+      "label": "Norma do detetor de CO",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": "EN_50291" },
+      "description": "Norma de conformidade do detetor de CO (EN 50291)"
+    },
+    {
+      "_group": "Monóxido de Carbono (CO)",
+      "field": "gas.monthsSinceCODetectorTest",
+      "label": "Meses desde último teste CO",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Meses decorridos desde o último teste do detetor de CO (máximo 12)"
+    },
+    {
+      "_group": "Monóxido de Carbono (CO)",
+      "field": "gas.hasEmergencyProcedurePosted",
+      "label": "Procedimento de emergência afixado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de procedimento de emergência CO afixado junto ao aparelho"
+    },
+
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.hasCollectiveRiser",
+      "label": "Existência de coluna montante coletiva",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe coluna montante coletiva de gás no edifício"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.riserFireRating",
+      "label": "Resistência ao fogo da prumada",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Classificação de resistência ao fogo do ducto da coluna montante (mínimo EI 60)"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.hasFloorIsolationValves",
+      "label": "Válvulas de isolamento por piso",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de válvula de isolamento individual por piso/fração na coluna montante"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.meterRoomVentilation",
+      "label": "Ventilação da sala de contadores",
+      "type": "number",
+      "unit": "cm²",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área de ventilação da sala/armário de contadores coletivos"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.hasBuildingEmergencyShutoff",
+      "label": "Corte de emergência à entrada do edifício",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de válvula de corte de emergência à entrada do edifício"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.hasRiserInspectionAccess",
+      "label": "Acesso para inspeção da coluna",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de acesso para inspeção da coluna montante em cada piso"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.hasFireStopAtFloors",
+      "label": "Corta-fogo nos pisos",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de selagem corta-fogo na travessia de cada piso"
+    },
+    {
+      "_group": "Instalações Coletivas",
+      "field": "gas.hasGarageGasDetection",
+      "label": "Deteção de gás na garagem coletiva",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Sistema de deteção de gás na garagem coletiva com tubagens de gás"
+    },
+
+    {
+      "_group": "Garagens e Caves",
+      "field": "gas.gplInGarage",
+      "label": "GPL instalado em garagem fechada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe GPL em garagem fechada (proibido)"
+    },
+    {
+      "_group": "Garagens e Caves",
+      "field": "gas.gasAppliancesInUnderground",
+      "label": "Aparelhos a gás em estacionamento subterrâneo",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem aparelhos a gás em parqueamento subterrâneo (proibido)"
+    },
+    {
+      "_group": "Garagens e Caves",
+      "field": "gas.hasContinuousProtectionSleeve",
+      "label": "Manga de proteção contínua na garagem",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de manga contínua nas tubagens de gás que atravessam garagens"
+    },
+    {
+      "_group": "Garagens e Caves",
+      "field": "gas.hasEmergencyVentilationOnDetection",
+      "label": "Ventilação de emergência por deteção",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Ativação automática de ventilação na garagem por deteção de gás"
+    },
+
+    {
+      "_group": "Exterior e Enterrado",
+      "field": "gas.hasExteriorPipes",
+      "label": "Existência de tubagens exteriores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem tubagens de gás em percurso exterior"
+    },
+    {
+      "_group": "Exterior e Enterrado",
+      "field": "gas.hasExteriorProtection",
+      "label": "Proteção mecânica exterior",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de proteção mecânica nas tubagens exteriores até 2 m de altura"
+    },
+    {
+      "_group": "Exterior e Enterrado",
+      "field": "gas.hasBuriedPipes",
+      "label": "Existência de tubagens enterradas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem tubagens de gás enterradas"
+    },
+    {
+      "_group": "Exterior e Enterrado",
+      "field": "gas.buriedPipeDepth",
+      "label": "Profundidade das tubagens enterradas",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Profundidade das tubagens enterradas (mínimo 0,60 m)"
+    },
+    {
+      "_group": "Exterior e Enterrado",
+      "field": "gas.pipesIdentified",
+      "label": "Tubagens identificadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Identificação das tubagens na cor amarela (RAL 1021) conforme NP 182"
+    },
+    {
+      "_group": "Exterior e Enterrado",
+      "field": "gas.pipesInUnventilatedSpaces",
+      "label": "Tubagens em locais não ventilados",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se tubagens passam por locais não ventilados (proibido)"
+    },
+
+    {
+      "_group": "Travessias e Proteção",
+      "field": "gas.hasWallCrossings",
+      "label": "Existência de travessias",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existem travessias de paredes ou pavimentos"
+    },
+    {
+      "_group": "Travessias e Proteção",
+      "field": "gas.hasProtectedWallCrossings",
+      "label": "Travessias com manga de proteção",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de mangas passantes nas travessias de paredes e pavimentos"
+    },
+    {
+      "_group": "Travessias e Proteção",
+      "field": "gas.hasInaccessibleDismountableJoints",
+      "label": "Ligações desmontáveis não acessíveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de ligações desmontáveis em locais não acessíveis (proibido)"
     },
 
     {
@@ -337,7 +1256,7 @@
       "unit": "mbar",
       "sources": ["form"],
       "required": false,
-      "description": "Pressão utilizada no ensaio de estanquidade da instalação (tipicamente 50 mbar para baixa pressão)"
+      "description": "Pressão utilizada no ensaio de estanquidade"
     },
     {
       "_group": "Ensaios e Certificação",
@@ -347,7 +1266,7 @@
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": false },
-      "description": "Indica se a instalação de gás possui certificação emitida por entidade inspetora"
+      "description": "Indica se a instalação possui certificação por instalador credenciado DGEG"
     },
     {
       "_group": "Ensaios e Certificação",
@@ -357,7 +1276,25 @@
       "unit": "anos",
       "sources": ["form"],
       "required": false,
-      "description": "Número de anos decorridos desde a última inspeção periódica da instalação de gás"
+      "description": "Número de anos decorridos desde a última inspeção periódica"
+    },
+    {
+      "_group": "Ensaios e Certificação",
+      "field": "gas.monthsSinceBoilerMaintenance",
+      "label": "Meses desde manutenção caldeira",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Meses desde a última manutenção anual da caldeira"
+    },
+    {
+      "_group": "Ensaios e Certificação",
+      "field": "gas.monthsSinceWaterHeaterMaintenance",
+      "label": "Meses desde manutenção esquentador",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Meses desde a última manutenção do esquentador"
     },
 
     {
@@ -368,17 +1305,27 @@
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": false },
-      "description": "Indica se existe detetor de gás combustível instalado no compartimento"
+      "description": "Indica se existe detetor de gás combustível instalado"
     },
     {
       "_group": "Segurança",
       "field": "gas.hasEmergencyValve",
-      "label": "Existência de válvula de corte de emergência",
+      "label": "Válvula de corte de emergência",
       "type": "boolean",
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": false },
-      "description": "Indica se existe válvula de corte de emergência acessível e identificada"
+      "description": "Existência de válvula de corte de emergência acessível"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.emergencyValveHeight",
+      "label": "Altura da válvula de emergência",
+      "type": "number",
+      "unit": "m",
+      "sources": ["form"],
+      "required": false,
+      "description": "Altura da válvula de emergência (entre 0,60 m e 1,80 m)"
     },
     {
       "_group": "Segurança",
@@ -388,7 +1335,108 @@
       "sources": ["form"],
       "required": false,
       "defaults": { "_default": true },
-      "description": "Indica se cada aparelho a gás possui válvula de corte individual"
+      "description": "Indica se cada aparelho possui válvula de corte individual"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.hasSafetyValveWithDetector",
+      "label": "Eletroválvula com detetor",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Sistema de segurança detetor + eletroválvula de corte automático"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.hasAntiReturnDevice",
+      "label": "Dispositivo anti-retorno de chama",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de dispositivo anti-retorno na ligação à conduta de exaustão"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.safetyDevicesAccessible",
+      "label": "Órgãos de segurança acessíveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Todos os órgãos de segurança estão acessíveis e não obstruídos"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.meterBoxVentilation",
+      "label": "Ventilação da caixa do contador",
+      "type": "number",
+      "unit": "cm²",
+      "sources": ["form"],
+      "required": false,
+      "description": "Área de ventilação da caixa do contador (mínimo 150 cm²)"
+    },
+    {
+      "_group": "Segurança",
+      "field": "gas.meterBoxMaterial",
+      "label": "Material da caixa do contador",
+      "type": "string",
+      "sources": ["form"],
+      "required": false,
+      "description": "Material da caixa do contador (deve ser M0 não combustível)"
+    },
+
+    {
+      "_group": "Documentação",
+      "field": "gas.hasAsBuiltDrawings",
+      "label": "Existência de telas finais",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de desenhos as-built da instalação de gás"
+    },
+    {
+      "_group": "Documentação",
+      "field": "gas.hasUserManualPT",
+      "label": "Manual de utilização em português",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de manual do aparelho em português"
+    },
+    {
+      "_group": "Documentação",
+      "field": "gas.hasEmergencyContactPosted",
+      "label": "Contacto de emergência afixado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Existência de contacto de emergência afixado junto ao contador"
+    },
+    {
+      "_group": "Documentação",
+      "field": "gas.hasCertificateOnPremises",
+      "label": "Certificado disponível no local",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Certificado da instalação de gás conservado no local"
+    },
+    {
+      "_group": "Documentação",
+      "field": "gas.hasSystemSchematic",
+      "label": "Esquema da instalação acessível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Esquema da rede de gás acessível para manutenção"
+    },
+    {
+      "_group": "Documentação",
+      "field": "gas.applianceNameplateVisible",
+      "label": "Placa de identificação do aparelho visível",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Placa de identificação (nameplate) do aparelho visível e legível após instalação"
     }
   ]
 }
