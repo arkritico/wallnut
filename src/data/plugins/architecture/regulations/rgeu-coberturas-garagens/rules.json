@@ -11,13 +11,26 @@
       "description": "O terraço acessível não possui impermeabilização adequada com proteção mecânica e pendentes para escoamento de águas pluviais.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.hasAccessibleTerrace", "operator": "==", "value": true },
-        { "field": "architecture.hasTerraceMembrane", "operator": "==", "value": false }
+        {
+          "field": "architecture.hasAccessibleTerrace",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasTerraceMembrane",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Impermeabilização de terraços acessíveis com pendente ≥ 1% e proteção mecânica",
       "remediation": "Impermeabilizar terraço: (1) Membrana impermeável contínua (tela asfáltica ou PVC). (2) Pendente mínima: 1% (recomendado 1.5-2%). (3) Proteção mecânica: betonilha ou pavimento flutuante. (4) Remate perimetral: ≥ 15 cm acima do pavimento acabado. (5) Ralos: ≥ 1 por cada 100 m², com cesto protetor. (6) Isolamento térmico: XPS ≥ 60 mm sob membrana (cobertura invertida preferível).",
       "enabled": true,
-      "tags": ["terraço", "impermeabilização", "cobertura", "pendente"]
+      "tags": [
+        "terraço",
+        "impermeabilização",
+        "cobertura",
+        "pendente"
+      ]
     },
     {
       "id": "ARQ-TERR-02",
@@ -26,14 +39,27 @@
       "description": "O terraço ou varanda acessível com desnível superior a 0.40 m não possui guarda-corpo com altura mínima de 1.10 m conforme regulamentação.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.hasAccessibleTerrace", "operator": "==", "value": true },
-        { "field": "architecture.terraceGuardHeight", "operator": "<", "value": 1.10 }
+        {
+          "field": "architecture.hasAccessibleTerrace",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.terraceGuardHeight",
+          "operator": "<",
+          "value": 1.1
+        }
       ],
       "currentValueTemplate": "Guarda-corpo = {architecture.terraceGuardHeight} m",
       "requiredValue": "Guarda-corpo ≥ 1.10 m em terraços e varandas com desnível > 0.40 m",
       "remediation": "Instalar guarda-corpo adequado: (1) Altura mínima: 1.10 m (medida do pavimento acabado ao topo). (2) Sem aberturas que permitam passagem de esfera Ø 110 mm. (3) Sem elementos horizontais que facilitem escalada (até 0.70 m de altura). (4) Resistência: ≥ 0.8 kN/m (carga horizontal no topo). (5) Materiais: aço, alumínio, vidro laminado (não temperado isolado).",
       "enabled": true,
-      "tags": ["guarda-corpo", "terraço", "varanda", "segurança"]
+      "tags": [
+        "guarda-corpo",
+        "terraço",
+        "varanda",
+        "segurança"
+      ]
     },
     {
       "id": "ARQ-COB-PEND-01",
@@ -42,13 +68,33 @@
       "description": "A cobertura inclinada não possui pendente adequada ao material de revestimento utilizado, podendo resultar em infiltrações.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.hasInclinedRoof", "operator": "==", "value": true },
-        { "field": "architecture.roofSlopeAdequate", "operator": "not_exists", "value": null }
+        {
+          "field": "architecture.hasInclinedRoof",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.roofSlopeAdequate",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Pendente de cobertura adequada ao material: telha cerâmica ≥ 30%, chapa metálica ≥ 8%, membrana ≥ 3%",
       "remediation": "Verificar pendente da cobertura: (1) Telha cerâmica/betão: ≥ 30% (17°). (2) Telha metálica (tipo sandwich): ≥ 8% (5°). (3) Chapa ondulada: ≥ 10% (6°). (4) Membrana asfáltica: ≥ 3% (2°). (5) Beirais: ≥ 0.30 m de projeção para proteção das fachadas. (6) Rufos e remates: em todos os encontros com paredes e chaminés.",
       "enabled": true,
-      "tags": ["cobertura", "pendente", "telha", "infiltração"]
+      "tags": [
+        "cobertura",
+        "pendente",
+        "telha",
+        "infiltração"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-GAR-PD-01",
@@ -57,14 +103,27 @@
       "description": "A garagem possui pé-direito livre inferior a 2.20 m, não permitindo a circulação segura de veículos.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.hasGarage", "operator": "==", "value": true },
-        { "field": "architecture.garageCeilingHeight", "operator": "<", "value": 2.20 }
+        {
+          "field": "architecture.hasGarage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.garageCeilingHeight",
+          "operator": "<",
+          "value": 2.2
+        }
       ],
       "currentValueTemplate": "Pé-direito garagem = {architecture.garageCeilingHeight} m",
       "requiredValue": "Pé-direito livre mínimo de garagem: 2.20 m (recomendado 2.40 m)",
       "remediation": "Garantir pé-direito de garagem: (1) Mínimo absoluto: 2.20 m livre sob qualquer obstáculo (vigas, tubagens). (2) Recomendado: 2.40 m para maior conforto. (3) Portão: altura livre ≥ 2.00 m (veículos ligeiros), ≥ 2.50 m (comerciais). (4) Rampas de acesso: pendente máxima 20% (1:5). (5) Raio de curvatura interior mínimo: 4.50 m.",
       "enabled": true,
-      "tags": ["garagem", "pé-direito", "veículos", "cave"]
+      "tags": [
+        "garagem",
+        "pé-direito",
+        "veículos",
+        "cave"
+      ]
     },
     {
       "id": "ARQ-GAR-VENT-01",
@@ -73,13 +132,26 @@
       "description": "A garagem fechada não possui ventilação natural ou mecânica adequada para evacuação de gases de escape, representando risco de intoxicação por CO.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.hasGarage", "operator": "==", "value": true },
-        { "field": "architecture.hasGarageVentilation", "operator": "not_exists", "value": null }
+        {
+          "field": "architecture.hasGarage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasGarageVentilation",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Ventilação de garagem: natural ≥ 5% da área em pavimento ou mecânica com deteção de CO",
       "remediation": "Garantir ventilação da garagem: (1) Natural: aberturas permanentes ≥ 5% da área em pavimento, distribuídas em paredes opostas. (2) Mecânica: caudal ≥ 300 m³/h por lugar (EN 13779). (3) Detetor de CO: obrigatório em garagens fechadas > 50 m². (4) Extração: ≥ 2/3 na zona baixa (CO é mais denso que o ar). (5) Insuflação: na zona alta, de preferência por aberturas naturais.",
       "enabled": true,
-      "tags": ["garagem", "ventilação", "CO", "segurança"]
+      "tags": [
+        "garagem",
+        "ventilação",
+        "CO",
+        "segurança"
+      ]
     },
     {
       "id": "ARQ-GAR-RAMPA-01",
@@ -88,14 +160,34 @@
       "description": "A rampa de acesso à garagem possui inclinação superior a 20% ou largura inferior à regulamentar, dificultando ou impedindo a circulação segura.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.hasGarage", "operator": "==", "value": true },
-        { "field": "architecture.garageRampSlope", "operator": ">", "value": 20 }
+        {
+          "field": "architecture.hasGarage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.garageRampSlope",
+          "operator": ">",
+          "value": 20
+        }
       ],
       "currentValueTemplate": "Inclinação da rampa = {architecture.garageRampSlope}%",
       "requiredValue": "Rampa de garagem: inclinação ≤ 20%, largura ≥ 3.00 m (1 via) ou ≥ 5.50 m (2 vias)",
       "remediation": "Corrigir rampa de acesso: (1) Inclinação máxima: 20% (1:5) no troço reto. (2) Troço de transição: inclinação máxima 12% nos primeiros 5 m junto à via pública. (3) Largura mínima: 3.00 m (1 via), 5.50 m (2 vias). (4) Patamar de descanso: ≥ 5.00 m de comprimento a cada 10 m de rampa. (5) Pavimento antiderrapante (coeficiente de atrito ≥ 0.40).",
       "enabled": true,
-      "tags": ["garagem", "rampa", "inclinação", "acesso"]
+      "tags": [
+        "garagem",
+        "rampa",
+        "inclinação",
+        "acesso"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-COM-PD-01",
@@ -104,14 +196,35 @@
       "description": "O piso comercial (rés-do-chão) possui pé-direito inferior a 3.00 m, não cumprindo o requisito mínimo para espaços de comércio e serviços.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.hasCommercialFloor", "operator": "==", "value": true },
-        { "field": "architecture.commercialCeilingHeight", "operator": "<", "value": 3.00 }
+        {
+          "field": "architecture.hasCommercialFloor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.commercialCeilingHeight",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "services"
+          ]
+        }
       ],
       "currentValueTemplate": "Pé-direito comercial = {architecture.commercialCeilingHeight} m",
       "requiredValue": "Pé-direito mínimo de pisos comerciais: 3.00 m",
       "remediation": "Garantir pé-direito comercial: (1) Mínimo: 3.00 m livre (RGEU Art. 65.º). (2) Para restauração: recomendado 3.50 m (ventilação e extração). (3) Teto falso: altura livre sob teto falso não pode reduzir abaixo de 3.00 m. (4) Entrada independente da entrada residencial quando em edifício misto. (5) Ventilação e iluminação próprias, independentes dos fogos habitacionais.",
       "enabled": true,
-      "tags": ["comercial", "pé-direito", "rés-do-chão", "serviços"]
+      "tags": [
+        "comercial",
+        "pé-direito",
+        "rés-do-chão",
+        "serviços"
+      ]
     },
     {
       "id": "ARQ-CAVE-VENT-01",
@@ -120,13 +233,26 @@
       "description": "A cave utilizada como espaço habitável ou de serviço não possui ventilação natural adequada com pelo menos uma parede com vão direto para o exterior.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.basementCeilingHeight", "operator": ">", "value": 0 },
-        { "field": "architecture.hasBasementVentilation", "operator": "not_exists", "value": null }
+        {
+          "field": "architecture.basementCeilingHeight",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "architecture.hasBasementVentilation",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Caves habitáveis: ventilação natural com vão direto ao exterior ou ventilação mecânica com 6 ren/h",
       "remediation": "Garantir ventilação da cave: (1) Caves habitáveis: pelo menos 1 parede com vão direto ao exterior. (2) Ventilação natural: aberturas ≥ 2.5% da área em pavimento. (3) Ventilação mecânica (alternativa): ≥ 6 renovações/hora. (4) Impermeabilização: obrigatória em todas as paredes e pavimento em contacto com o terreno. (5) Drenagem perimetral exterior (tubo dreno) recomendada para prevenir pressão hidrostática.",
       "enabled": true,
-      "tags": ["cave", "ventilação", "impermeabilização", "habitável"]
+      "tags": [
+        "cave",
+        "ventilação",
+        "impermeabilização",
+        "habitável"
+      ]
     },
     {
       "id": "ARQ-PARK-DIM-01",
@@ -135,14 +261,41 @@
       "description": "Os lugares de estacionamento na garagem não possuem as dimensões mínimas regulamentares para veículos ligeiros.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.hasGarage", "operator": "==", "value": true },
-        { "field": "architecture.parkingSpotWidth", "operator": "<", "value": 2.30 }
+        {
+          "field": "architecture.hasGarage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.parkingSpotWidth",
+          "operator": "<",
+          "value": 2.3
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "parking"
+          ]
+        }
       ],
       "currentValueTemplate": "Largura do lugar = {architecture.parkingSpotWidth} m",
       "requiredValue": "Lugar de estacionamento: ≥ 2.30 m × 4.50 m (perpendicular), corredor ≥ 5.00 m",
       "remediation": "Dimensionar estacionamento: (1) Lugar perpendicular: 2.30 m × 4.50 m (mínimo), 2.50 m × 5.00 m (recomendado). (2) Lugar paralelo: 2.00 m × 5.50 m. (3) Lugar oblíquo (45°): 2.30 m × 4.80 m, corredor 3.50 m. (4) Corredor de circulação: ≥ 5.00 m (perpendicular), ≥ 3.50 m (oblíquo). (5) Lugar para mobilidade reduzida: 3.50 m × 5.00 m (≥ 1 por cada 20 lugares).",
       "enabled": true,
-      "tags": ["estacionamento", "garagem", "dimensões", "lugares"]
+      "tags": [
+        "estacionamento",
+        "garagem",
+        "dimensões",
+        "lugares"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

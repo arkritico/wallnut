@@ -11,14 +11,38 @@
       "description": "O edifício não possui sistema de gestão técnica centralizada (GTC) e os sistemas AVAC operam sem horários programados, correspondendo à classe D de automação (não eficiente), que penaliza o IEE e Ntc.",
       "severity": "warning",
       "conditions": [
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "systems.bacClass", "operator": "==", "value": "D" }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "systems.bacClass",
+          "operator": "==",
+          "value": "D"
+        }
       ],
       "currentValueTemplate": "Classe BAC = D (não eficiente)",
       "requiredValue": "Classe BAC ≥ C para edifícios novos (≥ B recomendado para GES)",
       "remediation": "Atualizar para classe BAC C ou superior: (1) Classe D → C: instalar programação horária em AVAC + iluminação. (2) Classe C → B: adicionar controlo por zona, otimização, feedback de consumo. (3) Classe B → A: automação completa com integração, IA, preditivo. (4) Fator BAC típico (escritórios): D=1.51, C=1.00, B=0.80, A=0.70. (5) Impacto: Classe A vs D = redução de 54% no consumo AVAC teórico.",
       "enabled": true,
-      "tags": ["BAC", "automação", "classe D", "GTC", "EN 15232"]
+      "tags": [
+        "BAC",
+        "automação",
+        "classe D",
+        "GTC",
+        "EN 15232"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-BAC-GES-MINIMUM-01",
@@ -27,13 +51,34 @@
       "description": "Os GES (Grandes Edifícios de Serviços > 1000 m²) devem ter classe de automação BAC ≥ C. A classe D (sem automação) é proibida em edifícios novos de serviços conforme RECS.",
       "severity": "critical",
       "conditions": [
-        { "field": "energy.isGES", "operator": "==", "value": true },
-        { "field": "systems.bacClass", "operator": "==", "value": "D" }
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "systems.bacClass",
+          "operator": "==",
+          "value": "D"
+        }
       ],
       "requiredValue": "Classe BAC ≥ C obrigatória para GES (Classe B recomendada)",
       "remediation": "Implementar sistema GTC para GES: (1) Mínimo regulamentar: Classe C (programação horária, controlo básico). (2) Recomendado: Classe B (controlo por zona, otimização, sub-metering). (3) Custo típico GTC: 15-30 €/m² para Classe B. (4) Payback: 3-5 anos com redução de 20-30% no consumo AVAC. (5) Obrigatório em edifícios novos > 1000 m² e na renovação de sistemas AVAC em GES existentes.",
       "enabled": true,
-      "tags": ["BAC", "GES", "GTC", "mínimo", "RECS"]
+      "tags": [
+        "BAC",
+        "GES",
+        "GTC",
+        "mínimo",
+        "RECS"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-SUBMETERING-GES-01",
@@ -42,13 +87,34 @@
       "description": "O GES não possui sistema de subcontagem (sub-metering) de energia por uso final, obrigatório para monitorização e identificação de consumos anómalos.",
       "severity": "warning",
       "conditions": [
-        { "field": "energy.isGES", "operator": "==", "value": true },
-        { "field": "systems.hasSubMetering", "operator": "not_exists", "value": null }
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "systems.hasSubMetering",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Subcontagem por uso final: AVAC, iluminação, equipamentos, AQS (mínimo 4 circuitos)",
       "remediation": "Implementar subcontagem de energia: (1) Circuitos mínimos: AVAC, iluminação, equipamentos específicos, AQS. (2) Contadores inteligentes com comunicação (Modbus, BACnet, M-Bus). (3) Dashboard de monitorização em tempo real. (4) Alarmes de consumo anómalo (desvio > 15% da baseline). (5) Custo: ~5-10 €/m² para sistema completo. (6) Benefício: identificação de desperdícios, verificação de M&V, reporte para SGCIE.",
       "enabled": true,
-      "tags": ["subcontagem", "sub-metering", "GES", "monitorização", "RECS"]
+      "tags": [
+        "subcontagem",
+        "sub-metering",
+        "GES",
+        "monitorização",
+        "RECS"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-BAC-LIGHTING-CTRL-01",
@@ -57,14 +123,42 @@
       "description": "A iluminação do edifício de serviços não possui controlo automático (presença + luminosidade), requisito para classes BAC B e A que permite reduções de 30-60% no consumo de iluminação.",
       "severity": "warning",
       "conditions": [
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "hasOccupancySensors", "operator": "==", "value": false },
-        { "field": "hasAutoDimming", "operator": "==", "value": false }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "hasOccupancySensors",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "hasAutoDimming",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Controlo de iluminação: sensores de presença + regulação por luminosidade (daylight harvesting)",
       "remediation": "Implementar controlo automático de iluminação: (1) Sensores de presença: deteção PIR/ultrassom em espaços com ocupação intermitente (WC, corredores, salas de reunião). (2) Regulação por luminosidade (daylight harvesting): dimmers automáticos em zonas com luz natural (< 3m da fachada). (3) Programação horária: desligar iluminação fora do horário de ocupação. (4) Impacto: redução de 30-40% (presença) + 20-30% (daylight) = 40-60% total. (5) Payback: 1-3 anos.",
       "enabled": true,
-      "tags": ["iluminação", "automação", "presença", "daylight", "BAC"]
+      "tags": [
+        "iluminação",
+        "automação",
+        "presença",
+        "daylight",
+        "BAC"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-BAC-HVAC-SCHEDULING-01",
@@ -73,13 +167,37 @@
       "description": "Os sistemas AVAC não possuem programação horária automática, operando em modo contínuo mesmo fora do horário de ocupação, desperdiçando energia significativa.",
       "severity": "warning",
       "conditions": [
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "systems.hasHVACScheduling", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "systems.hasHVACScheduling",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Programação horária AVAC com arranque otimizado e setback noturno",
       "remediation": "Implementar programação horária AVAC: (1) Setback noturno/fim-de-semana: reduzir set-point em 4-6°C fora do horário. (2) Arranque otimizado: iniciar AVAC antes da ocupação para atingir temperatura de conforto no início do horário. (3) Free-cooling noturno: ventilação com ar exterior quando temperatura exterior < interior. (4) Impacto: redução de 15-25% no consumo AVAC. (5) Requisito mínimo para classe BAC C.",
       "enabled": true,
-      "tags": ["AVAC", "programação", "horário", "setback", "BAC"]
+      "tags": [
+        "AVAC",
+        "programação",
+        "horário",
+        "setback",
+        "BAC"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-BAC-MONITORING-01",
@@ -88,13 +206,42 @@
       "description": "O edifício não possui sistema de monitorização energética contínua (M&V), necessário para classes BAC A e B e para verificação do desempenho energético real vs. projeto.",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "systems.hasEnergyMonitoring", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "systems.hasEnergyMonitoring",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Monitorização contínua com dashboard, alarmes e relatórios mensais",
       "remediation": "Implementar monitorização energética contínua: (1) Recolha de dados: contadores, sensores de temperatura, humidade, CO₂. (2) Dashboard em tempo real: consumos por zona, tendências, comparação com baseline. (3) Alarmes automáticos: desvio > 15% da baseline, funcionamento fora de horário. (4) Relatórios mensais: indicadores de desempenho (kWh/m²/mês), benchmarking. (5) IPMVP (International Performance Measurement and Verification Protocol) para M&V.",
       "enabled": true,
-      "tags": ["monitorização", "M&V", "dashboard", "BAC", "IPMVP"]
+      "tags": [
+        "monitorização",
+        "M&V",
+        "dashboard",
+        "BAC",
+        "IPMVP"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-BAC-FACTOR-IMPACT-01",
@@ -103,13 +250,45 @@
       "description": "O fator BAC (Building Automation and Control) deve ser aplicado no cálculo do IEE para edifícios de serviços. Classe A (fBAC = 0.70) permite redução de 30% no IEE calculado.",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "systems.bacClass", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "systems.bacClass",
+          "operator": "in",
+          "value": [
+            "D",
+            "unknown"
+          ]
+        }
       ],
       "requiredValue": "Aplicar fator BAC ao IEE: D=1.51, C=1.00, B=0.80, A=0.70 (escritórios)",
       "remediation": "Fatores BAC por tipologia (EN 15232 Tabela 1): (1) Escritórios: D=1.51, C=1.00, B=0.80, A=0.70. (2) Escolas: D=1.20, C=1.00, B=0.88, A=0.80. (3) Hospitais: D=1.31, C=1.00, B=0.91, A=0.86. (4) Hotéis: D=1.31, C=1.00, B=0.85, A=0.75. (5) Comércio: D=1.56, C=1.00, B=0.73, A=0.60. (6) Investir em automação melhora o IEE e pode subir 1-2 classes energéticas.",
       "enabled": true,
-      "tags": ["fator BAC", "IEE", "classes", "tipologia", "EN 15232"]
+      "tags": [
+        "fator BAC",
+        "IEE",
+        "classes",
+        "tipologia",
+        "EN 15232"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     }
   ]
 }

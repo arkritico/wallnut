@@ -16,14 +16,38 @@
           "operator": "lookup_gt",
           "value": null,
           "table": "ref_u_walls",
-          "keys": ["location.climateZoneWinter"]
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
         }
       ],
       "currentValueTemplate": "U = {envelope.externalWallUValue} W/(m².K)",
       "requiredValue": "Referência: I1 ≤ 0.40 / I2 ≤ 0.35 / I3 ≤ 0.30 W/(m².K)",
       "remediation": "O valor U das paredes excede a referência (não o máximo regulamentar). Para atingir a referência e melhorar a classe energética: (1) Aumentar espessura do isolamento térmico. (2) ETICS com ≥ 60-80 mm de EPS/XPS para atingir os valores de referência. (3) A diferença entre U máximo e U referência é a margem para melhoria da classe energética — quanto mais baixo o U, melhor a classe.",
       "enabled": true,
-      "tags": ["referência", "valor-U", "paredes", "classe energética", "Ni"]
+      "tags": [
+        "referência",
+        "valor-U",
+        "paredes",
+        "classe energética",
+        "Ni"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-UREF-ROOF-01",
@@ -37,14 +61,37 @@
           "operator": "lookup_gt",
           "value": null,
           "table": "ref_u_roofs",
-          "keys": ["location.climateZoneWinter"]
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
         }
       ],
       "currentValueTemplate": "U = {envelope.roofUValue} W/(m².K)",
       "requiredValue": "Referência: I1 ≤ 0.35 / I2 ≤ 0.30 / I3 ≤ 0.25 W/(m².K)",
       "remediation": "Para atingir o U de referência da cobertura: (1) Aumentar isolamento para ≥ 80-100 mm na laje de esteira ou vertentes. (2) Cobertura invertida com XPS de alta densidade. (3) A cobertura tem grande impacto no balanço energético — melhorar o U da cobertura é tipicamente a medida mais custo-eficaz.",
       "enabled": true,
-      "tags": ["referência", "valor-U", "cobertura", "classe energética"]
+      "tags": [
+        "referência",
+        "valor-U",
+        "cobertura",
+        "classe energética"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-UREF-WIN-01",
@@ -58,14 +105,37 @@
           "operator": "lookup_gt",
           "value": null,
           "table": "ref_u_windows",
-          "keys": ["location.climateZoneWinter"]
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
         }
       ],
       "currentValueTemplate": "U = {envelope.windowUValue} W/(m².K)",
       "requiredValue": "Referência: I1 ≤ 2.40 / I2 ≤ 2.20 / I3 ≤ 2.00 W/(m².K)",
       "remediation": "Para atingir o U de referência dos envidraçados: (1) Vidro duplo com baixa emissividade (ε ≤ 0.1) e caixa-de-ar de árgon ≥ 16 mm — U ≈ 1.1-1.3 W/(m².K). (2) Caixilharia com corte térmico: alumínio com RPT (Uf ≈ 2.5-3.5), PVC (Uf ≈ 1.3-1.8), madeira (Uf ≈ 1.8-2.2). (3) Vidro triplo para zonas I3: U ≈ 0.6-0.8 W/(m².K).",
       "enabled": true,
-      "tags": ["referência", "valor-U", "envidraçados", "classe energética"]
+      "tags": [
+        "referência",
+        "valor-U",
+        "envidraçados",
+        "classe energética"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-PSI-DEFAULT-01",
@@ -74,13 +144,38 @@
       "description": "Não foram quantificados os coeficientes de transmissão térmica lineares (ψ) das pontes térmicas. Serão utilizados os valores por defeito do Despacho 15793-K/2013, que são penalizantes e agravam as necessidades de aquecimento.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.thermalBridgeCoefficient", "operator": "not_exists", "value": null },
-        { "field": "envelope.externalWallUValue", "operator": "exists", "value": null }
+        {
+          "field": "envelope.thermalBridgeCoefficient",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Cálculo detalhado de ψ conforme EN ISO 10211 ou catálogos de pontes térmicas",
       "remediation": "Quando os valores de ψ não são calculados, o Despacho 15793-K/2013 impõe valores por defeito conservadores: (1) Ligação fachada/pavimento: ψ = 0.50 W/(m.K). (2) Ligação fachada/cobertura: ψ = 0.50 W/(m.K). (3) Ligação fachada/varanda: ψ = 0.55 W/(m.K). (4) Ligação caixilharia/fachada: ψ = 0.25 W/(m.K). (5) Para obter melhores resultados, calcular ψ com EN ISO 10211 ou usar catálogos validados (ITeCons, LNEC).",
       "enabled": true,
-      "tags": ["pontes térmicas", "valores por defeito", "ψ", "15793-K"]
+      "tags": [
+        "pontes térmicas",
+        "valores por defeito",
+        "ψ",
+        "15793-K"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-VENT-REF-01",
@@ -89,13 +184,43 @@
       "description": "A taxa de renovação de ar ({envelope.airChangesPerHour} h⁻¹) difere significativamente do valor de referência de 0.60 h⁻¹ utilizado no cálculo de Ni. Valores superiores aumentam as perdas por ventilação e agravam as necessidades de aquecimento.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.airChangesPerHour", "operator": ">", "value": 0.8 }
+        {
+          "field": "envelope.airChangesPerHour",
+          "operator": ">",
+          "value": 0.8
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "Rph = {envelope.airChangesPerHour} h⁻¹",
       "requiredValue": "Referência: 0.60 h⁻¹ (valor para cálculo de Ni de referência)",
       "remediation": "A taxa de renovação de ar (Rph) deve aproximar-se de 0.60 h⁻¹ para minimizar perdas térmicas: (1) Instalar grelhas autorreguláveis que limitem o caudal ao necessário. (2) Em ventilação mecânica: dimensionar para 0.60 h⁻¹ e instalar recuperador de calor. (3) Eliminar infiltrações parasitas: caixilharia com classe ≥ 3 (EN 12207), vedação de caixas de estore. (4) Para Rph > 0.8 h⁻¹: verificar estanquidade com blower door test (EN 13829).",
       "enabled": true,
-      "tags": ["ventilação", "referência", "Rph", "renovação de ar"]
+      "tags": [
+        "ventilação",
+        "referência",
+        "Rph",
+        "renovação de ar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-INERTIA-CALC-01",
@@ -104,13 +229,38 @@
       "description": "A massa de inércia térmica interior ({energy.thermalInertiaMass} kg/m²) não foi determinada pelo método detalhado do Despacho 15793-K, podendo resultar numa classificação incorreta da inércia (fraca/média/forte) que afeta o cálculo de Nvc.",
       "severity": "info",
       "conditions": [
-        { "field": "energy.thermalInertiaMass", "operator": "not_exists", "value": null },
-        { "field": "envelope.externalWallUValue", "operator": "exists", "value": null }
+        {
+          "field": "energy.thermalInertiaMass",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Cálculo detalhado: It = Σ(MSi × ri × Si) / Ap [kg/m²]",
       "remediation": "Calcular a inércia térmica interior pelo método do Despacho 15793-K: (1) It = Σ(MSi × ri × Si) / Ap, onde MSi é a massa superficial útil de cada elemento, ri é o fator de redução, Si a área. (2) Classificação: It < 150 = fraca, 150 ≤ It ≤ 400 = média, It > 400 = forte. (3) Para edifícios com paredes de alvenaria de tijolo e lajes de betão: tipicamente inércia forte (It > 400). (4) A inércia térmica forte reduz Nvc (necessidades de arrefecimento) e melhora o conforto de verão. (5) O IFC pode fornecer as camadas de materiais e espessuras para este cálculo.",
       "enabled": true,
-      "tags": ["inércia térmica", "massa", "cálculo", "Nvc"]
+      "tags": [
+        "inércia térmica",
+        "massa",
+        "cálculo",
+        "Nvc"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-BTR-01",
@@ -119,13 +269,38 @@
       "description": "O coeficiente de redução de perdas (btr) para os espaços não úteis não foi determinado ou verificado. O btr afeta diretamente os limites de U aplicáveis às paredes e pavimentos interiores em contacto com ENU.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.btrValue", "operator": "not_exists", "value": null },
-        { "field": "envelope.interiorWallHighBtrUValue", "operator": "exists", "value": null }
+        {
+          "field": "envelope.btrValue",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.interiorWallHighBtrUValue",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "btr determinado conforme Tabela III.1: função da razão Ai/Au e do tipo de ENU",
       "remediation": "Determinar o btr conforme Despacho 15793-K Tabela III.1: (1) btr = f(Ai/Au, tipo de ENU): garagem (btr 0.8-0.9), cave não ventilada (btr 0.6-0.8), desvão cobertura ventilado (btr 0.9-1.0), circulação comum (btr 0.6-0.8). (2) Ai = área da envolvente interior (parede/pav. em contacto com ENU). (3) Au = área da envolvente exterior do ENU. (4) Se Ai/Au > 4: btr ≈ 1.0 (ENU comporta-se como exterior). (5) O btr determina os limites de U: para btr > 0.7 aplicam-se limites de exterior; para btr ≤ 0.7 aplicam-se limites majorados ×1.25.",
       "enabled": true,
-      "tags": ["btr", "ENU", "espaço não útil", "envolvente interior"]
+      "tags": [
+        "btr",
+        "ENU",
+        "espaço não útil",
+        "envolvente interior"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-FPU-01",
@@ -134,12 +309,42 @@
       "description": "Os fatores de conversão de energia primária (Fpu) utilizados no cálculo de Ntc devem corresponder aos valores regulamentares: eletricidade = 2.5 kWhEP/kWh, gás natural = 1.0, biomassa = 1.0.",
       "severity": "info",
       "conditions": [
-        { "field": "energy.primaryEnergyNeeds", "operator": "exists", "value": null }
+        {
+          "field": "energy.primaryEnergyNtc",
+          "operator": ">",
+          "value": 100
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Fpu eletricidade = 2.5 / gás = 1.0 / biomassa = 1.0 kWhEP/kWh",
       "remediation": "Verificar que os fatores de conversão de energia primária estão corretos: (1) Eletricidade da rede: Fpu = 2.5 kWhEP/kWh (penalizante — reflete perdas na produção e transporte). (2) Gás natural: Fpu = 1.0 kWhEP/kWh. (3) GPL: Fpu = 1.0 kWhEP/kWh. (4) Biomassa (pellets, lenha): Fpu = 1.0 kWhEP/kWh (fonte renovável). (5) Eletricidade de produção local (PV): Fpu = 2.5 para consumo, abate em Ntc. (6) Solar térmico: sem Fpu (energia diretamente contabilizada como renovável). (7) Estes fatores são críticos para o cálculo de Ntc e a determinação da classe energética.",
       "enabled": true,
-      "tags": ["Fpu", "energia primária", "conversão", "Ntc"]
+      "tags": [
+        "Fpu",
+        "energia primária",
+        "conversão",
+        "Ntc"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-SOLAR-ORIENT-01",
@@ -148,13 +353,39 @@
       "description": "A orientação dos vãos envidraçados não foi considerada no cálculo dos ganhos solares. O fator de orientação (Xj) varia de 1.0 (Sul) a 0.27 (Norte) e afeta significativamente o balanço energético.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.windowOrientation", "operator": "not_exists", "value": null },
-        { "field": "envelope.windowArea", "operator": "exists", "value": null }
+        {
+          "field": "envelope.windowOrientation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.windowArea",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Orientação de cada vão para cálculo correto de ganhos solares: Xj(S)=1.0, Xj(SE/SW)=0.84, Xj(E/W)=0.56, Xj(NE/NW)=0.33, Xj(N)=0.27",
       "remediation": "Incluir a orientação dos vãos envidraçados no cálculo térmico: (1) O fator Xj multiplica os ganhos solares por orientação. (2) Vãos a Sul (Xj=1.0) maximizam ganhos solares no inverno. (3) Vãos a Norte (Xj=0.27) têm ganhos solares muito reduzidos. (4) Vãos a Este/Oeste (Xj=0.56) contribuem para sobreaquecimento no verão. (5) O IFC pode fornecer a orientação de cada parede exterior e a localização de cada janela, permitindo cálculo automático. (6) Para IFC: a orientação pode ser inferida pelo vetor normal da parede (IfcWallStandardCase + IFCLOCALPLACEMENT).",
       "enabled": true,
-      "tags": ["orientação", "ganhos solares", "Xj", "envidraçados", "IFC"]
+      "tags": [
+        "orientação",
+        "ganhos solares",
+        "Xj",
+        "envidraçados",
+        "IFC"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-HEATING-SYSTEM-EFF-01",
@@ -163,13 +394,39 @@
       "description": "A eficiência do sistema de aquecimento ({energy.heatingSystemEfficiency}%) é inferior à eficiência de referência para o tipo de sistema instalado, penalizando o cálculo de Ntc.",
       "severity": "warning",
       "conditions": [
-        { "field": "energy.heatingSystemEfficiency", "operator": "<", "value": 89 }
+        {
+          "field": "energy.heatingSystemEfficiency",
+          "operator": "<",
+          "value": 89
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "Eficiência: {energy.heatingSystemEfficiency}%",
       "requiredValue": "Referência: caldeira a gás 89%, bomba de calor COP 3.0, resistência elétrica 1.0",
       "remediation": "Melhorar a eficiência do sistema de aquecimento: (1) Caldeira a gás de condensação: η ≥ 92-98% (vs. referência 89%). (2) Bomba de calor ar-ar: COP ≥ 3.5 (vs. referência COP 3.0). (3) Bomba de calor ar-água: COP ≥ 3.0. (4) Piso radiante com bomba de calor: maximiza COP (água a 35°C). (5) Evitar resistência elétrica como sistema principal (Fpu = 2.5 × 1.0 = 2.5 kWhEP/kWh útil). (6) A eficiência de referência define o limite para Nt — sistemas abaixo da referência aumentam Ntc acima de Nt.",
       "enabled": true,
-      "tags": ["aquecimento", "eficiência", "sistema", "referência", "Ntc"]
+      "tags": [
+        "aquecimento",
+        "eficiência",
+        "sistema",
+        "referência",
+        "Ntc"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-COOLING-SYSTEM-EFF-01",
@@ -178,13 +435,39 @@
       "description": "A eficiência do sistema de arrefecimento (EER = {energy.coolingSystemEER}) é inferior ao valor de referência de EER 3.0, penalizando o cálculo de necessidades de energia primária para arrefecimento.",
       "severity": "warning",
       "conditions": [
-        { "field": "energy.coolingSystemEER", "operator": "<", "value": 3.0 }
+        {
+          "field": "energy.coolingSystemEER",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "EER = {energy.coolingSystemEER}",
       "requiredValue": "Referência: EER ≥ 3.0 para sistemas de arrefecimento",
       "remediation": "Melhorar a eficiência do sistema de arrefecimento: (1) Bomba de calor ar-ar com EER ≥ 3.5 (classe A ou superior). (2) VRV/VRF: EER sazonal ≥ 4.0-5.0. (3) Chiller com condensação a água: EER ≥ 4.0-5.0. (4) Free-cooling: aproveitamento do ar exterior quando Text < Tint (sem consumo de compressão). (5) Estratégias passivas: sombreamento exterior, ventilação noturna, inércia térmica forte — podem reduzir ou eliminar necessidade de arrefecimento mecânico.",
       "enabled": true,
-      "tags": ["arrefecimento", "EER", "eficiência", "sistema", "referência"]
+      "tags": [
+        "arrefecimento",
+        "EER",
+        "eficiência",
+        "sistema",
+        "referência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "THERM-15793K-DHW-SYSTEM-EFF-01",
@@ -193,13 +476,39 @@
       "description": "A eficiência do sistema de preparação de águas quentes sanitárias (AQS) é inferior à eficiência de referência, aumentando as necessidades de energia primária para AQS (Nac).",
       "severity": "warning",
       "conditions": [
-        { "field": "energy.dhwSystemEfficiency", "operator": "<", "value": 82 }
+        {
+          "field": "energy.dhwSystemEfficiency",
+          "operator": "<",
+          "value": 82
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "Eficiência AQS: {energy.dhwSystemEfficiency}%",
       "requiredValue": "Referência: esquentador/caldeira 82%, bomba de calor COP 2.5",
       "remediation": "Melhorar a eficiência do sistema de AQS: (1) Esquentador modulante: η ≥ 85-90%. (2) Caldeira de condensação para AQS: η ≥ 92%. (3) Bomba de calor dedicada para AQS: COP ≥ 2.5-3.5. (4) Solar térmico: contribuição mínima de 1.0 m²/ocupante (obrigatório em edifícios novos). (5) Termoacumulador elétrico: penalizante (Fpu = 2.5, η = 90%) — substituir por bomba de calor ou solar.",
       "enabled": true,
-      "tags": ["AQS", "eficiência", "sistema", "referência", "Nac"]
+      "tags": [
+        "AQS",
+        "eficiência",
+        "sistema",
+        "referência",
+        "Nac"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

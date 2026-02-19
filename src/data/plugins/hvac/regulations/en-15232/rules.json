@@ -11,14 +11,42 @@
       "description": "O edifício novo não dispõe de sistema de automação e controlo (BACS) de classe C ou superior conforme EN 15232. A EPBD recast proíbe classe D em edifícios novos e obriga classe B para edifícios não residenciais novos > 290 kW.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasBACS", "operator": "not_exists", "value": null },
-        { "field": "hvac.isNewBuilding", "operator": "==", "value": true },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasBACS",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "BACS Classe C mínima (edifícios novos), Classe B para > 290 kW",
       "remediation": "Instalar sistema BACS (Building Automation and Control System) conforme EN 15232. Classe C (standard): controlo centralizado com programação horária, controlo de temperatura por zona, monitorização de consumos. Classe B (avançado): adicionalmente inclui controlo otimizado de setpoints, gestão de carga, deteção de avarias, free-cooling automático. Classe A (alta eficiência): inclui auto-otimização, previsão de cargas, integração com smart grid. Impacto: poupança de 10-30% no consumo AVAC com Classe B vs. Classe D.",
       "enabled": true,
-      "tags": ["BACS", "automação", "EN 15232", "EPBD", "edifício novo"]
+      "tags": [
+        "BACS",
+        "automação",
+        "EN 15232",
+        "EPBD",
+        "edifício novo"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-BACS-EXIST-01",
@@ -27,14 +55,40 @@
       "description": "O edifício existente com potência AVAC ≥ 290 kW não dispõe de sistema BACS, sendo obrigatória a instalação conforme diretiva EPBD (2018/844/UE) até 2025.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasBACS", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 290 },
-        { "field": "hvac.isNewBuilding", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.hasBACS",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 290
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "BACS obrigatório para edifícios existentes com potência AVAC ≥ 290 kW",
       "remediation": "Instalar sistema BACS de classe C mínima. Para edifícios existentes, considerar soluções retrofit: controladores DDC (Direct Digital Control) sobre a infraestrutura existente, sensores wireless para temperatura e humidade, integração via protocolo BACnet/IP ou Modbus TCP. Avaliar o retorno do investimento: tipicamente 2-5 anos para edifícios com potência > 290 kW. A EPBD (2018/844/UE) estabelece como prazo 2025 para conformidade.",
       "enabled": true,
-      "tags": ["BACS", "automação", "EN 15232", "EPBD", "edifício existente", "retrofit"]
+      "tags": [
+        "BACS",
+        "automação",
+        "EN 15232",
+        "EPBD",
+        "edifício existente",
+        "retrofit"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-DCV-01",
@@ -43,14 +97,42 @@
       "description": "O edifício de comércio/serviços com ocupação variável não utiliza ventilação controlada por demanda (DCV) com sondas de CO₂, resultando em ventilação excessiva em períodos de baixa ocupação.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasDCV", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasDCV",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "DCV recomendado para espaços com ocupação variável",
       "remediation": "Instalar ventilação controlada por demanda (DCV): sondas de CO₂ NDIR nas zonas de retorno de ar, controladores que modulam o caudal de ar novo em função da concentração de CO₂ (setpoint: 800-1000 ppm). Em sistemas VAV, o DCV controla a abertura dos registos de ar novo. Em sistemas a caudal constante, considerar ventiladores de velocidade variável. Poupança típica: 20-40% no consumo de ventilação e tratamento de ar novo.",
       "enabled": true,
-      "tags": ["DCV", "ventilação", "CO₂", "EN 15232", "eficiência"]
+      "tags": [
+        "DCV",
+        "ventilação",
+        "CO₂",
+        "EN 15232",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-BACS-DCV-CLASSIFICATION-01",
@@ -59,14 +141,39 @@
       "description": "O sistema de ventilação controlada por demanda (DCV) não atinge a classificação BACS exigida conforme EN 15232: DCV com controlo de CO₂ por zona corresponde a Classe B, mas o sistema instalado opera apenas com temporização horária (Classe C) sem modulação baseada em qualidade do ar.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.dcvControlMethod", "operator": "==", "value": "time-schedule" },
-        { "field": "hvac.requiredBACSClass", "operator": "in", "value": ["A", "B"] }
+        {
+          "field": "hvac.dcvControlMethod",
+          "operator": "==",
+          "value": "time-schedule"
+        },
+        {
+          "field": "hvac.requiredBACSClass",
+          "operator": "in",
+          "value": [
+            "A",
+            "B"
+          ]
+        }
       ],
       "currentValueTemplate": "DCV com controlo {hvac.dcvControlMethod} (Classe C)",
       "requiredValue": "DCV com sondas de CO₂ por zona (Classe B) ou com otimização preditiva (Classe A)",
       "remediation": "Atualizar o sistema de ventilação controlada por demanda para atingir a classificação BACS exigida: (1) Classe C (atual): controlo por temporização horária — ventilação ligada/desligada conforme horário. Não responde à ocupação real. (2) Classe B (objetivo mínimo): instalar sondas CO₂ NDIR em cada zona/sala de retorno. Controlador modula caudal de ar novo entre mínimo (desocupado: 0.35 l/s.m²) e máximo (ocupação plena). Setpoint: 800-1000 ppm CO₂. (3) Classe A (objetivo ideal): DCV com previsão de ocupação baseada em calendário + sensores de presença + CO₂ + COV. Algoritmo de otimização que minimiza consumo mantendo QAI. Integração com sistema de reserva de salas. (4) Impacto energético: Classe B vs. Classe C resulta em poupança de 20-40% no tratamento de ar novo em edifícios com ocupação variável.",
       "enabled": true,
-      "tags": ["DCV", "BACS", "EN 15232", "CO₂", "automação", "classificação"]
+      "tags": [
+        "DCV",
+        "BACS",
+        "EN 15232",
+        "CO₂",
+        "automação",
+        "classificação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-BACS-CONDENSATE-MON-01",
@@ -75,14 +182,45 @@
       "description": "As bombas de condensados dos equipamentos de arrefecimento não estão monitorizadas pelo sistema de automação (BMS/GTC), impedindo a deteção precoce de falhas que podem causar inundações e danos em materiais.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasCondensatePumpBMSMonitoring", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasCondensatePump", "operator": "exists", "value": null },
-        { "field": "hvac.hasBACS", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasCondensatePumpBMSMonitoring",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasCondensatePump",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasBACS",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Monitorização BMS de alarme de nível alto em todas as bombas de condensados (BACS Classe B)",
       "remediation": "Integrar monitorização de bombas de condensados no BMS: (1) Alarme de nível alto: sensor de nível (boia ou condutivo) no tabuleiro de cada unidade — contacto seco para GTC. (2) Estado de funcionamento: monitorizar corrente do motor da bomba (falha = 0 A indica avaria). (3) Ação automática: corte da unidade de arrefecimento quando alarme de nível alto é ativado (evita transbordo). (4) Tendência: registar frequência de alarmes para identificar unidades com problemas recorrentes (filtros de ar colmatados, fugas, obstrução da drenagem). (5) Notificação: alarme imediato para equipa de manutenção via e-mail/SMS. (6) BACS Classe B/A: a monitorização de condensados é uma funcionalidade de automação avançada que contribui para a prevenção de danos e manutenção preditiva.",
       "enabled": true,
-      "tags": ["BACS", "condensados", "BMS", "EN 15232", "monitorização", "alarme"]
+      "tags": [
+        "BACS",
+        "condensados",
+        "BMS",
+        "EN 15232",
+        "monitorização",
+        "alarme"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     }
   ]
 }

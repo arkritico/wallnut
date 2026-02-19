@@ -11,13 +11,33 @@
       "description": "A taxa de renovação de ar (Rph = {ventilation.airChangesPerHour} h⁻¹) é inferior ao mínimo regulamentar de 0.4 h⁻¹ para ventilação natural, comprometendo a qualidade do ar interior e o cálculo das necessidades de aquecimento.",
       "severity": "critical",
       "conditions": [
-        { "field": "ventilation.airChangesPerHour", "operator": "<", "value": 0.4 }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential"
+          ]
+        },
+        {
+          "field": "ventilation.airChangesPerHour",
+          "operator": "lookup_lt",
+          "table": "min_ventilation_rate_by_type",
+          "keys": [
+            "ventilation.type"
+          ]
+        }
       ],
       "currentValueTemplate": "Rph = {ventilation.airChangesPerHour} h⁻¹",
       "requiredValue": "Rph ≥ 0.4 h⁻¹ (ventilação natural) ou ≥ 0.6 h⁻¹ (referência REH)",
       "remediation": "Garantir taxa de renovação de ar adequada: (1) Ventilação natural: grelhas auto-reguláveis nas fachadas (Rph por defeito = 0.6 h⁻¹ se sem ensaio). (2) Ventilação mecânica: VMC com caudal mínimo NP 1037-1. (3) Se ensaio blower door: Rph real pode ser inferior a 0.6 mas nunca < 0.4. (4) Impacto no Nic: Rph mais alto = mais perdas por ventilação = Nic mais alto. (5) Sem ensaio blower door assume-se Rph = 0.6 h⁻¹.",
       "enabled": true,
-      "tags": ["Rph", "ventilação", "renovação de ar", "REH", "blower door"]
+      "tags": [
+        "Rph",
+        "ventilação",
+        "renovação de ar",
+        "REH",
+        "blower door"
+      ]
     },
     {
       "id": "ENE-15793I-AQS-CONSUMO-01",
@@ -26,13 +46,39 @@
       "description": "O consumo de referência de AQS é de 40 litros/pessoa/dia a 60°C. O número de ocupantes convencional é: T0=2, T1=2, T2=3, T3=4, T4=5, T5+=6 ocupantes.",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "energy.aqsConsumptionPerPerson", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "energy.aqsConsumptionPerPerson",
+          "operator": "<",
+          "value": 40
+        }
       ],
       "requiredValue": "40 L/pessoa/dia a 60°C (referência REH), ocupantes conforme tipologia",
       "remediation": "O consumo de AQS de referência para o cálculo de Nac: (1) Consumo unitário: 40 litros/pessoa/dia a 60°C (MAQS = 40 × n_ocupantes × 365 / 1000 kWh/ano). (2) Ocupantes convencionais: T0/T1=2, T2=3, T3=4, T4=5, T5=6. (3) Temperatura de referência: 60°C (θ_AQS). (4) O IFC pode fornecer a tipologia (número de quartos) para calcular automaticamente os ocupantes. (5) O valor de Nac é determinístico — não depende do projeto, apenas da tipologia.",
       "enabled": true,
-      "tags": ["AQS", "consumo", "ocupantes", "tipologia", "Nac"]
+      "tags": [
+        "AQS",
+        "consumo",
+        "ocupantes",
+        "tipologia",
+        "Nac"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-HEATING-SEASON-01",
@@ -41,13 +87,39 @@
       "description": "A duração da estação de aquecimento (M = {location.heatingSeasonMonths} meses) deve ser determinada conforme o Despacho 15793-I, baseada nos graus-dia e localização do município.",
       "severity": "info",
       "conditions": [
-        { "field": "location.heatingSeasonMonths", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "==", "value": "residential" }
+        {
+          "field": "location.heatingSeasonMonths",
+          "operator": "<",
+          "value": 4
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        }
       ],
       "requiredValue": "M calculado por município (tipicamente 5.3-7.3 meses para Portugal continental)",
       "remediation": "A duração da estação de aquecimento (M) é tabelada por município: (1) Algarve (Faro): M ≈ 5.3 meses. (2) Lisboa: M ≈ 5.7 meses. (3) Porto: M ≈ 6.3 meses. (4) Interior Norte (Bragança): M ≈ 7.3 meses. (5) A duração M é usada no cálculo de Ni (necessidades máximas de aquecimento). (6) Impacto: M mais longo = mais GD = Ni mais alto = mais difícil cumprir.",
       "enabled": true,
-      "tags": ["estação", "aquecimento", "M", "graus-dia", "município"]
+      "tags": [
+        "estação",
+        "aquecimento",
+        "M",
+        "graus-dia",
+        "município"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-COOLING-SEASON-01",
@@ -56,13 +128,42 @@
       "description": "A estação de arrefecimento é fixa: junho a setembro (Lv = 2928 horas). A temperatura exterior média de verão (θ_ext,v) é tabelada por zona climática de verão (V1/V2/V3).",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "location.climateZoneSummer", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": [
+            "unknown",
+            "undefined"
+          ]
+        }
       ],
       "requiredValue": "Lv = 2928 horas (junho-setembro), θ_ext,v conforme zona climática",
       "remediation": "Parâmetros da estação de arrefecimento: (1) Duração fixa: Lv = 2928 horas (4 meses: junho a setembro). (2) θ_ext,v por zona: V1 ≤ 20°C, V2 = 20-22°C, V3 > 22°C. (3) Intensidade de radiação solar (Isol): tabelada por orientação e zona climática. (4) O fator solar dos envidraçados e a orientação são os parâmetros de projeto que mais influenciam Nvc. (5) Nvc tipicamente mais fácil de cumprir que Nic em Portugal continental.",
       "enabled": true,
-      "tags": ["arrefecimento", "verão", "Lv", "θ_ext,v", "zona climática"]
+      "tags": [
+        "arrefecimento",
+        "verão",
+        "Lv",
+        "θ_ext,v",
+        "zona climática"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-HEATING-EFF-REF-01",
@@ -71,13 +172,39 @@
       "description": "A eficiência de referência do sistema de aquecimento para o cálculo de Nt é: bomba de calor COP_ref = 3.0 para sistemas elétricos, caldeira η_ref = 0.89 para gás.",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "energy.heatingSystemEfficiency", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "energy.heatingSystemEfficiency",
+          "operator": "<",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Eficiência de referência: COP 3.0 (elétrico) ou η 0.89 (gás)",
       "remediation": "Eficiências de referência para cálculo de Nt (sistema de referência): (1) Aquecimento elétrico: COP_ref = 3.0 (bomba de calor ar-ar). (2) Aquecimento a gás: η_ref = 0.89 (caldeira a condensação). (3) Biomassa: η_ref = 0.77 (salamandra com recuperador). (4) Sistemas reais com eficiência inferior ao referência aumentam Ntc face a Nt → pior classe. (5) Investir em bomba de calor com COP > 3.5 é a forma mais eficaz de melhorar a classe energética.",
       "enabled": true,
-      "tags": ["eficiência", "referência", "aquecimento", "COP", "caldeira"]
+      "tags": [
+        "eficiência",
+        "referência",
+        "aquecimento",
+        "COP",
+        "caldeira"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-COOLING-EFF-REF-01",
@@ -86,13 +213,38 @@
       "description": "A eficiência de referência do sistema de arrefecimento para o cálculo de Nt é: EER_ref = 3.0 para sistemas elétricos (bomba de calor reversível).",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "energy.coolingSystemEER", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "energy.coolingSystemEER",
+          "operator": "<",
+          "value": 1
+        }
       ],
       "requiredValue": "EER de referência: 3.0 (sistema elétrico de arrefecimento)",
       "remediation": "Eficiência de referência para arrefecimento: (1) EER_ref = 3.0 (bomba de calor reversível, referência REH). (2) Sistemas split modernos: EER real 3.5-5.0 — melhor que referência. (3) Se não existir sistema de arrefecimento: assume-se o de referência (EER = 3.0). (4) Impacto: Nvc tipicamente 5-15% de Ntc em Portugal — o aquecimento domina. (5) Estratégias passivas (sombreamento, ventilação noturna) são mais eficazes que o sistema ativo para reduzir Nvc.",
       "enabled": true,
-      "tags": ["eficiência", "referência", "arrefecimento", "EER"]
+      "tags": [
+        "eficiência",
+        "referência",
+        "arrefecimento",
+        "EER"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-DHW-EFF-REF-01",
@@ -101,13 +253,39 @@
       "description": "A eficiência de referência do sistema de AQS para o cálculo de Nt é: COP_ref = 2.8 (bomba de calor) ou η_ref = 0.89 (caldeira a gás de condensação).",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "energy.dhwSystemEfficiency", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "energy.dhwSystemEfficiency",
+          "operator": "<",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Eficiência AQS referência: COP 2.8 (elétrico) ou η 0.89 (gás)",
       "remediation": "Eficiências de referência AQS: (1) Bomba de calor termodinâmica: COP_ref = 2.8. (2) Caldeira a gás de condensação: η_ref = 0.89. (3) Esquentador a gás: η_ref = 0.82. (4) Termoacumulador elétrico: η = 0.95 (sem conversão renovável). (5) Solar térmico: contribuição Esolar deduzida ao Nac antes de aplicar eficiência. (6) AQS representa 40-60% de Ntc em moradias bem isoladas — é o consumo dominante.",
       "enabled": true,
-      "tags": ["eficiência", "referência", "AQS", "COP", "solar"]
+      "tags": [
+        "eficiência",
+        "referência",
+        "AQS",
+        "COP",
+        "solar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-SOLAR-AREA-01",
@@ -116,15 +294,36 @@
       "description": "A área mínima de coletores solares térmicos ({energy.solarCollectorArea} m²) é inferior ao mínimo regulamentar de 1.0 m² por ocupante convencional.",
       "severity": "critical",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "energy.solarCollectorArea", "operator": "<", "value": 2.0 }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.solarCollectorArea",
+          "operator": "lookup_lt",
+          "table": "min_solar_area_by_typology",
+          "keys": [
+            "building.typology"
+          ]
+        }
       ],
       "currentValueTemplate": "Área coletores = {energy.solarCollectorArea} m²",
       "requiredValue": "≥ 1.0 m² / ocupante convencional (mínimo 2.0 m² para T0/T1)",
       "remediation": "Área mínima de coletores solares: (1) Regra: ≥ 1.0 m²/ocupante convencional. (2) T0/T1 (2 occ.): ≥ 2.0 m². (3) T2 (3 occ.): ≥ 3.0 m². (4) T3 (4 occ.): ≥ 4.0 m². (5) T4 (5 occ.): ≥ 5.0 m². (6) Exceções: orientação desfavorável (±90° de Sul), sombreamento significativo, área de cobertura insuficiente — exigem justificação e compensação com sistema alternativo. (7) Cálculo pelo programa SCE.ER.",
       "enabled": true,
-      "tags": ["solar", "coletores", "área", "ocupantes", "obrigatório"]
+      "tags": [
+        "solar",
+        "coletores",
+        "área",
+        "ocupantes",
+        "obrigatório"
+      ]
     },
     {
       "id": "ENE-15793I-GAINS-UTIL-01",
@@ -133,14 +332,39 @@
       "description": "O fator de utilização dos ganhos solares (η) depende da razão ganhos/perdas (γ) e da inércia térmica do edifício. Valores de η baixos indicam sobreaquecimento potencial no inverno.",
       "severity": "info",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "energy.gainsUtilizationFactor", "operator": "<", "value": 0.6 }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "energy.gainsUtilizationFactor",
+          "operator": "<",
+          "value": 0.6
+        }
       ],
       "currentValueTemplate": "η = {energy.gainsUtilizationFactor}",
       "requiredValue": "η > 0.6 indica boa utilização dos ganhos (γ ≈ 1.5-2.0 com inércia forte)",
       "remediation": "O fator de utilização (η) é calculado automaticamente: (1) η = f(γ, a), onde γ = Qgu/Qht (ganhos/perdas), a = f(inércia). (2) Inércia forte (It ≥ 400 kg/m²): a = 4.2 → η mais alto para mesmo γ. (3) Inércia média (150 < It < 400): a = 3.6. (4) Inércia fraca (It ≤ 150): a = 2.6 → η mais baixo. (5) η baixo (< 0.6) com γ alto significa excesso de ganhos solares → considerar reduzir área de envidraçados a Sul ou aumentar sombreamento. (6) O objetivo é maximizar ganhos úteis sem sobreaquecimento.",
       "enabled": true,
-      "tags": ["ganhos solares", "utilização", "inércia", "sobreaquecimento"]
+      "tags": [
+        "ganhos solares",
+        "utilização",
+        "inércia",
+        "sobreaquecimento"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-15793I-NI-LIMIT-01",
@@ -149,13 +373,30 @@
       "description": "As necessidades nominais de aquecimento (Nic = {energy.Nic} kWh/m².ano) excedem o limite regulamentar (Ni = {energy.Ni} kWh/m².ano). O edifício não cumpre o requisito REH de aquecimento.",
       "severity": "critical",
       "conditions": [
-        { "field": "energy.Nic", "operator": "formula_gt", "value": "energy.Ni" }
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential"
+          ]
+        },
+        {
+          "field": "energy.Nic",
+          "operator": "formula_gt",
+          "value": "energy.Ni"
+        }
       ],
       "currentValueTemplate": "Nic = {energy.Nic} kWh/(m².ano)",
       "requiredValue": "Nic ≤ Ni (limite de aquecimento calculado por REH)",
       "remediation": "Reduzir as necessidades de aquecimento (Nic): (1) Isolamento paredes: ETICS ≥ 80-100 mm. (2) Isolamento cobertura: ≥ 100-120 mm. (3) Envidraçados: vidro duplo low-E + RPT (Uw ≤ 1.8). (4) Pontes térmicas: corrigir com ETICS contínuo. (5) Ventilação: reduzir Rph com estanquidade melhorada (mas ≥ 0.4 h⁻¹). (6) Ganhos solares: maximizar orientação Sul com envidraçados adequados. (7) Ni é calculado automaticamente pela metodologia REH em função de GD, área útil e envolvente de referência.",
       "enabled": true,
-      "tags": ["Nic", "Ni", "aquecimento", "REH", "conformidade"]
+      "tags": [
+        "Nic",
+        "Ni",
+        "aquecimento",
+        "REH",
+        "conformidade"
+      ]
     }
   ]
 }

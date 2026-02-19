@@ -11,14 +11,31 @@
       "description": "Em edifícios residenciais, a taxa mínima de renovação de ar deve ser de 0.6 h⁻¹ conforme NP 1037-1 para garantir qualidade do ar interior e evacuação de poluentes.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.freshAirFlow", "operator": "<", "value": 1 },
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "hvac.ventilationType", "operator": "==", "value": "natural" }
+        {
+          "field": "hvac.freshAirFlow",
+          "operator": "<",
+          "value": 1
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "hvac.ventilationType",
+          "operator": "==",
+          "value": "natural"
+        }
       ],
       "requiredValue": "Taxa mínima de renovação: 0.6 h⁻¹ (NP 1037-1)",
       "remediation": "Garantir taxa de renovação de ar mínima de 0.6 h⁻¹ através de: grelhas auto-reguláveis nos compartimentos principais (salas, quartos), condutas de extração natural nas cozinhas e instalações sanitárias, e aberturas de passagem entre compartimentos (folga sob portas ≥ 25 mm ou grelhas de transferência). Verificar que as condutas de extração natural possuem tiragem adequada (efeito chaminé).",
       "enabled": true,
-      "tags": ["ventilação natural", "residencial", "NP 1037", "renovação de ar"]
+      "tags": [
+        "ventilação natural",
+        "residencial",
+        "NP 1037",
+        "renovação de ar"
+      ]
     },
     {
       "id": "HVAC-NP1037-TRANSFER-01",
@@ -27,13 +44,36 @@
       "description": "As portas interiores não possuem aberturas de transferência de ar (folga sob porta ou grelha de transferência) para permitir a circulação de ar entre compartimentos de admissão e extração conforme NP 1037-1.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.ventilationType", "operator": "==", "value": "natural" },
-        { "field": "buildingType", "operator": "in", "value": ["residential", "mixed"] }
+        {
+          "field": "hvac.ventilationType",
+          "operator": "==",
+          "value": "natural"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Folga sob porta ≥ 25 mm ou grelha de transferência em todas as portas interiores",
       "remediation": "Garantir passagem de ar entre compartimentos: folga sob a porta ≥ 25 mm (secção livre ≥ 200 cm²) ou instalar grelhas de transferência na porta ou parede. O fluxo de ar deve circular dos compartimentos principais (sala, quartos — zona de admissão) para os compartimentos de serviço (cozinha, IS — zona de extração). A secção de passagem deve ser dimensionada para o caudal de extração previsto sem perda de carga excessiva.",
       "enabled": true,
-      "tags": ["ventilação natural", "transferência de ar", "NP 1037", "passagens"]
+      "tags": [
+        "ventilação natural",
+        "transferência de ar",
+        "NP 1037",
+        "passagens"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-NP1037-STACK-01",
@@ -42,13 +82,33 @@
       "description": "A conduta de extração natural (chaminé de ventilação) deve ter altura mínima para garantir tiragem natural adequada, conforme NP 1037-1.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.ventilationType", "operator": "==", "value": "natural" },
-        { "field": "buildingType", "operator": "==", "value": "residential" }
+        {
+          "field": "hvac.ventilationType",
+          "operator": "==",
+          "value": "natural"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        }
       ],
       "requiredValue": "Conduta de extração com saída ≥ 0.5 m acima da cumeeira",
       "remediation": "A chaminé de ventilação (conduta de extração natural) deve terminar acima da cobertura: no mínimo 0.5 m acima da cumeeira para telhados inclinados, ou 1.0 m acima da laje de cobertura para coberturas planas. Instalar chapéu estático ou eólico (aspirador estático) na extremidade para evitar entrada de água e melhorar a tiragem. Verificar que a secção da conduta é adequada ao caudal (mínimo 100 cm² por fogo).",
       "enabled": true,
-      "tags": ["ventilação natural", "chaminé", "NP 1037", "tiragem"]
+      "tags": [
+        "ventilação natural",
+        "chaminé",
+        "NP 1037",
+        "tiragem"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

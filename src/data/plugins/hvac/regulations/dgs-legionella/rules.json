@@ -11,13 +11,29 @@
       "description": "Não foi realizada avaliação de risco de Legionella para a instalação AVAC e rede de água quente sanitária, conforme recomendado pela DGS e exigido para edifícios de risco (hospitais, hotéis, lares).",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasLegionellaRiskAssessment", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasLegionellaRiskAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Avaliação de risco de Legionella obrigatória para edifícios de risco",
       "remediation": "Realizar avaliação de risco de Legionella conforme metodologia DGS: (1) Identificar fontes de risco: torres de arrefecimento, depósitos de AQS, redes de distribuição com troços mortos, chuveiros pouco utilizados, fontes decorativas, humidificadores. (2) Avaliar fatores de risco: temperatura da água (20-50°C = zona de proliferação), estagnação, biofilme, nutrientes (sedimentos, corrosão). (3) Classificar risco: baixo/médio/alto/muito alto. (4) Definir medidas de controlo: programa de temperaturas, desinfeção, limpeza, monitorização. (5) Reavaliação: anual ou após alterações na instalação. (6) Para edifícios de saúde: avaliação obrigatória conforme DGS Orientação 023/2014.",
       "enabled": true,
-      "tags": ["Legionella", "DGS", "avaliação de risco", "água quente"]
+      "tags": [
+        "Legionella",
+        "DGS",
+        "avaliação de risco",
+        "água quente"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-TEMP-STORAGE-01",
@@ -26,13 +42,28 @@
       "description": "A temperatura de armazenamento da água quente sanitária ({hvac.hotWaterStorageTemp}°C) é inferior a 60°C, permitindo a proliferação de Legionella no depósito.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hotWaterStorageTemp", "operator": "<", "value": 60 }
+        {
+          "field": "hvac.hotWaterStorageTemp",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "hvac.hasHvacSystem",
+          "operator": "!=",
+          "value": false
+        }
       ],
       "currentValueTemplate": "{hvac.hotWaterStorageTemp}°C no depósito",
       "requiredValue": "≥ 60°C no depósito de armazenamento de AQS",
       "remediation": "Manter temperatura de armazenamento de AQS ≥ 60°C: (1) Regulação: termostato do depósito a 60-65°C (não exceder 70°C para evitar calcário). (2) Estratificação: verificar que a temperatura no fundo do depósito ≥ 60°C (sonda inferior). (3) Ciclo térmico semanal: elevar a 70°C durante 30 minutos para pasteurização. (4) Depósitos múltiplos em série: garantir que todos atingem ≥ 60°C (não apenas o primeiro). (5) Bombas de calor para AQS: verificar que atingem 60°C (algumas bombas de calor limitam a 55°C — necessário resistência de apoio).",
       "enabled": true,
-      "tags": ["Legionella", "AQS", "temperatura", "armazenamento", "60°C"]
+      "tags": [
+        "Legionella",
+        "AQS",
+        "temperatura",
+        "armazenamento",
+        "60°C"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-TEMP-RETURN-01",
@@ -41,13 +72,28 @@
       "description": "A temperatura de retorno da recirculação de água quente ({hvac.hotWaterReturnTemp}°C) é inferior a 50°C, indicando arrefecimento excessivo na rede de distribuição e risco de proliferação de Legionella.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hotWaterReturnTemp", "operator": "<", "value": 50 }
+        {
+          "field": "hvac.hotWaterReturnTemp",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "hvac.hasHvacSystem",
+          "operator": "!=",
+          "value": false
+        }
       ],
       "currentValueTemplate": "{hvac.hotWaterReturnTemp}°C no retorno",
       "requiredValue": "≥ 50°C na recirculação (≥ 55°C recomendado)",
       "remediation": "Garantir temperatura de retorno ≥ 50°C na recirculação de AQS: (1) Verificar e equilibrar a rede de recirculação: válvulas de equilíbrio termostáticas em cada coluna. (2) Isolar tubagem: perdas térmicas excessivas reduzem a temperatura nos pontos mais distantes. (3) Bomba de recirculação: verificar caudal adequado (tipicamente 10-20% do caudal de ponta). (4) Funcionamento contínuo: a recirculação deve operar 24h (não desligar à noite). (5) Eliminar troços mortos (dead legs): tubagem > 3 m sem utilização regular é um foco de estagnação.",
       "enabled": true,
-      "tags": ["Legionella", "AQS", "recirculação", "temperatura", "retorno"]
+      "tags": [
+        "Legionella",
+        "AQS",
+        "recirculação",
+        "temperatura",
+        "retorno"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-SAMPLING-01",
@@ -56,13 +102,30 @@
       "description": "Não existe programa de amostragem microbiológica periódica para pesquisa de Legionella na rede de água e nos sistemas AVAC de risco (torres de arrefecimento, humidificadores).",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasLegionellaSamplingProgram", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasLegionellaSamplingProgram",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Amostragem semestral (trimestral para edifícios de saúde e torres de arrefecimento)",
       "remediation": "Implementar programa de amostragem de Legionella: (1) Pontos de colheita: depósito de AQS (fundo), ponto de utilização mais distante, retorno de recirculação, torre de arrefecimento (bacia). (2) Frequência: semestral para edifícios de comércio/serviços, trimestral para hospitais/lares/hotéis e torres de arrefecimento. (3) Método: colheita conforme ISO 11731, análise em laboratório acreditado IPAC. (4) Limites: < 100 UFC/L (satisfatório), 100-1000 UFC/L (vigilância reforçada), > 1000 UFC/L (ação corretiva imediata), > 10000 UFC/L (encerramento e desinfeção). (5) Registo: manter resultados por 5 anos.",
       "enabled": true,
-      "tags": ["Legionella", "amostragem", "DGS", "microbiologia", "ISO 11731"]
+      "tags": [
+        "Legionella",
+        "amostragem",
+        "DGS",
+        "microbiologia",
+        "ISO 11731"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-TREATMENT-01",
@@ -71,13 +134,27 @@
       "description": "Não existe plano de tratamento da água documentado para prevenção de Legionella, incluindo programa de desinfeção, controlo de biofilme e tratamento anti-corrosão.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasWaterTreatmentPlan", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasHotWaterSystem", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasWaterTreatmentPlan",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasHotWaterSystem",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Plano de tratamento de água documentado com protocolo de desinfeção",
       "remediation": "Elaborar plano de tratamento de água anti-Legionella: (1) Desinfeção contínua: cloro residual livre 0.2-0.5 mg/L nos pontos de utilização, OU dióxido de cloro 0.1-0.3 mg/L (mais eficaz contra biofilme). (2) Desinfeção de choque: hipercloração a 50 mg/L durante 1h (após contaminação confirmada), ou choque térmico a 70°C durante 30 min em todos os pontos. (3) Anti-incrustante: tratamento anti-calcário para manter eficiência dos permutadores. (4) Anti-corrosão: inibidor adequado ao material da tubagem (silicatos para cobre, fosfatos para aço). (5) Monitorização: pH, cloro residual, temperatura — registo semanal. (6) Responsável: técnico de tratamento de água designado.",
       "enabled": true,
-      "tags": ["Legionella", "tratamento água", "desinfeção", "cloro", "biofilme"]
+      "tags": [
+        "Legionella",
+        "tratamento água",
+        "desinfeção",
+        "cloro",
+        "biofilme"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-TEMP-MONITOR-01",
@@ -86,13 +163,27 @@
       "description": "Não existe programa de monitorização periódica de temperaturas na rede de AQS e nos sistemas de risco (torres de arrefecimento), impossibilitando a deteção precoce de condições favoráveis à proliferação de Legionella.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasTemperatureMonitoringProgram", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasHotWaterSystem", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasTemperatureMonitoringProgram",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasHotWaterSystem",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Monitorização semanal de temperaturas em pontos críticos da rede de AQS",
       "remediation": "Implementar programa de monitorização de temperaturas: (1) Frequência: semanal (mensal mínimo). (2) Pontos de medição: saída do depósito AQS, retorno de recirculação, ponto de utilização mais próximo, ponto mais distante, cada coluna montante. (3) Método: termómetro de contacto calibrado, medição após 1 minuto de escoamento. (4) Critérios: depósito ≥ 60°C, distribuição ≥ 55°C, retorno ≥ 50°C, ponto de utilização ≥ 50°C em 1 minuto. (5) Água fria: manter < 20°C (se > 25°C: risco significativo de Legionella). (6) Registar: data, ponto, temperatura, operador. Investigar qualquer desvio persistente.",
       "enabled": true,
-      "tags": ["Legionella", "temperatura", "monitorização", "AQS", "programa"]
+      "tags": [
+        "Legionella",
+        "temperatura",
+        "monitorização",
+        "AQS",
+        "programa"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-DEADLEG-01",
@@ -101,13 +192,27 @@
       "description": "A rede de distribuição de água possui troços mortos (dead legs) com comprimento superior a 3× o diâmetro da tubagem, criando zonas de estagnação favoráveis à proliferação de Legionella.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasDeadLegsEliminated", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasHotWaterSystem", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasDeadLegsEliminated",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasHotWaterSystem",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Troços mortos ≤ 3× diâmetro da tubagem (ou eliminados)",
       "remediation": "Identificar e eliminar troços mortos na rede de água: (1) Levantamento: identificar todos os ramais sem utilização regular (equipamentos desativados, pontos de consumo encerrados, ligações futuras não utilizadas). (2) Eliminação: cortar e tamponar os troços mortos junto à tubagem principal. (3) Minimização: quando impossível eliminar, reduzir comprimento para ≤ 3× DN da tubagem. (4) Purga periódica: para troços que não podem ser eliminados, purgar semanalmente durante 5 minutos. (5) Fontes comuns: ligações de reserva em coletores, ramais de equipamentos removidos, derivações para futuras ampliações.",
       "enabled": true,
-      "tags": ["Legionella", "troços mortos", "dead legs", "estagnação", "EN 806"]
+      "tags": [
+        "Legionella",
+        "troços mortos",
+        "dead legs",
+        "estagnação",
+        "EN 806"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-CT-DRIFT-01",
@@ -116,13 +221,27 @@
       "description": "A torre de arrefecimento não possui eliminadores de gotas (drift eliminators) com eficiência ≥ 99.9%, permitindo a dispersão de aerossóis contaminados com Legionella para a vizinhança.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true },
-        { "field": "hvac.hasDriftEliminators", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.hasCoolingTower",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "hvac.hasDriftEliminators",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Eliminadores de gotas com eficiência ≥ 99.9% (drift rate ≤ 0.001%)",
       "remediation": "Instalar ou substituir eliminadores de gotas na torre de arrefecimento: (1) Eficiência mínima: 99.9% (drift rate ≤ 0.001% do caudal de recirculação). (2) Tipo: lamelas em PVC de alta eficiência com perfil sinusoidal ou em chicana. (3) Verificar integridade: sem danos, deformações ou folgas que permitam bypass de ar. (4) Substituir a cada 5-7 anos (degradação UV e química). (5) A dispersão de gotículas é o principal mecanismo de transmissão de Legionella ao exterior — em Portugal, casos epidémicos foram associados a torres de arrefecimento com eliminadores deficientes ou ausentes.",
       "enabled": true,
-      "tags": ["Legionella", "torre de arrefecimento", "eliminadores gotas", "drift", "DGS"]
+      "tags": [
+        "Legionella",
+        "torre de arrefecimento",
+        "eliminadores gotas",
+        "drift",
+        "DGS"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-TRAINING-01",
@@ -131,13 +250,38 @@
       "description": "Os técnicos de manutenção AVAC não possuem formação específica em prevenção e controlo de Legionella, conforme recomendado pela DGS para edifícios de risco.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasLegionellaTraining", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hospital"] }
+        {
+          "field": "hvac.hasLegionellaTraining",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "hospital"
+          ]
+        }
       ],
       "requiredValue": "Formação em Legionella para técnicos AVAC de edifícios de risco (anual)",
       "remediation": "Proporcionar formação em prevenção de Legionella: (1) Conteúdo: biologia da Legionella, fatores de risco (20-50°C, estagnação, biofilme), sistemas de risco (torres, AQS, humidificadores), medidas de controlo (temperatura, tratamento, eliminação de dead legs), procedimentos de amostragem e interpretação de resultados. (2) Frequência: formação inicial + atualização anual. (3) Público: TIM, técnicos de manutenção, gestores de edifícios. (4) Certificação: registo de formação no dossier de manutenção. (5) Em edifícios de saúde: formação obrigatória para toda a equipa de manutenção conforme DGS Orientação 023/2014.",
       "enabled": true,
-      "tags": ["Legionella", "formação", "DGS", "prevenção", "técnicos"]
+      "tags": [
+        "Legionella",
+        "formação",
+        "DGS",
+        "prevenção",
+        "técnicos"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-CT-BIOCIDE-01",
@@ -146,13 +290,27 @@
       "description": "A torre de arrefecimento não possui programa de tratamento biocida contínuo e de choque para prevenção de Legionella, confiando apenas no tratamento térmico que é insuficiente em sistemas de circuito aberto.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasCoolingTowerBiocide", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasCoolingTowerBiocide",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasCoolingTower",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Programa de biocida contínuo + choque periódico obrigatório para torres de arrefecimento",
       "remediation": "Implementar programa de biocida para a torre de arrefecimento: (1) Biocida contínuo: doseamento automático de biocida oxidante (cloro: 0.5-1.0 mg/L residual, ou bromo: 1.0-2.0 mg/L residual, ou dióxido de cloro: 0.1-0.3 mg/L). (2) Biocida de choque: aplicação semanal de biocida não-oxidante (isotiazolona ou glutaraldeído) para controlo de biofilme. (3) Monitorização: medir residual de biocida diariamente (kit de teste rápido), registar resultados. (4) Análise microbiológica: Legionella pneumophila trimestral em laboratório acreditado. (5) Ação corretiva: se Legionella > 1000 UFC/L, hipercloração de choque (50 mg/L × 1h) e nova amostragem 48h após. (6) Regulamentação: DGS exige plano documentado com responsável identificado.",
       "enabled": true,
-      "tags": ["Legionella", "biocida", "torre de arrefecimento", "DGS", "tratamento"]
+      "tags": [
+        "Legionella",
+        "biocida",
+        "torre de arrefecimento",
+        "DGS",
+        "tratamento"
+      ]
     },
     {
       "id": "HVAC-HUMIDIFIER-LEGIONELLA-01",
@@ -161,14 +319,32 @@
       "description": "O sistema de humidificação do tipo evaporativo ou spray utiliza água em estado líquido a temperaturas favoráveis à proliferação de Legionella (20-45°C), sem programa de desinfeção adequado.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.humidifierType", "operator": "in", "value": ["evaporative", "spray", "ultrasonic"] },
-        { "field": "hvac.hasHumidifierDisinfection", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.humidifierType",
+          "operator": "in",
+          "value": [
+            "evaporative",
+            "spray",
+            "ultrasonic"
+          ]
+        },
+        {
+          "field": "hvac.hasHumidifierDisinfection",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "currentValueTemplate": "Humidificador tipo {hvac.humidifierType} sem programa de desinfeção",
       "requiredValue": "Programa de desinfeção obrigatório para humidificadores de água líquida, ou substituição por vapor",
       "remediation": "Controlar risco de Legionella em humidificadores: (1) Solução preferencial: substituir por humidificador de vapor (injeção de vapor estéril) — elimina risco de Legionella. (2) Se humidificador evaporativo: desinfeção UV-C na bacia de água, purga contínua (bleed-off), limpeza mensal, análise microbiológica trimestral. (3) Humidificadores ultrassónicos: evitar em sistemas AVAC — geram aerossóis que podem transportar Legionella e minerais dissolvidos. (4) Água de alimentação: utilizar água tratada (desmineralizada ou osmose inversa) para reduzir nutrientes. (5) Temperatura da água: manter < 20°C ou > 60°C (fora da zona de proliferação). (6) Tabuleiro de drenagem: inclinação mínima de 2%, sem pontos de estagnação.",
       "enabled": true,
-      "tags": ["Legionella", "humidificador", "DGS", "vapor", "evaporativo"]
+      "tags": [
+        "Legionella",
+        "humidificador",
+        "DGS",
+        "vapor",
+        "evaporativo"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-CT-REGISTER-01",
@@ -177,13 +353,27 @@
       "description": "A torre de arrefecimento não está registada junto das autoridades de saúde conforme exigido pela regulamentação portuguesa de prevenção de Legionella.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasCoolingTowerRegistration", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasCoolingTowerRegistration",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasCoolingTower",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Registo obrigatório de torres de arrefecimento junto da autoridade de saúde local (DGS)",
       "remediation": "Registar a torre de arrefecimento junto da autoridade de saúde: (1) Contactar a Unidade de Saúde Pública (USP) da Administração Regional de Saúde (ARS) da área. (2) Fornecer: localização GPS, tipo e potência da torre, volume de água, programa de manutenção e tratamento, resultados de análises microbiológicas recentes. (3) Atualizar o registo anualmente ou quando houver alterações significativas no equipamento. (4) Em caso de surto epidémico de legionellose: as autoridades de saúde podem ordenar paragem imediata de torres não registadas ou sem programa de controlo documentado. (5) Manter cópia do registo no dossier técnico da instalação.",
       "enabled": true,
-      "tags": ["Legionella", "torre de arrefecimento", "registo", "DGS", "autoridade saúde"]
+      "tags": [
+        "Legionella",
+        "torre de arrefecimento",
+        "registo",
+        "DGS",
+        "autoridade saúde"
+      ]
     }
   ]
 }

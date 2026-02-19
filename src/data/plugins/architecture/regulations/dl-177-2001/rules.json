@@ -11,15 +11,39 @@
       "description": "Em obras de reabilitação, o pé-direito mínimo pode ser reduzido para 2.40 m em compartimentos habitáveis, conforme permitido pelo DL 177/2001 quando a manutenção de 2.70 m é inviável.",
       "severity": "info",
       "conditions": [
-        { "field": "isRehabilitation", "operator": "==", "value": true },
-        { "field": "architecture.ceilingHeight", "operator": ">=", "value": 2.40 },
-        { "field": "architecture.ceilingHeight", "operator": "<", "value": 2.70 }
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.ceilingHeight",
+          "operator": ">=",
+          "value": 2.4
+        },
+        {
+          "field": "architecture.ceilingHeight",
+          "operator": "<",
+          "value": 2.7
+        }
       ],
       "currentValueTemplate": "Pé-direito = {architecture.ceilingHeight} m",
       "requiredValue": "Pé-direito em reabilitação: mínimo 2.40 m (dispensa do RGEU 2.70 m quando inviável)",
       "remediation": "Dispensa de pé-direito em reabilitação: (1) DL 177/2001 permite redução para 2.40 m quando manter 2.70 m é estrutural ou economicamente inviável. (2) Aplicável apenas a obras de reabilitação (não a construção nova). (3) Deve ser justificado no projeto e aceite pela câmara municipal. (4) Compromisso: manter conforto térmico e ventilação adequados. (5) Complementar com iluminação natural melhorada para compensar volume reduzido.",
       "enabled": true,
-      "tags": ["pé-direito", "reabilitação", "dispensa", "2.40 m"]
+      "tags": [
+        "pé-direito",
+        "reabilitação",
+        "dispensa",
+        "2.40 m"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-RUIDO-01",
@@ -28,14 +52,34 @@
       "description": "As paredes divisórias entre fogos não possuem isolamento acústico adequado, devendo garantir Rw ≥ 50 dB conforme requisitos atualizados pelo DL 177/2001.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
-        { "field": "architecture.interUnitWallRw", "operator": "<", "value": 50 }
+        {
+          "field": "architecture.isMultifamily",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.interUnitWallRw",
+          "operator": "<",
+          "value": 50
+        }
       ],
       "currentValueTemplate": "Rw parede entre fogos = {architecture.interUnitWallRw} dB",
       "requiredValue": "Rw ≥ 50 dB em paredes entre fogos (DL 177/2001 + RRAE). (Nota: conformidade acústica detalhada no plugin 'acoustic'.)",
       "remediation": "Melhorar isolamento entre fogos: (1) Parede simples: alvenaria 22 cm + reboco = Rw ≈ 50 dB (marginal). (2) Parede dupla: 15+15 cm com caixa de ar e lã mineral = Rw ≈ 56 dB. (3) Gesso cartonado dupla face: 2×13 mm + lã 50 mm + 2×13 mm = Rw ≈ 58 dB. (4) Evitar: travessas de madeira, blocos de 11 cm, passagens de tubagens sem selagem. (5) Nota: verificação acústica detalhada no plugin 'acoustic' (RRAE).",
       "enabled": true,
-      "tags": ["acústica", "ruído", "entre fogos", "Rw"]
+      "tags": [
+        "acústica",
+        "ruído",
+        "entre fogos",
+        "Rw"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-SEG-01",
@@ -44,13 +88,33 @@
       "description": "O projeto de arquitetura deve demonstrar conformidade com a regulamentação de segurança estrutural e contra incêndio em vigor, integrando as exigências no desenho dos espaços.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.hasFireSafetyIntegration", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasFireSafetyIntegration",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Projeto de arquitetura com integração de requisitos de segurança estrutural e contra incêndio",
       "remediation": "Integrar segurança no projeto de arquitetura: (1) Vias de evacuação: largura conforme UT e efetivo (SCIE). (2) Compartimentação: paredes corta-fogo nas empenas e entre fogos. (3) Distância máxima a saídas: 15 m (impasse) ou 30 m (alternativa). (4) Estrutura: resistência ao fogo mínima R60 (edifícios habitacionais > 2 pisos). (5) Nota: conformidade detalhada nos plugins 'fire-safety' e 'structural'.",
       "enabled": true,
-      "tags": ["segurança", "incêndio", "estrutural", "integração"]
+      "tags": [
+        "segurança",
+        "incêndio",
+        "estrutural",
+        "integração"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-VENT-ATU-01",
@@ -59,13 +123,33 @@
       "description": "O sistema de ventilação natural do fogo não cumpre os requisitos atualizados da NP 1037-1, com caudais insuficientes ou percurso ar incorreto.",
       "severity": "warning",
       "conditions": [
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "architecture.hasNP1037Compliance", "operator": "not_exists", "value": null }
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "architecture.hasNP1037Compliance",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Ventilação natural conforme NP 1037-1: admissão em compartimentos secos, extração em húmidos",
       "remediation": "Ventilação conforme NP 1037-1: (1) Admissão: grelhas auto-reguláveis em sala e quartos (compartimentos secos). (2) Passagem: folga sob portas interiores (≥ 10 mm) ou grelhas de transferência. (3) Extração: condutas em cozinha e IS (compartimentos húmidos). (4) Caudais: cozinha 60 m³/h, IS 45 m³/h, quartos 30 m³/h. (5) Condutas: individuais ou shunt, com aspirador estático no topo. (6) Nota: requisitos AVAC detalhados no plugin 'hvac'.",
       "enabled": true,
-      "tags": ["ventilação", "NP 1037-1", "grelhas", "caudais"]
+      "tags": [
+        "ventilação",
+        "NP 1037-1",
+        "grelhas",
+        "caudais"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-ACESS-01",
@@ -74,15 +158,43 @@
       "description": "O edifício multifamiliar novo com mais de 3 pisos acima da cota de soleira não possui elevador, conforme exigido pelo DL 177/2001 (alteração ao RGEU).",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.numberOfFloors", "operator": ">", "value": 3 },
-        { "field": "architecture.hasElevator", "operator": "==", "value": false }
+        {
+          "field": "architecture.isMultifamily",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.numberOfFloors",
+          "operator": ">",
+          "value": 3
+        },
+        {
+          "field": "architecture.hasElevator",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Elevador obrigatório em edifícios multifamiliares novos com > 3 pisos acima da cota de soleira",
       "remediation": "Instalar elevador: (1) Obrigatório: edifícios novos > 3 pisos (DL 177/2001). (2) Cabina mínima: 1.00 × 1.30 m (recomendado 1.10 × 1.40 m para acessibilidade). (3) Porta: ≥ 0.80 m de largura livre. (4) N.º mínimo: 1 por cada 60 fogos (orientação). (5) Para cumprir DL 163/2006 (acessibilidade): cabina ≥ 1.10 × 1.40 m + porta ≥ 0.90 m. (6) Nota: requisitos de elevadores detalhados no plugin 'elevators'.",
       "enabled": true,
-      "tags": ["elevador", "acessibilidade", "pisos", "obrigatório"]
+      "tags": [
+        "elevador",
+        "acessibilidade",
+        "pisos",
+        "obrigatório"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-EST-MIN-01",
@@ -91,15 +203,39 @@
       "description": "O edifício residencial novo não disponibiliza o número mínimo de lugares de estacionamento por fogo, conforme exigido pela regulamentação urbanística.",
       "severity": "warning",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "buildingType", "operator": "==", "value": "residential" },
-        { "field": "architecture.parkingRatioPerUnit", "operator": "<", "value": 1.0 }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "architecture.parkingRatioPerUnit",
+          "operator": "<",
+          "value": 1
+        }
       ],
       "currentValueTemplate": "Rácio estacionamento = {architecture.parkingRatioPerUnit} lugares/fogo",
       "requiredValue": "Mínimo 1 lugar de estacionamento por fogo (PDM define valores concretos por município)",
       "remediation": "Garantir estacionamento: (1) Mínimo geral: 1 lugar por fogo (valor orientativo). (2) PDM Lisboa: 1 lugar/fogo (≤ T2), 1.5 lugares/fogo (T3+). (3) PDM Porto: 1 lugar por 100 m² de área bruta. (4) Estacionamento visitantes: 0.3 lugares/fogo (orientação). (5) Mobilidade reduzida: 1 lugar adaptado por cada 20 (≥ 1 lugar sempre). (6) Pode ser dispensado em centros históricos com fundamentação.",
       "enabled": true,
-      "tags": ["estacionamento", "fogo", "PDM", "mínimo"]
+      "tags": [
+        "estacionamento",
+        "fogo",
+        "PDM",
+        "mínimo"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-ESPCOMUN-01",
@@ -108,14 +244,38 @@
       "description": "Os espaços comuns do edifício multifamiliar não cumprem os requisitos atualizados do DL 177/2001 quanto a iluminação, ventilação e dimensionamento.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.hasAdequateCommonAreas", "operator": "not_exists", "value": null }
+        {
+          "field": "architecture.isMultifamily",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasAdequateCommonAreas",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Espaços comuns com iluminação, ventilação, caixa de correio, casa do lixo e sala de condomínio",
       "remediation": "Espaços comuns adequados: (1) Átrio/hall: área ≥ 6 m² com iluminação natural ou artificial (≥ 100 lux). (2) Caixa de escadas: iluminação natural por vão ou claraboia, ventilação. (3) Caixa de correio: 1 por fração + 1 para publicidade/correspondência geral. (4) Casa do lixo: compartimento ventilado, impermeável, com ponto de água. (5) Sala de condomínio: recomendada em edifícios > 8 frações. (6) Arrecadações: 1 por fogo de área ≥ 2 m² (quando exigido pelo PDM).",
       "enabled": true,
-      "tags": ["espaços comuns", "átrio", "caixa de correio", "condomínio"]
+      "tags": [
+        "espaços comuns",
+        "átrio",
+        "caixa de correio",
+        "condomínio"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-177-EFIC-01",
@@ -124,13 +284,33 @@
       "description": "O projeto de arquitetura não integra medidas de eficiência hídrica e energética, conforme orientações atualizadas do DL 177/2001.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.hasResourceEfficiency", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasResourceEfficiency",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Integração de medidas de eficiência hídrica e energética no projeto de arquitetura",
       "remediation": "Medidas de eficiência no projeto: (1) Orientação solar: maximizar exposição Sul (ganhos passivos inverno). (2) Sombreamento: palas ou lâminas em vãos Oeste e Este. (3) Ventilação natural cruzada: vãos em fachadas opostas. (4) Aproveitamento de águas pluviais: depósito para rega de jardins. (5) Autoclismos dupla descarga (3/6 L). (6) Torneiras com arejador (caudal ≤ 6 L/min). (7) Nota: requisitos energéticos detalhados nos plugins 'energy' e 'thermal'.",
       "enabled": true,
-      "tags": ["eficiência", "água", "energia", "orientação solar"]
+      "tags": [
+        "eficiência",
+        "água",
+        "energia",
+        "orientação solar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

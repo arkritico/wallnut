@@ -11,13 +11,26 @@
       "description": "Os vasos de expansão da instalação AVAC (hidráulica e/ou frigorífica) não possuem marcação CE e declaração de conformidade conforme a Diretiva PED 2014/68/EU.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasExpansionVesselCE", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasExpansionVessel", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasExpansionVesselCE",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasExpansionVessel",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Marcação CE obrigatória para vasos com PS × V > 50 bar.L",
       "remediation": "Verificar que todos os vasos de expansão possuem: (1) Marcação CE com número do Organismo Notificado (para categoria ≥ II). (2) Declaração de conformidade EU. (3) Placa de identificação com: fabricante, PS (pressão máxima), TS (temperatura máxima/mínima), volume, ano de fabrico, número de série. (4) Manual de instruções. Para vasos de categoria I (PS × V ≤ 200 bar.L): autocertificação do fabricante. Para categoria ≥ II: intervenção de Organismo Notificado obrigatória.",
       "enabled": true,
-      "tags": ["PED", "vaso de expansão", "marcação CE", "pressão"]
+      "tags": [
+        "PED",
+        "vaso de expansão",
+        "marcação CE",
+        "pressão"
+      ]
     },
     {
       "id": "HVAC-PED-SAFETY-VALVE-01",
@@ -26,13 +39,26 @@
       "description": "As válvulas de segurança da instalação AVAC não possuem certificação conforme PED e não foram dimensionadas para o caudal de descarga requerido.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasCertifiedSafetyValves", "operator": "not_exists", "value": null },
-        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 0.5 }
+        {
+          "field": "hvac.hasCertifiedSafetyValves",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.maxSystemPressure",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Válvulas de segurança certificadas PED com dimensionamento verificado",
       "remediation": "Garantir que todas as válvulas de segurança AVAC cumprem PED: (1) Certificação: válvulas de segurança para equipamentos de categoria ≥ II devem ser certificadas por Organismo Notificado. (2) Dimensionamento: caudal de descarga ≥ potência da fonte de calor/pressão (caldeira, compressor). (3) Pressão de disparo: ≤ PS do equipamento protegido. (4) Descarga: canalizada para local seguro, sem redução de secção, sem válvula de seccionamento a montante. (5) Ensaio: verificação anual de funcionamento (elevação manual ou teste com pressão).",
       "enabled": true,
-      "tags": ["PED", "válvula segurança", "certificação", "pressão"]
+      "tags": [
+        "PED",
+        "válvula segurança",
+        "certificação",
+        "pressão"
+      ]
     },
     {
       "id": "HVAC-PED-INSPECTION-01",
@@ -41,13 +67,27 @@
       "description": "Os equipamentos sob pressão da instalação AVAC (vasos de expansão, depósitos de inércia, reservatórios de AQS) não foram submetidos a inspeção periódica conforme DL 90/2010.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasPressureEquipmentInspection", "operator": "not_exists", "value": null },
-        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 0.5 }
+        {
+          "field": "hvac.hasPressureEquipmentInspection",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.maxSystemPressure",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Inspeção periódica obrigatória conforme DL 90/2010 (intervalos conforme categoria)",
       "remediation": "Implementar programa de inspeções periódicas conforme DL 90/2010: (1) Inspeção visual externa: anual para categoria ≥ III, bianual para categoria II. (2) Inspeção interna: cada 4 anos para categoria ≥ III (se acessível), substituída por ensaio não destrutivo (END) quando inacessível. (3) Prova hidráulica: cada 8 anos para categoria ≥ III (a 1.43× PS para água, 1.25× PS para vapor). (4) Registo: manter livro de registo do equipamento com datas, resultados e entidade inspetora. (5) Entidade: inspeções por Organismo de Inspeção acreditado pelo IPAC.",
       "enabled": true,
-      "tags": ["PED", "inspeção", "DL 90/2010", "prova hidráulica", "periódica"]
+      "tags": [
+        "PED",
+        "inspeção",
+        "DL 90/2010",
+        "prova hidráulica",
+        "periódica"
+      ]
     },
     {
       "id": "HVAC-PED-PIPE-01",
@@ -56,13 +96,34 @@
       "description": "As tubagens da instalação AVAC que operam a pressão ≥ 0.5 bar não foram classificadas conforme PED e não possuem documentação de conformidade.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasPipingClassification", "operator": "not_exists", "value": null },
-        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 3 }
+        {
+          "field": "hvac.hasPipingClassification",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.maxSystemPressure",
+          "operator": ">",
+          "value": 3
+        }
       ],
       "requiredValue": "Classificação PED de tubagens com PS > 0.5 bar e DN > 25 mm",
       "remediation": "Classificar tubagens AVAC conforme PED Anexo II: (1) Grupo de fluidos: Grupo 2 (água, glicol) para a maioria das instalações AVAC hidráulicas; Grupo 1 para circuitos frigoríficos (refrigerante). (2) Categoria: determinada pelo diagrama PS × DN (tipicamente categoria I ou II para instalações AVAC correntes). (3) Documentação: dossiê técnico com cálculo de espessuras, certificados de materiais, qualificações de soldadores (conforme EN ISO 9606-1 para aço, EN ISO 13585 para cobre), relatório de ensaios não destrutivos. (4) Para tubagens de categoria I: módulo A (controlo interno da produção).",
       "enabled": true,
-      "tags": ["PED", "tubagem", "classificação", "pressão", "soldadura"]
+      "tags": [
+        "PED",
+        "tubagem",
+        "classificação",
+        "pressão",
+        "soldadura"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-PED-DOCUMENTATION-01",
@@ -71,13 +132,33 @@
       "description": "Não existe dossiê técnico completo para os equipamentos sob pressão da instalação AVAC, conforme exigido pela PED e DL 90/2010.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasPressureEquipmentDossier", "operator": "not_exists", "value": null },
-        { "field": "hvac.maxSystemPressure", "operator": ">", "value": 0.5 }
+        {
+          "field": "hvac.hasPressureEquipmentDossier",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.maxSystemPressure",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Dossiê técnico completo disponível para todos os equipamentos sob pressão",
       "remediation": "Constituir dossiê técnico para cada equipamento sob pressão: (1) Declaração de conformidade CE. (2) Desenhos de fabrico e de conjunto. (3) Cálculos de dimensionamento (pressão, temperatura, espessuras). (4) Certificados de materiais (normas EN 10204 tipo 3.1/3.2). (5) Procedimentos e registos de soldadura. (6) Relatórios de ensaios não destrutivos (END). (7) Relatório de prova hidráulica de fábrica. (8) Manual de instruções (operação, manutenção, limites de utilização). (9) Registos de inspeções periódicas. Conservar por 10 anos após abate.",
       "enabled": true,
-      "tags": ["PED", "dossiê técnico", "documentação", "conformidade"]
+      "tags": [
+        "PED",
+        "dossiê técnico",
+        "documentação",
+        "conformidade"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-PED-CHILLER-VESSEL-01",
@@ -86,14 +167,29 @@
       "description": "O evaporador e/ou condensador do chiller contém refrigerante sob pressão ≥ 0.5 bar e não possui marcação CE conforme PED, nem foi verificada a conformidade dos vasos de pressão do circuito frigorífico com a EN 14276-1.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasChillerPressureVesselCE", "operator": "not_exists", "value": null },
-        { "field": "hvac.chillerRefrigerantPressure", "operator": ">", "value": 0.5 }
+        {
+          "field": "hvac.hasChillerPressureVesselCE",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.chillerRefrigerantPressure",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "currentValueTemplate": "{hvac.chillerRefrigerantPressure} bar de pressão de projeto",
       "requiredValue": "Marcação CE PED + conformidade EN 14276-1 para vasos de pressão frigoríficos",
       "remediation": "Verificar conformidade PED dos vasos de pressão do chiller: (1) Evaporador e condensador são vasos de pressão PED quando PS × V > 50 bar.L (a maioria dos chillers comerciais excede este limiar). (2) Solicitar ao fabricante: declaração de conformidade CE, certificado PED com número do Organismo Notificado, placa de identificação com PS, TS, volume, fluido (grupo 1 — refrigerante). (3) EN 14276-1: requisitos específicos para vasos de pressão em sistemas de refrigeração — materiais, cálculo de espessuras para flutuações térmicas, ensaio de pressão (1.43× PS). (4) Inspeção periódica: conforme DL 90/2010, avaliar categoria PED (tipicamente III ou IV para chillers de grande porte). (5) Para chillers com R-410A: PS de projeto pode atingir 40 bar — verificar adequação dos vasos.",
       "enabled": true,
-      "tags": ["PED", "chiller", "vaso de pressão", "EN 14276", "refrigerante", "COP"]
+      "tags": [
+        "PED",
+        "chiller",
+        "vaso de pressão",
+        "EN 14276",
+        "refrigerante",
+        "COP"
+      ]
     },
     {
       "id": "HVAC-PED-ICE-STORAGE-01",
@@ -102,13 +198,34 @@
       "description": "O tanque de armazenamento térmico por gelo (ice storage) com circuito de glicol pressurizado não foi classificado conforme PED e não possui marcação CE, representando risco de não conformidade para vasos com PS × V > 50 bar.L.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasIceStoragePEDCert", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasIceThermalStorage", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasIceStoragePEDCert",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasIceThermalStorage",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Classificação PED e marcação CE para tanques de gelo com PS × V > 50 bar.L",
       "remediation": "Verificar conformidade PED do tanque de armazenamento de gelo: (1) Classificação: o tanque com circuito de glicol pressurizado é um equipamento sob pressão — classificar conforme PED Anexo II (fluido Grupo 2, líquido). (2) PS típica: 3-6 bar para circuitos de glicol — com volumes de 5-50 m³, ultrapassa facilmente o limiar de 50 bar.L. (3) Marcação CE: solicitar ao fabricante declaração de conformidade e placa de identificação. (4) Serpentinas internas: verificar que suportam a pressão de projeto e os ciclos térmicos (expansão/contração gelo). (5) Válvula de segurança: calibrada para PS do tanque, com descarga para local seguro. (6) Inspeção periódica: conforme DL 90/2010 para a categoria PED aplicável.",
       "enabled": true,
-      "tags": ["PED", "ice storage", "gelo", "vaso de pressão", "glicol"]
+      "tags": [
+        "PED",
+        "ice storage",
+        "gelo",
+        "vaso de pressão",
+        "glicol"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

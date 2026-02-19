@@ -11,13 +11,34 @@
       "description": "Os sistemas AVAC não foram sujeitos a comissionamento (Cx) após a instalação. O Cx verifica que todos os sistemas funcionam conforme o projeto e assegura a entrega de um edifício funcional ao proprietário.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasCommissioning", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 25 }
+        {
+          "field": "hvac.hasCommissioning",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 25
+        }
       ],
       "requiredValue": "Comissionamento (Cx) recomendado para sistemas AVAC ≥ 25 kW",
       "remediation": "Realizar comissionamento dos sistemas AVAC conforme ASHRAE Guideline 0 ou similar: verificação funcional de todos os equipamentos (chillers, caldeiras, UTAs, bombas, válvulas), calibração de sondas e controladores, verificação de setpoints, teste de sequências de controlo (arranque, paragem, free-cooling, alarmes), equilíbrio de caudais de ar e água, medição de COP/EER reais, registo fotográfico e relatório final. O Cx é obrigatório em muitos programas de certificação (LEED, BREEAM).",
       "enabled": true,
-      "tags": ["comissionamento", "Cx", "ASHRAE", "REHVA", "qualidade"]
+      "tags": [
+        "comissionamento",
+        "Cx",
+        "ASHRAE",
+        "REHVA",
+        "qualidade"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-BAL-01",
@@ -26,13 +47,33 @@
       "description": "O sistema hidráulico AVAC não possui válvulas de equilíbrio em todos os ramais, resultando em distribuição desigual de caudal e temperaturas desequilibradas entre zonas.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasBalancingValves", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasBalancingValves",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasPipework",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Válvulas de equilíbrio em todos os ramais do sistema hidráulico",
       "remediation": "Instalar válvulas de equilíbrio estáticas ou dinâmicas (PICV — Pressure Independent Control Valves) em todos os ramais do sistema hidráulico. Após instalação, realizar equilíbrio hidráulico: medir e ajustar caudais em cada ramal para corresponder ao caudal de projeto. Utilizar caudalímetro ultrassónico ou medição por perda de carga na válvula. Manter relatório de equilíbrio com caudais medidos vs. projetados.",
       "enabled": true,
-      "tags": ["equilíbrio hidráulico", "válvulas", "PICV", "distribuição"]
+      "tags": [
+        "equilíbrio hidráulico",
+        "válvulas",
+        "PICV",
+        "distribuição"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-COND-01",
@@ -41,13 +82,34 @@
       "description": "As unidades de climatização não possuem sistema adequado de drenagem de condensados com sifão, podendo causar fugas de água, danos em materiais e proliferação microbiológica.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasCondensateDrain", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedCoolingPower", "operator": ">", "value": 0 }
+        {
+          "field": "hvac.hasCondensateDrain",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": ">",
+          "value": 0
+        }
       ],
       "requiredValue": "Drenagem de condensados com sifão em todas as unidades de arrefecimento",
       "remediation": "Instalar sistema de drenagem de condensados em todas as unidades de arrefecimento (UTAs, ventiloconvectores, unidades split): tabuleiro de condensados com inclinação ≥ 1%, tubo de drenagem com sifão (altura = 2× pressão estática da UTA), descarga para rede de esgotos ou ponto de recolha. O tabuleiro deve ser acessível para limpeza. Prever aquecimento do tabuleiro em unidades exteriores para evitar congelação. A estagnação de água nos tabuleiros é uma causa comum de proliferação de Legionella e fungos.",
       "enabled": true,
-      "tags": ["condensados", "drenagem", "sifão", "Legionella", "manutenção"]
+      "tags": [
+        "condensados",
+        "drenagem",
+        "sifão",
+        "Legionella",
+        "manutenção"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-VIB-01",
@@ -56,13 +118,34 @@
       "description": "Os equipamentos AVAC (compressores, ventiladores, bombas) não possuem apoios anti-vibráticos, transmitindo vibrações e ruído à estrutura do edifício.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasVibrationIsolation", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 12 }
+        {
+          "field": "hvac.hasVibrationIsolation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 12
+        }
       ],
       "requiredValue": "Apoios anti-vibráticos em todos os equipamentos AVAC rotativos",
       "remediation": "Instalar apoios anti-vibráticos sob todos os equipamentos rotativos (compressores, ventiladores, bombas): molas de aço para baixa frequência (> 95% isolamento a 50 Hz), borracha para média/alta frequência, bases inerciais de betão para equipamentos de grande porte. Instalar juntas flexíveis (jangadas) nas ligações hidráulicas e de condutas aos equipamentos. Verificar que as tubagens possuem suportes elásticos nos primeiros 10 m após o equipamento. O isolamento anti-vibrático é essencial para cumprir os limites de ruído e vibrações do RRAE (DL 96/2008).",
       "enabled": true,
-      "tags": ["vibração", "anti-vibrático", "ruído", "molas", "RRAE"]
+      "tags": [
+        "vibração",
+        "anti-vibrático",
+        "ruído",
+        "molas",
+        "RRAE"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-DUCTCLEAN-01",
@@ -71,13 +154,34 @@
       "description": "As condutas AVAC não possuem portas de acesso para limpeza e inspeção conforme EN 12097, dificultando a manutenção e comprometendo a qualidade do ar interior.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasDuctCleaningAccess", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasDuctCleaningAccess",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Portas de acesso para limpeza a cada 3 m de conduta e em todos os acessórios",
       "remediation": "Instalar portas de acesso para limpeza conforme EN 12097: a cada 3 m em troços retos, antes e depois de curvas, tês e reduções, nos pontos de medição de caudal, junto a registos e silenciadores. As portas devem ser estanques (juntas de neoprene) e facilmente removíveis sem ferramentas especiais. Em condutas de teto falso, prever alçapões de acesso alinhados com as portas de limpeza. Considerar limpeza profissional das condutas a cada 2-5 anos (NADCA ACR 2013).",
       "enabled": true,
-      "tags": ["limpeza", "condutas", "EN 12097", "manutenção", "QAI"]
+      "tags": [
+        "limpeza",
+        "condutas",
+        "EN 12097",
+        "manutenção",
+        "QAI"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-EXPANSION-01",
@@ -86,13 +190,26 @@
       "description": "O circuito hidráulico fechado do sistema AVAC não possui vaso de expansão, podendo causar sobrepressão e danos nos equipamentos quando a temperatura da água varia.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasExpansionVessel", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasExpansionVessel",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasPipework",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Vaso de expansão obrigatório em todos os circuitos hidráulicos fechados",
       "remediation": "Instalar vaso de expansão de membrana em cada circuito hidráulico fechado. Dimensionar conforme o volume do circuito e a variação de temperatura prevista (ΔV = V × β × ΔT). Pré-carga de azoto = pressão estática do ponto mais alto + 0.3 bar. Instalar manómetro na ligação ao circuito. Verificar a pré-carga anualmente. Para circuitos de grande volume, considerar vasos de expansão com compressor (pressurização automática).",
       "enabled": true,
-      "tags": ["vaso de expansão", "pressão", "circuito fechado", "segurança"]
+      "tags": [
+        "vaso de expansão",
+        "pressão",
+        "circuito fechado",
+        "segurança"
+      ]
     },
     {
       "id": "HVAC-SAFETY-01",
@@ -101,13 +218,26 @@
       "description": "O circuito hidráulico pressurizado não possui válvula de segurança (alívio de pressão), representando risco de sobrepressão e avaria do equipamento.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasPressureRelief", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasPressureRelief",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasPipework",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Válvula de segurança obrigatória em circuitos pressurizados",
       "remediation": "Instalar válvula de segurança (alívio de pressão) em cada circuito pressurizado: calibrada para 10% acima da pressão de trabalho máxima. A descarga deve ser conduzida para ponto seguro (funil com ligação ao esgoto). Nunca instalar válvulas de corte entre a válvula de segurança e o circuito. Testar o funcionamento anualmente (abertura manual + verificação do fecho estanque). Para caldeiras e termoacumuladores, a válvula de segurança é obrigatória por lei.",
       "enabled": true,
-      "tags": ["válvula de segurança", "pressão", "segurança", "caldeira"]
+      "tags": [
+        "válvula de segurança",
+        "pressão",
+        "segurança",
+        "caldeira"
+      ]
     },
     {
       "id": "HVAC-WATER-TREAT-01",
@@ -116,13 +246,33 @@
       "description": "O circuito hidráulico fechado do sistema AVAC não possui tratamento de água, favorecendo corrosão, incrustação e proliferação microbiológica nas tubagens e permutadores.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasWaterTreatment", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasWaterTreatment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasPipework",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Tratamento de água obrigatório em circuitos hidráulicos AVAC",
       "remediation": "Implementar programa de tratamento de água do circuito fechado: inibidor de corrosão (molibdatos ou nitritos), biocida para prevenir proliferação biológica, anticongelante (glicol propilênico 25-35%) se risco de congelação. Encher o circuito com água tratada (baixa condutividade, sem oxigénio dissolvido). Instalar filtro de partículas e desaerificador. Analisar a água anualmente: pH (8.5-10.5), condutividade, teor de inibidor, contagem microbiológica. Manter registo das análises.",
       "enabled": true,
-      "tags": ["tratamento de água", "corrosão", "circuito fechado", "manutenção"]
+      "tags": [
+        "tratamento de água",
+        "corrosão",
+        "circuito fechado",
+        "manutenção"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-RETURN-FILT-01",
@@ -131,13 +281,33 @@
       "description": "O sistema de ventilação com recuperador de calor não possui filtro no retorno de ar, expondo o recuperador a contaminação e reduzindo a sua eficiência e vida útil.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasReturnAirFilter", "operator": "not_exists", "value": null },
-        { "field": "hvac.heatRecoveryEfficiency", "operator": ">", "value": 0 }
+        {
+          "field": "hvac.hasReturnAirFilter",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.heatRecoveryEfficiency",
+          "operator": ">",
+          "value": 0
+        }
       ],
       "requiredValue": "Filtro M5 mínimo no retorno de ar para proteção do recuperador",
       "remediation": "Instalar filtro de classe M5 mínima no circuito de retorno de ar, antes do recuperador de calor. O filtro protege o recuperador contra acumulação de poeiras e gorduras que reduzem a eficiência de troca e aumentam a perda de carga. Substituir o filtro conforme periodicidade recomendada pelo fabricante (tipicamente a cada 3-6 meses) ou quando a perda de carga atinge 150-250 Pa. Instalar pressóstato diferencial com alarme para indicação de filtro colmatado.",
       "enabled": true,
-      "tags": ["filtro", "retorno", "recuperador", "manutenção"]
+      "tags": [
+        "filtro",
+        "retorno",
+        "recuperador",
+        "manutenção"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-FIRE-SHUTOFF-01",
@@ -146,13 +316,27 @@
       "description": "O sistema AVAC não desliga automaticamente em caso de deteção de incêndio, podendo propagar fumos através das condutas e alimentar o incêndio com ar fresco.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasHVACFireShutoff", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasHVACFireShutoff",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Corte automático do AVAC obrigatório em caso de deteção de incêndio",
       "remediation": "Implementar interface entre o sistema de deteção de incêndio (SDI/SADI) e o sistema AVAC: paragem automática de todos os ventiladores de climatização, fecho de todos os registos corta-fogo, fecho dos registos de ar exterior, ativação do sistema de desenfumagem (se existente). A interface deve ser por contactos secos (relé de segurança) com ligação direta à central de deteção de incêndio. Testar a interface semestralmente como parte do plano de manutenção do SCIE.",
       "enabled": true,
-      "tags": ["incêndio", "corte AVAC", "SCIE", "segurança", "SDI"]
+      "tags": [
+        "incêndio",
+        "corte AVAC",
+        "SCIE",
+        "segurança",
+        "SDI"
+      ]
     },
     {
       "id": "HVAC-INSUL-FIRE-01",
@@ -161,14 +345,35 @@
       "description": "O isolamento térmico das condutas AVAC possui classe de reação ao fogo inadequada. Em vias de evacuação e espaços públicos, o isolamento deve ser classe A2 ou superior conforme EN 13501-1.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.insulationFireClass", "operator": "in", "value": ["C", "D"] },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hospital"] }
+        {
+          "field": "hvac.insulationFireClass",
+          "operator": "in",
+          "value": [
+            "C",
+            "D"
+          ]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "hospital"
+          ]
+        }
       ],
       "currentValueTemplate": "Classe {hvac.insulationFireClass}",
       "requiredValue": "Classe A2 ou superior em vias de evacuação e espaços públicos",
       "remediation": "Substituir o isolamento de condutas por material com classe de reação ao fogo adequada: Classe A1 (incombustível): lã de rocha sem revestimento; Classe A2: lã de rocha com revestimento alumínio. Em vias de evacuação, átrios e espaços públicos, o isolamento deve ser classe A2 no mínimo. O isolamento elastomérico (classe B/C) é aceitável em zonas técnicas e tetos falsos não acessíveis ao público. Verificar que o revestimento exterior (chapa, PVC) também cumpre a classe exigida.",
       "enabled": true,
-      "tags": ["reação ao fogo", "isolamento", "EN 13501-1", "SCIE", "condutas"]
+      "tags": [
+        "reação ao fogo",
+        "isolamento",
+        "EN 13501-1",
+        "SCIE",
+        "condutas"
+      ]
     },
     {
       "id": "HVAC-NOISE-OFFICE-01",
@@ -177,14 +382,43 @@
       "description": "O nível de ruído do sistema AVAC ({hvac.equipmentNoiseRating} NR) excede NR 40 em escritórios de planta aberta, comprometendo o conforto acústico dos ocupantes.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.equipmentNoiseRating", "operator": ">", "value": 40 },
-        { "field": "hvac.spaceType", "operator": "==", "value": "office" }
+        {
+          "field": "hvac.equipmentNoiseRating",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "office"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "office"
+          ]
+        }
       ],
       "currentValueTemplate": "{hvac.equipmentNoiseRating} NR",
       "requiredValue": "≤ NR 35-40 (escritórios open-plan), ≤ NR 30 (salas de reunião)",
       "remediation": "Reduzir o ruído AVAC: instalar atenuadores acústicos nas condutas (tipo splitter ou cilíndrico), reduzir velocidade do ar nos ramais terminais (≤ 3 m/s), instalar difusores de baixo nível sonoro, revestir o interior das condutas com material absorvente acústico nos primeiros 3 m após o ventilador, verificar o equilíbrio dos ventiladores. Em open-space, o masking sonoro (ruído branco/rosa) pode complementar a redução do ruído AVAC.",
       "enabled": true,
-      "tags": ["ruído", "escritório", "NR", "acústica", "conforto"]
+      "tags": [
+        "ruído",
+        "escritório",
+        "NR",
+        "acústica",
+        "conforto"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-NOISE-HOSPITAL-01",
@@ -193,14 +427,36 @@
       "description": "O nível de ruído do sistema AVAC ({hvac.equipmentNoiseRating} NR) excede NR 30 em espaço hospitalar, comprometendo o repouso e recuperação dos pacientes.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.equipmentNoiseRating", "operator": ">", "value": 30 },
-        { "field": "hvac.spaceType", "operator": "==", "value": "hospital" }
+        {
+          "field": "hvac.equipmentNoiseRating",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "hospital"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "hospital",
+            "healthcare"
+          ]
+        }
       ],
       "currentValueTemplate": "{hvac.equipmentNoiseRating} NR",
       "requiredValue": "≤ NR 25-30 (enfermarias), ≤ NR 25 (quartos individuais), ≤ NR 35 (bloco operatório)",
       "remediation": "Implementar medidas de redução de ruído rigorosas para espaços hospitalares: atenuadores acústicos de alto desempenho, difusores perforados de baixíssimo nível sonoro, condutas com revestimento acústico interno, equipamentos em zonas técnicas isoladas acusticamente. Verificar também ruído de válvulas (cavitação), bombas (ressonância), e ventiladores (frequência de pás). Considerar sistemas de teto radiante em vez de ventilação forçada em quartos para minimizar o ruído.",
       "enabled": true,
-      "tags": ["ruído", "hospital", "NR", "acústica", "saúde"]
+      "tags": [
+        "ruído",
+        "hospital",
+        "NR",
+        "acústica",
+        "saúde"
+      ]
     },
     {
       "id": "HVAC-NOISE-CLASSROOM-01",
@@ -209,14 +465,35 @@
       "description": "O nível de ruído do sistema AVAC ({hvac.equipmentNoiseRating} NR) excede NR 30 em sala de aula, comprometendo a inteligibilidade da fala e o desempenho académico.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.equipmentNoiseRating", "operator": ">", "value": 30 },
-        { "field": "hvac.spaceType", "operator": "==", "value": "classroom" }
+        {
+          "field": "hvac.equipmentNoiseRating",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "classroom"
+        }
       ],
       "currentValueTemplate": "{hvac.equipmentNoiseRating} NR",
       "requiredValue": "≤ NR 30 (salas de aula), ≤ NR 25 (salas de música/exames)",
       "remediation": "Reduzir o ruído AVAC em salas de aula: velocidade de ar nas grelhas ≤ 2 m/s, atenuadores acústicos nas condutas, evitar insuflação direta sobre a zona do professor. Em escolas existentes sem condutas, considerar unidades de ventilação descentralizadas (parede/janela) com ventiladores EC de baixo ruído. O ruído AVAC deve permitir STI (Speech Transmission Index) ≥ 0.60 na posição do aluno mais afastado.",
       "enabled": true,
-      "tags": ["ruído", "sala de aula", "NR", "acústica", "educação"]
+      "tags": [
+        "ruído",
+        "sala de aula",
+        "NR",
+        "acústica",
+        "educação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-MAINT-FILT-01",
@@ -225,13 +502,33 @@
       "description": "O plano de manutenção AVAC não inclui substituição periódica de filtros de ar, resultando em filtros colmatados que reduzem o caudal, aumentam o consumo energético e degradam a qualidade do ar interior.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasMaintenancePlan", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasMaintenancePlan",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Substituição de filtros a cada 3-6 meses ou quando ΔP > limite",
       "remediation": "Incluir no plano de manutenção preventiva: substituição de pré-filtros (M5) a cada 3 meses, substituição de filtros finais (F7) a cada 6 meses, verificação mensal da perda de carga dos filtros (pressóstato diferencial). Nunca limpar ou aspirar filtros tipo bolsa ou compacto — sempre substituir. Registar datas de substituição e leituras de pressão diferencial. Custo de energia de um filtro colmatado é 5-10× superior ao custo do filtro novo.",
       "enabled": true,
-      "tags": ["filtros", "manutenção", "perda de carga", "QAI"]
+      "tags": [
+        "filtros",
+        "manutenção",
+        "perda de carga",
+        "QAI"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-MAINT-PLAN-COMM",
@@ -240,15 +537,51 @@
       "description": "O edifício comercial com potência AVAC < 25 kW não possui plano de manutenção preventiva. Embora não seja obrigatório abaixo de 25 kW, a manutenção preventiva é essencial para a eficiência, qualidade do ar e longevidade dos equipamentos.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasMaintenancePlan", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": "<", "value": 25 },
-        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasMaintenancePlan",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": "<",
+          "value": 25
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Plano de manutenção preventiva recomendado mesmo para < 25 kW",
       "remediation": "Elaborar plano de manutenção preventiva simplificado: limpeza/substituição de filtros (trimestral), verificação de fugas de refrigerante (anual), limpeza de permutadores e tabuleiros de condensados (semestral), verificação de correias e rolamentos dos ventiladores (semestral), verificação dos termóstatos e controladores (anual). Manter registo de todas as intervenções. A manutenção preventiva prolonga a vida útil dos equipamentos em 30-50% e mantém a eficiência energética.",
       "enabled": true,
-      "tags": ["manutenção", "preventiva", "pequena potência", "eficiência"]
+      "tags": [
+        "manutenção",
+        "preventiva",
+        "pequena potência",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-MAINT-COND-CLEAN",
@@ -257,13 +590,39 @@
       "description": "As condutas AVAC não são sujeitas a limpeza periódica, acumulando poeiras, partículas e potenciais contaminantes microbiológicos que degradam a qualidade do ar interior.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasDuctCleaningAccess", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasDuctCleaningAccess",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Limpeza de condutas a cada 3-5 anos (NADCA ACR 2013)",
       "remediation": "Programar limpeza profissional de condutas AVAC a cada 3-5 anos conforme NADCA ACR 2013 (Assessment, Cleaning & Restoration). A limpeza deve incluir: inspeção vídeo prévia, aspiração com equipamento HEPA, escovagem mecânica, desinfeção (se necessário), inspeção vídeo final. Manter relatório fotográfico antes/depois. Em ambientes hospitalares ou com ocupantes sensíveis, a limpeza deve ser mais frequente (1-2 anos).",
       "enabled": true,
-      "tags": ["limpeza", "condutas", "NADCA", "QAI", "manutenção"]
+      "tags": [
+        "limpeza",
+        "condutas",
+        "NADCA",
+        "QAI",
+        "manutenção"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-SERVERROOM-01",
@@ -272,13 +631,27 @@
       "description": "A sala de servidores não dispõe de sistema de climatização dedicado com redundância, comprometendo a continuidade de operação dos equipamentos de TI.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.spaceType", "operator": "==", "value": "server-room" },
-        { "field": "hvac.installedCoolingPower", "operator": "<", "value": 5 }
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "server-room"
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": "<",
+          "value": 5
+        }
       ],
       "requiredValue": "Sistema de climatização dedicado com redundância N+1 para salas de servidores",
       "remediation": "Instalar sistema de climatização dedicado para a sala de servidores: unidades de precisão (CRAC/CRAH) com controlo de temperatura ± 1°C e humidade ± 5%. Manter temperatura 18-27°C (ASHRAE A1 classe). Prever redundância N+1 (uma unidade de backup). Instalar sensores de temperatura e humidade com alarme remoto. Garantir alimentação elétrica por UPS. Considerar free-cooling direto ou indireto para poupança energética.",
       "enabled": true,
-      "tags": ["sala de servidores", "datacenter", "ASHRAE", "redundância", "climatização"]
+      "tags": [
+        "sala de servidores",
+        "datacenter",
+        "ASHRAE",
+        "redundância",
+        "climatização"
+      ]
     },
     {
       "id": "HVAC-POOL-VENT-01",
@@ -287,13 +660,26 @@
       "description": "A piscina coberta não dispõe de sistema de desumidificação e ventilação adequado, resultando em condensação excessiva, degradação dos materiais e ambiente desconfortável.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.spaceType", "operator": "==", "value": "swimming-pool" },
-        { "field": "hvac.hasVentilationSystem", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "swimming-pool"
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Sistema de desumidificação e ventilação dedicado para piscinas cobertas",
       "remediation": "Instalar sistema de ventilação e desumidificação dedicado para a piscina coberta: UTA com desumidificação (bomba de calor de desumidificação ou roda dessecante), temperatura do ar 2-3°C acima da temperatura da água, humidade relativa 50-60% (máximo 65%), pressão negativa no recinto da piscina em relação aos espaços adjacentes. Prever recuperação de calor entre o ar extraído e o ar novo. Utilizar materiais resistentes à corrosão (aço inox 316, alumínio marítimo). Caudal de ar novo: 4-8 renovações por hora.",
       "enabled": true,
-      "tags": ["piscina", "desumidificação", "ventilação", "condensação"]
+      "tags": [
+        "piscina",
+        "desumidificação",
+        "ventilação",
+        "condensação"
+      ]
     },
     {
       "id": "HVAC-DATACENTER-FREECOOL-01",
@@ -302,13 +688,34 @@
       "description": "O centro de dados com consumo anual de arrefecimento significativo não utiliza free-cooling (econimizador de ar ou água), desperdiçando o potencial de arrefecimento gratuito quando a temperatura exterior é inferior a 18°C.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.spaceType", "operator": "==", "value": "data-center" },
-        { "field": "hvac.hasFreeCooling", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "data-center"
+        },
+        {
+          "field": "hvac.hasFreeCooling",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Free-cooling recomendado para datacenters — redução de PUE de 0.2-0.4",
       "remediation": "Implementar free-cooling no datacenter: (1) Free-cooling direto por ar: admissão de ar exterior filtrado quando T < 18°C e HR < 80%. (2) Free-cooling indireto por ar: permutador ar-ar sem mistura (evita contaminação). (3) Free-cooling por água gelada: dry-cooler ou torre de arrefecimento produz água a 15-18°C quando T exterior < 12°C. (4) Em Portugal continental, o free-cooling pode cobrir 3000-5000 horas/ano. (5) PUE alvo com free-cooling: ≤ 1.3 (vs. 1.5-1.8 sem free-cooling). (6) Controlar humidade: humidificação adiabática quando HR < 20%.",
       "enabled": true,
-      "tags": ["datacenter", "free-cooling", "PUE", "eficiência", "ASHRAE"]
+      "tags": [
+        "datacenter",
+        "free-cooling",
+        "PUE",
+        "eficiência",
+        "ASHRAE"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-RADIANT-CEILING-01",
@@ -317,14 +724,47 @@
       "description": "O projeto não considerou teto radiante para arrefecimento em escritórios, apesar de ser a solução com maior conforto térmico, menor ruído e menor consumo energético (temperatura de água 15-18°C vs. 7°C em sistemas convencionais).",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasCoolingSystem", "operator": "==", "value": true },
-        { "field": "hvac.hasRadiantCoolingAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "commercial"] }
+        {
+          "field": "hvac.hasCoolingSystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "hvac.hasRadiantCoolingAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "in",
+          "value": [
+            "office",
+            "commercial"
+          ]
+        }
       ],
       "requiredValue": "Avaliação de teto radiante recomendada para escritórios (potência 40-80 W/m²)",
       "remediation": "Avaliar a viabilidade de teto radiante para arrefecimento: (1) Potência típica: 40-80 W/m² em arrefecimento, 30-50 W/m² em aquecimento. (2) Temperatura da água: 15-18°C (arrefecimento), 30-40°C (aquecimento) — permite utilização de bomba de calor com COP/EER elevado. (3) Controlo de condensação: sensor de ponto de orvalho com corte da água fria quando ΔT < 2°C. (4) Necessidade de ventilação separada para ar novo e desumidificação. (5) Conforto: sem correntes de ar, sem ruído de ventilador, distribuição uniforme. (6) Norma de dimensionamento: EN 14240.",
       "enabled": true,
-      "tags": ["teto radiante", "arrefecimento", "conforto", "EN 14240", "eficiência"]
+      "tags": [
+        "teto radiante",
+        "arrefecimento",
+        "conforto",
+        "EN 14240",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-LABFUMEHOOD-VAV-01",
@@ -333,14 +773,35 @@
       "description": "As hottes de laboratório operam a caudal constante (CAV) em vez de caudal variável (VAV), consumindo energia excessiva quando a guilhotina está parcialmente ou totalmente fechada.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.fumeHoodControlType", "operator": "==", "value": "CAV" },
-        { "field": "hvac.spaceType", "operator": "==", "value": "laboratory" }
+        {
+          "field": "hvac.fumeHoodControlType",
+          "operator": "==",
+          "value": "CAV"
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "laboratory"
+        }
       ],
       "currentValueTemplate": "Controlo CAV (caudal constante)",
       "requiredValue": "Controlo VAV recomendado para hottes de laboratório (economia de 40-60%)",
       "remediation": "Converter hottes CAV para controlo VAV: (1) Instalar sensor de posição da guilhotina e controlador VAV que mantém velocidade facial constante (0.5 m/s). (2) Registo motorizado na conduta de extração da hotte. (3) Economia: 40-60% no consumo de extração e tratamento de ar. (4) O sistema de compensação (makeup air) deve também ser VAV, sincronizado com a extração. (5) Instalar monitor de velocidade facial com alarme quando fora do intervalo 0.4-0.6 m/s. (6) Payback típico: 2-4 anos para laboratórios com múltiplas hottes.",
       "enabled": true,
-      "tags": ["hotte", "laboratório", "VAV", "EN 14175", "eficiência"]
+      "tags": [
+        "hotte",
+        "laboratório",
+        "VAV",
+        "EN 14175",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-SMOKE-CONTROL-DESIGN-01",
@@ -349,14 +810,44 @@
       "description": "O sistema de controlo de fumo não foi dimensionado com base em simulação CFD (Computational Fluid Dynamics) para validar a eficácia em cenários de incêndio específicos do edifício.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasSmokeExtractionSystem", "operator": "exists", "value": null },
-        { "field": "hvac.hasCFDSimulation", "operator": "not_exists", "value": null },
-        { "field": "building.height", "operator": ">", "value": 20 }
+        {
+          "field": "hvac.hasSmokeExtractionSystem",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasCFDSimulation",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "building.height",
+          "operator": ">",
+          "value": 20
+        }
       ],
       "requiredValue": "Simulação CFD recomendada para sistemas de controlo de fumo em edifícios > 20 m",
       "remediation": "Realizar simulação CFD do sistema de controlo de fumo: (1) Software: FDS (Fire Dynamics Simulator), ANSYS Fluent, ou equivalente. (2) Cenários: incêndio na base do átrio, incêndio em piso intermédio, incêndio em estacionamento. (3) Validar: camada livre de fumo ≥ 2.5 m acima do piso mais alto acessível durante 60 min. (4) Verificar: caudais de extração, velocidades nas aberturas de admissão, temperatura dos componentes, interação com sprinklers. (5) A simulação CFD é particularmente importante para átrios, geometrias complexas e edifícios altos onde os métodos simplificados podem ser insuficientes.",
       "enabled": true,
-      "tags": ["controlo de fumo", "CFD", "simulação", "EN 12101", "incêndio"]
+      "tags": [
+        "controlo de fumo",
+        "CFD",
+        "simulação",
+        "EN 12101",
+        "incêndio"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-ICE-STORAGE-01",
@@ -365,13 +856,39 @@
       "description": "O edifício com pico de arrefecimento elevado e tarifa elétrica bi-horária não considerou armazenamento térmico por gelo (ice thermal storage) para deslocar a produção de frio para horas de vazio, reduzindo custos energéticos e potência contratada.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasIceThermalStorage", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 200 }
+        {
+          "field": "hvac.hasIceThermalStorage",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": ">=",
+          "value": 200
+        }
       ],
       "requiredValue": "Avaliação de armazenamento térmico por gelo recomendada para potências ≥ 200 kW",
       "remediation": "Avaliar viabilidade de sistema de armazenamento térmico por gelo: (1) Tanque de gelo com serpentina interna ou cápsulas: capacidade típica de 6-8 horas de carga a 50-70% da potência de pico. (2) Funcionamento: chiller produz gelo durante a noite (tarifa vazio) a -5°C a -7°C; durante o dia o gelo é descarregado para cobrir o pico. (3) Redução de potência contratada: chiller pode ser dimensionado para 50-60% do pico (restante coberto pelo gelo). (4) Glicol: circuito primário com 25-30% de etilenoglicol para temperaturas negativas. (5) Payback típico: 4-7 anos com tarifa bi-horária. (6) Espaço: prever 0.08-0.12 m³ de tanque por kWh de armazenamento.",
       "enabled": true,
-      "tags": ["armazenamento térmico", "gelo", "ice storage", "eficiência", "tarifa"]
+      "tags": [
+        "armazenamento térmico",
+        "gelo",
+        "ice storage",
+        "eficiência",
+        "tarifa"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-GSHP-BORE-01",
@@ -380,14 +897,35 @@
       "description": "Os furos geotérmicos (boreholes) para a bomba de calor geotérmica não foram dimensionados conforme EN 15450 e as condições geológicas locais, podendo resultar em subdimensionamento e degradação progressiva do desempenho.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.geothermalBoreDepth", "operator": "<", "value": 80 },
-        { "field": "hvac.heatPumpType", "operator": "==", "value": "ground-source" }
+        {
+          "field": "hvac.geothermalBoreDepth",
+          "operator": "<",
+          "value": 80
+        },
+        {
+          "field": "hvac.heatPumpType",
+          "operator": "==",
+          "value": "ground-source"
+        }
       ],
       "currentValueTemplate": "{hvac.geothermalBoreDepth} m de profundidade por furo",
       "requiredValue": "Profundidade ≥ 80-150 m conforme EN 15450 e teste de resposta térmica (TRT)",
       "remediation": "Dimensionar corretamente os furos geotérmicos: (1) Teste de Resposta Térmica (TRT): obrigatório para instalações > 30 kW — determina a condutividade térmica do solo (tipicamente 1.5-3.5 W/(m.K) em Portugal). (2) Profundidade típica: 80-150 m por furo, dependendo da geologia (granito: 2.5-3.5 W/(m.K), calcário: 2.0-2.8, argilas: 1.2-1.8). (3) Potência específica: 40-70 W/m em aquecimento, 30-50 W/m em arrefecimento (solo equilibrado). (4) Espaçamento entre furos: mínimo 6 m (preferencialmente 8-10 m) para evitar interferência térmica. (5) Equilibrar cargas: em Portugal, o arrefecimento predomina — considerar geocooling passivo ou recarga solar para equilibrar o campo geotérmico.",
       "enabled": true,
-      "tags": ["geotérmico", "bomba de calor", "bore", "EN 15450", "TRT"]
+      "tags": [
+        "geotérmico",
+        "bomba de calor",
+        "bore",
+        "EN 15450",
+        "TRT"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-CONDENSATE-PUMP-01",
@@ -396,14 +934,39 @@
       "description": "As unidades de arrefecimento instaladas abaixo do nível da rede de drenagem não possuem bomba de condensados, resultando em acumulação de água no tabuleiro e risco de transbordo, danos e proliferação microbiológica.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasCondensatePump", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasCoolingSystem", "operator": "==", "value": true },
-        { "field": "hvac.condensateDrainByGravity", "operator": "==", "value": false }
+        {
+          "field": "hvac.hasCondensatePump",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasCoolingSystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "hvac.condensateDrainByGravity",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Bomba de condensados obrigatória quando drenagem gravítica impossível",
       "remediation": "Instalar bomba de condensados (mini-pump) em todas as unidades sem drenagem gravítica: (1) Caudal: dimensionar para 1.5× o caudal de condensados de pico (tipicamente 0.5-2 L/h por kW de arrefecimento). (2) Altura de elevação: verificar altura manométrica disponível (tipicamente 3-8 m para mini-pumps). (3) Alarme: prever contacto de nível alto no tabuleiro com paragem da unidade e sinal para GTC. (4) Manutenção: limpeza trimestral do tabuleiro e verificação do flutuador/sensor de nível. (5) Reservatório de recolha: material anti-microbiológico, com acesso para limpeza. (6) Tubagem de descarga: diâmetro mínimo 16 mm, inclinação ascendente contínua até ao ponto de descarga.",
       "enabled": true,
-      "tags": ["condensados", "bomba", "drenagem", "arrefecimento", "manutenção"]
+      "tags": [
+        "condensados",
+        "bomba",
+        "drenagem",
+        "arrefecimento",
+        "manutenção"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-CX-AIRBALANCE-01",
@@ -412,14 +975,35 @@
       "description": "Os caudais de ar medidos durante o comissionamento desviam-se mais de ±10% dos caudais de projeto, indicando equilíbrio de ar inadequado que compromete o conforto e a qualidade do ar interior.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.airBalanceDeviation", "operator": ">", "value": 10 },
-        { "field": "hvac.hasCommissioning", "operator": "exists", "value": null }
+        {
+          "field": "hvac.airBalanceDeviation",
+          "operator": ">",
+          "value": 10
+        },
+        {
+          "field": "hvac.hasCommissioning",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "currentValueTemplate": "Desvio de ±{hvac.airBalanceDeviation}% nos caudais de ar",
       "requiredValue": "Tolerância de ±10% para condutas principais, ±15% para ramais terminais (ASHRAE 111)",
       "remediation": "Reequilibrar o sistema de ar conforme ASHRAE Standard 111: (1) Condutas principais: tolerância ±10% do caudal de projeto. (2) Ramais e difusores: tolerância ±15%. (3) Método: medir caudais com balómetro calibrado em todos os difusores, ajustar registos de equilíbrio nos ramais. (4) Sequência: equilibrar primeiro os ramais mais desfavorecidos (mais distantes ou com maior perda de carga), depois ajustar os restantes proporcionalmente. (5) Verificar: pressão estática no ventilador dentro dos limites de projeto (indica se o sistema total está conforme). (6) Documentar: relatório de equilíbrio com caudais de projeto vs. medidos em cada ponto.",
       "enabled": true,
-      "tags": ["comissionamento", "equilíbrio de ar", "ASHRAE 111", "caudal", "tolerância"]
+      "tags": [
+        "comissionamento",
+        "equilíbrio de ar",
+        "ASHRAE 111",
+        "caudal",
+        "tolerância"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-RUNAROUND-COIL-01",
@@ -428,14 +1012,44 @@
       "description": "O sistema de ventilação com caudais de ar novo e extração separados (UTAs independentes sem possibilidade de recuperação direta) não foi equipado com sistema de recuperação de calor tipo run-around coil (bateria de circuito fechado), desperdiçando energia térmica do ar extraído.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasRunAroundCoilRecovery", "operator": "not_exists", "value": null },
-        { "field": "hvac.freshAirFlow", "operator": ">=", "value": 3000 },
-        { "field": "hvac.hasHeatRecovery", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.hasRunAroundCoilRecovery",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.freshAirFlow",
+          "operator": ">=",
+          "value": 3000
+        },
+        {
+          "field": "hvac.hasHeatRecovery",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Sistema run-around coil recomendado quando recuperação direta não é viável (eficiência 40-55%)",
       "remediation": "Instalar sistema de recuperação run-around coil: (1) Princípio: duas baterias (uma na extração, uma na admissão) ligadas por circuito hidráulico fechado com bomba circuladora e fluido térmico (água+glicol 30-40%). (2) Eficiência: 40-55% (inferior ao permutador de placas, mas não exige proximidade entre condutas). (3) Vantagem: sem risco de contaminação cruzada (circuito fechado), ideal para hottes de laboratório, cozinhas industriais, salas limpas. (4) Dimensionamento: baterias com 4-6 fiadas, velocidade facial 2.0-2.5 m/s, ΔT fluido de 5-8°C. (5) Controlo: válvula de 3 vias no circuito para modular a recuperação. (6) Anti-congelação: glicol propilênico 35% se ar de extração < 0°C.",
       "enabled": true,
-      "tags": ["run-around coil", "recuperação de calor", "REHVA", "baterias", "eficiência"]
+      "tags": [
+        "run-around coil",
+        "recuperação de calor",
+        "REHVA",
+        "baterias",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-UVC-DISINFECTION-01",
@@ -444,14 +1058,44 @@
       "description": "O sistema AVAC com risco microbiológico (edifícios de saúde, hotelaria, escritórios de alta ocupação) não possui sistema de desinfeção UV-C nas UTAs para inativação de vírus, bactérias e fungos na corrente de ar.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasUVCDisinfection", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hospital"] }
+        {
+          "field": "hvac.hasUVCDisinfection",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "hospital"
+          ]
+        }
       ],
       "requiredValue": "Sistema UV-C com dose ≥ 40 J/m² para inativação de 99.9% de vírus e bactérias",
       "remediation": "Instalar sistema UV-C nas UTAs para desinfeção do ar: (1) Comprimento de onda: 254 nm (pico germicida) — lâmpadas de baixa pressão de mercúrio ou LEDs UV-C. (2) Dose germicida: ≥ 40 J/m² para 99.9% de inativação de vírus e bactérias comuns. (3) Posicionamento: a jusante da bateria de arrefecimento (desinfeção do ar + prevenção de biofilme na bateria e tabuleiro). (4) Dimensionamento: calcular irradiância necessária em função da velocidade do ar na secção da UTA (tipicamente 2-3 m/s). (5) Segurança: lâmpadas UV-C não devem ser visíveis pelos operadores — visor de inspeção com filtro UV e interruptor de segurança na porta de acesso. (6) Manutenção: substituição de lâmpadas a cada 9000-12000 horas, limpeza trimestral das lâmpadas (poeira reduz eficácia). (7) Ozono: selecionar lâmpadas 'ozone-free' para evitar geração de O₃.",
       "enabled": true,
-      "tags": ["UV-C", "desinfeção", "UTA", "microbiologia", "vírus", "bactérias"]
+      "tags": [
+        "UV-C",
+        "desinfeção",
+        "UTA",
+        "microbiologia",
+        "vírus",
+        "bactérias"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-BIPOLAR-ION-01",
@@ -460,14 +1104,35 @@
       "description": "O sistema de ionização bipolar (needlepoint bipolar ionization) instalado no sistema AVAC não cumpre os requisitos de segurança e eficácia, podendo gerar subprodutos nocivos (ozono, formaldeído) sem evidência documentada de eficácia germicida nas condições reais de operação.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasBipolarIonization", "operator": "==", "value": true },
-        { "field": "hvac.hasBipolarIonizationCertification", "operator": "not_exists", "value": null }
+        {
+          "field": "hvac.hasBipolarIonization",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "hvac.hasBipolarIonizationCertification",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "currentValueTemplate": "Ionização bipolar sem certificação de segurança e eficácia verificadas",
       "requiredValue": "Certificação UL 2998 (zero ozone), ensaio de eficácia in-situ e monitorização de subprodutos",
       "remediation": "Verificar conformidade do sistema de ionização bipolar: (1) Certificação UL 2998: obrigatória — garante emissão de ozono < 5 ppb (limiar de deteção). (2) Ensaio de eficácia: solicitar ao fabricante relatório de testes em condições reais (caudal de ar, humidade, contaminante alvo) por laboratório independente. (3) Subprodutos: medir formaldeído e ozono no ar de insuflação com e sem o sistema ativo. (4) Manutenção: limpeza mensal dos elétrodos (acumulação de poeira reduz produção de iões). (5) Monitorização: instalar contador de iões a jusante para verificar produção mínima (tipicamente > 1 × 10⁶ iões/cm³). (6) Nota: a ASHRAE Position Document on Filtration and Air Cleaning (2021) classifica a ionização como tecnologia emergente que necessita validação adicional. Não substituir a filtração adequada (M5+F7) pela ionização.",
       "enabled": true,
-      "tags": ["ionização bipolar", "ozono", "eficácia", "UL 2998", "tratamento de ar"]
+      "tags": [
+        "ionização bipolar",
+        "ozono",
+        "eficácia",
+        "UL 2998",
+        "tratamento de ar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-HEAT-WHEEL-CARRYOVER-01",
@@ -476,14 +1141,35 @@
       "description": "A roda de recuperação de calor (heat wheel/enthalpy wheel) apresenta transferência de contaminantes (carryover) excessiva do ar de extração para o ar de insuflação, comprometendo a qualidade do ar novo tratado.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.heatWheelCarryoverPercent", "operator": ">", "value": 5 },
-        { "field": "hvac.hasEnergyRecoveryWheel", "operator": "==", "value": true }
+        {
+          "field": "hvac.heatWheelCarryoverPercent",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "hvac.hasEnergyRecoveryWheel",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "{hvac.heatWheelCarryoverPercent}% de carryover",
       "requiredValue": "Carryover ≤ 5% (extração genérica), ≤ 1% (hottes, laboratórios), 0% (ar contaminado)",
       "remediation": "Reduzir carryover na roda de recuperação: (1) Setor de purga (purge sector): instalar sector de purga de 5-15° com ar novo pré-filtrado para limpar a matriz da roda antes de entrar no fluxo de insuflação — reduz carryover de 10-15% para 2-5%. (2) Vedantes de escova (brush seals): verificar estado dos vedantes periféricos e axiais — vedantes gastos aumentam fugas de 1-2% para 5-10%. (3) Diferencial de pressão: manter o lado da insuflação a pressão ligeiramente superior ao lado da extração (5-10 Pa) para que as fugas ocorram de ar limpo para sujo. (4) Velocidade de rotação: reduzir rpm para minimizar volume de ar transportado na matriz. (5) Aplicações proibidas: não usar roda de recuperação quando o ar de extração contém contaminantes tóxicos, agentes biológicos ou odores fortes — utilizar permutador de placas ou run-around coil.",
       "enabled": true,
-      "tags": ["roda recuperação", "carryover", "vedantes", "purge sector", "QAI"]
+      "tags": [
+        "roda recuperação",
+        "carryover",
+        "vedantes",
+        "purge sector",
+        "QAI"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-PLATE-HX-FOULING-01",
@@ -492,13 +1178,34 @@
       "description": "Os permutadores de placas do sistema AVAC (evaporadores, condensadores, circuitos de free-cooling) não são monitorizados quanto ao fator de sujamento (fouling factor), resultando em degradação progressiva da eficiência térmica sem deteção.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasPlateHXFoulingMonitoring", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasPlateHeatExchanger", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasPlateHXFoulingMonitoring",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasPlateHeatExchanger",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Monitorização do fator de sujamento com limpeza quando ΔT approach degrada > 20%",
       "remediation": "Implementar monitorização do sujamento nos permutadores de placas: (1) Indicadores: monitorizar ΔT approach (diferença entre temperaturas de saída dos dois fluidos) e ΔP do lado da água — desvio > 20% do valor de comissionamento indica sujamento significativo. (2) Fator de sujamento de projeto: 0.000017 m²·K/W para água tratada em circuito fechado, 0.000044 m²·K/W para água de torre de arrefecimento. (3) Limpeza: CIP (Clean-in-Place) com solução ácida (ácido cítrico 5%) para calcário, ou alcalina (NaOH 2%) para biofilme, sem desmontar o permutador. (4) Prevenção: programa de tratamento de água (inibidores, biocida), filtro de partículas a montante do PHE. (5) Frequência: análise trimestral de approach temperature, limpeza CIP anual (ou quando approach > 20% do valor inicial).",
       "enabled": true,
-      "tags": ["permutador de placas", "sujamento", "fouling", "limpeza", "eficiência"]
+      "tags": [
+        "permutador de placas",
+        "sujamento",
+        "fouling",
+        "limpeza",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-FAN-WALL-01",
@@ -507,14 +1214,45 @@
       "description": "O projeto de UTA de grande caudal (> 20.000 m³/h) não considerou a configuração fan wall (array de múltiplos ventiladores EC) como alternativa ao ventilador centrífugo único, perdendo vantagens de redundância, eficiência e manutenção simplificada.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasFanWallAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.freshAirFlow", "operator": ">=", "value": 20000 },
-        { "field": "hvac.isNewBuilding", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasFanWallAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.freshAirFlow",
+          "operator": ">=",
+          "value": 20000
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Avaliação fan wall recomendada para UTAs ≥ 20.000 m³/h em edifícios novos",
       "remediation": "Avaliar configuração fan wall para UTAs de grande caudal: (1) Princípio: substituir 1 ventilador centrífugo de grande porte por array de 4-16 ventiladores plugfan EC montados numa parede dentro da UTA. (2) Redundância: falha de 1 ventilador reduz caudal em apenas 1/N — sem paragem total (N+1 nativo). (3) Eficiência: motores EC com rendimento > 90%, variação de velocidade integrada, SFP tipicamente 10-15% inferior a centrífugo com VFD. (4) Ruído: distribuição uniforme do fluxo reduz ruído em 3-5 dB(A) vs. centrífugo. (5) Manutenção: substituição de um ventilador em < 30 minutos sem parar os restantes. (6) Espaço: redução do comprimento da UTA (sem voluta de centrífugo). (7) Custo: 5-15% superior ao centrífugo + VFD, compensado por menor SFP e manutenção.",
       "enabled": true,
-      "tags": ["fan wall", "ventilador", "EC", "UTA", "redundância", "eficiência"]
+      "tags": [
+        "fan wall",
+        "ventilador",
+        "EC",
+        "UTA",
+        "redundância",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-EVAP-COOLING-WATER-01",
@@ -523,14 +1261,35 @@
       "description": "O sistema de arrefecimento evaporativo (torre de arrefecimento, humidificador adiabático) consome água excessiva por falta de otimização dos ciclos de concentração e controlo de purga, resultando em desperdício de água e custos elevados.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.evapCoolingWaterConsumption", "operator": ">", "value": 4 },
-        { "field": "hvac.hasEvaporativeCooling", "operator": "==", "value": true }
+        {
+          "field": "hvac.evapCoolingWaterConsumption",
+          "operator": ">",
+          "value": 4
+        },
+        {
+          "field": "hvac.hasEvaporativeCooling",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "{hvac.evapCoolingWaterConsumption} L/kWh de arrefecimento",
       "requiredValue": "Consumo de água ≤ 2-4 L/kWh de arrefecimento com ciclos de concentração ≥ 5",
       "remediation": "Otimizar consumo de água do arrefecimento evaporativo: (1) Ciclos de concentração: aumentar de 3 para 5-8 ciclos reduz consumo de água de reposição em 30-50%. Requer tratamento anti-incrustante adequado. (2) Controlo de condutividade: purga automática por sensor de condutividade (setpoint 2000-3000 µS/cm dependendo da qualidade da água de reposição). (3) Água de reposição: considerar reutilização de águas pluviais ou condensados de UTAs como makeup water. (4) Benchmark: consumo típico de 2-3 L/kWh para torres otimizadas, 3-4 L/kWh para humidificadores adiabáticos. (5) Comparação: dry-cooler consome 0 L/kWh mas tem COP 20-30% inferior em dias quentes. (6) Monitorizar: contadores de água na reposição e na purga para controlo mensal.",
       "enabled": true,
-      "tags": ["arrefecimento evaporativo", "água", "consumo", "torre de arrefecimento", "sustentabilidade"]
+      "tags": [
+        "arrefecimento evaporativo",
+        "água",
+        "consumo",
+        "torre de arrefecimento",
+        "sustentabilidade"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ADIABATIC-COOLING-01",
@@ -539,14 +1298,48 @@
       "description": "O projeto de sistema AVAC para edifício em zona de clima quente seco não considerou o arrefecimento adiabático (evaporativo indireto) como estratégia de pré-arrefecimento do ar ou da água de condensação, desperdiçando potencial significativo de poupança energética.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasAdiabaticCoolingAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 50 },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "industrial"] }
+        {
+          "field": "hvac.hasAdiabaticCoolingAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": ">=",
+          "value": 50
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "industrial"
+          ]
+        }
       ],
       "requiredValue": "Avaliação de arrefecimento adiabático recomendada para climas com depressão de bolbo húmido > 8°C",
       "remediation": "Avaliar arrefecimento adiabático: (1) Evaporativo indireto de ar: pré-arrefecimento do ar exterior por pulverização de água em permutador ar-ar (sem adição de humidade ao ar de insuflação). Eficácia de 60-80% da depressão de bolbo húmido. (2) Adiabático no condensador: pré-arrefecimento do ar de entrada dos condensadores de chillers ou VRF por spray — reduz temperatura de condensação em 5-10°C, melhora COP em 15-25%. (3) Adiabático em dry-cooler: spray no permutador converte dry-cooler em mini torre nos dias mais quentes — reduz temperatura de saída da água em 5-8°C. (4) Controlo de Legionella: para sistemas com spray de água, usar bicos de atomização ultrafina (< 10 µm, evaporação completa) ou tratamento UV-C da água de spray. (5) Consumo de água: 1-2 L/kWh de arrefecimento evitado. (6) Em Portugal interior: depressão de bolbo húmido 8-15°C no verão — potencial significativo.",
       "enabled": true,
-      "tags": ["adiabático", "arrefecimento evaporativo", "pré-arrefecimento", "eficiência", "clima seco"]
+      "tags": [
+        "adiabático",
+        "arrefecimento evaporativo",
+        "pré-arrefecimento",
+        "eficiência",
+        "clima seco"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-HYDRONIC-BAL-COMMISSIONING-01",
@@ -555,14 +1348,39 @@
       "description": "O sistema hidráulico AVAC não foi submetido a procedimento formal de equilíbrio hidráulico após instalação, resultando em desvios de caudal superiores a ±15% em vários terminais, comprometendo a capacidade térmica e o conforto nas zonas mais desfavorecidas.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasHydronicBalancingReport", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasPipework", "operator": "exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 25 }
+        {
+          "field": "hvac.hasHydronicBalancingReport",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasPipework",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 25
+        }
       ],
       "requiredValue": "Relatório de equilíbrio hidráulico com caudais medidos dentro de ±10% do projeto",
       "remediation": "Realizar equilíbrio hidráulico formal: (1) Método proporcional (CIBSE): medir todos os ramais, calcular o rácio de cada ramal (caudal medido / caudal de projeto), ajustar a válvula do ramal com menor rácio para o caudal de projeto, recalcular todos os rácios e repetir. (2) Instrumentação: caudalímetro ultrassónico portátil ou medição por ΔP nas válvulas de equilíbrio (com curvas kv certificadas). (3) Critério de aceitação: caudal medido em cada ramal dentro de ±10% do caudal de projeto. (4) Documentação: relatório com diagrama da rede, caudais de projeto vs. medidos, posição de cada válvula. (5) Pré-requisitos: sistema cheio e purgado, bombas operacionais, todas as válvulas de controlo em posição 100% aberta. (6) Periodicidade: repetir após qualquer alteração significativa na rede.",
       "enabled": true,
-      "tags": ["equilíbrio hidráulico", "comissionamento", "CIBSE", "caudal", "boas práticas"]
+      "tags": [
+        "equilíbrio hidráulico",
+        "comissionamento",
+        "CIBSE",
+        "caudal",
+        "boas práticas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-BUILDING-PRESSURIZATION-01",
@@ -571,14 +1389,49 @@
       "description": "O edifício não possui controlo ativo de pressurização, resultando em pressão diferencial descontrolada entre interior e exterior que causa infiltrações excessivas, problemas de condensação intersticial, dificuldade em abrir portas e desconforto por correntes de ar.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasBuildingPressurizationControl", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "hospital", "laboratory", "mixed"] },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasBuildingPressurizationControl",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "hospital",
+            "laboratory",
+            "mixed"
+          ]
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Pressão diferencial interior-exterior entre +10 Pa e +25 Pa (edifícios comerciais)",
       "remediation": "Implementar controlo de pressurização: (1) Sensor de pressão diferencial: instalado na fachada dominante ao vento, gama 0-100 Pa, precisão ±1 Pa. (2) Setpoint: +10 a +25 Pa para edifícios comerciais (pressão positiva impede infiltrações de ar exterior não tratado). (3) Atuação: modulação do damper de ar novo ou ajuste da velocidade do ventilador de insuflação vs. extração. (4) Balanço de caudais: Qinsuflação = Qextração + Qinfiltração desejada (tipicamente 5-10% acima da extração). (5) Precauções: evitar pressão excessiva (> 50 Pa) que dificulta abertura de portas de emergência (força máxima 67 N conforme EN 12217). (6) Hospitais: pressão negativa em isolamento de doenças infecciosas, positiva em blocos operatórios.",
       "enabled": true,
-      "tags": ["pressurização", "infiltração", "pressão diferencial", "ASHRAE", "boas práticas"]
+      "tags": [
+        "pressurização",
+        "infiltração",
+        "pressão diferencial",
+        "ASHRAE",
+        "boas práticas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-DESTRAT-WAREHOUSE-01",
@@ -587,14 +1440,49 @@
       "description": "O armazém ou nave industrial com pé-direito superior a 6 m não possui sistema de destratificação do ar, resultando em acumulação de calor na zona superior (diferença de temperatura > 1.5°C/m) e desperdício energético estimado em 10-15% do consumo de aquecimento.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasDestratificationSystem", "operator": "not_exists", "value": null },
-        { "field": "hvac.ceilingHeight", "operator": ">", "value": 6 },
-        { "field": "hvac.spaceType", "operator": "in", "value": ["warehouse", "industrial", "sports-hall"] }
+        {
+          "field": "hvac.hasDestratificationSystem",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.ceilingHeight",
+          "operator": ">",
+          "value": 6
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "in",
+          "value": [
+            "warehouse",
+            "industrial",
+            "sports-hall"
+          ]
+        }
       ],
       "requiredValue": "Sistema de destratificação recomendado para espaços com pé-direito > 6 m e aquecimento",
       "remediation": "Instalar sistema de destratificação adequado ao espaço: (1) Ventiladores HVLS (High Volume Low Speed): diâmetro 3.7-7.3 m, montados no teto, caudal 100.000-350.000 m³/h. Espaçamento: 1 por cada 900-2.500 m² (depende do diâmetro e pé-direito). Consumo: 0.5-1.5 kW por ventilador. (2) Ventiladores tubulares (jet fans): para pé-direito > 10 m, jato descendente orientado a 45°. (3) Controlo inteligente: sensor de temperatura diferencial teto vs. 1.5 m — ligar quando ΔT > 2°C, variar velocidade proporcionalmente ao ΔT. (4) Modo aquecimento: rotação descendente para recirculação do ar quente estratificado. (5) Modo arrefecimento: rotação descendente para efeito de brisa (reduz sensação térmica em 3-5°C). (6) ROI: payback típico de 1-2 anos pela redução de consumo de aquecimento.",
       "enabled": true,
-      "tags": ["destratificação", "HVLS", "armazém", "industrial", "pé-direito", "boas práticas"]
+      "tags": [
+        "destratificação",
+        "HVLS",
+        "armazém",
+        "industrial",
+        "pé-direito",
+        "boas práticas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     }
   ]
 }

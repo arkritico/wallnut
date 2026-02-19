@@ -11,14 +11,37 @@
       "description": "O proprietário não mantém o edifício em boas condições de conservação, segurança e salubridade, conforme obrigatório pelo RGEU.",
       "severity": "warning",
       "conditions": [
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "architecture.conservationState", "operator": "in", "value": ["poor", "very_poor"] }
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "architecture.conservationState",
+          "operator": "in",
+          "value": [
+            "poor",
+            "very_poor"
+          ]
+        }
       ],
       "currentValueTemplate": "Estado de conservação = {architecture.conservationState}",
       "requiredValue": "Estado de conservação bom ou razoável — manutenção obrigatória pelo proprietário",
       "remediation": "Obrigações de conservação: (1) Manutenção periódica: pintura exterior (8-10 anos), coberturas (5 anos). (2) Reparação imediata de: infiltrações, fissuras estruturais, caixilharias danificadas. (3) Limpeza: caleiras, tubos de queda, ralos (anual). (4) Segurança: varandas, guardas, escadas, instalação elétrica. (5) A câmara pode ordenar obras coercivas se o proprietário não agir (Art. 89.º RJUE).",
       "enabled": true,
-      "tags": ["conservação", "manutenção", "proprietário", "obrigação"]
+      "tags": [
+        "conservação",
+        "manutenção",
+        "proprietário",
+        "obrigação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-CONS-FACH-01",
@@ -27,13 +50,26 @@
       "description": "As fachadas do edifício apresentam degradação visível (reboco destacado, pintura deteriorada, elementos em risco de queda) que afeta a segurança da via pública.",
       "severity": "critical",
       "conditions": [
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "architecture.hasFacadeDegradation", "operator": "==", "value": true }
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "architecture.hasFacadeDegradation",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Fachadas em bom estado de conservação, sem risco de queda de elementos para a via pública",
       "remediation": "Reparar fachada: (1) Reboco destacado: picar, reparar suporte, aplicar novo reboco armado. (2) Azulejos soltos: refixar ou substituir (risco de queda > risco de incumprimento estético). (3) Varandas degradadas: verificação estrutural + reparação ou substituição. (4) Cornijas e platibandas: inspeção periódica (5 anos) — risco de queda grave. (5) Câmara pode impor prazo de reparação sob pena de multa ou obras coercivas.",
       "enabled": true,
-      "tags": ["fachada", "degradação", "via pública", "segurança"]
+      "tags": [
+        "fachada",
+        "degradação",
+        "via pública",
+        "segurança"
+      ]
     },
     {
       "id": "ARQ-CONS-COB-01",
@@ -42,13 +78,26 @@
       "description": "A cobertura do edifício apresenta infiltrações, telhas partidas ou danificadas que comprometem a estanquidade e a salubridade dos pisos inferiores.",
       "severity": "critical",
       "conditions": [
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "architecture.hasRoofLeaks", "operator": "==", "value": true }
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "architecture.hasRoofLeaks",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Cobertura estanque sem infiltrações — manutenção obrigatória",
       "remediation": "Reparar cobertura: (1) Telhas partidas: substituir individualmente (manter stock de telhas iguais). (2) Membrana danificada: reparar com patch ou substituir integralmente se > 5% afetada. (3) Caleiras e rufos: verificar e substituir vedantes (silicone ou mástique). (4) Estrutura: verificar madeiras (podridão, caruncho) ou betão (armaduras expostas). (5) Periodicidade: inspeção anual, intervenção a cada 5-10 anos.",
       "enabled": true,
-      "tags": ["cobertura", "infiltrações", "manutenção", "telhas"]
+      "tags": [
+        "cobertura",
+        "infiltrações",
+        "manutenção",
+        "telhas"
+      ]
     },
     {
       "id": "ARQ-CONS-ESTR-01",
@@ -57,13 +106,26 @@
       "description": "O edifício existente apresenta sinais de degradação estrutural (fissuras ativas, deformações excessivas, destacamento de betão com armaduras expostas) que podem comprometer a segurança dos ocupantes.",
       "severity": "critical",
       "conditions": [
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "architecture.hasStructuralDamage", "operator": "==", "value": true }
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "architecture.hasStructuralDamage",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Estabilidade estrutural garantida — peritagem obrigatória quando existem sinais de degradação",
       "remediation": "Avaliar e reparar estrutura: (1) Fissuras ativas (> 0.3 mm, crescendo): peritagem estrutural urgente. (2) Armaduras expostas: reparação com morteiro de reparação classe R4. (3) Deformações excessivas: escoras provisórias + projeto de reforço. (4) Edifícios pombalinos/gaioleiros: avaliação sísmica recomendada. (5) Se risco iminente: evacuação e vedação do edifício (Art. 89.º RJUE).",
       "enabled": true,
-      "tags": ["estrutural", "segurança", "fissuras", "peritagem"]
+      "tags": [
+        "estrutural",
+        "segurança",
+        "fissuras",
+        "peritagem"
+      ]
     },
     {
       "id": "ARQ-CONS-PERIOD-01",
@@ -72,14 +134,34 @@
       "description": "O edifício não é submetido a obras de conservação periódica, conforme obrigatório a cada 8 anos pelo RJUE (Art. 89.º, alterado pelo DL 555/99).",
       "severity": "info",
       "conditions": [
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "architecture.lastMaintenanceYears", "operator": ">", "value": 8 }
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "architecture.lastMaintenanceYears",
+          "operator": ">",
+          "value": 8
+        }
       ],
       "currentValueTemplate": "Última intervenção há {architecture.lastMaintenanceYears} anos",
       "requiredValue": "Obras de conservação obrigatórias a cada 8 anos (Art. 89.º RJUE)",
       "remediation": "Planear obras de conservação periódica: (1) Obrigatórias a cada 8 anos (Art. 89.º RJUE, DL 555/99). (2) Incluem: pintura exterior, reparação de coberturas, caixilharias, canalizações. (3) A câmara pode determinar obras se o proprietário não agir. (4) Obras coercivas: câmara realiza e cobra ao proprietário. (5) Manter registo de intervenções e custos (útil para certificação energética e transações). (6) NOTA: obras de conservação são isentas de controlo prévio desde DL 10/2024 (Art. 6.º), incluindo em edifícios classificados.",
       "enabled": true,
-      "tags": ["conservação", "periodicidade", "8 anos", "RJUE"]
+      "tags": [
+        "conservação",
+        "periodicidade",
+        "8 anos",
+        "RJUE"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-RUINA-01",
@@ -88,12 +170,30 @@
       "description": "O edifício encontra-se em estado de ruína ou ameaça de ruína, devendo ser objeto de obras de reconstrução, demolição parcial ou total.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.conservationState", "operator": "==", "value": "ruin" }
+        {
+          "field": "architecture.conservationState",
+          "operator": "==",
+          "value": "ruin"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Edifícios em ruína: obras de reconstrução ou demolição obrigatórias por ordem municipal",
       "remediation": "Atuar em edifício em ruína: (1) Peritagem estrutural urgente para classificar o grau de risco. (2) Vedação e sinalização do perímetro (proteção de transeuntes). (3) Opções: reabilitação (se viável estrutural e economicamente) ou demolição. (4) Em ARU (Área de Reabilitação Urbana): incentivos fiscais para reabilitação. (5) A câmara pode ordenar demolição se existir perigo iminente para a via pública.",
       "enabled": true,
-      "tags": ["ruína", "demolição", "reconstrução", "perigo"]
+      "tags": [
+        "ruína",
+        "demolição",
+        "reconstrução",
+        "perigo"
+      ]
     },
     {
       "id": "ARQ-DEMO-01",
@@ -102,13 +202,26 @@
       "description": "A demolição total ou parcial do edifício não foi precedida de licença de demolição pela câmara municipal, conforme obrigatório.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.isDemolition", "operator": "==", "value": true },
-        { "field": "architecture.hasDemolitionPermit", "operator": "==", "value": false }
+        {
+          "field": "architecture.isDemolition",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasDemolitionPermit",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Licença de demolição obrigatória (exceto demolições isentas pelo DL 10/2024)",
       "remediation": "Obter licença de demolição: (1) Requerimento à câmara municipal com memória descritiva. (2) Plano de demolição: faseamento, contenção de poeiras, gestão de resíduos. (3) Verificação: edifício classificado ou em processo de classificação → DGPC. (4) Edifício em ARU: demolição pode ser condicionada pela SRU. (5) Exceção — demolição de emergência por risco iminente (notificação posterior à câmara). (6) Exceção — demolição de construções ilegais: isenta de controlo prévio (DL 10/2024, Art. 6.º). (7) Gestão de RCD conforme DL 46/2008.",
       "enabled": true,
-      "tags": ["demolição", "licença", "câmara", "RCD"]
+      "tags": [
+        "demolição",
+        "licença",
+        "câmara",
+        "RCD"
+      ]
     },
     {
       "id": "ARQ-MANUT-ELEV-01",
@@ -117,13 +230,33 @@
       "description": "As instalações técnicas do edifício (elevadores, rede de gás, instalação elétrica) não são submetidas a inspeções e manutenção periódica obrigatória.",
       "severity": "warning",
       "conditions": [
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "architecture.hasTechnicalMaintenance", "operator": "not_exists", "value": null }
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "architecture.hasTechnicalMaintenance",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Manutenção periódica obrigatória das instalações técnicas do edifício",
       "remediation": "Manter instalações técnicas: (1) Elevadores: contrato de manutenção obrigatório + inspeção periódica (DL 320/2002). (2) Gás: inspeção obrigatória a cada 5 anos (Portaria 362/2000). (3) Elétrica: inspeção a cada 5 anos para potências > 41.4 kVA (RTIEBT). (4) AVAC: TIM obrigatório para potência > 25 kW (SCE). (5) Contra incêndio: manutenção semestral de extintores, anual de sistemas. (6) Manter livro de manutenção do edifício atualizado.",
       "enabled": true,
-      "tags": ["manutenção", "instalações", "inspeção", "periódica"]
+      "tags": [
+        "manutenção",
+        "instalações",
+        "inspeção",
+        "periódica"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

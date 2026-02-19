@@ -11,13 +11,26 @@
       "description": "A torre de arrefecimento do sistema AVAC não possui programa de tratamento de água para prevenção de Legionella conforme DL 306/2007.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasCoolingTowerTreatment", "operator": "not_exists", "value": null },
-        { "field": "hvac.heatPumpType", "operator": "==", "value": "central" }
+        {
+          "field": "hvac.hasCoolingTowerTreatment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.heatPumpType",
+          "operator": "==",
+          "value": "central"
+        }
       ],
       "requiredValue": "Programa de tratamento de água obrigatório para torres de arrefecimento",
       "remediation": "Implementar programa de tratamento de água da torre de arrefecimento: biocida (cloro ou bromo), anticorrosivo, antincrustante. Realizar análises microbiológicas mensais (Legionella pneumophila). Manter temperatura de retorno > 32°C ou < 20°C quando possível. Prever purga automática para controlar a condutividade. Limpar e desinfetar a torre semestralmente. Manter registo de todas as análises e intervenções.",
       "enabled": true,
-      "tags": ["Legionella", "torre de arrefecimento", "tratamento de água", "microbiologia"]
+      "tags": [
+        "Legionella",
+        "torre de arrefecimento",
+        "tratamento de água",
+        "microbiologia"
+      ]
     },
     {
       "id": "HVAC-LEGIONELLA-04",
@@ -26,13 +39,33 @@
       "description": "A rede de distribuição de AQS apresenta troços mortos (dead legs) que favorecem a estagnação e proliferação de Legionella.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hotWaterDistributionTemp", "operator": "<", "value": 55 },
-        { "field": "hvac.hotWaterStorageTemp", "operator": ">=", "value": 60 }
+        {
+          "field": "hvac.hotWaterDistributionTemp",
+          "operator": "<",
+          "value": 55
+        },
+        {
+          "field": "hvac.hotWaterStorageTemp",
+          "operator": ">=",
+          "value": 60
+        }
       ],
       "requiredValue": "Temperatura ≥ 50°C em todos os pontos da rede de distribuição",
       "remediation": "Identificar e eliminar troços mortos (dead legs) na rede de AQS — segmentos de tubagem superiores a 3 litros sem circulação. Instalar ou reparar o sistema de recirculação. Instalar válvulas de recirculação termostáticas nos pontos mais afastados. Isolar todas as tubagens para minimizar perdas de temperatura. Programar choque térmico periódico (≥ 70°C durante 30 min) para desinfeção da rede.",
       "enabled": true,
-      "tags": ["Legionella", "dead legs", "AQS", "recirculação"]
+      "tags": [
+        "Legionella",
+        "dead legs",
+        "AQS",
+        "recirculação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

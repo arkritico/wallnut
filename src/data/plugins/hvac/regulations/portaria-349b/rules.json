@@ -11,14 +11,33 @@
       "description": "O sistema de climatização com potência ≥ 25 kW não dispõe de capacidade de free-cooling (arrefecimento gratuito) para aproveitamento das condições exteriores favoráveis, conforme Portaria 349-B/2013.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasFreeCooling", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 25 },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasFreeCooling",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": ">=",
+          "value": 25
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Free-cooling obrigatório para potência de arrefecimento ≥ 25 kW",
       "remediation": "Implementar free-cooling no sistema AVAC: registo motorizado de ar exterior com controlo por entalpia (comparação ar exterior vs. retorno). Quando a temperatura/entalpia do ar exterior é inferior à do ar de retorno, o registo abre a 100% para arrefecimento gratuito sem utilização do compressor. Considerar economia de 15-30% no consumo de arrefecimento em clima português.",
       "enabled": true,
-      "tags": ["free-cooling", "eficiência energética", "Portaria 349-B"]
+      "tags": [
+        "free-cooling",
+        "eficiência energética",
+        "Portaria 349-B"
+      ]
     },
     {
       "id": "HVAC-RECUP-02",
@@ -27,15 +46,39 @@
       "description": "O sistema de ventilação com caudal ≥ 5000 m³/h em edifício novo não dispõe de recuperador de calor com eficiência mínima de 50%, conforme Portaria 349-B/2013.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.freshAirFlow", "operator": ">=", "value": 5000 },
-        { "field": "hvac.heatRecoveryEfficiency", "operator": "<", "value": 50 },
-        { "field": "hvac.isNewBuilding", "operator": "==", "value": true }
+        {
+          "field": "hvac.freshAirFlow",
+          "operator": ">=",
+          "value": 5000
+        },
+        {
+          "field": "hvac.heatRecoveryEfficiency",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "Caudal: {hvac.freshAirFlow} m³/h, Eficiência: {hvac.heatRecoveryEfficiency}%",
       "requiredValue": "Recuperador com eficiência ≥ 50% para caudais ≥ 5000 m³/h em edifícios novos",
       "remediation": "Instalar recuperador de calor ar-ar com eficiência ≥ 50% (≥ 70% recomendado para edifícios novos). Tipos: placas (50-65%), rotativo (65-80%), permutador de calor de contra-corrente (75-90%). Prever bypass para free-cooling e limpeza dos filtros do recuperador. O recuperador deve incluir tabuleiro de condensados com drenagem.",
       "enabled": true,
-      "tags": ["recuperação de calor", "Portaria 349-B", "edifício novo", "eficiência"]
+      "tags": [
+        "recuperação de calor",
+        "Portaria 349-B",
+        "edifício novo",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ZONE-01",
@@ -44,14 +87,41 @@
       "description": "O sistema AVAC do edifício de comércio/serviços não permite controlo independente por zona térmica, conforme requisitos de conceção da Portaria 349-B/2013.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasZoning", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 25 }
+        {
+          "field": "hvac.hasZoning",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 25
+        }
       ],
       "requiredValue": "Zonamento térmico obrigatório com controlo independente por zona",
       "remediation": "Dividir o edifício em zonas térmicas com controlo independente. Cada zona deve ter: termóstato de zona, válvula de regulação (2 vias para VAV ou válvula de água), e possibilidade de ajustar o setpoint. Critérios de zonamento: orientação (N/S/E/O), tipo de ocupação, horário de funcionamento, cargas internas diferentes. Um sistema VRF com controlo individual por unidade interior cumpre este requisito.",
       "enabled": true,
-      "tags": ["zonamento", "controlo", "Portaria 349-B", "eficiência"]
+      "tags": [
+        "zonamento",
+        "controlo",
+        "Portaria 349-B",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-TIMER-01",
@@ -60,13 +130,36 @@
       "description": "O sistema AVAC não dispõe de controlo horário (programação de horários de funcionamento e setback noturno), conforme Portaria 349-B/2013.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasTimerControl", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasTimerControl",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Controlo horário obrigatório com programação semanal",
       "remediation": "Instalar programador horário semanal para o sistema AVAC. Funcionalidades mínimas: horário de arranque/paragem por dia da semana, setback noturno (redução de setpoint fora de horas de ocupação), arranque otimizado (cálculo do tempo de pré-aquecimento/arrefecimento). Para edifícios com GTC, programar os horários no sistema central. Considerar ocupancy scheduling com sensores de presença.",
       "enabled": true,
-      "tags": ["controlo horário", "programação", "Portaria 349-B", "eficiência"]
+      "tags": [
+        "controlo horário",
+        "programação",
+        "Portaria 349-B",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-METER-01",
@@ -75,14 +168,34 @@
       "description": "O edifício de comércio/serviços com potência instalada ≥ 100 kW não dispõe de contagem separada de energia para os sistemas AVAC, conforme Portaria 349-B/2013.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasEnergyMetering", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 100 },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+        {
+          "field": "hvac.hasEnergyMetering",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 100
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Contagem de energia separada para AVAC (potência ≥ 100 kW)",
       "remediation": "Instalar contadores de energia dedicados para os sistemas AVAC: contador de energia elétrica (chiller/bomba de calor, bombas, ventiladores), contador de energia térmica (circuito quente e frio) com caudalímetro e sondas de temperatura. Integrar os contadores no sistema GTC para registo histórico. Os dados de consumo devem ser disponibilizados ao gestor de energia para análise e otimização.",
       "enabled": true,
-      "tags": ["contagem de energia", "AVAC", "Portaria 349-B", "GTC"]
+      "tags": [
+        "contagem de energia",
+        "AVAC",
+        "Portaria 349-B",
+        "GTC"
+      ]
     },
     {
       "id": "HVAC-DAMPER-01",
@@ -91,13 +204,33 @@
       "description": "O sistema de ventilação não dispõe de registo motorizado na admissão de ar exterior com fecho automático à paragem do ventilador.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasOutdoorAirDamper", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+        {
+          "field": "hvac.hasOutdoorAirDamper",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasVentilationSystem",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Registo motorizado de ar exterior com fecho automático à paragem",
       "remediation": "Instalar registo motorizado (damper) na admissão de ar exterior com atuador spring-return (retorno por mola para posição fechada). O registo deve fechar automaticamente quando o ventilador para, evitando infiltrações de ar exterior não tratado. Posicionar antes dos filtros. Para sistemas com free-cooling, o registo deve ter modulação 0-100% com controlo por entalpia.",
       "enabled": true,
-      "tags": ["registo", "ar exterior", "damper", "Portaria 349-B"]
+      "tags": [
+        "registo",
+        "ar exterior",
+        "damper",
+        "Portaria 349-B"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-OVERSIZE-01",
@@ -106,13 +239,34 @@
       "description": "O sistema AVAC apresenta um sobredimensionamento de {hvac.oversizingPercent}%, superior ao máximo de 20% recomendado. O sobredimensionamento excessivo reduz a eficiência em carga parcial e aumenta o investimento.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.oversizingPercent", "operator": ">", "value": 20 }
+        {
+          "field": "hvac.oversizingPercent",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "hvac.hasHvacSystem",
+          "operator": "!=",
+          "value": false
+        }
       ],
       "currentValueTemplate": "{hvac.oversizingPercent}% sobredimensionamento",
       "requiredValue": "Sobredimensionamento ≤ 20% face às cargas térmicas calculadas",
       "remediation": "Redimensionar o sistema AVAC com base em cálculo rigoroso de cargas térmicas (EN 12831 para aquecimento, ASHRAE ou EN 15255 para arrefecimento). Considerar fatores de simultaneidade, diversidade de cargas e perfil de ocupação. O sobredimensionamento excessivo (> 20%) resulta em: cycling frequente (desgaste de compressores), menor eficiência em carga parcial, custos de investimento superiores. Considerar sistemas modulares ou com compressores de velocidade variável.",
       "enabled": true,
-      "tags": ["sobredimensionamento", "dimensionamento", "cargas térmicas", "eficiência"]
+      "tags": [
+        "sobredimensionamento",
+        "dimensionamento",
+        "cargas térmicas",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-NIGHTPURGE-01",
@@ -121,14 +275,46 @@
       "description": "O edifício de comércio/serviços não utiliza ventilação noturna (night purge) para pré-arrefecimento da massa térmica, perdendo potencial de poupança energética significativo no clima português.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasNightPurge", "operator": "not_exists", "value": null },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
-        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 25 }
+        {
+          "field": "hvac.hasNightPurge",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": ">=",
+          "value": 25
+        }
       ],
       "requiredValue": "Ventilação noturna recomendada em edifícios com massa térmica significativa",
       "remediation": "Implementar ventilação noturna (night purge): utilizar o sistema de ventilação mecânica durante a noite (quando a temperatura exterior < temperatura interior - 2°C) para arrefecer a massa térmica do edifício. Reduz a carga de arrefecimento mecânico no dia seguinte em 20-40% no clima de Portugal. Requisitos: massa térmica exposta (lajes de betão sem teto falso), controlo automático com sondas de temperatura interior e exterior, horário de funcionamento noturno (tipicamente 22h-06h).",
       "enabled": true,
-      "tags": ["ventilação noturna", "free-cooling", "massa térmica", "eficiência"]
+      "tags": [
+        "ventilação noturna",
+        "free-cooling",
+        "massa térmica",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-VAV-MINFLOW-01",
@@ -137,14 +323,35 @@
       "description": "As caixas VAV do sistema de climatização não possuem setpoint de caudal mínimo configurado, podendo fechar completamente e comprometer a ventilação mínima de ar novo exigida pela Portaria 353-A/2013.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.vavMinFlowPercent", "operator": "<", "value": 20 },
-        { "field": "hvac.hasVAVSystem", "operator": "==", "value": true }
+        {
+          "field": "hvac.vavMinFlowPercent",
+          "operator": "<",
+          "value": 20
+        },
+        {
+          "field": "hvac.hasVAVSystem",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "Caudal mínimo VAV: {hvac.vavMinFlowPercent}%",
       "requiredValue": "Caudal mínimo VAV ≥ 20-30% do caudal nominal (garantia de ar novo)",
       "remediation": "Configurar caudal mínimo em todas as caixas VAV: (1) Setpoint mínimo: 20-30% do caudal nominal (assegura ventilação mínima de ar novo). (2) O caudal mínimo deve corresponder ao caudal de ar novo por pessoa conforme Portaria 353-A (35 m³/h.pessoa para escritórios). (3) Em modo desocupado: reduzir para 10-15% (mínimo higiénico). (4) Caixas VAV com aquecimento terminal: manter caudal mínimo para distribuição do calor. (5) Integrar com DCV (sondas CO₂) para ajuste dinâmico do mínimo em função da ocupação real.",
       "enabled": true,
-      "tags": ["VAV", "caudal mínimo", "ventilação", "Portaria 349-B", "ar novo"]
+      "tags": [
+        "VAV",
+        "caudal mínimo",
+        "ventilação",
+        "Portaria 349-B",
+        "ar novo"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-SPLIT-OUTDOOR-SCREEN-01",
@@ -153,13 +360,34 @@
       "description": "As unidades exteriores de sistemas split/VRF não estão integradas arquitetonicamente (grelha, clausura ou nicho técnico), conforme frequentemente exigido pelos regulamentos municipais e planos de urbanização.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasOutdoorUnitScreen", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasOutdoorUnit", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasOutdoorUnitScreen",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasOutdoorUnit",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Integração arquitetónica de unidades exteriores conforme regulamento municipal",
       "remediation": "Integrar as unidades exteriores: (1) Grelha ou clausura: manter distância mínima de 300 mm da unidade e área livre ≥ 2× a área de descarga do condensador. (2) Nicho técnico ventilado: garantir entrada de ar na parte inferior e saída no topo. (3) Evitar clausuras completamente fechadas — causam recirculação e perda de COP de 10-30%. (4) Material: alumínio perfurado, grelha metálica ou betão com aberturas. (5) Verificar regulamento municipal específico (PDM, plano de pormenor) para exigências de integração em fachada. (6) Acesso para manutenção deve ser mantido.",
       "enabled": true,
-      "tags": ["split", "unidade exterior", "integração", "regulamento municipal", "VRF"]
+      "tags": [
+        "split",
+        "unidade exterior",
+        "integração",
+        "regulamento municipal",
+        "VRF"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-CHILLED-BEAM-SPEC-01",
@@ -168,14 +396,44 @@
       "description": "O projeto de edifício novo de escritórios não avaliou vigas frias (chilled beams) como alternativa de alta eficiência para arrefecimento, apesar de carga térmica compatível e requisitos de conforto acústico rigorosos.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasChilledBeamAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.spaceType", "operator": "==", "value": "office" },
-        { "field": "hvac.isNewBuilding", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasChilledBeamAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "==",
+          "value": "office"
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Avaliação de vigas frias recomendada para escritórios novos (carga ≤ 80 W/m²)",
       "remediation": "Avaliar vigas frias para escritórios novos conforme Portaria 349-B: (1) Vigas frias ativas: combinam arrefecimento por indução com ventilação de ar novo — potência 150-300 W/m, NC < 30. (2) Temperatura de água: 14-16°C — permite SEER/COP elevado com chiller ou bomba de calor. (3) Requisitos: sistema de ventilação dedicado para ar novo (DOAS), controlo de condensação por zona, pé direito mínimo 2.8 m. (4) Vantagens: sem ventiladores locais (manutenção reduzida), ruído muito baixo, integração em teto falso. (5) Limitações: potência de arrefecimento limitada a ~80 W/m² — complementar com proteção solar para cargas > 60 W/m². (6) Custo: 15-25% superior ao sistema convencional, compensado por menor consumo e manutenção.",
       "enabled": true,
-      "tags": ["viga fria", "chilled beam", "escritório", "Portaria 349-B", "eficiência"]
+      "tags": [
+        "viga fria",
+        "chilled beam",
+        "escritório",
+        "Portaria 349-B",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-DESICCANT-01",
@@ -184,14 +442,40 @@
       "description": "O edifício com elevada carga latente (piscinas, laboratórios, museus) não considerou desumidificação por roda dessecante, dependendo exclusivamente de arrefecimento abaixo do ponto de orvalho (sobre-arrefecimento) que consome energia excessiva.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasDesiccantDehumidification", "operator": "not_exists", "value": null },
-        { "field": "hvac.latentLoadPercent", "operator": ">", "value": 40 }
+        {
+          "field": "hvac.hasDesiccantDehumidification",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.latentLoadPercent",
+          "operator": ">",
+          "value": 40
+        }
       ],
       "currentValueTemplate": "Carga latente: {hvac.latentLoadPercent}% da carga total",
       "requiredValue": "Avaliação de roda dessecante recomendada quando carga latente > 40% da carga total",
       "remediation": "Avaliar desumidificação por roda dessecante (desiccant dehumidification): (1) Princípio: roda com material dessecante (sílica gel, zeólito, cloreto de lítio) adsorve humidade do ar de processo e é regenerada por ar quente (60-80°C). (2) Aplicações ideais: piscinas cobertas, museus (controlo preciso de HR), salas limpas, armazéns refrigerados. (3) Fonte de calor para regeneração: aproveitamento de calor residual do chiller (recuperação de condensação), solar térmico, ou gás. (4) Combinação: roda dessecante + arrefecimento evaporativo indireto — sistema DOAS de alta eficiência. (5) HR alvo: 45-55% em escritórios, 50-60% em museus (com tolerância ±5%). (6) Poupança: 30-50% vs. arrefecimento convencional para cargas latentes elevadas.",
       "enabled": true,
-      "tags": ["dessecante", "desumidificação", "roda", "carga latente", "Portaria 349-B"]
+      "tags": [
+        "dessecante",
+        "desumidificação",
+        "roda",
+        "carga latente",
+        "Portaria 349-B"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-UFAD-PLENUM-01",
@@ -200,14 +484,47 @@
       "description": "O projeto de edifício novo de escritórios com pavimento elevado não considerou a distribuição de ar pelo pavimento (UFAD — Underfloor Air Distribution) como alternativa de maior eficiência energética e flexibilidade.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasUFADAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasRaisedFloor", "operator": "==", "value": true },
-        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "data-center"] }
+        {
+          "field": "hvac.hasUFADAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasRaisedFloor",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "in",
+          "value": [
+            "office",
+            "data-center"
+          ]
+        }
       ],
       "requiredValue": "Avaliação UFAD recomendada em edifícios com pavimento elevado",
       "remediation": "Avaliar sistema UFAD para edifícios com pavimento elevado: (1) Plenum: espaço livre sob pavimento de 250-400 mm, estanque e limpo. (2) Difusores: tipo swirl ajustáveis pelo ocupante (controlo pessoal de conforto). (3) Temperatura de insuflação: 17-19°C (vs. 13-14°C em sistemas de teto) — permite COP superior do chiller. (4) Eficiência de ventilação: 1.0-1.2 (vs. 0.8-1.0 para mistura no teto) — necessita menos ar para a mesma qualidade. (5) Flexibilidade: reconfigurável sem alteração de condutas. (6) Pressão no plenum: 12-25 Pa — ventilador de baixa pressão com SFP reduzido. (7) Manutenção: limpeza do plenum bianual — prever acessos adequados.",
       "enabled": true,
-      "tags": ["UFAD", "pavimento elevado", "escritório", "Portaria 349-B", "eficiência"]
+      "tags": [
+        "UFAD",
+        "pavimento elevado",
+        "escritório",
+        "Portaria 349-B",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-MIXED-MODE-VENT-DESIGN-01",
@@ -216,14 +533,48 @@
       "description": "O projeto de edifício novo de escritórios ou serviços em zona climática com potencial de ventilação natural (> 2000 horas/ano com Text 18-26°C) não avaliou a estratégia de ventilação em modo misto (natural + mecânica), conforme recomendado pela Portaria 349-B para maximizar a eficiência energética.",
       "severity": "info",
       "conditions": [
-        { "field": "hvac.hasMixedModeAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.isNewBuilding", "operator": "==", "value": true },
-        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "school", "mixed-use"] }
+        {
+          "field": "hvac.hasMixedModeAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "hvac.spaceType",
+          "operator": "in",
+          "value": [
+            "office",
+            "school",
+            "mixed-use"
+          ]
+        }
       ],
       "requiredValue": "Avaliação de modo misto obrigatória em edifícios novos de escritórios com potencial de ventilação natural",
       "remediation": "Avaliar e conceber sistema de ventilação em modo misto: (1) Modo concorrente: ventilação natural (janelas) + mecânica em simultâneo — mais simples mas menos eficiente. (2) Modo changeover: alternância automática entre natural e mecânico com base em Text, HR, vento e CO₂ — mais eficiente, requer sensores e lógica de controlo. (3) Modo zoneado: zonas perimetrais com ventilação natural, zonas interiores com mecânica. (4) Janelas motorizadas: abertura automática controlada pelo BMS — alternativa a janelas manuais para edifícios de maior altura. (5) Cálculos: modelação CFD da ventilação natural para garantir caudais mínimos de ar novo em todas as condições. (6) Portaria 349-B Art. 6.º: crédito energético para ventilação natural documentada na simulação dinâmica.",
       "enabled": true,
-      "tags": ["modo misto", "ventilação", "Portaria 349-B", "conceção", "edifício novo"]
+      "tags": [
+        "modo misto",
+        "ventilação",
+        "Portaria 349-B",
+        "conceção",
+        "edifício novo"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "HVAC-EXPANSION-VESSEL-PED-01",
@@ -232,14 +583,39 @@
       "description": "O vaso de expansão do sistema AVAC em edifício novo não possui marcação CE conforme a Diretiva de Equipamentos sob Pressão (PED 2014/68/EU), ou a pressão de pré-carga de azoto não está ajustada à pressão estática do ponto mais alto do circuito.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.expansionVesselHasCE", "operator": "!=", "value": true },
-        { "field": "hvac.hasPipework", "operator": "exists", "value": null },
-        { "field": "hvac.isNewBuilding", "operator": "==", "value": true }
+        {
+          "field": "hvac.expansionVesselHasCE",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "hvac.hasPipework",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "hvac.isNewBuilding",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Vaso de expansão com marcação CE (PED), pré-carga ajustada e válvula de segurança dimensionada",
       "remediation": "Garantir conformidade do vaso de expansão em edifícios novos: (1) Marcação CE: obrigatória para vasos com PS × V > 50 bar·L (PED 2014/68/EU, Categoria I mínimo). (2) Pré-carga de azoto: P0 = pressão estática do ponto mais alto do circuito acima do vaso + 0.3 bar — medir com circuito despressurizado. (3) Volume: dimensionar conforme EN 13831 — Ve = Vsistema × (ρfrio/ρquente - 1), com reserva de 20%. (4) Válvula de segurança: montada entre o circuito e o vaso, calibrada a 0.3 bar acima da pressão máxima de operação. (5) Acessórios: manómetro, válvula de enchimento de azoto, válvula de seccionamento com posição aberta travada. (6) Verificação anual: pré-carga, integridade da membrana (verificar se sai água pela válvula de azoto). (7) Portaria 349-B: incluir no projeto de execução do sistema técnico.",
       "enabled": true,
-      "tags": ["vaso de expansão", "PED", "marcação CE", "Portaria 349-B", "segurança"]
+      "tags": [
+        "vaso de expansão",
+        "PED",
+        "marcação CE",
+        "Portaria 349-B",
+        "segurança"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

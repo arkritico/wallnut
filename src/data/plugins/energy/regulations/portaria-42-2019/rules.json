@@ -11,14 +11,38 @@
       "description": "A fração de energia renovável no consumo total do edifício ({energy.renewableFraction}%) é inferior ao mínimo regulamentar para edifícios nZEB.",
       "severity": "critical",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "energy.renewableFraction", "operator": "<", "value": 50 }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.renewableFraction",
+          "operator": "lookup_lt",
+          "table": "nzeb_min_renewable_fraction_by_type",
+          "keys": [
+            "buildingType"
+          ]
+        }
       ],
       "currentValueTemplate": "Fração renovável = {energy.renewableFraction}%",
-      "requiredValue": "Fração renovável ≥ 50% das necessidades energéticas totais (orientativo nZEB)",
+      "requiredValue": "Fração renovável ≥ 50% das necessidades energéticas totais (orientativo nZEB) (variável conforme tipologia do edifício)",
       "remediation": "Aumentar a fração renovável: (1) Solar térmico: cobre 50-70% das necessidades de AQS. (2) PV autoconsumo: reduz consumo elétrico da rede em 30-60%. (3) Bomba de calor aerotérmica: parcela renovável Eren = Q × (1-1/SPF). (4) Biomassa: 100% renovável (pellets, lenha). (5) Combinação típica nZEB: solar térmico (AQS) + PV (eletricidade) + bomba de calor (aquecimento). (6) A fração renovável é calculada: Eren_total / (Ntc × Ap).",
       "enabled": true,
-      "tags": ["nZEB", "fração renovável", "50%", "renováveis", "Portaria 42"]
+      "tags": [
+        "nZEB",
+        "fração renovável",
+        "50%",
+        "renováveis",
+        "Portaria 42"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-NZEB-ENVELOPE-ENHANCED-01",
@@ -27,15 +51,46 @@
       "description": "Para edifícios nZEB, os valores U da envolvente devem ser inferiores aos valores de referência (não apenas aos máximos), garantindo que a envolvente contribui ativamente para a redução de Ntc.",
       "severity": "warning",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "envelope.externalWallUValue", "operator": ">", "value": 0.40 },
-        { "field": "location.climateZoneWinter", "operator": "in", "value": ["I1", "I2"] }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": "lookup_gt",
+          "table": "nzeb_wall_u_value_by_zone",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        },
+        {
+          "field": "location.climateZoneWinter",
+          "operator": "in",
+          "value": [
+            "I1",
+            "I2"
+          ]
+        }
       ],
       "currentValueTemplate": "U paredes = {envelope.externalWallUValue} W/(m².K)",
-      "requiredValue": "U paredes < Uref para nZEB: I1 < 0.40, I2 < 0.35, I3 < 0.30 W/(m².K)",
+      "requiredValue": "U paredes < Uref para nZEB: I1 < 0.40, I2 < 0.35, I3 < 0.30 W/(m².K) (variável conforme zona climática)",
       "remediation": "Atingir U < referência para nZEB: (1) I1: Uref paredes = 0.40 → alvo 0.30-0.35 (ETICS 80-100 mm). (2) I2: Uref paredes = 0.35 → alvo 0.25-0.30 (ETICS 100-120 mm). (3) I3: Uref paredes = 0.30 → alvo 0.20-0.25 (ETICS 120-150 mm). (4) Coberturas: alvo U ≈ 0.20-0.25 (120-150 mm isolamento). (5) Janelas: U ≤ 1.4 (vidro duplo low-E + argon + RPT). (6) Custo adicional envolvente: 5-10% sobre construção convencional.",
       "enabled": true,
-      "tags": ["nZEB", "envolvente", "U referência", "ETICS", "janelas"]
+      "tags": [
+        "nZEB",
+        "envolvente",
+        "U referência",
+        "ETICS",
+        "janelas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ENE-NZEB-COST-OPTIMAL-01",
@@ -44,13 +99,39 @@
       "description": "O nível de desempenho energético do edifício deve ser avaliado na perspetiva do custo ótimo de ciclo de vida (cost-optimal level), equilibrando investimento inicial com custos de operação a 30 anos.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "energy.hasCostOptimalAnalysis", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.hasCostOptimalAnalysis",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Análise de custo ótimo (EN 15459) para validação económica do nível nZEB",
       "remediation": "Realizar análise de custo ótimo: (1) Metodologia: EN 15459 (custo global de ciclo de vida). (2) Período: 30 anos (residencial) ou 20 anos (serviços). (3) Taxa de desconto: 3% (perspetiva macroeconómica). (4) Custos incluídos: investimento, energia, manutenção, substituição, resíduo. (5) Tipicamente, o custo ótimo corresponde a classe A ou B — o nZEB (classe A) é marginalmente mais caro que o ótimo mas justificado pelo benefício ambiental. (6) Ferramentas: PHPP, DesignBuilder, EnergyPlus com módulo económico.",
       "enabled": true,
-      "tags": ["custo ótimo", "ciclo de vida", "EN 15459", "nZEB", "EPBD"]
+      "tags": [
+        "custo ótimo",
+        "ciclo de vida",
+        "EN 15459",
+        "nZEB",
+        "EPBD"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-NZEB-POST-OCCUPANCY-01",
@@ -59,14 +140,43 @@
       "description": "O edifício nZEB não possui plano de monitorização pós-ocupação para verificar que o desempenho energético real corresponde ao previsto no certificado.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "projectPhase", "operator": "==", "value": "operation" },
-        { "field": "energy.hasPostOccupancyMonitoring", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "projectPhase",
+          "operator": "==",
+          "value": "operation"
+        },
+        {
+          "field": "energy.hasPostOccupancyMonitoring",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Monitorização pós-ocupação durante 2 anos para verificação de desempenho nZEB",
       "remediation": "Implementar monitorização pós-ocupação: (1) Duração: 2 anos após ocupação (recomendado). (2) Indicadores: consumo real vs. IEE previsto, temperaturas interiores, qualidade do ar. (3) Performance gap: desvio típico +20-50% entre previsão e realidade. (4) Causas: comportamento dos ocupantes, condições climáticas reais, qualidade da construção. (5) Ação: identificar e corrigir desvios no 1.º ano de operação. (6) Smart meters: contadores inteligentes para recolha automática de dados.",
       "enabled": true,
-      "tags": ["pós-ocupação", "monitorização", "performance gap", "verificação"]
+      "tags": [
+        "pós-ocupação",
+        "monitorização",
+        "performance gap",
+        "verificação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-NZEB-EMBODIED-ENERGY-01",
@@ -75,13 +185,39 @@
       "description": "A Diretiva EPBD recast (2024) introduz requisitos de avaliação de carbono incorporado (GWP) para edifícios novos a partir de 2030. Portugal está a preparar a transposição destes requisitos.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "energy.hasLCAAssessment", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.hasLCAAssessment",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Avaliação de ciclo de vida (LCA/ACV) recomendada para edifícios nZEB — obrigatória a partir de 2030",
       "remediation": "Considerar avaliação de ciclo de vida: (1) EN 15978: metodologia para avaliação ambiental de edifícios. (2) Fases: A1-A3 (materiais), A4-A5 (transporte/construção), B (uso), C (fim de vida), D (reuso). (3) Carbono incorporado típico: 300-600 kgCO₂eq/m² para construção convencional. (4) Carbono operacional: 15-30 kgCO₂eq/(m².ano) para nZEB. (5) Ao longo de 50 anos: incorporado pode ser 30-50% do total num nZEB. (6) Ferramentas: OneClick LCA, Tally, SimaPro, openLCA.",
       "enabled": true,
-      "tags": ["LCA", "carbono incorporado", "ciclo de vida", "EN 15978", "EPBD"]
+      "tags": [
+        "LCA",
+        "carbono incorporado",
+        "ciclo de vida",
+        "EN 15978",
+        "EPBD"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-NZEB-THERMAL-BRIDGE-FREE-01",
@@ -90,13 +226,39 @@
       "description": "Para atingir nZEB de forma custo-eficaz, a envolvente deve minimizar pontes térmicas com isolamento contínuo (ETICS ou equivalente), idealmente com ψ < 0.10 W/(m.K) em todos os nós.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "envelope.hasETICS", "operator": "==", "value": false }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.hasETICS",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "ETICS ou isolamento contínuo para minimizar pontes térmicas (ψ < 0.10 W/(m.K))",
       "remediation": "Eliminar pontes térmicas significativas: (1) ETICS contínuo: elimina pontes térmicas em pilares, vigas, caixas de estore. (2) Caixilharia no plano do isolamento: reduz ψ da ligação parede/janela. (3) Varandas com corte térmico: Schöck Isokorb ou equivalente. (4) Caixas de estore isoladas: ≥ 30 mm de isolamento em todas as faces. (5) Impacto: pontes térmicas podem representar 20-30% das perdas totais em construção convencional. (6) Com ETICS e boas práticas: redução para 5-10% das perdas.",
       "enabled": true,
-      "tags": ["pontes térmicas", "ETICS", "ψ", "isolamento contínuo", "nZEB"]
+      "tags": [
+        "pontes térmicas",
+        "ETICS",
+        "ψ",
+        "isolamento contínuo",
+        "nZEB"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     },
     {
       "id": "ENE-NZEB-PASSIVE-COOLING-01",
@@ -105,14 +267,46 @@
       "description": "O edifício nZEB deve priorizar estratégias de arrefecimento passivo antes de recorrer a sistemas ativos, especialmente em zonas climáticas V2 e V3.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "location.climateZoneSummer", "operator": "in", "value": ["V2", "V3"] },
-        { "field": "envelope.hasPassiveCooling", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": [
+            "V2",
+            "V3"
+          ]
+        },
+        {
+          "field": "envelope.hasPassiveCooling",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Estratégias passivas de arrefecimento: sombreamento, ventilação noturna, inércia térmica",
       "remediation": "Implementar arrefecimento passivo: (1) Sombreamento exterior: palas Sul (ângulo ≥ 30°), estores/lâminas Este/Oeste. (2) Ventilação noturna: aberturas para ventilação cruzada com inércia exposta. (3) Inércia térmica forte: lajes e paredes em betão/alvenaria expostas (não forradas). (4) Vidro de controlo solar: g ≤ 0.35 nas orientações Oeste/Este. (5) Cores claras: refletância solar ≥ 0.60 nas coberturas. (6) Vegetação: árvores caducifólias a Sul/Oeste, coberturas ajardinadas. (7) Impacto: redução de 40-60% nas necessidades de arrefecimento.",
       "enabled": true,
-      "tags": ["arrefecimento passivo", "sombreamento", "ventilação noturna", "nZEB"]
+      "tags": [
+        "arrefecimento passivo",
+        "sombreamento",
+        "ventilação noturna",
+        "nZEB"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "grossFloorArea",
+          "operator": "<",
+          "value": 50
+        }
+      ]
     }
   ]
 }

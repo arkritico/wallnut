@@ -11,13 +11,31 @@
       "description": "O fator de temperatura superficial interior (fRsi) da envolvente opaca é inferior ao valor mínimo exigido ({envelope.fRsiMin}), indicando risco de condensação superficial e desenvolvimento de bolor.",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.fRsi", "operator": "<", "value": 0.75 }
+        {
+          "field": "envelope.fRsi",
+          "operator": "<",
+          "value": 0.75
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "fRsi = {envelope.fRsi}",
       "requiredValue": "fRsi ≥ 0.75 para risco de bolor (HR superficial < 80%)",
       "remediation": "O fator fRsi depende do coeficiente U e das condições interiores/exteriores. Melhorar fRsi: (1) Aumentar isolamento térmico (reduzir U) — fRsi = 1 - U × Rsi, onde Rsi = 0.25 m².K/W. (2) Para fRsi ≥ 0.75: U deve ser ≤ 1.0 W/(m².K) em condições típicas portuguesas. (3) Zonas críticas: ligações caixilharia/parede, cantos de paredes, zonas atrás de armários junto a paredes exteriores. (4) Ventilação adequada: manter HR interior ≤ 60% para reduzir exigência de fRsi.",
       "enabled": true,
-      "tags": ["condensação", "fRsi", "bolor", "higrotérmica"]
+      "tags": [
+        "condensação",
+        "fRsi",
+        "bolor",
+        "higrotérmica"
+      ]
     },
     {
       "id": "THERM-COND-FRSI-PT-01",
@@ -26,13 +44,31 @@
       "description": "O fator de temperatura superficial nas pontes térmicas (fRsi,pt = {envelope.fRsiThermalBridge}) é inferior a 0.75, indicando risco elevado de condensação e bolor nas zonas de ponte térmica.",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.fRsiThermalBridge", "operator": "<", "value": 0.75 }
+        {
+          "field": "envelope.fRsiThermalBridge",
+          "operator": "<",
+          "value": 0.75
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "fRsi,PT = {envelope.fRsiThermalBridge}",
       "requiredValue": "fRsi,PT ≥ 0.75 (≥ 0.90 recomendado para pontes térmicas corrigidas)",
       "remediation": "Corrigir pontes térmicas para evitar condensação: (1) Isolamento contínuo pelo exterior (ETICS): elimina a maioria das pontes térmicas lineares. (2) Elementos de corte térmico em pilares e vigas: Schöck Isokorb ou similar. (3) Caixilharia alinhada com o plano de isolamento. (4) Soleira com corte térmico na ligação fachada/pavimento. (5) Simular com software de análise 2D/3D (THERM, HTflux) para verificar fRsi nas zonas críticas.",
       "enabled": true,
-      "tags": ["condensação", "fRsi", "pontes térmicas", "bolor"]
+      "tags": [
+        "condensação",
+        "fRsi",
+        "pontes térmicas",
+        "bolor"
+      ]
     },
     {
       "id": "THERM-COND-INTERSTICIAL-01",
@@ -41,13 +77,33 @@
       "description": "Não foi realizada verificação de condensações intersticiais pelo método de Glaser conforme EN ISO 13788. Este método verifica se existe condensação entre camadas da parede durante a estação de aquecimento.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.hasInterstitialCondensationCheck", "operator": "not_exists", "value": null },
-        { "field": "envelope.externalWallUValue", "operator": "exists", "value": null }
+        {
+          "field": "envelope.hasInterstitialCondensationCheck",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "requiredValue": "Verificação pelo método de Glaser: condensação acumulada ≤ capacidade de evaporação no verão",
       "remediation": "Realizar verificação de condensações intersticiais (método de Glaser): (1) Calcular perfil de temperatura em cada interface entre camadas. (2) Calcular perfil de pressão de saturação e pressão de vapor real. (3) Onde Pv > Psat: ocorre condensação intersticial. (4) Verificar: condensação acumulada no inverno ≤ evaporação no verão (balanço anual positivo). (5) Regra prática: barreira para-vapor (μd ≥ 100 m) na face quente do isolamento se Riso > 2/3 × Rtotal. (6) Paredes com ETICS: raramente têm condensação intersticial (isolamento pelo exterior). (7) Isolamento pelo interior: risco elevado — obrigatória barreira para-vapor ou membrana inteligente.",
       "enabled": true,
-      "tags": ["condensação intersticial", "Glaser", "barreira para-vapor", "camadas"]
+      "tags": [
+        "condensação intersticial",
+        "Glaser",
+        "barreira para-vapor",
+        "camadas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "THERM-COND-VAPOR-BARRIER-01",
@@ -56,13 +112,26 @@
       "description": "O edifício possui isolamento térmico pelo interior sem barreira para-vapor adequada, criando risco de condensação intersticial entre o isolamento e a parede exterior.",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.hasInteriorInsulation", "operator": "==", "value": true },
-        { "field": "envelope.hasVaporBarrier", "operator": "==", "value": false }
+        {
+          "field": "envelope.hasInteriorInsulation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.hasVaporBarrier",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Barreira para-vapor (μd ≥ 100 m) na face quente do isolamento interior",
       "remediation": "Instalar barreira para-vapor quando o isolamento é pelo interior: (1) Membrana de polietileno (μd > 100 m) na face quente (interior) do isolamento. (2) Alternativa: membrana inteligente de humidade variável (μd 0.5-50 m conforme HR) — permite secagem bidirecional. (3) Selar todas as juntas e penetrações (tomadas, tubagens). (4) Gesso cartonado com barreira de alumínio (tipo vapor-check) é uma solução integrada. (5) ETICS (isolamento pelo exterior) é preferível pois elimina este problema.",
       "enabled": true,
-      "tags": ["barreira para-vapor", "isolamento interior", "condensação", "membrana"]
+      "tags": [
+        "barreira para-vapor",
+        "isolamento interior",
+        "condensação",
+        "membrana"
+      ]
     },
     {
       "id": "THERM-COND-MOLD-RISK-01",
@@ -71,14 +140,28 @@
       "description": "As condições de humidade relativa interior ({envelope.interiorRelativeHumidity}%) combinadas com os coeficientes U da envolvente criam risco de desenvolvimento de bolor nas superfícies interiores (HR superficial > 80% durante mais de 30 dias).",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.interiorRelativeHumidity", "operator": ">", "value": 70 },
-        { "field": "envelope.externalWallUValue", "operator": ">", "value": 0.50 }
+        {
+          "field": "envelope.interiorRelativeHumidity",
+          "operator": ">",
+          "value": 70
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "currentValueTemplate": "HR interior = {envelope.interiorRelativeHumidity}%, U parede = {envelope.externalWallUValue}",
       "requiredValue": "HR superficial < 80% (mantida ≤ 30 dias/ano acima de 80%)",
       "remediation": "Prevenir o desenvolvimento de bolor: (1) Reduzir HR interior para ≤ 60%: ventilação mínima de 0.6 h⁻¹, extração mecânica em cozinhas e casas de banho. (2) Aumentar temperatura superficial: melhorar isolamento (U < 0.40 W/(m².K)), corrigir pontes térmicas. (3) Zonas de risco: cantos de paredes exteriores, atrás de armários, paredes Norte sem isolamento. (4) Ventilação localizada: grelhas autorreguláveis ou VMC com recuperação de calor. (5) Em reabilitação: verificar se existe humidade ascensional ou infiltrações antes de isolar.",
       "enabled": true,
-      "tags": ["bolor", "humidade", "risco", "superfície", "ventilação"]
+      "tags": [
+        "bolor",
+        "humidade",
+        "risco",
+        "superfície",
+        "ventilação"
+      ]
     },
     {
       "id": "THERM-COND-WINDOW-FRAME-01",
@@ -87,13 +170,38 @@
       "description": "O coeficiente de transmissão térmica dos envidraçados ({envelope.windowUValue} W/(m².K)) é elevado, indicando risco de condensação na superfície do vidro e/ou no caixilho durante o inverno.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.windowUValue", "operator": ">", "value": 2.80 }
+        {
+          "field": "envelope.windowUValue",
+          "operator": ">",
+          "value": 2.8
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "Uw = {envelope.windowUValue} W/(m².K)",
       "requiredValue": "Uw ≤ 2.40 W/(m².K) para minimizar risco de condensação no vidro",
       "remediation": "Reduzir condensação nos envidraçados: (1) Substituir vidro simples por vidro duplo (U vidro de 5.8 para 2.8 W/(m².K)). (2) Vidro duplo com baixa emissividade: U ≈ 1.1 W/(m².K). (3) Caixilharia com corte térmico: elimina a ponte térmica do perfil metálico. (4) Ventilação para reduzir HR interior. (5) Nota: alguma condensação nos vidros em manhãs frias é normal — o problema é condensação prolongada que causa bolores no caixilho e degradação da parede subjacente.",
       "enabled": true,
-      "tags": ["condensação", "envidraçados", "vidro", "caixilho"]
+      "tags": [
+        "condensação",
+        "envidraçados",
+        "vidro",
+        "caixilho"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "REH-HUMID-01",
@@ -102,13 +210,32 @@
       "description": "O fator de temperatura superficial interior (fRsi = {envelope.fRsiCriticalPoint}) nos pontos críticos da envolvente (cantos, ligações estruturais, ombreira de janelas) é inferior ao fRsi,min calculado ({envelope.fRsiMinRequired}), indicando risco de condensação superficial localizada.",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.fRsiCriticalPoint", "operator": "formula_lt", "value": "envelope.fRsiMinRequired" }
+        {
+          "field": "envelope.fRsiCriticalPoint",
+          "operator": "formula_lt",
+          "value": "envelope.fRsiMinRequired"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "fRsi,critical = {envelope.fRsiCriticalPoint}",
       "requiredValue": "fRsi >= fRsi,min calculado para cada mes da estacao de aquecimento (tipicamente fRsi,min ~= 0.70-0.80 para condicoes portuguesas)",
       "remediation": "Garantir fRsi > fRsi,min nos pontos criticos: (1) Calcular fRsi,min para cada mes: fRsi,min = (thetasi,min - thetae) / (thetai - thetae), onde thetasi,min corresponde a HR superficial de 80%. (2) Pontos criticos tipicos: cantos de paredes exteriores (fRsi pode descer a 0.50 sem isolamento), ombreiras de janelas sem retorno de isolamento, ligacao fachada/cobertura. (3) Simulacao 2D/3D: usar THERM ou HTflux para determinar fRsi real nos pontos criticos. (4) Correcao: isolamento continuo pelo exterior (ETICS) com retorno em todas as arestas e reentrancias. (5) Caso fRsi,min > fRsi mesmo com isolamento: aumentar ventilacao para reduzir HR interior.",
       "enabled": true,
-      "tags": ["condensacao superficial", "fRsi", "pontos criticos", "cantos", "EN 13788"]
+      "tags": [
+        "condensacao superficial",
+        "fRsi",
+        "pontos criticos",
+        "cantos",
+        "EN 13788"
+      ]
     },
     {
       "id": "REH-HUMID-02",
@@ -117,14 +244,35 @@
       "description": "A verificacao de condensacoes intersticiais pelo metodo de Glaser (EN ISO 13788 §6) nao foi executada para todas as solucoes construtivas da envolvente exterior. Este metodo e obrigatorio para validar que nao ocorre condensacao entre camadas durante a estacao de aquecimento.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.glaserMethodCompleted", "operator": "==", "value": false },
-        { "field": "envelope.externalWallUValue", "operator": "exists", "value": null }
+        {
+          "field": "envelope.glaserMethodCompleted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": ">",
+          "value": 0.5
+        }
       ],
       "currentValueTemplate": "Verificacao Glaser: nao realizada",
       "requiredValue": "Verificacao Glaser completa para todos os elementos da envolvente opaca exterior",
       "remediation": "Executar o metodo de Glaser para cada solucao construtiva: (1) Listar todas as camadas com espessura, condutividade termica (lambda) e fator de resistencia ao vapor (mu). (2) Calcular perfil de temperatura em cada interface: thetai = thetaint - (Rsi + SigmaR) / Rtotal x (thetaint - thetaext). (3) Calcular pressao de saturacao (Psat) em cada interface usando a equacao de Magnus. (4) Calcular perfil de pressao de vapor real (Pv) considerando a difusao de vapor. (5) Se Pv > Psat em alguma interface: condensacao intersticial — quantificar massa de condensado (g/m2). (6) Software: WUFI, Condensa, U-Wert.net — permitem analise dinamica mensal.",
       "enabled": true,
-      "tags": ["Glaser", "condensacao intersticial", "camadas", "pressao de vapor", "verificacao"]
+      "tags": [
+        "Glaser",
+        "condensacao intersticial",
+        "camadas",
+        "pressao de vapor",
+        "verificacao"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "REH-HUMID-03",
@@ -133,13 +281,32 @@
       "description": "A massa de condensacao intersticial acumulada durante a estacao de aquecimento ({envelope.maxAccumulatedCondensation} g/m2) excede o limite maximo admissivel, podendo causar degradacao dos materiais de construcao.",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.maxAccumulatedCondensation", "operator": ">", "value": 500 }
+        {
+          "field": "envelope.maxAccumulatedCondensation",
+          "operator": ">",
+          "value": 500
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "Condensacao acumulada maxima = {envelope.maxAccumulatedCondensation} g/m2",
       "requiredValue": "Condensacao acumulada <= 500 g/m2 (materiais nao higroscopicos) ou <= 200 g/m2 (materiais sensiveis como las minerais sem hidrofugo)",
       "remediation": "Reduzir a condensacao intersticial acumulada: (1) Regra fundamental: colocar as camadas de maior resistencia ao vapor no lado quente (interior) e as de menor resistencia no lado frio (exterior). (2) Barreira para-vapor interior (mud >= 100 m) quando R_isolamento > 2/3 x R_total. (3) Evitar revestimentos exteriores muito impermeaveis ao vapor (ex: ceramico colado sem juntas ventiladas). (4) Em ETICS: o reboco exterior deve ter mud < 2 m (permeavel ao vapor). (5) Limites praticos: 500 g/m2 para betao/tijolo; 200 g/m2 para isolamentos fibrosos; 0 g/m2 para materiais que degradam com humidade (gesso cartonado nao hidrofugo). (6) Se limite excedido: reformular a composicao da parede ou adicionar ventilacao na caixa-de-ar.",
       "enabled": true,
-      "tags": ["condensacao acumulada", "massa condensada", "degradacao", "limite", "estacao aquecimento"]
+      "tags": [
+        "condensacao acumulada",
+        "massa condensada",
+        "degradacao",
+        "limite",
+        "estacao aquecimento"
+      ]
     },
     {
       "id": "REH-HUMID-04",
@@ -148,13 +315,32 @@
       "description": "A capacidade de evaporacao durante a estacao quente ({envelope.annualEvaporationCapacity} g/m2) e insuficiente para eliminar a condensacao acumulada durante a estacao de aquecimento ({envelope.maxAccumulatedCondensation} g/m2). O balanco anual de humidade e negativo, causando acumulacao progressiva de agua no interior do elemento construtivo.",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.annualEvaporationCapacity", "operator": "formula_lt", "value": "envelope.maxAccumulatedCondensation" }
+        {
+          "field": "envelope.annualEvaporationCapacity",
+          "operator": "formula_lt",
+          "value": "envelope.maxAccumulatedCondensation"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "currentValueTemplate": "Evaporacao anual = {envelope.annualEvaporationCapacity} g/m2, Condensacao acumulada = {envelope.maxAccumulatedCondensation} g/m2",
       "requiredValue": "Evaporacao anual >= Condensacao acumulada (balanco anual positivo ou neutro)",
       "remediation": "Garantir que toda a condensacao acumulada no inverno e evaporada no verao: (1) O balanco anual DEVE ser positivo: SigmaEvaporacao >= SigmaCondensacao. (2) Se negativo: agua acumula ano apos ano, causando degradacao estrutural, corrosao, perda de eficacia do isolamento, e desenvolvimento de fungos. (3) Solucoes: (a) Aumentar permeabilidade ao vapor do lado exterior (reboco mineral vs. acrilico). (b) Reduzir permeabilidade do lado interior (barreira para-vapor). (c) Criar caixa-de-ar ventilada no lado exterior do isolamento. (d) Reformular composicao da parede: ETICS elimina o problema na maioria dos casos. (4) Verificacao dinamica (WUFI): mais precisa que Glaser estatico, considera absorcao capilar e armazenamento higroscopico.",
       "enabled": true,
-      "tags": ["evaporacao", "balanco anual", "humidade acumulada", "Glaser", "secagem"]
+      "tags": [
+        "evaporacao",
+        "balanco anual",
+        "humidade acumulada",
+        "Glaser",
+        "secagem"
+      ]
     },
     {
       "id": "REH-HUMID-05",
@@ -163,15 +349,44 @@
       "description": "A barreira para-vapor nao esta posicionada no lado quente (interior) do isolamento termico, contrariando o principio fundamental da EN ISO 13788 para climas com estacao de aquecimento dominante (zonas I2 e I3 em Portugal). O posicionamento incorreto agrava o risco de condensacao intersticial.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.vaporBarrierPosition", "operator": "!=", "value": "warm_side" },
-        { "field": "envelope.hasVaporBarrier", "operator": "==", "value": true },
-        { "field": "location.climateZoneWinter", "operator": "in", "value": ["I2", "I3"] }
+        {
+          "field": "envelope.vaporBarrierPosition",
+          "operator": "!=",
+          "value": "warm_side"
+        },
+        {
+          "field": "envelope.hasVaporBarrier",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "location.climateZoneWinter",
+          "operator": "in",
+          "value": [
+            "I2",
+            "I3"
+          ]
+        }
       ],
       "currentValueTemplate": "Posicao da barreira para-vapor: {envelope.vaporBarrierPosition}",
       "requiredValue": "Barreira para-vapor no lado quente (interior) do isolamento — obrigatorio em zonas I2 e I3",
       "remediation": "Posicionar corretamente a barreira para-vapor: (1) Principio: em climas com aquecimento dominante (I2/I3), o fluxo de vapor e de dentro para fora — a barreira deve estar no lado quente (interior) do isolamento. (2) Regra dos 2/3: se R_isolamento > 2/3 x R_total, e obrigatoria barreira para-vapor com mud >= 100 m no lado interior. (3) Barreira no lado errado (frio): impede a evaporacao da condensacao para o exterior, agravando o problema. (4) Membrana inteligente (mud variavel 0.5-50 m): alternativa que permite secagem bidirecional — ideal para reabilitacao onde as condicoes podem variar. (5) Em zona I1 (inverno suave): a barreira pode nao ser necessaria se a permeabilidade das camadas segue a ordem correta (decrescente de dentro para fora). (6) ETICS: dispensa barreira para-vapor na grande maioria dos casos.",
       "enabled": true,
-      "tags": ["barreira para-vapor", "posicionamento", "lado quente", "I2", "I3", "condensacao"]
+      "tags": [
+        "barreira para-vapor",
+        "posicionamento",
+        "lado quente",
+        "I2",
+        "I3",
+        "condensacao"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

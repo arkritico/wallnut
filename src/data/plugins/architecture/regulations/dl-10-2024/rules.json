@@ -11,12 +11,37 @@
       "description": "A obra pode estar isenta de controlo prévio (licenciamento ou comunicação prévia) conforme as isenções alargadas do DL 10/2024 (Simplex Urbanístico), que ampliou significativamente os casos de dispensa.",
       "severity": "info",
       "conditions": [
-        { "field": "architecture.isMinorWork", "operator": "==", "value": true }
+        {
+          "field": "architecture.isMinorWork",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Verificar enquadramento nas isenções alargadas do DL 10/2024 Art. 6.º e 6.º-A",
       "remediation": "Isenções de controlo prévio (DL 10/2024): (1) Obras interiores sem alteração de estrutura, fachada ou cércea. (2) Obras interiores COM alteração estrutural acompanhadas de termo de responsabilidade. (3) Reconstrução e ampliação sem aumento de altura da fachada (mesmo com mais pisos ou área). (4) Obras de conservação, incluindo em edifícios classificados. (5) Demolição de construções ilegais. (6) Substituição de caixilharias com acabamento exterior idêntico (eficiência energética). (7) Painéis solares fotovoltaicos e coletores térmicos que não excedam a cobertura e sua altura em 1 m. (8) Muros de vedação até 1.80 m, piscinas até 50 m³, estufas < 3 m e ≤ 50 m². (9) Operações precedidas de informação prévia favorável (Art. 14.º). (10) NOTA: isenção de controlo NÃO isenta de cumprimento de normas técnicas — a responsabilidade recai sobre o promotor.",
       "enabled": true,
-      "tags": ["isenção", "controlo prévio", "simplex", "DL 10/2024"]
+      "tags": [
+        "isenção",
+        "controlo prévio",
+        "simplex",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-ISENT-02",
@@ -25,12 +50,37 @@
       "description": "A operação urbanística da administração pública pode estar isenta de controlo prévio municipal conforme o Art. 7.º do DL 10/2024.",
       "severity": "info",
       "conditions": [
-        { "field": "architecture.isPublicEntity", "operator": "==", "value": true }
+        {
+          "field": "architecture.isPublicEntity",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Operações de entidades públicas isentas de controlo prévio municipal (Art. 7.º DL 10/2024)",
       "remediation": "Isenções para administração pública (Art. 7.º): (1) Câmaras municipais em áreas com plano municipal. (2) Estado e institutos públicos para: serviços públicos, infraestruturas de utilidade pública, habitação social, residências de estudantes, parques industriais, património cultural. (3) Concessionários: obras de construção e demolição. (4) Cooperativas de habitação com acordo de terreno público. (5) Equipamentos de apoio à terceira idade, creches, habitação de emergência com financiamento público. (6) Empresas municipais, entidades intermunicipais, universidades e politécnicos públicos.",
       "enabled": true,
-      "tags": ["administração pública", "isenção", "habitação social", "simplex"]
+      "tags": [
+        "administração pública",
+        "isenção",
+        "habitação social",
+        "simplex"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-COMUN-01",
@@ -39,13 +89,33 @@
       "description": "A obra pode estar sujeita ao regime de comunicação prévia (em vez de licenciamento), cujo âmbito foi significativamente alargado pelo DL 10/2024, devendo verificar-se o enquadramento.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.hasLotAllotment", "operator": "==", "value": true }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasLotAllotment",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Verificar se a operação cabe no regime de comunicação prévia (DL 10/2024 Art. 4.º)",
       "remediation": "Comunicação prévia alargada (DL 10/2024): (1) Loteamento em área com plano de pormenor. (2) Obras de urbanização em áreas com plano de pormenor. (3) Construção em zonas urbanas consolidadas conformes ao plano municipal e altura padrão. (4) Piscinas associadas a edifício principal. (5) Alteração de uso sem obra — prazo de 20 dias para rejeição. (6) IMPORTANTE: o município NÃO pode exigir licenciamento quando a comunicação prévia é suficiente — a responsabilidade legal recai integralmente sobre o promotor e os técnicos autores. (7) Alvará de construção eliminado: o recibo de pagamento de taxas substitui o alvará como título da operação.",
       "enabled": true,
-      "tags": ["comunicação prévia", "loteamento", "simplex", "DL 10/2024"]
+      "tags": [
+        "comunicação prévia",
+        "loteamento",
+        "simplex",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-LICENC-01",
@@ -54,13 +124,33 @@
       "description": "A operação urbanística requer licenciamento municipal (não basta comunicação prévia), devendo seguir o procedimento de licenciamento conforme o DL 10/2024.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.requiresLicensing", "operator": "==", "value": true }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.requiresLicensing",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Licenciamento municipal obrigatório nos casos previstos no Art. 4.º DL 10/2024",
       "remediation": "Operações sujeitas a licenciamento (DL 10/2024): (1) Loteamento em áreas sem plano de pormenor. (2) Obras de urbanização em áreas sem plano de pormenor. (3) Construção, alteração ou ampliação sem orientação detalhada de planeamento. (4) Obras em imóveis classificados ou em vias de classificação. (5) Reconstrução com aumento de altura da fachada. (6) Demolições não cobertas por licença de reconstrução. (7) Construção em áreas de servidão. (8) Título: o recibo de pagamento de taxas substitui o alvará (Art. 74.º).",
       "enabled": true,
-      "tags": ["licenciamento", "licença", "câmara", "DL 10/2024"]
+      "tags": [
+        "licenciamento",
+        "licença",
+        "câmara",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-PRAZO-01",
@@ -69,14 +159,34 @@
       "description": "O pedido de licenciamento ou informação prévia não foi decidido pela câmara dentro do prazo legal, podendo considerar-se tacitamente deferido conforme o DL 10/2024.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.licensingPendingDays", "operator": ">", "value": 45 }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.licensingPendingDays",
+          "operator": ">",
+          "value": 45
+        }
       ],
       "currentValueTemplate": "Dias em análise = {architecture.licensingPendingDays}",
       "requiredValue": "Prazo de decisão excedido — verificar deferimento tácito (DL 10/2024)",
       "remediation": "Prazos de decisão (DL 10/2024): (1) Informação prévia simples: 15 dias. (2) Informação prévia qualificada (loteamento): 45 dias. (3) Informação prévia qualificada (outras): 20 dias. (4) Comunicação prévia (uso sem obra): 20 dias. (5) Licenciamento (construção/demolição): 20 dias (Proposta 2025). (6) Licenciamento (loteamento): 45 dias (Proposta 2025). (7) Deferimento tácito: decorrido o prazo sem decisão, o pedido considera-se tacitamente deferido. (8) Consultas externas: prazo suspende-se até resposta ou expiração do prazo da entidade. (9) Nota: prazos podem ser alterados pela Proposta de Lei 48/XVII (em tramitação).",
       "enabled": true,
-      "tags": ["prazo", "deferimento tácito", "licenciamento", "DL 10/2024"]
+      "tags": [
+        "prazo",
+        "deferimento tácito",
+        "licenciamento",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-REHAB-01",
@@ -85,12 +195,37 @@
       "description": "A obra de reabilitação pode beneficiar de procedimentos simplificados e dispensas de requisitos técnicos conforme o DL 10/2024 e RJRU (DL 307/2009).",
       "severity": "info",
       "conditions": [
-        { "field": "isRehabilitation", "operator": "==", "value": true }
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Verificar dispensas e simplificações aplicáveis em reabilitação (DL 10/2024 + RJRU)",
       "remediation": "Simplificações em reabilitação (DL 10/2024): (1) Reconstrução sem aumento de cércea é isenta de controlo prévio (mesmo com mais pisos/área). (2) Obras interiores com alteração estrutural: isentas com termo de responsabilidade. (3) Autorização de utilização: suprimida dos procedimentos de reabilitação. (4) Pé-direito: mínimo 2.40 m quando manter 2.70 m é inviável. (5) Estacionamento: dispensa quando inexistente e inviável de criar. (6) ETICS: pode ser dispensado em edifícios classificados ou centros históricos. (7) Pareceres desfavoráveis: entidades devem indicar expressamente as alterações necessárias.",
       "enabled": true,
-      "tags": ["reabilitação", "simplificação", "dispensa", "DL 10/2024"]
+      "tags": [
+        "reabilitação",
+        "simplificação",
+        "dispensa",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-DIGIT-01",
@@ -99,13 +234,33 @@
       "description": "O pedido de licenciamento ou comunicação prévia deve ser submetido através da Plataforma Eletrónica de Procedimentos Urbanísticos (obrigatória a partir de 5 de janeiro de 2026).",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true },
-        { "field": "architecture.hasDigitalSubmission", "operator": "not_exists", "value": null }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasDigitalSubmission",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Submissão digital obrigatória (plataforma eletrónica a partir de 05/01/2026, BIM a partir de 01/01/2030)",
       "remediation": "Submissão digital (DL 10/2024): (1) Plataforma eletrónica de procedimentos urbanísticos: obrigatória a partir de 5 de janeiro de 2026. (2) Formato: projetos em PDF/A, peças desenhadas em PDF vetorial. (3) Assinatura: digital qualificada do técnico autor. (4) Termo de responsabilidade: assinado digitalmente. (5) BIM: submissão em formato BIM obrigatória a partir de 1 de janeiro de 2030. (6) Sistema eletrónico de emissão de pareceres: obrigatório desde 6 de janeiro de 2025. (7) Transição: municípios com dispensa transitória podem aceitar papel até à data-limite.",
       "enabled": true,
-      "tags": ["digital", "plataforma", "BIM", "DL 10/2024"]
+      "tags": [
+        "digital",
+        "plataforma",
+        "BIM",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-RGEU-01",
@@ -114,12 +269,37 @@
       "description": "O RGEU (Regulamento Geral das Edificações Urbanas, DL 38382/1951) será revogado a 1 de junho de 2026, sendo substituído pelo Código da Construção com normas técnicas definidas pelas ordens profissionais.",
       "severity": "info",
       "conditions": [
-        { "field": "building.isNew", "operator": "==", "value": true }
+        {
+          "field": "building.isNew",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "RGEU revogado a 01/06/2026 — transição para Código da Construção (normas de desempenho)",
       "remediation": "Transição RGEU → Código da Construção: (1) Data de revogação: 1 de junho de 2026 (DL 10/2024). (2) Até essa data: RGEU (DL 38382/1951) permanece em vigor. (3) Código da Construção: em desenvolvimento pelas ordens profissionais (OA, OE, OET). (4) Filosofia: transição de requisitos quantitativos/prescritivos para avaliação de desempenho por tipologia. (5) Inclui: portaria de seguro RC, caderno de encargos, revisão de projeto, vulnerabilidade sísmica. (6) Até à publicação do Código: aplicam-se as normas RGEU existentes como referência técnica.",
       "enabled": true,
-      "tags": ["RGEU", "revogação", "Código da Construção", "transição"]
+      "tags": [
+        "RGEU",
+        "revogação",
+        "Código da Construção",
+        "transição"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "ARQ-SIMP-OBRAS-ISENT-NOT-01",
@@ -128,13 +308,33 @@
       "description": "As obras isentas de controlo prévio requerem notificação ao município antes do início dos trabalhos, com documentação de suporte obrigatória.",
       "severity": "info",
       "conditions": [
-        { "field": "architecture.isMinorWork", "operator": "==", "value": true },
-        { "field": "architecture.hasMunicipalNotification", "operator": "not_exists", "value": null }
+        {
+          "field": "architecture.isMinorWork",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasMunicipalNotification",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Notificação ao município obrigatória antes do início de obras isentas de controlo prévio",
       "remediation": "Obrigações em obras isentas (DL 10/2024 + Proposta 2025): (1) Notificação ao município no mínimo 5 dias antes do início dos trabalhos (Proposta 48/XVII). (2) Documentação: comprovativo de pagamento de taxas. (3) Obras com alteração estrutural: termo de responsabilidade do engenheiro de estruturas. (4) Projetos de especialidades: obrigatórios quando aplicável (ITED, gás, etc.). (5) Não cumprimento: sujeito a coimas e embargos. (6) A isenção de controlo NÃO dispensa o cumprimento das normas técnicas em vigor.",
       "enabled": true,
-      "tags": ["notificação", "obras isentas", "documentação", "DL 10/2024"]
+      "tags": [
+        "notificação",
+        "obras isentas",
+        "documentação",
+        "DL 10/2024"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }

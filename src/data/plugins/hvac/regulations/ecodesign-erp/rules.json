@@ -11,14 +11,28 @@
       "description": "A caldeira instalada não cumpre a eficiência sazonal mínima de aquecimento de 86% (ηs) exigida pelo Regulamento EU 813/2013 (Ecodesign para aquecedores).",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.boilerSeasonalEfficiency", "operator": "<", "value": 86 },
-        { "field": "hvac.hasBoiler", "operator": "==", "value": true }
+        {
+          "field": "hvac.boilerSeasonalEfficiency",
+          "operator": "<",
+          "value": 86
+        },
+        {
+          "field": "hvac.hasBoiler",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "{hvac.boilerSeasonalEfficiency}% ηs",
       "requiredValue": "≥ 86% eficiência sazonal (ηs) conforme EU 813/2013",
       "remediation": "A caldeira não cumpre os requisitos mínimos Ecodesign. Desde 26/09/2015, caldeiras com ηs < 86% não podem ser colocadas no mercado EU. Substituir por: (1) Caldeira de condensação a gás (ηs típica: 92-98%), (2) Bomba de calor (ηs > 100%), (3) Sistema híbrido caldeira condensação + bomba de calor. Verificar etiqueta energética: classe A (ηs ≥ 90%) obrigatória para edifícios novos conforme RECS.",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "caldeira", "eficiência", "EU 813/2013"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "caldeira",
+        "eficiência",
+        "EU 813/2013"
+      ]
     },
     {
       "id": "HVAC-ERP-BOILER-NOX-01",
@@ -27,14 +41,28 @@
       "description": "A caldeira excede o limite de emissões de NOx estabelecido pelo Regulamento Ecodesign: ≤ 56 mg/kWh para gás, ≤ 120 mg/kWh para combustível líquido.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.boilerNOxEmissions", "operator": ">", "value": 56 },
-        { "field": "hvac.boilerFuelType", "operator": "==", "value": "gas" }
+        {
+          "field": "hvac.boilerNOxEmissions",
+          "operator": ">",
+          "value": 56
+        },
+        {
+          "field": "hvac.boilerFuelType",
+          "operator": "==",
+          "value": "gas"
+        }
       ],
       "currentValueTemplate": "{hvac.boilerNOxEmissions} mg/kWh NOx",
       "requiredValue": "≤ 56 mg/kWh (gás) ou ≤ 120 mg/kWh (combustível líquido)",
       "remediation": "A caldeira excede os limites de emissões NOx Ecodesign (em vigor desde 26/09/2018). Substituir queimador por modelo low-NOx ou ultra-low-NOx (< 30 mg/kWh). As caldeiras de condensação modernas cumprem tipicamente < 40 mg/kWh. Para caldeiras a gasóleo, o limite é 120 mg/kWh — considerar conversão para gás natural para reduzir emissões.",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "NOx", "emissões", "caldeira"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "NOx",
+        "emissões",
+        "caldeira"
+      ]
     },
     {
       "id": "HVAC-ERP-BOILER-NOX-02",
@@ -43,14 +71,28 @@
       "description": "A caldeira a combustível líquido excede o limite de emissões de NOx de 120 mg/kWh estabelecido pelo Regulamento Ecodesign.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.boilerNOxEmissions", "operator": ">", "value": 120 },
-        { "field": "hvac.boilerFuelType", "operator": "==", "value": "oil" }
+        {
+          "field": "hvac.boilerNOxEmissions",
+          "operator": ">",
+          "value": 120
+        },
+        {
+          "field": "hvac.boilerFuelType",
+          "operator": "==",
+          "value": "oil"
+        }
       ],
       "currentValueTemplate": "{hvac.boilerNOxEmissions} mg/kWh NOx",
       "requiredValue": "≤ 120 mg/kWh para caldeiras a combustível líquido",
       "remediation": "Substituir queimador por modelo conforme com Ecodesign. Considerar conversão para gás natural (limite mais restritivo de 56 mg/kWh mas tecnologia mais limpa) ou substituição por bomba de calor para eliminar emissões locais.",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "NOx", "emissões", "gasóleo"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "NOx",
+        "emissões",
+        "gasóleo"
+      ]
     },
     {
       "id": "HVAC-ERP-VENT-SFP-01",
@@ -59,14 +101,32 @@
       "description": "A unidade de ventilação não cumpre a potência específica do ventilador (SFP) máxima exigida pelo Regulamento EU 1253/2014 para unidades de ventilação não residenciais.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.ventilationUnitSFP", "operator": ">", "value": 1.6 },
-        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "industrial"] }
+        {
+          "field": "hvac.ventilationUnitSFP",
+          "operator": ">",
+          "value": 1.6
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed",
+            "industrial"
+          ]
+        }
       ],
       "currentValueTemplate": "{hvac.ventilationUnitSFP} W/(m³/h)",
       "requiredValue": "SFP ≤ 1.6 W/(m³/h) para unidades não residenciais (Tier 2, desde 2018)",
       "remediation": "A unidade de ventilação excede a SFP máxima Ecodesign. Soluções: (1) Substituir ventiladores por modelos EC (Electronically Commutated) com rendimento > 80%. (2) Otimizar rede de condutas para reduzir perda de carga (ΔP). (3) Instalar variador de frequência para operação a caudal variável. (4) Verificar dimensionamento: condutas subdimensionadas aumentam ΔP e SFP. Para unidades residenciais (UVR): SFP máximo de 1.2 W/(m³/h).",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "SFP", "ventilação", "EU 1253/2014"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "SFP",
+        "ventilação",
+        "EU 1253/2014"
+      ]
     },
     {
       "id": "HVAC-ERP-VENT-RECOVERY-01",
@@ -75,14 +135,28 @@
       "description": "O recuperador de calor da unidade de ventilação não atinge a eficiência térmica mínima de 73% exigida pelo Regulamento EU 1253/2014 (Tier 2, desde 2018).",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.heatRecoveryEfficiency", "operator": "<", "value": 73 },
-        { "field": "hvac.hasHeatRecovery", "operator": "==", "value": true }
+        {
+          "field": "hvac.heatRecoveryEfficiency",
+          "operator": "<",
+          "value": 73
+        },
+        {
+          "field": "hvac.hasHeatRecovery",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "{hvac.heatRecoveryEfficiency}%",
       "requiredValue": "≥ 73% eficiência de recuperação térmica (Tier 2, EU 1253/2014)",
       "remediation": "O recuperador de calor não cumpre Ecodesign. Opções de substituição: (1) Recuperador de placas de contra-corrente: eficiência 80-90%. (2) Recuperador rotativo (roda entálpica): eficiência 75-85% (atenção à transferência de odores). (3) Recuperador de tubos de calor (heat pipes): eficiência 50-65% — geralmente insuficiente para Ecodesign. Verificar também a estanquidade da secção de recuperação (fugas internas reduzem eficiência real).",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "recuperação calor", "eficiência", "EU 1253/2014"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "recuperação calor",
+        "eficiência",
+        "EU 1253/2014"
+      ]
     },
     {
       "id": "HVAC-ERP-HP-SCOP-01",
@@ -91,14 +165,28 @@
       "description": "A bomba de calor não atinge o SCOP (Seasonal Coefficient of Performance) mínimo exigido pelo Regulamento Ecodesign para a zona climática aplicável.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.heatPumpSCOP", "operator": "<", "value": 2.5 },
-        { "field": "hvac.hasHeatPump", "operator": "==", "value": true }
+        {
+          "field": "hvac.heatPumpSCOP",
+          "operator": "<",
+          "value": 2.5
+        },
+        {
+          "field": "hvac.hasHeatPump",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "SCOP = {hvac.heatPumpSCOP}",
       "requiredValue": "SCOP ≥ 2.5 (zona climática média — Portugal Continental)",
       "remediation": "A bomba de calor não cumpre os requisitos mínimos Ecodesign. Substituir por modelo com SCOP ≥ 3.0 (classe A+) ou superior. Para Portugal (zona climática média/quente): bombas de calor ar-água com SCOP típico de 3.0-4.5, bombas de calor geotérmicas com SCOP 4.0-5.0. Verificar que o dimensionamento é adequado: sobredimensionamento reduz SCOP por funcionamento a carga parcial excessiva. Considerar sistema inverter para manter eficiência elevada a carga parcial.",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "SCOP", "bomba de calor", "eficiência"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "SCOP",
+        "bomba de calor",
+        "eficiência"
+      ]
     },
     {
       "id": "HVAC-ERP-AC-SEER-01",
@@ -107,14 +195,28 @@
       "description": "O sistema de arrefecimento não atinge o SEER (Seasonal Energy Efficiency Ratio) mínimo exigido pelo Regulamento Ecodesign.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.coolingSEER", "operator": "<", "value": 3.6 },
-        { "field": "hvac.hasCoolingSystem", "operator": "==", "value": true }
+        {
+          "field": "hvac.coolingSEER",
+          "operator": "<",
+          "value": 3.6
+        },
+        {
+          "field": "hvac.hasCoolingSystem",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "SEER = {hvac.coolingSEER}",
       "requiredValue": "SEER ≥ 3.6 (Tier 2, Ecodesign) — recomendado ≥ 5.0 (classe A++)",
       "remediation": "O sistema de arrefecimento não cumpre Ecodesign. Para novos equipamentos: (1) Split/multi-split inverter: SEER típico 5.0-8.0 (classe A++ a A+++). (2) Chiller ar-água scroll inverter: SEER 4.0-6.0. (3) Chiller água-água centrífugo: SEER 5.0-7.0. Para Portugal (clima quente), a eficiência em arrefecimento é particularmente importante. Verificar dimensionamento: equipamento sobredimensionado em > 20% perde eficiência significativa a carga parcial.",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "SEER", "arrefecimento", "eficiência"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "SEER",
+        "arrefecimento",
+        "eficiência"
+      ]
     },
     {
       "id": "HVAC-ERP-PUMP-EEI-01",
@@ -123,14 +225,35 @@
       "description": "As bombas circuladoras da instalação AVAC não cumprem o índice de eficiência energética (EEI) máximo de 0.23 exigido pelo Regulamento EU 622/2012.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.circulatorPumpEEI", "operator": ">", "value": 0.23 },
-        { "field": "hvac.hasCirculatorPumps", "operator": "==", "value": true }
+        {
+          "field": "hvac.circulatorPumpEEI",
+          "operator": ">",
+          "value": 0.23
+        },
+        {
+          "field": "hvac.hasCirculatorPumps",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "EEI = {hvac.circulatorPumpEEI}",
       "requiredValue": "EEI ≤ 0.23 conforme EU 622/2012 (desde 2015)",
       "remediation": "Substituir bombas circuladoras por modelos de alta eficiência: (1) Bombas com motor de ímanes permanentes (ECM): EEI típico 0.17-0.20. (2) Bombas com regulação eletrónica integrada (pressão constante ou proporcional): EEI típico 0.15-0.20. (3) Verificar dimensionamento: bomba sobredimensionada opera fora do ponto ótimo. (4) Bombas de rotor húmido: substituir por rotor seco com variador de frequência para caudais > 5 m³/h. O payback da substituição é tipicamente 2-3 anos devido à poupança energética.",
       "enabled": true,
-      "tags": ["Ecodesign", "ErP", "bomba", "EEI", "EU 622/2012"]
+      "tags": [
+        "Ecodesign",
+        "ErP",
+        "bomba",
+        "EEI",
+        "EU 622/2012"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-LABEL-01",
@@ -139,13 +262,33 @@
       "description": "Os equipamentos AVAC (caldeiras, bombas de calor, unidades de ar condicionado) não possuem etiqueta energética visível conforme exigido pelos Regulamentos Delegados da UE.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasEnergyLabel", "operator": "not_exists", "value": null },
-        { "field": "hvac.installedHVACPower", "operator": ">", "value": 0 }
+        {
+          "field": "hvac.hasEnergyLabel",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">",
+          "value": 0
+        }
       ],
       "requiredValue": "Etiqueta energética obrigatória e visível em todos os equipamentos AVAC",
       "remediation": "Garantir que todos os equipamentos AVAC possuem etiqueta energética conforme regulamentação EU: (1) Caldeiras e bombas de calor até 70 kW: etiqueta de produto + etiqueta de sistema (package label). (2) Ar condicionado até 12 kW: etiqueta de produto com SEER e SCOP. (3) Unidades de ventilação residenciais: etiqueta com classe de eficiência energética. (4) A etiqueta deve estar visível no equipamento e incluída na documentação técnica. (5) O instalador deve fornecer a etiqueta de sistema (combinação geradores + regulação + solar).",
       "enabled": true,
-      "tags": ["Ecodesign", "etiqueta energética", "ErP", "rotulagem"]
+      "tags": [
+        "Ecodesign",
+        "etiqueta energética",
+        "ErP",
+        "rotulagem"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-CHILLER-SEER-01",
@@ -154,15 +297,33 @@
       "description": "O chiller de conforto com potência > 12 kW não atinge o SEER mínimo exigido pelo Regulamento Ecodesign EU 2016/2281 para sistemas de arrefecimento.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.chillerSEER", "operator": "<", "value": 3.8 },
-        { "field": "hvac.chillerType", "operator": "==", "value": "compression" },
-        { "field": "hvac.installedCoolingPower", "operator": ">", "value": 12 }
+        {
+          "field": "hvac.chillerSEER",
+          "operator": "<",
+          "value": 3.8
+        },
+        {
+          "field": "hvac.chillerType",
+          "operator": "==",
+          "value": "compression"
+        },
+        {
+          "field": "hvac.installedCoolingPower",
+          "operator": ">",
+          "value": 12
+        }
       ],
       "currentValueTemplate": "SEER = {hvac.chillerSEER}",
       "requiredValue": "SEER ≥ 3.8 para chillers de conforto > 12 kW (EU 2016/2281 Tier 2)",
       "remediation": "Substituir chiller por modelo conforme Ecodesign: (1) Chiller ar-água scroll inverter: SEER 4.0-5.5. (2) Chiller água-água centrífugo: SEER 5.5-7.0. (3) Chiller ar-água parafuso: SEER 3.8-5.0. (4) Para Portugal (clima quente): a eficiência em arrefecimento é preponderante no consumo anual. (5) O SEER integra o desempenho a 100%, 75%, 50% e 25% de carga — chillers com compressor inverter têm melhor SEER que os de velocidade fixa.",
       "enabled": true,
-      "tags": ["Ecodesign", "SEER", "chiller", "EU 2016/2281", "eficiência"]
+      "tags": [
+        "Ecodesign",
+        "SEER",
+        "chiller",
+        "EU 2016/2281",
+        "eficiência"
+      ]
     },
     {
       "id": "HVAC-ERP-HP-DEFROST-01",
@@ -171,14 +332,35 @@
       "description": "A bomba de calor não possui descongelação inteligente por demanda, utilizando descongelação temporizada que penaliza excessivamente o SCOP sazonal e resulta em eficiência real inferior à declarada pelo fabricante.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.heatPumpDefrostType", "operator": "==", "value": "timed" },
-        { "field": "hvac.hasHeatPump", "operator": "==", "value": true }
+        {
+          "field": "hvac.heatPumpDefrostType",
+          "operator": "==",
+          "value": "timed"
+        },
+        {
+          "field": "hvac.hasHeatPump",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "Descongelação temporizada (penalização SCOP estimada: 10-15%)",
       "requiredValue": "Descongelação inteligente por demanda (penalização SCOP < 5%)",
       "remediation": "Substituir ou atualizar a lógica de descongelação: (1) Descongelação por demanda: inicia com base na diferença de temperatura entre o evaporador e o ar exterior (indicador de formação de gelo). (2) Sensores: temperatura do evaporador + pressão de evaporação. (3) Duração otimizada: termina quando o evaporador atinge temperatura positiva (não por temporização fixa). (4) Impacto no SCOP: descongelação inteligente penaliza < 5% vs. 10-15% da temporizada. (5) Para bombas de calor em zonas húmidas de Portugal (litoral norte), a eficiência da descongelação é particularmente importante entre dezembro e fevereiro.",
       "enabled": true,
-      "tags": ["bomba de calor", "descongelação", "SCOP", "Ecodesign", "eficiência"]
+      "tags": [
+        "bomba de calor",
+        "descongelação",
+        "SCOP",
+        "Ecodesign",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-HP-SIZING-01",
@@ -187,14 +369,35 @@
       "description": "A bomba de calor foi dimensionada para a carga de pico sem considerar a metodologia de carga parcial da EN 14825, resultando em sobredimensionamento que degrada o SCOP/SEER sazonal e aumenta os ciclos on/off.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.heatPumpOversizeFactor", "operator": ">", "value": 1.2 },
-        { "field": "hvac.hasHeatPump", "operator": "==", "value": true }
+        {
+          "field": "hvac.heatPumpOversizeFactor",
+          "operator": ">",
+          "value": 1.2
+        },
+        {
+          "field": "hvac.hasHeatPump",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "Fator de sobredimensionamento: {hvac.heatPumpOversizeFactor}×",
       "requiredValue": "Fator de sobredimensionamento ≤ 1.2× conforme EN 14825 e boas práticas Ecodesign",
       "remediation": "Redimensionar a bomba de calor conforme EN 14825: (1) Calcular a carga térmica a 100%, 75%, 50% e 25% da condição de projeto. (2) Selecionar bomba de calor cuja potência nominal corresponda a 80-100% da carga de pico (bivalente ou com resistência de apoio para picos). (3) Priorizar compressores inverter: mantêm eficiência elevada a carga parcial (SCOP/SEER real superior). (4) Sobredimensionamento > 20%: penalização de 10-25% no SCOP por funcionamento excessivo em on/off. (5) Para Portugal (clima ameno): a carga de aquecimento de pico é atingida < 100 h/ano — dimensionar para 80% da carga de pico é aceitável com appoint elétrico.",
       "enabled": true,
-      "tags": ["Ecodesign", "bomba de calor", "dimensionamento", "EN 14825", "SCOP"]
+      "tags": [
+        "Ecodesign",
+        "bomba de calor",
+        "dimensionamento",
+        "EN 14825",
+        "SCOP"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-ERW-01",
@@ -203,14 +406,28 @@
       "description": "A roda de recuperação entálpica (energy recovery wheel) da UTA não cumpre as especificações mínimas de eficiência e estanquidade do Regulamento EU 1253/2014 para unidades de ventilação não residenciais.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.energyRecoveryWheelEfficiency", "operator": "<", "value": 73 },
-        { "field": "hvac.hasEnergyRecoveryWheel", "operator": "==", "value": true }
+        {
+          "field": "hvac.energyRecoveryWheelEfficiency",
+          "operator": "<",
+          "value": 73
+        },
+        {
+          "field": "hvac.hasEnergyRecoveryWheel",
+          "operator": "==",
+          "value": true
+        }
       ],
       "currentValueTemplate": "{hvac.energyRecoveryWheelEfficiency}% eficiência da roda entálpica",
       "requiredValue": "≥ 73% eficiência térmica (Tier 2 EU 1253/2014), fuga interna ≤ 3%",
       "remediation": "Substituir ou otimizar a roda de recuperação entálpica: (1) Eficiência mínima Ecodesign: 73% (Tier 2, desde 2018). Rodas modernas atingem 75-85% de eficiência sensível e 65-80% de eficiência latente. (2) Estanquidade: fuga de ar (carry-over) ≤ 3% — verificar vedantes de escova (brush seals) e purge sector. (3) Velocidade de rotação: 10-20 rpm para recuperação sensível, 3-8 rpm para recuperação entálpica. (4) Revestimento higroscópico: obrigatório para recuperação de humidade (silica gel ou zeólito). (5) Filtração: F7 mínimo a montante de ambos os lados para proteger a roda.",
       "enabled": true,
-      "tags": ["Ecodesign", "roda entálpica", "energy recovery wheel", "EU 1253/2014", "UTA"]
+      "tags": [
+        "Ecodesign",
+        "roda entálpica",
+        "energy recovery wheel",
+        "EU 1253/2014",
+        "UTA"
+      ]
     },
     {
       "id": "HVAC-ERP-FROST-01",
@@ -219,13 +436,34 @@
       "description": "A roda de recuperação entálpica não possui sistema de proteção anti-gelo (frost protection) adequado, podendo resultar em formação de gelo na face de extração quando a temperatura exterior é inferior a -5°C, bloqueando a rotação e danificando o rotor.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasEnthalpyWheelFrostProtection", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasEnergyRecoveryWheel", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasEnthalpyWheelFrostProtection",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasEnergyRecoveryWheel",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Proteção anti-gelo obrigatória para rodas entálpicas em climas com T < -5°C",
       "remediation": "Implementar proteção anti-gelo na roda entálpica: (1) Pré-aquecimento do ar exterior: bateria de pré-aquecimento (água quente ou elétrica) para elevar temperatura de admissão a > -2°C antes da roda. (2) Controlo de velocidade: reduzir rpm da roda quando temperatura de extração atinge 0°C. (3) Bypass parcial: desviar parte do ar de admissão para reduzir a taxa de transferência. (4) Sensor de pressão diferencial: alarme quando ΔP da roda excede 150% do valor nominal (indicação de gelo). (5) Em Portugal Continental: risco de gelo limitado a zonas de montanha interior (Serra da Estrela, Trás-os-Montes) — avaliar necessidade conforme localização.",
       "enabled": true,
-      "tags": ["roda entálpica", "frost protection", "anti-gelo", "Ecodesign", "EN 308"]
+      "tags": [
+        "roda entálpica",
+        "frost protection",
+        "anti-gelo",
+        "Ecodesign",
+        "EN 308"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-CONDENSING-FLUE-01",
@@ -234,13 +472,27 @@
       "description": "A chaminé de exaustão da caldeira de condensação não é adequada para a operação em regime de condensação, utilizando material não resistente aos condensados ácidos (pH 3-5) que causam corrosão e risco de fuga de produtos de combustão.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.hasCondensingSafeFlue", "operator": "not_exists", "value": null },
-        { "field": "hvac.boilerType", "operator": "==", "value": "condensing" }
+        {
+          "field": "hvac.hasCondensingSafeFlue",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.boilerType",
+          "operator": "==",
+          "value": "condensing"
+        }
       ],
       "requiredValue": "Chaminé em aço inox 316L ou polipropileno (PP) classificada para caldeiras de condensação",
       "remediation": "Substituir ou adaptar a chaminé para caldeira de condensação: (1) Material: aço inox 316L (acidez pH 3-5 dos condensados corrói aço galvanizado e alvenaria), ou polipropileno (PP) para temperatura de fumos < 120°C, ou PVDF para ambientes agressivos. (2) Estanquidade: chaminé em sobrepressão (tipo C — tiragem forçada) com juntas de vedação estanques ao gás e à água. (3) Inclinação: mínimo 3° ascendente do equipamento ao exterior para drenagem dos condensados. (4) Drenagem: sifão de condensados na base da chaminé com descarga para rede de esgotos. (5) Dimensionamento: conforme EN 13384-1 — diâmetro e tiragem adequados para o caudal de gases e temperatura de fumos (40-80°C em condensação plena). (6) Nunca ligar caldeira de condensação a chaminé existente em alvenaria sem encamisamento inox.",
       "enabled": true,
-      "tags": ["Ecodesign", "caldeira condensação", "chaminé", "condensados", "EN 13384"]
+      "tags": [
+        "Ecodesign",
+        "caldeira condensação",
+        "chaminé",
+        "condensados",
+        "EN 13384"
+      ]
     },
     {
       "id": "HVAC-ERP-BIOMASS-PM-01",
@@ -249,14 +501,33 @@
       "description": "A caldeira a biomassa (pellets ou estilha) excede o limite de emissões de partículas de 40 mg/m³ (a 10% O₂) estabelecido pelo Regulamento Ecodesign EU 2015/1189 para aquecedores a combustível sólido.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.biomassPMEmissions", "operator": ">", "value": 40 },
-        { "field": "hvac.boilerFuelType", "operator": "in", "value": ["pellets", "biomass", "wood-chips"] }
+        {
+          "field": "hvac.biomassPMEmissions",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "hvac.boilerFuelType",
+          "operator": "in",
+          "value": [
+            "pellets",
+            "biomass",
+            "wood-chips"
+          ]
+        }
       ],
       "currentValueTemplate": "{hvac.biomassPMEmissions} mg/m³ de partículas",
       "requiredValue": "≤ 40 mg/m³ (a 10% O₂) conforme EU 2015/1189 (desde 2022)",
       "remediation": "Reduzir emissões de partículas da caldeira a biomassa: (1) Caldeira moderna: selecionar modelo com certificação Ecodesign (classe 5 EN 303-5) — emissões < 20 mg/m³. (2) Combustível: utilizar pellets certificados ENplus A1 (cinzas < 0.7%, humidade < 10%) — pellets de má qualidade aumentam emissões 3-5×. (3) Filtro de partículas: ciclone multicónico (redução de 50-70%) ou precipitador eletrostático (ESP, redução de 90-98%) para instalações existentes. (4) Manutenção: limpeza automática da câmara de combustão e permutador — acumulação de cinzas reduz eficiência e aumenta emissões. (5) Análise de combustão: verificar O₂ residual (6-10%), CO (< 500 mg/m³) e partículas anualmente.",
       "enabled": true,
-      "tags": ["Ecodesign", "biomassa", "pellets", "emissões", "partículas", "EU 2015/1189"]
+      "tags": [
+        "Ecodesign",
+        "biomassa",
+        "pellets",
+        "emissões",
+        "partículas",
+        "EU 2015/1189"
+      ]
     },
     {
       "id": "HVAC-ERP-BIOMASS-EFFICIENCY-01",
@@ -265,14 +536,32 @@
       "description": "A caldeira a biomassa não atinge a eficiência sazonal mínima de 77% exigida pelo Regulamento Ecodesign EU 2015/1189 para aquecedores a combustível sólido.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.biomassSeasonalEfficiency", "operator": "<", "value": 77 },
-        { "field": "hvac.boilerFuelType", "operator": "in", "value": ["pellets", "biomass", "wood-chips"] }
+        {
+          "field": "hvac.biomassSeasonalEfficiency",
+          "operator": "<",
+          "value": 77
+        },
+        {
+          "field": "hvac.boilerFuelType",
+          "operator": "in",
+          "value": [
+            "pellets",
+            "biomass",
+            "wood-chips"
+          ]
+        }
       ],
       "currentValueTemplate": "{hvac.biomassSeasonalEfficiency}% eficiência sazonal",
       "requiredValue": "≥ 77% eficiência sazonal (ηs) conforme EU 2015/1189",
       "remediation": "Melhorar eficiência da caldeira a biomassa: (1) Caldeiras a pellets modernas: eficiência sazonal 88-95% (classe 5 EN 303-5). (2) Modulação: selecionar caldeira com modulação 30-100% para evitar cycling em carga parcial. (3) Acumulação: depósito de inércia de 20-50 L/kW para permitir funcionamento a plena carga durante mais tempo (melhor eficiência). (4) Combustível: pellets ENplus A1 com PCI ≥ 4.6 kWh/kg. (5) Manutenção: limpeza automática do permutador, remoção de cinzas, verificação do ventilador de combustão. (6) Substituir caldeiras com eficiência < 77% por modelo Ecodesign certificado.",
       "enabled": true,
-      "tags": ["Ecodesign", "biomassa", "eficiência", "pellets", "EU 2015/1189"]
+      "tags": [
+        "Ecodesign",
+        "biomassa",
+        "eficiência",
+        "pellets",
+        "EU 2015/1189"
+      ]
     },
     {
       "id": "HVAC-ABSORPTION-CHILLER-01",
@@ -281,14 +570,36 @@
       "description": "O chiller de absorção (simples ou duplo efeito) não atinge a eficiência mínima (COP de arrefecimento) adequada, ou não está dimensionado conforme EN 12309 para aproveitamento de calor residual ou solar térmico.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.absorptionChillerCOP", "operator": "<", "value": 0.7 },
-        { "field": "hvac.chillerType", "operator": "==", "value": "absorption" }
+        {
+          "field": "hvac.absorptionChillerCOP",
+          "operator": "<",
+          "value": 0.7
+        },
+        {
+          "field": "hvac.chillerType",
+          "operator": "==",
+          "value": "absorption"
+        }
       ],
       "currentValueTemplate": "COP arrefecimento = {hvac.absorptionChillerCOP}",
       "requiredValue": "COP ≥ 0.7 (simples efeito) ou ≥ 1.2 (duplo efeito) conforme EN 12309",
       "remediation": "Otimizar chiller de absorção: (1) Simples efeito (LiBr/H₂O): COP 0.7-0.8 — adequado para temperaturas de fonte quente de 75-95°C (solar térmico, cogeração, calor residual). (2) Duplo efeito: COP 1.1-1.4 — requer fonte quente a 150-180°C (vapor ou gás direto). (3) Dimensionamento: calcular carga base de arrefecimento coberta pelo chiller de absorção + chiller de compressão para picos. (4) Fonte de calor: verificar disponibilidade contínua durante período de arrefecimento — solar térmico requer acumulação ou chiller de backup. (5) Torre de arrefecimento: dimensionar para rejeição de calor = potência de arrefecimento + potência da fonte quente (2× a carga para simples efeito). (6) Viabilidade: TIR positivo quando calor residual é gratuito ou solar térmico existente.",
       "enabled": true,
-      "tags": ["chiller absorção", "COP", "calor residual", "solar térmico", "EN 12309", "Ecodesign"]
+      "tags": [
+        "chiller absorção",
+        "COP",
+        "calor residual",
+        "solar térmico",
+        "EN 12309",
+        "Ecodesign"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-EC-MOTOR-RETROFIT-01",
@@ -297,14 +608,43 @@
       "description": "Os ventiladores AVAC existentes utilizam motores AC convencionais (IE1/IE2) com regulação por registo de ar ou por variação de tensão, quando a substituição por motores EC (Electronically Commutated) reduziria significativamente o consumo energético.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasECMotorAssessment", "operator": "not_exists", "value": null },
-        { "field": "hvac.ventilatorMotorType", "operator": "in", "value": ["AC-direct", "AC-belt"] },
-        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 10 }
+        {
+          "field": "hvac.hasECMotorAssessment",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.ventilatorMotorType",
+          "operator": "in",
+          "value": [
+            "AC-direct",
+            "AC-belt"
+          ]
+        },
+        {
+          "field": "hvac.installedHVACPower",
+          "operator": ">=",
+          "value": 10
+        }
       ],
       "requiredValue": "Avaliação de retrofit EC recomendada para ventiladores com > 4000 h/ano de funcionamento",
       "remediation": "Avaliar retrofit de motores EC em ventiladores AVAC: (1) Motores EC (ímanes permanentes + eletrónica integrada): rendimento > 90% em toda a gama de velocidade (vs. 75-85% para motores AC + VFD). (2) Poupança: 30-50% vs. motor AC com regulação por registo, 10-20% vs. motor AC com VFD. (3) Aplicações ideais: ventiladores de UTA, ventiladores de FCU, ventiladores de extração contínua. (4) Plug fans EC: substituição direta de centrífugos com correia — eliminam correia, polias e perdas de transmissão. (5) Payback: tipicamente 2-4 anos para ventiladores com > 4000 h/ano. (6) Dimensionamento: motor EC tipicamente 20-30% mais pequeno que AC equivalente para o mesmo ponto de funcionamento. (7) Custo: prémio de 40-80% vs. motor AC equivalente, compensado pela poupança energética.",
       "enabled": true,
-      "tags": ["motor EC", "retrofit", "ventilador", "eficiência", "Ecodesign", "EU 1253/2014"]
+      "tags": [
+        "motor EC",
+        "retrofit",
+        "ventilador",
+        "eficiência",
+        "Ecodesign",
+        "EU 1253/2014"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-SOLAR-PUMP-SIZING-01",
@@ -313,13 +653,35 @@
       "description": "A bomba circuladora do sistema solar térmico está sobredimensionada, consumindo energia excessiva e não cumprindo o EEI máximo de 0.23 do Regulamento EU 622/2012 para bombas circuladoras.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.hasSolarThermalPumpSizingCheck", "operator": "not_exists", "value": null },
-        { "field": "hvac.hasSolarThermal", "operator": "==", "value": true }
+        {
+          "field": "hvac.hasSolarThermalPumpSizingCheck",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "hvac.hasSolarThermal",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Bomba solar com EEI ≤ 0.23, caudal 40-60 L/(h·m² coletor), ΔT 10-15°C",
       "remediation": "Dimensionar corretamente a bomba do circuito solar térmico: (1) Caudal: 40-60 L/(h·m² de área de coletor) para low-flow, 70-100 L/h para high-flow. (2) Perda de carga: calcular comprimento equivalente do circuito (coletores + tubagem + permutador) — tipicamente 2-6 mca. (3) Bomba de alta eficiência: EEI ≤ 0.23 (regulamento EU 622/2012), motor de ímanes permanentes com regulação eletrónica. (4) Regulação: velocidade variável controlada pelo regulador solar (ΔT entre coletores e depósito) — velocidade mínima quando ΔT < 5°C, velocidade máxima quando ΔT > 15°C. (5) Proteção anti-gelo: verificar resistência da bomba ao fluido térmico (glicol propilênico 30-40%). (6) Verificação: após instalação, medir caudal real (caudalímetro ultrassónico) e ajustar velocidade para ΔT nominal de 10-15°C.",
       "enabled": true,
-      "tags": ["solar térmico", "bomba", "dimensionamento", "EEI", "Ecodesign", "EU 622/2012"]
+      "tags": [
+        "solar térmico",
+        "bomba",
+        "dimensionamento",
+        "EEI",
+        "Ecodesign",
+        "EU 622/2012"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-VSD-PUMP-EFFICIENCY-01",
@@ -328,14 +690,39 @@
       "description": "A bomba circuladora do sistema AVAC com variador de velocidade (VSD) apresenta um EEI (Energy Efficiency Index) superior a 0.23, não cumprindo o requisito mínimo do Regulamento EU 622/2012 para bombas circuladoras sem gland.",
       "severity": "warning",
       "conditions": [
-        { "field": "hvac.pumpEEI", "operator": ">", "value": 0.23 },
-        { "field": "hvac.pumpType", "operator": "in", "value": ["circulator", "glandless"] }
+        {
+          "field": "hvac.pumpEEI",
+          "operator": ">",
+          "value": 0.23
+        },
+        {
+          "field": "hvac.pumpType",
+          "operator": "in",
+          "value": [
+            "circulator",
+            "glandless"
+          ]
+        }
       ],
       "currentValueTemplate": "EEI da bomba: {hvac.pumpEEI}",
       "requiredValue": "EEI ≤ 0.23 (EU 622/2012 desde 2015)",
       "remediation": "Substituir ou atualizar bombas circuladoras para cumprir EEI ≤ 0.23: (1) Motores ECM (Electronically Commutated Motor): ímanes permanentes com regulação eletrónica integrada — EEI típico 0.17-0.21. (2) Regulação proporcional de pressão: reduz o setpoint de ΔP linearmente com a redução de caudal — poupança adicional de 10-20% vs. ΔP constante. (3) Modo AutoAdapt: bombas inteligentes que aprendem o perfil de carga e ajustam automaticamente. (4) Dimensionamento: selecionar a bomba para o ponto de funcionamento a 70-80% do caudal máximo (ponto de melhor eficiência). (5) Verificação: medir consumo elétrico real e comparar com a curva do fabricante. (6) Regulamento EU 622/2012: aplicável a bombas sem gland 1-2500 W. Para bombas com gland (> 0.75 kW): MEI ≥ 0.4 (EU 547/2012).",
       "enabled": true,
-      "tags": ["Ecodesign", "bomba", "EEI", "VSD", "eficiência", "EU 622/2012"]
+      "tags": [
+        "Ecodesign",
+        "bomba",
+        "EEI",
+        "VSD",
+        "eficiência",
+        "EU 622/2012"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "HVAC-ERP-THERMAL-WHEEL-MIN-01",
@@ -344,15 +731,33 @@
       "description": "A unidade de ventilação com roda térmica apresenta eficácia de recuperação térmica ({hvac.heatRecoveryEfficiency}%) inferior ao mínimo de 73% exigido pelo Regulamento Ecodesign EU 1253/2014 para unidades de ventilação não residenciais com caudal ≥ 250 m³/h.",
       "severity": "critical",
       "conditions": [
-        { "field": "hvac.heatRecoveryEfficiency", "operator": "<", "value": 73 },
-        { "field": "hvac.heatRecoveryType", "operator": "==", "value": "thermal-wheel" },
-        { "field": "hvac.ventilationFlowRate", "operator": ">=", "value": 250 }
+        {
+          "field": "hvac.heatRecoveryEfficiency",
+          "operator": "<",
+          "value": 73
+        },
+        {
+          "field": "hvac.heatRecoveryType",
+          "operator": "==",
+          "value": "thermal-wheel"
+        },
+        {
+          "field": "hvac.ventilationFlowRate",
+          "operator": ">=",
+          "value": 250
+        }
       ],
       "currentValueTemplate": "Eficácia da roda térmica: {hvac.heatRecoveryEfficiency}%",
       "requiredValue": "≥ 73% eficácia de recuperação térmica (EU 1253/2014, Tier 2 desde 2018)",
       "remediation": "Garantir que a roda térmica cumpre o mínimo Ecodesign: (1) EU 1253/2014 Tier 2 (desde 01/01/2018): eficácia mínima de recuperação ηt_nrvu ≥ 73% para unidades não residenciais. (2) Verificação: medir temperaturas de ar novo (entrada/saída do recuperador) e ar de extração (entrada) — ηt = (Tsaída_novo - Tentrada_novo) / (Tentrada_extração - Tentrada_novo). (3) Causas de baixa eficácia: vedações desgastadas (substituir anualmente), rotor sujo (limpeza semestral), velocidade de rotação incorreta (ajustar 8-20 rpm), sector de purga demasiado grande. (4) Upgrade: rotor entálpico (silica gel) para recuperação de calor latente — eficácia total 75-85%. (5) Cálculo SFPint: consumo específico de energia dos ventiladores ≤ 1.200 W/(m³/s) para UTA com HRS. (6) Bypass obrigatório para free-cooling quando Text < Tsetpoint.",
       "enabled": true,
-      "tags": ["Ecodesign", "roda térmica", "recuperação", "eficácia", "EU 1253/2014"]
+      "tags": [
+        "Ecodesign",
+        "roda térmica",
+        "recuperação",
+        "eficácia",
+        "EU 1253/2014"
+      ]
     }
   ]
 }

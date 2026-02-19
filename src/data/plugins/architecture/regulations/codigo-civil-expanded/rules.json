@@ -11,13 +11,26 @@
       "description": "O edifício constituído em propriedade horizontal não possui título constitutivo válido com especificação das frações, permilagens e partes comuns.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
-        { "field": "architecture.hasHorizontalPropertyTitle", "operator": "==", "value": false }
+        {
+          "field": "architecture.isMultifamily",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasHorizontalPropertyTitle",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Título constitutivo da PH com descrição das frações, permilagens e partes comuns",
       "remediation": "Constituir propriedade horizontal: (1) Título constitutivo: escritura pública ou documento particular autenticado. (2) Conteúdo: descrição de cada fração (tipo, localização, piso), partes comuns, permilagem. (3) Permilagem: proporção do valor de cada fração no total do prédio. (4) Partes comuns obrigatórias: solo, telhado, estrutura, escadas, elevadores, entradas. (5) Registo na Conservatória do Registo Predial. (6) Custo: emolumentos notariais + registo predial.",
       "enabled": true,
-      "tags": ["propriedade horizontal", "título", "frações", "permilagem"]
+      "tags": [
+        "propriedade horizontal",
+        "título",
+        "frações",
+        "permilagem"
+      ]
     },
     {
       "id": "CC-CONDM-ADMIN-01",
@@ -26,13 +39,33 @@
       "description": "O edifício em propriedade horizontal com mais de 4 frações não possui administração organizada do condomínio.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
-        { "field": "architecture.hasCondominiumAdmin", "operator": "not_exists", "value": null }
+        {
+          "field": "architecture.isMultifamily",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasCondominiumAdmin",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Administração do condomínio obrigatória com assembleia anual e administrador eleito",
       "remediation": "Organizar administração do condomínio: (1) Assembleia de condóminos: pelo menos 1 reunião anual. (2) Administrador: eleito pela assembleia ou empresa profissional. (3) Funções: manutenção, contas, seguros, representação. (4) Fundo de reserva: ≥ 10% do orçamento anual (obrigatório). (5) Seguro de incêndio: obrigatório (Art. 1429.º CC). (6) Regulamento do condomínio: facultativo mas recomendado em edifícios > 8 frações.",
       "enabled": true,
-      "tags": ["condomínio", "administração", "assembleia", "fundo reserva"]
+      "tags": [
+        "condomínio",
+        "administração",
+        "assembleia",
+        "fundo reserva"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "CC-SERV-PASS-01",
@@ -41,12 +74,30 @@
       "description": "O prédio não possui acesso à via pública e requer constituição de servidão de passagem sobre prédio vizinho.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.hasPublicRoadAccess", "operator": "==", "value": false }
+        {
+          "field": "architecture.hasPublicRoadAccess",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Acesso à via pública obrigatório — servidão legal de passagem se prédio encravado",
       "remediation": "Constituir servidão de passagem: (1) Direito: prédio encravado (sem acesso à via pública) pode exigir passagem sobre vizinho. (2) Trajeto: o mais curto e menos prejudicial para o prédio serviente. (3) Largura: adequada ao uso (habitação: ≥ 3.00 m para veículos, ≥ 1.50 m pedonal). (4) Indemnização: devida ao proprietário do prédio serviente. (5) Constituição: acordo ou sentença judicial. (6) Extinção: quando o encravamento cessa (abertura de novo arruamento).",
       "enabled": true,
-      "tags": ["servidão", "passagem", "encravado", "via pública"]
+      "tags": [
+        "servidão",
+        "passagem",
+        "encravado",
+        "via pública"
+      ]
     },
     {
       "id": "CC-ARV-DIST-01",
@@ -55,12 +106,37 @@
       "description": "As árvores plantadas no logradouro não respeitam a distância mínima ao limite do prédio vizinho, conforme estabelecido pelo Código Civil.",
       "severity": "info",
       "conditions": [
-        { "field": "architecture.hasTreesNearBoundary", "operator": "==", "value": true }
+        {
+          "field": "architecture.hasTreesNearBoundary",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Distância de árvores ao limite: porte alto ≥ 5 m, porte médio ≥ 2 m, porte baixo ≥ 0.50 m",
       "remediation": "Respeitar distâncias de plantação: (1) Árvores de alto porte (> 6 m altura): ≥ 5 m do limite. (2) Árvores de médio porte (2-6 m): ≥ 2 m do limite. (3) Arbustos e sebes (< 2 m): ≥ 0.50 m do limite. (4) Raízes e ramos que invadem o vizinho: o vizinho pode cortá-los ao nível do limite. (5) Regulamentos municipais podem impor distâncias diferentes. (6) Árvores protegidas: verificar classificação antes de podar ou remover.",
       "enabled": true,
-      "tags": ["árvores", "plantação", "distância", "vizinho"]
+      "tags": [
+        "árvores",
+        "plantação",
+        "distância",
+        "vizinho"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "CC-OBRAPRED-01",
@@ -69,12 +145,37 @@
       "description": "A utilização do prédio gera emissões de fumos, ruídos, vibrações ou efluentes que causam prejuízo substancial à utilização do prédio vizinho.",
       "severity": "warning",
       "conditions": [
-        { "field": "architecture.hasNuisanceEmissions", "operator": "==", "value": true }
+        {
+          "field": "architecture.hasNuisanceEmissions",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Não causar prejuízo substancial ao vizinho por emissões (fumos, ruídos, vibrações, cheiros)",
       "remediation": "Controlar emissões nocivas: (1) Ruído: cumprir limites do RRAE/RGR — Lden ≤ 55 dB(A) em zonas mistas. (2) Fumos/cheiros: extração com filtragem adequada (cozinhas comerciais: filtro de carvão ativado + UV). (3) Vibrações: isolamento de equipamentos AVAC (apoios anti-vibráteis). (4) Efluentes: separador de gorduras obrigatório em restauração. (5) Ação judicial: o vizinho pode exigir cessação ou indemnização (Art. 1346.º CC).",
       "enabled": true,
-      "tags": ["emissões", "ruído", "fumos", "vizinhança"]
+      "tags": [
+        "emissões",
+        "ruído",
+        "fumos",
+        "vizinhança"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "CC-MURO-MEEIRO-01",
@@ -83,12 +184,37 @@
       "description": "Existe muro ou parede meeira (divisória entre prédios) cuja utilização, reparação ou alteração requer acordo entre os proprietários confinantes.",
       "severity": "info",
       "conditions": [
-        { "field": "architecture.hasSharedWall", "operator": "==", "value": true }
+        {
+          "field": "architecture.hasSharedWall",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
       ],
       "requiredValue": "Paredes meeiras: encargos de conservação e reparação repartidos entre comproprietários",
       "remediation": "Regras de paredes meeiras: (1) Presunção: muro divisório entre prédios é meeiro (compropriedade). (2) Encargos: conservação e reparação divididos igualmente. (3) Alteamento: cada proprietário pode altear à sua custa, desde que não prejudique a estabilidade. (4) Aberturas: proibidas sem acordo do vizinho (são diferentes de janelas em parede própria). (5) Demolição ou substituição: requer acordo de ambos os comproprietários. (6) Prova de propriedade exclusiva: título ou sinais (remate da parede para um lado).",
       "enabled": true,
-      "tags": ["muro meeiro", "parede divisória", "compropriedade", "vizinho"]
+      "tags": [
+        "muro meeiro",
+        "parede divisória",
+        "compropriedade",
+        "vizinho"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     },
     {
       "id": "CC-SEGURO-01",
@@ -97,13 +223,26 @@
       "description": "O edifício em propriedade horizontal não possui seguro contra incêndio, obrigatório por lei para todas as frações e partes comuns.",
       "severity": "critical",
       "conditions": [
-        { "field": "architecture.isMultifamily", "operator": "==", "value": true },
-        { "field": "architecture.hasFireInsurance", "operator": "==", "value": false }
+        {
+          "field": "architecture.isMultifamily",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasFireInsurance",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Seguro contra incêndio obrigatório para cada fração e partes comuns (Art. 1429.º CC)",
       "remediation": "Contratar seguro obrigatório: (1) Cada condómino: seguro de incêndio da sua fração (valor de reconstrução). (2) Partes comuns: seguro contratado pela administração do condomínio. (3) Capital: valor de reconstrução (não de mercado). (4) Cobertura mínima: incêndio, raio, explosão. (5) Coberturas recomendadas: tempestade, inundação, responsabilidade civil. (6) Sanção: condómino em incumprimento pode ser responsabilizado pelos danos.",
       "enabled": true,
-      "tags": ["seguro", "incêndio", "obrigatório", "PH"]
+      "tags": [
+        "seguro",
+        "incêndio",
+        "obrigatório",
+        "PH"
+      ]
     },
     {
       "id": "CC-VISTAS-01",
@@ -112,13 +251,33 @@
       "description": "As janelas, varandas ou terraços com vistas diretas para o prédio vizinho foram mantidas durante mais de 20 anos, constituindo servidão de vistas por usucapião.",
       "severity": "info",
       "conditions": [
-        { "field": "isRehabilitation", "operator": "==", "value": true },
-        { "field": "architecture.hasEstablishedViews", "operator": "==", "value": true }
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "architecture.hasEstablishedViews",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Servidão de vistas constituída por usucapião (> 20 anos) — não pode ser obstruída",
       "remediation": "Direito de vistas: (1) Janelas a < 1.50 m do limite: o vizinho pode exigir encerramento se abriram há < 20 anos. (2) Após 20 anos: constitui-se servidão de vistas por usucapião — o vizinho não pode obstruir. (3) A servidão impede construção do vizinho que elimine a vista numa faixa de 1.50 m. (4) Em reabilitação: manter janelas existentes preserva direitos adquiridos. (5) Novas janelas: respeitar distância de 1.50 m ou obter acordo do vizinho.",
       "enabled": true,
-      "tags": ["vistas", "servidão", "usucapião", "janelas"]
+      "tags": [
+        "vistas",
+        "servidão",
+        "usucapião",
+        "janelas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }
