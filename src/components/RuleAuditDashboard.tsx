@@ -1,0 +1,838 @@
+"use client";
+
+import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+  Search,
+  Download,
+  ChevronDown,
+  ChevronRight,
+  AlertTriangle,
+  AlertCircle,
+  Info,
+  CheckCircle,
+  Filter,
+  X,
+} from "lucide-react";
+
+// ============================================================
+// Types
+// ============================================================
+
+interface AuditRule {
+  id: string;
+  specialtyId: string;
+  specialtyName: string;
+  regulationId: string;
+  regulationRef: string;
+  article: string;
+  description: string;
+  severity: "critical" | "warning" | "info" | "pass";
+  conditionCount: number;
+  conditions: string[];
+  exclusions: string[];
+  remediation: string;
+  tags: string[];
+  enabled: boolean;
+  applicableTypes: string[];
+  projectScope: "new" | "rehab" | "all";
+}
+
+interface AuditRegulation {
+  id: string;
+  shortRef: string;
+  title: string;
+  status: string;
+  sourceType: string;
+  sourceUrl: string | null;
+  legalForce: string;
+  ingestionStatus: string;
+  rulesCount: number;
+  specialties: string[];
+}
+
+interface AuditData {
+  rules: AuditRule[];
+  regulations: AuditRegulation[];
+  validation: {
+    totalErrors: number;
+    byPlugin: Record<string, { errors: string[]; warnings: string[] }>;
+  };
+  coverage: {
+    bySpecialty: Record<string, { score: number; total: number; covered: number }>;
+    overall: number;
+  };
+  stats: {
+    totalRules: number;
+    totalRegulations: number;
+    bySpecialty: Record<string, number>;
+    bySeverity: Record<string, number>;
+    enabledRules: number;
+    disabledRules: number;
+  };
+}
+
+type Tab = "rules" | "regulations" | "validation" | "coverage";
+type SortDir = "asc" | "desc";
+
+// ============================================================
+// Constants
+// ============================================================
+
+const SEVERITY_CONFIG = {
+  critical: { icon: AlertCircle, color: "text-red-600", bg: "bg-red-50", border: "border-red-200", label: "Crítico" },
+  warning: { icon: AlertTriangle, color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200", label: "Aviso" },
+  info: { icon: Info, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200", label: "Info" },
+  pass: { icon: CheckCircle, color: "text-green-600", bg: "bg-green-50", border: "border-green-200", label: "OK" },
+} as const;
+
+const STATUS_COLORS: Record<string, string> = {
+  active: "bg-green-100 text-green-800",
+  amended: "bg-yellow-100 text-yellow-800",
+  superseded: "bg-gray-100 text-gray-600",
+  revoked: "bg-red-100 text-red-800",
+  draft: "bg-blue-100 text-blue-800",
+};
+
+const INGESTION_COLORS: Record<string, string> = {
+  pending: "bg-gray-100 text-gray-600",
+  partial: "bg-yellow-100 text-yellow-800",
+  complete: "bg-green-100 text-green-800",
+  verified: "bg-emerald-100 text-emerald-800",
+};
+
+const PAGE_SIZE = 50;
+
+// ============================================================
+// Component
+// ============================================================
+
+export default function RuleAuditDashboard() {
+  const [data, setData] = useState<AuditData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<Tab>("rules");
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [filterSpecialty, setFilterSpecialty] = useState("");
+  const [filterSeverity, setFilterSeverity] = useState<string[]>([]);
+  const [filterRegulation, setFilterRegulation] = useState("");
+  const [filterScope, setFilterScope] = useState("");
+  const [filterEnabled, setFilterEnabled] = useState<"" | "enabled" | "disabled">("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Sort
+  const [sortCol, setSortCol] = useState<string>("id");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  // Pagination
+  const [page, setPage] = useState(0);
+
+  // Expanded rows
+  const [expandedRules, setExpandedRules] = useState<Set<string>>(new Set());
+  const [expandedRegs, setExpandedRegs] = useState<Set<string>>(new Set());
+  const [expandedPlugins, setExpandedPlugins] = useState<Set<string>>(new Set());
+
+  // Fetch data
+  useEffect(() => {
+    fetch("/api/rule-audit")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(setData)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Derive specialty list
+  const specialties = useMemo(() => {
+    if (!data) return [];
+    const map = new Map<string, string>();
+    for (const r of data.rules) map.set(r.specialtyId, r.specialtyName);
+    return Array.from(map.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+  }, [data]);
+
+  // Derive regulation list for filter dropdown
+  const regulationOptions = useMemo(() => {
+    if (!data) return [];
+    const seen = new Set<string>();
+    return data.rules
+      .filter((r) => {
+        if (seen.has(r.regulationId)) return false;
+        seen.add(r.regulationId);
+        return true;
+      })
+      .map((r) => ({ id: r.regulationId, ref: r.regulationRef }))
+      .sort((a, b) => a.ref.localeCompare(b.ref));
+  }, [data]);
+
+  // Filter + sort rules
+  const filteredRules = useMemo(() => {
+    if (!data) return [];
+    let rules = data.rules;
+
+    if (filterSpecialty) rules = rules.filter((r) => r.specialtyId === filterSpecialty);
+    if (filterSeverity.length > 0) rules = rules.filter((r) => filterSeverity.includes(r.severity));
+    if (filterRegulation) rules = rules.filter((r) => r.regulationId === filterRegulation);
+    if (filterScope) rules = rules.filter((r) => r.projectScope === filterScope);
+    if (filterEnabled === "enabled") rules = rules.filter((r) => r.enabled);
+    if (filterEnabled === "disabled") rules = rules.filter((r) => !r.enabled);
+    if (search) {
+      const q = search.toLowerCase();
+      rules = rules.filter(
+        (r) =>
+          r.id.toLowerCase().includes(q) ||
+          r.description.toLowerCase().includes(q) ||
+          r.tags.some((t) => t.toLowerCase().includes(q)) ||
+          r.regulationRef.toLowerCase().includes(q),
+      );
+    }
+
+    // Sort
+    rules = [...rules].sort((a, b) => {
+      let va: string | number = "";
+      let vb: string | number = "";
+      switch (sortCol) {
+        case "id": va = a.id; vb = b.id; break;
+        case "specialty": va = a.specialtyName; vb = b.specialtyName; break;
+        case "regulation": va = a.regulationRef; vb = b.regulationRef; break;
+        case "article": va = a.article; vb = b.article; break;
+        case "severity": {
+          const order = { critical: 0, warning: 1, info: 2, pass: 3 };
+          va = order[a.severity]; vb = order[b.severity]; break;
+        }
+        case "conditions": va = a.conditionCount; vb = b.conditionCount; break;
+        default: va = a.id; vb = b.id;
+      }
+      const cmp = typeof va === "number" ? va - (vb as number) : String(va).localeCompare(String(vb));
+      return sortDir === "asc" ? cmp : -cmp;
+    });
+
+    return rules;
+  }, [data, filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, search, sortCol, sortDir]);
+
+  // Paged rules
+  const pagedRules = useMemo(() => filteredRules.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [filteredRules, page]);
+  const totalPages = Math.ceil(filteredRules.length / PAGE_SIZE);
+
+  // Reset page when filters change
+  useEffect(() => { setPage(0); }, [filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, search]);
+
+  // Sort handler
+  const handleSort = useCallback((col: string) => {
+    if (sortCol === col) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortCol(col); setSortDir("asc"); }
+  }, [sortCol]);
+
+  // Toggle expand
+  const toggleRule = useCallback((id: string) => {
+    setExpandedRules((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleReg = useCallback((id: string) => {
+    setExpandedRegs((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const togglePlugin = useCallback((id: string) => {
+    setExpandedPlugins((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // CSV export
+  const exportCSV = useCallback(() => {
+    if (!filteredRules.length) return;
+    const headers = ["ID", "Specialty", "Regulation", "Article", "Severity", "Description", "Conditions", "Remediation", "Tags", "Enabled", "Scope"];
+    const rows = filteredRules.map((r) => [
+      r.id, r.specialtyName, r.regulationRef, r.article, r.severity,
+      `"${r.description.replace(/"/g, '""')}"`,
+      r.conditionCount,
+      `"${r.remediation.replace(/"/g, '""')}"`,
+      `"${r.tags.join(", ")}"`,
+      r.enabled ? "Yes" : "No",
+      r.projectScope,
+    ]);
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `wallnut-rules-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [filteredRules]);
+
+  // JSON export
+  const exportJSON = useCallback(() => {
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `wallnut-rules-audit-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [data]);
+
+  // Active filter count
+  const activeFilterCount = [filterSpecialty, filterRegulation, filterScope, filterEnabled].filter(Boolean).length + filterSeverity.length;
+
+  const clearFilters = useCallback(() => {
+    setFilterSpecialty("");
+    setFilterSeverity([]);
+    setFilterRegulation("");
+    setFilterScope("");
+    setFilterEnabled("");
+    setSearch("");
+  }, []);
+
+  // ============================================================
+  // Render
+  // ============================================================
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="animate-spin w-8 h-8 border-2 border-gray-300 border-t-accent rounded-full" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="text-center py-24 text-red-600">
+        <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+        <p>Erro ao carregar dados: {error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Auditoria de Regras</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {data.stats.totalRules} regras &middot; {data.stats.totalRegulations} regulamentos &middot; Cobertura: {data.coverage.overall}%
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={exportCSV} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <Download className="w-3.5 h-3.5" /> CSV
+          </button>
+          <button onClick={exportJSON} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <Download className="w-3.5 h-3.5" /> JSON
+          </button>
+        </div>
+      </div>
+
+      {/* Severity summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {(["critical", "warning", "info", "pass"] as const).map((sev) => {
+          const cfg = SEVERITY_CONFIG[sev];
+          const Icon = cfg.icon;
+          const count = data.stats.bySeverity[sev] ?? 0;
+          return (
+            <button
+              key={sev}
+              onClick={() => {
+                setFilterSeverity((prev) =>
+                  prev.includes(sev) ? prev.filter((s) => s !== sev) : [...prev, sev],
+                );
+                setTab("rules");
+              }}
+              className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                filterSeverity.includes(sev) ? `${cfg.bg} ${cfg.border}` : "bg-white border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <Icon className={`w-5 h-5 ${cfg.color}`} />
+              <div className="text-left">
+                <div className="text-lg font-bold text-gray-900">{count}</div>
+                <div className="text-xs text-gray-500">{cfg.label}</div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="flex gap-6">
+          {([
+            { key: "rules" as Tab, label: "Regras", count: data.stats.totalRules },
+            { key: "regulations" as Tab, label: "Regulamentos", count: data.stats.totalRegulations },
+            { key: "validation" as Tab, label: "Validação", count: data.validation.totalErrors },
+            { key: "coverage" as Tab, label: "Cobertura" },
+          ]).map(({ key, label, count }) => (
+            <button
+              key={key}
+              onClick={() => setTab(key)}
+              className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+                tab === key ? "border-accent text-accent" : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              {label}
+              {count !== undefined && (
+                <span className={`ml-1.5 text-xs px-1.5 py-0.5 rounded-full ${
+                  key === "validation" && count > 0 ? "bg-red-100 text-red-700" : "bg-gray-100 text-gray-600"
+                }`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab: Rules */}
+      {tab === "rules" && (
+        <div>
+          {/* Search + filter bar */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Pesquisar regras (ID, descrição, tags, regulamento)..."
+                className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+              />
+            </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 text-sm border rounded-lg transition-colors ${
+                activeFilterCount > 0 ? "border-accent text-accent bg-accent/5" : "border-gray-300 text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filtros
+              {activeFilterCount > 0 && (
+                <span className="ml-1 w-5 h-5 flex items-center justify-center text-xs bg-accent text-white rounded-full">{activeFilterCount}</span>
+              )}
+            </button>
+            {activeFilterCount > 0 && (
+              <button onClick={clearFilters} className="text-xs text-gray-500 hover:text-red-500 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Filter panel */}
+          {showFilters && (
+            <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Especialidade</label>
+                <select value={filterSpecialty} onChange={(e) => setFilterSpecialty(e.target.value)} className="w-full text-sm border border-gray-300 rounded px-2 py-1.5">
+                  <option value="">Todas</option>
+                  {specialties.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Regulamento</label>
+                <select value={filterRegulation} onChange={(e) => setFilterRegulation(e.target.value)} className="w-full text-sm border border-gray-300 rounded px-2 py-1.5">
+                  <option value="">Todos</option>
+                  {regulationOptions.map((r) => <option key={r.id} value={r.id}>{r.ref}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Âmbito</label>
+                <select value={filterScope} onChange={(e) => setFilterScope(e.target.value)} className="w-full text-sm border border-gray-300 rounded px-2 py-1.5">
+                  <option value="">Todos</option>
+                  <option value="new">Construção nova</option>
+                  <option value="rehab">Reabilitação</option>
+                  <option value="all">Universal</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Estado</label>
+                <select value={filterEnabled} onChange={(e) => setFilterEnabled(e.target.value as "" | "enabled" | "disabled")} className="w-full text-sm border border-gray-300 rounded px-2 py-1.5">
+                  <option value="">Todos</option>
+                  <option value="enabled">Ativa</option>
+                  <option value="disabled">Desativada</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Severidade</label>
+                <div className="flex flex-wrap gap-1">
+                  {(["critical", "warning", "info", "pass"] as const).map((sev) => (
+                    <button
+                      key={sev}
+                      onClick={() => setFilterSeverity((prev) => prev.includes(sev) ? prev.filter((s) => s !== sev) : [...prev, sev])}
+                      className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${
+                        filterSeverity.includes(sev)
+                          ? `${SEVERITY_CONFIG[sev].bg} ${SEVERITY_CONFIG[sev].border} ${SEVERITY_CONFIG[sev].color}`
+                          : "border-gray-200 text-gray-500 hover:border-gray-300"
+                      }`}
+                    >
+                      {SEVERITY_CONFIG[sev].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Results count */}
+          <div className="text-xs text-gray-500 mb-2">
+            {filteredRules.length} regra(s) encontrada(s)
+            {totalPages > 1 && ` — Página ${page + 1} de ${totalPages}`}
+          </div>
+
+          {/* Table */}
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="w-8 px-3 py-2" />
+                  {[
+                    { key: "id", label: "ID" },
+                    { key: "specialty", label: "Especialidade" },
+                    { key: "regulation", label: "Regulamento" },
+                    { key: "article", label: "Artigo" },
+                    { key: "severity", label: "Severidade" },
+                    { key: "conditions", label: "Cond." },
+                  ].map(({ key, label }) => (
+                    <th
+                      key={key}
+                      onClick={() => handleSort(key)}
+                      className="px-3 py-2 text-left font-medium text-gray-600 cursor-pointer hover:text-gray-900 select-none"
+                    >
+                      {label}
+                      {sortCol === key && <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>}
+                    </th>
+                  ))}
+                  <th className="px-3 py-2 text-left font-medium text-gray-600">Descrição</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {pagedRules.map((rule) => {
+                  const isExpanded = expandedRules.has(rule.id);
+                  const sev = SEVERITY_CONFIG[rule.severity];
+                  const SevIcon = sev.icon;
+                  return (
+                    <RuleRow
+                      key={rule.id}
+                      rule={rule}
+                      isExpanded={isExpanded}
+                      onToggle={toggleRule}
+                      sevConfig={sev}
+                      SevIcon={SevIcon}
+                    />
+                  );
+                })}
+                {pagedRules.length === 0 && (
+                  <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Nenhuma regra encontrada</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-4">
+              <button onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40">
+                Anterior
+              </button>
+              <span className="text-sm text-gray-600">{page + 1} / {totalPages}</span>
+              <button onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1} className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-40">
+                Seguinte
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Regulations */}
+      {tab === "regulations" && (
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="w-8 px-3 py-2" />
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Referência</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Título</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Estado</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Tipo Fonte</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Força Legal</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Regras</th>
+                <th className="px-3 py-2 text-left font-medium text-gray-600">Ingestão</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {data.regulations.map((reg) => {
+                const isExpanded = expandedRegs.has(reg.id);
+                return (
+                  <RegulationRow
+                    key={reg.id}
+                    reg={reg}
+                    isExpanded={isExpanded}
+                    onToggle={toggleReg}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Tab: Validation */}
+      {tab === "validation" && (
+        <div className="space-y-3">
+          {Object.entries(data.validation.byPlugin).map(([pluginId, { errors, warnings }]) => {
+            const isExpanded = expandedPlugins.has(pluginId);
+            const hasErrors = errors.length > 0;
+            const hasWarnings = warnings.length > 0;
+            const statusColor = hasErrors ? "text-red-600" : hasWarnings ? "text-amber-600" : "text-green-600";
+            const statusBg = hasErrors ? "bg-red-50" : hasWarnings ? "bg-amber-50" : "bg-green-50";
+            return (
+              <div key={pluginId} className={`border rounded-lg overflow-hidden ${hasErrors ? "border-red-200" : hasWarnings ? "border-amber-200" : "border-green-200"}`}>
+                <button
+                  onClick={() => togglePlugin(pluginId)}
+                  className={`w-full flex items-center justify-between px-4 py-3 text-left ${statusBg}`}
+                >
+                  <div className="flex items-center gap-3">
+                    {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-500" /> : <ChevronRight className="w-4 h-4 text-gray-500" />}
+                    <span className="font-medium text-gray-900">{pluginId}</span>
+                    <span className={`text-xs font-bold ${statusColor}`}>
+                      {hasErrors ? `${errors.length} erro(s)` : hasWarnings ? `${warnings.length} aviso(s)` : "OK"}
+                    </span>
+                  </div>
+                </button>
+                {isExpanded && (errors.length > 0 || warnings.length > 0) && (
+                  <div className="px-4 py-3 bg-white space-y-1.5">
+                    {errors.map((e, i) => (
+                      <div key={`e-${i}`} className="flex items-start gap-2 text-sm">
+                        <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-red-700">{e}</span>
+                      </div>
+                    ))}
+                    {warnings.map((w, i) => (
+                      <div key={`w-${i}`} className="flex items-start gap-2 text-sm">
+                        <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-amber-700">{w}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Tab: Coverage */}
+      {tab === "coverage" && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="text-3xl font-bold text-gray-900">{data.coverage.overall}%</div>
+            <div className="text-sm text-gray-500">Cobertura global</div>
+          </div>
+          <div className="space-y-2">
+            {Object.entries(data.coverage.bySpecialty)
+              .sort(([, a], [, b]) => b.score - a.score)
+              .map(([pluginId, cov]) => {
+                const name = specialties.find(([id]) => id === pluginId)?.[1] ?? pluginId;
+                const barColor = cov.score >= 70 ? "bg-green-500" : cov.score >= 30 ? "bg-amber-500" : "bg-red-500";
+                return (
+                  <div key={pluginId} className="flex items-center gap-3">
+                    <div className="w-48 text-sm text-gray-700 truncate" title={name}>{name}</div>
+                    <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                      <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${cov.score}%` }} />
+                    </div>
+                    <div className="w-16 text-right text-sm font-medium text-gray-700">{cov.score}%</div>
+                    <div className="w-24 text-right text-xs text-gray-400">{cov.covered} regras</div>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
+// Sub-components
+// ============================================================
+
+function RuleRow({
+  rule,
+  isExpanded,
+  onToggle,
+  sevConfig,
+  SevIcon,
+}: {
+  rule: AuditRule;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+  sevConfig: (typeof SEVERITY_CONFIG)[keyof typeof SEVERITY_CONFIG];
+  SevIcon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <>
+      <tr
+        onClick={() => onToggle(rule.id)}
+        className={`cursor-pointer hover:bg-gray-50 transition-colors ${!rule.enabled ? "opacity-50" : ""}`}
+      >
+        <td className="px-3 py-2">
+          {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+        </td>
+        <td className="px-3 py-2 font-mono text-xs">{rule.id}</td>
+        <td className="px-3 py-2 text-gray-600">{rule.specialtyName}</td>
+        <td className="px-3 py-2 text-gray-600">{rule.regulationRef}</td>
+        <td className="px-3 py-2 text-gray-500">{rule.article}</td>
+        <td className="px-3 py-2">
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sevConfig.bg} ${sevConfig.color}`}>
+            <SevIcon className="w-3 h-3" />
+            {sevConfig.label}
+          </span>
+        </td>
+        <td className="px-3 py-2 text-center text-gray-500">{rule.conditionCount}</td>
+        <td className="px-3 py-2 text-gray-700 truncate max-w-[300px]">{rule.description}</td>
+      </tr>
+      {isExpanded && (
+        <tr>
+          <td colSpan={8} className="bg-gray-50 px-6 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Descrição completa</h4>
+                <p className="text-gray-700">{rule.description}</p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Remediação</h4>
+                <p className="text-gray-700">{rule.remediation}</p>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Condições ({rule.conditionCount})</h4>
+                <ul className="space-y-1">
+                  {rule.conditions.map((c, i) => (
+                    <li key={i} className="text-gray-600 flex items-start gap-1.5">
+                      <span className="text-gray-400 mt-0.5">•</span>
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+                {rule.exclusions.length > 0 && (
+                  <>
+                    <h4 className="font-medium text-gray-900 mt-3 mb-1">Exclusões</h4>
+                    <ul className="space-y-1">
+                      {rule.exclusions.map((e, i) => (
+                        <li key={i} className="text-gray-600 flex items-start gap-1.5">
+                          <span className="text-gray-400 mt-0.5">•</span>
+                          {e}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900 mb-2">Metadados</h4>
+                <div className="space-y-1.5">
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Âmbito:</span>
+                    <span className="text-gray-800">
+                      {rule.projectScope === "new" ? "Construção nova" : rule.projectScope === "rehab" ? "Reabilitação" : "Universal"}
+                    </span>
+                  </div>
+                  {rule.applicableTypes.length > 0 && (
+                    <div className="flex gap-2">
+                      <span className="text-gray-500">Tipos:</span>
+                      <span className="text-gray-800">{rule.applicableTypes.join(", ")}</span>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Ativa:</span>
+                    <span className={rule.enabled ? "text-green-700" : "text-red-600"}>{rule.enabled ? "Sim" : "Não"}</span>
+                  </div>
+                  {rule.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {rule.tags.map((tag) => (
+                        <span key={tag} className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}
+
+function RegulationRow({
+  reg,
+  isExpanded,
+  onToggle,
+}: {
+  reg: AuditRegulation;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <>
+      <tr onClick={() => onToggle(reg.id)} className="cursor-pointer hover:bg-gray-50 transition-colors">
+        <td className="px-3 py-2">
+          {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
+        </td>
+        <td className="px-3 py-2 font-medium text-gray-900">{reg.shortRef}</td>
+        <td className="px-3 py-2 text-gray-700 truncate max-w-[300px]">{reg.title}</td>
+        <td className="px-3 py-2">
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[reg.status] ?? "bg-gray-100 text-gray-600"}`}>
+            {reg.status}
+          </span>
+        </td>
+        <td className="px-3 py-2 text-gray-500 text-xs">{reg.sourceType}</td>
+        <td className="px-3 py-2 text-gray-500 text-xs">{reg.legalForce}</td>
+        <td className="px-3 py-2 text-center text-gray-600">{reg.rulesCount}</td>
+        <td className="px-3 py-2">
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${INGESTION_COLORS[reg.ingestionStatus] ?? "bg-gray-100 text-gray-600"}`}>
+            {reg.ingestionStatus}
+          </span>
+        </td>
+      </tr>
+      {isExpanded && (
+        <tr>
+          <td colSpan={8} className="bg-gray-50 px-6 py-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <h4 className="font-medium text-gray-900 mb-1">Especialidades</h4>
+                <div className="flex flex-wrap gap-1">
+                  {reg.specialties.map((s) => (
+                    <span key={s} className="px-2 py-0.5 bg-gray-200 text-gray-700 rounded text-xs">{s}</span>
+                  ))}
+                </div>
+              </div>
+              {reg.sourceUrl && (
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-1">Fonte</h4>
+                  <a href={reg.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline text-xs break-all">
+                    {reg.sourceUrl}
+                  </a>
+                </div>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
+  );
+}

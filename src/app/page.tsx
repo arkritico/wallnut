@@ -82,8 +82,12 @@ const RegulationGraph = dynamic(() => import("@/components/RegulationGraph"), {
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar grafo 3D...</div>,
 });
+const RuleAuditDashboard = dynamic(() => import("@/components/RuleAuditDashboard"), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar auditoria...</div>,
+});
 
-type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations" | "unified" | "viewer" | "fourd" | "evm" | "graph";
+type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations" | "unified" | "viewer" | "fourd" | "evm" | "graph" | "audit";
 
 const REGULATION_BADGES = [
   "Codigo Civil", "RGEU", "Eurocodigos EC0-EC8", "SCIE + NT01-NT22",
@@ -916,6 +920,13 @@ export default function Home() {
                   {lang === "pt" ? "Gestão de Regulamentos" : "Regulations Management"}
                 </h1>
                 <button
+                  onClick={() => setView("audit")}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  {lang === "pt" ? "Auditoria" : "Audit"}
+                </button>
+                <button
                   onClick={() => setView("graph")}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
                 >
@@ -997,6 +1008,24 @@ export default function Home() {
             </span>
           </div>
           <RegulationGraph className="flex-1" />
+        </main>
+      )}
+      {/* Rule Audit Dashboard */}
+      {view === "audit" && (
+        <main className="min-h-screen bg-gray-50">
+          <AppHeader />
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="mb-4">
+              <button
+                onClick={() => setView("regulations")}
+                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                {t.back}
+              </button>
+            </div>
+            <RuleAuditDashboard />
+          </div>
         </main>
       )}
       {/* 3D IFC Viewer */}

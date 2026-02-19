@@ -314,7 +314,7 @@ export function buildConditionDisplay(
 // ============================================================
 
 /** Extract applicable building types from a rule's conditions */
-function extractApplicableTypes(rule: DeclarativeRule): string[] {
+export function extractApplicableTypes(rule: DeclarativeRule): string[] {
   const types: string[] = [];
   for (const cond of rule.conditions) {
     if (cond.field === "buildingType") {
@@ -329,7 +329,7 @@ function extractApplicableTypes(rule: DeclarativeRule): string[] {
 }
 
 /** Extract project scope (new build / rehabilitation / all) from a rule's conditions */
-function extractProjectScope(rule: DeclarativeRule): "new" | "rehab" | "all" {
+export function extractProjectScope(rule: DeclarativeRule): "new" | "rehab" | "all" {
   for (const cond of rule.conditions) {
     if (cond.field === "isRehabilitation" && cond.operator === "==") {
       return cond.value === true ? "rehab" : "new";
