@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import {
   Search,
   Download,
+  Upload,
   ChevronDown,
   ChevronRight,
   AlertTriangle,
@@ -16,11 +17,16 @@ import {
   EyeOff,
   Wrench,
   MessageSquare,
+  CheckSquare,
+  Square,
+  Minus,
+  BarChart3,
 } from "lucide-react";
 import {
   getAnnotations,
   setAnnotation as saveAnnotation,
   removeAnnotation,
+  importAnnotations,
   type RuleAnnotation,
   type AnnotationStatus,
 } from "@/lib/rule-annotations";
@@ -82,7 +88,7 @@ interface AuditData {
   };
 }
 
-type Tab = "rules" | "regulations" | "validation" | "coverage";
+type Tab = "rules" | "regulations" | "validation" | "coverage" | "progress";
 type SortDir = "asc" | "desc";
 
 // ============================================================
@@ -154,6 +160,14 @@ export default function RuleAuditDashboard() {
   const [expandedRegs, setExpandedRegs] = useState<Set<string>>(new Set());
   const [expandedPlugins, setExpandedPlugins] = useState<Set<string>>(new Set());
 
+  // Bulk selection
+  const [selectedRules, setSelectedRules] = useState<Set<string>>(new Set());
+  const lastCheckedRef = useRef<string | null>(null);
+
+  // Import ref
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importMessage, setImportMessage] = useState<string | null>(null);
+
   // Fetch data + annotations
   useEffect(() => {
     setAnnotations(getAnnotations());
@@ -181,6 +195,43 @@ export default function RuleAuditDashboard() {
       delete next[ruleId];
       return next;
     });
+  }, []);
+
+  // Batch annotation handler
+  const handleBatchAnnotate = useCallback((status: AnnotationStatus) => {
+    const now = new Date().toISOString();
+    const updated: Record<string, RuleAnnotation> = {};
+    for (const ruleId of selectedRules) {
+      const ann: RuleAnnotation = { status, updatedAt: now };
+      saveAnnotation(ruleId, ann);
+      updated[ruleId] = ann;
+    }
+    setAnnotations((prev) => ({ ...prev, ...updated }));
+    setSelectedRules(new Set());
+  }, [selectedRules]);
+
+  // Import handler
+  const handleImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const json = JSON.parse(reader.result as string);
+        // Support both direct annotations object and full audit export format
+        const anns: Record<string, RuleAnnotation> = json.annotations ?? json;
+        const count = importAnnotations(anns);
+        setAnnotations(getAnnotations());
+        setImportMessage(`${count} anotações importadas`);
+        setTimeout(() => setImportMessage(null), 3000);
+      } catch {
+        setImportMessage("Erro: ficheiro JSON inválido");
+        setTimeout(() => setImportMessage(null), 3000);
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be re-imported
+    e.target.value = "";
   }, []);
 
   // Annotation stats
@@ -213,6 +264,26 @@ export default function RuleAuditDashboard() {
       .map((r) => ({ id: r.regulationId, ref: r.regulationRef }))
       .sort((a, b) => a.ref.localeCompare(b.ref));
   }, [data]);
+
+  // Per-specialty audit progress
+  const specialtyProgress = useMemo(() => {
+    if (!data) return [];
+    const map = new Map<string, { name: string; total: number; reviewed: number; irrelevant: number; needsFix: number }>();
+    for (const r of data.rules) {
+      if (!map.has(r.specialtyId)) {
+        map.set(r.specialtyId, { name: r.specialtyName, total: 0, reviewed: 0, irrelevant: 0, needsFix: 0 });
+      }
+      const entry = map.get(r.specialtyId)!;
+      entry.total++;
+      const ann = annotations[r.id];
+      if (ann?.status === "reviewed") entry.reviewed++;
+      else if (ann?.status === "irrelevant") entry.irrelevant++;
+      else if (ann?.status === "needs-fix") entry.needsFix++;
+    }
+    return Array.from(map.entries())
+      .map(([id, s]) => ({ id, ...s, annotated: s.reviewed + s.irrelevant + s.needsFix }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [data, annotations]);
 
   // Filter + sort rules
   const filteredRules = useMemo(() => {
@@ -249,12 +320,10 @@ export default function RuleAuditDashboard() {
         case "id": va = a.id; vb = b.id; break;
         case "specialty": va = a.specialtyName; vb = b.specialtyName; break;
         case "regulation": va = a.regulationRef; vb = b.regulationRef; break;
-        case "article": va = a.article; vb = b.article; break;
         case "severity": {
           const order = { critical: 0, warning: 1, info: 2, pass: 3 };
           va = order[a.severity]; vb = order[b.severity]; break;
         }
-        case "conditions": va = a.conditionCount; vb = b.conditionCount; break;
         case "audit": {
           const order: Record<string, number> = { "needs-fix": 0, reviewed: 1, irrelevant: 2 };
           va = annotations[a.id] ? order[annotations[a.id].status] ?? 3 : 4;
@@ -276,6 +345,9 @@ export default function RuleAuditDashboard() {
 
   // Reset page when filters change
   useEffect(() => { setPage(0); }, [filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, filterAnnotation, search]);
+
+  // Clear selection when page or filters change
+  useEffect(() => { setSelectedRules(new Set()); }, [page, filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, filterAnnotation, search]);
 
   // Sort handler
   const handleSort = useCallback((col: string) => {
@@ -310,6 +382,72 @@ export default function RuleAuditDashboard() {
       return next;
     });
   }, []);
+
+  // Bulk selection handlers
+  const handleCheckbox = useCallback((ruleId: string, shiftKey: boolean) => {
+    setSelectedRules((prev) => {
+      const next = new Set(prev);
+      if (shiftKey && lastCheckedRef.current) {
+        // Shift+click: select range
+        const ids = pagedRules.map((r) => r.id);
+        const start = ids.indexOf(lastCheckedRef.current);
+        const end = ids.indexOf(ruleId);
+        if (start !== -1 && end !== -1) {
+          const [lo, hi] = start < end ? [start, end] : [end, start];
+          for (let i = lo; i <= hi; i++) next.add(ids[i]);
+        }
+      } else {
+        if (next.has(ruleId)) next.delete(ruleId);
+        else next.add(ruleId);
+      }
+      lastCheckedRef.current = ruleId;
+      return next;
+    });
+  }, [pagedRules]);
+
+  const handleSelectAll = useCallback(() => {
+    setSelectedRules((prev) => {
+      const pageIds = pagedRules.map((r) => r.id);
+      const allSelected = pageIds.every((id) => prev.has(id));
+      if (allSelected) return new Set();
+      return new Set(pageIds);
+    });
+  }, [pagedRules]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    if (tab !== "rules") return;
+    const handler = (e: KeyboardEvent) => {
+      // Skip if typing in an input
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      // Only when exactly one rule is expanded
+      if (expandedRules.size !== 1) return;
+      const ruleId = [...expandedRules][0];
+
+      switch (e.key) {
+        case "r": handleSetAnnotation(ruleId, "reviewed"); break;
+        case "i": handleSetAnnotation(ruleId, "irrelevant"); break;
+        case "f": handleSetAnnotation(ruleId, "needs-fix"); break;
+        case "j":
+        case "k": {
+          // Navigate to next/previous rule
+          const ids = pagedRules.map((r) => r.id);
+          const idx = ids.indexOf(ruleId);
+          if (idx === -1) return;
+          const nextIdx = e.key === "j" ? Math.min(idx + 1, ids.length - 1) : Math.max(idx - 1, 0);
+          if (nextIdx !== idx) {
+            setExpandedRules(new Set([ids[nextIdx]]));
+          }
+          break;
+        }
+        default: return;
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [tab, expandedRules, pagedRules, handleSetAnnotation]);
 
   // CSV export (with annotation columns)
   const exportCSV = useCallback(() => {
@@ -387,6 +525,8 @@ export default function RuleAuditDashboard() {
   }
 
   const totalAnnotated = Object.keys(annotations).length;
+  const pageCheckState = pagedRules.length > 0 && pagedRules.every((r) => selectedRules.has(r.id))
+    ? "all" : pagedRules.some((r) => selectedRules.has(r.id)) ? "some" : "none";
 
   return (
     <div className="space-y-6">
@@ -399,6 +539,10 @@ export default function RuleAuditDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+          <button onClick={() => fileInputRef.current?.click()} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            <Upload className="w-3.5 h-3.5" /> Importar
+          </button>
           <button onClick={exportCSV} className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
             <Download className="w-3.5 h-3.5" /> CSV
           </button>
@@ -407,6 +551,13 @@ export default function RuleAuditDashboard() {
           </button>
         </div>
       </div>
+
+      {/* Import feedback */}
+      {importMessage && (
+        <div className={`text-sm px-4 py-2 rounded-lg ${importMessage.startsWith("Erro") ? "bg-red-50 text-red-700" : "bg-emerald-50 text-emerald-700"}`}>
+          {importMessage}
+        </div>
+      )}
 
       {/* Severity + annotation summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
@@ -461,22 +612,21 @@ export default function RuleAuditDashboard() {
       </div>
 
       {/* Audit progress bar */}
-      {totalAnnotated > 0 && (
-        <div className="flex items-center gap-3 text-sm">
-          <span className="text-gray-500">Progresso da auditoria:</span>
-          <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
-            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${Math.round((totalAnnotated / data.stats.totalRules) * 100)}%` }} />
-          </div>
-          <span className="text-gray-700 font-medium">{totalAnnotated}/{data.stats.totalRules}</span>
-          <span className="text-gray-400">({Math.round((totalAnnotated / data.stats.totalRules) * 100)}%)</span>
+      <div className="flex items-center gap-3 text-sm">
+        <span className="text-gray-500">Progresso da auditoria:</span>
+        <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+          <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${data.stats.totalRules > 0 ? Math.round((totalAnnotated / data.stats.totalRules) * 100) : 0}%` }} />
         </div>
-      )}
+        <span className="text-gray-700 font-medium">{totalAnnotated}/{data.stats.totalRules}</span>
+        <span className="text-gray-400">({data.stats.totalRules > 0 ? Math.round((totalAnnotated / data.stats.totalRules) * 100) : 0}%)</span>
+      </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex gap-6">
           {([
             { key: "rules" as Tab, label: "Regras", count: data.stats.totalRules },
+            { key: "progress" as Tab, label: "Progresso" },
             { key: "regulations" as Tab, label: "Regulamentos", count: data.stats.totalRegulations },
             { key: "validation" as Tab, label: "Validação", count: data.validation.totalErrors },
             { key: "coverage" as Tab, label: "Cobertura" },
@@ -504,6 +654,33 @@ export default function RuleAuditDashboard() {
       {/* Tab: Rules */}
       {tab === "rules" && (
         <div>
+          {/* Batch action bar */}
+          {selectedRules.size > 0 && (
+            <div className="mb-4 flex items-center gap-3 p-3 bg-accent/5 border border-accent/20 rounded-lg">
+              <span className="text-sm font-medium text-gray-700">{selectedRules.size} selecionada(s)</span>
+              <div className="flex items-center gap-1.5 ml-auto">
+                <span className="text-xs text-gray-500 mr-1">Marcar como:</span>
+                {(["reviewed", "irrelevant", "needs-fix"] as const).map((status) => {
+                  const cfg = ANNOTATION_CONFIG[status];
+                  const AnnIcon = cfg.icon;
+                  return (
+                    <button
+                      key={status}
+                      onClick={() => handleBatchAnnotate(status)}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors bg-white border-gray-200 text-gray-600 hover:${cfg.bg} hover:${cfg.border}`}
+                    >
+                      <AnnIcon className="w-3.5 h-3.5" />
+                      {cfg.label}
+                    </button>
+                  );
+                })}
+                <button onClick={() => setSelectedRules(new Set())} className="ml-2 text-xs text-gray-400 hover:text-gray-600">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Search + filter bar */}
           <div className="flex items-center gap-3 mb-4">
             <div className="relative flex-1">
@@ -600,10 +777,20 @@ export default function RuleAuditDashboard() {
             </div>
           )}
 
-          {/* Results count */}
-          <div className="text-xs text-gray-500 mb-2">
-            {filteredRules.length} regra(s) encontrada(s)
-            {totalPages > 1 && ` — Página ${page + 1} de ${totalPages}`}
+          {/* Results count + keyboard hint */}
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+            <span>
+              {filteredRules.length} regra(s) encontrada(s)
+              {totalPages > 1 && ` — Página ${page + 1} de ${totalPages}`}
+            </span>
+            {expandedRules.size === 1 && (
+              <span className="text-gray-400">
+                <kbd className="px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">r</kbd> revista
+                <kbd className="ml-2 px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">i</kbd> irrelevante
+                <kbd className="ml-2 px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">f</kbd> corrigir
+                <kbd className="ml-2 px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">j</kbd>/<kbd className="px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px]">k</kbd> navegar
+              </span>
+            )}
           </div>
 
           {/* Table */}
@@ -611,7 +798,12 @@ export default function RuleAuditDashboard() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="w-8 px-3 py-2" />
+                  <th className="w-8 px-3 py-2">
+                    <button onClick={handleSelectAll} className="text-gray-400 hover:text-gray-600">
+                      {pageCheckState === "all" ? <CheckSquare className="w-4 h-4" /> : pageCheckState === "some" ? <Minus className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                    </button>
+                  </th>
+                  <th className="w-8 px-1 py-2" />
                   {[
                     { key: "id", label: "ID" },
                     { key: "specialty", label: "Especialidade" },
@@ -635,20 +827,23 @@ export default function RuleAuditDashboard() {
                 {pagedRules.map((rule) => {
                   const isExpanded = expandedRules.has(rule.id);
                   const ann = annotations[rule.id];
+                  const isSelected = selectedRules.has(rule.id);
                   return (
                     <RuleRow
                       key={rule.id}
                       rule={rule}
                       annotation={ann}
                       isExpanded={isExpanded}
+                      isSelected={isSelected}
                       onToggle={toggleRule}
+                      onCheck={handleCheckbox}
                       onSetAnnotation={handleSetAnnotation}
                       onRemoveAnnotation={handleRemoveAnnotation}
                     />
                   );
                 })}
                 {pagedRules.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">Nenhuma regra encontrada</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Nenhuma regra encontrada</td></tr>
                 )}
               </tbody>
             </table>
@@ -666,6 +861,47 @@ export default function RuleAuditDashboard() {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Tab: Progress */}
+      {tab === "progress" && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <BarChart3 className="w-6 h-6 text-gray-400" />
+            <div>
+              <div className="text-2xl font-bold text-gray-900">
+                {totalAnnotated}/{data.stats.totalRules}
+              </div>
+              <div className="text-sm text-gray-500">
+                regras anotadas ({data.stats.totalRules > 0 ? Math.round((totalAnnotated / data.stats.totalRules) * 100) : 0}%)
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {specialtyProgress.map((sp) => {
+              const pct = sp.total > 0 ? Math.round((sp.annotated / sp.total) * 100) : 0;
+              const barColor = pct >= 80 ? "bg-emerald-500" : pct >= 40 ? "bg-amber-500" : "bg-gray-300";
+              return (
+                <button
+                  key={sp.id}
+                  onClick={() => { setFilterSpecialty(sp.id); setTab("rules"); }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="w-48 text-sm font-medium text-gray-700 truncate" title={sp.name}>{sp.name}</div>
+                  <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                    <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <div className="w-20 text-right text-sm font-medium text-gray-700">{sp.annotated}/{sp.total}</div>
+                  <div className="w-40 flex items-center gap-1.5 text-xs">
+                    {sp.reviewed > 0 && <span className="px-1.5 py-0.5 bg-emerald-50 text-emerald-700 rounded">{sp.reviewed} rev</span>}
+                    {sp.irrelevant > 0 && <span className="px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded">{sp.irrelevant} irr</span>}
+                    {sp.needsFix > 0 && <span className="px-1.5 py-0.5 bg-orange-50 text-orange-700 rounded">{sp.needsFix} fix</span>}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -786,14 +1022,18 @@ function RuleRow({
   rule,
   annotation,
   isExpanded,
+  isSelected,
   onToggle,
+  onCheck,
   onSetAnnotation,
   onRemoveAnnotation,
 }: {
   rule: AuditRule;
   annotation?: RuleAnnotation;
   isExpanded: boolean;
+  isSelected: boolean;
   onToggle: (id: string) => void;
+  onCheck: (id: string, shiftKey: boolean) => void;
   onSetAnnotation: (ruleId: string, status: AnnotationStatus, note?: string) => void;
   onRemoveAnnotation: (ruleId: string) => void;
 }) {
@@ -809,22 +1049,24 @@ function RuleRow({
   return (
     <>
       <tr
-        onClick={() => onToggle(rule.id)}
-        className={`cursor-pointer hover:bg-gray-50 transition-colors ${!rule.enabled ? "opacity-50" : ""} ${isIrrelevant ? "opacity-40" : ""}`}
+        className={`cursor-pointer hover:bg-gray-50 transition-colors ${!rule.enabled ? "opacity-50" : ""} ${isIrrelevant ? "opacity-40" : ""} ${isSelected ? "bg-accent/5" : ""}`}
       >
-        <td className="px-3 py-2">
+        <td className="px-3 py-2" onClick={(e) => { e.stopPropagation(); onCheck(rule.id, e.shiftKey); }}>
+          {isSelected ? <CheckSquare className="w-4 h-4 text-accent" /> : <Square className="w-4 h-4 text-gray-300 hover:text-gray-500" />}
+        </td>
+        <td className="px-1 py-2" onClick={() => onToggle(rule.id)}>
           {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
         </td>
-        <td className="px-3 py-2 font-mono text-xs">{rule.id}</td>
-        <td className="px-3 py-2 text-gray-600">{rule.specialtyName}</td>
-        <td className="px-3 py-2 text-gray-600">{rule.regulationRef}</td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2 font-mono text-xs" onClick={() => onToggle(rule.id)}>{rule.id}</td>
+        <td className="px-3 py-2 text-gray-600" onClick={() => onToggle(rule.id)}>{rule.specialtyName}</td>
+        <td className="px-3 py-2 text-gray-600" onClick={() => onToggle(rule.id)}>{rule.regulationRef}</td>
+        <td className="px-3 py-2" onClick={() => onToggle(rule.id)}>
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sev.bg} ${sev.color}`}>
             <SevIcon className="w-3 h-3" />
             {sev.label}
           </span>
         </td>
-        <td className="px-3 py-2">
+        <td className="px-3 py-2" onClick={() => onToggle(rule.id)}>
           {annotation ? (() => {
             const cfg = ANNOTATION_CONFIG[annotation.status];
             const AnnIcon = cfg.icon;
@@ -838,11 +1080,11 @@ function RuleRow({
             <span className="text-xs text-gray-300">&mdash;</span>
           )}
         </td>
-        <td className={`px-3 py-2 text-gray-700 truncate max-w-[300px] ${isIrrelevant ? "line-through" : ""}`}>{rule.description}</td>
+        <td className={`px-3 py-2 text-gray-700 truncate max-w-[300px] ${isIrrelevant ? "line-through" : ""}`} onClick={() => onToggle(rule.id)}>{rule.description}</td>
       </tr>
       {isExpanded && (
         <tr>
-          <td colSpan={7} className="bg-gray-50 px-6 py-4">
+          <td colSpan={8} className="bg-gray-50 px-6 py-4">
             {/* Annotation toolbar */}
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
               <span className="text-xs font-medium text-gray-500 mr-1">Classificar:</span>

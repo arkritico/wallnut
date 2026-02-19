@@ -4,8 +4,9 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as THREE from "three";
 import {
   Search, X, Maximize2, ChevronDown, ChevronRight,
-  Home, Building2, Hammer, Layers, Tag,
+  Home, Building2, Hammer, Layers, Tag, Eye,
 } from "lucide-react";
+import { getAnnotations, type RuleAnnotation, type AnnotationStatus } from "@/lib/rule-annotations";
 import type {
   RegulationGraphData, GraphNode, GraphLink, RuleConditionDisplay,
 } from "@/lib/regulation-graph";
@@ -92,6 +93,10 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   // Dimensions
   const [dims, setDims] = useState({ width: 800, height: 600 });
 
+  // Annotation overlay
+  const [annotations, setAnnotationsState] = useState<Record<string, RuleAnnotation>>({});
+  const [showAnnotations, setShowAnnotations] = useState(false);
+
   // ── Load ForceGraph3D dynamically ─────────────────────────
   useEffect(() => {
     import("react-force-graph-3d").then(mod => {
@@ -99,8 +104,9 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     });
   }, []);
 
-  // ── Fetch graph data ──────────────────────────────────────
+  // ── Fetch graph data + annotations ───────────────────────
   useEffect(() => {
+    setAnnotationsState(getAnnotations());
     fetch("/api/regulation-graph")
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -277,6 +283,13 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     return { nodes: visibleNodes, links: visibleLinks };
   }, [graphData, expandedRegulations, severityFilter, browsePath, searchQuery, ruleMatchesBrowse]);
 
+  // ── Annotation color helper ──────────────────────────────
+  const ANNOTATION_RING_COLORS: Record<AnnotationStatus, string> = {
+    reviewed: "#10b981",   // emerald
+    irrelevant: "#6b7280", // gray
+    "needs-fix": "#f97316", // orange
+  };
+
   // ── Custom node rendering ─────────────────────────────────
   const nodeThreeObject = useCallback((node: FGNode) => {
     const n = node as unknown as GraphNode;
@@ -284,17 +297,35 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const segments = n.type === "specialty" ? 24 : n.type === "regulation" ? 16 : 8;
     const color = n.color;
 
+    // Check annotation for rule nodes
+    const ann = n.type === "rule" && showAnnotations ? annotations[n.label] : undefined;
+    const isIrrelevant = ann?.status === "irrelevant";
+
     const group = new THREE.Group();
 
     const geo = new THREE.SphereGeometry(size, segments, segments);
     const mat = new THREE.MeshPhongMaterial({
-      color,
+      color: isIrrelevant ? "#4b5563" : color,
       transparent: n.type === "rule",
-      opacity: n.type === "rule" ? 0.75 : 1,
-      emissive: new THREE.Color(color),
+      opacity: isIrrelevant ? 0.2 : n.type === "rule" ? 0.75 : 1,
+      emissive: new THREE.Color(isIrrelevant ? "#4b5563" : color),
       emissiveIntensity: n.type === "specialty" ? 0.3 : 0.1,
     });
     group.add(new THREE.Mesh(geo, mat));
+
+    // Add annotation ring for rule nodes
+    if (ann && !isIrrelevant) {
+      const ringColor = ANNOTATION_RING_COLORS[ann.status];
+      const ringGeo = new THREE.RingGeometry(size + 0.3, size + 0.8, 32);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: ringColor,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide,
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      group.add(ring);
+    }
 
     if (n.type !== "rule") {
       const canvas = document.createElement("canvas");
@@ -320,7 +351,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     }
 
     return group;
-  }, []);
+  }, [showAnnotations, annotations]);
 
   // ── Node label for hover tooltip ──────────────────────────
   const nodeLabel = useCallback((node: FGNode) => {
@@ -407,8 +438,27 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     }
   }, [graphData]);
 
-  const linkColor = useCallback((link: GraphLink) => link.type === "cross-specialty" ? "#ff6b6b" : "#2a2a3a", []);
-  const linkWidth = useCallback((link: GraphLink) => link.type === "cross-specialty" ? 2 : 0.3, []);
+  const linkColor = useCallback((link: GraphLink) => {
+    if (link.type === "cross-specialty") return "#ff6b6b";
+    if (link.type === "amends") return "#eab308";
+    return "#2a2a3a";
+  }, []);
+  const linkWidth = useCallback((link: GraphLink) => {
+    if (link.type === "cross-specialty") return 2;
+    if (link.type === "amends") return 1.5;
+    return 0.3;
+  }, []);
+  const linkLabel = useCallback((link: GraphLink) => {
+    if (link.type === "cross-specialty" && link.sharedFields?.length) {
+      return `<div style="background:#1e1e2e;color:#ff6b6b;padding:6px 10px;border-radius:6px;font-size:11px;max-width:300px">
+        <b>Campos partilhados (${link.sharedFields.length})</b><br/>
+        <span style="color:#94a3b8">${link.sharedFields.slice(0, 8).join(", ")}${link.sharedFields.length > 8 ? ` (+${link.sharedFields.length - 8})` : ""}</span></div>`;
+    }
+    if (link.type === "amends") {
+      return `<div style="background:#1e1e2e;color:#eab308;padding:6px 10px;border-radius:6px;font-size:11px">Altera/Republica</div>`;
+    }
+    return "";
+  }, []);
   const handleZoomToFit = useCallback(() => { fgRef.current?.zoomToFit(600, 40); }, []);
 
   // ── Chat panel: select rule by ID ──────────────────────────
@@ -787,11 +837,12 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             onNodeClick={handleNodeClick}
             linkColor={linkColor}
             linkWidth={linkWidth}
+            linkLabel={linkLabel}
             linkOpacity={0.4}
-            linkDirectionalParticles={(link: GraphLink) => link.type === "cross-specialty" ? 2 : 0}
-            linkDirectionalParticleSpeed={0.003}
+            linkDirectionalParticles={(link: GraphLink) => link.type === "cross-specialty" ? 2 : link.type === "amends" ? 1 : 0}
+            linkDirectionalParticleSpeed={(link: GraphLink) => link.type === "amends" ? 0.005 : 0.003}
             linkDirectionalParticleWidth={2}
-            linkDirectionalParticleColor={() => "#ff6b6b"}
+            linkDirectionalParticleColor={(link: GraphLink) => link.type === "amends" ? "#eab308" : "#ff6b6b"}
             warmupTicks={50}
             cooldownTime={3000}
             showNavInfo={false}
@@ -806,6 +857,15 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             title="Ajustar zoom"
           >
             <Maximize2 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setShowAnnotations(p => !p)}
+            className={`p-2 rounded-lg backdrop-blur-sm transition-colors ${
+              showAnnotations ? "bg-emerald-800/80 text-emerald-300" : "bg-gray-800/80 hover:bg-gray-700 text-gray-300"
+            }`}
+            title={showAnnotations ? "Ocultar anotações" : "Mostrar anotações"}
+          >
+            <Eye className="w-4 h-4" />
           </button>
         </div>
 
@@ -835,8 +895,28 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span className="w-4 h-0.5 bg-red-400 inline-block" />
-              Liga\u00e7\u00e3o cruzada
+              Ligação cruzada
             </div>
+            <div className="flex items-center gap-2">
+              <span className="w-4 h-0.5 bg-yellow-400 inline-block" />
+              Altera/Republica
+            </div>
+            {showAnnotations && (
+              <>
+                <div className="flex items-center gap-2 mt-1 pt-1 border-t border-gray-700">
+                  <span className="w-2 h-2 rounded-full ring-2 ring-emerald-400 inline-block" />
+                  Revista
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full ring-2 ring-orange-400 inline-block" />
+                  Corrigir
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-gray-600 opacity-30 inline-block" />
+                  Irrelevante
+                </div>
+              </>
+            )}
           </div>
         </div>
 

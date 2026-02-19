@@ -54,3 +54,28 @@ export function removeAnnotation(ruleId: string): void {
 export function getAnnotation(ruleId: string): RuleAnnotation | undefined {
   return getAnnotations()[ruleId];
 }
+
+/**
+ * Import annotations from an external JSON object, merging into localStorage.
+ * New annotations overwrite existing ones for the same ruleId.
+ * Returns the number of annotations imported.
+ */
+export function importAnnotations(data: Record<string, RuleAnnotation>): number {
+  if (!isAvailable()) return 0;
+  const validStatuses = new Set<string>(["reviewed", "irrelevant", "needs-fix"]);
+  const all = getAnnotations();
+  let count = 0;
+  for (const [ruleId, ann] of Object.entries(data)) {
+    if (ann && typeof ann === "object" && validStatuses.has(ann.status)) {
+      all[ruleId] = {
+        status: ann.status,
+        note: ann.note,
+        updatedAt: ann.updatedAt || new Date().toISOString(),
+        updatedBy: ann.updatedBy,
+      };
+      count++;
+    }
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  return count;
+}

@@ -58,8 +58,10 @@ export interface RuleConditionDisplay {
 export interface GraphLink {
   source: string;
   target: string;
-  type: "contains" | "cross-specialty";
+  type: "contains" | "cross-specialty" | "amends";
   fieldRef?: string;
+  /** For cross-specialty: all shared non-generic field paths between the two specialties */
+  sharedFields?: string[];
 }
 
 export interface GraphStats {
@@ -68,6 +70,8 @@ export interface GraphStats {
   totalRules: number;
   severityCounts: { critical: number; warning: number; info: number; pass: number };
   crossSpecialtyLinks: number;
+  /** Regulation amendment chain edges */
+  amendmentLinks: number;
   /** Distinct building types found in rule conditions */
   buildingTypes: string[];
 }
@@ -485,7 +489,8 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
   }
 
   // Detect cross-specialty links via shared field namespaces
-  const crossPairs = new Set<string>();
+  // Accumulate all shared fields per specialty pair
+  const crossPairFields = new Map<string, Set<string>>();
 
   for (const plugin of plugins) {
     for (const rule of plugin.rules) {
@@ -496,17 +501,57 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
         const targetPlugin = NAMESPACE_TO_PLUGIN[namespace];
         if (!targetPlugin || targetPlugin === plugin.id) continue;
 
-        // Deduplicate at the specialty-pair level
         const pairKey = [plugin.id, targetPlugin].sort().join(":");
-        if (crossPairs.has(pairKey)) continue;
-        crossPairs.add(pairKey);
+        let fields = crossPairFields.get(pairKey);
+        if (!fields) {
+          fields = new Set<string>();
+          crossPairFields.set(pairKey, fields);
+        }
+        fields.add(cond.field);
+      }
+    }
+  }
 
-        links.push({
-          source: `s:${plugin.id}`,
-          target: `s:${targetPlugin}`,
-          type: "cross-specialty",
-          fieldRef: cond.field,
-        });
+  for (const [pairKey, fields] of crossPairFields) {
+    const [srcId, tgtId] = pairKey.split(":");
+    links.push({
+      source: `s:${srcId}`,
+      target: `s:${tgtId}`,
+      type: "cross-specialty",
+      fieldRef: [...fields][0],
+      sharedFields: [...fields].sort(),
+    });
+  }
+
+  // Detect amendment chain links between regulations
+  // Build a lookup: regulation ID → node ID (for matching amendedBy/amends)
+  const regIdToNodeId = new Map<string, string>();
+  for (const node of nodes) {
+    if (node.type === "regulation" && node.regulationId) {
+      // If multiple nodes share a regulationId, first one wins (they're in the same specialty)
+      if (!regIdToNodeId.has(node.regulationId)) {
+        regIdToNodeId.set(node.regulationId, node.id);
+      }
+    }
+  }
+
+  let amendmentLinkCount = 0;
+  for (const plugin of plugins) {
+    for (const reg of plugin.regulations) {
+      const sourceNodeId = regIdToNodeId.get(reg.id);
+      if (!sourceNodeId) continue;
+
+      // amendedBy: this regulation was amended by another
+      for (const amenderId of (reg.amendedBy ?? [])) {
+        const targetNodeId = regIdToNodeId.get(amenderId);
+        if (targetNodeId) {
+          links.push({
+            source: sourceNodeId,
+            target: targetNodeId,
+            type: "amends",
+          });
+          amendmentLinkCount++;
+        }
       }
     }
   }
@@ -531,7 +576,8 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
       totalRegulations: regNodeCount,
       totalRules: ruleNodeCount,
       severityCounts,
-      crossSpecialtyLinks: crossPairs.size,
+      crossSpecialtyLinks: crossPairFields.size,
+      amendmentLinks: amendmentLinkCount,
       buildingTypes: [...buildingTypesSet].sort(),
     },
   };
