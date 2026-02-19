@@ -2446,6 +2446,1398 @@
         "aquecimento",
         "isolamento"
       ]
+    },
+    {
+      "id": "REH-COBISO-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 Tabela I.01 — Espessura Mínima de Isolamento em Cobertura Plana",
+      "description": "A espessura de isolamento térmico da cobertura plana ({envelope.flatRoofInsulationThickness} mm) é insuficiente para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.flatRoofInsulationThickness",
+          "operator": "<",
+          "value": 80
+        },
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "flat"
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento cobertura plana: {envelope.flatRoofInsulationThickness} mm",
+      "requiredValue": "≥ 80 mm (EPS/XPS λ ≤ 0.036 W/m·K) para cumprir Umáx coberturas",
+      "remediation": "Aplicar isolamento térmico na cobertura plana com espessura mínima de 80 mm (EPS, XPS ou PIR). Em zonas I2/I3 poderá ser necessário 100-120 mm para cumprir U ≤ 0.35/0.30 W/(m².K).",
+      "enabled": true,
+      "tags": [
+        "cobertura plana",
+        "isolamento",
+        "espessura",
+        "envolvente exterior"
+      ]
+    },
+    {
+      "id": "REH-COBISO-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento de Cobertura Inclinada",
+      "description": "A espessura de isolamento térmico da cobertura inclinada ({envelope.pitchedRoofInsulationThickness} mm) é insuficiente para garantir o cumprimento do Umáx regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.pitchedRoofInsulationThickness",
+          "operator": "<",
+          "value": 80
+        },
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "pitched"
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento cobertura inclinada: {envelope.pitchedRoofInsulationThickness} mm",
+      "requiredValue": "≥ 80 mm na laje de esteira ou ≥ 100 mm nas vertentes (lã mineral ou EPS)",
+      "remediation": "Colocar isolamento na laje de esteira (solução mais económica) ou nas vertentes (se desvão habitável). Usar lã mineral, EPS ou projecção de espuma com espessura adequada à zona climática.",
+      "enabled": true,
+      "tags": [
+        "cobertura inclinada",
+        "isolamento",
+        "espessura",
+        "esteira",
+        "vertentes"
+      ]
+    },
+    {
+      "id": "REH-COBISO-03",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 — Desempenho Térmico de Cobertura Verde",
+      "description": "A cobertura verde não atinge o valor de U máximo regulamentar ({envelope.greenRoofUValue} W/(m².K)).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.greenRoofUValue",
+          "operator": ">",
+          "value": 0.35
+        },
+        {
+          "field": "envelope.hasGreenRoof",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "U cobertura verde: {envelope.greenRoofUValue} W/(m².K)",
+      "requiredValue": "≤ 0.35 W/(m².K) (incluindo contribuição do substrato vegetal)",
+      "remediation": "A camada vegetal da cobertura verde contribui para a resistência térmica, mas não substitui o isolamento. Garantir isolamento XPS/PIR sob a camada drenante com espessura adequada para cumprir o Umáx.",
+      "enabled": true,
+      "tags": [
+        "cobertura verde",
+        "valor-U",
+        "isolamento",
+        "sustentabilidade"
+      ]
+    },
+    {
+      "id": "REH-COBISO-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Espaço de Ventilação em Cobertura",
+      "description": "O espaço de ventilação entre o isolamento e a telha ({envelope.roofVentilationGap} mm) é insuficiente para prevenir condensações na cobertura inclinada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.roofVentilationGap",
+          "operator": "<",
+          "value": 40
+        },
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "pitched"
+        }
+      ],
+      "currentValueTemplate": "Espaço de ventilação: {envelope.roofVentilationGap} mm",
+      "requiredValue": "≥ 40 mm de caixa-de-ar ventilada entre isolamento e subtelha",
+      "remediation": "Prever espaço de ventilação entre o isolamento nas vertentes e a subtelha (mínimo 40 mm). Garantir aberturas de entrada de ar na cumeeira e nos beirais para circulação natural.",
+      "enabled": true,
+      "tags": [
+        "cobertura",
+        "ventilação",
+        "caixa-de-ar",
+        "condensação"
+      ]
+    },
+    {
+      "id": "REH-COBISO-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Cobertura Invertida: Impermeabilização",
+      "description": "Na cobertura invertida, a impermeabilização não está posicionada sob o isolamento térmico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.invertedRoofWaterproofingBelowInsulation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "inverted"
+        }
+      ],
+      "currentValueTemplate": "Impermeabilização não está sob o isolamento na cobertura invertida",
+      "requiredValue": "Impermeabilização sob o isolamento (cobertura invertida correta)",
+      "remediation": "Na cobertura invertida, a membrana impermeabilizante deve ficar sob o isolamento (XPS), protegida termicamente. O isolamento XPS deve ter absorção de água ≤ 1% e resistência à compressão adequada para suportar a camada de protecção/lastro.",
+      "enabled": true,
+      "tags": [
+        "cobertura invertida",
+        "impermeabilização",
+        "XPS",
+        "sistema construtivo"
+      ]
+    },
+    {
+      "id": "REH-PAVISO-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento de Pavimento em Contacto com Solo",
+      "description": "O pavimento em contacto com o solo não possui isolamento térmico perimetral ou na totalidade da área ({envelope.groundFloorInsulationThickness} mm).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.groundFloorInsulationThickness",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "envelope.groundFloorContact",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento pavimento térreo: {envelope.groundFloorInsulationThickness} mm",
+      "requiredValue": "≥ 50 mm (XPS ≥ 300 kPa) sob laje ou perimetral conforme EN ISO 13370",
+      "remediation": "Aplicar isolamento sob a laje em contacto com o solo (XPS de alta resistência à compressão ≥ 300 kPa) ou isolamento perimetral com profundidade ≥ 1.0 m. O cálculo de Ubf deve seguir a EN ISO 13370.",
+      "enabled": true,
+      "tags": [
+        "pavimento",
+        "solo",
+        "isolamento perimetral",
+        "XPS"
+      ]
+    },
+    {
+      "id": "REH-PAVISO-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento de Pavimento Suspenso",
+      "description": "O pavimento suspenso sobre espaço não aquecido não possui isolamento térmico adequado ({envelope.suspendedFloorInsulationThickness} mm).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.suspendedFloorInsulationThickness",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "envelope.hasSuspendedFloor",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento pavimento suspenso: {envelope.suspendedFloorInsulationThickness} mm",
+      "requiredValue": "≥ 60 mm (lã mineral ou EPS) na face inferior da laje",
+      "remediation": "Isolar a face inferior da laje do pavimento suspenso com painéis rígidos (EPS, XPS) fixados mecanicamente ou projecção de espuma de poliuretano (PUR). Espessura mínima de 60 mm para zonas I1, podendo ser necessário 80-100 mm para I2/I3.",
+      "enabled": true,
+      "tags": [
+        "pavimento suspenso",
+        "isolamento",
+        "laje",
+        "espaço não aquecido"
+      ]
+    },
+    {
+      "id": "REH-PAVISO-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento do Tecto de Garagem",
+      "description": "O tecto da garagem (pavimento do espaço habitável acima) não possui isolamento térmico adequado ({envelope.garageCeilingUValue} W/(m².K)).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.garageCeilingUValue",
+          "operator": ">",
+          "value": 0.5
+        },
+        {
+          "field": "envelope.hasGarageBelow",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "U tecto garagem: {envelope.garageCeilingUValue} W/(m².K)",
+      "requiredValue": "≤ 0.50 W/(m².K) para zona I1; ≤ 0.40 para I2; ≤ 0.35 para I3",
+      "remediation": "Isolar o tecto da garagem pela face inferior com painéis de EPS/XPS (espessura ≥ 60mm) ou projecção de PUR. Solução alternativa: pavimento flutuante com isolamento no piso do espaço habitável acima.",
+      "enabled": true,
+      "tags": [
+        "garagem",
+        "tecto",
+        "isolamento",
+        "pavimento sobre ENU"
+      ]
+    },
+    {
+      "id": "REH-PAVISO-04",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Corte Térmico em Varanda/Consola",
+      "description": "A laje de varanda/consola não possui corte térmico na ligação com a laje interior, constituindo uma ponte térmica linear significativa ({envelope.balconyThermalBreak}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.balconyThermalBreak",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.hasBalcony",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem corte térmico na ligação laje-varanda",
+      "requiredValue": "Corte térmico estrutural com ψ ≤ 0.50 W/(m·K) na ligação laje-varanda",
+      "remediation": "Instalar elemento de corte térmico estrutural (tipo Schöck Isokorb ou equivalente) na ligação entre a laje interior e a consola da varanda. Reduz ψ de ~1.0 para ≤ 0.15 W/(m·K). Alternativa: varanda autoportante com apoio independente.",
+      "enabled": true,
+      "tags": [
+        "varanda",
+        "corte térmico",
+        "ponte térmica",
+        "laje",
+        "consola"
+      ]
+    },
+    {
+      "id": "REH-PAVISO-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Isolamento sob Piso Radiante",
+      "description": "O isolamento sob o sistema de piso radiante ({envelope.underfloorHeatingInsulationThickness} mm) é insuficiente, provocando perdas térmicas para baixo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.underfloorHeatingInsulationThickness",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "thermal.hasUnderfloorHeating",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento sob piso radiante: {envelope.underfloorHeatingInsulationThickness} mm",
+      "requiredValue": "≥ 50 mm (EPS/XPS) sobre laje interior; ≥ 80 mm sobre solo ou ENU",
+      "remediation": "Colocar isolamento rígido (EPS, XPS ou painéis com plots) sob as tubagens do piso radiante com espessura mínima de 50 mm sobre laje interior e 80 mm sobre solo ou espaço não aquecido. Usar isolamento com resistência à compressão ≥ 50 kPa.",
+      "enabled": true,
+      "tags": [
+        "piso radiante",
+        "isolamento",
+        "pavimento",
+        "aquecimento"
+      ]
+    },
+    {
+      "id": "REH-PARISO-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento na Caixa-de-Ar de Parede Dupla",
+      "description": "A espessura de isolamento na caixa-de-ar da parede dupla ({envelope.cavityWallInsulationThickness} mm) é insuficiente para cumprir o Umáx regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.cavityWallInsulationThickness",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "envelope.wallType",
+          "operator": "==",
+          "value": "cavity"
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento caixa-de-ar: {envelope.cavityWallInsulationThickness} mm",
+      "requiredValue": "≥ 60 mm (EPS, lã mineral) para I1; ≥ 80 mm para I2/I3",
+      "remediation": "Preencher totalmente a caixa-de-ar com isolamento térmico (EPS, lã mineral em painéis ou injecção de espuma). Evitar pontes térmicas nas ligações entre panos. Em reabilitação, considerar injecção de espuma de poliuretano ou grânulos de EPS.",
+      "enabled": true,
+      "tags": [
+        "parede dupla",
+        "caixa-de-ar",
+        "isolamento",
+        "envolvente exterior"
+      ]
+    },
+    {
+      "id": "REH-PARISO-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento ETICS em Parede Simples",
+      "description": "A espessura de isolamento ETICS ({envelope.eticsInsulationThickness} mm) é insuficiente para cumprir o Umáx da parede exterior na zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.eticsInsulationThickness",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "envelope.wallType",
+          "operator": "==",
+          "value": "etics"
+        }
+      ],
+      "currentValueTemplate": "Espessura ETICS: {envelope.eticsInsulationThickness} mm",
+      "requiredValue": "≥ 60 mm (EPS) para I1; ≥ 80 mm para I2; ≥ 100 mm para I3",
+      "remediation": "Aplicar sistema ETICS (External Thermal Insulation Composite System) com espessura de EPS adequada à zona climática. O ETICS elimina pontes térmicas planas e é a solução mais eficaz para isolamento pelo exterior. Usar EPS com λ ≤ 0.036 W/(m·K).",
+      "enabled": true,
+      "tags": [
+        "ETICS",
+        "parede simples",
+        "isolamento pelo exterior",
+        "envolvente exterior"
+      ]
+    },
+    {
+      "id": "REH-PARISO-03",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 — Barreira Pára-Vapor em Isolamento Interior de Paredes",
+      "description": "O isolamento térmico pelo interior da parede não possui barreira pára-vapor, com risco de condensações internas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.interiorWallInsulationVapourBarrier",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.wallType",
+          "operator": "==",
+          "value": "interior_insulation"
+        }
+      ],
+      "currentValueTemplate": "Sem barreira pára-vapor no isolamento interior de paredes",
+      "requiredValue": "Barreira pára-vapor (Sd ≥ 10 m) no lado quente do isolamento",
+      "remediation": "Instalar barreira pára-vapor (filme PE 200μm ou membrana com Sd ≥ 10 m) no lado interior (quente) do isolamento. Alternativa: usar isolamento com revestimento de alumínio incorporado. Selar todas as juntas e perfurações para garantir continuidade.",
+      "enabled": true,
+      "tags": [
+        "isolamento interior",
+        "barreira pára-vapor",
+        "condensação",
+        "paredes"
+      ]
+    },
+    {
+      "id": "REH-PARISO-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento de Paredes de Meação",
+      "description": "A parede de meação (entre frações ou edifícios adjacentes) não possui isolamento térmico adequado ({envelope.partyWallUValue} W/(m².K)).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.partyWallUValue",
+          "operator": ">",
+          "value": 0.8
+        }
+      ],
+      "currentValueTemplate": "U parede de meação: {envelope.partyWallUValue} W/(m².K)",
+      "requiredValue": "≤ 0.80 W/(m².K) para paredes de meação (todas as zonas climáticas)",
+      "remediation": "Isolar paredes de meação com contra-fachada com isolamento (lã mineral ≥ 40 mm + gesso cartonado) ou painéis isolantes colados. O isolamento acústico pode ser combinado com o isolamento térmico usando lã mineral de alta densidade.",
+      "enabled": true,
+      "tags": [
+        "parede de meação",
+        "isolamento",
+        "entre frações",
+        "valor-U"
+      ]
+    },
+    {
+      "id": "REH-PARISO-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Isolamento de Paredes Enterradas",
+      "description": "As paredes enterradas (cave/subsolo) não possuem isolamento térmico adequado ({envelope.basementWallInsulationThickness} mm).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.basementWallInsulationThickness",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "envelope.hasBasementWalls",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Espessura isolamento paredes enterradas: {envelope.basementWallInsulationThickness} mm",
+      "requiredValue": "≥ 50 mm (XPS ou espuma de vidro celular) com impermeabilização associada",
+      "remediation": "Aplicar isolamento pelo exterior das paredes enterradas com XPS (resistente à humidade e compressão do solo) ou espuma de vidro celular. Mínimo 50 mm, com membrana impermeabilizante e drenagem periférica. Pelo interior, usar XPS + gesso cartonado hidrófugo.",
+      "enabled": true,
+      "tags": [
+        "paredes enterradas",
+        "cave",
+        "isolamento",
+        "XPS",
+        "impermeabilização"
+      ]
+    },
+    {
+      "id": "REH-CAIXILH-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 Tabela I.01 — Vidro Duplo Mínimo",
+      "description": "Os vãos envidraçados não possuem vidro duplo, utilizando vidro simples com U excessivo ({envelope.glazingType}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.glazingType",
+          "operator": "==",
+          "value": "single"
+        }
+      ],
+      "currentValueTemplate": "Tipo de vidro: simples ({envelope.glazingType})",
+      "requiredValue": "Vidro duplo (mínimo 4-12-4 mm) ou superior em todas as zonas climáticas",
+      "remediation": "Substituir vidro simples por vidro duplo com caixa-de-ar ≥ 12 mm (U ≈ 2.8 W/(m².K)) ou vidro duplo com baixa emissividade (U ≈ 1.4-1.8 W/(m².K)). Em zonas I2/I3, considerar vidro triplo.",
+      "enabled": true,
+      "tags": [
+        "vidro duplo",
+        "envidraçados",
+        "caixilharia",
+        "valor-U"
+      ]
+    },
+    {
+      "id": "REH-CAIXILH-02",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 — Revestimento de Baixa Emissividade em Envidraçados",
+      "description": "Os vãos envidraçados não possuem revestimento de baixa emissividade (low-E), recomendado para edifícios NZEB.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.hasLowEGlazing",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "thermal.nzebRequired",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Envidraçados sem revestimento low-E",
+      "requiredValue": "Vidro com revestimento de baixa emissividade (ε ≤ 0.10) para edifícios NZEB",
+      "remediation": "Aplicar vidro com revestimento de baixa emissividade (low-E) na face 3 do vidro duplo. Reduz U do envidraçado de ~2.8 para ~1.4 W/(m².K). Optar por low-E seletivo em fachadas com elevada exposição solar para manter ganhos solares no inverno.",
+      "enabled": true,
+      "tags": [
+        "low-E",
+        "envidraçados",
+        "NZEB",
+        "emissividade"
+      ]
+    },
+    {
+      "id": "REH-CAIXILH-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Corte Térmico na Caixilharia",
+      "description": "A caixilharia em alumínio não possui corte térmico (RPT), resultando em U de caixilharia excessivo ({envelope.frameThermalBreak}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.frameThermalBreak",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.frameMaterial",
+          "operator": "==",
+          "value": "aluminium"
+        }
+      ],
+      "currentValueTemplate": "Caixilharia alumínio sem corte térmico (RPT)",
+      "requiredValue": "Caixilharia com rotura de ponte térmica (RPT ≥ 24 mm) ou PVC/madeira",
+      "remediation": "Substituir caixilharia de alumínio sem corte térmico (Uf ≈ 5.7 W/(m².K)) por caixilharia com RPT (Uf ≈ 2.8-3.8 W/(m².K)), PVC (Uf ≈ 1.4-2.2 W/(m².K)) ou madeira (Uf ≈ 1.8-2.5 W/(m².K)). A RPT mínima recomendada é de 24 mm.",
+      "enabled": true,
+      "tags": [
+        "caixilharia",
+        "corte térmico",
+        "RPT",
+        "alumínio",
+        "valor-U"
+      ]
+    },
+    {
+      "id": "REH-CAIXILH-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Valor U de Clarabóias",
+      "description": "O coeficiente de transmissão térmica das clarabóias ({envelope.skylightUValue} W/(m².K)) excede o valor máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.skylightUValue",
+          "operator": ">",
+          "value": 2.8
+        },
+        {
+          "field": "envelope.hasSkylights",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "U clarabóias: {envelope.skylightUValue} W/(m².K)",
+      "requiredValue": "≤ 2.80 W/(m².K) para I1; ≤ 2.40 para I2; ≤ 2.20 para I3",
+      "remediation": "Substituir clarabóias por modelos com vidro duplo de baixa emissividade e caixilho com corte térmico. Considerar clarabóias tubulares para iluminação sem perdas térmicas significativas. Em zonas I3, considerar vidro triplo.",
+      "enabled": true,
+      "tags": [
+        "clarabóias",
+        "valor-U",
+        "envidraçados",
+        "cobertura"
+      ]
+    },
+    {
+      "id": "REH-CAIXILH-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Desempenho Térmico de Fachada Cortina",
+      "description": "O sistema de fachada cortina não cumpre o valor U máximo regulamentar ({envelope.curtainWallUValue} W/(m².K)) para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.curtainWallUValue",
+          "operator": ">",
+          "value": 2.4
+        },
+        {
+          "field": "envelope.hasCurtainWall",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "U fachada cortina: {envelope.curtainWallUValue} W/(m².K)",
+      "requiredValue": "Ucw ≤ 2.40 W/(m².K) para envidraçados; painéis opacos devem cumprir Umáx de paredes",
+      "remediation": "Utilizar vidro duplo com baixa emissividade e caixa-de-ar com gás árgon nos módulos envidraçados. Os painéis opacos (spandrel) devem ter isolamento para cumprir Umáx de paredes. Garantir corte térmico nos perfis de alumínio da fachada cortina.",
+      "enabled": true,
+      "tags": [
+        "fachada cortina",
+        "valor-U",
+        "envidraçados",
+        "envolvente exterior"
+      ]
+    },
+    {
+      "id": "REH-INERCIA-01",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Classificação da Inércia Térmica",
+      "description": "A massa superficial útil por unidade de área de pavimento ({thermal.thermalMassPerArea} kg/m²) resulta numa classe de inércia térmica ({thermal.thermalMassClass}) que pode ser desfavorável para o desempenho energético.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.thermalMassPerArea",
+          "operator": "<",
+          "value": 150
+        }
+      ],
+      "currentValueTemplate": "It = {thermal.thermalMassPerArea} kg/m²; Classe: {thermal.thermalMassClass}",
+      "requiredValue": "It < 150 → Fraca; 150 ≤ It ≤ 400 → Média; It > 400 → Forte",
+      "remediation": "A inércia térmica influencia os parâmetros de aquecimento e arrefecimento. Para aumentar a inércia: usar paredes de alvenaria com reboco, lajes maciças de betão, pavimentos cerâmicos ou de pedra. Evitar revestimentos isolantes nas superfícies interiores.",
+      "enabled": true,
+      "tags": [
+        "inércia térmica",
+        "massa superficial",
+        "classificação",
+        "desempenho"
+      ]
+    },
+    {
+      "id": "REH-INERCIA-02",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Contribuição do Betão Exposto para Inércia Térmica",
+      "description": "As superfícies de betão aparente interiores ({thermal.exposedConcreteArea} m²) contribuem significativamente para a inércia térmica mas podem comprometer o conforto acústico.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.exposedConcreteArea",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "thermal.thermalMassClass",
+          "operator": "==",
+          "value": "forte"
+        }
+      ],
+      "currentValueTemplate": "Área betão exposto: {thermal.exposedConcreteArea} m²; Inércia: forte",
+      "requiredValue": "Massa superficial útil: Mi = 150 kg/m² para betão (espessura útil até 0.30 m)",
+      "remediation": "O betão exposto contribui com ~150 kg/m² de massa superficial útil para a inércia térmica (espessura útil limitada a 0.30 m ou metade da espessura total). Garantir que o conforto acústico é assegurado com soluções complementares.",
+      "enabled": true,
+      "tags": [
+        "betão exposto",
+        "inércia térmica",
+        "massa superficial",
+        "forte"
+      ]
+    },
+    {
+      "id": "REH-INERCIA-03",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Limitações de Construção Leve",
+      "description": "A construção leve (estrutura em aço leve ou madeira) resulta em inércia térmica fraca ({thermal.thermalMassClass}), com impacto negativo no sobreaquecimento estival.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.thermalMassClass",
+          "operator": "==",
+          "value": "fraca"
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": ["V2", "V3"]
+        }
+      ],
+      "currentValueTemplate": "Inércia: {thermal.thermalMassClass}; Zona verão: {location.climateZoneSummer}",
+      "requiredValue": "Inércia ≥ média recomendada em zonas V2/V3 para controlo de sobreaquecimento",
+      "remediation": "Em construção leve com zona de verão V2/V3, compensar a baixa inércia com: paredes interiores em alvenaria, laje de betão no pavimento térreo, revestimentos cerâmicos/pedra no pavimento, sistemas de sombreamento exterior eficazes. Considerar materiais de mudança de fase (PCM).",
+      "enabled": true,
+      "tags": [
+        "construção leve",
+        "inércia fraca",
+        "sobreaquecimento",
+        "verão"
+      ]
+    },
+    {
+      "id": "REH-INERCIA-04",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Posição da Massa Térmica Relativamente ao Isolamento",
+      "description": "O isolamento térmico pelo interior reduz a massa térmica útil disponível, impedindo a contribuição das paredes exteriores para a inércia térmica.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.wallType",
+          "operator": "==",
+          "value": "interior_insulation"
+        },
+        {
+          "field": "thermal.thermalMassClass",
+          "operator": "==",
+          "value": "fraca"
+        }
+      ],
+      "currentValueTemplate": "Isolamento pelo interior: massa térmica das paredes exteriores não contribui para inércia",
+      "requiredValue": "Massa térmica no lado interior do isolamento para máxima inércia",
+      "remediation": "O isolamento pelo exterior (ETICS) permite que a massa das paredes de alvenaria/betão contribua para a inércia térmica. Se o isolamento interior for necessário, maximizar a massa térmica com: lajes de betão expostas, paredes interiores pesadas, revestimentos cerâmicos/pedra.",
+      "enabled": true,
+      "tags": [
+        "inércia térmica",
+        "posição isolamento",
+        "massa térmica",
+        "ETICS"
+      ]
+    },
+    {
+      "id": "REH-INERCIA-05",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 — Materiais de Mudança de Fase (PCM) para Inércia Térmica",
+      "description": "Em construção leve, a ausência de materiais de mudança de fase (PCM) ou soluções equivalentes não permite compensar a baixa inércia térmica.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.thermalMassClass",
+          "operator": "==",
+          "value": "fraca"
+        },
+        {
+          "field": "thermal.hasPCM",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sem PCM em construção de inércia fraca",
+      "requiredValue": "PCM com temperatura de fusão 22-26°C recomendado para compensar baixa inércia",
+      "remediation": "Incorporar materiais de mudança de fase (PCM) em placas de gesso cartonado, tectos ou pavimentos para aumentar a capacidade de armazenamento térmico. Temperatura de fusão ideal: 22-26°C. Alternativa: soluções com betão leve com PCM micro-encapsulado.",
+      "enabled": true,
+      "tags": [
+        "PCM",
+        "mudança de fase",
+        "inércia térmica",
+        "construção leve"
+      ]
+    },
+    {
+      "id": "REH-SOBRAQ-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Artigo 11.º — Avaliação de Risco de Sobreaquecimento",
+      "description": "O factor de utilização dos ganhos solares na estação de arrefecimento é insuficiente, indicando risco de sobreaquecimento ({thermal.summerGainUtilizationFactor}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.overheatingRiskAssessed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Avaliação de risco de sobreaquecimento: não realizada",
+      "requiredValue": "Avaliação obrigatória do risco de sobreaquecimento conforme REH",
+      "remediation": "Realizar avaliação de sobreaquecimento conforme metodologia REH: calcular Nvc (necessidades de arrefecimento) e verificar se Nvc ≤ Nv. Implementar medidas passivas: sombreamento exterior, ventilação natural, inércia térmica, orientação dos envidraçados.",
+      "enabled": true,
+      "tags": [
+        "sobreaquecimento",
+        "ganhos solares",
+        "arrefecimento",
+        "verão"
+      ]
+    },
+    {
+      "id": "REH-SOBRAQ-02",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Ventilação Natural para Arrefecimento",
+      "description": "O edifício não dispõe de ventilação natural cruzada adequada para arrefecimento passivo na estação de verão.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.naturalCrossVentilation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": ["V2", "V3"]
+        }
+      ],
+      "currentValueTemplate": "Sem ventilação natural cruzada em zona {location.climateZoneSummer}",
+      "requiredValue": "Ventilação cruzada disponível em todas as zonas habitáveis para arrefecimento passivo",
+      "remediation": "Garantir ventilação natural cruzada com aberturas em fachadas opostas. Dimensionar aberturas para taxa de renovação ≥ 4 RPH no verão. Instalar janelas de correr ou basculantes para controlo do caudal. Em zonas V2/V3, a ventilação natural é essencial para reduzir Nvc.",
+      "enabled": true,
+      "tags": [
+        "ventilação natural",
+        "arrefecimento passivo",
+        "ventilação cruzada",
+        "verão"
+      ]
+    },
+    {
+      "id": "REH-SOBRAQ-03",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Estratégia de Arrefecimento Nocturno",
+      "description": "Não está prevista estratégia de arrefecimento nocturno (night cooling) para dissipar calor acumulado durante o dia.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.nightCoolingStrategy",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "thermal.thermalMassClass",
+          "operator": "in",
+          "value": ["media", "forte"]
+        }
+      ],
+      "currentValueTemplate": "Sem estratégia de arrefecimento nocturno",
+      "requiredValue": "Arrefecimento nocturno recomendado para edifícios com inércia média/forte em zonas V2/V3",
+      "remediation": "Implementar arrefecimento nocturno: aberturas automatizadas ou manuais para ventilação durante a noite (quando Text < Tint). Eficaz com inércia média ou forte. Garantir segurança contra intrusão com grelhas anti-vandalismo ou sistemas motorizados.",
+      "enabled": true,
+      "tags": [
+        "arrefecimento nocturno",
+        "ventilação",
+        "inércia térmica",
+        "passivo"
+      ]
+    },
+    {
+      "id": "REH-SOBRAQ-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Sombreamento Exterior Obrigatório",
+      "description": "Os vãos envidraçados orientados a Sul, Este ou Oeste não possuem dispositivos de sombreamento exterior ({envelope.externalShadingProvided}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.externalShadingProvided",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.windowOrientationRequiresSunControl",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem sombreamento exterior nos vãos envidraçados com exposição solar",
+      "requiredValue": "Sombreamento exterior obrigatório para envidraçados S/E/O com Aenv > 5% Ap",
+      "remediation": "Instalar dispositivos de sombreamento exterior: estores venezianos exteriores, portadas, palas horizontais (fachada Sul) ou verticais (fachadas E/O), brise-soleil. O factor solar com protecção (gT) deve cumprir os limites do Despacho 15793-K/2013.",
+      "enabled": true,
+      "tags": [
+        "sombreamento exterior",
+        "factor solar",
+        "envidraçados",
+        "sobreaquecimento"
+      ]
+    },
+    {
+      "id": "REH-SOBRAQ-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 — Vidro de Controlo Solar",
+      "description": "Os envidraçados com grande exposição solar não possuem vidro de controlo solar, resultando em ganhos solares excessivos ({envelope.solarControlGlass}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.solarControlGlass",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.windowSolarFactor",
+          "operator": ">",
+          "value": 0.5
+        }
+      ],
+      "currentValueTemplate": "Vidro sem controlo solar; g⊥ = {envelope.windowSolarFactor}",
+      "requiredValue": "Vidro de controlo solar (g⊥ ≤ 0.50) recomendado para fachadas com elevada exposição",
+      "remediation": "Utilizar vidro de controlo solar com factor solar g⊥ ≤ 0.50 nas fachadas com maior exposição solar (S/E/O). Optar por vidro selectivo que mantém boa transmissão luminosa (TL ≥ 70%) com baixo factor solar. Combinação com sombreamento exterior para desempenho óptimo.",
+      "enabled": true,
+      "tags": [
+        "controlo solar",
+        "vidro",
+        "factor solar",
+        "envidraçados"
+      ]
+    },
+    {
+      "id": "REH-AQS2-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Eficiência do Sistema de Preparação de AQS",
+      "description": "A eficiência do sistema de preparação de águas quentes sanitárias ({thermal.aqsSystemEfficiency}%) é inferior ao mínimo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.aqsSystemEfficiency",
+          "operator": "<",
+          "value": 0.82
+        }
+      ],
+      "currentValueTemplate": "Eficiência AQS: {thermal.aqsSystemEfficiency}",
+      "requiredValue": "η ≥ 0.82 para caldeiras; COP ≥ 2.8 para bombas de calor",
+      "remediation": "Substituir o sistema de preparação de AQS por equipamento de alta eficiência: caldeira de condensação (η ≥ 0.92), bomba de calor dedicada AQS (COP ≥ 2.8), ou sistema solar térmico com apoio eficiente. Para esquentadores, η ≥ 0.82.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "eficiência",
+        "caldeira",
+        "bomba de calor"
+      ]
+    },
+    {
+      "id": "REH-AQS2-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Perdas Térmicas do Depósito de AQS",
+      "description": "As perdas térmicas do depósito de acumulação de AQS ({thermal.aqsTankHeatLoss} W) excedem o limite para o volume instalado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.aqsTankHeatLossExcessive",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "thermal.hasAqsStorageTank",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Perdas depósito AQS: {thermal.aqsTankHeatLoss} W",
+      "requiredValue": "Perdas ≤ 1.6 + 0.8 × V^0.5 W (EN 15332) para depósitos de AQS",
+      "remediation": "Substituir ou reisolar o depósito de AQS: isolamento mínimo 50 mm de espuma rígida de PUR (λ ≤ 0.025 W/m·K). Verificar que a classe energética do depósito é ≥ B. Para volumes > 500 L, considerar depósitos com isolamento reforçado (≥ 80 mm).",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "depósito",
+        "perdas térmicas",
+        "isolamento"
+      ]
+    },
+    {
+      "id": "REH-AQS2-03",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Eficiência da Bomba Circuladora de AQS",
+      "description": "A bomba circuladora do circuito de AQS não é de alta eficiência ({thermal.aqsCirculationPumpEfficient}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.aqsCirculationPumpEfficient",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "thermal.hasAqsCirculationPump",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Bomba circuladora AQS não é de alta eficiência",
+      "requiredValue": "Bomba circuladora com EEI ≤ 0.23 (classe A ou superior)",
+      "remediation": "Substituir a bomba circuladora por modelo de alta eficiência (EEI ≤ 0.23, classe A). Instalar temporizador ou controlador para funcionamento apenas nos períodos de consumo. Considerar bomba com velocidade variável para adaptação ao caudal.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "bomba circuladora",
+        "eficiência",
+        "circulação"
+      ]
+    },
+    {
+      "id": "REH-AQS2-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Prevenção de Legionella no Sistema de AQS",
+      "description": "O sistema de AQS não garante a temperatura mínima de prevenção de Legionella no depósito ({thermal.aqsStorageTemperature}°C).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.aqsStorageTemperature",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "thermal.hasAqsStorageTank",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Temperatura depósito AQS: {thermal.aqsStorageTemperature}°C",
+      "requiredValue": "≥ 60°C no depósito para prevenção de Legionella (DL 306/2007)",
+      "remediation": "Garantir temperatura mínima de 60°C no depósito de AQS para prevenção de Legionella pneumophila. Programar ciclos de choque térmico (≥ 70°C) periódicos. Em sistemas com bomba de calor, prever resistência eléctrica de apoio para atingir 60°C.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "Legionella",
+        "temperatura",
+        "saúde pública"
+      ]
+    },
+    {
+      "id": "REH-AQS2-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Artigo 8.º — Integração de Solar Térmico para AQS",
+      "description": "O edifício novo não possui sistema solar térmico para preparação de AQS ou sistema alternativo equivalente ({thermal.solarThermalInstalled}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.solarThermalInstalled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "thermal.solarThermalAlternativeProvided",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sem sistema solar térmico ou alternativa para AQS",
+      "requiredValue": "Solar térmico obrigatório (1 m²/ocupante) ou sistema alternativo equivalente (Esolar ≥ Qa × 0.50)",
+      "remediation": "Instalar sistema solar térmico com área mínima de 1 m² de colector por ocupante convencional. Alternativas equivalentes: bomba de calor AQS com COP ≥ 2.8, caldeira de biomassa, sistema fotovoltaico dedicado a AQS com energia equivalente ao contributo solar mínimo.",
+      "enabled": true,
+      "tags": [
+        "solar térmico",
+        "AQS",
+        "obrigatório",
+        "energia renovável"
+      ]
+    },
+    {
+      "id": "REH-PONTES2-01",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Tratamento da Ligação Laje-Parede de Fachada",
+      "description": "A ligação entre a laje de piso e a parede de fachada não possui tratamento de ponte térmica adequado ({envelope.slabWallJunctionPsi} W/(m·K)).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.slabWallJunctionPsi",
+          "operator": ">",
+          "value": 0.5
+        }
+      ],
+      "currentValueTemplate": "ψ ligação laje-parede: {envelope.slabWallJunctionPsi} W/(m·K)",
+      "requiredValue": "ψ ≤ 0.50 W/(m·K) para ligação laje-parede tratada",
+      "remediation": "Tratar a ponte térmica na ligação laje-parede: prolongar o isolamento ETICS sobre o topo da laje, aplicar isolamento na face inferior da laje junto à fachada (≥ 1.0 m), ou usar corte térmico pré-fabricado na ligação. Com ETICS contínuo, ψ pode ser reduzido para < 0.10 W/(m·K).",
+      "enabled": true,
+      "tags": [
+        "ponte térmica",
+        "laje-parede",
+        "ligação",
+        "ψ",
+        "ETICS"
+      ]
+    },
+    {
+      "id": "REH-PONTES2-02",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Tratamento de Pilar em Fachada",
+      "description": "Os pilares inseridos na fachada não possuem isolamento térmico, constituindo pontes térmicas planas significativas ({envelope.facadePillarInsulated}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.facadePillarInsulated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.hasFacadePillars",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pilares em fachada sem isolamento térmico",
+      "requiredValue": "U na zona do pilar ≤ 2 × U da parede corrente (Despacho 15793-K/2013)",
+      "remediation": "Isolar os pilares pelo exterior com ETICS (mínimo mesma espessura que a parede corrente). Em parede dupla, envolver o pilar com isolamento na caixa-de-ar. O ETICS é a solução mais eficaz pois garante continuidade do isolamento. Verificar que U do pilar não excede 2 × U da parede corrente.",
+      "enabled": true,
+      "tags": [
+        "pilar",
+        "fachada",
+        "ponte térmica plana",
+        "isolamento",
+        "ETICS"
+      ]
+    },
+    {
+      "id": "REH-PONTES2-03",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Isolamento do Peitoril da Janela",
+      "description": "O peitoril da janela não possui isolamento térmico na ligação com a fachada, gerando ponte térmica linear na base do vão ({envelope.windowSillInsulated}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.windowSillInsulated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Peitoril da janela sem isolamento na ligação com fachada",
+      "requiredValue": "Isolamento contínuo sob o peitoril com sobreposição ao isolamento da parede ≥ 50 mm",
+      "remediation": "Aplicar isolamento térmico sob o peitoril da janela com sobreposição ao isolamento da parede (≥ 50 mm). Em ETICS, garantir que o isolamento envolve a soleira/peitoril sem interrupção. Usar perfis de peitoril com corte térmico para reduzir o ψ linear da ligação.",
+      "enabled": true,
+      "tags": [
+        "peitoril",
+        "janela",
+        "ponte térmica",
+        "isolamento",
+        "ligação"
+      ]
+    },
+    {
+      "id": "REH-PONTES2-04",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Ligação Cobertura-Parede de Fachada",
+      "description": "A ligação entre a cobertura e a parede de fachada apresenta ponte térmica não tratada ({envelope.roofWallJunctionPsi} W/(m·K)).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.roofWallJunctionPsi",
+          "operator": ">",
+          "value": 0.5
+        }
+      ],
+      "currentValueTemplate": "ψ ligação cobertura-parede: {envelope.roofWallJunctionPsi} W/(m·K)",
+      "requiredValue": "ψ ≤ 0.50 W/(m·K) para ligação cobertura-parede tratada",
+      "remediation": "Garantir continuidade do isolamento na ligação cobertura-parede: prolongar o isolamento da cobertura até se sobrepor ao isolamento da parede (mínimo 100 mm de sobreposição). Em ETICS, o isolamento da platibanda deve ser contínuo até à cobertura. ψ pode ser reduzido para < 0.15 W/(m·K) com tratamento adequado.",
+      "enabled": true,
+      "tags": [
+        "cobertura-parede",
+        "ponte térmica",
+        "ligação",
+        "ψ",
+        "platibanda"
+      ]
+    },
+    {
+      "id": "REH-PONTES2-05",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Isolamento Perimetral da Fundação",
+      "description": "A fundação não possui isolamento perimetral, gerando ponte térmica significativa na base da fachada ({envelope.foundationPerimeterInsulated}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.foundationPerimeterInsulated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sem isolamento perimetral na fundação",
+      "requiredValue": "Isolamento perimetral XPS ≥ 50 mm com profundidade ≥ 0.60 m abaixo do nível do solo",
+      "remediation": "Aplicar isolamento perimetral na fundação com XPS (resistente à humidade) com espessura ≥ 50 mm e profundidade ≥ 0.60 m abaixo do nível do solo. Proteger o isolamento com membrana drenante. Em zonas I3, considerar profundidade ≥ 1.0 m e espessura ≥ 80 mm.",
+      "enabled": true,
+      "tags": [
+        "fundação",
+        "isolamento perimetral",
+        "ponte térmica",
+        "XPS",
+        "base fachada"
+      ]
+    },
+    {
+      "id": "REH-CERTIF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Artigo 6.º — Verificação do Cálculo de Nic",
+      "description": "As necessidades nominais de energia útil para aquecimento (Nic = {thermal.nic} kWh/(m².ano)) excedem o valor limite (Ni = {thermal.ni} kWh/(m².ano)).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.nic",
+          "operator": "formula_gt",
+          "value": "thermal.ni"
+        }
+      ],
+      "currentValueTemplate": "Nic = {thermal.nic} kWh/(m².ano)",
+      "requiredValue": "Nic ≤ Ni = {thermal.ni} kWh/(m².ano)",
+      "remediation": "Reduzir as necessidades de aquecimento: reforçar isolamento da envolvente (paredes, cobertura, pavimentos), melhorar vãos envidraçados, tratar pontes térmicas, optimizar orientação e área de envidraçados para maximizar ganhos solares no inverno, garantir ventilação adequada sem perdas excessivas.",
+      "enabled": true,
+      "tags": [
+        "Nic",
+        "aquecimento",
+        "necessidades energéticas",
+        "verificação"
+      ]
+    },
+    {
+      "id": "REH-CERTIF-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Artigo 6.º — Verificação do Cálculo de Nvc",
+      "description": "As necessidades nominais de energia útil para arrefecimento (Nvc = {thermal.nvc} kWh/(m².ano)) excedem o valor limite (Nv = {thermal.nv} kWh/(m².ano)).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.nvc",
+          "operator": "formula_gt",
+          "value": "thermal.nv"
+        }
+      ],
+      "currentValueTemplate": "Nvc = {thermal.nvc} kWh/(m².ano)",
+      "requiredValue": "Nvc ≤ Nv = {thermal.nv} kWh/(m².ano)",
+      "remediation": "Reduzir as necessidades de arrefecimento: instalar sombreamento exterior nos vãos envidraçados (estores, palas, brise-soleil), usar vidro de controlo solar, aumentar inércia térmica, implementar ventilação natural cruzada e arrefecimento nocturno, reduzir cargas internas.",
+      "enabled": true,
+      "tags": [
+        "Nvc",
+        "arrefecimento",
+        "necessidades energéticas",
+        "verificação"
+      ]
+    },
+    {
+      "id": "REH-CERTIF-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Artigo 6.º — Verificação do Rácio Ntc/Nt",
+      "description": "O rácio entre as necessidades nominais globais de energia primária (Ntc) e o valor limite (Nt) excede 1.0, indicando incumprimento regulamentar ({thermal.ntcNtRatio}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.ntcNtRatio",
+          "operator": ">",
+          "value": 1.0
+        }
+      ],
+      "currentValueTemplate": "Ntc/Nt = {thermal.ntcNtRatio}",
+      "requiredValue": "Ntc/Nt ≤ 1.0 (condição de conformidade REH)",
+      "remediation": "Reduzir o rácio Ntc/Nt abaixo de 1.0: melhorar a envolvente térmica, usar sistemas de climatização de alta eficiência, integrar energias renováveis (solar térmico, fotovoltaico, bomba de calor). O rácio determina a classe energética: ≤ 0.25 → A+; ≤ 0.50 → A; ≤ 0.75 → B; ≤ 1.0 → B-.",
+      "enabled": true,
+      "tags": [
+        "Ntc/Nt",
+        "classe energética",
+        "verificação",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "REH-CERTIF-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Determinação da Classe Energética",
+      "description": "A classe energética do edifício ({thermal.energyClass}) é inferior a B-, o limite mínimo para edifícios novos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.ntcNtRatio",
+          "operator": ">",
+          "value": 1.0
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Classe energética: {thermal.energyClass} (Ntc/Nt = {thermal.ntcNtRatio})",
+      "requiredValue": "Classe ≥ B- (Ntc/Nt ≤ 1.0) para edifícios novos",
+      "remediation": "Para atingir classe B- (mínimo para edifícios novos): Ntc/Nt ≤ 1.0. Para classes superiores: B (≤ 0.75), A (≤ 0.50), A+ (≤ 0.25). Implementar medidas combinadas na envolvente, sistemas e renováveis para reduzir o rácio Ntc/Nt.",
+      "enabled": true,
+      "tags": [
+        "classe energética",
+        "certificação",
+        "edifício novo",
+        "Ntc/Nt"
+      ]
+    },
+    {
+      "id": "REH-CERTIF-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Documentação para Certificação Energética",
+      "description": "A documentação técnica necessária para a emissão do certificado energético está incompleta ({thermal.certificationDocumentationComplete}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.certificationDocumentationComplete",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Documentação para certificação: incompleta",
+      "requiredValue": "Documentação completa: peças desenhadas, fichas técnicas, declarações de desempenho (DoP), cálculo térmico detalhado",
+      "remediation": "Reunir documentação obrigatória para certificação: plantas e cortes com identificação da envolvente, fichas técnicas dos isolamentos e envidraçados, declarações de desempenho (DoP/CE), memória de cálculo térmico (Nic, Nvc, Nac, Ntc), fichas ITED, certificados de equipamentos AVAC e AQS.",
+      "enabled": true,
+      "tags": [
+        "certificação",
+        "documentação",
+        "perito qualificado",
+        "SCE"
+      ]
+    },
+    {
+      "id": "REH-MANUT-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Frequência de Inspecção do Isolamento Térmico",
+      "description": "A inspecção periódica ao estado do isolamento térmico da envolvente não está programada ou está em atraso ({maintenance.insulationInspectionOverdue}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "maintenance.insulationInspectionOverdue",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Inspecção do isolamento em atraso",
+      "requiredValue": "Inspecção visual do isolamento da envolvente a cada 5 anos (ETICS, cobertura, caixilharia)",
+      "remediation": "Programar inspecção periódica (a cada 5 anos) ao estado do isolamento: verificar fissuração e descolamento do ETICS, estado do isolamento da cobertura, vedação das caixilharias, integridade das juntas e remates. Registar observações e intervir preventivamente.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "inspecção",
+        "isolamento",
+        "ETICS",
+        "cobertura"
+      ]
+    },
+    {
+      "id": "REH-MANUT-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Substituição de Filtros AVAC",
+      "description": "Os filtros do sistema AVAC não foram substituídos dentro do intervalo recomendado ({maintenance.hvacFilterReplacementOverdue}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "maintenance.hvacFilterReplacementOverdue",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "thermal.hasHVACSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Substituição de filtros AVAC em atraso",
+      "requiredValue": "Substituição de filtros AVAC a cada 6 meses (ou conforme fabricante)",
+      "remediation": "Substituir os filtros do sistema AVAC a cada 6 meses ou conforme recomendação do fabricante. Filtros colmatados reduzem o caudal de ar, aumentam o consumo energético e degradam a qualidade do ar interior. Usar filtros com classe mínima ISO ePM1 50% (antigo F7).",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "AVAC",
+        "filtros",
+        "qualidade do ar"
+      ]
+    },
+    {
+      "id": "REH-MANUT-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Manutenção do Sistema Solar Térmico",
+      "description": "A manutenção periódica do sistema solar térmico não está em dia ({maintenance.solarThermalMaintenanceOverdue}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "maintenance.solarThermalMaintenanceOverdue",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "thermal.solarThermalInstalled",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Manutenção solar térmico em atraso",
+      "requiredValue": "Manutenção anual do sistema solar térmico (colectores, fluido, válvulas, depósito)",
+      "remediation": "Realizar manutenção anual do sistema solar térmico: verificar pressão do circuito primário, estado do fluido térmico (substituir a cada 3-5 anos), limpar colectores, verificar ânodo do depósito, testar válvulas de segurança e purgadores, verificar isolamento das tubagens.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "solar térmico",
+        "colectores",
+        "fluido térmico"
+      ]
+    },
+    {
+      "id": "REH-MANUT-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Limpeza do Sistema de Ventilação",
+      "description": "O sistema de ventilação mecânica não foi limpo/inspeccionado dentro do prazo recomendado ({maintenance.ventilationCleaningOverdue}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "maintenance.ventilationCleaningOverdue",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "thermal.hasMechanicalVentilation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Limpeza do sistema de ventilação em atraso",
+      "requiredValue": "Limpeza e inspecção das condutas de ventilação a cada 2 anos",
+      "remediation": "Limpar as condutas de ventilação e extraccão a cada 2 anos: aspirar depósitos de pó, verificar estanquidade das juntas, limpar grelhas de insuflação e extracção, verificar caudais em cada boca de ventilação com anemómetro. Registar os caudais medidos para comparação futura.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "ventilação",
+        "condutas",
+        "limpeza",
+        "qualidade do ar"
+      ]
+    },
+    {
+      "id": "REH-MANUT-05",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Monitorização de Pontes Térmicas",
+      "description": "Não existe monitorização do estado das zonas de ponte térmica para detecção precoce de patologias ({maintenance.thermalBridgeMonitoring}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "maintenance.thermalBridgeMonitoring",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sem monitorização de pontes térmicas",
+      "requiredValue": "Inspecção termográfica das pontes térmicas a cada 5 anos ou após patologias visíveis",
+      "remediation": "Realizar inspecção termográfica (câmara de infravermelhos) nas zonas de ponte térmica conhecidas a cada 5 anos: ligações laje-parede, pilares em fachada, contorno de vãos, platibandas. Detectar precocemente: condensações, bolores, destacamento de revestimentos. Registar imagens termográficas para histórico.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "pontes térmicas",
+        "termografia",
+        "monitorização",
+        "patologias"
+      ]
     }
   ]
 }

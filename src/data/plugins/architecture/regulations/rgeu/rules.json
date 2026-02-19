@@ -4,7 +4,7 @@
   "extractedBy": "claude-regulatory-expansion",
   "extractedAt": "2026-02-17",
   "version": "2.0",
-  "totalRules": 111,
+  "totalRules": 161,
   "coverage": {
     "regulations": [
       "DL 38 382/1951 (RGEU) — Arts. 46.º-72.º",
@@ -1694,6 +1694,802 @@
       "remediation": "Aumentar a área do compartimento de arrumos/despensa para o mínimo de 2.0 m² conforme Art. 66.º do RGEU.",
       "enabled": true,
       "tags": ["dimensionamento", "arrumos", "despensa", "área mínima", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ILUM-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Relação Mínima entre Área de Envidraçado e Área de Pavimento",
+      "description": "A relação entre a área de envidraçado e a área de pavimento do compartimento ({architecture.windowToFloorRatio}) é inferior ao mínimo regulamentar de 1/8 (0.125).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.windowToFloorRatio", "operator": "<", "value": 0.125 },
+        { "field": "architecture.roomType", "operator": "in", "value": ["sala", "quarto", "cozinha"] }
+      ],
+      "currentValueTemplate": "{architecture.windowToFloorRatio} (área envidraçado / área pavimento)",
+      "requiredValue": "≥ 0.125 (1/8 da área do pavimento)",
+      "remediation": "Aumentar a área de envidraçado do compartimento habitável para atingir, no mínimo, 1/8 da área do pavimento, conforme Art. 71.º do RGEU.",
+      "enabled": true,
+      "tags": ["iluminação", "envidraçado", "área", "vão", "RGEU"]
+    },
+    {
+      "id": "ARQ-ILUM-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Profundidade Máxima de Compartimento para Iluminação Natural",
+      "description": "A profundidade do compartimento ({architecture.roomDepth}m) excede 2.5 vezes o pé-direito, comprometendo a iluminação natural efetiva.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.roomDepth", "operator": ">", "value": 0 },
+        { "field": "architecture.ceilingHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.roomDepth", "operator": "formula_gt", "value": "architecture.ceilingHeight * 2.5" }
+      ],
+      "currentValueTemplate": "{architecture.roomDepth} m (profundidade) vs {architecture.ceilingHeight} m × 2.5 (limite)",
+      "requiredValue": "Profundidade ≤ 2.5 × pé-direito",
+      "remediation": "Reduzir a profundidade do compartimento ou aumentar o pé-direito para garantir que a iluminação natural alcance toda a extensão do espaço. Considerar segundos vãos ou clarabóias.",
+      "enabled": true,
+      "tags": ["iluminação", "profundidade", "pé-direito", "RGEU"]
+    },
+    {
+      "id": "ARQ-ILUM-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Iluminação Emprestada de Espaços Interiores",
+      "description": "O compartimento depende exclusivamente de iluminação emprestada (indireta) sem vão direto para o exterior, o que não é admissível para compartimentos habitáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasBorrowedLightOnly", "operator": "==", "value": true },
+        { "field": "architecture.roomType", "operator": "in", "value": ["sala", "quarto"] }
+      ],
+      "requiredValue": "Iluminação natural direta obrigatória para compartimentos habitáveis",
+      "remediation": "Dotar o compartimento habitável (sala ou quarto) de pelo menos um vão com iluminação natural direta para o exterior. A iluminação emprestada só é admissível em compartimentos de serviço (IS, despensa, corredor).",
+      "enabled": true,
+      "tags": ["iluminação", "emprestada", "indireta", "vão", "RGEU"]
+    },
+    {
+      "id": "ARQ-ILUM-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Contribuição de Clarabóias para Iluminação Zenital",
+      "description": "A área útil da clarabóia ({architecture.skylightArea}m²) é insuficiente para assegurar iluminação zenital adequada ao compartimento (mínimo 5% da área de pavimento).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasSkylight", "operator": "==", "value": true },
+        { "field": "architecture.skylightToFloorRatio", "operator": "<", "value": 0.05 }
+      ],
+      "currentValueTemplate": "{architecture.skylightToFloorRatio} (área clarabóia / área pavimento)",
+      "requiredValue": "≥ 0.05 (5% da área do pavimento)",
+      "remediation": "Aumentar a área útil de clarabóia para pelo menos 5% da área do pavimento do compartimento, ou complementar com vãos laterais para garantir iluminação natural adequada.",
+      "enabled": true,
+      "tags": ["iluminação", "clarabóia", "zenital", "RGEU"]
+    },
+    {
+      "id": "ARQ-ILUM-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 71.º — Dimensões Mínimas de Saguão/Poço de Luz",
+      "description": "A dimensão mínima do saguão/poço de luz ({architecture.lightWellMinDimension}m) é inferior ao mínimo regulamentar, comprometendo a iluminação e ventilação dos compartimentos servidos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasLightWell", "operator": "==", "value": true },
+        { "field": "architecture.lightWellMinDimension", "operator": "<", "value": 1.5 }
+      ],
+      "currentValueTemplate": "{architecture.lightWellMinDimension} m (dimensão mínima do saguão)",
+      "requiredValue": "≥ 1.5 m (dimensão mínima em planta)",
+      "remediation": "Redimensionar o saguão/poço de luz para que a sua menor dimensão em planta seja igual ou superior a 1.5 m, garantindo iluminação e ventilação adequadas aos compartimentos servidos.",
+      "enabled": true,
+      "tags": ["iluminação", "saguão", "poço de luz", "dimensão", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ACUST-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Massa Mínima de Parede de Meação (Isolamento Acústico)",
+      "description": "A massa superficial da parede de meação ({architecture.partyWallMass} kg/m²) é inferior ao mínimo de 250 kg/m² para garantir isolamento acústico adequado entre fogos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.partyWallMass", "operator": "<", "value": 250 },
+        { "field": "architecture.hasPartyWall", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.partyWallMass} kg/m²",
+      "requiredValue": "≥ 250 kg/m²",
+      "remediation": "Aumentar a massa superficial da parede de meação para pelo menos 250 kg/m², utilizando soluções construtivas de parede dupla com isolamento acústico ou parede simples reforçada.",
+      "enabled": true,
+      "tags": ["acústica", "parede", "meação", "isolamento", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACUST-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Tratamento de Sons de Impacto em Pavimentos",
+      "description": "O pavimento entre pisos não dispõe de tratamento acústico para sons de percussão/impacto, exigido entre fogos distintos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasImpactSoundTreatment", "operator": "==", "value": false },
+        { "field": "architecture.isMultiStory", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Tratamento acústico de sons de impacto obrigatório",
+      "remediation": "Aplicar sistema de isolamento a sons de impacto no pavimento (laje flutuante, membrana resiliente ou teto falso acústico) para cumprimento dos requisitos de conforto acústico entre fogos.",
+      "enabled": true,
+      "tags": ["acústica", "pavimento", "impacto", "percussão", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACUST-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Classe de Redução Sonora de Caixilharia de Fachada",
+      "description": "A classe de desempenho acústico da caixilharia de fachada ({architecture.facadeWindowAcousticClass}) é insuficiente para a zona de exposição ao ruído.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeWindowAcousticClass", "operator": "<", "value": 3 },
+        { "field": "architecture.noiseExposureZone", "operator": "in", "value": ["mista", "sensível"] }
+      ],
+      "currentValueTemplate": "Classe {architecture.facadeWindowAcousticClass}",
+      "requiredValue": "≥ Classe 3 para zonas mistas/sensíveis",
+      "remediation": "Especificar caixilharia de fachada com classe de desempenho acústico ≥ 3, adequada à zona de exposição ao ruído, com vidro duplo ou laminado acústico.",
+      "enabled": true,
+      "tags": ["acústica", "caixilharia", "fachada", "ruído", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACUST-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Isolamento Acústico de Courettes e Ductos Técnicos",
+      "description": "Os ductos técnicos/courettes ({architecture.serviceShaftAcousticRating} dB) não possuem isolamento acústico suficiente (mínimo Rw 40 dB) para evitar transmissão de ruído entre pisos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.serviceShaftAcousticRating", "operator": "<", "value": 40 },
+        { "field": "architecture.hasServiceShaft", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Rw {architecture.serviceShaftAcousticRating} dB",
+      "requiredValue": "≥ Rw 40 dB",
+      "remediation": "Revestir os ductos técnicos/courettes com material absorvente acústico e fechar as aberturas com tampas estanques ao som, garantindo Rw mínimo de 40 dB.",
+      "enabled": true,
+      "tags": ["acústica", "courette", "ducto", "isolamento", "RGEU"]
+    },
+    {
+      "id": "ARQ-ACUST-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Índice de Redução Sonora Mínimo de Portas Interiores",
+      "description": "O índice de redução sonora (Rw) das portas interiores entre zonas comuns e fogos ({architecture.internalDoorRw} dB) é inferior ao mínimo de 25 dB.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.internalDoorRw", "operator": "<", "value": 25 },
+        { "field": "architecture.doorSeparatesUnits", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Rw {architecture.internalDoorRw} dB",
+      "requiredValue": "≥ Rw 25 dB",
+      "remediation": "Substituir a porta interior por modelo com índice de redução sonora Rw ≥ 25 dB, incluindo vedação perimetral e soleira acústica.",
+      "enabled": true,
+      "tags": ["acústica", "porta", "Rw", "isolamento", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-SEGCONST-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 50.º — Distância Máxima de Evacuação a Saída de Emergência",
+      "description": "A distância do ponto mais desfavorável à saída de emergência ({architecture.maxEvacuationDistance}m) excede o máximo regulamentar de 30 m em impasse.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.maxEvacuationDistance", "operator": ">", "value": 30 },
+        { "field": "architecture.evacuationRouteType", "operator": "==", "value": "impasse" }
+      ],
+      "currentValueTemplate": "{architecture.maxEvacuationDistance} m",
+      "requiredValue": "≤ 30 m em impasse",
+      "remediation": "Reorganizar as circulações ou acrescentar uma saída de emergência alternativa para que a distância máxima de evacuação em impasse não exceda 30 m.",
+      "enabled": true,
+      "tags": ["segurança", "evacuação", "incêndio", "saída", "RGEU"]
+    },
+    {
+      "id": "ARQ-SEGCONST-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 50.º — Requisitos de Portas Corta-Fogo",
+      "description": "As portas de acesso a caixas de escadas e caminhos de evacuação não possuem classificação de resistência ao fogo adequada (mínimo EI 30).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasFireDoors", "operator": "==", "value": false },
+        { "field": "architecture.numberOfFloors", "operator": ">=", "value": 4 }
+      ],
+      "requiredValue": "Portas corta-fogo EI 30 obrigatórias",
+      "remediation": "Instalar portas corta-fogo com classificação mínima EI 30 em todos os acessos a caixas de escadas e vias de evacuação protegidas, conforme regulamento de segurança contra incêndio.",
+      "enabled": true,
+      "tags": ["segurança", "incêndio", "porta", "corta-fogo", "RGEU"]
+    },
+    {
+      "id": "ARQ-SEGCONST-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 50.º — Resistência ao Fogo de Elementos Estruturais",
+      "description": "O período de resistência ao fogo dos elementos estruturais ({architecture.structuralFireResistance} min) é inferior ao mínimo regulamentar para a utilização-tipo e altura do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.structuralFireResistance", "operator": "<", "value": 60 },
+        { "field": "architecture.numberOfFloors", "operator": ">=", "value": 4 }
+      ],
+      "currentValueTemplate": "R {architecture.structuralFireResistance} min",
+      "requiredValue": "≥ R 60 min (edifícios ≥ 4 pisos)",
+      "remediation": "Reforçar a proteção ao fogo dos elementos estruturais (pilares, vigas, lajes) para atingir o período mínimo de resistência ao fogo R 60 minutos, através de revestimentos intumescentes, projeção de argamassa ou encamisamento.",
+      "enabled": true,
+      "tags": ["segurança", "incêndio", "estrutura", "resistência", "RGEU"]
+    },
+    {
+      "id": "ARQ-SEGCONST-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 50.º — Utilização de Materiais Não Combustíveis em Vias de Evacuação",
+      "description": "Os revestimentos das vias de evacuação contêm materiais combustíveis de classe de reação ao fogo inadequada (classe superior a B-s2,d0).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.evacuationRouteMaterialClass", "operator": "not_in", "value": ["A1", "A2", "B-s1,d0", "B-s2,d0"] }
+      ],
+      "requiredValue": "Materiais classe ≤ B-s2,d0 em vias de evacuação",
+      "remediation": "Substituir os revestimentos das vias de evacuação por materiais com classe de reação ao fogo A1, A2 ou B-s2,d0, eliminando elementos combustíveis (madeira não tratada, plásticos, têxteis inflamáveis).",
+      "enabled": true,
+      "tags": ["segurança", "incêndio", "materiais", "combustível", "RGEU"]
+    },
+    {
+      "id": "ARQ-SEGCONST-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 50.º — Limite de Área de Compartimento Corta-Fogo",
+      "description": "A área do compartimento corta-fogo ({architecture.fireCompartmentArea}m²) excede o limite máximo regulamentar de 1600 m² para a utilização-tipo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.fireCompartmentArea", "operator": ">", "value": 1600 }
+      ],
+      "currentValueTemplate": "{architecture.fireCompartmentArea} m²",
+      "requiredValue": "≤ 1600 m² por compartimento corta-fogo",
+      "remediation": "Subdividir o espaço em compartimentos corta-fogo com área máxima de 1600 m², utilizando paredes e pavimentos com resistência ao fogo adequada (EI 60 ou EI 90).",
+      "enabled": true,
+      "tags": ["segurança", "incêndio", "compartimento", "área", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ESTAB-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 48.º — Profundidade Mínima de Fundações",
+      "description": "A profundidade das fundações ({architecture.foundationDepth}m) é inferior ao mínimo de 0.50 m abaixo do nível do terreno natural, comprometendo a estabilidade da edificação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.foundationDepth", "operator": "<", "value": 0.50 }
+      ],
+      "currentValueTemplate": "{architecture.foundationDepth} m",
+      "requiredValue": "≥ 0.50 m abaixo do terreno natural",
+      "remediation": "Aprofundar as fundações para, no mínimo, 0.50 m abaixo do nível do terreno natural, ou até ao estrato resistente adequado, conforme estudo geotécnico.",
+      "enabled": true,
+      "tags": ["estabilidade", "fundações", "profundidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAB-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 48.º — Projeto de Muros de Suporte/Contenção",
+      "description": "Os muros de suporte/contenção com altura superior a 2 m não dispõem de projeto de estabilidade específico.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.retainingWallHeight", "operator": ">", "value": 2.0 },
+        { "field": "architecture.hasRetainingWallDesign", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Altura do muro: {architecture.retainingWallHeight} m",
+      "requiredValue": "Projeto de estabilidade obrigatório para muros > 2 m",
+      "remediation": "Elaborar projeto de estabilidade específico para muros de suporte/contenção com altura superior a 2 m, subscrito por engenheiro civil, incluindo cálculo de impulsos de terras e verificação de segurança ao derrubamento e deslizamento.",
+      "enabled": true,
+      "tags": ["estabilidade", "muro", "contenção", "suporte", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAB-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 48.º — Espaçamento de Juntas Estruturais",
+      "description": "O espaçamento entre juntas de dilatação estrutural ({architecture.structuralJointSpacing}m) excede o máximo recomendado de 30 m para estruturas de betão armado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.structuralJointSpacing", "operator": ">", "value": 30 },
+        { "field": "architecture.structuralSystem", "operator": "==", "value": "betão armado" }
+      ],
+      "currentValueTemplate": "{architecture.structuralJointSpacing} m",
+      "requiredValue": "≤ 30 m entre juntas de dilatação",
+      "remediation": "Introduzir juntas de dilatação estrutural a intervalos não superiores a 30 m, ou justificar a sua dispensa com cálculo específico de efeitos térmicos e retração.",
+      "enabled": true,
+      "tags": ["estabilidade", "juntas", "dilatação", "betão", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAB-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 48.º — Limite de Flecha em Pavimentos",
+      "description": "A flecha máxima do pavimento ({architecture.floorDeflection}mm) excede o limite de L/400, onde L é o vão do elemento estrutural.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.floorDeflection", "operator": ">", "value": 0 },
+        { "field": "architecture.floorSpan", "operator": ">", "value": 0 },
+        { "field": "architecture.floorDeflection", "operator": "formula_gt", "value": "architecture.floorSpan * 1000 / 400" }
+      ],
+      "currentValueTemplate": "{architecture.floorDeflection} mm (limite: L/400 = {architecture.floorSpan}×1000/400 mm)",
+      "requiredValue": "≤ L/400 do vão",
+      "remediation": "Redimensionar o pavimento estrutural para limitar a flecha a L/400 do vão, aumentando a secção, a armadura ou recorrendo a pré-esforço.",
+      "enabled": true,
+      "tags": ["estabilidade", "flecha", "deformação", "pavimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-ESTAB-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 48.º — Requisitos de Manutenção Estrutural Periódica",
+      "description": "O edifício com mais de 30 anos não possui relatório de inspeção estrutural atualizado, exigido para garantir condições de estabilidade e segurança.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.buildingAge", "operator": ">", "value": 30 },
+        { "field": "architecture.hasStructuralInspectionReport", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Idade do edifício: {architecture.buildingAge} anos",
+      "requiredValue": "Relatório de inspeção estrutural obrigatório para edifícios > 30 anos",
+      "remediation": "Realizar inspeção estrutural por engenheiro civil qualificado, incluindo avaliação de fissuras, carbonatação, corrosão de armaduras e capacidade residual dos elementos estruturais.",
+      "enabled": true,
+      "tags": ["estabilidade", "manutenção", "inspeção", "estrutura", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-EFIC-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Percentagem Máxima de Área de Circulação",
+      "description": "A percentagem de área dedicada a circulações ({architecture.circulationAreaPercentage}%) excede o máximo recomendado de 20% da área bruta do piso.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.circulationAreaPercentage", "operator": ">", "value": 20 }
+      ],
+      "currentValueTemplate": "{architecture.circulationAreaPercentage}%",
+      "requiredValue": "≤ 20% da área bruta do piso",
+      "remediation": "Otimizar a distribuição interna do fogo, reduzindo corredores e halls desnecessários para que a área de circulação não ultrapasse 20% da área bruta do piso.",
+      "enabled": true,
+      "tags": ["eficiência", "circulação", "área", "RGEU"]
+    },
+    {
+      "id": "ARQ-EFIC-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Cálculo de Área Útil Habitável",
+      "description": "A área útil habitável declarada ({architecture.usableAreaDeclared}m²) não corresponde ao cálculo correto, devendo excluir paredes, varandas não encerradas e espaços com pé-direito inferior a 1.80 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.usableAreaDeclared", "operator": ">", "value": 0 },
+        { "field": "architecture.usableAreaCalculated", "operator": ">", "value": 0 },
+        { "field": "architecture.usableAreaDeclared", "operator": "!=", "value": null }
+      ],
+      "currentValueTemplate": "Declarada: {architecture.usableAreaDeclared} m² / Calculada: {architecture.usableAreaCalculated} m²",
+      "requiredValue": "Área útil conforme critérios do RGEU",
+      "remediation": "Recalcular a área útil habitável excluindo espessura de paredes, varandas não encerradas e zonas com pé-direito inferior a 1.80 m, conforme metodologia do RGEU.",
+      "enabled": true,
+      "tags": ["eficiência", "área útil", "cálculo", "RGEU"]
+    },
+    {
+      "id": "ARQ-EFIC-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Rácio de Eficiência do Fogo",
+      "description": "O rácio de eficiência do fogo (área útil / área bruta = {architecture.apartmentEfficiencyRatio}) é inferior ao mínimo recomendado de 0.75.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.apartmentEfficiencyRatio", "operator": "<", "value": 0.75 }
+      ],
+      "currentValueTemplate": "{architecture.apartmentEfficiencyRatio}",
+      "requiredValue": "≥ 0.75 (75%)",
+      "remediation": "Otimizar a planta do fogo para atingir um rácio de eficiência mínimo de 0.75, reduzindo áreas de circulação, paredes interiores e espaços mortos.",
+      "enabled": true,
+      "tags": ["eficiência", "rácio", "área útil", "área bruta", "RGEU"]
+    },
+    {
+      "id": "ARQ-EFIC-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Afetação de Áreas Comuns por Fogo",
+      "description": "A quota-parte de áreas comuns imputada ao fogo ({architecture.commonAreaPerUnit}m²) excede o máximo razoável de 15% da área bruta privativa.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.commonAreaPerUnit", "operator": ">", "value": 0 },
+        { "field": "architecture.grossPrivateArea", "operator": ">", "value": 0 },
+        { "field": "architecture.commonAreaPerUnit", "operator": "formula_gt", "value": "architecture.grossPrivateArea * 0.15" }
+      ],
+      "currentValueTemplate": "{architecture.commonAreaPerUnit} m² (limite: {architecture.grossPrivateArea} × 0.15 m²)",
+      "requiredValue": "≤ 15% da área bruta privativa",
+      "remediation": "Reestruturar as áreas comuns do edifício para que a quota-parte por fogo não exceda 15% da área bruta privativa, otimizando corredores, halls de entrada e espaços de circulação comum.",
+      "enabled": true,
+      "tags": ["eficiência", "áreas comuns", "afetação", "RGEU"]
+    },
+    {
+      "id": "ARQ-EFIC-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Rácio Área Bruta / Área Líquida do Edifício",
+      "description": "O rácio entre a área bruta de construção e a área líquida habitável ({architecture.grossToNetRatio}) excede o máximo recomendado de 1.35, indicando ineficiência construtiva.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.grossToNetRatio", "operator": ">", "value": 1.35 }
+      ],
+      "currentValueTemplate": "{architecture.grossToNetRatio}",
+      "requiredValue": "≤ 1.35",
+      "remediation": "Otimizar a relação entre área bruta e área líquida, reduzindo espessura de paredes desnecessária, áreas técnicas sobredimensionadas e circulações comuns excessivas.",
+      "enabled": true,
+      "tags": ["eficiência", "rácio", "bruta", "líquida", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-COMPAT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Altura do Edifício em Relação à Largura da Via",
+      "description": "A altura do edifício ({architecture.buildingHeight}m) excede a largura da via pública adjacente ({architecture.streetWidth}m), desrespeitando a proporção regulamentar máxima de 1:1.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.buildingHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.streetWidth", "operator": ">", "value": 0 },
+        { "field": "architecture.buildingHeight", "operator": "formula_gt", "value": "architecture.streetWidth * 1.0" }
+      ],
+      "currentValueTemplate": "Altura: {architecture.buildingHeight} m / Largura da via: {architecture.streetWidth} m",
+      "requiredValue": "Altura ≤ largura da via (proporção 1:1)",
+      "remediation": "Reduzir a altura do edifício ou recuar os pisos superiores para que a cércea não exceda a largura da via pública adjacente, conforme Art. 59.º do RGEU.",
+      "enabled": true,
+      "tags": ["compatibilidade", "altura", "via", "proporção", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMPAT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Alinhamento de Fachada com Edifícios Vizinhos",
+      "description": "O alinhamento da fachada não respeita o alinhamento dominante dos edifícios adjacentes, desrespeitando a continuidade urbana exigida pelo regulamento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.facadeAligned", "operator": "==", "value": false },
+        { "field": "architecture.isUrbanContext", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Alinhamento de fachada conforme envolvente",
+      "remediation": "Alinhar a fachada principal do edifício com o alinhamento dominante dos edifícios adjacentes, conforme regulamento municipal e Art. 59.º do RGEU.",
+      "enabled": true,
+      "tags": ["compatibilidade", "fachada", "alinhamento", "urbano", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMPAT-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Integração da Linha de Cobertura na Envolvente",
+      "description": "A cota da cumeeira ou platibanda ({architecture.rooflineHeight}m) apresenta um desvio superior a 1.5 m relativamente à linha de cobertura dominante da envolvente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.rooflineHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.neighborAvgRooflineHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.rooflineHeight", "operator": "formula_gt", "value": "architecture.neighborAvgRooflineHeight + 1.5" }
+      ],
+      "currentValueTemplate": "Cobertura: {architecture.rooflineHeight} m / Envolvente: {architecture.neighborAvgRooflineHeight} m",
+      "requiredValue": "Desvio ≤ 1.5 m da linha de cobertura dominante",
+      "remediation": "Ajustar a altura da cobertura para que a cumeeira ou platibanda não exceda em mais de 1.5 m a linha de cobertura dominante da envolvente edificada.",
+      "enabled": true,
+      "tags": ["compatibilidade", "cobertura", "cumeeira", "envolvente", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMPAT-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Compatibilidade de Materiais de Fachada com a Envolvente",
+      "description": "Os materiais de revestimento da fachada são incompatíveis com o carácter arquitetónico da envolvente urbana, desrespeitando a harmonia visual exigida.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.facadeMaterialCompatible", "operator": "==", "value": false },
+        { "field": "architecture.isHistoricArea", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Materiais compatíveis com envolvente urbana",
+      "remediation": "Selecionar materiais de revestimento de fachada compatíveis com o carácter arquitetónico da envolvente, nomeadamente em zonas históricas ou de interesse patrimonial. Consultar regulamento municipal e parecer da Câmara.",
+      "enabled": true,
+      "tags": ["compatibilidade", "materiais", "fachada", "histórico", "RGEU"]
+    },
+    {
+      "id": "ARQ-COMPAT-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Pé-Direito Mínimo do Rés-do-Chão Comercial",
+      "description": "O pé-direito do rés-do-chão com uso comercial ({architecture.groundFloorCommercialHeight}m) é inferior ao mínimo regulamentar de 3.50 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.groundFloorCommercialHeight", "operator": "<", "value": 3.50 },
+        { "field": "architecture.groundFloorUse", "operator": "==", "value": "comercial" }
+      ],
+      "currentValueTemplate": "{architecture.groundFloorCommercialHeight} m",
+      "requiredValue": "≥ 3.50 m (rés-do-chão comercial)",
+      "remediation": "Aumentar o pé-direito do rés-do-chão com uso comercial para o mínimo de 3.50 m, conforme exigências regulamentares para estabelecimentos comerciais.",
+      "enabled": true,
+      "tags": ["compatibilidade", "pé-direito", "comercial", "rés-do-chão", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-LOGIST-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Compartimento para Recolha de Resíduos Sólidos",
+      "description": "O edifício com mais de 4 fogos não dispõe de compartimento dedicado à recolha e armazenamento temporário de resíduos sólidos urbanos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasRefuseRoom", "operator": "==", "value": false },
+        { "field": "architecture.numberOfUnits", "operator": ">", "value": 4 }
+      ],
+      "requiredValue": "Compartimento de resíduos obrigatório (> 4 fogos)",
+      "remediation": "Prever compartimento ventilado e impermeabilizado para recolha de resíduos sólidos urbanos, com ponto de água e ralo sifonado, acessível a partir das zonas comuns e do exterior.",
+      "enabled": true,
+      "tags": ["logística", "resíduos", "lixo", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-LOGIST-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Parqueamento de Bicicletas",
+      "description": "O edifício residencial com mais de 8 fogos não dispõe de espaço dedicado ao estacionamento de bicicletas (mínimo 1 lugar por fogo).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasBicycleStorage", "operator": "==", "value": false },
+        { "field": "architecture.numberOfUnits", "operator": ">", "value": 8 }
+      ],
+      "requiredValue": "Espaço para bicicletas obrigatório (> 8 fogos)",
+      "remediation": "Prever espaço coberto e seguro para estacionamento de bicicletas, com capacidade mínima de 1 lugar por fogo, preferencialmente ao nível do rés-do-chão ou cave com acesso facilitado.",
+      "enabled": true,
+      "tags": ["logística", "bicicletas", "estacionamento", "mobilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-LOGIST-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Instalação de Recetáculos de Correio",
+      "description": "O edifício multifamiliar não dispõe de zona de recetáculos de correio (caixas de correio) acessível junto à entrada principal.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasMailRoom", "operator": "==", "value": false },
+        { "field": "architecture.numberOfUnits", "operator": ">", "value": 1 }
+      ],
+      "requiredValue": "Zona de caixas de correio obrigatória em edifícios multifamiliares",
+      "remediation": "Instalar recetáculos de correio normalizados (1 por fogo + 1 para administração do condomínio) em zona acessível junto à entrada principal do edifício.",
+      "enabled": true,
+      "tags": ["logística", "correio", "caixas", "entrada", "RGEU"]
+    },
+    {
+      "id": "ARQ-LOGIST-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Espaço de Portaria/Receção",
+      "description": "O edifício com mais de 20 fogos não prevê espaço dedicado a portaria ou receção na zona de entrada comum.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasConciergeArea", "operator": "==", "value": false },
+        { "field": "architecture.numberOfUnits", "operator": ">", "value": 20 }
+      ],
+      "requiredValue": "Espaço de portaria/receção recomendado (> 20 fogos)",
+      "remediation": "Considerar a inclusão de um espaço de portaria ou receção no átrio de entrada do edifício, com área mínima de 6 m², para controlo de acessos e gestão de correspondência e encomendas.",
+      "enabled": true,
+      "tags": ["logística", "portaria", "receção", "segurança", "RGEU"]
+    },
+    {
+      "id": "ARQ-LOGIST-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Acesso Técnico para Manutenção de Instalações",
+      "description": "As instalações técnicas do edifício (AVAC, eletricidade, telecomunicações, águas) não possuem acesso adequado para operações de manutenção.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasTechnicalMaintenanceAccess", "operator": "==", "value": false },
+        { "field": "architecture.numberOfFloors", "operator": ">=", "value": 3 }
+      ],
+      "requiredValue": "Acesso técnico a todas as instalações para manutenção",
+      "remediation": "Garantir acesso técnico adequado (portas de visita, alçapões, passagens) a todas as instalações do edifício, incluindo courettes, cobertura, compartimentos técnicos e redes enterradas.",
+      "enabled": true,
+      "tags": ["logística", "manutenção", "técnico", "acesso", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-EXTSPACE-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 73.º — Área Mínima de Logradouro Privado",
+      "description": "A área do logradouro/jardim privado afeto ao fogo do rés-do-chão ({architecture.privateGardenArea}m²) é inferior ao mínimo recomendado de 10 m².",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasPrivateGarden", "operator": "==", "value": true },
+        { "field": "architecture.privateGardenArea", "operator": "<", "value": 10 }
+      ],
+      "currentValueTemplate": "{architecture.privateGardenArea} m²",
+      "requiredValue": "≥ 10 m²",
+      "remediation": "Dimensionar o logradouro/jardim privado com área mínima de 10 m² para permitir utilização funcional e ajardinamento adequado.",
+      "enabled": true,
+      "tags": ["espaço exterior", "logradouro", "jardim", "privado", "RGEU"]
+    },
+    {
+      "id": "ARQ-EXTSPACE-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 73.º — Dimensões Mínimas de Pátio Interior Comum",
+      "description": "A menor dimensão do pátio interior comum ({architecture.courtyardMinDimension}m) é inferior ao mínimo de 3 m, comprometendo a ventilação e iluminação dos espaços servidos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasCommunalCourtyard", "operator": "==", "value": true },
+        { "field": "architecture.courtyardMinDimension", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "{architecture.courtyardMinDimension} m",
+      "requiredValue": "≥ 3.0 m (menor dimensão)",
+      "remediation": "Redimensionar o pátio interior comum para que a sua menor dimensão em planta seja igual ou superior a 3 m, garantindo ventilação cruzada e iluminação natural adequadas.",
+      "enabled": true,
+      "tags": ["espaço exterior", "pátio", "comum", "dimensão", "RGEU"]
+    },
+    {
+      "id": "ARQ-EXTSPACE-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 73.º — Largura Mínima de Circulação Exterior",
+      "description": "A largura do percurso de circulação exterior/pedonal ({architecture.outdoorCirculationWidth}m) é inferior ao mínimo de 1.20 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.outdoorCirculationWidth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "{architecture.outdoorCirculationWidth} m",
+      "requiredValue": "≥ 1.20 m",
+      "remediation": "Alargar o percurso de circulação exterior para a largura mínima de 1.20 m, permitindo a passagem confortável e a acessibilidade de pessoas com mobilidade reduzida.",
+      "enabled": true,
+      "tags": ["espaço exterior", "circulação", "percurso", "largura", "RGEU"]
+    },
+    {
+      "id": "ARQ-EXTSPACE-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 73.º — Requisitos de Ajardinamento e Permeabilidade do Logradouro",
+      "description": "O logradouro não cumpre o requisito mínimo de 50% de área permeável e ajardinada.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.gardenPermeablePercentage", "operator": "<", "value": 50 },
+        { "field": "architecture.hasRearYard", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{architecture.gardenPermeablePercentage}% permeável",
+      "requiredValue": "≥ 50% do logradouro permeável e ajardinado",
+      "remediation": "Aumentar a área permeável e ajardinada do logradouro para pelo menos 50%, utilizando terra vegetal, relvado, arbustos e árvores, e reduzindo pavimentos impermeáveis.",
+      "enabled": true,
+      "tags": ["espaço exterior", "ajardinamento", "permeabilidade", "logradouro", "RGEU"]
+    },
+    {
+      "id": "ARQ-EXTSPACE-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 73.º — Iluminação de Espaços Exteriores Comuns",
+      "description": "Os espaços exteriores comuns (acessos, estacionamento, jardins) não dispõem de iluminação artificial adequada para utilização noturna segura.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasOutdoorLighting", "operator": "==", "value": false },
+        { "field": "architecture.hasCommonExteriorAreas", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Iluminação exterior dos espaços comuns obrigatória",
+      "remediation": "Instalar iluminação artificial nos espaços exteriores comuns (caminhos pedonais, estacionamento, áreas ajardinadas), com nível mínimo de 20 lux nos percursos e 50 lux nas entradas.",
+      "enabled": true,
+      "tags": ["espaço exterior", "iluminação", "segurança", "noturna", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-TIPOL-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Área Mínima Bruta de Fogo T0",
+      "description": "A área bruta do fogo T0 ({architecture.t0GrossArea}m²) é inferior ao mínimo regulamentar de 35 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.typology", "operator": "==", "value": "T0" },
+        { "field": "architecture.t0GrossArea", "operator": "<", "value": 35 }
+      ],
+      "currentValueTemplate": "{architecture.t0GrossArea} m²",
+      "requiredValue": "≥ 35 m² (T0)",
+      "remediation": "Aumentar a área bruta do fogo T0 para o mínimo de 35 m², incluindo zona de estar/dormir, kitchenette e instalação sanitária conforme RGEU.",
+      "enabled": true,
+      "tags": ["tipologia", "T0", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-TIPOL-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Área Mínima Bruta de Fogo T1",
+      "description": "A área bruta do fogo T1 ({architecture.t1GrossArea}m²) é inferior ao mínimo regulamentar de 52 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.typology", "operator": "==", "value": "T1" },
+        { "field": "architecture.t1GrossArea", "operator": "<", "value": 52 }
+      ],
+      "currentValueTemplate": "{architecture.t1GrossArea} m²",
+      "requiredValue": "≥ 52 m² (T1)",
+      "remediation": "Aumentar a área bruta do fogo T1 para o mínimo de 52 m², assegurando sala, quarto, cozinha e instalação sanitária com dimensões regulamentares.",
+      "enabled": true,
+      "tags": ["tipologia", "T1", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-TIPOL-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Área Mínima Bruta de Fogo T2",
+      "description": "A área bruta do fogo T2 ({architecture.t2GrossArea}m²) é inferior ao mínimo regulamentar de 72 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.typology", "operator": "==", "value": "T2" },
+        { "field": "architecture.t2GrossArea", "operator": "<", "value": 72 }
+      ],
+      "currentValueTemplate": "{architecture.t2GrossArea} m²",
+      "requiredValue": "≥ 72 m² (T2)",
+      "remediation": "Aumentar a área bruta do fogo T2 para o mínimo de 72 m², assegurando sala, dois quartos, cozinha e instalação sanitária com dimensões regulamentares.",
+      "enabled": true,
+      "tags": ["tipologia", "T2", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-TIPOL-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Área Mínima Bruta de Fogo T3",
+      "description": "A área bruta do fogo T3 ({architecture.t3GrossArea}m²) é inferior ao mínimo regulamentar de 91 m².",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.typology", "operator": "==", "value": "T3" },
+        { "field": "architecture.t3GrossArea", "operator": "<", "value": 91 }
+      ],
+      "currentValueTemplate": "{architecture.t3GrossArea} m²",
+      "requiredValue": "≥ 91 m² (T3)",
+      "remediation": "Aumentar a área bruta do fogo T3 para o mínimo de 91 m², assegurando sala, três quartos, cozinha e pelo menos uma instalação sanitária com dimensões regulamentares.",
+      "enabled": true,
+      "tags": ["tipologia", "T3", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-TIPOL-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Requisitos Específicos para Fogos Duplex/Loft",
+      "description": "O fogo em duplex ou loft não cumpre os requisitos específicos: escada interior com largura mínima de 0.80 m e instalação sanitária em cada piso habitável.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.isDuplexOrLoft", "operator": "==", "value": true },
+        { "field": "architecture.duplexInternalStairWidth", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "Escada interior: {architecture.duplexInternalStairWidth} m",
+      "requiredValue": "Escada ≥ 0.80 m + IS em cada piso habitável",
+      "remediation": "Garantir que o fogo duplex/loft possui escada interior com largura mínima de 0.80 m, guarda-corpos regulamentares e, preferencialmente, instalação sanitária em cada piso habitável.",
+      "enabled": true,
+      "tags": ["tipologia", "duplex", "loft", "escada", "RGEU"]
+    },
+
+    {
+      "id": "ARQ-ADAPT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Instalação Sanitária Adaptável para Cadeira de Rodas",
+      "description": "A instalação sanitária principal do fogo não é adaptável para utilização por pessoa em cadeira de rodas (espaço de rotação mínimo de diâmetro 1.50 m).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.bathroomAdaptableForWheelchair", "operator": "==", "value": false },
+        { "field": "architecture.isNewConstruction", "operator": "==", "value": true }
+      ],
+      "requiredValue": "IS adaptável (rotação ø 1.50 m possível)",
+      "remediation": "Projetar a instalação sanitária principal de forma a permitir futura adaptação para cadeira de rodas: prever espaço para rotação de ø 1.50 m, paredes reforçadas para barras de apoio, e porta com abertura mínima de 0.80 m.",
+      "enabled": true,
+      "tags": ["adaptabilidade", "IS", "cadeira de rodas", "acessibilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-ADAPT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Cozinha com Layout Adaptável",
+      "description": "A cozinha do fogo não permite adaptação futura do layout para utilização por pessoa com mobilidade reduzida (circulação mínima de 1.10 m entre bancadas).",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.kitchenAdaptableLayout", "operator": "==", "value": false },
+        { "field": "architecture.isNewConstruction", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Cozinha adaptável (circulação ≥ 1.10 m entre bancadas)",
+      "remediation": "Projetar a cozinha com espaço de circulação mínimo de 1.10 m entre bancadas/equipamentos opostos, permitindo futura utilização por pessoa em cadeira de rodas, incluindo bancada com zona rebaixável.",
+      "enabled": true,
+      "tags": ["adaptabilidade", "cozinha", "mobilidade reduzida", "layout", "RGEU"]
+    },
+    {
+      "id": "ARQ-ADAPT-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Pré-instalação para Elevador Futuro",
+      "description": "O edifício com 3 ou 4 pisos não prevê reserva de espaço (caixa) para instalação futura de elevador, conforme exigido para adaptabilidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasFutureElevatorProvision", "operator": "==", "value": false },
+        { "field": "architecture.numberOfFloors", "operator": ">=", "value": 3 },
+        { "field": "architecture.numberOfFloors", "operator": "<=", "value": 4 },
+        { "field": "architecture.hasElevator", "operator": "==", "value": false }
+      ],
+      "requiredValue": "Reserva de caixa para elevador futuro",
+      "remediation": "Prever na caixa de escadas ou zona adjacente o espaço necessário para futura instalação de elevador (caixa mínima 1.60 m × 1.80 m), incluindo reserva estrutural para o fosso e casa das máquinas.",
+      "enabled": true,
+      "tags": ["adaptabilidade", "elevador", "reserva", "futuro", "RGEU"]
+    },
+    {
+      "id": "ARQ-ADAPT-04",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Paredes Divisórias Flexíveis/Removíveis",
+      "description": "As paredes divisórias interiores do fogo são estruturais, impedindo a futura reorganização do layout interno conforme princípios de adaptabilidade.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasFlexiblePartitions", "operator": "==", "value": false },
+        { "field": "architecture.isNewConstruction", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Paredes divisórias não estruturais (flexíveis)",
+      "remediation": "Projetar as paredes divisórias interiores do fogo como elementos não estruturais (gesso cartonado, blocos leves), permitindo futura reorganização do layout sem intervenção estrutural.",
+      "enabled": true,
+      "tags": ["adaptabilidade", "paredes", "divisórias", "flexibilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-ADAPT-05",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Varanda/Terraço Convertível para Utilização Acessível",
+      "description": "A varanda ou terraço do fogo apresenta desnível ({architecture.balconyThreshold}m) superior a 0.02 m em relação ao pavimento interior, impedindo acesso a pessoa com mobilidade reduzida.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.balconyThreshold", "operator": ">", "value": 0.02 },
+        { "field": "architecture.hasBalconyOrTerrace", "operator": "==", "value": true },
+        { "field": "architecture.isNewConstruction", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Desnível: {architecture.balconyThreshold} m",
+      "requiredValue": "≤ 0.02 m (desnível máximo varanda-interior)",
+      "remediation": "Reduzir o desnível entre o pavimento interior e a varanda/terraço para o máximo de 0.02 m, utilizando soleiras rebaixadas e sistemas de drenagem linear para evitar infiltrações.",
+      "enabled": true,
+      "tags": ["adaptabilidade", "varanda", "terraço", "acessibilidade", "desnível", "RGEU"]
     }
   ]
 }
