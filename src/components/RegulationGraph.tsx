@@ -11,6 +11,7 @@ import type {
 } from "@/lib/regulation-graph";
 import { BUILDING_TYPE_LABELS } from "@/lib/regulation-graph";
 import type { ForceGraphMethods, NodeObject } from "react-force-graph-3d";
+import GraphChatPanel from "./GraphChatPanel";
 
 // ============================================================
 // Types
@@ -410,6 +411,43 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   const linkWidth = useCallback((link: GraphLink) => link.type === "cross-specialty" ? 2 : 0.3, []);
   const handleZoomToFit = useCallback(() => { fgRef.current?.zoomToFit(600, 40); }, []);
 
+  // ── Chat panel: select rule by ID ──────────────────────────
+  const handleSelectRule = useCallback((ruleLabel: string) => {
+    if (!graphData) return;
+    const node = graphData.nodes.find(n => n.type === "rule" && n.label === ruleLabel);
+    if (!node) return;
+
+    // Expand parent regulation so rule is visible in 3D
+    if (node.regulationId) {
+      setExpandedRegulations(prev => {
+        const next = new Set(prev);
+        next.add(node.regulationId!);
+        return next;
+      });
+    }
+
+    // Navigate sidebar to the rule's context
+    setBrowsePath({
+      buildingType: null,
+      projectScope: null,
+      specialty: node.specialtyId,
+      subTopic: null,
+      regulationId: node.regulationId!,
+    });
+
+    setSelectedNode(node);
+
+    // Camera focus (node may not have coordinates until force settles)
+    const fgNode = node as unknown as FGNode;
+    if (fgRef.current && fgNode.x != null && fgNode.y != null && fgNode.z != null) {
+      fgRef.current.cameraPosition(
+        { x: fgNode.x, y: fgNode.y, z: fgNode.z! + 60 },
+        { x: fgNode.x, y: fgNode.y, z: fgNode.z! },
+        800,
+      );
+    }
+  }, [graphData]);
+
   // ── Initial zoom ──────────────────────────────────────────
   useEffect(() => {
     if (!fgRef.current || !visibleData.nodes.length) return;
@@ -801,6 +839,9 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             </div>
           </div>
         </div>
+
+        {/* Chat panel */}
+        <GraphChatPanel browsePath={browsePath} onSelectRule={handleSelectRule} />
 
         {/* Selected node detail panel */}
         {selectedNode && (

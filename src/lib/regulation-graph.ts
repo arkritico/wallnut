@@ -230,7 +230,7 @@ function camelToReadable(s: string): string {
 }
 
 /** Build a field→{label, unit, options} lookup from all field mappings */
-function buildFieldLookup(): Map<string, { label: string; unit?: string; options?: Map<string, string> }> {
+export function buildFieldLookup(): Map<string, { label: string; unit?: string; options?: Map<string, string> }> {
   const lookup = new Map<string, { label: string; unit?: string; options?: Map<string, string> }>();
   try {
     const mappings = getFieldMappings();
@@ -268,7 +268,7 @@ function formatValue(
 }
 
 /** Build a human-readable question from a condition */
-function buildConditionDisplay(
+export function buildConditionDisplay(
   cond: { field: string; operator: string; value: unknown; formula?: string },
   fieldLookup: Map<string, { label: string; unit?: string; options?: Map<string, string> }>,
 ): RuleConditionDisplay {
