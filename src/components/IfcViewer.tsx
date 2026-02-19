@@ -140,7 +140,11 @@ export default function IfcViewer({
         // 6. Init components (starts animation loop)
         components.init();
 
-        // 7. Setup IFC loader with WASM path
+        // 7. Init FragmentsManager (required before loading any IFC)
+        const fragmentsManager = components.get(FragmentsManager);
+        fragmentsManager.init("/wasm/fragments-worker.mjs");
+
+        // 8. Setup IFC loader with WASM path
         const ifcLoader = components.get(IfcLoader);
         await ifcLoader.setup({
           wasm: {
@@ -151,12 +155,11 @@ export default function IfcViewer({
         });
         ifcLoaderRef.current = ifcLoader;
 
-        // 8. Setup hider
+        // 9. Setup hider
         const hider = components.get(Hider);
         hiderRef.current = hider;
 
-        // 9. Setup click picking
-        const fragmentsManager = components.get(FragmentsManager);
+        // 10. Setup click picking
         renderer.three.domElement.addEventListener("pointerdown", async (e) => {
           if (e.button !== 0) return; // left click only
           const rect = container.getBoundingClientRect();
