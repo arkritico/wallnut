@@ -7,7 +7,7 @@ import {
   Home, Building2, Hammer, Layers, Tag,
 } from "lucide-react";
 import type {
-  RegulationGraphData, GraphNode, GraphLink,
+  RegulationGraphData, GraphNode, GraphLink, RuleConditionDisplay,
 } from "@/lib/regulation-graph";
 import { BUILDING_TYPE_LABELS } from "@/lib/regulation-graph";
 import type { ForceGraphMethods, NodeObject } from "react-force-graph-3d";
@@ -875,26 +875,19 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                     )}
                   </div>
 
-                  {/* Conditions — the actual rule logic */}
+                  {/* Conditions — the actual rule logic as readable questions */}
                   {selectedNode.conditions && selectedNode.conditions.length > 0 && (
                     <div className="mb-3">
                       <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-                        Condicoes ({selectedNode.conditions.length})
+                        Verifica ({selectedNode.conditions.length})
                       </p>
-                      <div className="bg-gray-800/60 rounded-lg p-2 flex flex-col gap-1.5">
-                        {selectedNode.conditions.map((cond, i) => (
-                          <div key={i} className="text-[11px] font-mono leading-snug">
-                            <span className="text-cyan-400">{cond.field}</span>
-                            {" "}
-                            <span className="text-yellow-400">{cond.operator}</span>
-                            {" "}
-                            <span className="text-green-400">
-                              {cond.formula
-                                ? cond.formula
-                                : typeof cond.value === "object"
-                                  ? JSON.stringify(cond.value)
-                                  : String(cond.value)}
-                            </span>
+                      <div className="bg-gray-800/60 rounded-lg p-2.5 flex flex-col gap-2">
+                        {(selectedNode.conditions as RuleConditionDisplay[]).map((cond, i) => (
+                          <div key={i} className="text-xs leading-relaxed">
+                            <p className="text-gray-200">{cond.question}</p>
+                            <p className="text-[10px] text-gray-600 font-mono mt-0.5">
+                              {cond.field} {cond.operator} {cond.formula || (typeof cond.value === "object" ? JSON.stringify(cond.value) : String(cond.value ?? ""))}
+                            </p>
                           </div>
                         ))}
                       </div>

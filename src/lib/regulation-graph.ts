@@ -6,6 +6,8 @@
  */
 
 import type { SpecialtyPlugin, DeclarativeRule } from "./plugins/types";
+import { getFieldMappings } from "./plugins/loader";
+import type { FieldMapping } from "./context-builder";
 
 // ============================================================
 // Types
@@ -35,9 +37,22 @@ export interface GraphNode {
   projectScope?: "new" | "rehab" | "all";
   subTopic?: string;              // derived from tags
   // Full rule data (for detail display)
-  conditions?: Array<{ field: string; operator: string; value: unknown; formula?: string }>;
+  conditions?: RuleConditionDisplay[];
   remediation?: string;
   requiredValue?: string;
+}
+
+export interface RuleConditionDisplay {
+  field: string;
+  operator: string;
+  value: unknown;
+  formula?: string;
+  /** Human-readable field label in Portuguese */
+  label: string;
+  /** Unit of measurement */
+  unit?: string;
+  /** Human-readable question/statement */
+  question: string;
 }
 
 export interface GraphLink {
@@ -145,6 +160,156 @@ const NAMESPACE_TO_PLUGIN: Record<string, string> = {
 };
 
 // ============================================================
+// Condition humanization
+// ============================================================
+
+/** Readable operator symbols */
+const OPERATOR_LABELS: Record<string, string> = {
+  ">": ">",
+  "<": "<",
+  ">=": "\u2265",
+  "<=": "\u2264",
+  "==": "=",
+  "!=": "\u2260",
+  gt: ">",
+  lt: "<",
+  gte: "\u2265",
+  lte: "\u2264",
+  in: "\u2208",
+  not_in: "\u2209",
+  between: "entre",
+  exists: "existe",
+  not_exists: "n\u00e3o existe",
+  lookup_gt: "> tabela",
+  lookup_lt: "< tabela",
+  lookup_gte: "\u2265 tabela",
+  lookup_lte: "\u2264 tabela",
+  ordinal_gt: "> (escala)",
+  ordinal_lt: "< (escala)",
+  ordinal_gte: "\u2265 (escala)",
+  ordinal_lte: "\u2264 (escala)",
+  formula_gt: "> f\u00f3rmula",
+  formula_lt: "< f\u00f3rmula",
+  formula_gte: "\u2265 f\u00f3rmula",
+  formula_lte: "\u2264 f\u00f3rmula",
+  computed_gt: "> calculado",
+  computed_lt: "< calculado",
+  computed_gte: "\u2265 calculado",
+  computed_lte: "\u2264 calculado",
+  not_in_range: "fora do intervalo",
+  reaction_class_lt: "< classe rea\u00e7\u00e3o",
+  reaction_class_lte: "\u2264 classe rea\u00e7\u00e3o",
+  reaction_class_gt: "> classe rea\u00e7\u00e3o",
+  reaction_class_gte: "\u2265 classe rea\u00e7\u00e3o",
+};
+
+/** Known enum value translations */
+const VALUE_LABELS: Record<string, string> = {
+  residential: "Habita\u00e7\u00e3o",
+  commercial: "Com\u00e9rcio/Servi\u00e7os",
+  mixed: "Misto",
+  industrial: "Industrial",
+  office: "Escrit\u00f3rios",
+  school: "Escolar",
+  hospital: "Hospitalar",
+  hotel: "Hotelaria",
+  single_phase: "Monof\u00e1sico",
+  three_phase: "Trif\u00e1sico",
+  true: "Sim",
+  false: "N\u00e3o",
+};
+
+/** Fallback: convert camelCase to readable Portuguese-ish label */
+function camelToReadable(s: string): string {
+  // Remove namespace prefix (e.g., "electrical." -> "")
+  const field = s.includes(".") ? s.split(".").pop()! : s;
+  return field
+    .replace(/([A-Z])/g, " $1")
+    .replace(/^./, c => c.toUpperCase())
+    .trim();
+}
+
+/** Build a field→{label, unit, options} lookup from all field mappings */
+function buildFieldLookup(): Map<string, { label: string; unit?: string; options?: Map<string, string> }> {
+  const lookup = new Map<string, { label: string; unit?: string; options?: Map<string, string> }>();
+  try {
+    const mappings = getFieldMappings();
+    for (const m of mappings) {
+      const optMap = m.options ? new Map(m.options.map(o => [o.value, o.label])) : undefined;
+      lookup.set(m.field, {
+        label: m.label,
+        unit: m.unit && m.unit !== "\u2014" ? m.unit : undefined,
+        options: optMap,
+      });
+    }
+  } catch {
+    // Gracefully continue if field mappings unavailable
+  }
+  return lookup;
+}
+
+/** Format a condition value to readable text */
+function formatValue(
+  value: unknown,
+  options?: Map<string, string>,
+): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "boolean") return value ? "Sim" : "N\u00e3o";
+  const str = String(value);
+  // Check options map first (select field translated labels)
+  if (options?.has(str)) return options.get(str)!;
+  // Check global value labels
+  if (VALUE_LABELS[str]) return VALUE_LABELS[str];
+  // Arrays
+  if (Array.isArray(value)) {
+    return value.map(v => formatValue(v, options)).join(", ");
+  }
+  return str;
+}
+
+/** Build a human-readable question from a condition */
+function buildConditionDisplay(
+  cond: { field: string; operator: string; value: unknown; formula?: string },
+  fieldLookup: Map<string, { label: string; unit?: string; options?: Map<string, string> }>,
+): RuleConditionDisplay {
+  const info = fieldLookup.get(cond.field);
+  const label = info?.label || camelToReadable(cond.field);
+  const unit = info?.unit;
+  const opLabel = OPERATOR_LABELS[cond.operator] || cond.operator;
+
+  let question: string;
+  const valueText = cond.formula
+    ? cond.formula
+    : formatValue(cond.value, info?.options);
+
+  if (cond.operator === "exists") {
+    question = `${label} est\u00e1 definido?`;
+  } else if (cond.operator === "not_exists") {
+    question = `${label} n\u00e3o est\u00e1 definido?`;
+  } else if (cond.operator === "==" && typeof cond.value === "boolean") {
+    question = cond.value ? `${label}?` : `N\u00e3o \u00e9 ${label.toLowerCase()}?`;
+  } else if (cond.operator === "==" || cond.operator === "equals") {
+    question = `${label} = ${valueText}${unit ? " " + unit : ""}?`;
+  } else if (cond.operator === "in" || cond.operator === "not_in") {
+    question = `${label} ${opLabel} [${valueText}]?`;
+  } else if (cond.operator.startsWith("lookup_")) {
+    question = `${label} ${opLabel}?`;
+  } else {
+    question = `${label} ${opLabel} ${valueText}${unit ? " " + unit : ""}?`;
+  }
+
+  return {
+    field: cond.field,
+    operator: cond.operator,
+    value: cond.value,
+    formula: cond.formula,
+    label,
+    unit,
+    question,
+  };
+}
+
+// ============================================================
 // Rule browsing metadata extraction
 // ============================================================
 
@@ -221,6 +386,7 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
   const links: GraphLink[] = [];
   const severityCounts = { critical: 0, warning: 0, info: 0, pass: 0 };
   const seenNodeIds = new Set<string>();
+  const fieldLookup = buildFieldLookup();
 
   // Build specialty → regulation → rule tree
   for (const plugin of plugins) {
@@ -300,12 +466,10 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
           applicableTypes: extractApplicableTypes(rule),
           projectScope: extractProjectScope(rule),
           subTopic: extractSubTopic(rule),
-          conditions: rule.conditions.map(c => ({
-            field: c.field,
-            operator: c.operator,
-            value: c.value,
-            ...(c.formula ? { formula: c.formula } : {}),
-          })),
+          conditions: rule.conditions.map(c => buildConditionDisplay(
+            { field: c.field, operator: c.operator, value: c.value, formula: c.formula },
+            fieldLookup,
+          )),
           remediation: rule.remediation,
           requiredValue: rule.requiredValue,
         });
@@ -355,13 +519,17 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
     }
   }
 
+  // Count actual graph nodes (not plugin.rules.length) since orphaned rules are excluded
+  const ruleNodeCount = nodes.filter(n => n.type === "rule").length;
+  const regNodeCount = nodes.filter(n => n.type === "regulation").length;
+
   return {
     nodes,
     links,
     stats: {
       totalSpecialties: plugins.length,
-      totalRegulations: plugins.reduce((sum, p) => sum + p.regulations.length, 0),
-      totalRules: plugins.reduce((sum, p) => sum + p.rules.length, 0),
+      totalRegulations: regNodeCount,
+      totalRules: ruleNodeCount,
       severityCounts,
       crossSpecialtyLinks: crossPairs.size,
       buildingTypes: [...buildingTypesSet].sort(),
