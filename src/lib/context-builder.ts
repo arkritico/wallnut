@@ -18,6 +18,7 @@ import type { IfcExtractedData } from "./ifc-parser";
 import { ifcToProjectFields } from "./ifc-parser";
 import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
 import { specialtyAnalysisToProjectFields } from "./ifc-enrichment";
+import { resolveLocationParams } from "./municipality-lookup";
 
 // ----------------------------------------------------------
 // Types
@@ -70,6 +71,8 @@ export interface ContextBuildReport {
   fromDefaults: string[];
   /** Fields still missing (rules will be skipped) */
   stillMissing: string[];
+  /** Fields auto-derived from municipality lookup */
+  fromLocation: string[];
   /** Alias resolutions applied */
   aliasesApplied: string[];
   /** Total fields expected vs populated */
@@ -1029,6 +1032,7 @@ export function buildProjectContext(
     fromIfc: [],
     fromForm: [],
     fromDefaults: [],
+    fromLocation: [],
     stillMissing: [],
     aliasesApplied: [],
     coverage: { total: 0, populated: 0, percentage: 0 },
@@ -1077,6 +1081,37 @@ export function buildProjectContext(
     const afterDecl = countDefinedFields(enriched, fieldMappings);
     if (afterDecl > beforeDecl) {
       report.fromIfc.push(`(${afterDecl - beforeDecl} declarative IFC fields)`);
+    }
+  }
+
+  // Step 2d: Municipality auto-derivation
+  // If municipality is set, derive seismic zones, climate zones, soil type, etc.
+  const municipalityName = getFieldValue(enriched, "location.municipality") as string | undefined;
+  if (municipalityName) {
+    const altitude = getFieldValue(enriched, "location.altitude") as number | undefined;
+    const resolved = resolveLocationParams(municipalityName, altitude ?? undefined);
+    if (resolved) {
+      const locationFields: [string, unknown][] = [
+        ["location.district", resolved.district],
+        ["location.climateZoneWinter", resolved.climateZoneWinter],
+        ["location.climateZoneSummer", resolved.climateZoneSummer],
+        ["location.heatingDegreeDays", resolved.heatingDegreeDays],
+        ["location.heatingSeasonMonths", resolved.heatingSeasonMonths],
+        ["location.summerExternalTemp", resolved.summerExternalTemp],
+        ["location.solarRadiationSouth", resolved.solarRadiationSouth],
+        ["location.latitude", resolved.lat],
+        ["location.longitude", resolved.lon],
+        ["structural.seismicZone", resolved.seismicZoneType1],
+        ["structural.seismicZoneType2", resolved.seismicZoneType2],
+        ["structural.soilType", resolved.soilType],
+      ];
+      for (const [field, value] of locationFields) {
+        const existing = getFieldValue(enriched, field);
+        if (existing === undefined || existing === null) {
+          setFieldValue(enriched, field, value);
+          report.fromLocation.push(field);
+        }
+      }
     }
   }
 

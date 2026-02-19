@@ -5,6 +5,7 @@ import type { BuildingProject, BuildingType } from "@/lib/types";
 import { DEFAULT_PROJECT } from "@/lib/defaults";
 import { PROJECT_TEMPLATES, type ProjectTemplate } from "@/lib/templates";
 import { PORTUGAL_DISTRICTS, CLIMATE_DATA } from "@/lib/regulations";
+import { getAllMunicipalities, resolveLocationParams } from "@/lib/municipality-lookup";
 import { extractTextFromFile, parseDocumentWithAI, mergeExtractedData, type ParsedProjectData } from "@/lib/document-parser";
 import { analyzeIfcSpecialty, type SpecialtyAnalysisResult } from "@/lib/ifc-specialty-analyzer";
 import { mergeIfcFieldsIntoProject, type IfcEnrichmentReport } from "@/lib/ifc-enrichment";
@@ -24,7 +25,9 @@ import {
   Loader2,
   Box,
   Upload,
+  Info,
 } from "lucide-react";
+import TemplatePreviewModal from "./TemplatePreviewModal";
 
 interface ProjectWizardProps {
   onComplete: (project: BuildingProject) => void;
@@ -57,6 +60,9 @@ export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: 
   const [ifcReport, setIfcReport] = useState<IfcEnrichmentReport | null>(null);
   const [ifcFileNames, setIfcFileNames] = useState<string[]>([]);
   const ifcInputRef = useRef<HTMLInputElement>(null);
+
+  // Template preview + regional
+  const [previewTemplate, setPreviewTemplate] = useState<ProjectTemplate | null>(null);
 
   const stepIndex = STEPS.indexOf(step);
 
@@ -196,11 +202,41 @@ export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: 
   function updateLocation(field: string, value: string | number) {
     setProject(prev => {
       const newLocation = { ...prev.location, [field]: value };
-      if (field === "district" && typeof value === "string" && CLIMATE_DATA[value]) {
+      const newStructural = { ...prev.structural };
+
+      if (field === "municipality" && typeof value === "string") {
+        // Auto-derive all location parameters from municipality
+        const altitude = newLocation.altitude ?? 0;
+        const resolved = resolveLocationParams(value, altitude);
+        if (resolved) {
+          newLocation.district = resolved.district;
+          newLocation.climateZoneWinter = resolved.climateZoneWinter;
+          newLocation.climateZoneSummer = resolved.climateZoneSummer;
+          newLocation.altitude = newLocation.altitude || resolved.altitude;
+          newLocation.latitude = resolved.lat;
+          newLocation.longitude = resolved.lon;
+          newStructural.seismicZone = resolved.seismicZoneType1 as typeof newStructural.seismicZone;
+          newStructural.soilType = resolved.soilType as typeof newStructural.soilType;
+          return { ...prev, location: newLocation, structural: newStructural };
+        }
+      } else if (field === "altitude" && typeof value === "number") {
+        // Recompute climate zones when altitude changes
+        const municipality = newLocation.municipality;
+        if (municipality) {
+          const resolved = resolveLocationParams(municipality, value);
+          if (resolved) {
+            newLocation.climateZoneWinter = resolved.climateZoneWinter;
+            newLocation.climateZoneSummer = resolved.climateZoneSummer;
+            return { ...prev, location: newLocation };
+          }
+        }
+      } else if (field === "district" && typeof value === "string" && CLIMATE_DATA[value]) {
+        // Fallback: district-based climate for municipalities not in the database
         const climate = CLIMATE_DATA[value];
         newLocation.climateZoneWinter = climate.winter;
         newLocation.climateZoneSummer = climate.summer;
       }
+
       return { ...prev, location: newLocation };
     });
   }
@@ -402,32 +438,50 @@ export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: 
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {PROJECT_TEMPLATES.map(tmpl => (
-              <button
-                key={tmpl.id}
-                onClick={() => selectTemplate(tmpl)}
-                className={`p-5 bg-white border-2 rounded-xl hover:border-accent transition-colors text-left ${
-                  selectedTemplate === tmpl.id ? "border-accent bg-accent-light" : "border-gray-200"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{tmpl.icon}</span>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">
-                      {t[tmpl.nameKey as keyof typeof t] || tmpl.project.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {t[tmpl.descriptionKey as keyof typeof t] || ""}
-                    </p>
-                    <div className="flex gap-3 mt-2 text-xs text-gray-400">
-                      <span>{tmpl.project.grossFloorArea}m²</span>
-                      <span>{tmpl.project.numberOfFloors} {lang === "pt" ? "pisos" : "floors"}</span>
-                      <span>{tmpl.project.numberOfDwellings || 1} {lang === "pt" ? "fogos" : "dwellings"}</span>
+              <div key={tmpl.id} className="relative">
+                <button
+                  onClick={() => selectTemplate(tmpl)}
+                  className={`w-full p-5 bg-white border-2 rounded-xl hover:border-accent transition-colors text-left ${
+                    selectedTemplate === tmpl.id ? "border-accent bg-accent-light" : "border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">{tmpl.icon}</span>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">
+                        {t[tmpl.nameKey as keyof typeof t] || tmpl.project.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {t[tmpl.descriptionKey as keyof typeof t] || ""}
+                      </p>
+                      <div className="flex gap-3 mt-2 text-xs text-gray-400">
+                        <span>{tmpl.project.grossFloorArea}m²</span>
+                        <span>{tmpl.project.numberOfFloors} {lang === "pt" ? "pisos" : "floors"}</span>
+                        {tmpl.project.numberOfDwellings ? (
+                          <span>{tmpl.project.numberOfDwellings} {lang === "pt" ? "fogos" : "dwellings"}</span>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
+                </button>
+                <button
+                  onClick={() => setPreviewTemplate(tmpl)}
+                  className="absolute top-2 right-2 p-1.5 rounded-full bg-white shadow-sm border border-gray-200 hover:bg-gray-50 transition-colors"
+                  title={lang === "pt" ? "Ver detalhes" : "View details"}
+                >
+                  <Info className="w-3.5 h-3.5 text-gray-400" />
+                </button>
+              </div>
             ))}
           </div>
+
+          {previewTemplate && (
+            <TemplatePreviewModal
+              template={previewTemplate}
+              onClose={() => setPreviewTemplate(null)}
+              onSelect={() => selectTemplate(previewTemplate)}
+            />
+          )}
 
           <div className="flex justify-between mt-6">
             <button onClick={goBack} className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
@@ -710,31 +764,55 @@ export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: 
             {lang === "pt" ? "Localização" : "Location"}
           </h2>
 
+          {/* Municipality selector — primary input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {lang === "pt" ? "Município" : "Municipality"}
+            </label>
+            <select
+              value={project.location.municipality}
+              onChange={e => updateLocation("municipality", e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent focus:border-accent"
+            >
+              <option value="">{lang === "pt" ? "Selecionar município..." : "Select municipality..."}</option>
+              {getAllMunicipalities().map(m => (
+                <option key={m} value={m}>{m}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-400 mt-1">
+              {lang === "pt"
+                ? "Preenche automaticamente distrito, zona climática, zona sísmica e tipo de solo."
+                : "Auto-fills district, climate zone, seismic zone, and soil type."}
+            </p>
+          </div>
+
+          {/* Auto-derived parameters summary */}
+          {project.location.municipality && resolveLocationParams(project.location.municipality) && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs">
+              <p className="font-medium text-blue-800 mb-1">
+                {lang === "pt" ? "Parâmetros derivados automaticamente:" : "Auto-derived parameters:"}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-blue-700">
+                <span>{lang === "pt" ? "Distrito" : "District"}: <strong>{project.location.district}</strong></span>
+                <span>{lang === "pt" ? "Inverno" : "Winter"}: <strong>{project.location.climateZoneWinter}</strong></span>
+                <span>{lang === "pt" ? "Verão" : "Summer"}: <strong>{project.location.climateZoneSummer}</strong></span>
+                <span>{lang === "pt" ? "Sísmica" : "Seismic"}: <strong>{(project.structural as Record<string, unknown>)?.seismicZone as string ?? "—"}</strong></span>
+              </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">{t.district}</label>
               <select
                 value={project.location.district}
-                onChange={e => {
-                  updateLocation("district", e.target.value);
-                  updateLocation("municipality", e.target.value);
-                }}
+                onChange={e => updateLocation("district", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent focus:border-accent"
               >
                 {PORTUGAL_DISTRICTS.map(d => (
                   <option key={d} value={d}>{d}</option>
                 ))}
               </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t.municipality}</label>
-              <input
-                type="text"
-                value={project.location.municipality}
-                onChange={e => updateLocation("municipality", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-accent focus:border-accent"
-              />
             </div>
 
             <div>
@@ -748,7 +826,12 @@ export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: 
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">{t.altitude}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t.altitude}
+                <span className="ml-1 text-xs text-gray-400 font-normal">
+                  {lang === "pt" ? "(afeta zonas climáticas)" : "(affects climate zones)"}
+                </span>
+              </label>
               <input
                 type="number"
                 value={project.location.altitude}
