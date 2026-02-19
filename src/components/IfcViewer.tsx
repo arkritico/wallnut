@@ -117,15 +117,15 @@ export default function IfcViewer({
         });
         world.scene = scene;
 
-        // 4. Setup camera
-        const camera = new SimpleCamera(components);
-        world.camera = camera;
-
-        // 5. Setup renderer (preserveDrawingBuffer for screenshot export)
+        // 4. Setup renderer first (camera needs the DOM element for controls)
         const renderer = new SimpleRenderer(components, container, {
           preserveDrawingBuffer: true,
         });
         world.renderer = renderer;
+
+        // 5. Setup camera (after renderer, so controls can bind to DOM)
+        const camera = new SimpleCamera(components);
+        world.camera = camera;
 
         // 6. Init components (starts animation loop)
         components.init();
