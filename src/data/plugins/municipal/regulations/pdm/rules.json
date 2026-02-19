@@ -551,6 +551,484 @@
       "remediation": "O edifício deve incluir infraestruturas de telecomunicações em edifícios (ITED) conforme o DL 123/2009. Incluir projeto ITED elaborado por projetista habilitado pela ANACOM.",
       "enabled": true,
       "tags": ["infraestruturas", "telecomunicações", "ITED", "PDM"]
+    },
+
+    {
+      "id": "PDM-TMU-01",
+      "regulationId": "pdm-generic",
+      "article": "RGTAL (Lei 53-E/2006) / Regulamento Municipal de Taxas — Taxa Municipal de Urbanização",
+      "description": "A taxa municipal de urbanização (TMU) deve ser liquidada e paga antes da emissão do alvará de construção. O não pagamento impede a emissão do alvará e o início legal das obras.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.tmuPaid", "operator": "==", "value": false },
+        { "field": "municipal.alvaraRequired", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "TMU paga: {municipal.tmuPaid}",
+      "requiredValue": "TMU liquidada e paga antes da emissão do alvará (tmuPaid = true)",
+      "remediation": "Proceder ao pagamento da taxa municipal de urbanização (TMU) junto dos serviços de tesouraria da câmara municipal. O valor é calculado com base na área de construção, localização e uso, conforme a tabela de taxas municipal em vigor. Sem pagamento, o alvará não será emitido.",
+      "enabled": true,
+      "tags": ["TMU", "taxas", "alvará", "RGTAL", "urbanização"]
+    },
+    {
+      "id": "PDM-TMU-02",
+      "regulationId": "pdm-generic",
+      "article": "RJIGT (DL 80/2015), Art. 176.º — Compensações Urbanísticas",
+      "description": "Nas operações de loteamento, quando o loteador não cede as áreas necessárias para infraestruturas, equipamentos e espaços verdes de utilização coletiva, deve pagar compensações urbanísticas ao município, em numerário ou espécie.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.urbanCompensationRequired", "operator": "==", "value": true },
+        { "field": "municipal.urbanCompensationPaid", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Compensação urbanística paga: {municipal.urbanCompensationPaid}",
+      "requiredValue": "Compensação urbanística liquidada quando não há cedências suficientes",
+      "remediation": "Calcular a compensação urbanística devida, com base na diferença entre as áreas de cedência exigidas e as efetivamente cedidas, conforme o regulamento municipal de taxas e compensações. Submeter o pagamento ou proposta de compensação em espécie à câmara municipal.",
+      "enabled": true,
+      "tags": ["compensações", "cedências", "loteamento", "infraestruturas", "RJIGT"]
+    },
+    {
+      "id": "PDM-TMU-03",
+      "regulationId": "pdm-generic",
+      "article": "RJUE (DL 555/99), Art. 54.º — Caução de Obras de Urbanização",
+      "description": "O titular do alvará de loteamento deve prestar caução para garantia da boa execução das obras de urbanização. A caução pode ser prestada mediante garantia bancária, seguro-caução ou depósito em dinheiro.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.urbanizationBondRequired", "operator": "==", "value": true },
+        { "field": "municipal.urbanizationBondPosted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Caução prestada: {municipal.urbanizationBondPosted}",
+      "requiredValue": "Caução de obras de urbanização obrigatoriamente prestada antes do alvará",
+      "remediation": "Prestar caução junto da câmara municipal para garantia da execução das obras de urbanização previstas no alvará de loteamento. O valor da caução corresponde ao custo estimado das obras de urbanização. Pode ser prestada por garantia bancária, seguro-caução ou depósito em numerário.",
+      "enabled": true,
+      "tags": ["caução", "obras-urbanização", "alvará", "loteamento", "garantia"]
+    },
+    {
+      "id": "PDM-TMU-04",
+      "regulationId": "pdm-generic",
+      "article": "Regulamento Municipal de Taxas — Taxa de Ocupação do Subsolo",
+      "description": "A ocupação do subsolo do domínio público municipal (garagens subterrâneas sob via pública, infraestruturas enterradas, etc.) está sujeita ao pagamento de taxa de ocupação do subsolo, conforme regulamento municipal de taxas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.undergroundPublicOccupation", "operator": "==", "value": true },
+        { "field": "municipal.undergroundOccupationFeePaid", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ocupação do subsolo público: {municipal.undergroundPublicOccupation} | Taxa paga: {municipal.undergroundOccupationFeePaid}",
+      "requiredValue": "Taxa de ocupação do subsolo paga quando há ocupação de domínio público subterrâneo",
+      "remediation": "Se o projeto prevê ocupação do subsolo do domínio público (ex.: garagem sob via pública, galerias técnicas), requerer autorização à câmara municipal e proceder ao pagamento da taxa de ocupação do subsolo conforme a tabela de taxas municipal.",
+      "enabled": true,
+      "tags": ["subsolo", "taxa-ocupação", "domínio-público", "garagens", "taxas"]
+    },
+    {
+      "id": "PDM-TMU-05",
+      "regulationId": "pdm-generic",
+      "article": "Regulamento Municipal de Taxas — Taxas de Ligação às Redes de Infraestruturas",
+      "description": "A ligação do edifício às redes públicas de abastecimento de água, saneamento e eletricidade está sujeita ao pagamento de taxas de ligação (ramais) às respetivas entidades gestoras, conforme regulamento municipal e tarifários das entidades concessionárias.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.networkConnectionFeesRequired", "operator": "==", "value": true },
+        { "field": "municipal.networkConnectionFeesPaid", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Taxas de ligação às redes pagas: {municipal.networkConnectionFeesPaid}",
+      "requiredValue": "Taxas de ligação às redes de água, saneamento e eletricidade pagas",
+      "remediation": "Solicitar orçamento às entidades gestoras das redes de abastecimento de água (ex.: EPAL, Águas de Portugal), saneamento e eletricidade (E-Redes) para a execução dos ramais de ligação. Proceder ao pagamento das taxas antes da ligação efetiva às redes.",
+      "enabled": true,
+      "tags": ["ligação-redes", "ramais", "água", "saneamento", "eletricidade", "taxas"]
+    },
+
+    {
+      "id": "PDM-UOP-01",
+      "regulationId": "pdm-generic",
+      "article": "RJIGT (DL 80/2015), Art. 148.º — Unidade de Execução",
+      "description": "Em áreas sujeitas a unidade de execução (UE) no PDM, a operação urbanística deve ser integrada na UE definida, respeitando a programação e os objetivos de desenvolvimento coordenado do território.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInExecutionUnit", "operator": "==", "value": true },
+        { "field": "municipal.executionUnitCompliance", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Em unidade de execução: {municipal.isInExecutionUnit} | Conforme com UE: {municipal.executionUnitCompliance}",
+      "requiredValue": "Operação urbanística conforme com a unidade de execução definida no PDM",
+      "remediation": "O terreno encontra-se integrado numa unidade de execução (UE). A operação urbanística deve ser programada e executada no âmbito da UE, em articulação com os restantes proprietários e a câmara municipal. Consultar os serviços de urbanismo para verificar o estado de execução da UE.",
+      "enabled": true,
+      "tags": ["unidade-execução", "UE", "programação", "RJIGT", "execução-plano"]
+    },
+    {
+      "id": "PDM-UOP-02",
+      "regulationId": "pdm-generic",
+      "article": "RJIGT (DL 80/2015), Art. 100.º — Plano de Pormenor Obrigatório",
+      "description": "Em áreas identificadas no PDM como sujeitas a plano de pormenor (PP), a operação urbanística só pode ser licenciada após a aprovação e entrada em vigor do PP, salvo exceções previstas na lei.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.requiresDetailedPlan", "operator": "==", "value": true },
+        { "field": "municipal.detailedPlanApproved", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Plano de pormenor exigido: {municipal.requiresDetailedPlan} | Aprovado: {municipal.detailedPlanApproved}",
+      "requiredValue": "Plano de pormenor aprovado e em vigor antes do licenciamento",
+      "remediation": "A área está sujeita a plano de pormenor (PP) obrigatório que ainda não foi aprovado. Aguardar a aprovação do PP ou verificar junto da câmara municipal se existe alguma exceção aplicável (art. 100.º, n.º 3 do RJIGT). Em alternativa, promover a elaboração do PP em parceria com o município.",
+      "enabled": true,
+      "tags": ["plano-pormenor", "PP", "RJIGT", "ordenamento", "licenciamento"]
+    },
+    {
+      "id": "PDM-UOP-03",
+      "regulationId": "pdm-generic",
+      "article": "RJUE (DL 555/99), Art. 43.º e 44.º — Cedências para o Domínio Público",
+      "description": "As operações de loteamento e impacte relevante devem prever a cedência gratuita ao município de áreas destinadas a arruamentos, estacionamento público, espaços verdes e equipamentos de utilização coletiva, nos termos dos parâmetros definidos no PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.publicDomainCessionsRequired", "operator": "==", "value": true },
+        { "field": "municipal.publicDomainCessionsArea", "operator": "exists", "value": null },
+        { "field": "municipal.publicDomainCessionsAreaMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Cedências previstas: {municipal.publicDomainCessionsArea} m²",
+      "requiredValue": "Cedências ao domínio público ≥ {municipal.publicDomainCessionsAreaMin} m² (arruamentos, espaços verdes, equipamentos)",
+      "remediation": "Rever o projeto de loteamento para garantir que as áreas de cedência ao domínio público (arruamentos, espaços verdes de utilização coletiva e equipamentos) respeitam os parâmetros de dimensionamento definidos na Portaria 216-B/2008 e no regulamento municipal. Em caso de impossibilidade de cedência, propor compensação urbanística em numerário.",
+      "enabled": true,
+      "tags": ["cedências", "domínio-público", "arruamentos", "espaços-verdes", "equipamentos"]
+    },
+    {
+      "id": "PDM-UOP-04",
+      "regulationId": "pdm-generic",
+      "article": "RJIGT (DL 80/2015), Art. 164.º — Reparcelamento do Solo Urbano",
+      "description": "Em operações de reparcelamento, a nova configuração dos lotes deve respeitar os parâmetros urbanísticos do PDM e garantir que todos os lotes resultantes têm acesso à via pública e às infraestruturas urbanas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isReparcelamento", "operator": "==", "value": true },
+        { "field": "municipal.reparcelamentoApproved", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Operação de reparcelamento: {municipal.isReparcelamento} | Aprovado: {municipal.reparcelamentoApproved}",
+      "requiredValue": "Reparcelamento aprovado pela câmara municipal com cumprimento dos parâmetros do PDM",
+      "remediation": "Submeter a operação de reparcelamento à câmara municipal, assegurando que todos os lotes resultantes cumprem a área mínima, frente mínima e demais parâmetros do PDM. Garantir que todos os lotes têm acesso direto a via pública e possibilidade de ligação às redes de infraestruturas.",
+      "enabled": true,
+      "tags": ["reparcelamento", "RJIGT", "lotes", "parcelamento", "operação-urbanística"]
+    },
+    {
+      "id": "PDM-UOP-05",
+      "regulationId": "pdm-generic",
+      "article": "RJUE (DL 555/99), Art. 2.º, al. i) e Art. 4.º, n.º 2 — Operações de Loteamento",
+      "description": "As operações de loteamento estão sujeitas a licenciamento municipal e devem cumprir os parâmetros de dimensionamento definidos no PDM, incluindo infraestruturas viárias, espaços verdes, equipamentos e estacionamento público.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isLoteamento", "operator": "==", "value": true },
+        { "field": "municipal.loteamentoLicensed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Operação de loteamento: {municipal.isLoteamento} | Licenciado: {municipal.loteamentoLicensed}",
+      "requiredValue": "Loteamento licenciado pela câmara municipal com alvará emitido",
+      "remediation": "Submeter pedido de licenciamento da operação de loteamento à câmara municipal, incluindo os projetos de infraestruturas viárias, abastecimento de água, saneamento, eletricidade, telecomunicações e arranjos exteriores. Garantir o cumprimento dos parâmetros de dimensionamento da Portaria 216-B/2008 e do regulamento municipal.",
+      "enabled": true,
+      "tags": ["loteamento", "licenciamento", "alvará", "infraestruturas", "operação-urbanística"]
+    },
+
+    {
+      "id": "PDM-ESTDIM-01",
+      "regulationId": "pdm-generic",
+      "article": "Portaria 216-B/2008 / Regulamento Municipal — Dimensão Mínima de Lugar de Estacionamento Normal",
+      "description": "Cada lugar de estacionamento normal deve ter dimensões mínimas de 2,30 m de largura por 4,50 m de comprimento, conforme os parâmetros de dimensionamento da Portaria 216-B/2008 e regulamento municipal aplicável.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.parkingSpaceWidth", "operator": "<", "value": 2.3 }
+      ],
+      "currentValueTemplate": "{municipal.parkingSpaceWidth} m × {municipal.parkingSpaceLength} m",
+      "requiredValue": "Lugar de estacionamento normal ≥ 2,30 m × 4,50 m",
+      "remediation": "Redimensionar os lugares de estacionamento normal para garantir as dimensões mínimas de 2,30 m de largura × 4,50 m de comprimento. Em parques cobertos, considerar largura de 2,50 m junto a pilares ou paredes.",
+      "enabled": true,
+      "tags": ["estacionamento", "dimensões", "lugar-normal", "Portaria-216-B"]
+    },
+    {
+      "id": "PDM-ESTDIM-02",
+      "regulationId": "pdm-generic",
+      "article": "DL 163/2006 / Portaria 216-B/2008 — Dimensão de Lugar de Estacionamento PMR",
+      "description": "Cada lugar de estacionamento reservado a pessoas com mobilidade reduzida (PMR) deve ter dimensões mínimas de 2,50 m de largura por 5,00 m de comprimento, com uma faixa lateral de acesso livre com pelo menos 1,00 m de largura.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.accessibleParkingSpaceWidth", "operator": "<", "value": 3.5 }
+      ],
+      "currentValueTemplate": "Largura total (lugar + faixa lateral): {municipal.accessibleParkingSpaceWidth} m",
+      "requiredValue": "Lugar PMR ≥ 2,50 m + faixa lateral ≥ 1,00 m (total ≥ 3,50 m) × 5,00 m de comprimento",
+      "remediation": "Redimensionar os lugares de estacionamento PMR para garantir 2,50 m de largura do lugar + 1,00 m de faixa lateral de acesso (total 3,50 m) e 5,00 m de comprimento. A faixa lateral pode ser partilhada entre dois lugares PMR adjacentes. Garantir sinalização horizontal e vertical adequada.",
+      "enabled": true,
+      "tags": ["estacionamento", "PMR", "acessibilidade", "DL-163-2006", "dimensões"]
+    },
+    {
+      "id": "PDM-ESTDIM-03",
+      "regulationId": "pdm-generic",
+      "article": "Portaria 216-B/2008 / Regulamento Municipal — Largura de Faixa de Circulação em Garagens",
+      "description": "A faixa de circulação em garagens deve ter largura mínima de 5,00 m em sentido duplo ou 3,00 m em sentido único, de modo a permitir a circulação segura e o acesso aos lugares de estacionamento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.garageAisleWidth", "operator": "<", "value": 3.0 }
+      ],
+      "currentValueTemplate": "Largura da faixa de circulação: {municipal.garageAisleWidth} m",
+      "requiredValue": "Faixa de circulação ≥ 5,00 m (dois sentidos) ou ≥ 3,00 m (sentido único)",
+      "remediation": "Redimensionar as faixas de circulação da garagem para garantir a largura mínima regulamentar: 5,00 m para circulação em dois sentidos ou 3,00 m para sentido único. Em rampas de acesso, considerar sobrelargueiras para veículos maiores.",
+      "enabled": true,
+      "tags": ["estacionamento", "garagem", "circulação", "largura-faixa", "Portaria-216-B"]
+    },
+    {
+      "id": "PDM-ESTDIM-04",
+      "regulationId": "pdm-generic",
+      "article": "RGEU / Regulamento Municipal — Pé-Direito Mínimo de Garagem",
+      "description": "O pé-direito livre mínimo em garagens de estacionamento deve ser de 2,20 m, medido entre o pavimento acabado e a face inferior da estrutura ou instalações técnicas suspensas mais baixas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.garageClearHeight", "operator": "<", "value": 2.2 }
+      ],
+      "currentValueTemplate": "Pé-direito livre da garagem: {municipal.garageClearHeight} m",
+      "requiredValue": "Pé-direito livre de garagem ≥ 2,20 m",
+      "remediation": "Aumentar o pé-direito livre da garagem para garantir o mínimo de 2,20 m. Verificar que o pé-direito indicado é medido entre o pavimento acabado e a face inferior de quaisquer elementos estruturais, condutas ou instalações técnicas suspensas.",
+      "enabled": true,
+      "tags": ["estacionamento", "garagem", "pé-direito", "altura-livre", "RGEU"]
+    },
+    {
+      "id": "PDM-ESTDIM-05",
+      "regulationId": "pdm-generic",
+      "article": "RGEU / SCIE (DL 220/2008) / Regulamento Municipal — Ventilação de Garagens Subterrâneas",
+      "description": "As garagens subterrâneas devem dispor de sistema de ventilação adequado (natural ou mecânica) para garantir a renovação do ar e a extração de gases poluentes, cumprindo os caudais mínimos regulamentares.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasUndergroundGarage", "operator": "==", "value": true },
+        { "field": "municipal.garageVentilationSystem", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Garagem subterrânea: {municipal.hasUndergroundGarage} | Sistema de ventilação: {municipal.garageVentilationSystem}",
+      "requiredValue": "Sistema de ventilação obrigatório em garagens subterrâneas",
+      "remediation": "Projetar sistema de ventilação para a garagem subterrânea, dimensionado para os caudais mínimos de renovação de ar (tipicamente 300 m³/h por lugar de estacionamento ou conforme o RSECE/RECS). O sistema pode ser natural (aberturas para o exterior com área ≥ 2,5% da área da garagem por piso) ou mecânico (ventiladores de insuflação e extração). Incluir deteção de CO.",
+      "enabled": true,
+      "tags": ["garagem", "ventilação", "subterrânea", "SCIE", "qualidade-ar"]
+    },
+
+    {
+      "id": "PDM-SUST-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / SCE (DL 118/2013) — Eficiência Energética a Nível Municipal",
+      "description": "Alguns PDM e regulamentos municipais exigem que os novos edifícios atinjam uma classe energética mínima (classe A ou B), para além dos requisitos mínimos do Sistema de Certificação Energética (SCE) nacional.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.requiredEnergyClass", "operator": "exists", "value": null },
+        { "field": "municipal.proposedEnergyClass", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Classe energética proposta: {municipal.proposedEnergyClass}",
+      "requiredValue": "Classe energética ≥ {municipal.requiredEnergyClass} (conforme regulamento municipal)",
+      "remediation": "Melhorar o desempenho energético do edifício para atingir a classe energética mínima exigida pelo regulamento municipal. Considerar reforço do isolamento térmico, melhoria da eficiência dos sistemas de climatização, instalação de sistemas de energia renovável (painéis solares, fotovoltaicos) e otimização da iluminação.",
+      "enabled": true,
+      "tags": ["eficiência-energética", "classe-energética", "SCE", "sustentabilidade", "municipal"]
+    },
+    {
+      "id": "PDM-SUST-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Retenção de Águas Pluviais",
+      "description": "Alguns regulamentos municipais exigem a implementação de sistemas de retenção de águas pluviais (SRAP) em novos edifícios e operações de loteamento, para mitigar o impacte da impermeabilização do solo e prevenir cheias urbanas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.rainwaterRetentionRequired", "operator": "==", "value": true },
+        { "field": "municipal.rainwaterRetentionProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Retenção de águas pluviais exigida: {municipal.rainwaterRetentionRequired} | Prevista: {municipal.rainwaterRetentionProvided}",
+      "requiredValue": "Sistema de retenção de águas pluviais obrigatório conforme regulamento municipal",
+      "remediation": "Projetar sistema de retenção de águas pluviais (cisterna de retenção, bacia de retenção, trincheiras de infiltração, pavimentos permeáveis ou cobertura ajardinada) dimensionado conforme o regulamento municipal. Tipicamente, o volume de retenção é calculado com base na área impermeabilizada e no período de retorno de projeto (5 a 10 anos).",
+      "enabled": true,
+      "tags": ["águas-pluviais", "retenção", "SRAP", "sustentabilidade", "cheias-urbanas"]
+    },
+    {
+      "id": "PDM-SUST-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Espaços Verdes Privados Mínimos",
+      "description": "Alguns regulamentos municipais exigem uma área mínima de espaço verde privado por lote, expressa em percentagem da área do lote ou em m² absolutos, para contribuir para o equilíbrio ecológico e a qualidade do ambiente urbano.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.privateGreenArea", "operator": "exists", "value": null },
+        { "field": "municipal.privateGreenAreaMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Espaço verde privado: {municipal.privateGreenArea} m²",
+      "requiredValue": "Espaço verde privado ≥ {municipal.privateGreenAreaMin} m² (conforme regulamento municipal)",
+      "remediation": "Aumentar a área de espaço verde privado no lote (jardim, áreas ajardinadas, canteiros) para atingir o mínimo exigido pelo regulamento municipal. Considerar soluções como coberturas ajardinadas, paredes verdes ou jardins interiores, conforme admitido pelo regulamento.",
+      "enabled": true,
+      "tags": ["espaços-verdes", "privado", "sustentabilidade", "ecologia", "PDM"]
+    },
+    {
+      "id": "PDM-SUST-04",
+      "regulationId": "pdm-generic",
+      "article": "DL 39/2010 / PDM — Infraestrutura de Carregamento de Veículos Elétricos",
+      "description": "Os novos edifícios com estacionamento devem prever infraestrutura de pré-instalação para carregamento de veículos elétricos, conforme o DL 39/2010 (alterado pelo DL 90/2014) e regulamentação municipal complementar. Alguns PDM exigem pontos de carregamento ativos em percentagem dos lugares.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.evChargingRequired", "operator": "==", "value": true },
+        { "field": "municipal.evChargingProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Carregamento VE exigido: {municipal.evChargingRequired} | Previsto: {municipal.evChargingProvided}",
+      "requiredValue": "Infraestrutura de carregamento de veículos elétricos prevista no projeto",
+      "remediation": "Incluir no projeto elétrico a pré-instalação de infraestrutura de carregamento de veículos elétricos (condutas, cabos e quadros elétricos dimensionados) para a percentagem de lugares exigida. Alguns municípios exigem pontos de carregamento ativos (wallbox) em pelo menos 20% dos lugares de estacionamento em novos edifícios residenciais.",
+      "enabled": true,
+      "tags": ["veículos-elétricos", "carregamento", "mobilidade", "sustentabilidade", "EPBD"]
+    },
+    {
+      "id": "PDM-SUST-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Cobertura Verde ou Instalação Solar",
+      "description": "Alguns regulamentos municipais exigem que os novos edifícios disponham de cobertura verde (cobertura ajardinada) ou instalação de painéis solares (térmicos ou fotovoltaicos) em percentagem mínima da área de cobertura.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.greenOrSolarRoofRequired", "operator": "==", "value": true },
+        { "field": "municipal.greenOrSolarRoofProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Cobertura verde/solar exigida: {municipal.greenOrSolarRoofRequired} | Prevista: {municipal.greenOrSolarRoofProvided}",
+      "requiredValue": "Cobertura verde ou instalação solar conforme regulamento municipal",
+      "remediation": "Incluir no projeto de arquitetura cobertura verde (extensiva ou intensiva) ou painéis solares (térmicos para AQS ou fotovoltaicos para produção de energia) na percentagem mínima da área de cobertura exigida pelo regulamento municipal. Verificar os requisitos específicos do município quanto a espécies vegetais admitidas, substrato mínimo e manutenção (coberturas verdes) ou potência mínima instalada (painéis solares).",
+      "enabled": true,
+      "tags": ["cobertura-verde", "painéis-solares", "fotovoltaico", "sustentabilidade", "PDM"]
+    },
+    {
+      "id": "PDM-DENS-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Densidade Habitacional Máxima",
+      "description": "A densidade habitacional (número de fogos por hectare) não pode exceder o valor máximo definido no PDM para a categoria de solo urbano. A densidade habitacional é um parâmetro urbanístico fundamental para o ordenamento do território.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.housingDensity", "operator": "exists", "value": null },
+        { "field": "municipal.housingDensityMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.housingDensity} fogos/ha",
+      "requiredValue": "Densidade habitacional ≤ {municipal.housingDensityMax} fogos/ha",
+      "remediation": "Reduzir o número de fogos propostos ou aumentar a área do terreno afeta à operação urbanística de modo a cumprir a densidade habitacional máxima definida no PDM. Considerar a redução do número de pisos ou a adoção de tipologias de menor densidade.",
+      "enabled": true,
+      "tags": ["densidade", "habitacional", "fogos", "parâmetros-urbanísticos", "PDM"]
+    },
+    {
+      "id": "PDM-DENS-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Volumetria e Alinhamento",
+      "description": "O volume do edifício deve respeitar as regras de volumetria definidas no PDM e regulamento municipal, nomeadamente quanto ao alinhamento da fachada principal com os edifícios contíguos e a integração na envolvente urbana.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.respectsVolumetryRules", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Conformidade volumétrica: {municipal.respectsVolumetryRules}",
+      "requiredValue": "Volumetria e alinhamento em conformidade com o regulamento municipal (respectsVolumetryRules = true)",
+      "remediation": "Ajustar a volumetria do edifício para respeitar os alinhamentos e volumetrias dominantes na envolvente urbana, conforme definido no regulamento do PDM. Considerar a adaptação da cércea, recuo e volumetria geral para garantir a integração harmoniosa na malha urbana existente.",
+      "enabled": true,
+      "tags": ["volumetria", "alinhamento", "integração-urbana", "PDM"]
+    },
+    {
+      "id": "PDM-DENS-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Recuo Obrigatório ao Alinhamento Dominante",
+      "description": "O edifício deve respeitar o alinhamento dominante da frente edificada existente no arruamento. O recuo ou avanço em relação ao alinhamento estabelecido pode ser condicionado ou interdito pelo regulamento municipal.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.respectsDominantAlignment", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Respeita alinhamento dominante: {municipal.respectsDominantAlignment}",
+      "requiredValue": "Fachada alinhada com a frente edificada dominante do arruamento (respectsDominantAlignment = true)",
+      "remediation": "Ajustar a implantação do edifício para respeitar o alinhamento dominante da frente edificada no arruamento, conforme definido no regulamento do PDM. O alinhamento é geralmente definido pela linha de fachada dos edifícios existentes. Caso pretenda alinhamento diferente, fundamentar tecnicamente a proposta e obter parecer favorável dos serviços de urbanismo.",
+      "enabled": true,
+      "tags": ["alinhamento", "recuo", "frente-edificada", "PDM"]
+    },
+    {
+      "id": "PDM-DENS-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Capacidade das Infraestruturas",
+      "description": "A operação urbanística deve ser precedida da verificação da capacidade das infraestruturas existentes (água, saneamento, eletricidade, telecomunicações, acessos viários) para suportar o acréscimo de utilização resultante do projeto.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.infrastructureCapacityVerified", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Capacidade infraestrutural verificada: {municipal.infrastructureCapacityVerified}",
+      "requiredValue": "Verificação de capacidade das infraestruturas realizada (infrastructureCapacityVerified = true)",
+      "remediation": "Obter pareceres das entidades gestoras das infraestruturas (água: AdP/SMAS; saneamento: AdP/SMAS; eletricidade: E-Redes; telecomunicações: operadores; viário: câmara municipal) confirmando a capacidade para servir o empreendimento proposto. Em caso de insuficiência, pode ser necessário o reforço das infraestruturas a cargo do promotor.",
+      "enabled": true,
+      "tags": ["infraestruturas", "capacidade", "pareceres", "PDM"]
+    },
+    {
+      "id": "PDM-DENS-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Faixa Non-Aedificandi a Linhas de Alta Tensão",
+      "description": "Deve ser respeitada a faixa non-aedificandi associada a linhas de alta e muito alta tensão que atravessem ou confinem com o terreno. A distância mínima de segurança depende da tensão da linha (tipicamente 5 m para AT, 15 m para MAT).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToPowerLine", "operator": "exists", "value": null },
+        { "field": "municipal.powerLineBufferMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToPowerLine} m à linha elétrica",
+      "requiredValue": "Distância à linha elétrica ≥ {municipal.powerLineBufferMin} m",
+      "remediation": "O edifício encontra-se dentro da faixa non-aedificandi da linha de alta/muito alta tensão. Recuar a implantação para fora da faixa de proteção definida pelo regulamento de segurança de linhas elétricas (DL 226/2005) e pelo PDM. A distância mínima varia com a tensão: 5 m para AT (60 kV), 15 m para MAT (150-400 kV). Contactar a REN/E-Redes para confirmação da faixa aplicável.",
+      "enabled": true,
+      "tags": ["alta-tensão", "non-aedificandi", "servidão-elétrica", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-AMB-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 151-B/2013 — Avaliação de Impacte Ambiental (AIA)",
+      "description": "Projetos de grande dimensão ou com potencial impacto ambiental significativo estão sujeitos a Avaliação de Impacte Ambiental (AIA) obrigatória nos termos do DL 151-B/2013. Os limiares dependem do tipo e dimensão do projeto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.requiresEIA", "operator": "==", "value": true },
+        { "field": "municipal.hasEIAApproval", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "AIA aprovada: {municipal.hasEIAApproval}",
+      "requiredValue": "Declaração de Impacte Ambiental (DIA) favorável obtida (hasEIAApproval = true)",
+      "remediation": "Submeter o projeto a procedimento de Avaliação de Impacte Ambiental (AIA) junto da APA (Agência Portuguesa do Ambiente) nos termos do DL 151-B/2013. O EIA (Estudo de Impacte Ambiental) deve avaliar os impactos em recursos hídricos, solo, ar, ruído, fauna, flora, paisagem e património. O licenciamento urbanístico não pode ser deferido sem DIA favorável ou condicionalmente favorável.",
+      "enabled": true,
+      "tags": ["AIA", "impacte-ambiental", "EIA", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-AMB-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 140/99 — Rede Natura 2000",
+      "description": "Projetos localizados em áreas classificadas da Rede Natura 2000 (Sítios de Importância Comunitária — SIC ou Zonas de Proteção Especial — ZPE) estão sujeitos a avaliação de incidências ambientais e a restrições específicas de ocupação do solo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInNatura2000", "operator": "==", "value": true },
+        { "field": "municipal.hasNatura2000Clearance", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Terreno em área Rede Natura 2000: {municipal.isInNatura2000}, parecer: {municipal.hasNatura2000Clearance}",
+      "requiredValue": "Parecer favorável do ICNF para intervenção em área Rede Natura 2000 (hasNatura2000Clearance = true)",
+      "remediation": "Submeter o projeto a avaliação de incidências ambientais junto do ICNF (Instituto da Conservação da Natureza e das Florestas) nos termos do DL 140/99. A intervenção em áreas da Rede Natura 2000 pode estar sujeita a condicionantes severas ou ser inviável. Obter parecer favorável do ICNF antes de prosseguir com o licenciamento urbanístico.",
+      "enabled": true,
+      "tags": ["Natura-2000", "rede-natura", "biodiversidade", "ICNF", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-AMB-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 169/2001 — Árvores Protegidas",
+      "description": "Árvores protegidas por lei (sobreiros, azinheiras, azevinho, entre outras espécies protegidas pelo DL 169/2001 e legislação complementar) não podem ser abatidas sem autorização do ICNF. A presença de árvores protegidas no terreno condiciona a implantação do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasProtectedTrees", "operator": "==", "value": true },
+        { "field": "municipal.hasTreeRemovalPermit", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Árvores protegidas no terreno: {municipal.hasProtectedTrees}, autorização de abate: {municipal.hasTreeRemovalPermit}",
+      "requiredValue": "Autorização de abate do ICNF obtida ou projeto adaptado para preservação (hasTreeRemovalPermit = true)",
+      "remediation": "Identificar todas as árvores protegidas existentes no terreno (sobreiros e azinheiras ao abrigo do DL 169/2001; outras espécies protegidas). Se o abate for inevitável, requerer autorização ao ICNF com justificação técnica e proposta de compensação. Adaptar preferencialmente o projeto para preservar as árvores protegidas, ajustando a implantação do edifício.",
+      "enabled": true,
+      "tags": ["árvores-protegidas", "sobreiros", "ICNF", "abate", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-AMB-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Zona Sensível do Ponto de Vista Paisagístico",
+      "description": "Em zonas classificadas como sensíveis do ponto de vista paisagístico pelo PDM, aplicam-se restrições adicionais quanto à volumetria, materiais de revestimento, cores e integração visual do edifício na paisagem.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInLandscapeProtectionZone", "operator": "==", "value": true },
+        { "field": "municipal.landscapeIntegrationApproved", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Zona de proteção paisagística: {municipal.isInLandscapeProtectionZone}, integração aprovada: {municipal.landscapeIntegrationApproved}",
+      "requiredValue": "Integração paisagística aprovada pela câmara municipal (landscapeIntegrationApproved = true)",
+      "remediation": "Elaborar estudo de integração paisagística do edifício, demonstrando a adequação da volumetria, cores, materiais de revestimento e coberturas à envolvente paisagística. Submeter o estudo à câmara municipal para aprovação. Em zonas de proteção paisagística, podem aplicar-se restrições adicionais quanto a: altura máxima, tipologia de cobertura (inclinada vs plana), paleta de cores e materiais naturais.",
+      "enabled": true,
+      "tags": ["paisagem", "integração-paisagística", "zona-sensível", "condicionantes", "PDM"]
+    },
+    {
+      "id": "PDM-AMB-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / EC8 / NP EN 1998-1 — Sismicidade e Zona Sísmica",
+      "description": "A classificação da zona sísmica do local deve ser considerada no projeto de estruturas, conforme o zonamento sísmico nacional definido no Eurocódigo 8 (NP EN 1998-1) e no Anexo Nacional. O PDM pode identificar zonas de risco sísmico acrescido.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.seismicZone", "operator": "exists", "value": null },
+        { "field": "municipal.seismicZoneConsidered", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Zona sísmica: {municipal.seismicZone}, considerada no projeto: {municipal.seismicZoneConsidered}",
+      "requiredValue": "Classificação sísmica do local considerada no projeto de estruturas (seismicZoneConsidered = true)",
+      "remediation": "Incluir no projeto de estruturas a classificação da zona sísmica do local conforme o Eurocódigo 8 (NP EN 1998-1) e o Anexo Nacional. Portugal continental está dividido em zonas sísmicas de 1.1 a 2.5 (ação sísmica tipo 1 — interplaca e tipo 2 — intraplaca). Garantir que a aceleração de referência (agR) utilizada no cálculo é a correspondente à zona sísmica correta.",
+      "enabled": true,
+      "tags": ["sismicidade", "zona-sísmica", "EC8", "estruturas", "condicionantes", "PDM"]
     }
   ]
 }

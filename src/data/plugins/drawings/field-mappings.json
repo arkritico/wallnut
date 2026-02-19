@@ -1,6 +1,6 @@
 {
   "pluginId": "drawings",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Mapeamento de campos para regras de peças desenhadas e documentação de projeto (Portaria 113/2015, normas NP)",
   "fields": [
     {
@@ -534,6 +534,510 @@
       "sources": ["form"],
       "defaults": { "_default": false },
       "description": "Indica se existe plano de trabalhos com cronograma de execução da obra"
+    },
+
+    {
+      "_group": "BIM e Entrega Digital",
+      "field": "drawings.hasBIMModel",
+      "label": "Modelo BIM/IFC",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto inclui modelo BIM em formato IFC"
+    },
+    {
+      "_group": "BIM e Entrega Digital",
+      "field": "drawings.bimLOD",
+      "label": "Nível de desenvolvimento BIM (LOD)",
+      "type": "select",
+      "options": [
+        { "value": "100", "label": "LOD 100 - Conceptual" },
+        { "value": "200", "label": "LOD 200 - Esquemático" },
+        { "value": "300", "label": "LOD 300 - Execução" },
+        { "value": "400", "label": "LOD 400 - Fabricação" },
+        { "value": "500", "label": "LOD 500 - As-built" }
+      ],
+      "sources": ["form"],
+      "defaults": { "_default": "300" },
+      "description": "Nível de desenvolvimento (LOD) do modelo BIM"
+    },
+    {
+      "_group": "BIM e Entrega Digital",
+      "field": "drawings.hasIFCClassification",
+      "label": "Classificação IFC correta",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os elementos do modelo IFC têm classificação correta (IfcWall, IfcColumn, etc.)"
+    },
+    {
+      "_group": "BIM e Entrega Digital",
+      "field": "drawings.hasClashDetection",
+      "label": "Deteção de conflitos (clash detection)",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi realizada deteção de conflitos entre modelos de especialidades"
+    },
+    {
+      "_group": "BIM e Entrega Digital",
+      "field": "drawings.hasBIMProperties",
+      "label": "Propriedades obrigatórias no modelo BIM",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o modelo BIM contém materiais, classificação e faseamento"
+    },
+
+    {
+      "_group": "Telas Finais (As-Built)",
+      "field": "drawings.hasAsBuiltDrawings",
+      "label": "Telas finais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foram elaboradas telas finais (as-built) do projeto"
+    },
+    {
+      "_group": "Telas Finais (As-Built)",
+      "field": "drawings.asBuiltShowsDeviations",
+      "label": "Telas finais identificam desvios",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as telas finais identificam todos os desvios ao projeto aprovado"
+    },
+    {
+      "_group": "Telas Finais (As-Built)",
+      "field": "drawings.hasAsBuiltAllSpecialties",
+      "label": "Telas finais de todas as especialidades",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem telas finais de todas as especialidades (arquitetura, estruturas, MEP)"
+    },
+    {
+      "_group": "Telas Finais (As-Built)",
+      "field": "drawings.asBuiltDigitalFormat",
+      "label": "Telas finais em formato digital",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as telas finais foram entregues em formato digital (DWG/PDF)"
+    },
+    {
+      "_group": "Telas Finais (As-Built)",
+      "field": "drawings.hasAsBuiltStamp",
+      "label": "Selo de tela final",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as telas finais possuem selo identificativo de 'Tela Final'"
+    },
+
+    {
+      "_group": "Desenhos de Estruturas",
+      "field": "drawings.hasFoundationPlans",
+      "label": "Plantas de fundações",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o projeto de estruturas inclui plantas de fundações"
+    },
+    {
+      "_group": "Desenhos de Estruturas",
+      "field": "drawings.hasReinforcementDrawings",
+      "label": "Plantas de armaduras",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de armaduras para todos os elementos estruturais"
+    },
+    {
+      "_group": "Desenhos de Estruturas",
+      "field": "drawings.hasColumnSchedule",
+      "label": "Quadros de pilares",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem quadros de pilares com pormenorização de armaduras"
+    },
+    {
+      "_group": "Desenhos de Estruturas",
+      "field": "drawings.hasReinforcementDetails",
+      "label": "Pormenores de armaduras",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem pormenores de ligações e amarrações de armaduras"
+    },
+    {
+      "_group": "Desenhos de Estruturas",
+      "field": "drawings.hasStructuralSections",
+      "label": "Cortes estruturais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem cortes estruturais com indicação de armaduras"
+    },
+
+    {
+      "_group": "Desenhos de Especialidades MEP",
+      "field": "drawings.hasHydraulicPlans",
+      "label": "Plantas de redes hidráulicas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de redes de abastecimento de água e drenagem"
+    },
+    {
+      "_group": "Desenhos de Especialidades MEP",
+      "field": "drawings.hasSingleLineDiagrams",
+      "label": "Esquemas unifilares elétricos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem esquemas unifilares dos quadros elétricos"
+    },
+    {
+      "_group": "Desenhos de Especialidades MEP",
+      "field": "drawings.hasHVACPlans",
+      "label": "Plantas de AVAC",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de instalações de AVAC com condutas e equipamentos"
+    },
+    {
+      "_group": "Desenhos de Especialidades MEP",
+      "field": "drawings.hasGasPlans",
+      "label": "Plantas de gás",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de instalações de gás com distâncias de segurança"
+    },
+    {
+      "_group": "Desenhos de Especialidades MEP",
+      "field": "drawings.hasITEDPlans",
+      "label": "Plantas de ITED",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de infraestruturas de telecomunicações (ITED)"
+    },
+
+    {
+      "_group": "Layers e Codificação",
+      "field": "drawings.hasOrganizedLayers",
+      "label": "Organização por layers",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos CAD utilizam sistema de layers organizado"
+    },
+    {
+      "_group": "Layers e Codificação",
+      "field": "drawings.hasStandardLayerNames",
+      "label": "Nomenclatura de layers normalizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os nomes dos layers seguem convenção normalizada"
+    },
+    {
+      "_group": "Layers e Codificação",
+      "field": "drawings.hasSpecialtyColorCoding",
+      "label": "Cores por especialidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos usam codificação de cores por especialidade"
+    },
+    {
+      "_group": "Layers e Codificação",
+      "field": "drawings.hasDemolitionNewLayers",
+      "label": "Layers de demolição vs construção nova",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem layers separados para demolição e construção nova"
+    },
+
+    {
+      "_group": "Submissão Digital",
+      "field": "drawings.hasPDFAFormat",
+      "label": "Formato PDF/A",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os desenhos estão em formato PDF/A para arquivo de longa duração"
+    },
+    {
+      "_group": "Submissão Digital",
+      "field": "drawings.hasEditableCADFiles",
+      "label": "Ficheiros CAD editáveis",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foram fornecidos ficheiros CAD editáveis (DWG/DXF)"
+    },
+    {
+      "_group": "Submissão Digital",
+      "field": "drawings.scanResolutionDPI",
+      "label": "Resolução de digitalização",
+      "type": "number",
+      "unit": "DPI",
+      "sources": ["form"],
+      "defaults": { "_default": 300 },
+      "description": "Resolução mínima de documentos digitalizados em DPI"
+    },
+    {
+      "_group": "Submissão Digital",
+      "field": "drawings.hasDigitalSignature",
+      "label": "Assinatura digital do projetista",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as peças desenhadas possuem assinatura digital qualificada do projetista"
+    },
+    {
+      "_group": "Submissão Digital",
+      "field": "drawings.hasDrawingIndex",
+      "label": "Índice de peças desenhadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe índice mestre com listagem de todas as peças desenhadas"
+    },
+
+    {
+      "_group": "Levantamento e Topografia",
+      "field": "drawings.hasTopographicSurvey",
+      "label": "Levantamento topográfico",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe levantamento topográfico do terreno"
+    },
+    {
+      "_group": "Levantamento e Topografia",
+      "field": "drawings.topographicSurveyScale",
+      "label": "Escala do levantamento topográfico",
+      "type": "number",
+      "sources": ["form"],
+      "description": "Escala do levantamento topográfico (denominador, ex.: 200 para 1:200)"
+    },
+    {
+      "_group": "Levantamento e Topografia",
+      "field": "drawings.hasContourLines",
+      "label": "Curvas de nível",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o levantamento inclui curvas de nível com equidistância adequada"
+    },
+    {
+      "_group": "Levantamento e Topografia",
+      "field": "drawings.hasGeodesicReference",
+      "label": "Referenciação geodésica",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se o levantamento está referenciado ao sistema geodésico nacional (PT-TM06/ETRS89)"
+    },
+    {
+      "_group": "Levantamento e Topografia",
+      "field": "drawings.hasTerrainProfiles",
+      "label": "Perfis do terreno",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem perfis do terreno para avaliação de desníveis"
+    },
+
+    {
+      "_group": "Qualidade e Consistência",
+      "field": "drawings.hasConsistentScales",
+      "label": "Escalas consistentes entre folhas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as escalas são consistentes entre folhas comparáveis"
+    },
+    {
+      "_group": "Qualidade e Consistência",
+      "field": "drawings.plansSectionsConsistent",
+      "label": "Correspondência plantas-cortes",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se plantas e cortes são consistentes entre si"
+    },
+    {
+      "_group": "Qualidade e Consistência",
+      "field": "drawings.writtenDrawnConsistent",
+      "label": "Correspondência peças escritas-desenhadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se peças escritas e desenhadas são coerentes"
+    },
+    {
+      "_group": "Qualidade e Consistência",
+      "field": "drawings.hasUniformTerminology",
+      "label": "Terminologia uniforme",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a terminologia é uniforme em todos os documentos do projeto"
+    },
+    {
+      "_group": "Qualidade e Consistência",
+      "field": "drawings.allDocumentsHaveDate",
+      "label": "Data de emissão em todas as peças",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se todas as peças possuem data de emissão"
+    },
+
+    {
+      "_group": "Memória Descritiva e Cálculos",
+      "field": "drawings.hasDescriptiveMemory",
+      "label": "Memória descritiva",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe memória descritiva e justificativa"
+    },
+    {
+      "_group": "Memória Descritiva e Cálculos",
+      "field": "drawings.hasCalculations",
+      "label": "Cálculos justificativos",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem cálculos justificativos para dimensionamento"
+    },
+    {
+      "_group": "Memória Descritiva e Cálculos",
+      "field": "drawings.hasRegulatoryBasis",
+      "label": "Fundamentação regulamentar",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se a memória descritiva cita a regulamentação aplicável"
+    },
+    {
+      "_group": "Memória Descritiva e Cálculos",
+      "field": "drawings.hasConformityDeclaration",
+      "label": "Declaração de conformidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe declaração de conformidade regulamentar assinada pelo projetista"
+    },
+    {
+      "_group": "Memória Descritiva e Cálculos",
+      "field": "drawings.hasResponsibilityTerms",
+      "label": "Termos de responsabilidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os termos de responsabilidade estão assinados pelo projetista habilitado"
+    },
+
+    {
+      "_group": "Coordenação e Compatibilização",
+      "field": "drawings.hasStructuralOpenings",
+      "label": "Passagens e reservas estruturais",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as aberturas em elementos estruturais para passagem de MEP estão coordenadas"
+    },
+    {
+      "_group": "Coordenação e Compatibilização",
+      "field": "drawings.hasNetworkOverlapCheck",
+      "label": "Verificação de sobreposição de redes",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se foi verificada a sobreposição de redes de especialidades"
+    },
+    {
+      "_group": "Coordenação e Compatibilização",
+      "field": "drawings.clearHeightsVerified",
+      "label": "Alturas livres verificadas após MEP",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se as alturas livres foram verificadas após instalação de redes MEP"
+    },
+    {
+      "_group": "Coordenação e Compatibilização",
+      "field": "drawings.hasMaintenanceAccess",
+      "label": "Acessos para manutenção",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se os acessos para manutenção de equipamentos estão indicados nos desenhos"
+    },
+    {
+      "_group": "Coordenação e Compatibilização",
+      "field": "drawings.hasConsolidatedOverlay",
+      "label": "Planta síntese de especialidades",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe planta síntese com sobreposição de todas as especialidades"
+    },
+
+    {
+      "_group": "Levantamento do Existente",
+      "field": "drawings.hasExistingSurvey",
+      "label": "Levantamento do existente",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe levantamento do edifício existente (para obras de reabilitação)"
+    },
+    {
+      "_group": "Levantamento do Existente",
+      "field": "drawings.hasDemolitionPlans",
+      "label": "Plantas de demolições",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de demolições com convenção gráfica adequada"
+    },
+    {
+      "_group": "Levantamento do Existente",
+      "field": "drawings.hasNewConstructionPlans",
+      "label": "Plantas de construção nova",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existem plantas de construção nova distintas das de demolição"
+    },
+    {
+      "_group": "Levantamento do Existente",
+      "field": "drawings.hasOverlayComparison",
+      "label": "Sobreposição existente/proposto",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe sobreposição do existente com o proposto para comparação"
+    },
+    {
+      "_group": "Levantamento do Existente",
+      "field": "drawings.hasConditionReport",
+      "label": "Relatório de anomalias do existente",
+      "type": "boolean",
+      "sources": ["form"],
+      "defaults": { "_default": false },
+      "description": "Indica se existe relatório do estado de conservação e anomalias do edifício existente"
     }
   ]
 }

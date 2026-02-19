@@ -828,6 +828,486 @@
       "remediation": "Incluir mapa de áreas com: área de implantação, área bruta de construção, área útil por compartimento e por piso, área de logradouro e índices urbanísticos (COS, CAS).",
       "enabled": true,
       "tags": ["áreas", "mapa", "índices", "portaria-701h"]
+    },
+    {
+      "id": "DRW-BIM-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I",
+      "description": "Modelo BIM/IFC para projetos de execução — quando BIM é exigido contratualmente ou por regulamento, a entrega do modelo em formato IFC é obrigatória na fase de projeto de execução.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.bimRequired", "operator": "==", "value": true },
+        { "field": "drawings.ifcFileProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "BIM exigido: {drawings.bimRequired}, ficheiro IFC entregue: {drawings.ifcFileProvided}",
+      "requiredValue": "Ficheiro IFC obrigatório quando BIM é exigido",
+      "remediation": "Exporte o modelo BIM para formato IFC (versão 2x3 ou 4) e inclua o ficheiro na entrega do projeto de execução. Verifique que o ficheiro IFC é válido e abre correctamente num visualizador IFC.",
+      "enabled": true,
+      "tags": ["bim", "ifc", "digital", "execução", "entrega"]
+    },
+    {
+      "id": "DRW-BIM-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I",
+      "description": "Classificação de objetos IFC — todos os elementos do modelo BIM devem ter classificação IFC correcta (IfcWall, IfcColumn, IfcSlab, IfcBeam, etc.) de acordo com o esquema IFC.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.bimRequired", "operator": "==", "value": true },
+        { "field": "drawings.ifcObjectsClassified", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Objectos IFC classificados correctamente: {drawings.ifcObjectsClassified}",
+      "requiredValue": "Todos os elementos com classificação IFC válida (IfcWall, IfcColumn, IfcSlab, etc.)",
+      "remediation": "Reveja o modelo BIM e atribua a classe IFC correcta a cada elemento. Não utilize IfcBuildingElementProxy para elementos que possuam classe IFC específica. Valide com ferramentas de verificação IFC.",
+      "enabled": true,
+      "tags": ["bim", "ifc", "classificação", "qualidade", "modelo"]
+    },
+    {
+      "id": "DRW-BIM-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 3.º a 6.º",
+      "description": "LOD mínimo — o Level of Development do modelo BIM deve ser adequado à fase do projeto: LOD 100 para programa base, LOD 200 para estudo prévio, LOD 300 para projeto de execução, LOD 400 para construção.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.bimRequired", "operator": "==", "value": true },
+        { "field": "drawings.bimLOD", "operator": "formula_lt", "value": "drawings.requiredLOD" }
+      ],
+      "currentValueTemplate": "LOD actual: {drawings.bimLOD}, LOD exigido para a fase: {drawings.requiredLOD}",
+      "requiredValue": "LOD igual ou superior ao exigido para a fase do projeto",
+      "remediation": "Desenvolva o modelo BIM até atingir o LOD mínimo exigido para a fase corrente do projeto. Para projeto de execução, todos os elementos devem estar em LOD 300 ou superior com geometria precisa e informação de materiais.",
+      "enabled": true,
+      "tags": ["bim", "lod", "fase", "desenvolvimento", "detalhe"]
+    },
+    {
+      "id": "DRW-BIM-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I",
+      "description": "Coordenação de modelos — deve ser realizada clash detection entre especialidades (arquitectura, estrutura, MEP) antes da submissão, com relatório de conflitos resolvidos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.bimRequired", "operator": "==", "value": true },
+        { "field": "drawings.clashDetectionPerformed", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Clash detection realizada: {drawings.clashDetectionPerformed}",
+      "requiredValue": "Clash detection executada entre todas as especialidades com relatório de conflitos",
+      "remediation": "Execute clash detection entre os modelos de todas as especialidades (arquitectura vs estrutura, estrutura vs MEP, arquitectura vs MEP). Resolva todos os conflitos críticos e documente os restantes com justificação. Inclua relatório de clash detection na entrega.",
+      "enabled": true,
+      "tags": ["bim", "coordenação", "clash", "especialidades", "conflitos"]
+    },
+    {
+      "id": "DRW-BIM-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Anexo I",
+      "description": "Propriedades obrigatórias no modelo BIM — todos os elementos devem conter propriedades de materiais, classificação técnica e faseamento de construção no modelo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.bimRequired", "operator": "==", "value": true },
+        { "field": "drawings.bimPropertiesComplete", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Propriedades BIM completas: {drawings.bimPropertiesComplete}",
+      "requiredValue": "Materiais, classificação e faseamento preenchidos em todos os elementos BIM",
+      "remediation": "Preencha para cada elemento do modelo BIM as propriedades obrigatórias: material (tipo e características), classificação técnica (ex: UniClass ou CCS), e fase de construção. Verifique que não existem elementos sem propriedades atribuídas.",
+      "enabled": true,
+      "tags": ["bim", "propriedades", "materiais", "classificação", "faseamento"]
+    },
+    {
+      "id": "DRW-TF-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE e Art. 12.º",
+      "description": "Telas finais obrigatórias — as telas finais (desenhos as-built) são obrigatórias para a obtenção da autorização de utilização, refletindo a obra efectivamente construída.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.projectPhase", "operator": "==", "value": "utilização" },
+        { "field": "drawings.asBuiltProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Fase do projeto: {drawings.projectPhase}, telas finais entregues: {drawings.asBuiltProvided}",
+      "requiredValue": "Telas finais obrigatórias para pedido de autorização de utilização",
+      "remediation": "Elabore as telas finais reflectindo a obra tal como foi construída. As telas finais devem ser assinadas pelo director de fiscalização e pelo director de obra, confirmando a conformidade com o executado.",
+      "enabled": true,
+      "tags": ["telas-finais", "as-built", "utilização", "licenciamento", "obrigatório"]
+    },
+    {
+      "id": "DRW-TF-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE",
+      "description": "Conformidade com projeto aprovado — as telas finais devem identificar claramente todas as alterações e desvios relativamente ao projeto aprovado pela câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.asBuiltProvided", "operator": "==", "value": true },
+        { "field": "drawings.deviationsDocumented", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Desvios documentados: {drawings.deviationsDocumented}",
+      "requiredValue": "Todas as alterações relativamente ao projecto aprovado devem estar identificadas",
+      "remediation": "Compare as telas finais com o projeto aprovado e identifique todas as alterações. Documente cada desvio com descrição, localização e justificação. As alterações não substanciais devem ser claramente marcadas nos desenhos.",
+      "enabled": true,
+      "tags": ["telas-finais", "conformidade", "desvios", "aprovação", "câmara"]
+    },
+    {
+      "id": "DRW-TF-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 128.º RJUE e Art. 12.º",
+      "description": "Telas finais de todas as especialidades — devem ser entregues telas finais de todas as especialidades do projeto (arquitectura, estrutura, águas, electricidade, gás, AVAC, telecomunicações, etc.).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.asBuiltProvided", "operator": "==", "value": true },
+        { "field": "drawings.asBuiltAllSpecialties", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Telas finais de todas as especialidades: {drawings.asBuiltAllSpecialties}",
+      "requiredValue": "Telas finais entregues para todas as especialidades do projecto",
+      "remediation": "Verifique que existem telas finais para cada especialidade do projecto: arquitectura, estabilidade, redes de águas e esgotos, instalações eléctricas, gás, AVAC, ITED, segurança contra incêndios e acústica. Solicite aos projectistas de cada especialidade as respectivas telas finais.",
+      "enabled": true,
+      "tags": ["telas-finais", "especialidades", "completo", "verificação", "entrega"]
+    },
+    {
+      "id": "DRW-TF-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Portaria 113/2015",
+      "description": "Formato digital das telas finais — as telas finais devem ser entregues em formato digital (DWG e PDF), para além do formato em papel quando exigido.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.asBuiltProvided", "operator": "==", "value": true },
+        { "field": "drawings.asBuiltDigitalFormat", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Telas finais em formato digital: {drawings.asBuiltDigitalFormat}",
+      "requiredValue": "Telas finais entregues em formato digital (DWG + PDF)",
+      "remediation": "Entregue as telas finais em formato digital: ficheiro DWG editável e ficheiro PDF para consulta. Assegure que os ficheiros digitais correspondem exactamente à versão em papel assinada.",
+      "enabled": true,
+      "tags": ["telas-finais", "digital", "dwg", "pdf", "formato"]
+    },
+    {
+      "id": "DRW-TF-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º",
+      "description": "Selo de tela final — as telas finais devem conter carimbo específico identificando-as como 'Tela Final / As-Built', com data de conclusão da obra e assinaturas do director de obra e director de fiscalização.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.asBuiltProvided", "operator": "==", "value": true },
+        { "field": "drawings.asBuiltStamp", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Selo de tela final presente: {drawings.asBuiltStamp}",
+      "requiredValue": "Carimbo 'Tela Final' com data de conclusão, assinaturas do director de obra e fiscalização",
+      "remediation": "Adicione a todas as telas finais o carimbo específico com a indicação 'TELA FINAL / AS-BUILT', a data de conclusão da obra, e os espaços para assinatura do director de obra e do director de fiscalização de obra.",
+      "enabled": true,
+      "tags": ["telas-finais", "carimbo", "selo", "assinatura", "identificação"]
+    },
+    {
+      "id": "DRW-EST-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Estabilidade",
+      "description": "Plantas de fundações obrigatórias — o projecto de estabilidade deve incluir plantas de fundações com dimensões, cotas de implantação e referência ao relatório geotécnico.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyStructural", "operator": "==", "value": true },
+        { "field": "drawings.foundationPlansProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Plantas de fundações entregues: {drawings.foundationPlansProvided}",
+      "requiredValue": "Plantas de fundações obrigatórias no projecto de estabilidade",
+      "remediation": "Elabore as plantas de fundações incluindo: dimensões de todos os elementos de fundação (sapatas, lintéis, estacas), cotas de fundo de fundação, cotas de nível freático, referência ao estudo geotécnico, e tensões admissíveis do solo.",
+      "enabled": true,
+      "tags": ["estrutura", "fundações", "plantas", "estabilidade", "geotecnia"]
+    },
+    {
+      "id": "DRW-EST-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Estabilidade",
+      "description": "Plantas de armaduras — o projecto de execução de estruturas deve incluir desenhos de armaduras para todos os elementos estruturais (lajes, vigas, pilares, muros, fundações).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyStructural", "operator": "==", "value": true },
+        { "field": "drawings.projectPhase", "operator": "in", "value": ["execução", "construção"] },
+        { "field": "drawings.reinforcementDrawingsProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Desenhos de armaduras entregues: {drawings.reinforcementDrawingsProvided}",
+      "requiredValue": "Desenhos de armaduras para todos os elementos estruturais na fase de execução",
+      "remediation": "Elabore os desenhos de armaduras para todos os elementos estruturais: lajes (armadura superior e inferior), vigas (armadura longitudinal e transversal), pilares (armadura longitudinal e cintas), muros de contenção e fundações. Inclua diâmetros, espaçamentos e comprimentos de amarração.",
+      "enabled": true,
+      "tags": ["estrutura", "armaduras", "betão-armado", "execução", "desenhos"]
+    },
+    {
+      "id": "DRW-EST-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Estabilidade",
+      "description": "Quadros de pilares — o projecto de estruturas deve incluir quadros de pilares com secções, armaduras longitudinais, cintas, recobrimentos e classe de betão para cada tramo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyStructural", "operator": "==", "value": true },
+        { "field": "drawings.columnScheduleProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Quadro de pilares presente: {drawings.columnScheduleProvided}",
+      "requiredValue": "Quadros de pilares com secções, armaduras e detalhes por tramo",
+      "remediation": "Elabore quadros de pilares contendo para cada pilar e tramo: secção transversal com dimensões, armadura longitudinal (número e diâmetro dos varões), cintas (diâmetro e espaçamento), recobrimento nominal, classe de betão e aço, e comprimentos de emenda.",
+      "enabled": true,
+      "tags": ["estrutura", "pilares", "quadros", "armaduras", "detalhes"]
+    },
+    {
+      "id": "DRW-EST-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Estabilidade",
+      "description": "Pormenores de armaduras — os desenhos de pormenores construtivos de armaduras nas ligações e nós estruturais devem ser apresentados a escala mínima de 1:20.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.specialtyStructural", "operator": "==", "value": true },
+        { "field": "drawings.reinforcementDetailScale", "operator": ">", "value": 20 }
+      ],
+      "currentValueTemplate": "Escala dos pormenores de armaduras: 1:{drawings.reinforcementDetailScale}",
+      "requiredValue": "Pormenores de armaduras a escala mínima de 1:20",
+      "remediation": "Elabore pormenores de armaduras nas zonas críticas (ligações viga-pilar, nós de pórtico, arranques de pilares, ligações laje-viga) a escala 1:20 ou superior (1:10, 1:5). Os pormenores devem mostrar claramente a disposição dos varões, comprimentos de amarração e sobreposição.",
+      "enabled": true,
+      "tags": ["estrutura", "pormenores", "armaduras", "escala", "ligações"]
+    },
+    {
+      "id": "DRW-EST-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Estabilidade",
+      "description": "Cortes estruturais — o projecto de estruturas deve incluir cortes transversais e longitudinais mostrando toda a armadura, recobrimentos e dimensões dos elementos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.specialtyStructural", "operator": "==", "value": true },
+        { "field": "drawings.structuralSectionsProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Cortes estruturais presentes: {drawings.structuralSectionsProvided}",
+      "requiredValue": "Cortes estruturais com armaduras e dimensões completas",
+      "remediation": "Elabore cortes estruturais transversais e longitudinais para vigas, lajes e muros, mostrando: armadura superior, inferior e transversal, dimensões da secção, recobrimentos, espaçamentos, e posição relativa dos elementos. Inclua cortes-tipo e cortes em zonas especiais (apoios, consolas, aberturas).",
+      "enabled": true,
+      "tags": ["estrutura", "cortes", "secções", "armaduras", "dimensões"]
+    },
+    {
+      "id": "DRW-MEP-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Redes prediais",
+      "description": "Plantas de redes hidráulicas — o projecto de redes prediais deve incluir plantas com traçado das redes de abastecimento de água e drenagem (residuais e pluviais), com diâmetros, pendentes e materiais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyHydraulic", "operator": "==", "value": true },
+        { "field": "drawings.hydraulicPlansProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Plantas de redes hidráulicas entregues: {drawings.hydraulicPlansProvided}",
+      "requiredValue": "Plantas de redes de abastecimento de água e drenagem obrigatórias",
+      "remediation": "Elabore as plantas de redes hidráulicas incluindo: rede de abastecimento de água fria e quente (traçado, diâmetros, materiais), rede de drenagem de águas residuais domésticas (traçado, diâmetros, pendentes), e rede de drenagem de águas pluviais (traçado, diâmetros, pendentes). Identifique todos os acessórios, caixas de visita e pontos de ligação.",
+      "enabled": true,
+      "tags": ["mep", "hidráulica", "água", "drenagem", "redes"]
+    },
+    {
+      "id": "DRW-MEP-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Instalações eléctricas",
+      "description": "Esquemas unifilares eléctricos — o projecto de instalações eléctricas deve incluir esquemas unifilares do quadro geral e quadros parciais com protecções, secções e circuitos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyElectrical", "operator": "==", "value": true },
+        { "field": "drawings.singleLineDiagramProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Esquemas unifilares entregues: {drawings.singleLineDiagramProvided}",
+      "requiredValue": "Esquemas unifilares eléctricos obrigatórios para o projecto de instalações eléctricas",
+      "remediation": "Elabore os esquemas unifilares do quadro geral de entrada e de todos os quadros parciais, incluindo: aparelhagem de protecção (disjuntores, diferenciais), secções dos condutores, designação dos circuitos, potências instaladas, correntes de serviço e de curto-circuito, e selectividade das protecções.",
+      "enabled": true,
+      "tags": ["mep", "eléctrica", "unifilares", "quadros", "protecções"]
+    },
+    {
+      "id": "DRW-MEP-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — AVAC",
+      "description": "Plantas de AVAC — o projecto de AVAC deve incluir plantas com traçado de condutas, localização de equipamentos, difusores/grelhas e dimensionamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyHVAC", "operator": "==", "value": true },
+        { "field": "drawings.hvacPlansProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Plantas de AVAC entregues: {drawings.hvacPlansProvided}",
+      "requiredValue": "Plantas de AVAC com condutas, equipamentos e dimensionamento obrigatórias",
+      "remediation": "Elabore as plantas de AVAC incluindo: traçado de condutas com dimensões (secção e caudal), localização de unidades de climatização (UTA, split, chiller), difusores e grelhas de insuflação e retorno, registos corta-fogo, e esquema de princípio da instalação. Identifique todos os equipamentos com referência à memória descritiva.",
+      "enabled": true,
+      "tags": ["mep", "avac", "condutas", "climatização", "equipamentos"]
+    },
+    {
+      "id": "DRW-MEP-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — Instalações de gás",
+      "description": "Plantas de gás — o projecto de instalações de gás deve incluir plantas com traçado da rede, localização de equipamentos, válvulas de corte e distâncias de segurança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyGas", "operator": "==", "value": true },
+        { "field": "drawings.gasPlansProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Plantas de gás entregues: {drawings.gasPlansProvided}",
+      "requiredValue": "Plantas de instalações de gás com traçado, válvulas e distâncias de segurança obrigatórias",
+      "remediation": "Elabore as plantas de instalações de gás incluindo: traçado da canalização (materiais e diâmetros), válvulas de corte geral e parciais, localização de contadores, ventilações obrigatórias, distâncias de segurança a fontes de ignição e instalações eléctricas, e identificação dos aparelhos de queima.",
+      "enabled": true,
+      "tags": ["mep", "gás", "segurança", "válvulas", "distâncias"]
+    },
+    {
+      "id": "DRW-MEP-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e Anexo I — ITED",
+      "description": "Plantas de ITED — o projecto de infra-estruturas de telecomunicações deve incluir plantas com traçado de tubagem, localização de caixas, bastidores e tomadas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.specialtyITED", "operator": "==", "value": true },
+        { "field": "drawings.itedPlansProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Plantas de ITED entregues: {drawings.itedPlansProvided}",
+      "requiredValue": "Plantas de ITED com tubagem, caixas e bastidores obrigatórias",
+      "remediation": "Elabore as plantas de ITED incluindo: traçado da tubagem e caminhos de cabos, localização do ATE (armário de telecomunicações do edifício), caixas de passagem e derivação, ATI (armário de telecomunicações individual), tomadas de telecomunicações (TV, telefone, dados), e esquema de ligações à rede pública.",
+      "enabled": true,
+      "tags": ["mep", "ited", "telecomunicações", "tubagem", "bastidores"]
+    },
+    {
+      "id": "DRW-LAYER-01",
+      "regulationId": "iso-128",
+      "article": "ISO 128-1:2020 — Secção 5",
+      "description": "Organização por layers — os desenhos CAD devem utilizar um sistema organizado de layers, separando diferentes tipos de informação (paredes, cotas, texto, mobiliário, etc.).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.cadFormat", "operator": "==", "value": true },
+        { "field": "drawings.layerSystemOrganized", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Sistema de layers organizado: {drawings.layerSystemOrganized}",
+      "requiredValue": "Desenhos CAD com sistema de layers organizado e consistente",
+      "remediation": "Organize os desenhos CAD utilizando layers separados para cada tipo de informação: elementos construtivos (paredes, lajes, coberturas), cotas e medições, texto e anotações, mobiliário, elementos técnicos (redes, equipamentos). Evite colocar toda a informação num único layer.",
+      "enabled": true,
+      "tags": ["cad", "layers", "organização", "estrutura", "convenções"]
+    },
+    {
+      "id": "DRW-LAYER-02",
+      "regulationId": "iso-128",
+      "article": "ISO 128-1:2020 — Secção 5",
+      "description": "Nomenclatura de layers normalizada — os nomes de layers devem seguir uma convenção normalizada e consistente (ex: ARQ-PAREDES, EST-ARMADURAS, ELE-ILUMINACAO).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.cadFormat", "operator": "==", "value": true },
+        { "field": "drawings.layerNamingStandard", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Nomenclatura de layers normalizada: {drawings.layerNamingStandard}",
+      "requiredValue": "Nomes de layers seguindo convenção padronizada (prefixo especialidade + descrição)",
+      "remediation": "Adopte uma convenção de nomenclatura de layers consistente, utilizando prefixo de especialidade seguido de descrição: ARQ- (arquitectura), EST- (estrutura), ELE- (electricidade), HID- (hidráulica), AVAC- (AVAC), GAS- (gás), ITED- (telecomunicações). Exemplo: ARQ-PAREDES-EXT, EST-PILARES, ELE-TOMADAS.",
+      "enabled": true,
+      "tags": ["cad", "layers", "nomenclatura", "convenção", "normalização"]
+    },
+    {
+      "id": "DRW-LAYER-03",
+      "regulationId": "iso-128",
+      "article": "ISO 128-1:2020 — Secção 6",
+      "description": "Cores por especialidade — os desenhos devem utilizar codificação por cores para distinguir especialidades: arquitectura (branco/preto), estrutura (vermelho), águas (azul), electricidade (verde), gás (amarelo).",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.cadFormat", "operator": "==", "value": true },
+        { "field": "drawings.colorCodingBySpecialty", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Codificação de cores por especialidade: {drawings.colorCodingBySpecialty}",
+      "requiredValue": "Cores diferenciadas por especialidade segundo convenção standard",
+      "remediation": "Aplique codificação de cores por especialidade nos desenhos CAD: arquitectura em branco/preto, estrutura em vermelho, redes de água em azul, electricidade em verde, gás em amarelo, AVAC em magenta, telecomunicações em ciano. Esta convenção facilita a leitura em desenhos sobrepostos.",
+      "enabled": true,
+      "tags": ["cad", "cores", "especialidades", "convenção", "distinção"]
+    },
+    {
+      "id": "DRW-LAYER-04",
+      "regulationId": "iso-128",
+      "article": "ISO 128-1:2020 — Secção 5 e 6",
+      "description": "Layers de demolição vs construção — os desenhos de obras de remodelação devem ter layers separados para elementos a demolir e elementos a construir, com representação gráfica distinta.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.projectType", "operator": "in", "value": ["remodelação", "reabilitação", "ampliação"] },
+        { "field": "drawings.demolitionLayersSeparated", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Layers demolição/construção separados: {drawings.demolitionLayersSeparated}",
+      "requiredValue": "Layers distintos para demolição (tracejado/vermelho) e construção nova (cheio/preto)",
+      "remediation": "Separe os elementos em layers distintos: existente a manter, existente a demolir, e construção nova. Utilize representação gráfica diferenciada — demolições a tracejado ou em vermelho/amarelo, construção nova a traço contínuo. Elabore plantas separadas de demolições e de construção quando a complexidade o justifique.",
+      "enabled": true,
+      "tags": ["cad", "layers", "demolição", "construção", "remodelação"]
+    },
+    {
+      "id": "DRW-LAYER-05",
+      "regulationId": "iso-128",
+      "article": "ISO 128-1:2020 — Secção 5",
+      "description": "Layers bloqueados/congelados — os layers de referência de outras especialidades devem estar bloqueados (locked) ou congelados (frozen) para evitar alterações acidentais.",
+      "severity": "info",
+      "conditions": [
+        { "field": "drawings.cadFormat", "operator": "==", "value": true },
+        { "field": "drawings.referenceLayersLocked", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Layers de referência bloqueados: {drawings.referenceLayersLocked}",
+      "requiredValue": "Layers de referência (xref) devem estar bloqueados ou congelados",
+      "remediation": "Bloqueie (lock) ou congele (freeze) todos os layers provenientes de referências externas (xrefs) de outras especialidades. Isto previne alterações acidentais nos desenhos de base. Utilize xrefs em vez de copiar e colar desenhos de outras especialidades.",
+      "enabled": true,
+      "tags": ["cad", "layers", "referência", "bloqueio", "xref"]
+    },
+    {
+      "id": "DRW-DIGIT-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e Portaria 113/2015",
+      "description": "Submissão em formato PDF/A — os desenhos submetidos electronicamente devem estar em formato PDF/A (ISO 19005) para garantir a preservação a longo prazo e a integridade do documento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.digitalSubmission", "operator": "==", "value": true },
+        { "field": "drawings.pdfAFormat", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Formato PDF/A: {drawings.pdfAFormat}",
+      "requiredValue": "Ficheiros PDF em formato PDF/A (ISO 19005) para arquivo de longa duração",
+      "remediation": "Converta todos os ficheiros PDF para formato PDF/A (preferencialmente PDF/A-1b ou PDF/A-2b) antes da submissão digital. O formato PDF/A garante que o documento é auto-contido (fontes incorporadas, sem dependências externas) e legível a longo prazo. Utilize as opções de exportação PDF/A do software CAD ou converta com ferramentas como Adobe Acrobat.",
+      "enabled": true,
+      "tags": ["digital", "pdf", "arquivo", "preservação", "submissão"]
+    },
+    {
+      "id": "DRW-DIGIT-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º",
+      "description": "Ficheiros DWG/DXF editáveis — juntamente com os PDF, devem ser entregues os ficheiros CAD editáveis (DWG ou DXF) para permitir futuras alterações e consultas técnicas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.digitalSubmission", "operator": "==", "value": true },
+        { "field": "drawings.editableCadProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Ficheiros CAD editáveis entregues: {drawings.editableCadProvided}",
+      "requiredValue": "Ficheiros DWG ou DXF editáveis entregues juntamente com os PDF",
+      "remediation": "Entregue os ficheiros CAD editáveis em formato DWG (AutoCAD 2018 ou anterior para compatibilidade) ou DXF juntamente com os ficheiros PDF. Assegure que os ficheiros DWG incluem todas as referências externas (xrefs) e fontes utilizadas, ou faça bind/purge antes da entrega.",
+      "enabled": true,
+      "tags": ["digital", "cad", "dwg", "dxf", "editável"]
+    },
+    {
+      "id": "DRW-DIGIT-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º",
+      "description": "Resolução mínima de digitalização — os documentos digitalizados (plantas existentes, levantamentos) devem ter resolução mínima de 300 DPI para garantir legibilidade.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.scannedDocuments", "operator": "==", "value": true },
+        { "field": "drawings.scanResolutionDPI", "operator": "<", "value": 300 }
+      ],
+      "currentValueTemplate": "Resolução de digitalização: {drawings.scanResolutionDPI} DPI",
+      "requiredValue": "Resolução mínima de 300 DPI para documentos digitalizados",
+      "remediation": "Digitalize todos os documentos com resolução mínima de 300 DPI. Para desenhos técnicos com linhas finas ou texto pequeno, recomenda-se 400-600 DPI. Utilize formato TIFF ou PDF sem compressão destrutiva. Verifique que todos os detalhes, cotas e textos são legíveis após digitalização.",
+      "enabled": true,
+      "tags": ["digital", "digitalização", "resolução", "dpi", "qualidade"]
+    },
+    {
+      "id": "DRW-DIGIT-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 12.º e DL 12/2021",
+      "description": "Assinatura digital do projectista — as peças desenhadas submetidas electronicamente devem conter assinatura digital qualificada do técnico autor do projecto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "drawings.digitalSubmission", "operator": "==", "value": true },
+        { "field": "drawings.digitalSignaturePresent", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Assinatura digital presente: {drawings.digitalSignaturePresent}",
+      "requiredValue": "Assinatura digital qualificada do projectista responsável em todos os desenhos",
+      "remediation": "Assine digitalmente todos os ficheiros PDF dos desenhos com certificado digital qualificado (Cartão de Cidadão ou certificado profissional da Ordem dos Engenheiros / Ordem dos Arquitectos). A assinatura digital tem valor legal equivalente à assinatura manuscrita e é obrigatória para submissões electrónicas.",
+      "enabled": true,
+      "tags": ["digital", "assinatura", "certificado", "projectista", "legal"]
+    },
+    {
+      "id": "DRW-DIGIT-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º e 12.º",
+      "description": "Índice de peças desenhadas — deve existir um índice geral (mapa de desenhos) que liste todas as peças desenhadas do projecto, com número, designação, escala e data de revisão.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "drawings.drawingIndexProvided", "operator": "!=", "value": true }
+      ],
+      "currentValueTemplate": "Índice de peças desenhadas: {drawings.drawingIndexProvided}",
+      "requiredValue": "Índice geral com listagem de todas as peças desenhadas do projecto",
+      "remediation": "Elabore um índice geral de peças desenhadas (mapa de desenhos) contendo para cada desenho: número de referência, designação/título, escala, formato de papel, data de emissão, número de revisão e estado (preliminar, para aprovação, para construção). O índice deve ser actualizado sempre que houver alterações ao conjunto de desenhos.",
+      "enabled": true,
+      "tags": ["digital", "índice", "organização", "peças", "controlo"]
     }
   ]
 }

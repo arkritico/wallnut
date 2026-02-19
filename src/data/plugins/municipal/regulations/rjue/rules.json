@@ -1,0 +1,486 @@
+{
+  "regulationRef": "rjue-dl-555-99",
+  "description": "Regras de procedimentos urbanísticos do RJUE (DL 555/99) aplicáveis no contexto municipal — licenciamento, autorização de utilização, estaleiro de obra, demolição e procedimentos especiais.",
+  "extractedBy": "claude-regulatory-expansion",
+  "extractedAt": "2026-02-19",
+  "rules": [
+    {
+      "id": "PDM-LIC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 4.º — Licença de Construção Obrigatória",
+      "description": "As obras de construção nova estão sujeitas a licenciamento municipal obrigatório. O início de obras sem licença válida constitui contraordenação grave nos termos do RJUE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.operationType", "operator": "==", "value": "construcao_nova" },
+        { "field": "municipal.hasConstructionLicense", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Licença de construção: {municipal.hasConstructionLicense}",
+      "requiredValue": "Licença de construção obtida antes do início das obras (hasConstructionLicense = true)",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal competente nos termos do Art. 4.º do DL 555/99. O início de obras sem licença constitui contraordenação grave (Art. 98.º), podendo resultar em embargo e demolição coerciva.",
+      "enabled": true,
+      "tags": ["licenciamento", "construção-nova", "RJUE", "obrigatório"]
+    },
+    {
+      "id": "PDM-LIC-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 34.º — Comunicação Prévia",
+      "description": "Determinadas obras (alterações interiores, reconstrução sem aumento de cércea/pisos em zona não protegida, etc.) podem seguir o procedimento simplificado de comunicação prévia, dispensando licenciamento formal.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.operationType", "operator": "in", "value": ["alteracao_interior", "reconstrucao_sem_alteracao", "obras_interiores"] },
+        { "field": "municipal.isInProtectedZone", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Tipo de operação: {municipal.operationType}",
+      "requiredValue": "Comunicação prévia admissível para este tipo de obra (Art. 34.º RJUE)",
+      "remediation": "A operação urbanística pode beneficiar do procedimento simplificado de comunicação prévia (Art. 34.º do DL 555/99). Apresentar comunicação prévia à câmara municipal com os elementos instrutórios exigidos pela Portaria 113/2015. A obra pode iniciar-se após o prazo de 20 dias sem rejeição.",
+      "enabled": true,
+      "tags": ["comunicação-prévia", "simplificação", "RJUE", "procedimento"]
+    },
+    {
+      "id": "PDM-LIC-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 58.º — Prazo de Validade da Licença",
+      "description": "A licença de construção tem um prazo de validade para início das obras, tipicamente 12 meses a contar da data de emissão do alvará. A caducidade da licença impede o início ou prosseguimento das obras.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.licenseIssueDateMonthsAgo", "operator": "exists", "value": null },
+        { "field": "municipal.licenseIssueDateMonthsAgo", "operator": ">", "value": 12 },
+        { "field": "municipal.worksStarted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Licença emitida há {municipal.licenseIssueDateMonthsAgo} meses, obras não iniciadas",
+      "requiredValue": "Início das obras dentro de 12 meses após emissão do alvará (Art. 58.º RJUE)",
+      "remediation": "A licença de construção pode ter caducado por não terem sido iniciadas as obras dentro do prazo de 12 meses (Art. 58.º do DL 555/99). Requerer à câmara municipal a prorrogação do prazo ou solicitar nova licença. Verificar igualmente o prazo de conclusão das obras fixado no alvará.",
+      "enabled": true,
+      "tags": ["prazo", "validade", "licença", "caducidade", "RJUE"]
+    },
+    {
+      "id": "PDM-LIC-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 74.º — Alvará de Construção",
+      "description": "O alvará de construção é o documento formal que titula a licença e deve ser obtido antes do início de quaisquer trabalhos. A realização de obras sem alvará válido é proibida.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasConstructionLicense", "operator": "==", "value": true },
+        { "field": "municipal.hasAlvara", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Alvará de construção: {municipal.hasAlvara}",
+      "requiredValue": "Alvará de construção emitido e válido antes do início das obras (hasAlvara = true)",
+      "remediation": "Requerer a emissão do alvará de construção à câmara municipal após deferimento da licença (Art. 74.º do DL 555/99). O alvará só é emitido após pagamento das taxas devidas e prestação de caução (quando aplicável). Não iniciar obras antes da obtenção do alvará.",
+      "enabled": true,
+      "tags": ["alvará", "construção", "RJUE", "obrigatório"]
+    },
+    {
+      "id": "PDM-LIC-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 11.º — Projeto Completo para Licenciamento",
+      "description": "O pedido de licenciamento deve ser instruído com todos os projetos das especialidades exigidos (arquitetura, estabilidade, águas e esgotos, AVAC, eletricidade, gás, telecomunicações, acústica, térmica, segurança contra incêndio), conforme a Portaria 113/2015.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.allSpecialtyProjectsSubmitted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Projetos de especialidades completos: {municipal.allSpecialtyProjectsSubmitted}",
+      "requiredValue": "Todos os projetos de especialidades exigidos submetidos (allSpecialtyProjectsSubmitted = true)",
+      "remediation": "Completar a instrução do pedido de licenciamento com todos os projetos de especialidades obrigatórios nos termos do Art. 11.º do DL 555/99 e da Portaria 113/2015. A câmara municipal pode rejeitar liminarmente pedidos incompletos. Verificar a necessidade de: projeto de estabilidade, projeto de águas e esgotos, projeto de AVAC, projeto elétrico (ITED), projeto de gás, projeto acústico, projeto térmico/SCE e projeto de segurança contra incêndio (SCIE).",
+      "enabled": true,
+      "tags": ["especialidades", "projetos", "instrução", "licenciamento", "RJUE"]
+    },
+    {
+      "id": "PDM-UTIL-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 62.º — Autorização de Utilização Obrigatória",
+      "description": "Nenhum edifício pode ser utilizado sem autorização de utilização emitida pela câmara municipal. A ocupação ou utilização de edifício sem esta autorização constitui contraordenação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.buildingOccupied", "operator": "==", "value": true },
+        { "field": "municipal.hasUtilizationPermit", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Autorização de utilização: {municipal.hasUtilizationPermit}",
+      "requiredValue": "Autorização de utilização emitida antes da ocupação do edifício (hasUtilizationPermit = true)",
+      "remediation": "Requerer a autorização de utilização à câmara municipal nos termos do Art. 62.º do DL 555/99, antes de qualquer ocupação ou utilização do edifício. A utilização sem autorização é punível com coima e pode resultar no despejo administrativo.",
+      "enabled": true,
+      "tags": ["autorização-utilização", "ocupação", "RJUE", "obrigatório"]
+    },
+    {
+      "id": "PDM-UTIL-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 63.º — Conformidade com Projeto Aprovado",
+      "description": "O edifício construído deve estar em conformidade com o projeto aprovado e as condições da licença. Desvios significativos ao projeto aprovado podem impedir a emissão da autorização de utilização.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.matchesApprovedProject", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Conformidade com projeto aprovado: {municipal.matchesApprovedProject}",
+      "requiredValue": "Obra em conformidade com o projeto aprovado (matchesApprovedProject = true)",
+      "remediation": "Verificar e corrigir todas as desconformidades entre a obra executada e o projeto aprovado. Se as alterações forem substanciais, pode ser necessário submeter um pedido de alteração ao projeto (Art. 27.º do DL 555/99) antes de requerer a autorização de utilização. Desvios não regularizados impedem a emissão da autorização de utilização.",
+      "enabled": true,
+      "tags": ["conformidade", "projeto-aprovado", "utilização", "RJUE"]
+    },
+    {
+      "id": "PDM-UTIL-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 64.º — Vistoria Municipal",
+      "description": "A autorização de utilização é precedida de vistoria municipal para verificação da conformidade da obra com o projeto aprovado e condições da licença. A vistoria deve ser requerida pelo titular da licença.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.municipalInspectionCompleted", "operator": "==", "value": false },
+        { "field": "municipal.worksCompleted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Vistoria municipal realizada: {municipal.municipalInspectionCompleted}",
+      "requiredValue": "Vistoria municipal concluída com parecer favorável (municipalInspectionCompleted = true)",
+      "remediation": "Requerer a vistoria municipal à câmara municipal após a conclusão das obras (Art. 64.º do DL 555/99). A vistoria deve ser realizada no prazo de 30 dias após o requerimento. Garantir que a obra está concluída, limpa e acessível para a inspeção. Ter disponíveis no local todos os termos de responsabilidade dos técnicos e as telas finais.",
+      "enabled": true,
+      "tags": ["vistoria", "inspeção", "utilização", "RJUE"]
+    },
+    {
+      "id": "PDM-UTIL-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 66.º — Constituição de Propriedade Horizontal",
+      "description": "A constituição de propriedade horizontal requer autorização administrativa da câmara municipal, que verifica a conformidade das frações autónomas com o projeto aprovado e com os requisitos legais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.requiresHorizontalProperty", "operator": "==", "value": true },
+        { "field": "municipal.hasHorizontalPropertyAuth", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Autorização para PH: {municipal.hasHorizontalPropertyAuth}",
+      "requiredValue": "Autorização de constituição de propriedade horizontal obtida (hasHorizontalPropertyAuth = true)",
+      "remediation": "Requerer a autorização de constituição de propriedade horizontal à câmara municipal nos termos do Art. 66.º do DL 555/99. Apresentar projeto com a descrição de todas as frações autónomas, partes comuns e respetivas permilagens. Cada fração deve cumprir os requisitos de autonomia funcional e acesso independente.",
+      "enabled": true,
+      "tags": ["propriedade-horizontal", "frações", "autorização", "RJUE"]
+    },
+    {
+      "id": "PDM-UTIL-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 128.º-A — Telas Finais Obrigatórias",
+      "description": "As telas finais (desenhos as-built) são obrigatórias para a emissão da autorização de utilização. Devem refletir fielmente a obra executada, incluindo todas as alterações introduzidas durante a construção.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.asBuiltDrawingsSubmitted", "operator": "==", "value": false },
+        { "field": "municipal.worksCompleted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Telas finais entregues: {municipal.asBuiltDrawingsSubmitted}",
+      "requiredValue": "Telas finais submetidas à câmara municipal (asBuiltDrawingsSubmitted = true)",
+      "remediation": "Elaborar e submeter as telas finais (as-built drawings) à câmara municipal nos termos do Art. 128.º-A do DL 555/99. As telas finais devem ser elaboradas pelo diretor de fiscalização e incluir todas as peças desenhadas atualizadas que reflitam fielmente a obra construída, incluindo projetos de especialidades. A não entrega das telas finais impede a emissão da autorização de utilização.",
+      "enabled": true,
+      "tags": ["telas-finais", "as-built", "utilização", "RJUE"]
+    },
+    {
+      "id": "PDM-OBRA-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 80.º-A — Aviso de Início de Obra",
+      "description": "O titular da licença de construção deve comunicar à câmara municipal a data de início das obras com antecedência mínima de 5 dias úteis. O incumprimento desta obrigação constitui contraordenação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.startNoticeSubmitted", "operator": "==", "value": false },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Aviso de início de obra: {municipal.startNoticeSubmitted}",
+      "requiredValue": "Aviso de início de obra comunicado à câmara municipal (startNoticeSubmitted = true)",
+      "remediation": "Comunicar o início das obras à câmara municipal com antecedência mínima de 5 dias úteis, conforme Art. 80.º-A do DL 555/99. A comunicação deve incluir a identificação do diretor de obra, do diretor de fiscalização e da empresa de construção. Juntar as declarações de responsabilidade dos técnicos e o plano de segurança e saúde.",
+      "enabled": true,
+      "tags": ["início-obra", "comunicação", "estaleiro", "RJUE"]
+    },
+    {
+      "id": "PDM-OBRA-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / Portaria 1268/2008 — Livro de Obra Obrigatório",
+      "description": "O livro de obra é obrigatório em todos os estaleiros de obras sujeitas a licenciamento ou comunicação prévia. Deve estar permanentemente disponível no local da obra e ser preenchido regularmente pelo diretor de obra e pelo diretor de fiscalização.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.hasConstructionLogbook", "operator": "==", "value": false },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Livro de obra presente: {municipal.hasConstructionLogbook}",
+      "requiredValue": "Livro de obra presente no estaleiro e atualizado (hasConstructionLogbook = true)",
+      "remediation": "Adquirir e manter o livro de obra no estaleiro conforme a Portaria 1268/2008. O livro deve ser preenchido pelo diretor de obra e pelo diretor de fiscalização, registando todas as ocorrências relevantes, visitas de inspeção, alterações ao projeto e decisões técnicas. A ausência do livro de obra constitui contraordenação.",
+      "enabled": true,
+      "tags": ["livro-obra", "estaleiro", "fiscalização", "RJUE"]
+    },
+    {
+      "id": "PDM-OBRA-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 78.º — Alvará Afixado em Obra",
+      "description": "O alvará de construção (ou comprovativo de comunicação prévia) deve ser afixado de forma visível no local da obra durante todo o período de execução dos trabalhos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.alvaraDisplayedOnSite", "operator": "==", "value": false },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Alvará afixado no estaleiro: {municipal.alvaraDisplayedOnSite}",
+      "requiredValue": "Alvará visível e afixado no local da obra (alvaraDisplayedOnSite = true)",
+      "remediation": "Afixar o alvará de construção (ou o recibo da comunicação prévia) em local visível da via pública no estaleiro da obra, conforme Art. 78.º do DL 555/99. O alvará deve permanecer afixado durante toda a execução dos trabalhos. A não afixação constitui contraordenação leve.",
+      "enabled": true,
+      "tags": ["alvará", "afixação", "estaleiro", "RJUE"]
+    },
+    {
+      "id": "PDM-OBRA-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 63.º-A — Diretor de Obra Qualificado",
+      "description": "A execução de obras sujeitas a licenciamento deve ser dirigida por um diretor de obra com qualificação profissional adequada (engenheiro ou arquiteto inscrito na respetiva Ordem profissional).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasSiteDirector", "operator": "==", "value": false },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Diretor de obra nomeado: {municipal.hasSiteDirector}",
+      "requiredValue": "Diretor de obra qualificado nomeado e com termo de responsabilidade (hasSiteDirector = true)",
+      "remediation": "Nomear um diretor de obra com qualificação profissional adequada nos termos do Art. 63.º-A do DL 555/99. O diretor de obra deve ser engenheiro civil ou arquiteto inscrito na respetiva Ordem e deve subscrever termo de responsabilidade. A execução de obras sem diretor de obra qualificado constitui contraordenação grave.",
+      "enabled": true,
+      "tags": ["diretor-obra", "qualificação", "responsabilidade", "RJUE"]
+    },
+    {
+      "id": "PDM-OBRA-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE) / DL 273/2003 — Tapumes e Vedação de Estaleiro",
+      "description": "O estaleiro de obra deve ser vedado com tapumes ou vedações adequadas para garantir a segurança pública, impedir o acesso de pessoas não autorizadas e minimizar perturbações na via pública e vizinhança.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.siteFencingInstalled", "operator": "==", "value": false },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true },
+        { "field": "municipal.siteAdjacentToPublicWay", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Tapumes/vedação instalados: {municipal.siteFencingInstalled}",
+      "requiredValue": "Vedação do estaleiro instalada com tapumes adequados (siteFencingInstalled = true)",
+      "remediation": "Instalar tapumes e vedação do estaleiro conforme as normas de segurança do DL 273/2003 e regulamento municipal de urbanização e edificação. Os tapumes devem ter altura mínima de 2 m, ser estáveis e impedir o acesso de terceiros ao estaleiro. Em vias públicas, pode ser necessário requerer licença de ocupação de via pública à câmara municipal. Garantir sinalização noturna adequada.",
+      "enabled": true,
+      "tags": ["tapumes", "vedação", "estaleiro", "segurança-pública", "RJUE"]
+    },
+    {
+      "id": "PDM-DEM-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 4.º, n.º 2, al. d) — Licença de Demolição",
+      "description": "As obras de demolição estão sujeitas a licenciamento municipal obrigatório e separado da licença de construção. A demolição sem licença constitui contraordenação muito grave.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.requiresDemolition", "operator": "==", "value": true },
+        { "field": "municipal.hasDemolitionLicense", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Licença de demolição: {municipal.hasDemolitionLicense}",
+      "requiredValue": "Licença de demolição obtida antes do início dos trabalhos (hasDemolitionLicense = true)",
+      "remediation": "Submeter pedido de licenciamento de demolição à câmara municipal nos termos do Art. 4.º, n.º 2, al. d) do DL 555/99. O pedido deve incluir levantamento do existente, memória descritiva da demolição, plano de segurança e gestão de resíduos (DL 46/2008). Em caso de imóvel classificado ou em zona de proteção, é necessário parecer da DGPC.",
+      "enabled": true,
+      "tags": ["demolição", "licenciamento", "RJUE", "obrigatório"]
+    },
+    {
+      "id": "PDM-DEM-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 14.º / DL 273/2003 — Plano de Demolição",
+      "description": "As obras de demolição devem ser precedidas de um plano de demolição que garanta a segurança dos trabalhadores, dos edifícios confinantes e do público, incluindo a gestão de resíduos de construção e demolição.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.requiresDemolition", "operator": "==", "value": true },
+        { "field": "municipal.hasDemolitionPlan", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Plano de demolição: {municipal.hasDemolitionPlan}",
+      "requiredValue": "Plano de demolição aprovado e disponível (hasDemolitionPlan = true)",
+      "remediation": "Elaborar plano de demolição detalhado incluindo: faseamento dos trabalhos, métodos de demolição, medidas de segurança para edifícios confinantes, plano de gestão de resíduos de construção e demolição (RCD) conforme DL 46/2008, medidas de contenção de poeiras e ruído, e plano de emergência. O plano deve ser elaborado por técnico habilitado.",
+      "enabled": true,
+      "tags": ["demolição", "plano", "segurança", "resíduos", "RJUE"]
+    },
+    {
+      "id": "PDM-DEM-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 14.º — Pedido de Informação Prévia (PIP)",
+      "description": "O interessado pode submeter um pedido de informação prévia (PIP) à câmara municipal para obter vinculação sobre a viabilidade urbanística de uma operação antes de submeter o pedido de licenciamento formal.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.hasPriorInformationRequest", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "PIP submetido: {municipal.hasPriorInformationRequest}",
+      "requiredValue": "PIP opcional mas recomendado para projetos complexos",
+      "remediation": "Considerar a submissão de um pedido de informação prévia (PIP) à câmara municipal nos termos do Art. 14.º do DL 555/99. O PIP vincula a câmara durante 1 ano quanto às condições urbanísticas informadas, dando segurança jurídica ao promotor antes de investir nos projetos de especialidades. O PIP é especialmente recomendado para operações urbanísticas complexas ou em zonas com condicionantes diversas.",
+      "enabled": true,
+      "tags": ["PIP", "informação-prévia", "viabilidade", "RJUE"]
+    },
+    {
+      "id": "PDM-DEM-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 89.º — Obras de Conservação Obrigatória",
+      "description": "A câmara municipal pode determinar a execução de obras de conservação necessárias à correção de más condições de segurança ou salubridade de edifícios existentes. O proprietário é obrigado a executar as obras no prazo fixado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.conservationOrderIssued", "operator": "==", "value": true },
+        { "field": "municipal.conservationWorksCompleted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ordem de conservação: emitida, obras concluídas: {municipal.conservationWorksCompleted}",
+      "requiredValue": "Obras de conservação obrigatória concluídas no prazo fixado (conservationWorksCompleted = true)",
+      "remediation": "Executar as obras de conservação determinadas pela câmara municipal no prazo fixado na notificação, nos termos do Art. 89.º do DL 555/99. O incumprimento pode resultar na execução coerciva das obras a expensas do proprietário, na posse administrativa do imóvel ou na aplicação de coimas. Se necessário, requerer a prorrogação do prazo com justificação fundamentada.",
+      "enabled": true,
+      "tags": ["conservação", "obrigatória", "segurança", "salubridade", "RJUE"]
+    },
+    {
+      "id": "PDM-DEM-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 4.º, n.º 2 — Obras de Urbanização",
+      "description": "As obras de urbanização (arruamentos, infraestruturas, espaços verdes e equipamentos de utilização coletiva) estão sujeitas a licenciamento próprio e seguem regras específicas de execução, receção e conservação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.includesUrbanizationWorks", "operator": "==", "value": true },
+        { "field": "municipal.hasUrbanizationLicense", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Licença de obras de urbanização: {municipal.hasUrbanizationLicense}",
+      "requiredValue": "Licença de obras de urbanização obtida (hasUrbanizationLicense = true)",
+      "remediation": "Submeter pedido de licenciamento de obras de urbanização à câmara municipal nos termos do Art. 4.º, n.º 2 do DL 555/99. O pedido deve incluir projetos de arruamentos, redes de água, saneamento, eletricidade, telecomunicações, gás e espaços verdes. As obras de urbanização estão sujeitas a caução para garantia da boa execução e a receção provisória e definitiva pela câmara municipal.",
+      "enabled": true,
+      "tags": ["urbanização", "infraestruturas", "arruamentos", "licenciamento", "RJUE"]
+    },
+
+    {
+      "id": "PDM-FISC-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 93.º — Fiscalização Municipal de Obras",
+      "description": "A câmara municipal tem o direito e o dever de fiscalizar a conformidade de quaisquer obras com os projetos aprovados e as condições de licenciamento, podendo inspecionar a obra a qualquer momento durante a sua execução.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.worksStarted", "operator": "==", "value": true },
+        { "field": "municipal.municipalInspectionReadiness", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Obra pronta para fiscalização municipal: {municipal.municipalInspectionReadiness}",
+      "requiredValue": "Obra permanentemente preparada para inspeção municipal (municipalInspectionReadiness = true)",
+      "remediation": "Garantir que a obra está permanentemente preparada para inspeção pela câmara municipal, nos termos do Art. 93.º do DL 555/99. Manter acessíveis no estaleiro: alvará de construção, livro de obra, projetos aprovados, termos de responsabilidade e plano de segurança e saúde. Os fiscais municipais podem aceder à obra sem aviso prévio. A obstrução à fiscalização constitui contraordenação.",
+      "enabled": true,
+      "tags": ["fiscalização", "inspeção", "câmara-municipal", "RJUE", "art-93"]
+    },
+    {
+      "id": "PDM-FISC-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 102.º — Embargo de Obras",
+      "description": "A câmara municipal pode ordenar o embargo total ou parcial de obras que estejam a ser executadas sem licença, em desconformidade com o projeto aprovado, ou em violação de normas legais e regulamentares. O embargo determina a suspensão imediata de todos os trabalhos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.embargoRisk", "operator": "==", "value": true },
+        { "field": "municipal.worksStarted", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Risco de embargo: {municipal.embargoRisk}",
+      "requiredValue": "Obra em conformidade com a licença, sem risco de embargo (embargoRisk = false)",
+      "remediation": "Corrigir imediatamente todas as desconformidades identificadas para evitar o embargo da obra nos termos do Art. 102.º do DL 555/99. Em caso de embargo já decretado: suspender imediatamente todos os trabalhos, apresentar requerimento de legalização à câmara municipal e aguardar decisão. O desrespeito ao embargo constitui crime de desobediência qualificada. As obras de conservação para evitar degradação podem prosseguir com autorização.",
+      "enabled": true,
+      "tags": ["embargo", "suspensão", "desconformidade", "RJUE", "art-102"]
+    },
+    {
+      "id": "PDM-FISC-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 102.º-A — Legalização de Obras Ilegais",
+      "description": "As obras executadas sem licença ou em desconformidade com o projeto aprovado devem ser legalizadas mediante a submissão de pedido de legalização à câmara municipal, demonstrando que as obras cumprem as normas urbanísticas em vigor à data do pedido.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.hasIllegalWorks", "operator": "==", "value": true },
+        { "field": "municipal.legalizationSubmitted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Obras ilegais identificadas: {municipal.hasIllegalWorks} | Legalização submetida: {municipal.legalizationSubmitted}",
+      "requiredValue": "Pedido de legalização submetido para regularização das obras ilegais (legalizationSubmitted = true)",
+      "remediation": "Submeter pedido de legalização à câmara municipal nos termos do Art. 102.º-A do DL 555/99. O pedido deve demonstrar que as obras cumprem as normas legais e regulamentares em vigor à data do pedido de legalização. São aplicáveis as taxas de licenciamento acrescidas de agravamento por legalização (tipicamente triplicadas). Se as obras não forem legalizáveis, deve proceder-se à reposição da legalidade (demolição ou correção das desconformidades).",
+      "enabled": true,
+      "tags": ["legalização", "obras-ilegais", "regularização", "RJUE", "art-102-A"]
+    },
+    {
+      "id": "PDM-FISC-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 106.º — Reposição da Legalidade",
+      "description": "Quando as obras não são legalizáveis, a câmara municipal ordena a reposição da legalidade, que pode implicar a correção das desconformidades, a reconstrução ou, em último caso, a demolição total ou parcial das obras não conformes.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.legalityRestorationOrdered", "operator": "==", "value": true },
+        { "field": "municipal.legalityRestored", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Ordem de reposição da legalidade: emitida | Cumprida: {municipal.legalityRestored}",
+      "requiredValue": "Reposição da legalidade cumprida no prazo fixado (legalityRestored = true)",
+      "remediation": "Cumprir a ordem de reposição da legalidade no prazo fixado pela câmara municipal, nos termos do Art. 106.º do DL 555/99. A reposição pode implicar: correção das desconformidades ao projeto aprovado, reconstrução de elementos demolidos ilegalmente, ou demolição total/parcial das obras não conformes. O incumprimento resulta em execução coerciva a expensas do proprietário, posse administrativa do imóvel e aplicação de coimas agravadas.",
+      "enabled": true,
+      "tags": ["reposição-legalidade", "demolição", "correção", "RJUE", "art-106"]
+    },
+    {
+      "id": "PDM-FISC-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 98.º e 98.º-A — Contraordenações Urbanísticas",
+      "description": "A violação das normas urbanísticas constitui contraordenação punível com coimas que variam conforme a gravidade: muito graves (obras sem licença, desrespeito a embargo), graves (obras em desconformidade com projeto), e leves (falta de documentação em obra).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.urbanInfractionDetected", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Infração urbanística detetada: {municipal.urbanInfractionDetected}",
+      "requiredValue": "Sem infrações urbanísticas detetadas (urbanInfractionDetected = false)",
+      "remediation": "Corrigir imediatamente a situação que originou a contraordenação urbanística. Nos termos do Art. 98.º do DL 555/99, as coimas variam: infrações muito graves (€500 a €200.000 para pessoas singulares, €1.500 a €450.000 para pessoas coletivas), graves (€250 a €100.000 / €750 a €250.000), leves (€50 a €5.000 / €150 a €15.000). A regularização voluntária da situação pode atenuar a coima. Para além da coima, pode ser decretado o embargo da obra e a obrigação de reposição da legalidade.",
+      "enabled": true,
+      "tags": ["contraordenações", "coimas", "infrações", "RJUE", "art-98"]
+    },
+
+    {
+      "id": "PDM-CONS-01",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 89.º, n.º 1 — Dever de Conservação dos Edifícios",
+      "description": "O proprietário de qualquer edifício tem o dever de o manter em boas condições de utilização, segurança, salubridade e arranjo estético. Deve realizar as obras de conservação necessárias pelo menos uma vez em cada período de oito anos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.buildingAge", "operator": ">", "value": 0 },
+        { "field": "municipal.lastConservationYearsAgo", "operator": ">", "value": 8 }
+      ],
+      "currentValueTemplate": "Última conservação há {municipal.lastConservationYearsAgo} anos",
+      "requiredValue": "Obras de conservação realizadas nos últimos 8 anos (Art. 89.º, n.º 1 RJUE)",
+      "remediation": "Nos termos do Art. 89.º, n.º 1 do DL 555/99, o proprietário é obrigado a realizar obras de conservação pelo menos uma vez em cada período de 8 anos. Proceder à inspeção do estado de conservação do edifício e executar as obras necessárias, incluindo: reparação de fachadas, cobertura, caixilharias, instalações comuns, elementos estruturais e sistemas de segurança. A câmara municipal pode ordenar a execução coerciva das obras em caso de incumprimento.",
+      "enabled": true,
+      "tags": ["conservação", "dever-proprietário", "manutenção", "8-anos", "RJUE", "art-89"]
+    },
+    {
+      "id": "PDM-CONS-02",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 89.º / NRAU (Lei 6/2006) — Estado de Conservação Mínimo",
+      "description": "O edifício deve manter um nível de conservação mínimo que garanta condições de segurança, salubridade e arranjo estético. O nível de conservação é aferido pelo método de avaliação do estado de conservação (MAEC) previsto no NRAU.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.conservationLevel", "operator": "exists", "value": null },
+        { "field": "municipal.conservationLevel", "operator": "<", "value": 3 }
+      ],
+      "currentValueTemplate": "Nível de conservação (MAEC): {municipal.conservationLevel}",
+      "requiredValue": "Nível de conservação ≥ 3 (bom estado) conforme MAEC/NRAU",
+      "remediation": "O edifício apresenta um nível de conservação insuficiente, conforme avaliação pelo MAEC (Método de Avaliação do Estado de Conservação). Realizar obras de conservação para repor o nível mínimo exigido (nível 3 — bom estado). Para edifícios arrendados, o nível de conservação é determinante para a atualização de rendas nos termos do NRAU (Lei 6/2006). Solicitar vistoria municipal para aferir formalmente o nível de conservação.",
+      "enabled": true,
+      "tags": ["conservação", "MAEC", "NRAU", "nível-conservação", "salubridade", "RJUE"]
+    },
+    {
+      "id": "PDM-CONS-03",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 91.º — Obras Coercivas Municipais",
+      "description": "Quando o proprietário não realiza as obras de conservação determinadas pela câmara municipal dentro do prazo fixado, o município pode determinar a posse administrativa do imóvel e mandar executar as obras coercivamente, a expensas do proprietário.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.coerciveWorksOrdered", "operator": "==", "value": true },
+        { "field": "municipal.coerciveWorksComplied", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Obras coercivas ordenadas: {municipal.coerciveWorksOrdered} | Cumprido: {municipal.coerciveWorksComplied}",
+      "requiredValue": "Ordem de obras coercivas cumprida ou obras realizadas voluntariamente (coerciveWorksComplied = true)",
+      "remediation": "Cumprir a ordem de obras coercivas no prazo fixado pela câmara municipal, nos termos do Art. 91.º do DL 555/99. Se o proprietário não executar as obras, a câmara pode: tomar posse administrativa do imóvel, executar as obras a expensas do proprietário, e inscrever o crédito na matriz predial como ónus real sobre o imóvel. Os custos das obras coercivas constituem dívida privilegiada e podem ser cobrados coercivamente.",
+      "enabled": true,
+      "tags": ["obras-coercivas", "conservação", "posse-administrativa", "RJUE", "art-91"]
+    },
+    {
+      "id": "PDM-CONS-04",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 91.º, n.º 2 — Posse Administrativa de Imóvel",
+      "description": "Para execução de obras coercivas, a câmara municipal pode tomar posse administrativa do imóvel pelo tempo necessário à realização das obras. A posse administrativa é uma medida de último recurso quando o proprietário não cumpre a ordem de conservação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.administrativePossessionRisk", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Risco de posse administrativa: {municipal.administrativePossessionRisk}",
+      "requiredValue": "Sem risco de posse administrativa — obras de conservação realizadas atempadamente",
+      "remediation": "Para evitar a posse administrativa do imóvel nos termos do Art. 91.º, n.º 2 do DL 555/99, executar voluntariamente as obras de conservação determinadas pela câmara municipal dentro do prazo fixado. A posse administrativa permite ao município tomar posse do imóvel, alojar temporariamente os ocupantes e executar as obras necessárias, recuperando os custos sobre o proprietário. Em caso de posse administrativa já decretada, colaborar com o município na execução das obras.",
+      "enabled": true,
+      "tags": ["posse-administrativa", "conservação", "câmara-municipal", "RJUE", "art-91"]
+    },
+    {
+      "id": "PDM-CONS-05",
+      "regulationId": "rjue-dl-555-99",
+      "article": "DL 555/99 (RJUE), Art. 89.º, n.º 3 — Edifícios em Ruína / Ordem de Demolição",
+      "description": "Quando o edifício ameace ruína ou constitua perigo para a segurança de pessoas e bens, a câmara municipal pode ordenar a demolição total ou parcial do edifício, precedida de vistoria municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.buildingInRuinState", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Edifício em estado de ruína: {municipal.buildingInRuinState}",
+      "requiredValue": "Edifício em bom estado de conservação, sem ameaça de ruína (buildingInRuinState = false)",
+      "remediation": "Nos termos do Art. 89.º, n.º 3 do DL 555/99, a câmara municipal pode ordenar a demolição de edifícios que ameacem ruína. Para evitar a ordem de demolição: realizar urgentemente as obras de reforço estrutural e conservação necessárias, apresentar projeto de reabilitação ou reconstrução à câmara municipal, e demonstrar a viabilidade técnica e económica da recuperação do edifício. Em caso de demolição ordenada, cumprir no prazo fixado e gerir os resíduos de construção e demolição (RCD) conforme o DL 46/2008.",
+      "enabled": true,
+      "tags": ["ruína", "demolição", "segurança", "conservação", "RJUE", "art-89"]
+    }
+  ]
+}
