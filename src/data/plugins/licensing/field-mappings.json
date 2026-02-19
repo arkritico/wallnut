@@ -1,7 +1,7 @@
 {
   "pluginId": "licensing",
-  "version": "1.0.0",
-  "description": "Mapeamento de campos para regras de licenciamento urbanistico (RJUE - DL 555/99)",
+  "version": "2.0.0",
+  "description": "Mapeamento de campos para regras de licenciamento urbanistico (RJUE, RJRU, DL 273/2003, DL 136/2014)",
   "fields": [
     {
       "_group": "Tipo de Operacao",
@@ -9,10 +9,19 @@
       "label": "Tipo de operacao urbanistica",
       "type": "select",
       "options": [
-        { "value": "building_permit", "label": "Licenca de construcao" },
-        { "value": "urbanization_permit", "label": "Licenca de urbanizacao" },
-        { "value": "communication_prior", "label": "Comunicacao previa" },
-        { "value": "utilization", "label": "Autorizacao de utilizacao" }
+        { "value": "construcao_nova", "label": "Construcao nova" },
+        { "value": "ampliacao", "label": "Ampliacao" },
+        { "value": "reconstrucao", "label": "Reconstrucao" },
+        { "value": "alteracao_interior", "label": "Alteracao interior" },
+        { "value": "alteracao_utilizacao", "label": "Alteracao de utilizacao" },
+        { "value": "demolicao", "label": "Demolicao" },
+        { "value": "conservacao", "label": "Conservacao" },
+        { "value": "loteamento", "label": "Loteamento" },
+        { "value": "piscina", "label": "Piscina" },
+        { "value": "muro", "label": "Muro de vedacao" },
+        { "value": "vedacao", "label": "Vedacao" },
+        { "value": "paineis_solares", "label": "Paineis solares" },
+        { "value": "ar_condicionado", "label": "Ar condicionado" }
       ],
       "sources": ["form"],
       "required": true
@@ -26,7 +35,8 @@
         { "value": "licensing", "label": "Licenciamento" },
         { "value": "execution", "label": "Projeto de execucao" },
         { "value": "construction", "label": "Fase de obra" },
-        { "value": "completion", "label": "Conclusao" }
+        { "value": "completion", "label": "Conclusao" },
+        { "value": "utilization", "label": "Utilizacao" }
       ],
       "sources": ["form"],
       "required": true
@@ -101,6 +111,35 @@
     },
     {
       "_group": "Tipo de Operacao",
+      "field": "licensing.numberOfFloors",
+      "label": "Numero de pisos",
+      "type": "number",
+      "sources": ["form", "ifc"],
+      "required": false,
+      "description": "Numero total de pisos do edificio (acima e abaixo do solo)"
+    },
+    {
+      "_group": "Tipo de Operacao",
+      "field": "licensing.numberOfDwellings",
+      "label": "Numero de fogos",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero de fracoes autonomas/fogos habitacionais do edificio"
+    },
+    {
+      "_group": "Tipo de Operacao",
+      "field": "licensing.totalConstructionArea",
+      "label": "Area bruta de construcao",
+      "type": "number",
+      "unit": "m2",
+      "sources": ["form", "ifc"],
+      "required": false,
+      "description": "Area bruta de construcao total do projeto em metros quadrados"
+    },
+
+    {
+      "_group": "Controlo Previo",
       "field": "licensing.hasComunicacaoPrevia",
       "label": "Sujeito a comunicacao previa",
       "type": "boolean",
@@ -110,7 +149,7 @@
       "description": "Indica se a operacao urbanistica esta sujeita ao regime de comunicacao previa (Art. 4.o RJUE)"
     },
     {
-      "_group": "Tipo de Operacao",
+      "_group": "Controlo Previo",
       "field": "licensing.hasMunicipalApproval",
       "label": "Aprovacao municipal obtida",
       "type": "boolean",
@@ -118,6 +157,44 @@
       "required": false,
       "defaults": { "_default": false },
       "description": "Indica se foi obtida a aprovacao da Camara Municipal para o projeto"
+    },
+    {
+      "_group": "Controlo Previo",
+      "field": "licensing.dl136Eligible",
+      "label": "Elegivel para procedimento simplificado DL 136/2014",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se a operacao e elegivel para procedimento simplificado ao abrigo do DL 136/2014"
+    },
+    {
+      "_group": "Controlo Previo",
+      "field": "licensing.hasURBSimplified",
+      "label": "Procedimento urbanistico simplificado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se esta a utilizar o procedimento urbanistico simplificado"
+    },
+    {
+      "_group": "Controlo Previo",
+      "field": "licensing.hasCopiaSimples",
+      "label": "Copia simples submetida",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi submetida copia simples do projeto (procedimento simplificado)"
+    },
+    {
+      "_group": "Controlo Previo",
+      "field": "licensing.hasDeclaracaoConformidade",
+      "label": "Declaracao de conformidade",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi apresentada declaracao de conformidade do projeto com normas aplicaveis"
     },
 
     {
@@ -185,34 +262,6 @@
     },
     {
       "_group": "Documentos de Licenciamento",
-      "field": "licensing.requiresExternalConsultation",
-      "label": "Requer consulta a entidades externas",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": false },
-      "description": "Indica se o processo requer parecer de entidades externas (DGPC, APA, CCDR, etc.)"
-    },
-    {
-      "_group": "Documentos de Licenciamento",
-      "field": "licensing.hasExternalConsultations",
-      "label": "Consultas externas realizadas",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": false,
-      "description": "Indica se as consultas a entidades externas foram realizadas e os pareceres obtidos"
-    },
-    {
-      "_group": "Documentos de Licenciamento",
-      "field": "licensing.hasDGPCApproval",
-      "label": "Parecer da DGPC obtido",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": false,
-      "description": "Indica se foi obtido parecer favoravel da Direcao-Geral do Patrimonio Cultural (imoveis classificados)"
-    },
-    {
-      "_group": "Documentos de Licenciamento",
       "field": "licensing.prazoUltrapassado",
       "label": "Prazo de decisao ultrapassado",
       "type": "boolean",
@@ -221,8 +270,9 @@
       "defaults": { "_default": false },
       "description": "Indica se o prazo legal para decisao da Camara Municipal foi ultrapassado (deferimento tacito)"
     },
+
     {
-      "_group": "Documentos de Licenciamento",
+      "_group": "Alvara e Licencas",
       "field": "licensing.hasConstructionLicense",
       "label": "Alvara de construcao emitido",
       "type": "boolean",
@@ -232,7 +282,7 @@
       "description": "Indica se foi emitido o alvara de licenca de construcao (Art. 74.o RJUE)"
     },
     {
-      "_group": "Documentos de Licenciamento",
+      "_group": "Alvara e Licencas",
       "field": "licensing.alvaraValidityMonths",
       "label": "Validade do alvara",
       "type": "number",
@@ -243,7 +293,7 @@
       "description": "Prazo de validade do alvara de construcao em meses"
     },
     {
-      "_group": "Documentos de Licenciamento",
+      "_group": "Alvara e Licencas",
       "field": "licensing.hasDemolitionLicense",
       "label": "Licenca de demolicao",
       "type": "boolean",
@@ -253,13 +303,306 @@
       "description": "Indica se foi obtida licenca de demolicao quando aplicavel (Art. 6.o RJUE)"
     },
     {
-      "_group": "Documentos de Licenciamento",
-      "field": "licensing.hasPSS",
-      "label": "Plano de Seguranca e Saude (PSS)",
+      "_group": "Alvara e Licencas",
+      "field": "licensing.obraDeadlineMonths",
+      "label": "Prazo de conclusao da obra",
+      "type": "number",
+      "unit": "meses",
+      "sources": ["form"],
+      "required": false,
+      "description": "Prazo maximo de conclusao da obra fixado no alvara em meses"
+    },
+    {
+      "_group": "Alvara e Licencas",
+      "field": "licensing.hasProrogacao",
+      "label": "Prorogacao de prazo requerida",
       "type": "boolean",
       "sources": ["form"],
       "required": false,
-      "description": "Indica se foi elaborado o Plano de Seguranca e Saude em fase de projeto conforme DL 273/2003"
+      "defaults": { "_default": false },
+      "description": "Indica se foi requerida prorogacao do prazo de conclusao da obra"
+    },
+    {
+      "_group": "Alvara e Licencas",
+      "field": "licensing.prorogacaoApproved",
+      "label": "Prorogacao aprovada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a prorogacao de prazo foi aprovada pela camara municipal"
+    },
+    {
+      "_group": "Alvara e Licencas",
+      "field": "licensing.hasTaxasLicenciamentoPagas",
+      "label": "Taxas de licenciamento pagas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foram pagas as taxas urbanisticas devidas para emissao do alvara"
+    },
+
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.isLoteamento",
+      "label": "Operacao de loteamento",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se a operacao urbanistica e um loteamento (fracionamento de terreno)"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.hasAlvaraLoteamento",
+      "label": "Alvara de loteamento emitido",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi emitido alvara de loteamento para a operacao de urbanizacao"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.hasInfrastructureProject",
+      "label": "Projeto de infraestruturas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foram entregues os projetos de infraestruturas urbanisticas (arruamentos, redes, etc.)"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.hasCaucao",
+      "label": "Caucao prestada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi prestada caucao para garantia de execucao das infraestruturas urbanisticas"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.caucaoValue",
+      "label": "Valor da caucao",
+      "type": "number",
+      "unit": "EUR",
+      "sources": ["form"],
+      "required": false,
+      "description": "Valor da caucao prestada para garantia de infraestruturas em euros"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.hasRecepcaoProvisoria",
+      "label": "Rececao provisoria realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada a rececao provisoria das infraestruturas urbanisticas pela camara"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.hasRecepcaoDefinitiva",
+      "label": "Rececao definitiva realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada a rececao definitiva das infraestruturas apos periodo de garantia"
+    },
+    {
+      "_group": "Loteamento e Urbanizacao",
+      "field": "licensing.hasPropHorizontal",
+      "label": "Propriedade horizontal constituida",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi constituida a propriedade horizontal do edificio"
+    },
+
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.requiresExternalConsultation",
+      "label": "Requer consulta a entidades externas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o processo requer parecer de entidades externas (DGPC, APA, CCDR, etc.)"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.hasExternalConsultations",
+      "label": "Consultas externas realizadas",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se as consultas a entidades externas foram realizadas e os pareceres obtidos"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.hasDGPCApproval",
+      "label": "Parecer da DGPC obtido",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi obtido parecer favoravel da Direcao-Geral do Patrimonio Cultural (imoveis classificados)"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.hasParecerCCDR",
+      "label": "Parecer da CCDR obtido",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi obtido parecer da CCDR (Comissao de Coordenacao e Desenvolvimento Regional)"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.hasParecerAPA",
+      "label": "Parecer da APA obtido",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi obtido parecer da APA (Agencia Portuguesa do Ambiente)"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.hasEstudoImpacteAmbiental",
+      "label": "Estudo de impacte ambiental",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizado EIA (Estudo de Impacte Ambiental) quando exigido"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.isInREN",
+      "label": "Localizado em REN",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em area de Reserva Ecologica Nacional"
+    },
+    {
+      "_group": "Consultas Externas e Pareceres",
+      "field": "licensing.isInRAN",
+      "label": "Localizado em RAN",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se o terreno se encontra em area de Reserva Agricola Nacional"
+    },
+
+    {
+      "_group": "Qualificacao e Seguros",
+      "field": "licensing.hasIMPICRegistration",
+      "label": "Registo IMPIC do construtor",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o construtor possui registo valido no IMPIC (ex-InCI)"
+    },
+    {
+      "_group": "Qualificacao e Seguros",
+      "field": "licensing.hasComprovativoIMPIC",
+      "label": "Comprovativo IMPIC apresentado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi apresentado comprovativo do registo IMPIC do construtor"
+    },
+    {
+      "_group": "Qualificacao e Seguros",
+      "field": "licensing.constructorQualification",
+      "label": "Classe de habilitacao do construtor",
+      "type": "select",
+      "options": [
+        { "value": "1", "label": "Classe 1 (ate 166.000 EUR)" },
+        { "value": "2", "label": "Classe 2 (ate 332.000 EUR)" },
+        { "value": "3", "label": "Classe 3 (ate 664.000 EUR)" },
+        { "value": "4", "label": "Classe 4 (ate 1.328.000 EUR)" },
+        { "value": "5", "label": "Classe 5 (ate 2.656.000 EUR)" },
+        { "value": "6", "label": "Classe 6 (ate 5.312.000 EUR)" },
+        { "value": "7", "label": "Classe 7 (ate 10.624.000 EUR)" },
+        { "value": "8", "label": "Classe 8 (ate 16.600.000 EUR)" },
+        { "value": "9", "label": "Classe 9 (sem limite)" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Classe de habilitacao do construtor conforme Portaria 119/2012"
+    },
+    {
+      "_group": "Qualificacao e Seguros",
+      "field": "licensing.hasSeguroObra",
+      "label": "Seguro de obra",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o construtor possui seguro de responsabilidade civil de obra"
+    },
+    {
+      "_group": "Qualificacao e Seguros",
+      "field": "licensing.hasSeguroDecenalObrigatorio",
+      "label": "Seguro decenal obrigatorio",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi contratado seguro decenal obrigatorio (edificios habitacionais >4 fogos)"
+    },
+    {
+      "_group": "Qualificacao e Seguros",
+      "field": "licensing.hasSeguroResponsabilidade",
+      "label": "Seguro de responsabilidade profissional",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os tecnicos possuem seguro de responsabilidade profissional"
+    },
+
+    {
+      "_group": "Alteracoes em Obra",
+      "field": "licensing.hasAditamento",
+      "label": "Aditamento ao projeto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi submetido aditamento ao projeto aprovado para alteracoes em obra"
+    },
+    {
+      "_group": "Alteracoes em Obra",
+      "field": "licensing.aditamentoApproved",
+      "label": "Aditamento aprovado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o aditamento ao projeto foi aprovado pela camara municipal"
+    },
+    {
+      "_group": "Alteracoes em Obra",
+      "field": "licensing.hasDesvioAoProjeto",
+      "label": "Desvio ao projeto aprovado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se existem alteracoes em obra que constituem desvio ao projeto aprovado"
+    },
+    {
+      "_group": "Alteracoes em Obra",
+      "field": "licensing.isLegalizable",
+      "label": "Obra passivel de legalizacao",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a situacao existente e passivel de legalizacao nos termos do RJUE"
+    },
+    {
+      "_group": "Alteracoes em Obra",
+      "field": "licensing.hasEsquemaColor",
+      "label": "Esquema de cores aprovado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o esquema de cores foi aprovado pela camara (obrigatorio em areas protegidas)"
     },
 
     {
@@ -291,31 +634,22 @@
     },
     {
       "_group": "Fase de Obra",
+      "field": "licensing.requiresViaPublicaOccupation",
+      "label": "Requer ocupacao da via publica",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "defaults": { "_default": false },
+      "description": "Indica se a obra requer ocupacao da via publica para estaleiro, andaimes ou tapumes"
+    },
+    {
+      "_group": "Fase de Obra",
       "field": "licensing.hasViaPublicaLicense",
       "label": "Licenca de ocupacao da via publica",
       "type": "boolean",
       "sources": ["form"],
       "required": false,
       "description": "Indica se foi obtida licenca de ocupacao da via publica para estaleiro, andaimes ou tapumes"
-    },
-    {
-      "_group": "Fase de Obra",
-      "field": "licensing.hasDesvioAoProjeto",
-      "label": "Desvio ao projeto aprovado",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": false,
-      "defaults": { "_default": false },
-      "description": "Indica se existem alteracoes em obra que constituem desvio ao projeto aprovado"
-    },
-    {
-      "_group": "Fase de Obra",
-      "field": "licensing.isLegalizable",
-      "label": "Obra passivel de legalizacao",
-      "type": "boolean",
-      "sources": ["form"],
-      "required": false,
-      "description": "Indica se a situacao existente e passivel de legalizacao nos termos do RJUE"
     },
 
     {
@@ -335,6 +669,204 @@
       "sources": ["form"],
       "required": false,
       "description": "Indica se foi nomeado o diretor de fiscalizacao de obra conforme Art. 14.o do RJUE"
+    },
+
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasPSS",
+      "label": "Plano de Seguranca e Saude (PSS)",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborado o Plano de Seguranca e Saude em fase de projeto conforme DL 273/2003"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasPSSObraAtualizado",
+      "label": "PSS atualizado para fase de obra",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o PSS foi atualizado e desenvolvido para a fase de execucao da obra"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasCSSProjeto",
+      "label": "Coordenador de seguranca em projeto",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi nomeado coordenador de seguranca e saude em fase de projeto (CSS-P)"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasCSSObra",
+      "label": "Coordenador de seguranca em obra",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi nomeado coordenador de seguranca e saude em fase de obra (CSS-O)"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasComunicacaoACT",
+      "label": "Comunicacao previa ao ACT",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi efetuada comunicacao previa a ACT (Autoridade para as Condicoes de Trabalho)"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.numberOfWorkers",
+      "label": "Numero de trabalhadores em obra",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Numero maximo previsto de trabalhadores em simultaneo no estaleiro"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.constructionDurationDays",
+      "label": "Duracao prevista da obra",
+      "type": "number",
+      "unit": "dias",
+      "sources": ["form"],
+      "required": false,
+      "description": "Duracao prevista da obra em dias uteis"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasPlanoTrabalhoRiscosEspeciais",
+      "label": "Plano de trabalhos com riscos especiais",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborado plano para trabalhos com riscos especiais (altura, confinamento, explosivos, etc.)"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasFormacaoTrabalhadores",
+      "label": "Formacao de seguranca dos trabalhadores",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se os trabalhadores receberam formacao em seguranca e saude no trabalho"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasPlanoEmergencia",
+      "label": "Plano de emergencia do estaleiro",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborado plano de emergencia para o estaleiro de obra"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasSinalizacaoSeguranca",
+      "label": "Sinalizacao de seguranca",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe sinalizacao de seguranca adequada no estaleiro"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasRegistoAcidentes",
+      "label": "Registo de acidentes",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se e mantido registo de acidentes e incidentes de trabalho no estaleiro"
+    },
+    {
+      "_group": "Seguranca em Estaleiro (DL 273/2003)",
+      "field": "licensing.hasEsquemaOrganizativoObra",
+      "label": "Esquema organizativo da obra",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi elaborado esquema organizativo da obra com responsabilidades de seguranca"
+    },
+
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.hasERU",
+      "label": "Estrategia de Reabilitacao Urbana",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se a ARU possui ERU (Estrategia de Reabilitacao Urbana) aprovada"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.hasORU",
+      "label": "Operacao de Reabilitacao Urbana",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se existe ORU (Operacao de Reabilitacao Urbana) aprovada para a area"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.rehabLevel",
+      "label": "Nivel de intervencao de reabilitacao",
+      "type": "select",
+      "options": [
+        { "value": "light", "label": "Reabilitacao ligeira" },
+        { "value": "medium", "label": "Reabilitacao media" },
+        { "value": "deep", "label": "Reabilitacao profunda" },
+        { "value": "exceptional", "label": "Reabilitacao excecional" }
+      ],
+      "sources": ["form"],
+      "required": false,
+      "description": "Nivel de intervencao da reabilitacao conforme RJRU"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.hasNivelConservacao",
+      "label": "Nivel de conservacao avaliado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada avaliacao do nivel de conservacao do edificio (NRAU)"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.nivelConservacao",
+      "label": "Nivel de conservacao NRAU",
+      "type": "number",
+      "sources": ["form"],
+      "required": false,
+      "description": "Nivel de conservacao do edificio: 1 (pessimo) a 5 (excelente) conforme NRAU"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.hasObrigacaoReabilitar",
+      "label": "Obrigacao de reabilitar imposta",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi imposta obrigacao de reabilitar pelo municipio"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.hasAutoVistoria",
+      "label": "Auto-vistoria realizada",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se foi realizada auto-vistoria ao edificio para avaliacao do estado de conservacao"
+    },
+    {
+      "_group": "Reabilitacao Urbana (RJRU)",
+      "field": "licensing.hasProprietarioNotificado",
+      "label": "Proprietario notificado",
+      "type": "boolean",
+      "sources": ["form"],
+      "required": false,
+      "description": "Indica se o proprietario foi notificado da obrigacao de reabilitar ou de intervencao coerciva"
     },
 
     {
