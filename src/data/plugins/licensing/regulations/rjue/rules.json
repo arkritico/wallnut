@@ -6298,6 +6298,1519 @@
         "desenfumagem",
         "qualidade-ar"
       ]
+    },
+    {
+      "id": "RJUE-CONSULT-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º-A — Consulta Prévia Obrigatória",
+      "description": "Para operações urbanísticas de grande dimensão (área de construção superior a 2000 m²), é obrigatória a consulta prévia às entidades externas antes da submissão do pedido de licenciamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.grossBuildingArea",
+          "operator": ">",
+          "value": 2000
+        },
+        {
+          "field": "licensing.hasPriorConsultation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área de construção: {licensing.grossBuildingArea} m² — Consulta prévia: {licensing.hasPriorConsultation}",
+      "requiredValue": "Consulta prévia obrigatória para área > 2000 m²",
+      "remediation": "Submeter pedido de consulta prévia à câmara municipal nos termos do Art. 13.º-A do RJUE. A câmara promoverá as consultas às entidades externas competentes (CCDR, APA, DGPC, etc.) antes da instrução formal do pedido de licenciamento.",
+      "enabled": true,
+      "tags": [
+        "consulta-prévia",
+        "entidades-externas",
+        "grande-dimensão"
+      ]
+    },
+    {
+      "id": "RJUE-CONSULT-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º-A, n.º 2 — Consulta Prévia em Zona de Servidão",
+      "description": "Operações urbanísticas em zonas de servidão administrativa ou restrição de utilidade pública exigem consulta prévia às entidades com jurisdição sobre a servidão.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isInPublicEasementZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasPriorConsultationEasement",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona de servidão: {licensing.isInPublicEasementZone} — Consulta prévia servidão: {licensing.hasPriorConsultationEasement}",
+      "requiredValue": "Consulta prévia às entidades com jurisdição sobre a servidão",
+      "remediation": "Identificar as servidões administrativas e restrições de utilidade pública aplicáveis ao local (RAN, REN, domínio hídrico, estradas nacionais, aeroportos, etc.) e promover consulta prévia às respetivas entidades (DGADR, APA, IP, ANAC, etc.).",
+      "enabled": true,
+      "tags": [
+        "consulta-prévia",
+        "servidão",
+        "restrição",
+        "entidades-externas"
+      ]
+    },
+    {
+      "id": "RJUE-CONSULT-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º-A, n.º 3 — Prazo de Resposta das Entidades Consultadas",
+      "description": "As entidades externas consultadas devem pronunciar-se no prazo de 20 dias úteis. A ausência de resposta vale como parecer favorável (deferimento tácito).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasPriorConsultation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.consultationResponseDays",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "licensing.hasExplicitConsultationResponse",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Dias desde consulta: {licensing.consultationResponseDays} — Resposta explícita: {licensing.hasExplicitConsultationResponse}",
+      "requiredValue": "Deferimento tácito após 20 dias úteis sem resposta",
+      "remediation": "Decorridos 20 dias úteis sem resposta, considerar o parecer como favorável por deferimento tácito (Art. 13.º-A, n.º 3). Documentar a data de envio e o decurso do prazo para efeitos de instrução processual.",
+      "enabled": true,
+      "tags": [
+        "consulta-prévia",
+        "deferimento-tácito",
+        "prazo",
+        "entidades-externas"
+      ]
+    },
+    {
+      "id": "RJUE-AIA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 20.º, n.º 8 e DL 151-B/2013 — Avaliação de Impacte Ambiental",
+      "description": "Projetos de loteamento ou urbanização com área superior a 10 hectares ou que envolvam mais de 500 fogos estão sujeitos a Avaliação de Impacte Ambiental (AIA) obrigatória.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.totalLotArea",
+          "operator": ">",
+          "value": 100000
+        },
+        {
+          "field": "licensing.hasEnvironmentalImpactAssessment",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área total loteamento: {licensing.totalLotArea} m² — AIA: {licensing.hasEnvironmentalImpactAssessment}",
+      "requiredValue": "Declaração de Impacte Ambiental (DIA) favorável ou condicionalmente favorável",
+      "remediation": "Submeter Estudo de Impacte Ambiental (EIA) à Agência Portuguesa do Ambiente (APA) nos termos do DL 151-B/2013. O procedimento de AIA é prévio ao licenciamento e a DIA constitui condição de validade da licença urbanística.",
+      "enabled": true,
+      "tags": [
+        "AIA",
+        "impacte-ambiental",
+        "loteamento",
+        "APA"
+      ]
+    },
+    {
+      "id": "RJUE-AIA-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 151-B/2013, Anexo II — Triagem de AIA para Projetos Urbanos",
+      "description": "Projetos de urbanização com mais de 5 hectares em zona não abrangida por plano de urbanização aprovado podem estar sujeitos a procedimento de triagem para AIA (caso a caso).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.totalLotArea",
+          "operator": "between",
+          "value": [50000, 100000]
+        },
+        {
+          "field": "licensing.isInApprovedUrbanPlan",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.hasAIAScreening",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área: {licensing.totalLotArea} m² — Plano de urbanização aprovado: {licensing.isInApprovedUrbanPlan} — Triagem AIA: {licensing.hasAIAScreening}",
+      "requiredValue": "Decisão de triagem sobre necessidade de AIA",
+      "remediation": "Submeter pedido de triagem (caso a caso) à APA para determinar se o projeto requer AIA completa. A triagem avalia a sensibilidade ambiental do local, a dimensão e natureza do projeto, e os impactes cumulativos potenciais.",
+      "enabled": true,
+      "tags": [
+        "AIA",
+        "triagem",
+        "impacte-ambiental",
+        "urbanização"
+      ]
+    },
+    {
+      "id": "RJUE-AIA-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 151-B/2013, Art. 18.º — Pós-Avaliação de Impacte Ambiental",
+      "description": "Projetos sujeitos a AIA devem incluir programa de monitorização ambiental durante a fase de construção e exploração, conforme condições da DIA.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasEnvironmentalImpactAssessment",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasEnvironmentalMonitoringPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "AIA realizada: {licensing.hasEnvironmentalImpactAssessment} — Plano de monitorização: {licensing.hasEnvironmentalMonitoringPlan}",
+      "requiredValue": "Programa de monitorização ambiental conforme condições da DIA",
+      "remediation": "Elaborar programa de monitorização ambiental que cubra as fases de construção e exploração, conforme as condições impostas na DIA. O programa deve incluir indicadores de qualidade do ar, ruído, recursos hídricos e solos, com relatórios periódicos à APA.",
+      "enabled": true,
+      "tags": [
+        "AIA",
+        "monitorização",
+        "pós-avaliação",
+        "DIA"
+      ]
+    },
+    {
+      "id": "RJUE-HERIT-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 20.º, n.º 1, al. c) e Lei 107/2001 — Avaliação de Impacte Patrimonial",
+      "description": "Operações urbanísticas na envolvente de imóveis classificados ou em vias de classificação (zona de proteção de 50 m) requerem parecer da DGPC ou DRC competente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isInHeritageProtectionZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasDGPCOrDRCApproval",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona de proteção patrimonial: {licensing.isInHeritageProtectionZone} — Parecer DGPC/DRC: {licensing.hasDGPCOrDRCApproval}",
+      "requiredValue": "Parecer favorável da DGPC ou DRC sobre impacte patrimonial",
+      "remediation": "Requerer parecer à DGPC (bens de interesse nacional) ou DRC (bens de interesse público/municipal) sobre o impacte da operação urbanística no imóvel classificado e sua envolvente. O parecer é vinculativo e deve acompanhar o pedido de licenciamento.",
+      "enabled": true,
+      "tags": [
+        "património",
+        "DGPC",
+        "DRC",
+        "zona-proteção",
+        "impacte-patrimonial"
+      ]
+    },
+    {
+      "id": "RJUE-HERIT-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 107/2001, Art. 36.º — Estudo de Impacte Patrimonial em ZEP",
+      "description": "Operações de grande dimensão em Zona Especial de Proteção (ZEP) de imóvel classificado requerem estudo de impacte patrimonial detalhado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isInZEP",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.grossBuildingArea",
+          "operator": ">",
+          "value": 500
+        },
+        {
+          "field": "licensing.hasHeritageImpactStudy",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em ZEP: {licensing.isInZEP} — Área: {licensing.grossBuildingArea} m² — Estudo de impacte patrimonial: {licensing.hasHeritageImpactStudy}",
+      "requiredValue": "Estudo de impacte patrimonial aprovado pela DGPC",
+      "remediation": "Elaborar Estudo de Impacte Patrimonial que analise o efeito da intervenção na leitura e fruição do imóvel classificado, incluindo modelação volumétrica, análise de vistas e cotas, integração cromática e de materiais, e medidas de minimização de impactes visuais.",
+      "enabled": true,
+      "tags": [
+        "ZEP",
+        "impacte-patrimonial",
+        "DGPC",
+        "classificação"
+      ]
+    },
+    {
+      "id": "RJUE-ARU-04",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 44.º a Art. 54.º — Licenciamento em Área de Reabilitação Urbana",
+      "description": "Em Áreas de Reabilitação Urbana (ARU), as operações de reabilitação podem beneficiar de dispensa parcial de cumprimento de requisitos legais e regulamentares em vigor, desde que garantam a segurança estrutural e a salubridade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasARUDispenseRequest",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Em ARU: {licensing.isInARU} — Reabilitação: {licensing.isRehabilitation} — Pedido de dispensa: {licensing.hasARUDispenseRequest}",
+      "requiredValue": "Pedido de dispensa de requisitos instruído conforme RJRU",
+      "remediation": "Requerer a dispensa de requisitos legais e regulamentares nos termos do RJRU (DL 307/2009), identificando especificamente quais os requisitos de que se pretende a dispensa (RGEU, regulamentos de acessibilidade, eficiência energética, etc.) e justificando que a segurança estrutural e salubridade estão asseguradas.",
+      "enabled": true,
+      "tags": [
+        "ARU",
+        "reabilitação",
+        "dispensa-requisitos",
+        "RJRU"
+      ]
+    },
+    {
+      "id": "RJUE-ARU-05",
+      "regulationId": "dl-307-2009-rjru",
+      "article": "Art. 45.º — Nível de Intervenção em ARU",
+      "description": "A intervenção em ARU deve ser classificada por nível (ligeira, média, profunda ou excecional), determinando o grau de cumprimento regulamentar exigido.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.isInARU",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.rehabInterventionLevel",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Nível de intervenção: {licensing.rehabInterventionLevel}",
+      "requiredValue": "Classificação do nível de intervenção (ligeira, média, profunda ou excecional)",
+      "remediation": "Classificar a intervenção de reabilitação conforme os níveis definidos no RJRU: ligeira (manutenção e reparação), média (alterações parciais sem estrutura), profunda (alterações estruturais significativas) ou excecional (reconstrução quase total). O nível determina os requisitos regulamentares aplicáveis.",
+      "enabled": true,
+      "tags": [
+        "ARU",
+        "nível-intervenção",
+        "reabilitação",
+        "RJRU"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPLIC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º-A — Licença para Utilização Temporária",
+      "description": "A utilização temporária de edifícios ou terrenos para fins diferentes dos licenciados (eventos, feiras, mercados) requer licença de utilização temporária, com prazo máximo de 1 ano renovável.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isTemporaryUse",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTemporaryUseLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Uso temporário: {licensing.isTemporaryUse} — Licença de uso temporário: {licensing.hasTemporaryUseLicense}",
+      "requiredValue": "Licença de utilização temporária emitida pela câmara municipal",
+      "remediation": "Requerer licença de utilização temporária à câmara municipal, indicando: o uso pretendido, o período (máximo 1 ano), as condições de segurança e salubridade, e o compromisso de reposição do estado anterior findo o prazo. A licença pode ser renovada por igual período mediante novo requerimento.",
+      "enabled": true,
+      "tags": [
+        "utilização-temporária",
+        "eventos",
+        "licença-temporária"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPLIC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º-A, n.º 3 — Condições de Segurança para Uso Temporário",
+      "description": "A licença de utilização temporária exige comprovação de que o edifício ou terreno reúne condições de segurança contra incêndios e de evacuação adequadas ao uso pretendido.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isTemporaryUse",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTemporaryUseLicense",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTemporaryUseFireSafety",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Segurança contra incêndios para uso temporário: {licensing.hasTemporaryUseFireSafety}",
+      "requiredValue": "Parecer favorável da ANEPC sobre segurança para o uso temporário",
+      "remediation": "Obter parecer da Autoridade Nacional de Emergência e Proteção Civil (ANEPC) atestando a adequação das condições de segurança contra incêndios e de evacuação para o uso temporário pretendido. Pode ser necessário instalar equipamentos suplementares (extintores, sinalização, saídas de emergência adicionais).",
+      "enabled": true,
+      "tags": [
+        "utilização-temporária",
+        "segurança-incêndios",
+        "ANEPC",
+        "evacuação"
+      ]
+    },
+    {
+      "id": "RJUE-FASEADO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 56.º — Licenciamento Faseado de Obras",
+      "description": "O licenciamento pode ser concedido por fases quando o projeto global estiver aprovado e cada fase constituir uma unidade funcional autónoma.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isPhasedConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasPhasedLicenseApproval",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Construção faseada: {licensing.isPhasedConstruction} — Aprovação de faseamento: {licensing.hasPhasedLicenseApproval}",
+      "requiredValue": "Aprovação do faseamento pela câmara municipal com projeto global aprovado",
+      "remediation": "Submeter requerimento de licenciamento faseado acompanhado do projeto global aprovado e do plano de faseamento, identificando: as fases propostas, a sequência temporal, a autonomia funcional de cada fase e os prazos de execução de cada fase. Cada fase deve poder funcionar autonomamente.",
+      "enabled": true,
+      "tags": [
+        "faseamento",
+        "licença-faseada",
+        "fases",
+        "construção-faseada"
+      ]
+    },
+    {
+      "id": "RJUE-FASEADO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 56.º, n.º 3 — Alvará por Fase de Construção",
+      "description": "Cada fase de construção aprovada exige emissão de alvará próprio, com identificação da fase, prazo de execução e caução correspondente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isPhasedConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasPhasedLicenseApproval",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.currentPhaseHasAlvara",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Fase atual com alvará: {licensing.currentPhaseHasAlvara}",
+      "requiredValue": "Alvará emitido para a fase de construção em curso",
+      "remediation": "Requerer a emissão de alvará para a fase de construção em curso, apresentando a caução exigida e o comprovativo de início de obras dentro do prazo estipulado. O alvará de cada fase identifica as obras autorizadas, os prazos e as condições específicas da fase.",
+      "enabled": true,
+      "tags": [
+        "faseamento",
+        "alvará",
+        "caução",
+        "fase-construção"
+      ]
+    },
+    {
+      "id": "RJUE-RENOV-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 72.º — Renovação de Licença de Construção",
+      "description": "A licença de construção pode ser renovada uma vez, por período igual ao inicialmente concedido, desde que o pedido seja formulado antes da caducidade e as normas urbanísticas vigentes não tenham sido alteradas de forma incompatível.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.licenseExpiryDays",
+          "operator": "<",
+          "value": 90
+        },
+        {
+          "field": "licensing.hasRenewalRequest",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.constructionComplete",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Dias até caducidade: {licensing.licenseExpiryDays} — Pedido de renovação: {licensing.hasRenewalRequest}",
+      "requiredValue": "Pedido de renovação submetido antes da caducidade da licença",
+      "remediation": "Submeter pedido de renovação da licença de construção à câmara municipal antes do termo do prazo de validade. O pedido deve incluir justificação para o atraso, estado atual da obra, cronograma atualizado e comprovativo de que as normas urbanísticas vigentes são compatíveis com o projeto licenciado.",
+      "enabled": true,
+      "tags": [
+        "renovação",
+        "licença",
+        "caducidade",
+        "prazo"
+      ]
+    },
+    {
+      "id": "RJUE-RENOV-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 72.º, n.º 2 — Condições de Renovação da Licença",
+      "description": "A renovação da licença é indeferida se o plano de ordenamento do território tiver sido alterado e o projeto licenciado for incompatível com as novas regras.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasRenewalRequest",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.isProjectCompatibleWithCurrentPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Compatibilidade com plano vigente: {licensing.isProjectCompatibleWithCurrentPlan}",
+      "requiredValue": "Projeto compatível com o plano de ordenamento do território em vigor",
+      "remediation": "Verificar a conformidade do projeto licenciado com o PDM/PU/PP em vigor. Se houver incompatibilidade, será necessário submeter projeto de alterações para adequação ao plano vigente ou requerer novo licenciamento. Considerar a possibilidade de invocar direitos adquiridos se a obra estiver em fase avançada.",
+      "enabled": true,
+      "tags": [
+        "renovação",
+        "compatibilidade",
+        "PDM",
+        "plano-ordenamento"
+      ]
+    },
+    {
+      "id": "RJUE-SEGURO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 14.º, n.º 2 e Lei 31/2009, Art. 24.º — Seguro de Responsabilidade Civil de Construção",
+      "description": "O dono de obra deve contratar seguro de responsabilidade civil que cubra os riscos decorrentes da execução da obra, incluindo danos a terceiros.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasConstructionInsurance",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao", "alteracao"]
+        }
+      ],
+      "currentValueTemplate": "Seguro RC construção: {licensing.hasConstructionInsurance}",
+      "requiredValue": "Seguro de responsabilidade civil de construção contratado e em vigor",
+      "remediation": "Contratar seguro de responsabilidade civil de construção com cobertura mínima proporcional ao valor da obra. O seguro deve cobrir danos corporais e materiais a terceiros, incluindo proprietários de imóveis vizinhos, transeuntes e trabalhadores não abrangidos pelo seguro de acidentes de trabalho.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "responsabilidade-civil",
+        "construção",
+        "danos-terceiros"
+      ]
+    },
+    {
+      "id": "RJUE-SEGURO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 14.º, n.º 3 — Seguro Decenal de Defeitos Estruturais",
+      "description": "Para edifícios destinados a habitação, é obrigatório o seguro decenal que garanta a reparação de defeitos estruturais que afetem a solidez e a segurança do edifício durante 10 anos após a conclusão.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUseType",
+          "operator": "==",
+          "value": "habitacao"
+        },
+        {
+          "field": "licensing.hasDecennialInsurance",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "reconstrucao"]
+        }
+      ],
+      "currentValueTemplate": "Seguro decenal: {licensing.hasDecennialInsurance}",
+      "requiredValue": "Seguro decenal de defeitos estruturais contratado",
+      "remediation": "Contratar seguro decenal de defeitos estruturais antes da emissão da licença de utilização. O seguro deve cobrir defeitos que afetem a solidez, estabilidade e segurança do edifício durante 10 anos, com capital seguro mínimo correspondente ao custo de reconstrução.",
+      "enabled": true,
+      "tags": [
+        "seguro-decenal",
+        "defeitos-estruturais",
+        "habitação",
+        "garantia"
+      ]
+    },
+    {
+      "id": "RJUE-CAUCAO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 54.º — Caução para Obras de Urbanização",
+      "description": "A emissão de alvará de licença de obras de urbanização está condicionada à prestação de caução destinada a garantir a boa execução das obras.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isUrbanizationWorks",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasBondDeposit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Caução prestada: {licensing.hasBondDeposit}",
+      "requiredValue": "Caução prestada no valor de 5% do custo total das obras de urbanização",
+      "remediation": "Prestar caução no valor de 5% do custo total estimado das obras de urbanização, mediante garantia bancária, depósito em dinheiro, seguro-caução ou hipoteca sobre bens do requerente. A caução é libertada após a receção provisória das obras de urbanização pela câmara municipal.",
+      "enabled": true,
+      "tags": [
+        "caução",
+        "urbanização",
+        "garantia-bancária",
+        "alvará"
+      ]
+    },
+    {
+      "id": "RJUE-CAUCAO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 54.º, n.º 4 — Valor Mínimo de Caução para Loteamentos",
+      "description": "Nos loteamentos, a caução deve cobrir o valor total estimado das infraestruturas urbanísticas a executar pelo loteador.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.isLoteamento",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.bondAmount",
+          "operator": "computed_lt",
+          "value": "licensing.infrastructureCost * 0.05"
+        }
+      ],
+      "currentValueTemplate": "Caução prestada: {licensing.bondAmount} € — Custo infraestruturas: {licensing.infrastructureCost} €",
+      "requiredValue": "Caução >= 5% do custo estimado das infraestruturas urbanísticas",
+      "remediation": "Reforçar a caução para pelo menos 5% do custo estimado atualizado das infraestruturas urbanísticas (arruamentos, redes de água, esgotos, eletricidade, telecomunicações, gás, espaços verdes). A câmara municipal pode exigir reforço se o custo efetivo exceder a estimativa inicial.",
+      "enabled": true,
+      "tags": [
+        "caução",
+        "loteamento",
+        "infraestruturas",
+        "valor-mínimo"
+      ]
+    },
+    {
+      "id": "RJUE-RESP-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 10.º e Lei 31/2009, Art. 14.º — Declaração de Responsabilidade Técnica",
+      "description": "O pedido de licenciamento deve ser acompanhado de termos de responsabilidade subscritos pelos autores dos projetos, declarando que os mesmos cumprem as normas legais e regulamentares aplicáveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasTechnicalResponsibilityDeclarations",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao", "alteracao"]
+        }
+      ],
+      "currentValueTemplate": "Termos de responsabilidade técnica: {licensing.hasTechnicalResponsibilityDeclarations}",
+      "requiredValue": "Termos de responsabilidade de todos os autores de projeto subscritos",
+      "remediation": "Obter termos de responsabilidade de todos os autores de projetos de especialidade (arquitetura, estabilidade, águas e esgotos, eletricidade, gás, telecomunicações, térmica, acústica, segurança contra incêndios). Cada termo deve declarar a conformidade com as normas legais e regulamentares aplicáveis e ser assinado por técnico habilitado.",
+      "enabled": true,
+      "tags": [
+        "responsabilidade-técnica",
+        "termo-responsabilidade",
+        "autores-projeto"
+      ]
+    },
+    {
+      "id": "RJUE-RESP-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 31/2009, Art. 14.º, n.º 2 — Declaração de Responsabilidade do Diretor de Obra",
+      "description": "O diretor de obra deve subscrever declaração de responsabilidade técnica pela direção e condução dos trabalhos conforme o projeto aprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasDirectorDeObraDeclaration",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.hasConstructionLicense",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Declaração do diretor de obra: {licensing.hasDirectorDeObraDeclaration}",
+      "requiredValue": "Declaração de responsabilidade técnica do diretor de obra subscrita",
+      "remediation": "Obter a declaração de responsabilidade técnica do diretor de obra (engenheiro ou engenheiro técnico habilitado), nos termos da Lei 31/2009. A declaração deve identificar o técnico, a sua inscrição na respetiva ordem profissional e o compromisso de condução dos trabalhos conforme o projeto aprovado.",
+      "enabled": true,
+      "tags": [
+        "responsabilidade-técnica",
+        "diretor-obra",
+        "Lei-31-2009"
+      ]
+    },
+    {
+      "id": "RJUE-ARQ-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 31/2009, Art. 10.º e Art. 13.º — Responsabilidade do Arquiteto Autor do Projeto",
+      "description": "O projeto de arquitetura deve ser subscrito por arquiteto inscrito na Ordem dos Arquitetos, que assume a responsabilidade pela conformidade urbanística e pela qualidade arquitetónica do projeto.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.architectOARegistration",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao"]
+        }
+      ],
+      "currentValueTemplate": "Inscrição OA do arquiteto: {licensing.architectOARegistration}",
+      "requiredValue": "Arquiteto inscrito na Ordem dos Arquitetos com inscrição válida",
+      "remediation": "Assegurar que o projeto de arquitetura é subscrito por arquiteto com inscrição válida na Ordem dos Arquitetos (OA). Verificar que a inscrição se encontra ativa e sem suspensões. O arquiteto assume responsabilidade pela conformidade do projeto com as normas urbanísticas, PDM e regulamentos municipais.",
+      "enabled": true,
+      "tags": [
+        "arquiteto",
+        "Ordem-Arquitetos",
+        "inscrição",
+        "responsabilidade"
+      ]
+    },
+    {
+      "id": "RJUE-ARQ-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 31/2009, Art. 13.º, n.º 3 — Seguro de Responsabilidade Profissional do Arquiteto",
+      "description": "O arquiteto autor do projeto deve possuir seguro de responsabilidade profissional válido e com cobertura adequada ao valor da obra.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.architectHasProfessionalInsurance",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao"]
+        }
+      ],
+      "currentValueTemplate": "Seguro profissional do arquiteto: {licensing.architectHasProfessionalInsurance}",
+      "requiredValue": "Seguro de responsabilidade profissional do arquiteto em vigor",
+      "remediation": "Verificar que o arquiteto autor do projeto possui seguro de responsabilidade civil profissional em vigor, com capital adequado ao valor e dimensão da obra. O seguro é obrigatório nos termos da Lei 31/2009 e do Estatuto da Ordem dos Arquitetos.",
+      "enabled": true,
+      "tags": [
+        "arquiteto",
+        "seguro-profissional",
+        "responsabilidade-civil"
+      ]
+    },
+    {
+      "id": "RJUE-ENG-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 31/2009, Art. 10.º e Art. 14.º — Responsabilidade do Engenheiro de Estabilidade",
+      "description": "O projeto de estabilidade deve ser subscrito por engenheiro civil inscrito na Ordem dos Engenheiros, com termo de responsabilidade pela segurança estrutural.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.structuralEngineerOERegistration",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao"]
+        }
+      ],
+      "currentValueTemplate": "Inscrição OE do engenheiro de estabilidade: {licensing.structuralEngineerOERegistration}",
+      "requiredValue": "Engenheiro civil inscrito na OE com especialidade em estruturas",
+      "remediation": "Assegurar que o projeto de estabilidade é subscrito por engenheiro civil inscrito na Ordem dos Engenheiros (OE) com qualificação em estruturas. O engenheiro deve emitir termo de responsabilidade pela segurança estrutural conforme os Eurocódigos e regulamentos nacionais aplicáveis.",
+      "enabled": true,
+      "tags": [
+        "engenheiro",
+        "estabilidade",
+        "Ordem-Engenheiros",
+        "estruturas"
+      ]
+    },
+    {
+      "id": "RJUE-ENG-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 31/2009, Art. 14.º, n.º 4 — Termo de Responsabilidade de Especialidades",
+      "description": "Cada projeto de especialidade deve ser acompanhado de termo de responsabilidade subscrito pelo engenheiro autor, com identificação da habilitação profissional.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.specialtyProjectCount",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "licensing.specialtyTermsOfResponsibilityCount",
+          "operator": "computed_lt",
+          "value": "licensing.specialtyProjectCount"
+        }
+      ],
+      "currentValueTemplate": "Projetos de especialidade: {licensing.specialtyProjectCount} — Termos de responsabilidade: {licensing.specialtyTermsOfResponsibilityCount}",
+      "requiredValue": "Todos os projetos de especialidade com termos de responsabilidade subscritos",
+      "remediation": "Obter termos de responsabilidade em falta para os projetos de especialidade. Cada termo deve identificar: o engenheiro autor, o número de inscrição na OE ou OET, a especialidade, e a declaração de conformidade com as normas técnicas aplicáveis.",
+      "enabled": true,
+      "tags": [
+        "especialidades",
+        "termo-responsabilidade",
+        "engenheiro",
+        "habilitação"
+      ]
+    },
+    {
+      "id": "RJUE-GEOTECH-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 2 e EC7 (Eurocódigo 7) — Estudo Geotécnico Obrigatório",
+      "description": "Para obras de construção nova com mais de 2 pisos enterrados ou em terrenos com declive superior a 20%, é obrigatória a apresentação de estudo geotécnico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.undergroundFloors",
+          "operator": ">",
+          "value": 2
+        },
+        {
+          "field": "licensing.hasGeotechnicalReport",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Pisos enterrados: {licensing.undergroundFloors} — Estudo geotécnico: {licensing.hasGeotechnicalReport}",
+      "requiredValue": "Estudo geotécnico elaborado por entidade habilitada",
+      "remediation": "Encomendar estudo geotécnico a laboratório acreditado ou empresa de geotecnia, que deve incluir: sondagens e ensaios in situ (SPT, CPT), classificação dos solos, nível freático, capacidade de carga, parâmetros de dimensionamento de fundações e contenções, e recomendações para a fase de projeto.",
+      "enabled": true,
+      "tags": [
+        "geotecnia",
+        "estudo-geotécnico",
+        "fundações",
+        "sondagens"
+      ]
+    },
+    {
+      "id": "RJUE-GEOTECH-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "EC7 e Art. 11.º — Estudo Geotécnico em Terreno com Declive Acentuado",
+      "description": "Construções em terrenos com declive superior a 20% requerem estudo geotécnico que avalie a estabilidade de taludes e o risco de deslizamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.terrainSlopePercent",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "licensing.hasGeotechnicalReport",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Declive do terreno: {licensing.terrainSlopePercent}% — Estudo geotécnico: {licensing.hasGeotechnicalReport}",
+      "requiredValue": "Estudo geotécnico com análise de estabilidade de taludes",
+      "remediation": "Elaborar estudo geotécnico que inclua análise de estabilidade de taludes (métodos de Bishop, Janbu ou Morgenstern-Price), avaliação do risco de deslizamento, dimensionamento de estruturas de contenção e drenagem, e monitorização de movimentos de terreno durante e após a construção.",
+      "enabled": true,
+      "tags": [
+        "geotecnia",
+        "taludes",
+        "estabilidade",
+        "declive"
+      ]
+    },
+    {
+      "id": "RJUE-TOPO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 1, al. d) — Levantamento Topográfico Obrigatório",
+      "description": "O pedido de licenciamento deve ser acompanhado de levantamento topográfico atualizado do terreno, elaborado por topógrafo ou engenheiro geógrafo habilitado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasTopographicSurvey",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "loteamento"]
+        }
+      ],
+      "currentValueTemplate": "Levantamento topográfico: {licensing.hasTopographicSurvey}",
+      "requiredValue": "Levantamento topográfico atualizado (menos de 1 ano) à escala adequada",
+      "remediation": "Encomendar levantamento topográfico a topógrafo ou engenheiro geógrafo habilitado, à escala 1:200 ou 1:500, incluindo: limites do terreno, curvas de nível (equidistância de 0,5 m ou 1 m), construções existentes, árvores de porte, infraestruturas enterradas, cotas de soleira dos edifícios vizinhos e referenciação ao sistema de coordenadas nacional (PT-TM06/ETRS89).",
+      "enabled": true,
+      "tags": [
+        "topografia",
+        "levantamento",
+        "coordenadas",
+        "terreno"
+      ]
+    },
+    {
+      "id": "RJUE-TOPO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 1, al. d) — Validade do Levantamento Topográfico",
+      "description": "O levantamento topográfico deve ter sido realizado nos 12 meses anteriores à submissão do pedido de licenciamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasTopographicSurvey",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.topographicSurveyAgeDays",
+          "operator": ">",
+          "value": 365
+        }
+      ],
+      "currentValueTemplate": "Idade do levantamento topográfico: {licensing.topographicSurveyAgeDays} dias",
+      "requiredValue": "Levantamento topográfico com menos de 365 dias",
+      "remediation": "Atualizar o levantamento topográfico, uma vez que o existente tem mais de 12 meses. Alterações no terreno, construções vizinhas ou infraestruturas podem ter ocorrido desde o levantamento anterior. Assegurar que o novo levantamento reflete a situação atual do terreno.",
+      "enabled": true,
+      "tags": [
+        "topografia",
+        "validade",
+        "atualização",
+        "12-meses"
+      ]
+    },
+    {
+      "id": "RJUE-PSS-02",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 5.º — Plano de Segurança e Saúde em Projeto",
+      "description": "O dono de obra deve assegurar a elaboração do Plano de Segurança e Saúde (PSS) na fase de projeto, que identifique os riscos previsíveis e as medidas preventivas para a fase de construção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasPSSDesignPhase",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.estimatedConstructionDays",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "PSS em fase de projeto: {licensing.hasPSSDesignPhase}",
+      "requiredValue": "Plano de Segurança e Saúde elaborado na fase de projeto",
+      "remediation": "Elaborar o PSS em fase de projeto, nos termos do Art. 5.º do DL 273/2003, incluindo: identificação dos riscos previsíveis por fase de obra, medidas preventivas e de proteção, condicionantes do estaleiro, interferências entre trabalhos simultâneos e cronograma de segurança. O PSS deve ser desenvolvido pelo coordenador de segurança em projeto (CSS-P).",
+      "enabled": true,
+      "tags": [
+        "PSS",
+        "segurança",
+        "projeto",
+        "CSS-P",
+        "estaleiro"
+      ]
+    },
+    {
+      "id": "RJUE-PSS-03",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 11.º — Plano de Segurança e Saúde em Obra (Desenvolvimento)",
+      "description": "O PSS deve ser desenvolvido e adaptado pelo empreiteiro antes do início dos trabalhos, incorporando os processos construtivos, os equipamentos e os métodos de trabalho específicos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasPSSConstructionPhase",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.constructionStarted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "PSS desenvolvido para obra: {licensing.hasPSSConstructionPhase}",
+      "requiredValue": "PSS desenvolvido pelo empreiteiro e validado pelo CSS-O",
+      "remediation": "Desenvolver o PSS para a fase de obra, adaptando o PSS de projeto aos métodos construtivos, equipamentos e subempreiteiros efetivos. O PSS de obra deve ser validado pelo coordenador de segurança em obra (CSS-O) e estar disponível no estaleiro para consulta de todos os intervenientes.",
+      "enabled": true,
+      "tags": [
+        "PSS",
+        "segurança",
+        "obra",
+        "CSS-O",
+        "empreiteiro"
+      ]
+    },
+    {
+      "id": "RJUE-TRAFEG-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 57.º, n.º 3 e Regulamento Municipal — Plano de Gestão de Tráfego",
+      "description": "Obras que impliquem condicionamento de vias públicas devem apresentar plano de gestão de tráfego aprovado pela câmara municipal e, quando aplicável, pela autoridade policial.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.affectsPublicRoads",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTrafficManagementPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Afeta vias públicas: {licensing.affectsPublicRoads} — Plano de tráfego: {licensing.hasTrafficManagementPlan}",
+      "requiredValue": "Plano de gestão de tráfego aprovado pela câmara e autoridade policial",
+      "remediation": "Elaborar plano de gestão de tráfego que inclua: sinalização temporária conforme o Manual de Sinalização Temporária, desvios de tráfego propostos, horários de carga/descarga, condicionamento de estacionamento, percursos pedonais alternativos e cronograma das ocupações de via pública. Submeter à câmara e à PSP/GNR para aprovação.",
+      "enabled": true,
+      "tags": [
+        "tráfego",
+        "vias-públicas",
+        "sinalização",
+        "condicionamento"
+      ]
+    },
+    {
+      "id": "RJUE-TRAFEG-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 57.º, n.º 5 — Sinalização Temporária de Desvios",
+      "description": "A sinalização temporária de desvios de tráfego deve cumprir o Manual de Sinalização Temporária do IMT e ser instalada antes do início dos trabalhos que afetem a via.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.affectsPublicRoads",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTrafficManagementPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTemporarySignage",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sinalização temporária instalada: {licensing.hasTemporarySignage}",
+      "requiredValue": "Sinalização temporária conforme Manual do IMT instalada e operacional",
+      "remediation": "Instalar sinalização temporária de acordo com o Manual de Sinalização Temporária do IMT, incluindo: sinais de pré-aviso, sinalização de desvio, balizamento de zona de obras, iluminação noturna dos dispositivos e sinalização de fim de condicionamento. Manter a sinalização em bom estado durante toda a duração das obras.",
+      "enabled": true,
+      "tags": [
+        "sinalização-temporária",
+        "IMT",
+        "desvios",
+        "segurança-rodoviária"
+      ]
+    },
+    {
+      "id": "RJUE-RUIDO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 9/2007 (RGR), Art. 13.º — Plano de Gestão de Ruído em Obra",
+      "description": "Obras em zonas mistas ou sensíveis devem incluir plano de gestão de ruído que garanta o cumprimento dos limites de exposição regulamentares durante a fase de construção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isInSensitiveNoiseZone",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasNoiseManagementPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona sensível ao ruído: {licensing.isInSensitiveNoiseZone} — Plano de ruído: {licensing.hasNoiseManagementPlan}",
+      "requiredValue": "Plano de gestão de ruído de construção aprovado",
+      "remediation": "Elaborar plano de gestão de ruído de construção que inclua: identificação das atividades ruidosas, horários de trabalho permitidos (tipicamente 8h-20h dias úteis), medidas de mitigação (barreiras acústicas, escolha de equipamentos menos ruidosos), monitorização dos níveis sonoros e procedimento de resposta a reclamações.",
+      "enabled": true,
+      "tags": [
+        "ruído",
+        "RGR",
+        "zona-sensível",
+        "gestão-ambiental"
+      ]
+    },
+    {
+      "id": "RJUE-RUIDO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 9/2007, Art. 14.º — Licença Especial de Ruído",
+      "description": "Trabalhos de construção fora do horário normal (20h-8h e fins de semana/feriados) requerem licença especial de ruído emitida pela câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasNightOrWeekendWorks",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasSpecialNoisePermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Trabalhos fora de horário: {licensing.hasNightOrWeekendWorks} — Licença de ruído especial: {licensing.hasSpecialNoisePermit}",
+      "requiredValue": "Licença especial de ruído emitida pela câmara municipal",
+      "remediation": "Requerer licença especial de ruído à câmara municipal para trabalhos fora do horário normal, justificando a necessidade (p.ex., betonagem contínua, trabalhos em vias com tráfego intenso). O pedido deve incluir: atividades a realizar, duração prevista, medidas de minimização do ruído e área afetada.",
+      "enabled": true,
+      "tags": [
+        "ruído",
+        "licença-especial",
+        "trabalho-noturno",
+        "horário"
+      ]
+    },
+    {
+      "id": "RJUE-POEIRA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 57.º e DL 78/2004 — Plano de Controlo de Poeiras em Estaleiro",
+      "description": "Estaleiros de construção devem implementar medidas de controlo de poeiras e emissões difusas, especialmente em zonas urbanas e próximas de zonas sensíveis.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isUrbanLocation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasDustControlPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Localização urbana: {licensing.isUrbanLocation} — Plano de poeiras: {licensing.hasDustControlPlan}",
+      "requiredValue": "Plano de controlo de poeiras implementado no estaleiro",
+      "remediation": "Elaborar e implementar plano de controlo de poeiras que inclua: rega periódica de caminhos e zonas de movimentação de terras, cobertura de stocks de materiais pulverulentos, lavagem de rodas de veículos à saída do estaleiro, proteção de fachadas e aberturas de edifícios vizinhos, e monitorização de partículas em suspensão quando exigido.",
+      "enabled": true,
+      "tags": [
+        "poeiras",
+        "emissões-difusas",
+        "estaleiro",
+        "qualidade-ar"
+      ]
+    },
+    {
+      "id": "RJUE-POEIRA-02",
+      "regulationId": "dl-273-2003",
+      "article": "DL 273/2003, Art. 7.º e DL 78/2004 — Documentação de Controlo Ambiental em Estaleiro",
+      "description": "O estaleiro deve manter documentação atualizada sobre as medidas de controlo de poeiras e emissões, registos de monitorização e evidência de implementação das medidas.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasDustControlPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasDustControlDocumentation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Documentação de controlo de poeiras: {licensing.hasDustControlDocumentation}",
+      "requiredValue": "Registos de monitorização e evidência de implementação disponíveis em estaleiro",
+      "remediation": "Manter em estaleiro os registos de monitorização ambiental: fichas de rega, relatórios de medição de PM10/PM2.5 (quando aplicável), registo fotográfico das medidas implementadas, registos de reclamações e ações corretivas. A documentação deve estar disponível para inspeção pela câmara municipal e APA.",
+      "enabled": true,
+      "tags": [
+        "poeiras",
+        "documentação",
+        "monitorização",
+        "registos"
+      ]
+    },
+    {
+      "id": "RJUE-VIZIN-06",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 6 e CPA Art. 121.º — Notificação de Vizinhos",
+      "description": "Os proprietários de prédios confinantes devem ser notificados do pedido de licenciamento quando a operação urbanística possa afetar os seus direitos ou interesses legalmente protegidos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasAdjacentProperties",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasNeighborNotification",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao"]
+        }
+      ],
+      "currentValueTemplate": "Prédios confinantes: {licensing.hasAdjacentProperties} — Notificação de vizinhos: {licensing.hasNeighborNotification}",
+      "requiredValue": "Notificação dos proprietários de prédios confinantes efetuada",
+      "remediation": "Notificar os proprietários dos prédios confinantes do pedido de licenciamento, por carta registada com aviso de receção, informando: a natureza da operação, os elementos essenciais do projeto (cércea, afastamentos, usos) e o prazo para pronúncia (15 dias úteis). Conservar os comprovativos de notificação.",
+      "enabled": true,
+      "tags": [
+        "vizinhos",
+        "notificação",
+        "confinantes",
+        "audiência"
+      ]
+    },
+    {
+      "id": "RJUE-VIZIN-07",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 11.º, n.º 7 — Prova de Notificação dos Vizinhos",
+      "description": "O requerente deve juntar ao pedido de licenciamento comprovativo de notificação dos proprietários confinantes ou, em caso de impossibilidade, prova de afixação de edital no local.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasNeighborNotification",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasNeighborNotificationProof",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Comprovativo de notificação: {licensing.hasNeighborNotificationProof}",
+      "requiredValue": "Comprovativo de notificação ou afixação de edital junto ao pedido",
+      "remediation": "Juntar ao pedido de licenciamento os avisos de receção das notificações ou, quando os proprietários não forem identificáveis ou localizáveis, comprovativo de afixação de edital no local da obra e na junta de freguesia, com registo fotográfico datado e testemunho da afixação.",
+      "enabled": true,
+      "tags": [
+        "vizinhos",
+        "comprovativo",
+        "edital",
+        "prova"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-06",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 22.º — Consulta Pública para Operações de Grande Impacte",
+      "description": "Operações de loteamento com mais de 10 hectares ou mais de 100 fogos, ou operações com impacte relevante no ordenamento do território, estão sujeitas a período de consulta pública.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.totalDwellingUnits",
+          "operator": ">",
+          "value": 100
+        },
+        {
+          "field": "licensing.hasPublicConsultation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Fogos: {licensing.totalDwellingUnits} — Consulta pública: {licensing.hasPublicConsultation}",
+      "requiredValue": "Período de consulta pública concluído com relatório de ponderação",
+      "remediation": "Requerer a abertura de período de consulta pública, com publicação de anúncio na plataforma eletrónica da câmara municipal e em jornal local. O período mínimo é de 15 dias úteis. Após a consulta, elaborar relatório de ponderação das participações recebidas e incorporar as alterações necessárias no projeto.",
+      "enabled": true,
+      "tags": [
+        "consulta-pública",
+        "participação",
+        "grande-impacte",
+        "loteamento"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLICO-07",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 22.º, n.º 3 — Publicação de Aviso de Consulta Pública",
+      "description": "O aviso de abertura de consulta pública deve ser publicado na plataforma eletrónica do município, afixado nos paços do concelho e na junta de freguesia, e publicado em jornal de circulação local.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.hasPublicConsultation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasPublicConsultationNotice",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Aviso de consulta pública publicado: {licensing.hasPublicConsultationNotice}",
+      "requiredValue": "Aviso de consulta pública publicado em todos os meios exigidos",
+      "remediation": "Publicar o aviso de abertura de consulta pública em: (1) plataforma eletrónica do município, (2) edital nos paços do concelho e junta de freguesia, (3) jornal de circulação local. O aviso deve indicar o local e horário de consulta do processo, o prazo para apresentação de observações e a forma de participação.",
+      "enabled": true,
+      "tags": [
+        "consulta-pública",
+        "aviso",
+        "publicação",
+        "transparência"
+      ]
+    },
+    {
+      "id": "RJUE-RESP-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 31/2009, Art. 16.º — Declaração de Direção de Fiscalização",
+      "description": "Deve ser nomeado diretor de fiscalização para acompanhar a execução da obra, com declaração de responsabilidade técnica pela conformidade da execução com o projeto aprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasFiscalizationDirector",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": ["construcao_nova", "ampliacao", "reconstrucao"]
+        }
+      ],
+      "currentValueTemplate": "Diretor de fiscalização nomeado: {licensing.hasFiscalizationDirector}",
+      "requiredValue": "Diretor de fiscalização nomeado com declaração de responsabilidade",
+      "remediation": "Nomear diretor de fiscalização (engenheiro ou engenheiro técnico habilitado) que acompanhará a execução da obra. O diretor de fiscalização deve subscrever declaração de responsabilidade pela verificação da conformidade da execução com o projeto aprovado, as normas técnicas e os regulamentos aplicáveis.",
+      "enabled": true,
+      "tags": [
+        "fiscalização",
+        "diretor-fiscalização",
+        "responsabilidade-técnica",
+        "Lei-31-2009"
+      ]
+    },
+    {
+      "id": "RJUE-GEOTECH-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "EC7 e NP EN 1997-1 — Classe Geotécnica do Projeto",
+      "description": "O projeto de fundações deve classificar a obra numa classe geotécnica (1, 2 ou 3) conforme o Eurocódigo 7, determinando o nível de investigação geotécnica exigido.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasGeotechnicalReport",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.geotechnicalClass",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Classe geotécnica: {licensing.geotechnicalClass}",
+      "requiredValue": "Classificação geotécnica (1, 2 ou 3) conforme EC7",
+      "remediation": "Classificar a obra numa classe geotécnica conforme o EC7: Classe 1 (estruturas simples em terrenos conhecidos), Classe 2 (fundações convencionais sem riscos excecionais) ou Classe 3 (estruturas grandes ou terrenos com riscos excecionais). A classe determina a extensão dos ensaios e o nível de detalhe do relatório geotécnico.",
+      "enabled": true,
+      "tags": [
+        "geotecnia",
+        "classe-geotécnica",
+        "EC7",
+        "fundações"
+      ]
+    },
+    {
+      "id": "RJUE-PSS-04",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 15.º — Comunicação Prévia de Estaleiro ao ACT",
+      "description": "Estaleiros com duração superior a 30 dias ou com mais de 20 trabalhadores simultâneos devem ser comunicados à Autoridade para as Condições do Trabalho (ACT) antes do início dos trabalhos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.estimatedConstructionDays",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "licensing.hasACTNotification",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Duração estimada: {licensing.estimatedConstructionDays} dias — Comunicação ACT: {licensing.hasACTNotification}",
+      "requiredValue": "Comunicação prévia ao ACT efetuada antes do início dos trabalhos",
+      "remediation": "Efetuar comunicação prévia de abertura de estaleiro à ACT, pelo menos 10 dias úteis antes do início dos trabalhos, indicando: localização, dono de obra, empreiteiro geral, coordenador de segurança, duração prevista, número máximo de trabalhadores, subempreiteiros e riscos especiais. Afixar cópia da comunicação no estaleiro.",
+      "enabled": true,
+      "tags": [
+        "ACT",
+        "comunicação-prévia",
+        "estaleiro",
+        "segurança"
+      ]
+    },
+    {
+      "id": "RJUE-SEG-06",
+      "regulationId": "dl-273-2003",
+      "article": "DL 273/2003, Art. 7.º, n.º 2 — Plano de Emergência de Estaleiro",
+      "description": "O estaleiro deve dispor de plano de emergência que preveja os procedimentos de evacuação, combate a incêndio, primeiros socorros e comunicação de acidentes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.constructionStarted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasSiteEmergencyPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Plano de emergência de estaleiro: {licensing.hasSiteEmergencyPlan}",
+      "requiredValue": "Plano de emergência de estaleiro elaborado e divulgado",
+      "remediation": "Elaborar plano de emergência do estaleiro que inclua: pontos de encontro, percursos de evacuação, responsáveis pela emergência, contactos de emergência (INEM, bombeiros), localização de extintores e kits de primeiros socorros, procedimentos de combate a incêndio e simulacros periódicos. Afixar planta de emergência em local visível.",
+      "enabled": true,
+      "tags": [
+        "emergência",
+        "estaleiro",
+        "evacuação",
+        "plano-emergência"
+      ]
+    },
+    {
+      "id": "RJUE-SEGURO-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 14.º, n.º 4 e Lei 100/97 — Seguro de Acidentes de Trabalho em Obra",
+      "description": "O empreiteiro e todos os subempreiteiros devem possuir seguro de acidentes de trabalho válido para todos os trabalhadores presentes no estaleiro.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.constructionStarted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.allContractorsHaveWorkInsurance",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Seguros de acidentes de trabalho: {licensing.allContractorsHaveWorkInsurance}",
+      "requiredValue": "Todos os empreiteiros e subempreiteiros com seguro de AT válido",
+      "remediation": "Verificar que o empreiteiro geral e todos os subempreiteiros possuem seguro de acidentes de trabalho em vigor, com cobertura para todos os trabalhadores. Manter cópias das apólices no estaleiro e atualizar em caso de novos subempreiteiros. O diretor de fiscalização deve verificar mensalmente a conformidade.",
+      "enabled": true,
+      "tags": [
+        "seguro",
+        "acidentes-trabalho",
+        "empreiteiro",
+        "subempreiteiros"
+      ]
+    },
+    {
+      "id": "RJUE-CAUCAO-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 54.º, n.º 6 — Reforço de Caução por Alteração de Custos",
+      "description": "Se durante a execução das obras de urbanização o custo real exceder em mais de 15% a estimativa inicial, a caução deve ser reforçada proporcionalmente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isUrbanizationWorks",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasBondDeposit",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.costOverrunPercent",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "Desvio de custos: {licensing.costOverrunPercent}%",
+      "requiredValue": "Caução reforçada proporcionalmente ao aumento de custos",
+      "remediation": "Reforçar a caução junto da câmara municipal, ajustando o valor ao custo real atualizado das obras de urbanização. Apresentar orçamento revisto e novo montante de caução calculado sobre 5% do custo atualizado. O reforço pode ser feito por aumento da garantia bancária ou depósito complementar.",
+      "enabled": true,
+      "tags": [
+        "caução",
+        "reforço",
+        "desvio-custos",
+        "urbanização"
+      ]
+    },
+    {
+      "id": "RJUE-HERIT-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Lei 107/2001, Art. 40.º — Achados Arqueológicos Durante a Obra",
+      "description": "Em caso de descoberta de vestígios arqueológicos durante a obra, os trabalhos devem ser imediatamente suspensos na zona afetada e a DGPC deve ser notificada no prazo de 48 horas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasArchaeologicalFinds",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasDGPCArchaeologicalNotification",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Achados arqueológicos: {licensing.hasArchaeologicalFinds} — Notificação DGPC: {licensing.hasDGPCArchaeologicalNotification}",
+      "requiredValue": "DGPC notificada e trabalhos suspensos na zona dos achados",
+      "remediation": "Suspender imediatamente os trabalhos na zona de achados arqueológicos e notificar a DGPC no prazo de 48 horas. Preservar os vestígios in situ, delimitar a área, registar fotograficamente e aguardar instruções da DGPC quanto à necessidade de acompanhamento arqueológico, escavação ou alteração do projeto.",
+      "enabled": true,
+      "tags": [
+        "arqueologia",
+        "achados",
+        "DGPC",
+        "suspensão"
+      ]
+    },
+    {
+      "id": "RJUE-TEMPLIC-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º-A, n.º 5 — Reposição de Estado Anterior após Uso Temporário",
+      "description": "Findo o período de utilização temporária, o titular da licença deve repor o edifício ou terreno no estado anterior, sob pena de execução coerciva pela câmara municipal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isTemporaryUse",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.temporaryUseLicenseExpired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasRestoredOriginalState",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Licença temporária expirada: {licensing.temporaryUseLicenseExpired} — Estado reposto: {licensing.hasRestoredOriginalState}",
+      "requiredValue": "Estado anterior reposto após expiração da licença temporária",
+      "remediation": "Proceder à reposição do edifício ou terreno no estado anterior à utilização temporária, removendo todos os elementos provisórios (stands, palcos, vedações, instalações sanitárias, etc.) e reparando eventuais danos. Comunicar a conclusão da reposição à câmara municipal para verificação.",
+      "enabled": true,
+      "tags": [
+        "utilização-temporária",
+        "reposição",
+        "estado-anterior",
+        "obrigação"
+      ]
     }
   ]
 }
