@@ -11,13 +11,26 @@
       "description": "O sistema de isolamento pelo exterior (ETICS) não é contínuo, apresentando interrupções em pilares, vigas, varandas ou outros elementos, gerando pontes térmicas lineares com ψ > 0.10 W/(m.K).",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.hasETICS", "operator": "==", "value": true },
-        { "field": "envelope.hasContinuousInsulation", "operator": "==", "value": false }
+        {
+          "field": "envelope.hasETICS",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.hasContinuousInsulation",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "ETICS contínuo sem interrupções: ψ < 0.10 W/(m.K) em todas as ligações",
       "remediation": "Garantir continuidade do isolamento pelo exterior: (1) Pilares e vigas: o ETICS deve envolver completamente os elementos estruturais que contactam com o exterior. (2) Varandas: utilizar elementos de corte térmico (Schöck Isokorb ou similar) — sem corte térmico, ψ ≈ 0.55 W/(m.K); com corte térmico, ψ ≈ 0.05-0.15 W/(m.K). (3) Soleiras: isolamento deve ser contínuo sob e sobre a soleira. (4) Platibandas: isolar pelo exterior e pelo topo. (5) Encastramentos de estores: caixas de estore pré-isoladas ou isolamento envolvente.",
       "enabled": true,
-      "tags": ["ponte térmica", "ETICS", "continuidade", "isolamento"]
+      "tags": [
+        "ponte térmica",
+        "ETICS",
+        "continuidade",
+        "isolamento"
+      ]
     },
     {
       "id": "THERM-PTL-WINDOW-INSTALL-01",
@@ -26,13 +39,23 @@
       "description": "A instalação da caixilharia não está alinhada com o plano de isolamento térmico, gerando uma ponte térmica linear na ligação caixilharia/parede com ψ > 0.25 W/(m.K).",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.windowInstallationPsiValue", "operator": ">", "value": 0.25 }
+        {
+          "field": "envelope.windowInstallationPsiValue",
+          "operator": ">",
+          "value": 0.25
+        }
       ],
       "currentValueTemplate": "ψ ligação janela/parede = {envelope.windowInstallationPsiValue} W/(m.K)",
       "requiredValue": "ψ ≤ 0.25 W/(m.K) (valor por defeito REH) / ψ < 0.10 W/(m.K) para nZEB",
       "remediation": "Otimizar a instalação da caixilharia: (1) Alinhamento: instalar a caixilharia no plano do isolamento (não na face interior da parede). (2) Para ETICS: a caixilharia deve estar alinhada com a face exterior do isolamento, com sobreposição de ≥ 30 mm. (3) Para parede dupla: alinhar com o plano de isolamento da caixa-de-ar. (4) Aro: utilizar perfil de arranque/ligação com corte térmico. (5) Espuma de poliuretano: preencher completamente o espaço entre aro e parede. (6) Fita de estanquidade: interior (para-vapor) e exterior (permeável ao vapor).",
       "enabled": true,
-      "tags": ["ponte térmica", "caixilharia", "instalação", "ψ", "IFC"]
+      "tags": [
+        "ponte térmica",
+        "caixilharia",
+        "instalação",
+        "ψ",
+        "IFC"
+      ]
     },
     {
       "id": "THERM-PTL-BALCONY-01",
@@ -41,13 +64,27 @@
       "description": "A varanda/consola em betão armado é contínua com a laje interior sem elemento de corte térmico, constituindo uma das pontes térmicas mais significativas (ψ ≈ 0.55-0.90 W/(m.K)).",
       "severity": "critical",
       "conditions": [
-        { "field": "envelope.hasBalcony", "operator": "==", "value": true },
-        { "field": "envelope.hasBalconyThermalBreak", "operator": "==", "value": false }
+        {
+          "field": "envelope.hasBalcony",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.hasBalconyThermalBreak",
+          "operator": "==",
+          "value": false
+        }
       ],
       "requiredValue": "Corte térmico na ligação laje/varanda: ψ ≤ 0.20 W/(m.K)",
       "remediation": "Tratar a ponte térmica da varanda: (1) Elemento de corte térmico estrutural (Schöck Isokorb ou equivalente): reduz ψ de 0.55-0.90 para 0.05-0.15 W/(m.K). (2) Alternativa: varanda apoiada independentemente (consola metálica fixada apenas na fachada). (3) Isolamento envolvente da laje de varanda (inferior + lateral + superior) — reduz ψ para 0.30-0.40 W/(m.K) (melhoria parcial). (4) O IFC pode identificar varandas/consolas (IfcSlab com PredefinedType=LANDING ou elementos suspensos) e alertar automaticamente para esta ponte térmica.",
       "enabled": true,
-      "tags": ["ponte térmica", "varanda", "consola", "corte térmico", "IFC"]
+      "tags": [
+        "ponte térmica",
+        "varanda",
+        "consola",
+        "corte térmico",
+        "IFC"
+      ]
     },
     {
       "id": "THERM-PTL-ROLLERBOX-01",
@@ -56,13 +93,26 @@
       "description": "As caixas de estore não possuem isolamento térmico adequado, constituindo uma ponte térmica significativa e uma fonte de infiltrações de ar. O U equivalente de caixas de estore tradicionais pode atingir 3-6 W/(m².K).",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.hasRollerShutterBoxInsulation", "operator": "==", "value": false },
-        { "field": "envelope.hasExteriorSolarProtection", "operator": "==", "value": true }
+        {
+          "field": "envelope.hasRollerShutterBoxInsulation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.hasExteriorSolarProtection",
+          "operator": "==",
+          "value": true
+        }
       ],
       "requiredValue": "Caixa de estore isolada: U equivalente ≤ 0.60 W/(m².K)",
       "remediation": "Isolar as caixas de estore: (1) Caixas pré-isoladas de fábrica: U ≈ 0.40-0.60 W/(m².K) (vs. 3-6 W/(m².K) sem isolamento). (2) Reabilitação: tampa interior com EPS 30 mm + vedação perimetral. (3) Caixas compactas (estore + isolamento integrado na caixilharia): solução ideal para construção nova. (4) Eliminar caixas de estore: substituir por estores exteriores de fachada (sem caixa interior). (5) Vedação: fita de espuma compressível em todo o perímetro para eliminar infiltrações de ar.",
       "enabled": true,
-      "tags": ["ponte térmica", "caixa de estore", "isolamento", "infiltração"]
+      "tags": [
+        "ponte térmica",
+        "caixa de estore",
+        "isolamento",
+        "infiltração"
+      ]
     },
     {
       "id": "THERM-PTL-CATALOG-01",
@@ -71,13 +121,27 @@
       "description": "Os valores de pontes térmicas lineares (ψ) não foram determinados por cálculo numérico (EN ISO 10211) nem por catálogos validados (ITE 50 do LNEC), sendo utilizados valores por defeito penalizantes do Despacho 15793-K.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.thermalBridgeCalculationMethod", "operator": "not_exists", "value": null },
-        { "field": "envelope.externalWallUValue", "operator": "exists", "value": null }
+        {
+          "field": "envelope.thermalBridgeCalculationMethod",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": "exists",
+          "value": null
+        }
       ],
       "requiredValue": "Cálculo EN ISO 10211, catálogo ITE 50, ou software validado",
       "remediation": "Determinar ψ por métodos mais precisos que os valores por defeito: (1) Cálculo numérico 2D (EN ISO 10211): software THERM (gratuito, LBNL), HTflux, AnTherm. (2) Catálogo ITE 50 (LNEC): tabelas de ψ para ligações típicas da construção portuguesa. (3) Catálogos de fabricantes: Schöck, Halfen — valores certificados para elementos de corte térmico. (4) Base de dados ITeCons: pontes térmicas calculadas para construção portuguesa. (5) Impacto: os valores por defeito (Despacho 15793-K) são conservadores — cálculos detalhados podem reduzir perdas por pontes térmicas em 30-50%.",
       "enabled": true,
-      "tags": ["ponte térmica", "ψ", "catálogo", "ITE 50", "EN ISO 10211"]
+      "tags": [
+        "ponte térmica",
+        "ψ",
+        "catálogo",
+        "ITE 50",
+        "EN ISO 10211"
+      ]
     },
     {
       "id": "THERM-PTL-IMPACT-01",
@@ -86,14 +150,162 @@
       "description": "As perdas térmicas através de pontes térmicas representam uma fração significativa (> 30%) das perdas totais pela envolvente. À medida que o isolamento da zona corrente melhora, o peso relativo das pontes térmicas aumenta.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.externalWallUValue", "operator": "<", "value": 0.35 },
-        { "field": "envelope.thermalBridgeCoefficient", "operator": ">", "value": 0.40 }
+        {
+          "field": "envelope.externalWallUValue",
+          "operator": "<",
+          "value": 0.35
+        },
+        {
+          "field": "envelope.thermalBridgeCoefficient",
+          "operator": ">",
+          "value": 0.4
+        }
       ],
       "currentValueTemplate": "U paredes = {envelope.externalWallUValue}, ψ médio = {envelope.thermalBridgeCoefficient}",
       "requiredValue": "Pontes térmicas representando < 20% das perdas totais pela envolvente",
       "remediation": "Quando o isolamento da zona corrente é bom (U < 0.35), as pontes térmicas tornam-se dominantes: (1) Em edifícios bem isolados, as pontes térmicas podem representar 30-50% das perdas pela envolvente. (2) Priorizar: varandas (ψ 0.55-0.90), ligações fachada/pavimento (ψ 0.40-0.50), caixas de estore (ψ 0.20-0.40). (3) Objetivo nZEB: ψ médio < 0.10 W/(m.K) em todas as ligações. (4) O IFC pode fornecer o perímetro total de junções (comprimentos de vigas, pilares, varandas) para quantificação automática das perdas por pontes térmicas.",
       "enabled": true,
-      "tags": ["ponte térmica", "impacto", "perdas térmicas", "proporção"]
+      "tags": [
+        "ponte térmica",
+        "impacto",
+        "perdas térmicas",
+        "proporção"
+      ]
+    },
+    {
+      "id": "REH-PTLDET-01",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 §5 — Calculo de psi por Modelacao 2D",
+      "description": "Os valores de pontes termicas lineares (psi) nao foram determinados por calculo numerico 2D/3D conforme EN ISO 10211, utilizando-se valores tabelados ou por defeito que podem ser significativamente mais penalizantes.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.thermalBridgePsiCalculated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.thermalBridgeCoefficient",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "psi determinado por: valores por defeito / catalogo (nao calculado numericamente)",
+      "requiredValue": "Calculo numerico EN ISO 10211 com modelo 2D (minimo) ou 3D para pontes termicas significativas (psi > 0.10 W/(m.K))",
+      "remediation": "Realizar calculo numerico de psi conforme EN ISO 10211: (1) Software: THERM (gratuito), HTflux, Flixo. (2) Condicoes fronteira: Rsi = 0.13, Rse = 0.04 m2.K/W. (3) psi = L2D - Sigma(Ui x li). (4) Plano de corte >= 1.0 m. (5) Malha <= 5 mm. (6) Impacto: reducao de 30-60% face a valores por defeito.",
+      "enabled": true,
+      "tags": [
+        "psi",
+        "calculo numerico",
+        "EN ISO 10211",
+        "modelacao 2D",
+        "THERM"
+      ]
+    },
+    {
+      "id": "REH-PTLDET-02",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 §5 — Ponte Termica nos Cantos do Edificio",
+      "description": "A ponte termica geometrica nos cantos do edificio (ligacao parede/parede exterior) nao foi verificada. Nos cantos, a area exterior e superior a interior, causando concentracao de fluxo de calor.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.cornerThermalBridgePsi",
+          "operator": ">",
+          "value": 0.1
+        }
+      ],
+      "currentValueTemplate": "psi canto = {envelope.cornerThermalBridgePsi} W/(m.K)",
+      "requiredValue": "psi canto <= 0.10 W/(m.K) (com ETICS continuo) / psi <= 0.05 W/(m.K) para nZEB",
+      "remediation": "Tratar a ponte termica nos cantos: (1) Com ETICS continuo: psi ~= 0.05-0.10 W/(m.K). (2) Sem isolamento: psi ~= 0.15-0.25 W/(m.K). (3) ETICS com espessura reforcada nos cantos (+20 mm). (4) Verificar fRsi: se U > 0.60, fRsi no canto pode ser < 0.70.",
+      "enabled": true,
+      "tags": [
+        "ponte termica",
+        "cantos",
+        "geometrica",
+        "fRsi",
+        "ETICS"
+      ]
+    },
+    {
+      "id": "REH-PTLDET-03",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 + ITE 50 — Retorno de Isolamento na Ombreira (min. 50 mm)",
+      "description": "O isolamento termico nao tem retorno adequado na ombreira, padieira e peitoril dos vaos envidracados. O retorno minimo de 50 mm e necessario para mitigar a ponte termica na ligacao caixilharia/parede.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.windowRevealInsulationDepth",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Retorno de isolamento na ombreira = {envelope.windowRevealInsulationDepth} mm",
+      "requiredValue": "Retorno de isolamento >= 50 mm na ombreira, padieira e peitoril",
+      "remediation": "Executar retorno de isolamento: (1) Retorno 50 mm: XPS ou EPS na ombreira. (2) Sem retorno: psi ~= 0.20-0.35; com retorno: psi ~= 0.05-0.15 W/(m.K). (3) Ideal: caixilharia alinhada com plano de isolamento, sobreposicao >= 30 mm. (4) Material: XPS 30-50 mm ou cortica expandida.",
+      "enabled": true,
+      "tags": [
+        "ponte termica",
+        "ombreira",
+        "retorno isolamento",
+        "caixilharia",
+        "50 mm"
+      ]
+    },
+    {
+      "id": "REH-PTLDET-04",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Corte Termico em Varandas (psi <= 0.15 W/(m.K))",
+      "description": "O elemento de corte termico na ligacao laje/varanda apresenta psi ({envelope.balconyThermalBreakPsi} W/(m.K)) superior a 0.15 W/(m.K). Sem corte termico, a varanda em betao constitui ponte termica extremamente significativa (psi = 0.55-0.90).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.balconyThermalBreakPsi",
+          "operator": ">",
+          "value": 0.15
+        },
+        {
+          "field": "envelope.hasBalcony",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "psi varanda = {envelope.balconyThermalBreakPsi} W/(m.K)",
+      "requiredValue": "psi <= 0.15 W/(m.K) com corte termico estrutural (Schock Isokorb ou equivalente)",
+      "remediation": "Implementar corte termico estrutural: (1) Schock Isokorb: psi = 0.05-0.15 W/(m.K) (vs. 0.55-0.90 sem). (2) Alternativa: varanda apoiada independentemente. (3) Impacto: reducao de 85% nas perdas. (4) Previne condensacao e bolor na face interior.",
+      "enabled": true,
+      "tags": [
+        "ponte termica",
+        "varanda",
+        "corte termico",
+        "Isokorb",
+        "psi <= 0.15"
+      ]
+    },
+    {
+      "id": "REH-PTLDET-05",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 + EN ISO 13370 — Isolamento Perimetral da Fundacao (min. 0.60 m)",
+      "description": "O isolamento perimetral da fundacao tem profundidade insuficiente ({envelope.foundationPerimeterInsulationDepth} m). E necessario minimo 0.60 m para reduzir perdas pelo solo e ponte termica parede/fundacao.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.foundationPerimeterInsulationDepth",
+          "operator": "<",
+          "value": 0.6
+        }
+      ],
+      "currentValueTemplate": "Profundidade do isolamento perimetral = {envelope.foundationPerimeterInsulationDepth} m",
+      "requiredValue": "Profundidade >= 0.60 m de isolamento perimetral (vertical ou horizontal)",
+      "remediation": "Executar isolamento perimetral adequado: (1) Minimo 0.60 m vertical (XPS >= 60 mm). (2) Alternativa horizontal: XPS >= 80 mm, largura >= 0.60 m. (3) Impacto: sem isolamento psi ~= 0.40-0.80; com 0.60 m: psi ~= 0.10-0.25 W/(m.K). (4) Protecao mecanica obrigatoria. (5) Para I3: >= 1.00 m.",
+      "enabled": true,
+      "tags": [
+        "ponte termica",
+        "fundacao",
+        "isolamento perimetral",
+        "0.60 m",
+        "EN ISO 13370"
+      ]
     }
   ]
 }

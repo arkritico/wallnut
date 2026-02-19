@@ -1012,6 +1012,801 @@
       "remediation": "O certificado energético está próximo de expirar (validade 10 anos). Planear a renovação da certificação energética atempadamente. Contratar Perito Qualificado (PQ) registado na ADENE.",
       "enabled": true,
       "tags": ["certificado", "validade", "10 anos", "DL 118/2013"]
+    },
+
+    {
+      "id": "ENE-VE-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 39/2010 (atualizado) / DL 101-D/2020 — Infraestrutura de Carregamento VE (Residencial)",
+      "description": "O edifício residencial novo não prevê infraestrutura de canalização para carregamento de veículos elétricos em 100% dos lugares de estacionamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.evDuctingPct", "operator": "<", "value": 100 },
+        { "field": "buildingType", "operator": "==", "value": "residential" },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "{energy.evDuctingPct}% dos lugares com canalização VE",
+      "requiredValue": "100% dos lugares com canalização (tubagem) para futura instalação de carregadores",
+      "remediation": "Instalar canalização (tubos, esteiras) desde o QGBT até 100% dos lugares de estacionamento, dimensionada para futura instalação de carregadores. Prever coluna montante com capacidade para 3.7 kW por lugar.",
+      "enabled": true,
+      "tags": ["veículos elétricos", "carregamento", "canalização", "residencial"]
+    },
+    {
+      "id": "ENE-VE-02",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 39/2010 (atualizado) — Carregadores VE (Comércio/Serviços)",
+      "description": "O edifício de comércio/serviços novo não instala carregadores de VE em pelo menos 20% dos lugares de estacionamento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.evChargerRatio", "operator": "<", "value": 0.20 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "office"] },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Rácio de carregadores: {energy.evChargerRatio}",
+      "requiredValue": "≥ 20% dos lugares com carregador VE instalado (mín. 3.7 kW por ponto)",
+      "remediation": "Instalar pontos de carregamento de veículos elétricos em pelo menos 20% dos lugares de estacionamento, com potência mínima de 3.7 kW por ponto. Garantir contagem individualizada de energia.",
+      "enabled": true,
+      "tags": ["veículos elétricos", "carregamento", "comércio", "serviços"]
+    },
+    {
+      "id": "ENE-VE-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 39/2010 (atualizado) — Potência Mínima do Ponto de Carregamento",
+      "description": "A potência dos pontos de carregamento de VE ({energy.evChargerPowerKw} kW) é inferior ao mínimo de 3.7 kW.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.evChargerPowerKw", "operator": "<", "value": 3.7 }
+      ],
+      "currentValueTemplate": "Potência do carregador: {energy.evChargerPowerKw} kW",
+      "requiredValue": "≥ 3.7 kW por ponto de carregamento (modo 3, IEC 61851)",
+      "remediation": "Aumentar a potência de cada ponto de carregamento para pelo menos 3.7 kW (monofásico 16A ou trifásico). Para edifícios de serviços, considerar pontos de 7.4 kW ou 22 kW para carregamento mais rápido.",
+      "enabled": true,
+      "tags": ["veículos elétricos", "potência", "carregamento"]
+    },
+    {
+      "id": "ENE-VE-04",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 39/2010 — Renovação: Carregadores VE em Edifícios Existentes",
+      "description": "Na renovação de edifícios existentes com mais de 20 lugares, não são instalados carregadores VE em pelo menos 5% dos lugares.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.evChargerRatio", "operator": "<", "value": 0.05 },
+        { "field": "isRehabilitation", "operator": "==", "value": true },
+        { "field": "parking.totalSpaces", "operator": ">", "value": 20 }
+      ],
+      "currentValueTemplate": "Rácio de carregadores: {energy.evChargerRatio}",
+      "requiredValue": "≥ 5% dos lugares com carregador VE em renovações (edifícios > 20 lugares)",
+      "remediation": "Instalar carregadores de VE em pelo menos 5% dos lugares de estacionamento na renovação de edifícios com mais de 20 lugares. Garantir canalização adicional para futura expansão até 20%.",
+      "enabled": true,
+      "tags": ["veículos elétricos", "renovação", "existente"]
+    },
+    {
+      "id": "ENE-VE-05",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 39/2010 — Contagem Individualizada de Energia VE",
+      "description": "Os pontos de carregamento de VE não dispõem de contagem individualizada de energia para faturação.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.evIndividualMetering", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem contagem individualizada nos carregadores VE",
+      "requiredValue": "Contagem individualizada por ponto de carregamento (contador ou smartmeter)",
+      "remediation": "Instalar sistema de contagem de energia individualizado em cada ponto de carregamento VE, permitindo a imputação de consumos a cada utilizador. Pode ser através de contador dedicado ou smartmeter com identificação do utilizador (RFID/app).",
+      "enabled": true,
+      "tags": ["veículos elétricos", "contagem", "faturação"]
+    },
+
+    {
+      "id": "ENE-AQS-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Eficiência do Sistema de AQS",
+      "description": "A eficiência do sistema de preparação de AQS ({energy.aqsEfficiency}) é inferior ao mínimo de referência para edifícios novos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.aqsEfficiency", "operator": "<", "value": 0.82 },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Eficiência AQS: {energy.aqsEfficiency}",
+      "requiredValue": "≥ 0.82 para caldeiras convencionais; ≥ 0.89 para caldeiras de condensação; COP ≥ 2.6 para bombas de calor AQS",
+      "remediation": "Substituir ou melhorar o sistema de preparação de AQS para atingir eficiências de referência. Soluções: caldeira de condensação (η ≥ 0.89), bomba de calor dedicada AQS (COP ≥ 2.6), ou sistema combinado solar térmico + apoio de alta eficiência.",
+      "enabled": true,
+      "tags": ["AQS", "eficiência", "caldeira", "bomba de calor"]
+    },
+    {
+      "id": "ENE-AQS-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Isolamento do Depósito de AQS",
+      "description": "O depósito de água quente sanitária não possui isolamento térmico adequado, com perdas térmicas excessivas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.aqsTankInsulationMm", "operator": "<", "value": 50 }
+      ],
+      "currentValueTemplate": "Espessura do isolamento do depósito: {energy.aqsTankInsulationMm} mm",
+      "requiredValue": "≥ 50 mm de isolamento (poliuretano ou equivalente) no depósito de AQS",
+      "remediation": "Isolar o depósito de AQS com pelo menos 50mm de espuma de poliuretano (λ ≤ 0.040 W/m·K) ou equivalente. As perdas estáticas do depósito não devem exceder 1.0 W/litro para depósitos até 200L. Isolar todas as tubagens de ligação.",
+      "enabled": true,
+      "tags": ["AQS", "isolamento", "depósito", "perdas térmicas"]
+    },
+    {
+      "id": "ENE-AQS-03",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-I/2013 — Consumo de Referência AQS (40L/pessoa/dia)",
+      "description": "O consumo de referência de AQS deve ser de 40 litros/pessoa/dia a 60°C para efeito de cálculo no REH.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.aqsConsumptionReference", "operator": "!=", "value": 40 },
+        { "field": "buildingType", "operator": "==", "value": "residential" }
+      ],
+      "currentValueTemplate": "Consumo de referência AQS: {energy.aqsConsumptionReference} L/pessoa/dia",
+      "requiredValue": "40 L/pessoa/dia a 60°C (referência REH)",
+      "remediation": "Utilizar o valor de referência de 40 litros por pessoa por dia a 60°C no cálculo das necessidades energéticas de AQS do REH. O número de ocupantes convencionais é calculado em função da tipologia: T0=2, T1=2, T2=3, T3=4, Tn=n+1.",
+      "enabled": true,
+      "tags": ["AQS", "consumo", "referência", "REH"]
+    },
+    {
+      "id": "ENE-AQS-04",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Sistemas de AQS Centralizado em GES",
+      "description": "O sistema centralizado de AQS em grande edifício de serviços não dispõe de recirculação controlada e isolamento de tubagens.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.aqsCentralizedRecirculation", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sistema AQS centralizado sem recirculação controlada",
+      "requiredValue": "Recirculação com bomba controlada por temperatura e/ou horário, tubagens isoladas",
+      "remediation": "Instalar bomba de recirculação controlada por temperatura (termostato) e horário (temporizador). Isolar todas as tubagens do circuito de recirculação. Prever válvulas de equilíbrio para garantir temperatura uniforme em todos os pontos de consumo.",
+      "enabled": true,
+      "tags": ["AQS", "centralizado", "recirculação", "GES"]
+    },
+    {
+      "id": "ENE-AQS-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Temperatura Anti-Legionella",
+      "description": "O sistema de AQS não garante a temperatura mínima de armazenamento de 60°C para prevenção de Legionella.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.aqsStorageTemp", "operator": "<", "value": 60 }
+      ],
+      "currentValueTemplate": "Temperatura de armazenamento AQS: {energy.aqsStorageTemp}°C",
+      "requiredValue": "≥ 60°C no depósito de armazenamento (prevenção Legionella)",
+      "remediation": "Garantir que a água no depósito de AQS é mantida a pelo menos 60°C para prevenir a proliferação de Legionella. Para bombas de calor com temperatura limitada, prever resistência elétrica de apoio ou ciclo semanal de pasteurização a 70°C.",
+      "enabled": true,
+      "tags": ["AQS", "Legionella", "temperatura", "segurança"]
+    },
+
+    {
+      "id": "ENE-PASSIV-01",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Arrefecimento Passivo (Ventilação Noturna)",
+      "description": "O edifício não prevê estratégias de arrefecimento passivo, como ventilação noturna ou sombreamento exterior eficaz.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.hasPassiveCoolingStrategy", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem estratégias de arrefecimento passivo identificadas",
+      "requiredValue": "Estratégias passivas: ventilação noturna, sombreamento exterior, massa térmica, ventilação cruzada",
+      "remediation": "Incorporar pelo menos uma estratégia de arrefecimento passivo: (1) ventilação noturna natural (aberturas dimensionadas para taxa de ventilação ≥ 4 Rph); (2) sombreamento exterior regulável; (3) aproveitamento da massa térmica interior; (4) ventilação cruzada natural.",
+      "enabled": true,
+      "tags": ["arrefecimento passivo", "ventilação noturna", "NZEB"]
+    },
+    {
+      "id": "ENE-PASSIV-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Sombreamento de Envidraçados (Fator solar g_T)",
+      "description": "Os envidraçados orientados a Sul, Este e Oeste não dispõem de dispositivos de sombreamento exterior eficazes para controlar os ganhos solares.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.glazingSolarProtection", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Envidraçados sem sombreamento exterior eficaz",
+      "requiredValue": "Fator solar com proteção ativada g_T·Fo·Ff ≤ 0.56 (zona I); g_T·Fo·Ff ≤ 0.50 (zona V)",
+      "remediation": "Instalar dispositivos de sombreamento exterior nos envidraçados orientados a Sul (±90°), Este e Oeste: estores exteriores, palas, portadas ou persianas. O fator solar com proteção ativada deve respeitar os limites regulamentares por zona climática.",
+      "enabled": true,
+      "tags": ["sombreamento", "fator solar", "envidraçados", "ganhos solares"]
+    },
+    {
+      "id": "ENE-PASSIV-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Fator de Utilização de Ganhos (η)",
+      "description": "O fator de utilização de ganhos térmicos é baixo, indicando massa térmica insuficiente ou excesso de ganhos solares.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.gainsUtilizationFactor", "operator": "<", "value": 0.60 }
+      ],
+      "currentValueTemplate": "Fator de utilização de ganhos: {energy.gainsUtilizationFactor}",
+      "requiredValue": "η ≥ 0.60 (indica bom equilíbrio entre ganhos e capacidade de absorção)",
+      "remediation": "Aumentar a massa térmica interior (paredes e lajes em betão, pavimentos cerâmicos) e/ou reduzir a área de envidraçados orientados a Sul. Uma massa térmica elevada permite absorver ganhos solares durante o dia e libertá-los à noite.",
+      "enabled": true,
+      "tags": ["ganhos solares", "massa térmica", "fator de utilização"]
+    },
+    {
+      "id": "ENE-PASSIV-04",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Orientação e Compacidade do Edifício",
+      "description": "O fator de forma do edifício (Ff) é elevado, indicando baixa compacidade e maiores perdas térmicas pela envolvente.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.formFactor", "operator": ">", "value": 1.0 }
+      ],
+      "currentValueTemplate": "Fator de forma: {energy.formFactor}",
+      "requiredValue": "Ff ≤ 1.0 idealmente (menor Ff = edifício mais compacto = menores perdas)",
+      "remediation": "O fator de forma elevado indica geometria pouco compacta. Considerar: (1) reduzir saliências e reentrâncias na fachada; (2) agrupar volumes aquecidos; (3) minimizar a relação superfície/volume. Para edifícios existentes, reforçar o isolamento proporcionalmente.",
+      "enabled": true,
+      "tags": ["fator de forma", "compacidade", "envolvente", "perdas"]
+    },
+    {
+      "id": "ENE-PASSIV-05",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Iluminação Natural e Fator de Luz do Dia",
+      "description": "Os espaços principais do edifício não atingem o fator de luz do dia mínimo para redução do consumo de iluminação artificial.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.daylightFactorAvg", "operator": "<", "value": 2.0 }
+      ],
+      "currentValueTemplate": "Fator de luz do dia médio: {energy.daylightFactorAvg}%",
+      "requiredValue": "≥ 2.0% nos espaços de trabalho e permanência (EN 17037)",
+      "remediation": "Melhorar a iluminação natural: aumentar a área de envidraçados, usar vidro de alta transmissão luminosa, instalar claraboias ou tubos solares, pintar superfícies interiores em cores claras. Objetivo: reduzir o consumo de iluminação artificial em pelo menos 30%.",
+      "enabled": true,
+      "tags": ["iluminação natural", "fator de luz do dia", "eficiência"]
+    },
+
+    {
+      "id": "ENE-MONIT-01",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Sub-metering por Uso Final de Energia",
+      "description": "O edifício de serviços não dispõe de sub-contagem de energia por uso final (AVAC, iluminação, equipamentos, AQS).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasSubMetering", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sem sub-contagem de energia por uso final",
+      "requiredValue": "Sub-contagem obrigatória para GES: AVAC, iluminação, equipamentos, AQS, VE",
+      "remediation": "Instalar sistema de sub-contagem de energia (smartmeters) por uso final: (1) AVAC (aquecimento/arrefecimento/ventilação); (2) iluminação; (3) equipamentos; (4) AQS; (5) VE se aplicável. Integrar num sistema de gestão de energia (SGEE) para monitorização contínua.",
+      "enabled": true,
+      "tags": ["monitorização", "sub-metering", "GES", "contagem"]
+    },
+    {
+      "id": "ENE-MONIT-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Sistema de Gestão de Energia (SGEE/BMS)",
+      "description": "O edifício de serviços de grande dimensão não dispõe de sistema centralizado de gestão técnica (BMS/GTC) de classe mínima C.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.bmsClassSufficient", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Classe BAC atual insuficiente",
+      "requiredValue": "Classe BAC mínima C (EN 15232) para GES; Classe B para edifícios > 1000 m²",
+      "remediation": "Instalar sistema de gestão técnica centralizada (GTC/BMS) com funcionalidades mínimas de classe C: controlo de horários, monitorização de consumos, alarmes de funcionamento. Para edifícios > 1000m², classe B com otimização energética.",
+      "enabled": true,
+      "tags": ["BMS", "GTC", "BAC", "classe", "automatização"]
+    },
+    {
+      "id": "ENE-MONIT-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Plano de Racionalização Energética (PRE)",
+      "description": "O grande edifício de serviços com consumo elevado não implementou o plano de racionalização energética (PRE) obrigatório.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.hasPREImplemented", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true },
+        { "field": "energy.ieeExceedsRef", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "PRE não implementado (IEE > IEE_ref)",
+      "requiredValue": "PRE obrigatório quando IEE_s > IEE_ref: implementação das medidas identificadas na auditoria",
+      "remediation": "Implementar as medidas identificadas no PRE: (1) medidas de retorno de investimento < 8 anos são obrigatórias; (2) prazo de implementação: 3 anos após a data da auditoria energética; (3) reportar a implementação à ADENE/DGEG.",
+      "enabled": true,
+      "tags": ["PRE", "racionalização", "GES", "auditoria"]
+    },
+    {
+      "id": "ENE-MONIT-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Contrato de Manutenção TIM (Técnico de Instalação e Manutenção)",
+      "description": "Os sistemas técnicos de climatização não dispõem de contrato de manutenção com TIM credenciado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hasTIMContract", "operator": "==", "value": false },
+        { "field": "energy.hvacInstalledPower", "operator": ">", "value": 25 }
+      ],
+      "currentValueTemplate": "Sem contrato de manutenção TIM",
+      "requiredValue": "Contrato com TIM obrigatório para sistemas > 25 kW (Cat. II ou III conforme potência)",
+      "remediation": "Contratar TIM credenciado pela DGEG para manutenção dos sistemas de climatização. Categoria II: potência 25-250 kW; Categoria III: potência > 250 kW. A manutenção deve ser periódica (trimestral/semestral) com registo no livro de manutenção.",
+      "enabled": true,
+      "tags": ["TIM", "manutenção", "AVAC", "contrato"]
+    },
+    {
+      "id": "ENE-MONIT-05",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Registo de Consumos Energéticos em Portal SCE",
+      "description": "O edifício de serviços não reporta os consumos energéticos anuais no portal SCE da ADENE.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.annualEnergyReporting", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sem reporte anual de consumos no portal SCE",
+      "requiredValue": "Reporte obrigatório de consumos energéticos anuais para GES (portal ADENE/SCE)",
+      "remediation": "Registar os consumos energéticos anuais no portal SCE da ADENE até 30 de abril de cada ano. Incluir: consumo de eletricidade, gás, gasóleo e outras fontes, desagregados por uso final quando possível. O não cumprimento constitui contraordenação.",
+      "enabled": true,
+      "tags": ["consumos", "reporte", "SCE", "ADENE", "GES"]
+    },
+
+    {
+      "id": "ENE-HVAC-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Free-cooling Obrigatório em Sistemas de Arrefecimento",
+      "description": "O sistema de arrefecimento com potência > 25 kW não dispõe de free-cooling quando a temperatura exterior permite.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hvacHasFreeCooling", "operator": "==", "value": false },
+        { "field": "energy.coolingPowerKw", "operator": ">", "value": 25 }
+      ],
+      "currentValueTemplate": "Sem sistema de free-cooling",
+      "requiredValue": "Free-cooling obrigatório em sistemas > 25 kW com economizador de ar exterior",
+      "remediation": "Instalar sistema de free-cooling (economizador) que utilize ar exterior quando a temperatura exterior é inferior à temperatura de retorno. O controlo deve ser entálpico (temperatura + humidade) para máxima eficiência. Prever registos motorizados e sensor de temperatura exterior.",
+      "enabled": true,
+      "tags": ["free-cooling", "economizador", "AVAC", "arrefecimento"]
+    },
+    {
+      "id": "ENE-HVAC-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Recuperação de Calor em UTA",
+      "description": "A unidade de tratamento de ar com caudal > 10,000 m³/h não dispõe de recuperador de calor com eficiência mínima de 50%.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ahuHeatRecoveryEfficiency", "operator": "<", "value": 50 },
+        { "field": "energy.ahuAirflowM3h", "operator": ">", "value": 10000 }
+      ],
+      "currentValueTemplate": "Eficiência de recuperação de calor: {energy.ahuHeatRecoveryEfficiency}%",
+      "requiredValue": "≥ 50% de eficiência (sensível) para caudais > 10,000 m³/h (Portaria 349-D)",
+      "remediation": "Instalar ou substituir o recuperador de calor da UTA para atingir eficiência sensível ≥ 50%. Tipos: recuperador de placas cruzadas (50-70%), rotativo entálpico (70-85%), ou tubos de calor (40-55%). A perda de carga adicional deve ser compensada pela poupança energética.",
+      "enabled": true,
+      "tags": ["recuperação de calor", "UTA", "AVAC", "eficiência"]
+    },
+    {
+      "id": "ENE-HVAC-03",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — SFP de Ventiladores (Potência Específica)",
+      "description": "A potência específica dos ventiladores (SFP) excede o limite de 2500 W/(m³/s) para sistemas de ventilação novos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.ventilationSFP", "operator": ">", "value": 2500 }
+      ],
+      "currentValueTemplate": "SFP: {energy.ventilationSFP} W/(m³/s)",
+      "requiredValue": "≤ 2500 W/(m³/s) para sistemas com aquecimento e arrefecimento; ≤ 1250 W/(m³/s) para extração simples",
+      "remediation": "Reduzir o SFP: (1) dimensionar corretamente as condutas para minimizar perdas de carga; (2) utilizar ventiladores com motor EC de alta eficiência; (3) aplicar variadores de velocidade (VSD); (4) otimizar a geometria das condutas e acessórios.",
+      "enabled": true,
+      "tags": ["SFP", "ventiladores", "potência específica", "AVAC"]
+    },
+    {
+      "id": "ENE-HVAC-04",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Variadores de Velocidade (VSD) em Bombas",
+      "description": "As bombas de circulação do sistema de AVAC com potência > 5.5 kW não dispõem de variador de velocidade (VSD).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.hvacPumpsHaveVSD", "operator": "==", "value": false },
+        { "field": "energy.pumpPowerKw", "operator": ">", "value": 5.5 }
+      ],
+      "currentValueTemplate": "Bombas sem variador de velocidade",
+      "requiredValue": "VSD obrigatório em bombas > 5.5 kW (Portaria 349-D/2013)",
+      "remediation": "Instalar variadores de velocidade (VSD/VFD) nas bombas de circulação com potência superior a 5.5 kW. Os VSD permitem poupanças de 30-60% em regime de carga parcial (lei cúbica: redução de 50% na velocidade = 87% de redução no consumo).",
+      "enabled": true,
+      "tags": ["VSD", "bombas", "variador velocidade", "AVAC"]
+    },
+    {
+      "id": "ENE-HVAC-05",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — EER Mínimo do Chiller",
+      "description": "O EER (Energy Efficiency Ratio) do chiller é inferior ao mínimo de referência.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.chillerEER", "operator": "<", "value": 2.9 }
+      ],
+      "currentValueTemplate": "EER do chiller: {energy.chillerEER}",
+      "requiredValue": "EER ≥ 2.9 (ar-água) ou ≥ 4.5 (água-água) em condições nominais (Eurovent)",
+      "remediation": "Substituir o chiller por um modelo de maior eficiência com EER de plena carga ≥ 2.9 (ar-água) ou ≥ 4.5 (água-água). Verificar também o ESEER/SEER para eficiência sazonal. Considerar chillers com compressor inverter para melhor eficiência em carga parcial.",
+      "enabled": true,
+      "tags": ["chiller", "EER", "eficiência", "arrefecimento"]
+    },
+
+    {
+      "id": "ENE-ENVREF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Coeficiente U Máximo de Paredes Exteriores",
+      "description": "O coeficiente de transmissão térmica (U) das paredes exteriores ({energy.wallUValue} W/m²·K) excede o máximo regulamentar para a zona climática.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.wallUExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "U paredes = {energy.wallUValue} W/m²·K",
+      "requiredValue": "≤ U_max por zona climática: I1=0.50, I2=0.40, I3=0.35 W/m²·K",
+      "remediation": "Reforçar o isolamento térmico das paredes exteriores. Soluções: (1) ETICS com EPS/XPS (espessura conforme cálculo); (2) isolamento na caixa de ar; (3) contra-fachada interior isolada. O isolamento pelo exterior (ETICS) é preferível pois reduz pontes térmicas.",
+      "enabled": true,
+      "tags": ["envolvente", "paredes", "U valor", "isolamento"]
+    },
+    {
+      "id": "ENE-ENVREF-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Coeficiente U Máximo de Coberturas",
+      "description": "O coeficiente de transmissão térmica (U) das coberturas ({energy.roofUValue} W/m²·K) excede o máximo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.roofUExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "U coberturas = {energy.roofUValue} W/m²·K",
+      "requiredValue": "≤ U_max por zona climática: I1=0.40, I2=0.35, I3=0.30 W/m²·K",
+      "remediation": "Isolar termicamente as coberturas (terraço, inclinada, desvão). Soluções: (1) isolamento sobre a laje (XPS em coberturas invertidas, EPS sob impermeabilização); (2) isolamento sob a estrutura (lã mineral, PIR); (3) desvão não habitado: isolamento sobre o teto do último piso.",
+      "enabled": true,
+      "tags": ["envolvente", "coberturas", "U valor", "isolamento"]
+    },
+    {
+      "id": "ENE-ENVREF-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Coeficiente U Máximo de Pavimentos",
+      "description": "O coeficiente de transmissão térmica (U) dos pavimentos sobre espaço não aquecido ou exterior ({energy.floorUValue} W/m²·K) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.floorUExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "U pavimentos = {energy.floorUValue} W/m²·K",
+      "requiredValue": "≤ U_max por zona climática: I1=0.50, I2=0.40, I3=0.35 W/m²·K",
+      "remediation": "Isolar termicamente os pavimentos sobre espaços não aquecidos (garagem, cave, pilotis). Soluções: (1) isolamento pelo lado inferior (projeção de espuma, painéis); (2) isolamento sobre a laje com pavimento flutuante; (3) piso radiante com isolamento inferior.",
+      "enabled": true,
+      "tags": ["envolvente", "pavimentos", "U valor", "isolamento"]
+    },
+    {
+      "id": "ENE-ENVREF-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Coeficiente Uw Máximo de Vãos Envidraçados",
+      "description": "O coeficiente de transmissão térmica (Uw) dos vãos envidraçados ({energy.windowUw} W/m²·K) excede o máximo regulamentar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.windowUwExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Uw envidraçados = {energy.windowUw} W/m²·K",
+      "requiredValue": "≤ Uw_max: 2.80 W/m²·K (I1), 2.40 W/m²·K (I2), 2.20 W/m²·K (I3)",
+      "remediation": "Substituir os vãos envidraçados por janelas de melhor desempenho: (1) vidro duplo com caixilharia de corte térmico (Uw ≈ 2.0-2.5); (2) vidro duplo com capa low-e (Uw ≈ 1.5-1.8); (3) vidro triplo para zonas I3 (Uw ≈ 1.0-1.3). A caixilharia deve ter classificação mínima classe 3 de permeabilidade ao ar.",
+      "enabled": true,
+      "tags": ["envolvente", "envidraçados", "Uw", "janelas"]
+    },
+    {
+      "id": "ENE-ENVREF-05",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Área Máxima de Envidraçados (20% da Ap)",
+      "description": "A área de envidraçados excede 20% da área útil de pavimento, requerendo verificação detalhada do comportamento térmico.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.glazingToFloorRatio", "operator": ">", "value": 0.20 }
+      ],
+      "currentValueTemplate": "Rácio envidraçados/pavimento: {energy.glazingToFloorRatio}",
+      "requiredValue": "≤ 20% da área útil de pavimento (Ap); se excedido, cálculo detalhado obrigatório",
+      "remediation": "Se a área de envidraçados excede 20% de Ap, é necessário verificação detalhada por cálculo dinâmico ou método simplificado com penalização. Medidas compensatórias: vidro de baixo fator solar, sombreamento exterior eficaz, reforço do isolamento de paredes.",
+      "enabled": true,
+      "tags": ["envidraçados", "área", "rácio", "envolvente"]
+    },
+
+    {
+      "id": "ENE-LIGHT-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 / Portaria 349-D — Densidade de Potência de Iluminação (DPIE)",
+      "description": "A densidade de potência de iluminação ({energy.lightingDensity} W/m²) excede o máximo regulamentar para o tipo de uso.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.lightingDensityExceedsMax", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "DPIE: {energy.lightingDensity} W/m²",
+      "requiredValue": "≤ DPIE_max por tipo de uso: escritório 10, comércio 15, ensino 10, hospitalar 12 W/m²",
+      "remediation": "Reduzir a densidade de potência de iluminação: (1) substituir luminárias por LED de alta eficácia (≥ 120 lm/W); (2) instalar sensores de presença e detetores crepusculares; (3) implementar regulação da luz (dimming) em função da luz natural. Meta: DPIE ≤ 50% do máximo regulamentar.",
+      "enabled": true,
+      "tags": ["iluminação", "DPIE", "densidade", "LED"]
+    },
+    {
+      "id": "ENE-LIGHT-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Controlo Automático de Iluminação em Zonas Comuns",
+      "description": "As zonas comuns (corredores, escadas, IS comuns) não dispõem de controlo automático de iluminação por deteção de presença.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.commonAreaLightingAutoControl", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Iluminação de zonas comuns sem controlo automático",
+      "requiredValue": "Deteção de presença obrigatória em zonas comuns de edifícios de serviços",
+      "remediation": "Instalar sensores de presença/movimento nas zonas comuns: corredores, escadas, IS comuns, estacionamento. Os sensores devem desligar ou reduzir a iluminação após período de não deteção (máximo 10 minutos). Em estacionamentos, reduzir para 20% na ausência de movimento.",
+      "enabled": true,
+      "tags": ["iluminação", "controlo automático", "presença", "zonas comuns"]
+    },
+    {
+      "id": "ENE-LIGHT-03",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Regulação de Iluminação por Luz Natural (Daylight Harvesting)",
+      "description": "Os espaços com iluminação natural abundante não dispõem de regulação automática da iluminação artificial em função da luz natural.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.daylightHarvestingInstalled", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Sem regulação de iluminação por luz natural",
+      "requiredValue": "Regulação automática (dimming) em zonas com iluminação natural junto a fachadas (primeiros 3-5 m)",
+      "remediation": "Instalar sensores de luminosidade e reguladores (dimming) na faixa de 3-5m junto às fachadas com envidraçados significativos. O sistema deve manter o nível de iluminância constante (ex: 500 lux em escritórios) independentemente da luz natural disponível.",
+      "enabled": true,
+      "tags": ["iluminação", "daylight harvesting", "regulação", "luz natural"]
+    },
+    {
+      "id": "ENE-LIGHT-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Iluminação LED em Estacionamentos",
+      "description": "O estacionamento do edifício não utiliza iluminação LED com controlo por deteção de presença/veículos.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.parkingLightingLedControl", "operator": "==", "value": false },
+        { "field": "parking.totalSpaces", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "Estacionamento sem iluminação LED com controlo automático",
+      "requiredValue": "Iluminação LED com deteção de movimento, redução a 20% na ausência de ocupação (≤ 3 W/m²)",
+      "remediation": "Substituir a iluminação do estacionamento por LED (eficácia ≥ 120 lm/W) com sensores de presença/movimento por zona. Em ausência de ocupação, reduzir a iluminação para 20% (nível de segurança). DPIE máxima: 3 W/m² para estacionamento.",
+      "enabled": true,
+      "tags": ["iluminação", "estacionamento", "LED", "controlo"]
+    },
+    {
+      "id": "ENE-LIGHT-05",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Iluminação de Emergência Eficiente",
+      "description": "A iluminação de emergência do edifício não utiliza tecnologia LED de baixo consumo com módulo de bateria integrado.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.emergencyLightingLed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Iluminação de emergência não LED",
+      "requiredValue": "Blocos autónomos LED com autonomia ≥ 1h, consumo em vigília ≤ 1W",
+      "remediation": "Substituir blocos autónomos de emergência por modelos LED de baixo consumo em modo de vigília (≤ 1W). Em edifícios de serviços, a poupança energética acumulada é significativa (funcionamento 24/7/365 em vigília). Garantir autonomia ≥ 1 hora conforme regulamento SCIE.",
+      "enabled": true,
+      "tags": ["iluminação", "emergência", "LED", "eficiência"]
+    },
+
+    {
+      "id": "ENE-PENAL-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Contraordenação: Falta de Certificado na Venda/Arrendamento",
+      "description": "A publicidade de venda ou arrendamento do imóvel não inclui a classe energética do certificado SCE, constituindo contraordenação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.adEnergyClassDisplayed", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Classe energética não indicada na publicidade",
+      "requiredValue": "Classe energética obrigatória em toda a publicidade de venda/arrendamento (DL 68-A/2015)",
+      "remediation": "Incluir a classe energética do certificado SCE em toda a publicidade de venda ou arrendamento: anúncios, placards, websites, contratos. A não indicação constitui contraordenação com coima entre €250 e €3,740 (Art. 18.º DL 118/2013).",
+      "enabled": true,
+      "tags": ["certificado", "publicidade", "classe energética", "contraordenação"]
+    },
+    {
+      "id": "ENE-PENAL-02",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Obrigação do Proprietário: Afixação do Certificado",
+      "description": "O certificado energético não se encontra afixado em local acessível ao público no edifício de serviços.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.certificateDisplayed", "operator": "==", "value": false },
+        { "field": "buildingType", "operator": "!=", "value": "residential" }
+      ],
+      "currentValueTemplate": "Certificado energético não afixado no edifício",
+      "requiredValue": "Certificado afixado em local visível e acessível ao público (GES obrigatório, outros recomendado)",
+      "remediation": "Afixar o certificado energético (ou resumo com classe e data) em local visível e acessível ao público, preferencialmente na receção/entrada principal. Para GES, a afixação é obrigatória (Art. 6.º DL 118/2013). Incluir QR code de acesso ao certificado digital no portal SCE.",
+      "enabled": true,
+      "tags": ["certificado", "afixação", "GES", "obrigatório"]
+    },
+    {
+      "id": "ENE-PENAL-03",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Pré-certificado Obrigatório para Licenciamento",
+      "description": "O processo de licenciamento não inclui o pré-certificado energético emitido por PQ registado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.preCertificateForLicensing", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem pré-certificado energético para licenciamento",
+      "requiredValue": "Pré-certificado SCE obrigatório na submissão do processo de licenciamento",
+      "remediation": "Obter pré-certificado energético emitido por PQ (Perito Qualificado) registado na ADENE antes da submissão do processo de licenciamento na câmara municipal. O pré-certificado deve ser emitido com base no projeto de arquitetura e especialidades.",
+      "enabled": true,
+      "tags": ["pré-certificado", "licenciamento", "PQ", "obrigatório"]
+    },
+    {
+      "id": "ENE-PENAL-04",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Isenção de Certificação para Edifícios Industriais/Agrícolas",
+      "description": "O edifício industrial/agrícola com consumo energético baixo está isento de certificação energética, mas deve documentar a isenção.",
+      "severity": "info",
+      "conditions": [
+        { "field": "buildingType", "operator": "in", "value": ["industrial", "agricultural"] },
+        { "field": "energy.hasCertificate", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Edifício industrial/agrícola sem certificação",
+      "requiredValue": "Isenção válida para edifícios industriais/agrícolas com aquecimento ambiente limitado (Art. 4.º DL 68-A/2015)",
+      "remediation": "Verificar se o edifício se enquadra na isenção: edifícios industriais ou agrícolas com necessidades energéticas de aquecimento ambiente reduzidas e utilizados para atividade que exija elevada renovação do ar interior. Documentar a isenção por escrito.",
+      "enabled": true,
+      "tags": ["isenção", "industrial", "agrícola", "certificação"]
+    },
+    {
+      "id": "ENE-PENAL-05",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Certificado Final antes da Autorização de Utilização",
+      "description": "O edifício novo não obteve o certificado energético final antes do pedido de autorização de utilização.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.finalCertificateBeforeUtilization", "operator": "==", "value": false },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem certificado energético final",
+      "requiredValue": "Certificado SCE final obrigatório antes do pedido de autorização de utilização",
+      "remediation": "Obter o certificado energético final emitido por PQ antes de requerer a autorização de utilização à câmara municipal. O certificado final deve refletir as condições reais de construção (que podem diferir do pré-certificado). A câmara deve verificar a existência do certificado.",
+      "enabled": true,
+      "tags": ["certificado final", "autorização", "utilização", "obrigatório"]
+    },
+
+    {
+      "id": "ENE-GES-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Definição de GES (Grande Edifício de Serviços)",
+      "description": "O edifício de serviços com área útil ≥ 1000 m² ou potência instalada de climatização ≥ 25 kW é classificado como GES e sujeito a obrigações específicas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.isGES", "operator": "==", "value": true },
+        { "field": "energy.gesObligationsMet", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "GES com obrigações por cumprir",
+      "requiredValue": "GES: auditoria energética, certificação RECS, plano de manutenção, QAI, GTC",
+      "remediation": "Enquanto GES, o edifício deve cumprir: (1) auditoria energética periódica; (2) certificação energética RECS; (3) contrato TIM de manutenção; (4) monitorização QAI; (5) GTC/BMS obrigatório; (6) sub-metering por uso; (7) plano de racionalização se IEE > IEE_ref.",
+      "enabled": true,
+      "tags": ["GES", "obrigações", "auditoria", "RECS"]
+    },
+    {
+      "id": "ENE-GES-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — IEE Máximo para GES (Indicador de Eficiência Energética)",
+      "description": "O IEE efetivo do edifício ({energy.ieeEffective} kWhEP/m²/ano) excede o IEE de referência para o tipo de edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.ieeExceedsRef", "operator": "==", "value": true },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "IEE efetivo: {energy.ieeEffective} kWhEP/m²/ano",
+      "requiredValue": "IEE_s ≤ IEE_ref por tipo de uso: escritório 100, comércio 120-150, hospitalar 200, hotelaria 180 kWhEP/m²/ano",
+      "remediation": "Implementar medidas do PRE para reduzir o IEE: (1) substituição de iluminação por LED; (2) melhoria da eficiência AVAC; (3) implementação de free-cooling; (4) otimização de horários; (5) isolamento térmico; (6) instalação de renováveis (PV). Prazo: 3 anos após auditoria.",
+      "enabled": true,
+      "tags": ["IEE", "GES", "referência", "eficiência"]
+    },
+    {
+      "id": "ENE-GES-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Qualidade do Ar Interior (QAI) em GES",
+      "description": "O grande edifício de serviços não cumpre os parâmetros mínimos de qualidade do ar interior (CO₂, PM, COVT).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.qaiCompliant", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "QAI não conforme (parâmetros excedidos)",
+      "requiredValue": "CO₂ ≤ 2250 mg/m³, PM2.5 ≤ 25 µg/m³, PM10 ≤ 50 µg/m³, COVT ≤ 600 µg/m³, CH₂O ≤ 100 µg/m³",
+      "remediation": "Melhorar a QAI: (1) aumentar os caudais de ar novo; (2) verificar e limpar condutas e filtros; (3) eliminar fontes de poluição interior (tintas, adesivos, materiais com emissão de COV); (4) instalar monitorização contínua de CO₂ e PM. Realizar medições periódicas por laboratório acreditado.",
+      "enabled": true,
+      "tags": ["QAI", "qualidade ar", "CO2", "GES"]
+    },
+    {
+      "id": "ENE-GES-04",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Auditoria Energética Obrigatória para GES",
+      "description": "O grande edifício de serviços não realizou a auditoria energética obrigatória dentro do prazo regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.energyAuditCurrent", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Auditoria energética não realizada ou expirada",
+      "requiredValue": "Auditoria energética obrigatória para GES: periodicidade conforme potência instalada",
+      "remediation": "Realizar auditoria energética por Perito Qualificado ou técnico reconhecido ADENE. A auditoria deve incluir: (1) caraterização energética; (2) desagregação de consumos; (3) identificação de medidas de melhoria; (4) análise custo-benefício; (5) PRE com medidas de retorno < 8 anos.",
+      "enabled": true,
+      "tags": ["auditoria", "GES", "obrigatória", "PQ"]
+    },
+    {
+      "id": "ENE-GES-05",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Eficiência de Elevadores em GES",
+      "description": "Os elevadores do edifício de serviços não cumprem a classe de eficiência mínima A (EN ISO 25745) ou não dispõem de modo stand-by.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.elevatorEfficiencyCompliant", "operator": "==", "value": false },
+        { "field": "energy.isGES", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Elevadores sem eficiência energética otimizada",
+      "requiredValue": "Classe A (EN ISO 25745-2), modo stand-by, iluminação LED na cabina",
+      "remediation": "Otimizar a eficiência dos elevadores: (1) modo stand-by com desligamento de iluminação e ventilação na cabina após 5 minutos de inatividade; (2) iluminação LED na cabina; (3) variador de velocidade (VVVF); (4) regeneração de energia na descida em carga. Elevadores novos devem ser classe A.",
+      "enabled": true,
+      "tags": ["elevadores", "eficiência", "stand-by", "GES"]
+    },
+
+    {
+      "id": "ENE-RENEW-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Dimensionamento UPAC Fotovoltaico",
+      "description": "A potência do sistema fotovoltaico instalado não corresponde ao perfil de autoconsumo do edifício.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.pvSelfConsumptionRatio", "operator": "<", "value": 0.50 }
+      ],
+      "currentValueTemplate": "Rácio de autoconsumo PV: {energy.pvSelfConsumptionRatio}",
+      "requiredValue": "Autoconsumo ≥ 50% da produção PV (otimização económica sem armazenamento)",
+      "remediation": "Ajustar a potência PV para maximizar o autoconsumo: dimensionar para cobrir o consumo diurno base. Um rácio de autoconsumo < 50% indica sobredimensionamento. Soluções: (1) reduzir o número de painéis; (2) instalar armazenamento por bateria; (3) desfasar cargas para o período diurno.",
+      "enabled": true,
+      "tags": ["fotovoltaico", "autoconsumo", "UPAC", "dimensionamento"]
+    },
+    {
+      "id": "ENE-RENEW-02",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Registo DGEG para UPAC > 1.5 kW (até 30 kW)",
+      "description": "A unidade de produção para autoconsumo (UPAC) com potência entre 1.5 kW e 30 kW não está registada na DGEG.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.upacRegisteredDGEG", "operator": "==", "value": false },
+        { "field": "energy.pvPeakPowerKw", "operator": ">", "value": 1.5 }
+      ],
+      "currentValueTemplate": "UPAC não registada na DGEG",
+      "requiredValue": "Registo obrigatório na DGEG para UPAC entre 1.5 kW e 30 kW (comunicação prévia); > 30 kW licenciamento",
+      "remediation": "Efetuar o registo da UPAC na DGEG (Portal SERUP): UPAC 1.5-30 kW: comunicação prévia (mera comunicação, sem aprovação); UPAC > 30 kW: licença de exploração. O registo deve ser feito antes da ligação à rede. Incluir projeto elétrico assinado por eletrotécnico responsável.",
+      "enabled": true,
+      "tags": ["UPAC", "registo", "DGEG", "fotovoltaico"]
+    },
+    {
+      "id": "ENE-RENEW-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Contribuição Solar Obrigatória para AQS (Esolar)",
+      "description": "A contribuição do sistema solar térmico para AQS ({energy.solarContribution}%) é inferior ao mínimo obrigatório.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "energy.solarContributionInsufficient", "operator": "==", "value": true },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Contribuição solar: {energy.solarContribution}%",
+      "requiredValue": "≥ 50% para residencial novo; ≥ 30% para renovação; ≥ 50% para comércio/hotelaria; ≥ 70% para piscinas",
+      "remediation": "Aumentar a área de coletores solares ou substituir por solução alternativa com contribuição renovável equivalente (bomba de calor com SPF > 2.5 e origem renovável). A insuficiência de solar é penalizada no cálculo de Ntc. Calcular Esolar por software certificado (ex: SolTerm).",
+      "enabled": true,
+      "tags": ["solar", "AQS", "contribuição", "obrigatório"]
+    },
+    {
+      "id": "ENE-RENEW-04",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Fração Renovável Mínima NZEB",
+      "description": "A fração de energia renovável no edifício novo não atinge o mínimo para classificação NZEB.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "energy.renewableFraction", "operator": "<", "value": 0.50 },
+        { "field": "isRehabilitation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Fração renovável: {energy.renewableFraction}",
+      "requiredValue": "≥ 50% de fração renovável para NZEB (produzida no local ou proximidades)",
+      "remediation": "Aumentar a fração de energia renovável: (1) ampliar o sistema PV; (2) instalar ou ampliar o solar térmico; (3) utilizar bomba de calor (contribuição renovável via SPF); (4) considerar biomassa sustentável. A contribuição renovável inclui produção local e créditos de sistemas eficientes.",
+      "enabled": true,
+      "tags": ["renovável", "NZEB", "fração", "energia"]
+    },
+    {
+      "id": "ENE-RENEW-05",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Comunidades de Energia Renovável (CER)",
+      "description": "O edifício inserido numa comunidade de energia renovável não reporta adequadamente a partilha de energia.",
+      "severity": "info",
+      "conditions": [
+        { "field": "energy.isPartOfCER", "operator": "==", "value": true },
+        { "field": "energy.cerReportingCompliant", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "CER sem reporte adequado de partilha de energia",
+      "requiredValue": "Reporte mensal de produção, consumo e partilha de energia na CER",
+      "remediation": "Implementar o reporte mensal de energia na comunidade: produção local, consumo individual, energia partilhada, e excedente injetado na rede. Utilizar plataforma digital aprovada. A CER deve estar registada na DGEG e cumprir o DL 162/2019 alterado.",
+      "enabled": true,
+      "tags": ["CER", "comunidade", "renovável", "partilha"]
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "pluginId": "energy",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Mapeamento de campos para regras SCE/RECS (Sistema de Certificação Energética dos Edifícios / Regulamento de Desempenho Energético dos Edifícios de Comércio e Serviços)",
   "fields": [
     {
@@ -737,6 +737,86 @@
       "sources": ["form"],
       "defaults": { "_default": false },
       "description": "Indica se foi realizada auditoria energética ao edifício (obrigatória para GES)"
-    }
+    },
+
+    { "_group": "Veículos Elétricos" },
+    { "field": "energy.evDuctingPct", "label": "% de lugares com canalização VE", "type": "number", "unit": "%", "sources": ["form"], "defaults": { "_default": 0 } },
+    { "field": "energy.evChargerRatio", "label": "Rácio de carregadores VE", "type": "number", "sources": ["form"], "defaults": { "_default": 0 } },
+    { "field": "energy.evChargerPowerKw", "label": "Potência por ponto de carregamento VE", "type": "number", "unit": "kW", "sources": ["form"], "defaults": { "_default": 3.7 } },
+    { "field": "energy.evIndividualMetering", "label": "Contagem individualizada VE", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+
+    { "_group": "AQS (Água Quente Sanitária)" },
+    { "field": "energy.aqsEfficiency", "label": "Eficiência do sistema AQS", "type": "number", "sources": ["form"], "defaults": { "_default": 0.82 } },
+    { "field": "energy.aqsTankInsulationMm", "label": "Espessura isolamento depósito AQS", "type": "number", "unit": "mm", "sources": ["form"], "defaults": { "_default": 50 } },
+    { "field": "energy.aqsConsumptionReference", "label": "Consumo referência AQS", "type": "number", "unit": "L/pessoa/dia", "sources": ["form"], "defaults": { "_default": 40 } },
+    { "field": "energy.aqsCentralizedRecirculation", "label": "Recirculação AQS controlada", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.aqsStorageTemp", "label": "Temperatura armazenamento AQS", "type": "number", "unit": "°C", "sources": ["form"], "defaults": { "_default": 60 } },
+
+    { "_group": "Design Passivo" },
+    { "field": "energy.hasPassiveCoolingStrategy", "label": "Estratégia de arrefecimento passivo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.glazingSolarProtection", "label": "Sombreamento exterior nos envidraçados", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.gainsUtilizationFactor", "label": "Fator de utilização de ganhos", "type": "number", "sources": ["form"] },
+    { "field": "energy.formFactor", "label": "Fator de forma do edifício", "type": "number", "sources": ["form"] },
+    { "field": "energy.daylightFactorAvg", "label": "Fator de luz do dia médio", "type": "number", "unit": "%", "sources": ["form"] },
+
+    { "_group": "Monitorização e Gestão" },
+    { "field": "energy.hasSubMetering", "label": "Sub-contagem por uso final", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.bmsClassSufficient", "label": "Classe BAC suficiente", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.hasPREImplemented", "label": "PRE implementado", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.hasTIMContract", "label": "Contrato TIM de manutenção", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.annualEnergyReporting", "label": "Reporte anual de consumos SCE", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+
+    { "_group": "AVAC Eficiência" },
+    { "field": "energy.hvacHasFreeCooling", "label": "Free-cooling no sistema AVAC", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.coolingPowerKw", "label": "Potência de arrefecimento", "type": "number", "unit": "kW", "sources": ["form"] },
+    { "field": "energy.ahuHeatRecoveryEfficiency", "label": "Eficiência do recuperador de calor", "type": "number", "unit": "%", "sources": ["form"] },
+    { "field": "energy.ahuAirflowM3h", "label": "Caudal de ar da UTA", "type": "number", "unit": "m³/h", "sources": ["form"] },
+    { "field": "energy.ventilationSFP", "label": "SFP dos ventiladores", "type": "number", "unit": "W/(m³/s)", "sources": ["form"] },
+    { "field": "energy.hvacPumpsHaveVSD", "label": "Bombas com variador de velocidade", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.pumpPowerKw", "label": "Potência das bombas AVAC", "type": "number", "unit": "kW", "sources": ["form"] },
+    { "field": "energy.chillerEER", "label": "EER do chiller", "type": "number", "sources": ["form"] },
+    { "field": "energy.hvacInstalledPower", "label": "Potência instalada AVAC", "type": "number", "unit": "kW", "sources": ["form"] },
+
+    { "_group": "Envolvente" },
+    { "field": "energy.wallUValue", "label": "U paredes exteriores", "type": "number", "unit": "W/m²·K", "sources": ["form", "ifc"] },
+    { "field": "energy.wallUExceedsMax", "label": "U paredes excede máximo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.roofUValue", "label": "U coberturas", "type": "number", "unit": "W/m²·K", "sources": ["form", "ifc"] },
+    { "field": "energy.roofUExceedsMax", "label": "U coberturas excede máximo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.floorUValue", "label": "U pavimentos", "type": "number", "unit": "W/m²·K", "sources": ["form", "ifc"] },
+    { "field": "energy.floorUExceedsMax", "label": "U pavimentos excede máximo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.windowUw", "label": "Uw envidraçados", "type": "number", "unit": "W/m²·K", "sources": ["form", "ifc"] },
+    { "field": "energy.windowUwExceedsMax", "label": "Uw excede máximo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.glazingToFloorRatio", "label": "Rácio envidraçados/pavimento", "type": "number", "sources": ["form"] },
+
+    { "_group": "Iluminação" },
+    { "field": "energy.lightingDensity", "label": "Densidade potência iluminação", "type": "number", "unit": "W/m²", "sources": ["form"] },
+    { "field": "energy.lightingDensityExceedsMax", "label": "DPIE excede máximo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.commonAreaLightingAutoControl", "label": "Iluminação zonas comuns com controlo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.daylightHarvestingInstalled", "label": "Regulação por luz natural", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.parkingLightingLedControl", "label": "Estacionamento com LED e controlo", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.emergencyLightingLed", "label": "Iluminação emergência LED", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+
+    { "_group": "Penalidades e Obrigações" },
+    { "field": "energy.adEnergyClassDisplayed", "label": "Classe energética na publicidade", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.certificateDisplayed", "label": "Certificado afixado no edifício", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.preCertificateForLicensing", "label": "Pré-certificado para licenciamento", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.finalCertificateBeforeUtilization", "label": "Certificado final antes utilização", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+
+    { "_group": "GES (Grandes Edifícios de Serviços)" },
+    { "field": "energy.gesObligationsMet", "label": "Obrigações GES cumpridas", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.ieeEffective", "label": "IEE efetivo", "type": "number", "unit": "kWhEP/m²/ano", "sources": ["form"] },
+    { "field": "energy.ieeExceedsRef", "label": "IEE excede referência", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.qaiCompliant", "label": "QAI conforme", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.energyAuditCurrent", "label": "Auditoria energética atualizada", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.elevatorEfficiencyCompliant", "label": "Elevadores com eficiência adequada", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+
+    { "_group": "Renováveis (Avançado)" },
+    { "field": "energy.pvSelfConsumptionRatio", "label": "Rácio autoconsumo PV", "type": "number", "sources": ["form"] },
+    { "field": "energy.upacRegisteredDGEG", "label": "UPAC registada na DGEG", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.pvPeakPowerKw", "label": "Potência pico PV", "type": "number", "unit": "kW", "sources": ["form"] },
+    { "field": "energy.solarContribution", "label": "Contribuição solar AQS", "type": "number", "unit": "%", "sources": ["form"] },
+    { "field": "energy.solarContributionInsufficient", "label": "Contribuição solar insuficiente", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.isPartOfCER", "label": "Integrado em comunidade de energia", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } },
+    { "field": "energy.cerReportingCompliant", "label": "Reporte CER conforme", "type": "boolean", "sources": ["form"], "defaults": { "_default": false } }
   ]
 }

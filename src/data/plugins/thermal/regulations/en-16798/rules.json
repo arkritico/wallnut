@@ -11,13 +11,22 @@
       "description": "A temperatura operativa interior de projeto para aquecimento ({envelope.heatingSetpointTemp}°C) é inferior ao mínimo recomendado de 20°C para categoria II (edifícios residenciais novos) conforme EN 16798-1.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.heatingSetpointTemp", "operator": "<", "value": 20 }
+        {
+          "field": "envelope.heatingSetpointTemp",
+          "operator": "<",
+          "value": 20
+        }
       ],
       "currentValueTemplate": "Temperatura de aquecimento: {envelope.heatingSetpointTemp}°C",
       "requiredValue": "≥ 20°C (Cat. II) / ≥ 21°C (Cat. I — idosos, crianças) / ≥ 18°C (Cat. III)",
       "remediation": "Ajustar a temperatura operativa de aquecimento conforme EN 16798-1: (1) Categoria I (elevada expectativa — hospitais, lares): 21°C. (2) Categoria II (normal — habitação nova, escritórios): 20°C. (3) Categoria III (aceitável — edifícios existentes): 18°C. (4) Nota: o REH utiliza 18°C como temperatura interior convencional para cálculo de Nic, mas o conforto real exige 20°C. (5) Quartos de dormir: podem ter 1-2°C menos.",
       "enabled": true,
-      "tags": ["conforto térmico", "aquecimento", "temperatura operativa", "EN 16798"]
+      "tags": [
+        "conforto térmico",
+        "aquecimento",
+        "temperatura operativa",
+        "EN 16798"
+      ]
     },
     {
       "id": "THERM-COMFORT-COOL-01",
@@ -26,13 +35,22 @@
       "description": "A temperatura operativa interior de projeto para arrefecimento ({envelope.coolingSetpointTemp}°C) excede o máximo recomendado de 26°C para categoria II conforme EN 16798-1.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.coolingSetpointTemp", "operator": ">", "value": 26 }
+        {
+          "field": "envelope.coolingSetpointTemp",
+          "operator": ">",
+          "value": 26
+        }
       ],
       "currentValueTemplate": "Temperatura de arrefecimento: {envelope.coolingSetpointTemp}°C",
       "requiredValue": "≤ 26°C (Cat. II) / ≤ 25.5°C (Cat. I) / ≤ 27°C (Cat. III)",
       "remediation": "Ajustar a temperatura operativa de arrefecimento: (1) Categoria II (normal): 26°C. (2) Categoria I (elevada): 25.5°C. (3) O REH utiliza 25°C como referência para cálculo de Nvc. (4) Modelo adaptativo (edifícios sem arrefecimento mecânico): temperatura aceitável aumenta com a temperatura exterior média — permite até 28-29°C em dias quentes se a temperatura média dos últimos 7 dias é elevada. (5) Ventilação natural cruzada e inércia térmica forte: estratégias para manter conforto sem arrefecimento mecânico.",
       "enabled": true,
-      "tags": ["conforto térmico", "arrefecimento", "temperatura operativa", "EN 16798"]
+      "tags": [
+        "conforto térmico",
+        "arrefecimento",
+        "temperatura operativa",
+        "EN 16798"
+      ]
     },
     {
       "id": "THERM-COMFORT-QAI-VENT-01",
@@ -41,13 +59,23 @@
       "description": "O caudal de ventilação por pessoa é inferior ao mínimo exigido pela EN 16798-1 para a categoria de ambiente interior aplicável, comprometendo a qualidade do ar interior.",
       "severity": "warning",
       "conditions": [
-        { "field": "envelope.ventilationRatePerPerson", "operator": "<", "value": 7 }
+        {
+          "field": "envelope.ventilationRatePerPerson",
+          "operator": "<",
+          "value": 7
+        }
       ],
       "currentValueTemplate": "Caudal: {envelope.ventilationRatePerPerson} L/(s.pessoa)",
       "requiredValue": "≥ 7 L/(s.pessoa) Cat. II / ≥ 10 L/(s.pessoa) Cat. I / ≥ 4 L/(s.pessoa) Cat. III",
       "remediation": "Garantir caudal de ar novo adequado conforme EN 16798-1: (1) Categoria II (habitação nova): 7 L/(s.pessoa) = 25.2 m³/(h.pessoa). (2) Categoria I (hospitais, lares): 10 L/(s.pessoa). (3) Método alternativo: por área — 0.7 L/(s.m²) Cat. II. (4) REH: Rph mínimo 0.4 h⁻¹ ≈ 4-5 L/(s.pessoa) para compartimento de 15 m² com 2.7 m altura e 2 ocupantes. (5) O IFC pode fornecer volumes dos compartimentos (IfcSpace) para cálculo automático.",
       "enabled": true,
-      "tags": ["qualidade do ar", "ventilação", "caudal", "EN 16798", "QAI"]
+      "tags": [
+        "qualidade do ar",
+        "ventilação",
+        "caudal",
+        "EN 16798",
+        "QAI"
+      ]
     },
     {
       "id": "THERM-COMFORT-CO2-01",
@@ -56,13 +84,23 @@
       "description": "O sistema de ventilação não garante uma concentração de CO₂ interior abaixo de 800 ppm acima do exterior (950 ppm absoluto), nível recomendado para a categoria II de qualidade do ar interior.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.maxCO2Concentration", "operator": ">", "value": 950 }
+        {
+          "field": "envelope.maxCO2Concentration",
+          "operator": ">",
+          "value": 950
+        }
       ],
       "currentValueTemplate": "CO₂ máximo: {envelope.maxCO2Concentration} ppm",
       "requiredValue": "≤ 950 ppm (800 ppm acima do exterior) para Cat. II",
       "remediation": "Controlar concentração de CO₂: (1) Cat. I: ≤ 550 ppm acima do exterior (≈ 800 ppm absoluto). (2) Cat. II: ≤ 800 ppm acima do exterior (≈ 950 ppm absoluto). (3) Sensor de CO₂ para controlo demand-controlled ventilation (DCV). (4) Para habitação: caudal de 7 L/(s.pessoa) mantém tipicamente CO₂ < 1000 ppm. (5) A monitorização de CO₂ em tempo real é recomendada para edifícios nZEB com ventilação mecânica.",
       "enabled": true,
-      "tags": ["CO₂", "qualidade do ar", "ventilação", "DCV", "EN 16798"]
+      "tags": [
+        "CO₂",
+        "qualidade do ar",
+        "ventilação",
+        "DCV",
+        "EN 16798"
+      ]
     },
     {
       "id": "THERM-COMFORT-ASYMMETRY-01",
@@ -71,14 +109,27 @@
       "description": "A diferença de temperatura entre a superfície dos envidraçados e as paredes interiores pode exceder os limites de assimetria radiante (10°C para paredes frias, 5°C para tetos quentes), causando desconforto local.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.windowUValue", "operator": ">", "value": 2.50 },
-        { "field": "envelope.windowArea", "operator": ">", "value": 6 }
+        {
+          "field": "envelope.windowUValue",
+          "operator": ">",
+          "value": 2.5
+        },
+        {
+          "field": "envelope.windowArea",
+          "operator": ">",
+          "value": 6
+        }
       ],
       "currentValueTemplate": "Uw = {envelope.windowUValue} W/(m².K), Área envidraçada = {envelope.windowArea} m²",
       "requiredValue": "Assimetria radiante ≤ 10°C (parede fria) / ≤ 5°C (teto quente radiante)",
       "remediation": "Reduzir assimetria de temperatura radiante junto a envidraçados: (1) Envidraçados com U baixo: vidro duplo low-E (temperatura superficial interior mais elevada). (2) Radiadores sob as janelas: contrariam o efeito de parede fria com convecção ascendente. (3) Para grandes envidraçados (> 6 m²): exigir U ≤ 1.8 W/(m².K) para manter assimetria < 10°C. (4) Piso radiante: distribui calor uniformemente, evitando assimetria vertical. (5) O IFC fornece a área total de envidraçados — envidraçados grandes com U elevado = risco de assimetria.",
       "enabled": true,
-      "tags": ["conforto térmico", "assimetria radiante", "envidraçados", "ISO 7730"]
+      "tags": [
+        "conforto térmico",
+        "assimetria radiante",
+        "envidraçados",
+        "ISO 7730"
+      ]
     },
     {
       "id": "THERM-COMFORT-CATEGORY-01",
@@ -87,12 +138,164 @@
       "description": "A categoria de ambiente interior (I a IV) não foi definida para o edifício, impossibilitando a determinação correta dos critérios de conforto térmico e qualidade do ar.",
       "severity": "info",
       "conditions": [
-        { "field": "envelope.indoorEnvironmentCategory", "operator": "not_exists", "value": null }
+        {
+          "field": "envelope.indoorEnvironmentCategory",
+          "operator": "not_exists",
+          "value": null
+        }
       ],
       "requiredValue": "Definir categoria: I (elevada), II (normal — edifícios novos), III (aceitável), IV (tolerável)",
       "remediation": "Definir a categoria de ambiente interior conforme EN 16798-1: (1) Categoria I: elevada expectativa — hospitais, quartos de bebés, idosos. PPD < 6%. (2) Categoria II: normal — edifícios residenciais e de serviços novos. PPD < 10%. (3) Categoria III: aceitável — edifícios existentes, reabilitação. PPD < 15%. (4) Categoria IV: tolerável — períodos limitados. PPD < 25%. (5) Para REH: a categoria II é implícita (20°C aquecimento, 25°C arrefecimento). (6) A categoria determina os limites de temperatura, humidade, velocidade do ar e concentração de poluentes.",
       "enabled": true,
-      "tags": ["categoria", "ambiente interior", "conforto", "EN 16798", "PPD"]
+      "tags": [
+        "categoria",
+        "ambiente interior",
+        "conforto",
+        "EN 16798",
+        "PPD"
+      ]
+    },
+    {
+      "id": "REH-CONFORT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Tabela NA.2 — Temperatura Interior de Referencia para Aquecimento (Residencial)",
+      "description": "A temperatura interior de referencia para aquecimento em edificios residenciais ({envelope.heatingDesignTemp} C) nao corresponde aos 20 C definidos pela EN 16798-1 para a categoria II.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.heatingDesignTemp",
+          "operator": "!=",
+          "value": 20
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        }
+      ],
+      "currentValueTemplate": "Temperatura de referencia aquecimento = {envelope.heatingDesignTemp} C",
+      "requiredValue": "20 C para edificios residenciais (Cat. II EN 16798-1)",
+      "remediation": "Adotar a temperatura interior de referencia correta: (1) EN 16798-1 Cat. II (habitacao nova): 20 C (conforto real). (2) Cat. I (idosos, criancas): 21 C. (3) Cat. III (existentes): 18 C. (4) O REH utiliza 18 C para calculo de Nic, mas o conforto real exige 20 C. (5) Quartos: 18-19 C. (6) Casas de banho: 22-24 C. (7) Cada +1 C aumenta necessidades de aquecimento em ~7%.",
+      "enabled": true,
+      "tags": [
+        "temperatura",
+        "aquecimento",
+        "residencial",
+        "20C",
+        "conforto",
+        "EN 16798"
+      ]
+    },
+    {
+      "id": "REH-CONFORT-02",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 Tabela NA.2 — Temperatura Interior de Referencia para Arrefecimento (Residencial)",
+      "description": "A temperatura interior de referencia para arrefecimento em edificios residenciais ({envelope.coolingDesignTemp} C) nao corresponde aos 25 C definidos pelo REH e alinhados com a EN 16798-1 para a categoria II.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.coolingDesignTemp",
+          "operator": "!=",
+          "value": 25
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        }
+      ],
+      "currentValueTemplate": "Temperatura de referencia arrefecimento = {envelope.coolingDesignTemp} C",
+      "requiredValue": "25 C para edificios residenciais (REH) / 26 C (Cat. II EN 16798-1)",
+      "remediation": "Adotar a temperatura interior de referencia para arrefecimento: (1) REH: 25 C e a temperatura convencional para calculo de Nvc. (2) EN 16798-1 Cat. II: 26 C. (3) Modelo adaptativo (sem arrefecimento mecanico): limite pode ser superior. (4) Estrategias passivas: ventilacao noturna, sombreamento exterior, inercia termica forte. (5) Nao dimensionar abaixo de 25 C — sobredimensionamento aumenta consumo.",
+      "enabled": true,
+      "tags": [
+        "temperatura",
+        "arrefecimento",
+        "residencial",
+        "25C",
+        "conforto",
+        "EN 16798"
+      ]
+    },
+    {
+      "id": "REH-CONFORT-03",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 §6.3 — Gama de Temperatura Operativa de Conforto (Categoria II)",
+      "description": "A gama de temperatura operativa de projeto excede os limites da categoria II da EN 16798-1 (+-2 C em relacao ao setpoint), indicando risco de desconforto termico para mais de 10% dos ocupantes (PPD > 10%).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.operativeTempRange",
+          "operator": ">",
+          "value": 4
+        }
+      ],
+      "currentValueTemplate": "Amplitude de temperatura operativa = {envelope.operativeTempRange} C",
+      "requiredValue": "Amplitude <= 4 C (+-2 C do setpoint) para Cat. II (PPD < 10%)",
+      "remediation": "Manter a temperatura operativa dentro da gama de conforto Cat. II: (1) Cat. II: +-2 C, amplitude maxima de 4 C. (2) Cat. I: +-1 C, amplitude de 2 C. (3) Fatores que aumentam a amplitude: intermitencia da climatizacao, inercia termica insuficiente. (4) Solucoes: termostatos precisos, regulacao por zona, piso/teto radiante, inercia termica forte.",
+      "enabled": true,
+      "tags": [
+        "temperatura operativa",
+        "gama de conforto",
+        "PPD",
+        "categoria II",
+        "EN 16798"
+      ]
+    },
+    {
+      "id": "REH-CONFORT-04",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 / ISO 7730 §A.3 — Temperatura Superficial do Pavimento",
+      "description": "A temperatura superficial do pavimento ({envelope.floorSurfaceTemp} C) esta fora da gama de conforto de 19 C a 29 C definida pela EN 16798-1 / ISO 7730 para superficies em contacto com os pes dos ocupantes.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.floorSurfaceTemp",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "envelope.hasUnderfloorHeating",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Temperatura superficial do pavimento: {envelope.floorSurfaceTemp} C",
+      "requiredValue": "19 C <= theta_pavimento <= 29 C (ISO 7730: 19-29 C para calcado normal, 25-28 C ideal)",
+      "remediation": "Controlar a temperatura superficial do pavimento: (1) Piso radiante: max 29 C (zonas de permanencia), 35 C (perifericas). (2) Minimo 19 C: pavimentos sobre espacos nao aquecidos devem ter U <= 0.40 W/(m2.K). (3) Pavimentos frios sem isolamento: podem descer a 14-16 C. (4) Solucoes: isolamento sob laje (>= 50 mm XPS), pavimento flutuante, piso radiante. (5) PPD local: para 15 C, PPD ~= 25-30%; para 19 C, PPD < 10%.",
+      "enabled": true,
+      "tags": [
+        "pavimento",
+        "temperatura superficial",
+        "piso radiante",
+        "conforto local",
+        "ISO 7730"
+      ]
+    },
+    {
+      "id": "REH-CONFORT-05",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 / ISO 7730 §A.4 — Gradiente Vertical de Temperatura",
+      "description": "O gradiente vertical de temperatura entre 0.1 m e 1.1 m de altura (tornozelo e cabeca de pessoa sentada) pode exceder 3 C, causando desconforto termico local. Este risco e elevado em espacos com aquecimento por convectores ou pe-direito alto.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.verticalTempGradient",
+          "operator": ">",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "Gradiente vertical Delta-theta(0.1m-1.1m) = {envelope.verticalTempGradient} C",
+      "requiredValue": "Delta-theta vertical <= 3 C entre 0.1 m e 1.1 m de altura (ISO 7730 Cat. B: < 5% insatisfeitos)",
+      "remediation": "Minimizar o gradiente vertical de temperatura: (1) Limite ISO 7730: <= 3 C (Cat. B); <= 2 C (Cat. A). (2) Causas: convectores, radiadores mal dimensionados, pe-direito elevado. (3) Solucoes: piso radiante (gradiente < 1 C), teto radiante, ventiladores de destratificacao para pe-direito > 3.5 m. (4) Evitar: aquecimento apenas por split mural. (5) Inercia termica forte reduz o gradiente.",
+      "enabled": true,
+      "tags": [
+        "gradiente vertical",
+        "estratificacao",
+        "conforto local",
+        "ISO 7730",
+        "piso radiante"
+      ]
     }
   ]
 }
