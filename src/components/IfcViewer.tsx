@@ -117,15 +117,25 @@ export default function IfcViewer({
         });
         world.scene = scene;
 
-        // 4. Setup renderer first (camera needs the DOM element for controls)
+        // 4. Setup renderer (must exist on world before camera is assigned)
         const renderer = new SimpleRenderer(components, container, {
           preserveDrawingBuffer: true,
         });
         world.renderer = renderer;
 
-        // 5. Setup camera (after renderer, so controls can bind to DOM)
+        // 5. Setup camera — assigned to world AFTER renderer so
+        //    newCameraControls() can find the renderer's DOM element.
+        //    Wrapped in retry: on first mount the renderer may not yet
+        //    be visible to the camera's event handler synchronously.
         const camera = new SimpleCamera(components);
-        world.camera = camera;
+        try {
+          world.camera = camera;
+        } catch {
+          // Fallback: force renderer reference, then retry
+          camera.currentWorld = null;
+          await new Promise(r => setTimeout(r, 0));
+          world.camera = camera;
+        }
 
         // 6. Init components (starts animation loop)
         components.init();
