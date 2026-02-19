@@ -62,7 +62,10 @@
 
 9. Go to **SQL Editor** in the Supabase dashboard
 10. Open a new query and paste the contents of `supabase/schema.sql` — run it
-11. Open another query and paste the contents of `supabase/migrations/20260215_cype_prices.sql` — run it
+11. Run each migration in order:
+    - `supabase/migrations/20260215_cype_prices.sql` — CYPE price tables
+    - `supabase/migrations/20260218_pipeline_uploads_bucket.sql` — Storage bucket for large file uploads
+    - `supabase/migrations/20260219_pipeline_jobs.sql` — Background pipeline job tracking
 
 ### Enable RLS:
 
@@ -77,10 +80,15 @@
 2. Update these variables (apply to all environments: Production, Preview, Development):
    - `NEXT_PUBLIC_SUPABASE_URL` = the Project URL from Step 2.7
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = the anon key from Step 2.8
-3. Add one more:
+3. Add these:
    - `ANTHROPIC_API_KEY` = your Anthropic API key (for AI-powered regulation analysis)
-4. Click **Save**
-5. Go to **Deployments** → click the three dots on the latest deployment → **Redeploy**
+   - `SUPABASE_SERVICE_KEY` = the **service_role** key from Supabase Settings → API (for server-side storage uploads)
+4. Optionally add:
+   - `NEXT_PUBLIC_SENTRY_DSN` = Sentry DSN for error monitoring (skip if not using Sentry)
+   - `CYPE_ADMIN_API_KEY` = any secret string to protect the CYPE price update endpoint
+   - `LOG_LEVEL` = `info` (default) or `debug` for verbose server logs
+5. Click **Save**
+6. Go to **Deployments** → click the three dots on the latest deployment → **Redeploy**
 
 ---
 
@@ -118,10 +126,11 @@ After completing all steps, verify:
 - [ ] Production branch set to `master`
 - [ ] Preview deployments enabled on PRs
 - [ ] Supabase staging project created (EU-West region)
-- [ ] Database schema migrated (`schema.sql` + CYPE prices migration)
+- [ ] Database schema migrated (`schema.sql` + 3 migrations)
 - [ ] RLS enabled on all tables
 - [ ] `NEXT_PUBLIC_SUPABASE_URL` set on Vercel
 - [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY` set on Vercel
+- [ ] `SUPABASE_SERVICE_KEY` set on Vercel
 - [ ] `ANTHROPIC_API_KEY` set on Vercel
 - [ ] `/api/health` returns `{ status: "ok" }`
 - [ ] Template analysis works end-to-end
