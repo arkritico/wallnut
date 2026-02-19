@@ -7811,6 +7811,1606 @@
         "estado-anterior",
         "obrigação"
       ]
+    },
+    {
+      "id": "RJUE-CONCL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 1 — Requerimento de Autorização de Utilização após Conclusão de Obra",
+      "description": "Concluída a obra, o titular da licença ou comunicação prévia deve requerer a emissão do alvará de autorização de utilização, apresentando os elementos exigidos por lei.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.constructionCompleted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasRequestedOccupancyPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Obra concluída: {licensing.constructionCompleted} — Pedido de utilização: {licensing.hasRequestedOccupancyPermit}",
+      "requiredValue": "Requerimento de autorização de utilização submetido à câmara municipal",
+      "remediation": "Submeter requerimento de autorização de utilização à câmara municipal competente, acompanhado do termo de responsabilidade do diretor de obra, telas finais, certificado energético e comprovativo de subscrição de seguro de responsabilidade civil decenal (quando aplicável).",
+      "enabled": true,
+      "tags": [
+        "conclusão-obra",
+        "autorização-utilização",
+        "alvará",
+        "requerimento"
+      ]
+    },
+    {
+      "id": "RJUE-CONCL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 63.º, n.º 1 — Vistoria para Autorização de Utilização",
+      "description": "A câmara municipal deve realizar vistoria ao edifício no prazo de 10 dias úteis após receção do requerimento de autorização de utilização, para verificar conformidade com o projeto aprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasRequestedOccupancyPermit",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasCompletionInspection",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.daysSinceOccupancyRequest",
+          "operator": ">=",
+          "value": 10
+        }
+      ],
+      "currentValueTemplate": "Vistoria realizada: {licensing.hasCompletionInspection} — Dias desde pedido: {licensing.daysSinceOccupancyRequest}",
+      "requiredValue": "Vistoria realizada no prazo de 10 dias úteis",
+      "remediation": "Contactar o serviço de urbanismo da câmara municipal para agendar a vistoria de conclusão de obra. Caso o prazo legal tenha sido ultrapassado, a autorização de utilização pode ser emitida tacitamente.",
+      "enabled": true,
+      "tags": [
+        "vistoria",
+        "conclusão-obra",
+        "prazo",
+        "autorização-utilização"
+      ]
+    },
+    {
+      "id": "RJUE-CONCL-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 2 — Telas Finais e Compilação Técnica na Conclusão de Obra",
+      "description": "O requerimento de autorização de utilização deve ser acompanhado das telas finais (desenhos conforme executado) e da compilação técnica da obra.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.constructionCompleted",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasAsBuiltDrawings",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Telas finais entregues: {licensing.hasAsBuiltDrawings}",
+      "requiredValue": "Telas finais e compilação técnica entregues com o requerimento",
+      "remediation": "Solicitar ao diretor de obra e projetistas a elaboração das telas finais (Art. 128.º do RJUE), que devem refletir a obra efetivamente executada. Preparar a compilação técnica com os manuais de equipamentos, certificados de materiais e fichas técnicas.",
+      "enabled": true,
+      "tags": [
+        "telas-finais",
+        "compilação-técnica",
+        "conclusão-obra",
+        "as-built"
+      ]
+    },
+    {
+      "id": "RJUE-OCPERM-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 3 — Certificado Energético para Autorização de Utilização",
+      "description": "A emissão da autorização de utilização de edifícios de habitação ou comércio/serviços está condicionada à apresentação do certificado energético emitido por perito qualificado da ADENE.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "comercio",
+            "servicos",
+            "misto"
+          ]
+        },
+        {
+          "field": "licensing.hasEnergyCertificate",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Uso do edifício: {licensing.buildingUse} — Certificado energético: {licensing.hasEnergyCertificate}",
+      "requiredValue": "Certificado energético SCE emitido por perito qualificado",
+      "remediation": "Contratar perito qualificado inscrito na ADENE para emitir o certificado energético do edifício (SCE). O certificado deve ser emitido antes da submissão do pedido de autorização de utilização, conforme DL 118/2013.",
+      "enabled": true,
+      "tags": [
+        "certificado-energético",
+        "SCE",
+        "ADENE",
+        "autorização-utilização"
+      ]
+    },
+    {
+      "id": "RJUE-OCPERM-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º — Deferimento Tácito da Autorização de Utilização",
+      "description": "Decorrido o prazo legal de 10 dias para realização da vistoria sem que esta tenha sido efetuada, a autorização de utilização considera-se tacitamente deferida.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.hasRequestedOccupancyPermit",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasCompletionInspection",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.daysSinceOccupancyRequest",
+          "operator": ">=",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "Dias desde pedido de utilização: {licensing.daysSinceOccupancyRequest} — Vistoria: {licensing.hasCompletionInspection}",
+      "requiredValue": "Autorização tacitamente deferida após 10 dias úteis sem vistoria",
+      "remediation": "Requerer certidão de deferimento tácito junto da câmara municipal, comprovando que decorreu o prazo sem realização da vistoria. A certidão constitui título bastante para efeitos de registo predial e contratação de serviços.",
+      "enabled": true,
+      "tags": [
+        "deferimento-tácito",
+        "autorização-utilização",
+        "prazo",
+        "certidão"
+      ]
+    },
+    {
+      "id": "RJUE-PARCIAL-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 4 — Autorização de Utilização Parcial",
+      "description": "Pode ser concedida autorização de utilização parcial para partes autónomas do edifício que estejam concluídas e em condições de serem utilizadas independentemente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.requestsPartialOccupancy",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.partialAreaIsAutonomous",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Fração autónoma e independente: {licensing.partialAreaIsAutonomous}",
+      "requiredValue": "A parte do edifício deve constituir fração autónoma e funcional",
+      "remediation": "Demonstrar que a parte do edifício para a qual se requer utilização parcial é autónoma, dispõe de acessos independentes, infraestruturas próprias (água, eletricidade, saneamento) e não compromete a segurança dos utilizadores nem a conclusão das restantes obras.",
+      "enabled": true,
+      "tags": [
+        "utilização-parcial",
+        "fração-autónoma",
+        "conclusão-parcial",
+        "ocupação"
+      ]
+    },
+    {
+      "id": "RJUE-PARCIAL-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 4 e Art. 63.º — Segurança em Zona de Ocupação Parcial",
+      "description": "A autorização de utilização parcial só pode ser concedida se as obras remanescentes não puserem em causa a segurança dos utilizadores da parte já concluída.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.requestsPartialOccupancy",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.partialOccupancySafetyAssessed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Avaliação de segurança para ocupação parcial: {licensing.partialOccupancySafetyAssessed}",
+      "requiredValue": "Avaliação de segurança confirmando inexistência de risco para utilizadores",
+      "remediation": "Apresentar declaração do diretor de obra e do coordenador de segurança atestando que as obras em curso não comprometem a segurança dos utilizadores da parte concluída. Devem ser implementadas medidas de separação física (vedações, sinalização) entre a zona em uso e o estaleiro ativo.",
+      "enabled": true,
+      "tags": [
+        "utilização-parcial",
+        "segurança",
+        "estaleiro",
+        "separação-física"
+      ]
+    },
+    {
+      "id": "RJUE-PARCIAL-03",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 12.º e Art. 62.º, n.º 4 do RJUE — Plano de Segurança Atualizado para Coexistência Obra/Utilização",
+      "description": "Quando é concedida autorização de utilização parcial com obras em curso, o PSS deve ser atualizado para contemplar a coexistência de estaleiro e ocupação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.requestsPartialOccupancy",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.pssUpdatedForPartialOccupancy",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "PSS atualizado para coexistência obra/utilização: {licensing.pssUpdatedForPartialOccupancy}",
+      "requiredValue": "PSS revisto contemplando a coexistência entre estaleiro ativo e zona ocupada",
+      "remediation": "O coordenador de segurança em obra (CSS-O) deve rever o Plano de Segurança e Saúde, incluindo medidas específicas para: separação de circulações (trabalhadores vs. utilizadores), controlo de poeiras e ruído, proteção contra queda de objetos, sinalização de perigo e plano de emergência adaptado à coexistência.",
+      "enabled": true,
+      "tags": [
+        "PSS",
+        "utilização-parcial",
+        "coexistência",
+        "segurança-estaleiro"
+      ]
+    },
+    {
+      "id": "RJUE-MUDUSO-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 5, al. e) — Licenciamento de Alteração de Uso",
+      "description": "A alteração da utilização de edifícios ou suas frações está sujeita a autorização de utilização, mesmo sem obras.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "alteracao_uso"
+        },
+        {
+          "field": "licensing.hasChangeOfUsePermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Alteração de uso: {licensing.operationType} — Autorização: {licensing.hasChangeOfUsePermit}",
+      "requiredValue": "Autorização de utilização para o novo uso pretendido",
+      "remediation": "Submeter pedido de autorização de utilização para alteração de uso à câmara municipal, indicando o uso atual e o uso pretendido, acompanhado de memória descritiva justificativa e declaração de conformidade com o PDM. Caso o novo uso implique obras, deve ser requerido licenciamento ou comunicação prévia.",
+      "enabled": true,
+      "tags": [
+        "alteração-uso",
+        "autorização-utilização",
+        "PDM",
+        "mudança-afetação"
+      ]
+    },
+    {
+      "id": "RJUE-MUDUSO-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 5, al. e) e Art. 62.º — Conformidade PDM na Alteração de Uso",
+      "description": "A alteração de uso pretendida deve ser compatível com a classificação do solo e as regras de uso definidas no Plano Diretor Municipal aplicável.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "alteracao_uso"
+        },
+        {
+          "field": "licensing.newUseConformsWithPDM",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Novo uso conforme PDM: {licensing.newUseConformsWithPDM}",
+      "requiredValue": "Uso pretendido compatível com classificação e qualificação do solo no PDM",
+      "remediation": "Verificar no PDM em vigor se o uso pretendido é admissível para a zona em questão. Caso não seja, avaliar a possibilidade de requerer alteração ao PDM ou procurar localização alternativa. O uso pretendido deve ser compatível com a classificação funcional do solo (habitacional, comercial, industrial, misto, etc.).",
+      "enabled": true,
+      "tags": [
+        "alteração-uso",
+        "PDM",
+        "classificação-solo",
+        "compatibilidade"
+      ]
+    },
+    {
+      "id": "RJUE-MUDUSO-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 2 e RGEU Art. 65.º — Condições Técnicas para Novo Uso",
+      "description": "Na alteração de uso, o edifício deve cumprir as exigências regulamentares aplicáveis ao novo uso, nomeadamente de segurança contra incêndio, acessibilidade e salubridade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "alteracao_uso"
+        },
+        {
+          "field": "licensing.meetsNewUseTechnicalRequirements",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Requisitos técnicos para novo uso cumpridos: {licensing.meetsNewUseTechnicalRequirements}",
+      "requiredValue": "Edifício cumpre requisitos técnicos para o novo uso (SCIE, acessibilidade, salubridade)",
+      "remediation": "Realizar avaliação técnica do edifício face aos requisitos do novo uso pretendido: segurança contra incêndio (RT-SCIE), acessibilidade (DL 163/2006), ventilação, iluminação natural, instalações sanitárias e demais exigências regulamentares. Promover as obras de adaptação necessárias antes de requerer a autorização.",
+      "enabled": true,
+      "tags": [
+        "alteração-uso",
+        "SCIE",
+        "acessibilidade",
+        "requisitos-técnicos"
+      ]
+    },
+    {
+      "id": "RJUE-AMPLIA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2, al. c) — Licença para Ampliação de Edifício",
+      "description": "As obras de ampliação de edifícios existentes (aumento de área de construção, cércea ou volume) estão sujeitas a licenciamento municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "ampliacao"
+        },
+        {
+          "field": "licensing.increasesGrossFloorArea",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasExtensionPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ampliação com aumento de área bruta: {licensing.increasesGrossFloorArea} — Licença: {licensing.hasExtensionPermit}",
+      "requiredValue": "Licença de construção para ampliação emitida pela câmara municipal",
+      "remediation": "Submeter pedido de licenciamento de ampliação à câmara municipal, incluindo projeto de arquitetura que demonstre a conformidade com os índices urbanísticos do PDM (índice de ocupação, índice de utilização, cércea máxima, afastamentos). O projeto deve evidenciar claramente as áreas existentes e as áreas a ampliar.",
+      "enabled": true,
+      "tags": [
+        "ampliação",
+        "licenciamento",
+        "área-bruta",
+        "índices-urbanísticos"
+      ]
+    },
+    {
+      "id": "RJUE-AMPLIA-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 60.º — Conformidade Estrutural na Ampliação",
+      "description": "Na ampliação de edifício existente, deve ser demonstrada a capacidade resistente da estrutura existente para suportar as novas cargas decorrentes da ampliação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "ampliacao"
+        },
+        {
+          "field": "licensing.hasStructuralAssessmentForExtension",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Avaliação estrutural para ampliação: {licensing.hasStructuralAssessmentForExtension}",
+      "requiredValue": "Avaliação estrutural confirmando capacidade para suportar a ampliação",
+      "remediation": "Contratar engenheiro de estruturas para avaliar a capacidade resistente do edifício existente face às novas cargas da ampliação. Caso necessário, projetar reforço estrutural. A avaliação deve incluir: inspeção visual, ensaios não destrutivos, verificação de fundações e modelação estrutural da situação ampliada.",
+      "enabled": true,
+      "tags": [
+        "ampliação",
+        "estrutura",
+        "reforço",
+        "capacidade-resistente"
+      ]
+    },
+    {
+      "id": "RJUE-PISC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4, al. d) e Regulamentos Municipais — Licença para Piscina",
+      "description": "A construção de piscinas (exceto piscinas pré-fabricadas amovíveis instaladas à superfície) está sujeita a comunicação prévia ou licenciamento, dependendo da dimensão e localização.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "piscina"
+        },
+        {
+          "field": "licensing.poolIsBuiltIn",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasPoolPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Piscina embutida: {licensing.poolIsBuiltIn} — Licença/comunicação: {licensing.hasPoolPermit}",
+      "requiredValue": "Licença ou comunicação prévia para construção de piscina embutida",
+      "remediation": "Submeter comunicação prévia ou pedido de licenciamento para a construção da piscina, conforme regulamento municipal aplicável. O projeto deve incluir: planta de implantação, corte transversal com profundidades, sistema de tratamento de água, vedação de segurança (obrigatória para piscinas exteriores) e sistema de drenagem.",
+      "enabled": true,
+      "tags": [
+        "piscina",
+        "comunicação-prévia",
+        "vedação-segurança",
+        "tratamento-água"
+      ]
+    },
+    {
+      "id": "RJUE-PISC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 65/97 e Regulamentos Municipais — Segurança e Higiene de Piscinas",
+      "description": "Piscinas de uso coletivo (condomínios, hotéis, equipamentos desportivos) devem cumprir requisitos de segurança e higiene, incluindo vedação perimetral com altura mínima de 1,20 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.poolUseType",
+          "operator": "in",
+          "value": [
+            "coletiva",
+            "publica",
+            "condominio",
+            "hotel"
+          ]
+        },
+        {
+          "field": "licensing.poolHasSecurityFence",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Tipo de uso da piscina: {licensing.poolUseType} — Vedação de segurança: {licensing.poolHasSecurityFence}",
+      "requiredValue": "Vedação perimetral de segurança com altura mínima de 1,20 m e portão com fecho automático",
+      "remediation": "Instalar vedação perimetral com altura mínima de 1,20 m, sem elementos escaláveis, com portão de fecho automático e trinco inacessível a crianças. Para piscinas de uso público, cumprir adicionalmente os requisitos do DL 65/97 quanto a qualidade da água, sistema de recirculação, socorrismo e sinalização.",
+      "enabled": true,
+      "tags": [
+        "piscina",
+        "segurança",
+        "vedação",
+        "uso-coletivo"
+      ]
+    },
+    {
+      "id": "RJUE-SOLAR-01",
+      "regulationId": "dl-136-2014",
+      "article": "Art. 6.º-A (introduzido pelo DL 136/2014) — Isenção para Painéis Solares",
+      "description": "A instalação de painéis solares fotovoltaicos ou térmicos está isenta de controlo prévio quando instalados na cobertura e não ultrapassem a altura da cumeeira em mais de 1 metro.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "paineis_solares"
+        },
+        {
+          "field": "licensing.solarPanelExceedsCumeeira",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.solarPanelOnRoof",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Painéis na cobertura: {licensing.solarPanelOnRoof} — Excedem cumeeira: {licensing.solarPanelExceedsCumeeira}",
+      "requiredValue": "Instalação isenta de controlo prévio (cobertura, não excede cumeeira + 1 m)",
+      "remediation": "Confirmar que os painéis solares são instalados na cobertura do edifício e não ultrapassam a altura da cumeeira em mais de 1 metro. Nestas condições, a instalação está isenta de licenciamento ou comunicação prévia, conforme Art. 6.º-A do DL 136/2014.",
+      "enabled": true,
+      "tags": [
+        "painéis-solares",
+        "isenção",
+        "cobertura",
+        "cumeeira"
+      ]
+    },
+    {
+      "id": "RJUE-SOLAR-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4 e DL 136/2014 — Comunicação Prévia para Painéis Solares Não Isentos",
+      "description": "Painéis solares que excedam a cumeeira em mais de 1 metro, sejam instalados no solo, ou em edifícios em zona de proteção patrimonial, estão sujeitos a comunicação prévia ou licenciamento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "paineis_solares"
+        },
+        {
+          "field": "licensing.solarPanelRequiresPermit",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasSolarPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Painéis solares requerem licença: {licensing.solarPanelRequiresPermit} — Licença: {licensing.hasSolarPermit}",
+      "requiredValue": "Comunicação prévia ou licença para instalação de painéis solares",
+      "remediation": "Submeter comunicação prévia ou pedido de licenciamento para instalação de painéis solares. Aplica-se quando: excedem cumeeira em mais de 1 m, são instalados no solo com estrutura fixa, ou o edifício está em zona de proteção de imóvel classificado. Incluir memória descritiva, fotomontagem e parecer da DGPC (se aplicável).",
+      "enabled": true,
+      "tags": [
+        "painéis-solares",
+        "comunicação-prévia",
+        "licenciamento",
+        "proteção-patrimonial"
+      ]
+    },
+    {
+      "id": "RJUE-SOLAR-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4 e DL 153/2014 — Ligação à Rede de Unidade de Produção para Autoconsumo",
+      "description": "A instalação de unidades de produção para autoconsumo (UPAC) com potência superior a 350 W deve ser registada no SERUP e, acima de 1,5 kW, requer certificado de exploração.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.solarPowerKW",
+          "operator": ">",
+          "value": 1.5
+        },
+        {
+          "field": "licensing.hasUPACExplorationCertificate",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Potência UPAC: {licensing.solarPowerKW} kW — Certificado exploração: {licensing.hasUPACExplorationCertificate}",
+      "requiredValue": "Registo SERUP e certificado de exploração para UPAC > 1,5 kW",
+      "remediation": "Registar a unidade de produção para autoconsumo (UPAC) no SERUP (Sistema Eletrónico de Registo de Unidades de Produção). Para potências superiores a 1,5 kW, solicitar certificado de exploração à DGEG. Para potências superiores a 1 MW, é necessária licença de produção.",
+      "enabled": true,
+      "tags": [
+        "UPAC",
+        "autoconsumo",
+        "SERUP",
+        "certificado-exploração"
+      ]
+    },
+    {
+      "id": "RJUE-VE-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 6.º-A e DL 39/2010 — Instalação de Carregadores de Veículos Elétricos",
+      "description": "A instalação de postos de carregamento de veículos elétricos em edifícios existentes está isenta de controlo prévio quando não implique alteração da estrutura ou fachada.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "carregador_ve"
+        },
+        {
+          "field": "licensing.evChargerAltersStructure",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.evChargerAltersFacade",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Altera estrutura: {licensing.evChargerAltersStructure} — Altera fachada: {licensing.evChargerAltersFacade}",
+      "requiredValue": "Instalação isenta de controlo prévio (sem alteração estrutural ou de fachada)",
+      "remediation": "Confirmar que a instalação do carregador EV não implica alteração da estrutura resistente nem da fachada do edifício. Nessas condições, a instalação está isenta de licenciamento. É necessário, contudo, que a instalação elétrica seja certificada por técnico responsável e comunicada ao distribuidor de energia.",
+      "enabled": true,
+      "tags": [
+        "veículo-elétrico",
+        "carregador",
+        "isenção",
+        "instalação-elétrica"
+      ]
+    },
+    {
+      "id": "RJUE-VE-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e DL 90/2014 — Infraestrutura de Carregamento em Edifícios Novos",
+      "description": "Edifícios novos com mais de 10 lugares de estacionamento devem prever infraestrutura de tubagem para carregamento de veículos elétricos em pelo menos 20% dos lugares.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.parkingSpaces",
+          "operator": ">",
+          "value": 10
+        },
+        {
+          "field": "licensing.evReadyParkingPercent",
+          "operator": "<",
+          "value": 20
+        },
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Lugares estacionamento: {licensing.parkingSpaces} — Preparados para VE: {licensing.evReadyParkingPercent}%",
+      "requiredValue": "Mínimo 20% dos lugares de estacionamento preparados para carregamento VE",
+      "remediation": "Incluir no projeto de instalações elétricas a infraestrutura de tubagem e quadro elétrico para carregamento de veículos elétricos em pelo menos 20% dos lugares de estacionamento. A tubagem deve permitir a instalação futura de postos de carregamento sem necessidade de obras adicionais.",
+      "enabled": true,
+      "tags": [
+        "veículo-elétrico",
+        "estacionamento",
+        "edifício-novo",
+        "infraestrutura"
+      ]
+    },
+    {
+      "id": "RJUE-TELEC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2 e DL 11/2003 — Licença para Antena de Telecomunicações",
+      "description": "A instalação de antenas e infraestruturas de telecomunicações (estações-base de radiocomunicações) está sujeita a licenciamento municipal quando implique construção de estrutura de suporte.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "antena_telecomunicacoes"
+        },
+        {
+          "field": "licensing.antennaRequiresStructure",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasAntennaPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Antena com estrutura de suporte: {licensing.antennaRequiresStructure} — Licença: {licensing.hasAntennaPermit}",
+      "requiredValue": "Licença municipal para instalação de antena de telecomunicações com estrutura de suporte",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal para instalação de antena de telecomunicações, incluindo: projeto de estabilidade da estrutura de suporte, relatório de impacto eletromagnético (ANACOM), fotomontagem, parecer da Autoridade de Saúde (quando em proximidade de áreas sensíveis) e estudo de integração paisagística.",
+      "enabled": true,
+      "tags": [
+        "telecomunicações",
+        "antena",
+        "estação-base",
+        "ANACOM"
+      ]
+    },
+    {
+      "id": "RJUE-TELEC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 11/2003 e Portaria 1421/2004 — Monitorização de Campos Eletromagnéticos",
+      "description": "A instalação de antenas de telecomunicações deve respeitar os níveis de referência de exposição a campos eletromagnéticos definidos pela ANACOM.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "antena_telecomunicacoes"
+        },
+        {
+          "field": "licensing.hasElectromagneticImpactReport",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Relatório de impacto eletromagnético: {licensing.hasElectromagneticImpactReport}",
+      "requiredValue": "Relatório de impacto eletromagnético confirmando conformidade com níveis de referência",
+      "remediation": "Solicitar ao operador de telecomunicações a elaboração do relatório de impacto eletromagnético, demonstrando que os níveis de exposição nas áreas acessíveis ao público não excedem os valores de referência estabelecidos na Portaria 1421/2004 (baseados nas recomendações da ICNIRP).",
+      "enabled": true,
+      "tags": [
+        "telecomunicações",
+        "campos-eletromagnéticos",
+        "ANACOM",
+        "ICNIRP"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLIC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 4, al. g) e Regulamentos Municipais — Licença para Publicidade e Sinalética",
+      "description": "A afixação de painéis publicitários, toldos, letreiros e demais elementos de sinalética comercial está sujeita a licenciamento ou comunicação prévia municipal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "in",
+          "value": [
+            "publicidade",
+            "letreiro",
+            "toldo",
+            "painel_publicitario"
+          ]
+        },
+        {
+          "field": "licensing.hasSignagePermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Tipo de sinalética: {licensing.operationType} — Licença: {licensing.hasSignagePermit}",
+      "requiredValue": "Licença municipal para afixação de publicidade ou sinalética",
+      "remediation": "Submeter pedido de licenciamento ou comunicação prévia para afixação de publicidade à câmara municipal, de acordo com o regulamento municipal de publicidade e ocupação do espaço público. Incluir: dimensões, materiais, localização exata, fotomontagem e, se iluminado, projeto de instalação elétrica.",
+      "enabled": true,
+      "tags": [
+        "publicidade",
+        "sinalética",
+        "letreiro",
+        "regulamento-municipal"
+      ]
+    },
+    {
+      "id": "RJUE-PUBLIC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e Regulamentos Municipais — Dimensão Máxima de Painéis Publicitários",
+      "description": "Painéis publicitários em fachada não podem exceder a área máxima definida no regulamento municipal (tipicamente 20% da área da fachada).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "painel_publicitario"
+        },
+        {
+          "field": "licensing.signageAreaExceedsLimit",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Área de publicidade excede limite: {licensing.signageAreaExceedsLimit}",
+      "requiredValue": "Área de publicidade dentro dos limites regulamentares (tipicamente ≤ 20% da fachada)",
+      "remediation": "Reduzir a área do painel publicitário para cumprir os limites do regulamento municipal de publicidade. Consultar o regulamento específico do município para os limites aplicáveis. Em zonas históricas ou de proteção patrimonial, os limites podem ser mais restritivos.",
+      "enabled": true,
+      "tags": [
+        "publicidade",
+        "painel",
+        "dimensão-máxima",
+        "fachada"
+      ]
+    },
+    {
+      "id": "RJUE-ESCAV-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2 e Art. 83.º — Licença para Escavações e Movimentação de Terras",
+      "description": "Trabalhos de escavação e movimentação de terras com profundidade superior a 1,5 m ou volume significativo estão sujeitos a licenciamento municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.operationType",
+          "operator": "==",
+          "value": "escavacao"
+        },
+        {
+          "field": "licensing.excavationDepthM",
+          "operator": ">",
+          "value": 1.5
+        },
+        {
+          "field": "licensing.hasExcavationPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Profundidade escavação: {licensing.excavationDepthM} m — Licença: {licensing.hasExcavationPermit}",
+      "requiredValue": "Licença de escavação para profundidades superiores a 1,5 m",
+      "remediation": "Submeter pedido de licenciamento para escavação à câmara municipal, acompanhado de: estudo geotécnico, projeto de contenção periférica (quando aplicável), plano de monitorização de edifícios vizinhos, plano de gestão de terras escavadas e parecer do coordenador de segurança sobre riscos de soterramento.",
+      "enabled": true,
+      "tags": [
+        "escavação",
+        "movimentação-terras",
+        "contenção",
+        "geotécnico"
+      ]
+    },
+    {
+      "id": "RJUE-ESCAV-02",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 7.º e Anexo II do DL 273/2003 — Riscos Especiais em Escavações",
+      "description": "Escavações com profundidade superior a 2 metros constituem trabalhos com riscos especiais, exigindo medidas de prevenção reforçadas no PSS.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.excavationDepthM",
+          "operator": ">",
+          "value": 2
+        },
+        {
+          "field": "licensing.pssIncludesExcavationRisks",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Profundidade escavação: {licensing.excavationDepthM} m — PSS com riscos de escavação: {licensing.pssIncludesExcavationRisks}",
+      "requiredValue": "PSS com medidas específicas para riscos de escavação (profundidade > 2 m)",
+      "remediation": "O coordenador de segurança deve atualizar o PSS incluindo medidas específicas para escavações profundas: entivação ou contenção de paredes, monitorização de deslocamentos, deteção de infraestruturas enterradas (água, gás, eletricidade, telecomunicações), procedimentos de emergência para soterramento e formação dos trabalhadores.",
+      "enabled": true,
+      "tags": [
+        "escavação",
+        "riscos-especiais",
+        "PSS",
+        "entivação"
+      ]
+    },
+    {
+      "id": "RJUE-GRUA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 83.º do RJUE e DL 50/2005 — Licença para Montagem de Grua-Torre",
+      "description": "A montagem de grua-torre em estaleiro de construção requer autorização da câmara municipal quando o braço da grua sobrevoe a via pública ou propriedades vizinhas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasTowerCrane",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.craneOverfliesPublicSpace",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasCraneErectionPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Grua-torre sobrevoa via pública: {licensing.craneOverfliesPublicSpace} — Licença montagem: {licensing.hasCraneErectionPermit}",
+      "requiredValue": "Autorização municipal para montagem de grua-torre com sobrevoo de via pública",
+      "remediation": "Submeter pedido de autorização para montagem de grua-torre à câmara municipal, incluindo: plano de montagem e desmontagem, raio de ação e área de sobrevoo, seguro de responsabilidade civil, certificado de conformidade do equipamento, identificação do técnico responsável pela montagem e plano de sinalização/proteção da via pública.",
+      "enabled": true,
+      "tags": [
+        "grua-torre",
+        "estaleiro",
+        "via-pública",
+        "sobrevoo"
+      ]
+    },
+    {
+      "id": "RJUE-GRUA-02",
+      "regulationId": "dl-273-2003",
+      "article": "Art. 7.º, al. h) do DL 273/2003 — Segurança na Montagem de Grua-Torre",
+      "description": "A montagem, desmontagem e utilização de grua-torre constitui trabalho com riscos especiais, devendo constar de procedimento específico no PSS.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasTowerCrane",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.pssIncludesCraneProcedure",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "PSS inclui procedimento de grua: {licensing.pssIncludesCraneProcedure}",
+      "requiredValue": "PSS com procedimento específico para montagem, utilização e desmontagem de grua-torre",
+      "remediation": "Atualizar o PSS incluindo procedimento detalhado para: montagem e desmontagem da grua-torre por empresa certificada, inspeção periódica do equipamento (DL 50/2005), formação do operador (manobrista), delimitação de zona de risco sob o braço, procedimento de operação com vento forte e coordenação com gruas vizinhas.",
+      "enabled": true,
+      "tags": [
+        "grua-torre",
+        "PSS",
+        "riscos-especiais",
+        "montagem"
+      ]
+    },
+    {
+      "id": "RJUE-ESTRADA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 83.º do RJUE e Código da Estrada — Licença de Ocupação de Via Pública para Construção",
+      "description": "A ocupação temporária da via pública para realização de obras de construção (andaimes, contentores, vedação de estaleiro) requer licença de ocupação emitida pela câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.requiresPublicRoadOccupation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasRoadOccupationPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ocupação de via pública: {licensing.requiresPublicRoadOccupation} — Licença: {licensing.hasRoadOccupationPermit}",
+      "requiredValue": "Licença de ocupação temporária da via pública emitida pela câmara municipal",
+      "remediation": "Requerer licença de ocupação temporária da via pública à câmara municipal, incluindo: planta com delimitação da área a ocupar, prazo previsto, plano de sinalização temporária (conforme Manual de Sinalização Temporária da IP), plano de desvio de tráfego (se aplicável), seguro de responsabilidade civil e parecer da PSP/GNR.",
+      "enabled": true,
+      "tags": [
+        "via-pública",
+        "ocupação-temporária",
+        "estaleiro",
+        "sinalização"
+      ]
+    },
+    {
+      "id": "RJUE-ESTRADA-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 83.º do RJUE e Regulamentos Municipais — Condicionamento de Trânsito para Obras",
+      "description": "Obras que impliquem condicionamento ou corte total de trânsito devem obter autorização específica da câmara municipal e da autoridade policial competente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.requiresTrafficRestriction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasTrafficRestrictionPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Condicionamento de trânsito necessário: {licensing.requiresTrafficRestriction} — Autorização: {licensing.hasTrafficRestrictionPermit}",
+      "requiredValue": "Autorização de condicionamento de trânsito emitida pela câmara e autoridade policial",
+      "remediation": "Requerer autorização de condicionamento de trânsito junto da câmara municipal e da PSP/GNR, apresentando: plano de desvio de tráfego, sinalização temporária conforme normas da Infraestruturas de Portugal, período e horário do condicionamento, comunicação prévia aos residentes e comerciantes afetados.",
+      "enabled": true,
+      "tags": [
+        "condicionamento-trânsito",
+        "corte-estrada",
+        "sinalização",
+        "PSP"
+      ]
+    },
+    {
+      "id": "RJUE-INFRA-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 1 e Art. 43.º — Ligação às Redes de Infraestruturas Públicas",
+      "description": "A emissão da autorização de utilização está condicionada à comprovação de ligação às redes públicas de abastecimento de água, saneamento e eletricidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.hasWaterConnectionApproval",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.constructionCompleted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ligação à rede de água aprovada: {licensing.hasWaterConnectionApproval}",
+      "requiredValue": "Comprovativo de ligação às redes públicas de água, saneamento e eletricidade",
+      "remediation": "Solicitar às entidades gestoras (EPAL/Águas de Portugal, E-REDES, câmara municipal) os pedidos de ligação às redes públicas de abastecimento de água, drenagem de águas residuais e pluviais, e fornecimento de energia elétrica. Obter os comprovativos de aprovação antes de requerer a autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "infraestruturas",
+        "ligação-rede",
+        "água",
+        "saneamento"
+      ]
+    },
+    {
+      "id": "RJUE-INFRA-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º e Regulamento Municipal — Ligação à Rede de Gás (quando disponível)",
+      "description": "Em zonas com rede de gás natural disponível, a ligação à rede deve ser comprovada ou, alternativamente, deve ser demonstrada a solução energética alternativa.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.gasNetworkAvailable",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasGasConnectionOrAlternative",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.constructionCompleted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rede de gás disponível: {licensing.gasNetworkAvailable} — Ligação/alternativa: {licensing.hasGasConnectionOrAlternative}",
+      "requiredValue": "Ligação à rede de gás natural ou solução energética alternativa documentada",
+      "remediation": "Solicitar ligação à rede de gás natural junto do operador da rede de distribuição (Galp Gás Natural Distribuição ou outro). Caso se opte por solução alternativa (bomba de calor, painéis solares térmicos), documentar a solução no projeto de instalações mecânicas e incluir no requerimento de autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "infraestruturas",
+        "gás-natural",
+        "ligação-rede",
+        "solução-alternativa"
+      ]
+    },
+    {
+      "id": "RJUE-INFRA-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º e DL 123/2009 — Infraestrutura de Telecomunicações em Edifícios (ITED)",
+      "description": "Edifícios novos ou sujeitos a remodelação profunda devem dispor de infraestrutura de telecomunicações conforme o regime ITED, certificada por técnico ITED.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "licensing.hasITEDCertification",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Certificação ITED: {licensing.hasITEDCertification}",
+      "requiredValue": "Projeto e certificação ITED por técnico habilitado",
+      "remediation": "Contratar técnico ITED (inscrito na ANACOM) para projetar e certificar a infraestrutura de telecomunicações do edifício. O projeto ITED deve incluir: rede de tubagens, caixas de passagem, armários de telecomunicações, pontos de terminação de rede e ensaios de conformidade. A certificação ITED é obrigatória para a autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "ITED",
+        "telecomunicações",
+        "certificação",
+        "ANACOM"
+      ]
+    },
+    {
+      "id": "RJUE-BOMB-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º do RJUE e DL 220/2008 (RJ-SCIE) — Parecer da ANPC/Bombeiros",
+      "description": "Os pedidos de licenciamento de edifícios classificados na 2.ª categoria de risco ou superior devem ser instruídos com parecer favorável da ANEPC (ex-ANPC) ou dos bombeiros locais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.fireRiskCategory",
+          "operator": ">=",
+          "value": 2
+        },
+        {
+          "field": "licensing.hasFireBrigadeApproval",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Categoria de risco SCIE: {licensing.fireRiskCategory} — Parecer bombeiros: {licensing.hasFireBrigadeApproval}",
+      "requiredValue": "Parecer favorável da ANEPC ou bombeiros para edifícios de 2.ª categoria de risco ou superior",
+      "remediation": "Submeter o projeto de segurança contra incêndio à ANEPC (para 3.ª e 4.ª categorias de risco) ou ao corpo de bombeiros local (para 2.ª categoria) para obtenção de parecer. O projeto deve cumprir o RT-SCIE (Portaria 1532/2008) e incluir: medidas de autoprotecção, meios de extinção, sistemas de deteção e caminhos de evacuação.",
+      "enabled": true,
+      "tags": [
+        "SCIE",
+        "bombeiros",
+        "ANEPC",
+        "categoria-risco"
+      ]
+    },
+    {
+      "id": "RJUE-BOMB-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 64.º do RJUE e DL 220/2008 — Vistoria de Segurança contra Incêndio antes da Utilização",
+      "description": "Antes da emissão da autorização de utilização de edifícios de 2.ª categoria de risco ou superior, deve ser realizada vistoria de segurança contra incêndio pela ANEPC ou bombeiros.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.fireRiskCategory",
+          "operator": ">=",
+          "value": 2
+        },
+        {
+          "field": "licensing.hasFireSafetyInspectionForOccupancy",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.constructionCompleted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Categoria risco SCIE: {licensing.fireRiskCategory} — Vistoria SCIE para utilização: {licensing.hasFireSafetyInspectionForOccupancy}",
+      "requiredValue": "Vistoria de segurança contra incêndio favorável antes da autorização de utilização",
+      "remediation": "Solicitar vistoria de segurança contra incêndio à ANEPC ou ao corpo de bombeiros local, verificando a conformidade da obra executada com o projeto de SCIE aprovado: meios de extinção instalados, sinalização de emergência, sistemas de deteção operacionais, portas corta-fogo, caminhos de evacuação desimpedidos e medidas de autoprotecção implementadas.",
+      "enabled": true,
+      "tags": [
+        "SCIE",
+        "vistoria",
+        "bombeiros",
+        "autorização-utilização"
+      ]
+    },
+    {
+      "id": "RJUE-SAUDE-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 13.º do RJUE e DL 10/2015 (RJACSR) — Parecer da Autoridade de Saúde para Estabelecimentos Alimentares",
+      "description": "Estabelecimentos de restauração e bebidas, comércio alimentar e similares devem obter parecer favorável da Autoridade de Saúde competente (Delegado de Saúde) antes da emissão da autorização de utilização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "restauracao",
+            "bebidas",
+            "comercio_alimentar",
+            "pastelaria",
+            "padaria"
+          ]
+        },
+        {
+          "field": "licensing.hasHealthAuthorityApproval",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Uso: {licensing.buildingUse} — Parecer Autoridade de Saúde: {licensing.hasHealthAuthorityApproval}",
+      "requiredValue": "Parecer favorável da Autoridade de Saúde (Delegado de Saúde)",
+      "remediation": "Solicitar vistoria e parecer à Autoridade de Saúde competente (ULS / ACES), demonstrando conformidade com os requisitos de higiene alimentar: cozinha com revestimentos laváveis, ventilação adequada, instalações sanitárias separadas para pessoal e público, sistema HACCP implementado, rastreabilidade de fornecedores e condições de armazenamento.",
+      "enabled": true,
+      "tags": [
+        "saúde",
+        "restauração",
+        "higiene-alimentar",
+        "HACCP"
+      ]
+    },
+    {
+      "id": "RJUE-SAUDE-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 10/2015 e Reg. (CE) 852/2004 — Requisitos de Higiene para Estabelecimentos Alimentares",
+      "description": "Estabelecimentos alimentares devem cumprir os requisitos de higiene europeus e nacionais, incluindo sistema HACCP e condições estruturais adequadas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "restauracao",
+            "bebidas",
+            "comercio_alimentar"
+          ]
+        },
+        {
+          "field": "licensing.hasHACCPPlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Plano HACCP implementado: {licensing.hasHACCPPlan}",
+      "requiredValue": "Plano HACCP elaborado e implementado conforme Reg. (CE) 852/2004",
+      "remediation": "Elaborar e implementar plano de autocontrolo baseado nos princípios HACCP (Análise de Perigos e Pontos Críticos de Controlo), conforme Reg. (CE) 852/2004. O plano deve incluir: análise de perigos, pontos críticos de controlo, limites críticos, monitorização, ações corretivas, verificação e registos. Contratar técnico de segurança alimentar para apoio.",
+      "enabled": true,
+      "tags": [
+        "HACCP",
+        "higiene-alimentar",
+        "autocontrolo",
+        "regulamento-europeu"
+      ]
+    },
+    {
+      "id": "RJUE-TURISM-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º do RJUE e DL 39/2008 (RJET) — Licenciamento de Empreendimento Turístico",
+      "description": "A construção, instalação ou modificação de empreendimentos turísticos (hotéis, aparthotéis, aldeamentos, resorts) está sujeita a licenciamento urbanístico e a classificação pelo Turismo de Portugal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "hotel",
+            "aparthotel",
+            "aldeamento_turistico",
+            "resort",
+            "turismo_rural",
+            "turismo_habitacao"
+          ]
+        },
+        {
+          "field": "licensing.hasTourismLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Tipo de empreendimento turístico: {licensing.buildingUse} — Licença turismo: {licensing.hasTourismLicense}",
+      "requiredValue": "Licenciamento urbanístico e registo no Turismo de Portugal",
+      "remediation": "Submeter pedido de licenciamento urbanístico à câmara municipal e, simultaneamente, requerer a classificação do empreendimento turístico junto do Turismo de Portugal (RNET — Registo Nacional de Empreendimentos Turísticos). O empreendimento deve cumprir os requisitos do DL 39/2008 (RJET) quanto a áreas mínimas, equipamentos obrigatórios e categoria pretendida.",
+      "enabled": true,
+      "tags": [
+        "turismo",
+        "empreendimento-turístico",
+        "RJET",
+        "Turismo-de-Portugal"
+      ]
+    },
+    {
+      "id": "RJUE-TURISM-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 39/2008, Art. 38.º — Vistoria de Classificação de Empreendimento Turístico",
+      "description": "Antes da abertura ao público, os empreendimentos turísticos devem ser objeto de vistoria para atribuição de classificação (número de estrelas).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "hotel",
+            "aparthotel",
+            "aldeamento_turistico",
+            "resort"
+          ]
+        },
+        {
+          "field": "licensing.hasTourismClassification",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.constructionCompleted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Classificação turística atribuída: {licensing.hasTourismClassification}",
+      "requiredValue": "Classificação do empreendimento turístico atribuída pelo Turismo de Portugal",
+      "remediation": "Requerer vistoria de classificação ao Turismo de Portugal (ou câmara municipal por delegação), demonstrando o cumprimento dos requisitos mínimos para a categoria pretendida conforme Portaria 327/2008: áreas mínimas de quartos, instalações sanitárias, receção, restauração, equipamentos de segurança e acessibilidade.",
+      "enabled": true,
+      "tags": [
+        "turismo",
+        "classificação",
+        "vistoria",
+        "estrelas"
+      ]
+    },
+    {
+      "id": "RJUE-TURISM-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "DL 128/2014 — Registo de Alojamento Local",
+      "description": "O alojamento local (exploração turística de frações ou moradias fora do regime de empreendimentos turísticos) está sujeito a registo na câmara municipal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "==",
+          "value": "alojamento_local"
+        },
+        {
+          "field": "licensing.hasLocalAccommodationRegistry",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Registo de alojamento local: {licensing.hasLocalAccommodationRegistry}",
+      "requiredValue": "Registo de alojamento local na câmara municipal competente",
+      "remediation": "Efetuar o registo de alojamento local no Balcão Único Eletrónico, com comunicação à câmara municipal. Verificar se o condomínio permite a atividade (quando aplicável) e se a zona não está em área de contenção (conforme regulamento municipal). O registo deve incluir: capacidade máxima, tipologia, identificação do titular e seguro de responsabilidade civil.",
+      "enabled": true,
+      "tags": [
+        "alojamento-local",
+        "turismo",
+        "registo",
+        "câmara-municipal"
+      ]
+    },
+    {
+      "id": "RJUE-RELIG-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º, n.º 2 do RJUE e Lei 16/2001 (Lei da Liberdade Religiosa) — Licenciamento de Edifício de Culto",
+      "description": "A construção de edifícios destinados ao culto religioso (igrejas, mesquitas, sinagogas, templos) está sujeita a licenciamento municipal, com requisitos especiais de acessibilidade e segurança.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "==",
+          "value": "culto_religioso"
+        },
+        {
+          "field": "licensing.hasReligiousBuildingPermit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Edifício de culto religioso — Licença: {licensing.hasReligiousBuildingPermit}",
+      "requiredValue": "Licenciamento municipal para edifício de culto religioso",
+      "remediation": "Submeter pedido de licenciamento à câmara municipal para edifício de culto religioso. O projeto deve atender a requisitos específicos: lotação máxima definida, caminhos de evacuação dimensionados para a capacidade prevista, acessibilidade para pessoas com mobilidade reduzida (DL 163/2006), segurança contra incêndio e estacionamento conforme PDM.",
+      "enabled": true,
+      "tags": [
+        "culto-religioso",
+        "licenciamento",
+        "acessibilidade",
+        "evacuação"
+      ]
+    },
+    {
+      "id": "RJUE-RELIG-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e RGEU — Requisitos Acústicos para Edifícios de Culto",
+      "description": "Edifícios de culto religioso devem cumprir requisitos de isolamento acústico para não perturbar a vizinhança, conforme DL 96/2008 (RRAE).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "==",
+          "value": "culto_religioso"
+        },
+        {
+          "field": "licensing.hasAcousticStudyForWorship",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Estudo acústico para edifício de culto: {licensing.hasAcousticStudyForWorship}",
+      "requiredValue": "Estudo acústico demonstrando conformidade com RRAE e RGR",
+      "remediation": "Realizar estudo acústico por engenheiro acústico credenciado, demonstrando que o edifício de culto cumpre os limites de isolamento sonoro a sons aéreos (DnT,w) e de nível sonoro do equipamento (LAeq). O estudo deve considerar: sinos, sistema de som, coro e aglomerações de público. Caso necessário, projetar reforço de isolamento acústico.",
+      "enabled": true,
+      "tags": [
+        "culto-religioso",
+        "acústica",
+        "RRAE",
+        "isolamento-sonoro"
+      ]
+    },
+    {
+      "id": "RJUE-EDUC-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º do RJUE e DL 152/2013 — Licenciamento de Estabelecimento de Ensino",
+      "description": "A construção ou instalação de estabelecimentos de ensino (creches, jardins de infância, escolas) está sujeita a licenciamento municipal e a autorização do Ministério da Educação ou Segurança Social.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "creche",
+            "jardim_infancia",
+            "escola_basica",
+            "escola_secundaria",
+            "ensino_superior"
+          ]
+        },
+        {
+          "field": "licensing.hasEducationalFacilityLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Tipo de estabelecimento de ensino: {licensing.buildingUse} — Licença: {licensing.hasEducationalFacilityLicense}",
+      "requiredValue": "Licenciamento urbanístico e autorização do Ministério da Educação/Segurança Social",
+      "remediation": "Submeter pedido de licenciamento urbanístico à câmara municipal e requerer autorização de funcionamento ao Ministério da Educação (escolas) ou à Segurança Social (creches e jardins de infância). O projeto deve cumprir: áreas mínimas por aluno, iluminação natural, ventilação, espaço exterior, instalações sanitárias adaptadas à faixa etária e requisitos de segurança contra incêndio.",
+      "enabled": true,
+      "tags": [
+        "educação",
+        "escola",
+        "creche",
+        "Ministério-Educação"
+      ]
+    },
+    {
+      "id": "RJUE-EDUC-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e DL 163/2006 — Acessibilidade em Estabelecimentos de Ensino",
+      "description": "Estabelecimentos de ensino devem garantir acessibilidade plena a pessoas com mobilidade reduzida, incluindo rampas, elevadores, instalações sanitárias adaptadas e sinalética inclusiva.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "creche",
+            "jardim_infancia",
+            "escola_basica",
+            "escola_secundaria",
+            "ensino_superior"
+          ]
+        },
+        {
+          "field": "licensing.meetsEducationalAccessibilityRequirements",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Acessibilidade em estabelecimento de ensino: {licensing.meetsEducationalAccessibilityRequirements}",
+      "requiredValue": "Conformidade plena com DL 163/2006 — acessibilidade para todos",
+      "remediation": "Garantir que o projeto cumpre integralmente o DL 163/2006: entrada acessível ao nível do piso, rampas com inclinação máxima de 6% (8% em casos excecionais), elevador em edifícios com mais de um piso, corredores com largura mínima de 1,20 m, instalações sanitárias adaptadas, sinalética tátil e em braille, e sistema de alarme acessível a pessoas com deficiência auditiva.",
+      "enabled": true,
+      "tags": [
+        "educação",
+        "acessibilidade",
+        "DL-163/2006",
+        "mobilidade-reduzida"
+      ]
+    },
+    {
+      "id": "RJUE-EDUC-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e Despacho Conjunto 268/97 — Áreas Mínimas para Creches e Jardins de Infância",
+      "description": "Creches e jardins de infância devem cumprir áreas mínimas por criança, espaços exteriores obrigatórios e condições de segurança adequadas à faixa etária.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "creche",
+            "jardim_infancia"
+          ]
+        },
+        {
+          "field": "licensing.meetsMinAreaPerChild",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Área mínima por criança cumprida: {licensing.meetsMinAreaPerChild}",
+      "requiredValue": "Área mínima por criança conforme normas da Segurança Social (2 m²/criança em berçário, 2,5 m²/criança em sala de atividades)",
+      "remediation": "Verificar e ajustar as áreas do projeto para cumprir os mínimos regulamentares: berçário (2 m²/criança), sala de atividades (2,5 m²/criança), refeitório, zona de higiene com equipamentos à escala infantil, espaço exterior vedado (mín. 4 m²/criança). O equipamento deve estar no rés-do-chão ou pisos acessíveis, com saídas diretas para o exterior.",
+      "enabled": true,
+      "tags": [
+        "creche",
+        "jardim-infância",
+        "áreas-mínimas",
+        "Segurança-Social"
+      ]
+    },
+    {
+      "id": "RJUE-HEALTH-01",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º do RJUE e DL 95/2019 — Licenciamento de Unidade de Saúde",
+      "description": "A construção ou instalação de unidades de saúde (clínicas, hospitais, centros de saúde, laboratórios) está sujeita a licenciamento urbanístico e a licenciamento pela ERS (Entidade Reguladora da Saúde).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "clinica",
+            "hospital",
+            "centro_saude",
+            "laboratorio",
+            "farmacia"
+          ]
+        },
+        {
+          "field": "licensing.hasHealthFacilityLicense",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Tipo de unidade de saúde: {licensing.buildingUse} — Licença: {licensing.hasHealthFacilityLicense}",
+      "requiredValue": "Licenciamento urbanístico e registo na ERS (Entidade Reguladora da Saúde)",
+      "remediation": "Submeter pedido de licenciamento urbanístico à câmara municipal e requerer registo/licenciamento junto da ERS. O projeto deve cumprir os requisitos técnicos aplicáveis: áreas mínimas de gabinetes, condições de assepsia, ventilação e climatização (AVAC com filtragem), gestão de resíduos hospitalares, acessibilidade e segurança contra incêndio específica para estabelecimentos de saúde.",
+      "enabled": true,
+      "tags": [
+        "saúde",
+        "hospital",
+        "clínica",
+        "ERS"
+      ]
+    },
+    {
+      "id": "RJUE-HEALTH-02",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e Portaria 268/2010 — Requisitos Técnicos para Unidades de Saúde",
+      "description": "Unidades de saúde devem cumprir requisitos técnicos específicos quanto a circuitos limpos/sujos, gestão de resíduos hospitalares e condições de AVAC.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "clinica",
+            "hospital",
+            "centro_saude"
+          ]
+        },
+        {
+          "field": "licensing.meetsHealthTechnicalRequirements",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Requisitos técnicos de saúde cumpridos: {licensing.meetsHealthTechnicalRequirements}",
+      "requiredValue": "Conformidade com requisitos técnicos para unidades de saúde (circuitos, resíduos, AVAC)",
+      "remediation": "Garantir que o projeto contempla: separação de circuitos limpos e sujos, sala de resíduos hospitalares com ventilação própria, sistema AVAC com pressão diferencial (zonas estéreis em sobrepressão), revestimentos laváveis e desinfetáveis em zonas clínicas, iluminação adequada em salas de procedimentos e sistema de gases medicinais (quando aplicável).",
+      "enabled": true,
+      "tags": [
+        "saúde",
+        "requisitos-técnicos",
+        "AVAC",
+        "resíduos-hospitalares"
+      ]
+    },
+    {
+      "id": "RJUE-HEALTH-03",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 4.º e DL 58/2019 (RGPD) — Proteção de Dados em Unidades de Saúde",
+      "description": "Unidades de saúde devem garantir a proteção de dados pessoais e clínicos dos utentes, com medidas arquitetónicas de privacidade (gabinetes individuais, arquivo seguro).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "clinica",
+            "hospital",
+            "centro_saude",
+            "laboratorio"
+          ]
+        },
+        {
+          "field": "licensing.hasPrivacyDesignMeasures",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Medidas de privacidade no projeto: {licensing.hasPrivacyDesignMeasures}",
+      "requiredValue": "Projeto com medidas arquitetónicas de proteção da privacidade dos utentes",
+      "remediation": "Incluir no projeto medidas de proteção da privacidade dos utentes: gabinetes individuais com isolamento acústico, receção com distância de privacidade, sala de espera separada para resultados sensíveis, arquivo clínico com acesso controlado, rede informática segura e sistema de videovigilância conforme CNPD.",
+      "enabled": true,
+      "tags": [
+        "saúde",
+        "privacidade",
+        "RGPD",
+        "proteção-dados"
+      ]
+    },
+    {
+      "id": "RJUE-CONCL-04",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 6 — Seguro Decenal para Autorização de Utilização de Habitação",
+      "description": "Para edifícios de habitação, a autorização de utilização está condicionada à apresentação de seguro de responsabilidade civil decenal que cubra vícios estruturais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "==",
+          "value": "habitacao"
+        },
+        {
+          "field": "licensing.hasDecennialInsurance",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Seguro decenal: {licensing.hasDecennialInsurance}",
+      "requiredValue": "Seguro de responsabilidade civil decenal subscrito e válido",
+      "remediation": "Subscrever seguro de responsabilidade civil decenal que cubra os danos resultantes de defeitos ou vícios na construção relacionados com elementos estruturais, impermeabilização e fundações. O seguro deve ter duração mínima de 10 anos e ser apresentado com o requerimento de autorização de utilização.",
+      "enabled": true,
+      "tags": [
+        "seguro-decenal",
+        "responsabilidade-civil",
+        "autorização-utilização",
+        "habitação"
+      ]
+    },
+    {
+      "id": "RJUE-CONCL-05",
+      "regulationId": "dl-555-99-rjue",
+      "article": "Art. 62.º, n.º 5 — Ficha Técnica de Habitação",
+      "description": "Edifícios destinados a habitação devem dispor de Ficha Técnica de Habitação (FTH), entregue com o requerimento de autorização de utilização.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "licensing.buildingUse",
+          "operator": "in",
+          "value": [
+            "habitacao",
+            "misto"
+          ]
+        },
+        {
+          "field": "licensing.hasTechnicalHousingSheet",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "licensing.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ficha Técnica de Habitação: {licensing.hasTechnicalHousingSheet}",
+      "requiredValue": "Ficha Técnica de Habitação (FTH) elaborada e entregue",
+      "remediation": "Elaborar a Ficha Técnica de Habitação conforme DL 68/2004, contendo: identificação do prédio e fração, descrição dos materiais e acabamentos, projeto de instalações (água, eletricidade, gás, telecomunicações), certificado energético, instruções de manutenção e garantias dos equipamentos instalados. A FTH deve ser entregue ao primeiro adquirente.",
+      "enabled": true,
+      "tags": [
+        "ficha-técnica",
+        "habitação",
+        "FTH",
+        "primeiro-adquirente"
+      ]
     }
   ]
 }

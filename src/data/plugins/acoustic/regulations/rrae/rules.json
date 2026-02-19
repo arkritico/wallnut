@@ -7834,6 +7834,1310 @@
       "remediation": "Emitir relatório de conformidade acústica incluindo: identificação do edifício e do técnico responsável, requisitos aplicáveis do RRAE para o tipo de edifício, resultados dos ensaios acústicos in situ (D'nT,w, L'nT,w, D2m,nT,w, LAr,nT, T), comparação com os limites regulamentares (incluindo tolerância de -3 dB), declaração de conformidade ou não conformidade, recomendações de correção (se aplicável). Entregar à câmara municipal com o pedido de licença de utilização.",
       "enabled": true,
       "tags": ["relatório", "conformidade", "licença de utilização", "certificação"]
+    },
+    {
+      "id": "ACUS-CLASSREV-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º, n.º 2 — Tempo de Reverberação em Salas de Aula (500 Hz–2 kHz)",
+      "description": "O tempo de reverberação na banda de 500 Hz a 2 kHz da sala de aula ({acoustic.classroomRT_mid} s) excede o limite recomendado de 0.6 s para salas com volume inferior a 150 m³. A reverberação excessiva nas frequências médias compromete gravemente a inteligibilidade da palavra do professor.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.classroomRT_mid",
+          "operator": ">",
+          "value": 0.6
+        },
+        {
+          "field": "acoustic.roomVolume",
+          "operator": "<",
+          "value": 150
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["school", "education", "escolar"]
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["classroom", "sala-de-aula", "sala de aula"]
+        }
+      ],
+      "currentValueTemplate": "T(500–2k) = {acoustic.classroomRT_mid} s (sala de aula, V = {acoustic.roomVolume} m³)",
+      "requiredValue": "T(500 Hz–2 kHz) ≤ 0.6 s para V < 150 m³",
+      "remediation": "Instalar tratamento absorvente nas frequências médias: teto falso acústico com α_w ≥ 0.85 em toda a área do teto, painéis absorventes na parede posterior (α ≥ 0.7 a 1 kHz), e nas paredes laterais acima de 1.2 m de altura. Manter a parede frontal (quadro) refletora. Evitar superfícies paralelas lisas para reduzir flutter echo.",
+      "enabled": true,
+      "tags": ["reverberação", "sala de aula", "escolar", "frequências médias", "inteligibilidade"]
+    },
+    {
+      "id": "ACUS-CLASSREV-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — Ruído de Fundo em Salas de Aula",
+      "description": "O nível de ruído de fundo na sala de aula ({acoustic.classroomBackgroundNoise} dB(A)) excede o máximo recomendado de 35 dB(A). Ruído de fundo excessivo obriga o professor a elevar a voz e reduz a relação sinal/ruído, afetando a aprendizagem dos alunos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.classroomBackgroundNoise",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["school", "education", "escolar"]
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["classroom", "sala-de-aula", "sala de aula"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.classroomBackgroundNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A) (ruído de fundo em sala de aula)",
+      "remediation": "Reduzir o ruído de fundo: verificar e melhorar o isolamento de fachada (D2m,nT,w ≥ 33 dB), silenciar instalações de AVAC (NC ≤ 30), instalar silenciadores em condutas, verificar ruído de equipamentos (projetores, computadores). Garantir relação sinal/ruído ≥ 15 dB para a voz do professor.",
+      "enabled": true,
+      "tags": ["ruído de fundo", "sala de aula", "escolar", "AVAC", "inteligibilidade"]
+    },
+    {
+      "id": "ACUS-STI-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º, n.º 2 — Inteligibilidade da Palavra em Auditórios Escolares (STI)",
+      "description": "O índice de inteligibilidade da palavra (STI) no auditório ({acoustic.stiValue}) está abaixo do mínimo aceitável de 0.60 (classificação 'Bom'). Em auditórios escolares, a compreensão da palavra é essencial para o ensino e comunicação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.stiValue",
+          "operator": "<",
+          "value": 0.60
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["auditorium", "auditório", "anfiteatro", "lecture-hall"]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["school", "education", "escolar", "university", "universitário"]
+        }
+      ],
+      "currentValueTemplate": "STI = {acoustic.stiValue}",
+      "requiredValue": "STI ≥ 0.60 ('Bom' conforme IEC 60268-16)",
+      "remediation": "Melhorar o STI do auditório: reduzir o tempo de reverberação (T ≤ 1.0 s para auditórios até 500 m³), instalar absorção nas paredes laterais e teto posterior, prever reflexões iniciais úteis do teto frontal para as últimas filas, instalar sistema de reforço sonoro se o volume exceder 300 m³. Verificar STI conforme IEC 60268-16.",
+      "enabled": true,
+      "tags": ["STI", "inteligibilidade", "auditório", "escolar", "IEC 60268-16"]
+    },
+    {
+      "id": "ACUS-STI-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — STI com Sistema de Reforço Sonoro em Auditório",
+      "description": "O auditório com sistema de reforço sonoro não atingiu STI ≥ 0.50 em todos os lugares. O sistema de sonorização deve garantir inteligibilidade uniforme, incluindo as últimas filas e posições laterais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.stiWithPA",
+          "operator": "<",
+          "value": 0.50
+        },
+        {
+          "field": "acoustic.hasPASystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["auditorium", "auditório", "anfiteatro", "lecture-hall"]
+        }
+      ],
+      "currentValueTemplate": "STI (com PA) = {acoustic.stiWithPA}",
+      "requiredValue": "STI ≥ 0.50 em todos os lugares com sistema de reforço sonoro",
+      "remediation": "Reconfigurar o sistema de reforço sonoro: verificar a orientação e cobertura das colunas, ajustar tempos de atraso (delay) para colunas secundárias, calibrar a equalização para compensar a acústica da sala. Utilizar colunas de linha (line array) para auditórios com teto baixo. Realizar medição de STI conforme IEC 60268-16 em grelha de pontos representativa.",
+      "enabled": true,
+      "tags": ["STI", "reforço sonoro", "auditório", "PA system", "inteligibilidade"]
+    },
+    {
+      "id": "ACUS-STI-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 7.º — Uniformidade de STI em Auditórios",
+      "description": "A variação do STI entre posições no auditório é excessiva (desvio padrão > 0.05). A inteligibilidade deve ser uniforme em toda a plateia para garantir condições equitativas de aprendizagem.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.stiStdDev",
+          "operator": ">",
+          "value": 0.05
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["auditorium", "auditório", "anfiteatro", "lecture-hall"]
+        }
+      ],
+      "currentValueTemplate": "Desvio padrão STI = {acoustic.stiStdDev}",
+      "requiredValue": "Desvio padrão STI ≤ 0.05 entre posições de medição",
+      "remediation": "Garantir uniformidade de STI: instalar refletores acústicos no teto para direcionar primeiras reflexões para zonas distantes, adicionar absorção seletiva em zonas com reverberação excessiva (fundo da sala), ajustar o sistema de reforço sonoro com atrasos. Mapear STI em grelha de 2×2 m em toda a plateia.",
+      "enabled": true,
+      "tags": ["STI", "uniformidade", "auditório", "mapeamento", "inteligibilidade"]
+    },
+    {
+      "id": "ACUS-CINEMA-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Isolamento Acústico entre Salas de Cinema (Sons Aéreos)",
+      "description": "O isolamento a sons aéreos entre salas de cinema adjacentes ({acoustic.cinemaAirborneInsulation} dB) é insuficiente. Salas de cinema requerem isolamento elevado (D'nT,w ≥ 67 dB) devido aos elevados níveis sonoros de reprodução (até 105 dB(A) pico).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.cinemaAirborneInsulation",
+          "operator": "<",
+          "value": 67
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["cinema", "sala-cinema", "movie-theater"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.cinemaAirborneInsulation} dB (entre salas de cinema)",
+      "requiredValue": "D'nT,w ≥ 67 dB entre salas de cinema adjacentes",
+      "remediation": "Construir paredes de separação entre salas de cinema com sistema 'box-in-box' ou parede dupla dessolidarizada: duas paredes independentes com caixa-de-ar ≥ 200 mm preenchida com lã mineral de alta densidade (≥ 60 kg/m³), cada folha com massa superficial ≥ 250 kg/m². Sem ligações rígidas entre as duas estruturas. Prever cortes acústicos na laje e cobertura.",
+      "enabled": true,
+      "tags": ["cinema", "isolamento", "sons aéreos", "sala de espetáculos", "box-in-box"]
+    },
+    {
+      "id": "ACUS-CINEMA-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Isolamento de Baixas Frequências em Salas de Cinema",
+      "description": "O isolamento acústico a baixas frequências (50–125 Hz) entre salas de cinema ({acoustic.cinemaLFInsulation} dB) é insuficiente. Os sistemas de subwoofer geram níveis elevados abaixo de 100 Hz que exigem isolamento especial.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.cinemaLFInsulation",
+          "operator": "<",
+          "value": 55
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["cinema", "sala-cinema", "movie-theater"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w (50–125 Hz) = {acoustic.cinemaLFInsulation} dB",
+      "requiredValue": "D'nT,w (50–125 Hz) ≥ 55 dB entre salas de cinema",
+      "remediation": "Reforçar isolamento a baixas frequências: aumentar massa das paredes divisórias (betão ≥ 30 cm), utilizar sistema flutuante duplo para pavimentos com apoios de baixa frequência de ressonância (f0 ≤ 12 Hz), instalar painéis ressonantes nos limites da sala. O sistema 'box-in-box' com caixa-de-ar ≥ 250 mm é essencial para atenuação abaixo de 100 Hz.",
+      "enabled": true,
+      "tags": ["cinema", "baixas frequências", "subwoofer", "isolamento", "box-in-box"]
+    },
+    {
+      "id": "ACUS-CINEMA-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Fundo em Salas de Cinema (Critério NC)",
+      "description": "O nível de ruído de fundo na sala de cinema ({acoustic.cinemaNC}) excede o critério NC 25. Salas de cinema requerem níveis de ruído de fundo muito baixos para não mascarar os detalhes sonoros da banda sonora.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.cinemaNC",
+          "operator": ">",
+          "value": 25
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["cinema", "sala-cinema", "movie-theater"]
+        }
+      ],
+      "currentValueTemplate": "NC = {acoustic.cinemaNC}",
+      "requiredValue": "NC ≤ 25 (ruído de fundo em salas de cinema)",
+      "remediation": "Reduzir o ruído de fundo: AVAC com condutas de secção adequada (velocidade ≤ 3.5 m/s), silenciadores em todas as condutas de insuflação e retorno, equipamentos isolados vibraticamente, difusores com regulação de caudal silenciosos. Verificar estanquidade das portas acústicas e ausência de ruído de equipamento de projeção.",
+      "enabled": true,
+      "tags": ["cinema", "ruído de fundo", "NC", "AVAC", "projeção"]
+    },
+    {
+      "id": "ACUS-STUDIO-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Isolamento Acústico de Estúdio de Gravação",
+      "description": "O isolamento acústico do estúdio de gravação ({acoustic.studioInsulation} dB) é insuficiente. Estúdios de gravação profissional requerem D'nT,w ≥ 70 dB e ruído de fundo NC ≤ 15 para captação de áudio sem interferência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.studioInsulation",
+          "operator": "<",
+          "value": 70
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["recording-studio", "estúdio-gravação", "studio"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.studioInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 70 dB (estúdio de gravação profissional)",
+      "remediation": "Implementar construção 'box-in-box' completa: estrutura interior flutuante independente da estrutura do edifício, com apoios antivibráticos (molas de aço ou neoprene com f0 ≤ 8 Hz), paredes duplas com caixa-de-ar ≥ 300 mm, teto suspenso dessolidarizado, pavimento flutuante sobre molas. Todas as portas e janelas acústicas com selo hermético. Sem ligações rígidas ao edifício.",
+      "enabled": true,
+      "tags": ["estúdio", "gravação", "isolamento", "box-in-box", "profissional"]
+    },
+    {
+      "id": "ACUS-STUDIO-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Fundo em Estúdio de Gravação (NC 15)",
+      "description": "O nível de ruído de fundo no estúdio de gravação ({acoustic.studioNC}) excede NC 15. Estúdios de gravação profissional exigem o nível de ruído de fundo mais baixo possível para evitar contaminação das gravações.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.studioNC",
+          "operator": ">",
+          "value": 15
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["recording-studio", "estúdio-gravação", "studio"]
+        }
+      ],
+      "currentValueTemplate": "NC = {acoustic.studioNC}",
+      "requiredValue": "NC ≤ 15 (estúdio de gravação profissional)",
+      "remediation": "Eliminar todas as fontes de ruído de fundo: AVAC com velocidade do ar ≤ 2 m/s, condutas oversized com atenuadores de alta performance (atenuação ≥ 40 dB), nenhum equipamento mecânico no interior ou adjacente ao estúdio, iluminação sem balastros audíveis (LED direto). Verificar isolamento de vibrações estruturais (tráfego, metro).",
+      "enabled": true,
+      "tags": ["estúdio", "gravação", "NC", "ruído de fundo", "AVAC"]
+    },
+    {
+      "id": "ACUS-STUDIO-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Condicionamento Acústico Interior de Estúdio de Gravação",
+      "description": "O tempo de reverberação do estúdio de gravação ({acoustic.studioRT} s) está fora da gama recomendada para o tipo de utilização. Estúdios de gravação requerem RT controlado entre 0.2 e 0.4 s para salas de captação polivalentes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.studioRT",
+          "operator": "not_in_range",
+          "value": [0.2, 0.4]
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["recording-studio", "estúdio-gravação", "studio"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.studioRT} s",
+      "requiredValue": "T entre 0.2 s e 0.4 s (sala de captação polivalente)",
+      "remediation": "Ajustar o condicionamento acústico do estúdio: combinar absorção (painéis porosos com α ≥ 0.8 nas médias/altas frequências), difusão (difusores quadráticos ou de Schroeder nas paredes laterais e posterior), e absorção de baixas frequências (painéis ressonantes, bass traps nos cantos). O projeto deve ser personalizado por consultor acústico especializado em estúdios.",
+      "enabled": true,
+      "tags": ["estúdio", "gravação", "reverberação", "condicionamento", "difusão"]
+    },
+    {
+      "id": "ACUS-CHURCH-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Tempo de Reverberação em Espaços de Culto Religioso",
+      "description": "O tempo de reverberação do espaço de culto ({acoustic.churchRT} s) excede o recomendado para inteligibilidade da palavra (T ≤ 2.0 s para liturgia com discurso). Igrejas com reverberação excessiva comprometem a compreensão de sermões e leituras.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.churchRT",
+          "operator": ">",
+          "value": 2.0
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["church", "igreja", "chapel", "capela", "worship", "culto"]
+        },
+        {
+          "field": "acoustic.primaryUse",
+          "operator": "in",
+          "value": ["speech", "liturgia", "discurso", "mixed"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.churchRT} s",
+      "requiredValue": "T ≤ 2.0 s (espaço de culto com ênfase na palavra)",
+      "remediation": "Reduzir a reverberação preservando o carácter acústico do espaço: instalar absorção acústica oculta (painéis nas costas dos bancos, tapetes nos corredores, absorção sob varandas), tratamento seletivo do teto (absorção suspensa ou painéis acústicos integrados na cobertura). Para igrejas históricas, soluções reversíveis e não intrusivas. Considerar sistema de reforço sonoro distribuído para complementar.",
+      "enabled": true,
+      "tags": ["igreja", "culto", "reverberação", "inteligibilidade", "património"]
+    },
+    {
+      "id": "ACUS-CHURCH-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Reverberação para Música Sacra em Espaços de Culto",
+      "description": "O tempo de reverberação do espaço de culto ({acoustic.churchRT} s) é insuficiente para música sacra (T recomendado ≥ 1.5 s). Um tempo de reverberação demasiado curto empobrece a experiência musical coral e de órgão.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.churchRT",
+          "operator": "<",
+          "value": 1.5
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["church", "igreja", "chapel", "capela", "worship", "culto"]
+        },
+        {
+          "field": "acoustic.primaryUse",
+          "operator": "in",
+          "value": ["music", "música sacra", "coral", "mixed"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.churchRT} s",
+      "requiredValue": "T ≥ 1.5 s para música sacra (coral, órgão)",
+      "remediation": "Aumentar a reverberação para música: reduzir a absorção existente (remover tapetes e cortinas desnecessários), restaurar superfícies refletoras (rebocar paredes em pedra nua se adequado), considerar sistema de reverberação eletrónica assistida para flexibilidade entre discurso e música. Em igrejas novas, projetar para T entre 1.5 e 2.5 s como compromisso discurso/música.",
+      "enabled": true,
+      "tags": ["igreja", "música sacra", "reverberação", "coral", "órgão"]
+    },
+    {
+      "id": "ACUS-CHURCH-03",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 13.º — Isolamento Acústico de Espaço de Culto (Ruído para Vizinhança)",
+      "description": "O isolamento acústico do espaço de culto para a vizinhança ({acoustic.churchFacadeInsulation} dB) é insuficiente. O ruído de sinos, órgão e congregação deve cumprir os limites do RGR para zonas sensíveis e mistas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.churchFacadeInsulation",
+          "operator": "<",
+          "value": 45
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["church", "igreja", "chapel", "capela", "worship", "culto"]
+        }
+      ],
+      "currentValueTemplate": "D2m,nT,w = {acoustic.churchFacadeInsulation} dB",
+      "requiredValue": "D2m,nT,w ≥ 45 dB (isolamento para vizinhança)",
+      "remediation": "Reforçar o isolamento da envolvente: janelas com vidro duplo assimétrico (Rw ≥ 38 dB), portas maciças com vedação perimetral, tratamento de aberturas de ventilação com atenuadores. Regulamentar o uso de sinos conforme horários do RGR. Para igrejas históricas, considerar vidros interiores secundários e portas de antecâmara.",
+      "enabled": true,
+      "tags": ["igreja", "isolamento", "vizinhança", "RGR", "sinos"]
+    },
+    {
+      "id": "ACUS-MUSEUM-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Fundo em Salas de Exposição de Museu",
+      "description": "O nível de ruído de fundo nas salas de exposição do museu ({acoustic.museumBackgroundNoise} dB(A)) excede o limite recomendado de 40 dB(A). Museus requerem ambientes silenciosos para contemplação das obras e conforto dos visitantes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.museumBackgroundNoise",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["museum", "museu", "gallery", "galeria", "exhibition", "exposição"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.museumBackgroundNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 40 dB(A) em salas de exposição",
+      "remediation": "Reduzir o ruído de fundo: AVAC com condutas sobredimensionadas e silenciadores (NC ≤ 30), isolamento da fachada adequado à zona urbana, portas de separação entre salas com diferentes requisitos acústicos. Afastar equipamentos técnicos (projetores, ecrãs interativos) das zonas de contemplação silenciosa.",
+      "enabled": true,
+      "tags": ["museu", "ruído de fundo", "exposição", "contemplação", "AVAC"]
+    },
+    {
+      "id": "ACUS-MUSEUM-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Condicionamento Acústico de Salas de Museu",
+      "description": "O tempo de reverberação nas salas de exposição ({acoustic.museumRT} s) excede o recomendado de 1.2 s. Reverberação excessiva em museus gera acumulação de ruído dos visitantes e dificulta áudioguias e instalações sonoras.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.museumRT",
+          "operator": ">",
+          "value": 1.2
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["museum", "museu", "gallery", "galeria", "exhibition", "exposição"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.museumRT} s",
+      "requiredValue": "T ≤ 1.2 s em salas de exposição de museu",
+      "remediation": "Instalar absorção acústica discreta: teto falso acústico integrado na arquitetura (α_w ≥ 0.75), painéis absorventes ocultos atrás de paredes expositivas perfuradas, cortinas acústicas em zonas de transição. A absorção deve ser esteticamente integrada e não competir visualmente com as obras expostas.",
+      "enabled": true,
+      "tags": ["museu", "reverberação", "absorção", "exposição", "visitantes"]
+    },
+    {
+      "id": "ACUS-MUSEUM-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Isolamento entre Salas de Museu com Diferentes Funções",
+      "description": "O isolamento acústico entre salas de museu com diferentes requisitos sonoros ({acoustic.museumInterRoomInsulation} dB) é insuficiente. Salas com instalações audiovisuais devem estar isoladas das salas de contemplação silenciosa.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.museumInterRoomInsulation",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["museum", "museu", "gallery", "galeria"]
+        },
+        {
+          "field": "acoustic.hasAudiovisualInstallations",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.museumInterRoomInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 50 dB entre salas AV e salas de contemplação",
+      "remediation": "Isolar acusticamente salas com instalações audiovisuais: paredes de separação com Rw ≥ 52 dB, portas acústicas (Rw ≥ 35 dB) com vedação, limitar o nível de reprodução das instalações AV. Prever zonas-tampão (corredores ou antecâmaras) entre salas com requisitos acústicos muito diferentes.",
+      "enabled": true,
+      "tags": ["museu", "isolamento", "audiovisual", "contemplação", "salas"]
+    },
+    {
+      "id": "ACUS-LIBRARY-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º / Art. 7.º — Ruído de Fundo em Zonas de Leitura Silenciosa",
+      "description": "O nível de ruído de fundo na zona de leitura silenciosa da biblioteca ({acoustic.libraryQuietZoneNoise} dB(A)) excede o máximo de 35 dB(A). Zonas de estudo e leitura requerem níveis muito baixos para concentração.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.libraryQuietZoneNoise",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["library", "biblioteca", "reading-room", "sala-leitura"]
+        },
+        {
+          "field": "acoustic.zoneType",
+          "operator": "in",
+          "value": ["quiet", "silenciosa", "reading", "leitura", "study", "estudo"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.libraryQuietZoneNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A) em zonas de leitura silenciosa",
+      "remediation": "Reduzir ruído de fundo: localizar zonas silenciosas afastadas de fachadas ruidosas e de zonas de circulação, instalar AVAC silencioso (NC ≤ 25), teto falso acústico (α_w ≥ 0.90), separar fisicamente da zona de entrada e balcão de atendimento. Implementar zonamento acústico da biblioteca.",
+      "enabled": true,
+      "tags": ["biblioteca", "leitura", "zona silenciosa", "ruído de fundo", "concentração"]
+    },
+    {
+      "id": "ACUS-LIBRARY-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º / Art. 7.º — Absorção Acústica em Bibliotecas",
+      "description": "O tempo de reverberação na biblioteca ({acoustic.libraryRT} s) excede o máximo recomendado de 0.8 s. Bibliotecas requerem reverberação curta para limitar a propagação de ruído de conversas e movimentação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.libraryRT",
+          "operator": ">",
+          "value": 0.8
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["library", "biblioteca", "reading-room", "sala-leitura"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.libraryRT} s",
+      "requiredValue": "T ≤ 0.8 s em salas de biblioteca",
+      "remediation": "Instalar absorção acústica generalizada: teto falso acústico (α_w ≥ 0.85) em toda a área, painéis absorventes nas paredes acima das estantes, alcatifa ou pavimento resiliente. As estantes de livros contribuem para a absorção e difusão, mas são insuficientes isoladamente. Adicionar divisórias acústicas entre zonas de trabalho de grupo e zonas silenciosas.",
+      "enabled": true,
+      "tags": ["biblioteca", "reverberação", "absorção", "estantes", "zonamento"]
+    },
+    {
+      "id": "ACUS-LIBRARY-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º / Art. 7.º — Isolamento entre Zonas de Biblioteca",
+      "description": "O isolamento entre a zona de trabalho de grupo e a zona de leitura silenciosa ({acoustic.libraryZoneInsulation} dB) é insuficiente. Bibliotecas modernas requerem zonamento acústico eficaz entre espaços com diferentes atividades.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.libraryZoneInsulation",
+          "operator": "<",
+          "value": 40
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["library", "biblioteca"]
+        },
+        {
+          "field": "acoustic.hasMultipleZones",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.libraryZoneInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 40 dB entre zona de grupo e zona silenciosa",
+      "remediation": "Separar zonas acusticamente: divisórias envidraçadas com vidro acústico laminado (Rw ≥ 42 dB), portas de correr acústicas, antecâmaras. Localizar zonas de trabalho de grupo, multimédia e café em extremidades opostas às zonas de leitura silenciosa. Prever sinalética de zonamento acústico.",
+      "enabled": true,
+      "tags": ["biblioteca", "zonamento", "isolamento", "grupo", "leitura"]
+    },
+    {
+      "id": "ACUS-MEDICAL-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Privacidade Acústica em Consultórios Médicos",
+      "description": "O isolamento acústico do consultório médico ({acoustic.medicalConsultInsulation} dB) é insuficiente para garantir privacidade das consultas. Informações médicas confidenciais não devem ser audíveis nos espaços adjacentes (corredores, salas de espera, outros consultórios).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.medicalConsultInsulation",
+          "operator": "<",
+          "value": 48
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["medical-consultation", "consultório", "consultation-room", "gabinete-médico"]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["hospital", "hospitalar", "clinic", "clínica", "health-center", "centro-saúde"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.medicalConsultInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 48 dB (privacidade em consultório médico)",
+      "remediation": "Reforçar isolamento do consultório: paredes até à laje estrutural (não apenas até ao teto falso), vedação de todas as passagens de instalações, porta acústica com vedação (Rw ≥ 35 dB), teto falso com barreira acústica contínua sobre o plenum. Verificar ausência de vias de fuga sonora (grelhas de AVAC partilhadas, tomadas back-to-back).",
+      "enabled": true,
+      "tags": ["consultório", "privacidade", "médico", "hospitalar", "confidencialidade"]
+    },
+    {
+      "id": "ACUS-MEDICAL-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Índice de Privacidade Acústica STC/SPI em Consultórios",
+      "description": "A classificação de privacidade acústica do consultório médico não atinge o nível 'Confidencial'. A conversação normal do interior não deve ser inteligível no exterior do consultório (corredor ou sala de espera).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.speechPrivacyClass",
+          "operator": "ordinal_lt",
+          "value": "confidential",
+          "scale": ["none", "poor", "marginal", "normal", "confidential"]
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["medical-consultation", "consultório", "consultation-room", "gabinete-médico"]
+        }
+      ],
+      "currentValueTemplate": "Classe de privacidade: {acoustic.speechPrivacyClass}",
+      "requiredValue": "Classe de privacidade acústica ≥ 'Confidencial'",
+      "remediation": "Atingir privacidade 'Confidencial': isolamento D'nT,w ≥ 48 dB combinado com mascaramento sonoro (sound masking) na sala de espera (nível de mascaramento LAeq ≈ 40 dB(A) com espectro de ruído rosa). Instalar sistema de mascaramento no teto falso do corredor/sala de espera. Verificar todas as vias de transmissão flanking (condutas, plenum, caixilharias).",
+      "enabled": true,
+      "tags": ["consultório", "privacidade", "mascaramento", "confidencial", "STC"]
+    },
+    {
+      "id": "ACUS-MEDICAL-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 8.º — Ruído de Fundo em Consultórios Médicos",
+      "description": "O nível de ruído de fundo no consultório médico ({acoustic.medicalConsultBackground} dB(A)) excede o máximo recomendado de 35 dB(A). Ruído excessivo dificulta a comunicação médico-paciente e a auscultação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.medicalConsultBackground",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["medical-consultation", "consultório", "consultation-room", "gabinete-médico"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.medicalConsultBackground} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A) (ruído de fundo em consultório)",
+      "remediation": "Reduzir fontes de ruído de fundo: silenciar AVAC (NC ≤ 30), isolar ruído do corredor e sala de espera, verificar estanquidade da porta, instalar teto falso acústico. A auscultação requer ambiente ainda mais silencioso — considerar NC ≤ 25 para consultórios de cardiologia e pneumologia.",
+      "enabled": true,
+      "tags": ["consultório", "ruído de fundo", "médico", "AVAC", "auscultação"]
+    },
+    {
+      "id": "ACUS-COURT-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Inteligibilidade da Palavra em Salas de Audiência (Tribunal)",
+      "description": "O STI na sala de audiências do tribunal ({acoustic.courtroomSTI}) é inferior a 0.60. Em salas de audiência, a inteligibilidade da palavra é essencial para a administração da justiça — todos os intervenientes devem compreender claramente os depoimentos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.courtroomSTI",
+          "operator": "<",
+          "value": 0.60
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["courtroom", "tribunal", "sala-audiências", "sala de audiência"]
+        }
+      ],
+      "currentValueTemplate": "STI = {acoustic.courtroomSTI}",
+      "requiredValue": "STI ≥ 0.60 em salas de audiência de tribunal",
+      "remediation": "Melhorar a inteligibilidade: reduzir reverberação (T ≤ 0.8 s para salas até 300 m³), instalar teto acústico com reflexões direcionadas para a área de público, painéis absorventes nas paredes laterais e posterior. Prever sistema de reforço sonoro distribuído com colunas junto às posições de testemunhas, advogados e juiz. Verificar STI em todas as posições de público.",
+      "enabled": true,
+      "tags": ["tribunal", "audiência", "STI", "inteligibilidade", "justiça"]
+    },
+    {
+      "id": "ACUS-COURT-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Privacidade Acústica em Salas de Deliberação (Tribunal)",
+      "description": "O isolamento acústico da sala de deliberação do tribunal ({acoustic.deliberationRoomInsulation} dB) não garante privacidade total. As deliberações judiciais são secretas e não devem ser audíveis em qualquer espaço adjacente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.deliberationRoomInsulation",
+          "operator": "<",
+          "value": 55
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["deliberation-room", "sala-deliberação", "chambers"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.deliberationRoomInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 55 dB (sala de deliberação)",
+      "remediation": "Garantir isolamento máximo: paredes completas até à laje (sem interrupção no plenum), porta acústica dupla ou com antecâmara (Rw ≥ 42 dB), vedação de todas as passagens técnicas, sistema de mascaramento ativo no corredor. Proibir grelhas de AVAC partilhadas com outros espaços. Testar com fonte sonora a 80 dB(A) e verificar inaudibilidade no exterior.",
+      "enabled": true,
+      "tags": ["tribunal", "deliberação", "privacidade", "isolamento", "segredo"]
+    },
+    {
+      "id": "ACUS-COURT-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Fundo em Salas de Audiência",
+      "description": "O nível de ruído de fundo na sala de audiências ({acoustic.courtroomBackground} dB(A)) excede o limite de 35 dB(A). O registo áudio das audiências requer condições acústicas controladas para gravação inteligível.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.courtroomBackground",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["courtroom", "tribunal", "sala-audiências"]
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.courtroomBackground} dB(A)",
+      "requiredValue": "LAeq ≤ 35 dB(A) em sala de audiências",
+      "remediation": "Reduzir ruído de fundo para qualidade de gravação: AVAC com NC ≤ 25, isolamento reforçado da fachada em zonas urbanas, portas com vedação acústica, separação do público por ante-sala com porta dupla. O sistema de gravação das audiências beneficia de ruído de fundo ≤ 30 dB(A).",
+      "enabled": true,
+      "tags": ["tribunal", "ruído de fundo", "gravação", "audiência", "AVAC"]
+    },
+    {
+      "id": "ACUS-CALLCTR-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Absorção Acústica em Open Space de Call Center",
+      "description": "O tempo de reverberação no open space do call center ({acoustic.callCenterRT} s) excede o máximo de 0.5 s. Em call centers, a reverberação excessiva amplifica o ruído cumulativo de múltiplos operadores em simultâneo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.callCenterRT",
+          "operator": ">",
+          "value": 0.5
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["call-center", "contact-center", "call center"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.callCenterRT} s",
+      "requiredValue": "T ≤ 0.5 s em open space de call center",
+      "remediation": "Tratamento acústico intensivo: teto falso acústico de elevado desempenho (α_w ≥ 0.95, classe A), divisórias absorventes entre postos de trabalho (altura ≥ 1.5 m acima da secretária), alcatifa ou pavimento absorvente, painéis suspensos (baffles) se o pé-direito exceder 3.0 m. Considerar sistema de mascaramento sonoro eletrónico para melhorar a privacidade entre operadores.",
+      "enabled": true,
+      "tags": ["call center", "open space", "absorção", "reverberação", "operadores"]
+    },
+    {
+      "id": "ACUS-CALLCTR-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Distância de Distração em Call Center (rD)",
+      "description": "A distância de distração no call center (rD = {acoustic.distractionDistance} m) é demasiado curta. A distância de distração é a distância a partir da qual a conversação de um operador vizinho se torna suficientemente atenuada para não distrair. O mínimo recomendado é 5 m.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.distractionDistance",
+          "operator": "<",
+          "value": 5
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["call-center", "contact-center", "call center"]
+        }
+      ],
+      "currentValueTemplate": "rD = {acoustic.distractionDistance} m",
+      "requiredValue": "rD ≥ 5 m (distância de distração mínima)",
+      "remediation": "Aumentar a distância de distração: instalar teto acústico classe A (α_w ≥ 0.95), divisórias absorventes de altura adequada (≥ 1.5 m sobre a mesa), orientar estações de trabalho para não ficarem face a face, e implementar mascaramento sonoro eletrónico (40–45 dB(A) com espectro calibrado). Avaliar conforme ISO 3382-3 (acústica de open office).",
+      "enabled": true,
+      "tags": ["call center", "distância de distração", "open space", "ISO 3382-3", "mascaramento"]
+    },
+    {
+      "id": "ACUS-REST-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído Interior em Restaurantes (Efeito Lombard)",
+      "description": "O nível sonoro interior do restaurante durante a ocupação ({acoustic.restaurantOccupiedNoise} dB(A)) excede 75 dB(A), indicando efeito Lombard severo. Quando o ruído de fundo é excessivo, os clientes elevam a voz progressivamente, criando um ciclo de escalada sonora.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.restaurantOccupiedNoise",
+          "operator": ">",
+          "value": 75
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["restaurant", "restaurante", "dining", "refeitório"]
+        }
+      ],
+      "currentValueTemplate": "LAeq (ocupado) = {acoustic.restaurantOccupiedNoise} dB(A)",
+      "requiredValue": "LAeq ≤ 75 dB(A) durante ocupação típica",
+      "remediation": "Reduzir reverberação para quebrar o efeito Lombard: teto acústico (α_w ≥ 0.80), painéis absorventes nas paredes (mínimo 30% da área de parede), divisórias entre zonas de mesas, cortinas pesadas. Objetivo: T ≤ 0.8 s para restaurantes, T ≤ 0.6 s para cafetarias. A absorção reduz o acoplamento acústico entre mesas e mitiga a escalada vocal.",
+      "enabled": true,
+      "tags": ["restaurante", "Lombard", "ruído", "absorção", "conforto"]
+    },
+    {
+      "id": "ACUS-REST-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Reverberação em Restaurantes e Cantinas",
+      "description": "O tempo de reverberação no restaurante ({acoustic.restaurantRT} s) excede o máximo recomendado para conforto acústico. Restaurantes com reverberação elevada são percebidos como ruidosos e desconfortáveis.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.restaurantRT",
+          "operator": ">",
+          "value": 0.8
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["restaurant", "restaurante", "dining", "refeitório", "cantina"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.restaurantRT} s",
+      "requiredValue": "T ≤ 0.8 s em restaurantes e cantinas",
+      "remediation": "Instalar absorção: teto falso acústico, painéis decorativos absorventes, cortinas, estofos com materiais absorventes. Em cantinas escolares (RRAE Art. 7.º), o T deve cumprir T ≤ 0.15 × V^(1/3) para V ≤ 250 m³ ou T ≤ 0.12 × V^(1/3) para V > 250 m³. Mesas com tampo absorvente e cadeiras estofadas contribuem para a absorção.",
+      "enabled": true,
+      "tags": ["restaurante", "cantina", "reverberação", "absorção", "conforto"]
+    },
+    {
+      "id": "ACUS-REST-03",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 13.º — Ruído de Restaurante para Vizinhança (RGR)",
+      "description": "O ruído emitido pelo restaurante para a vizinhança ({acoustic.restaurantExteriorNoise} dB(A)) excede os limites do RGR. O critério de incomodidade limita o ruído emergente a +5 dB(A) acima do residual no período diurno e +3 dB(A) no noturno.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.restaurantExteriorNoise",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["restaurant", "restaurante", "bar", "café"]
+        },
+        {
+          "field": "acoustic.hasNoiseComplaint",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Ruído emergente = +{acoustic.restaurantExteriorNoise} dB(A) acima do residual",
+      "requiredValue": "Ruído emergente ≤ +5 dB(A) diurno / +3 dB(A) noturno (RGR Art. 13.º)",
+      "remediation": "Implementar medidas de redução de ruído para o exterior: reforçar isolamento da envolvente (paredes e janelas), instalar portas de antecâmara, limitar horários de esplanada, instalar limitador de nível no sistema de som, silenciar sistemas de extração e AVAC no exterior. Realizar medição de conformidade conforme RGR.",
+      "enabled": true,
+      "tags": ["restaurante", "RGR", "vizinhança", "incomodidade", "ruído noturno"]
+    },
+    {
+      "id": "ACUS-GYM-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º / Art. 7.º — Absorção Acústica em Ginásios e Pavilhões",
+      "description": "O tempo de reverberação no ginásio ({acoustic.gymRT} s) excede o máximo regulamentar. Ginásios e pavilhões desportivos, por terem grandes volumes e superfícies duras, tendem a reverberações excessivas que impedem comunicação e são desconfortáveis.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.gymRT",
+          "operator": "formula_gt",
+          "value": "0.12 * Math.pow(acoustic.roomVolume, 1/3)"
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["gymnasium", "ginásio", "sports-hall", "pavilhão", "gym"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.gymRT} s (V = {acoustic.roomVolume} m³)",
+      "requiredValue": "T ≤ 0.12 × V^(1/3) s (ginásios e pavilhões, V > 250 m³)",
+      "remediation": "Instalar absorção de alto desempenho: painéis acústicos resistentes ao impacto nas paredes (até 3 m de altura com proteção anti-vandalismo, acima com painéis absorventes standard), teto acústico suspenso (baffles verticais ou painéis horizontais α_w ≥ 0.80), absorção atrás de tabelas de basquetebol. Os materiais devem resistir a impactos de bola conforme EN 13964.",
+      "enabled": true,
+      "tags": ["ginásio", "pavilhão", "reverberação", "absorção", "desporto", "impacto"]
+    },
+    {
+      "id": "ACUS-GYM-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Isolamento de Ginásio para Compartimentos Adjacentes",
+      "description": "O isolamento a sons de percussão do ginásio para espaços habitáveis adjacentes ({acoustic.gymImpactNoise} dB) excede o limite. Atividades desportivas geram impactos severos (quedas de pesos, saltos, corrida) que se transmitem pela estrutura.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.gymImpactNoise",
+          "operator": ">",
+          "value": 50
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["gymnasium", "ginásio", "sports-hall", "pavilhão", "gym", "fitness"]
+        }
+      ],
+      "currentValueTemplate": "L'nT,w = {acoustic.gymImpactNoise} dB",
+      "requiredValue": "L'nT,w ≤ 50 dB (ginásio para espaços habitáveis)",
+      "remediation": "Isolar percussão: pavimento flutuante reforçado com camada resiliente de elevada espessura (≥ 25 mm de borracha reciclada ou manta de poliuretano), pavimento desportivo com subcamada de absorção de impacto, laje estrutural de massa elevada (≥ 25 cm de betão). Para salas de musculação com queda de pesos: plataformas de impacto sobre apoios antivibráticos independentes.",
+      "enabled": true,
+      "tags": ["ginásio", "percussão", "impacto", "pavimento flutuante", "fitness"]
+    },
+    {
+      "id": "ACUS-POOL-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Condicionamento Acústico de Piscinas Cobertas",
+      "description": "O tempo de reverberação na piscina coberta ({acoustic.poolRT} s) excede o máximo recomendado de 2.0 s. Piscinas cobertas são acusticamente desafiantes: grande volume, superfícies duras (água, azulejo, betão, vidro) e fontes de ruído intensas (chapinhamento, vozes, equipamento de filtragem).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.poolRT",
+          "operator": ">",
+          "value": 2.0
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["swimming-pool", "piscina", "natação", "indoor-pool"]
+        }
+      ],
+      "currentValueTemplate": "T = {acoustic.poolRT} s",
+      "requiredValue": "T ≤ 2.0 s em piscinas cobertas",
+      "remediation": "Instalar absorção resistente à humidade: painéis acústicos de alumínio perfurado com lã mineral hidrófuga no teto (α_w ≥ 0.80), baffles suspensos em material resistente à corrosão, painéis acústicos em resina melamínica nas paredes acima de 2 m. Todos os materiais devem ser classe de humidade H conforme EN 13964 e resistentes a ambientes com cloro. A absorção deve cobrir ≥ 60% da área do teto.",
+      "enabled": true,
+      "tags": ["piscina", "reverberação", "humidade", "absorção", "cloro"]
+    },
+    {
+      "id": "ACUS-POOL-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 6.º — Ruído de Equipamentos de Piscina",
+      "description": "O nível de ruído dos equipamentos de filtragem e AVAC da piscina ({acoustic.poolEquipmentNoise} dB(A)) excede o limite para o conforto dos utilizadores. Bombas de circulação, sistemas de filtração e desumidificação geram ruído significativo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.poolEquipmentNoise",
+          "operator": ">",
+          "value": 45
+        },
+        {
+          "field": "acoustic.roomFunction",
+          "operator": "in",
+          "value": ["swimming-pool", "piscina", "natação", "indoor-pool"]
+        }
+      ],
+      "currentValueTemplate": "LAr,nT = {acoustic.poolEquipmentNoise} dB(A)",
+      "requiredValue": "LAr,nT ≤ 45 dB(A) (ruído de equipamentos na nave da piscina)",
+      "remediation": "Isolar equipamentos: sala técnica de filtragem com isolamento reforçado (D'nT,w ≥ 55 dB), bombas sobre apoios antivibráticos, condutas de AVAC e desumidificação com silenciadores, difusores de baixa velocidade (≤ 3 m/s). Separar a sala de máquinas da nave da piscina com paredes de massa elevada e porta acústica.",
+      "enabled": true,
+      "tags": ["piscina", "equipamentos", "filtragem", "AVAC", "desumidificação"]
+    },
+    {
+      "id": "ACUS-GENENC-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º, n.º 1, alínea e) — Encapsulamento Acústico de Geradores",
+      "description": "O gerador de emergência não possui encapsulamento acústico adequado. Geradores a diesel emitem tipicamente 95–105 dB(A) a 1 m, requerendo atenuação de 40–60 dB para cumprir limites regulamentares em zonas habitáveis adjacentes e na vizinhança.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.hasGeneratorEnclosure",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasGenerator",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Encapsulamento com atenuação ≥ 40 dB(A)",
+      "remediation": "Encapsular o gerador: cabina insonorizada com paredes de painel sandwich (aço + lã mineral ≥ 100 mm, Rw ≥ 45 dB), silenciador de escape na saída dos gases (atenuação ≥ 35 dB), admissão de ar com atenuador (labirinto ou splitter), apoios antivibráticos de mola (f0 ≤ 10 Hz). O encapsulamento deve garantir LAeq ≤ 75 dB(A) a 1 m do exterior da cabina e cumprimento dos limites do RGR na vizinhança.",
+      "enabled": true,
+      "tags": ["gerador", "encapsulamento", "emergência", "diesel", "insonorização"]
+    },
+    {
+      "id": "ACUS-GENENC-02",
+      "regulationId": "rgr-dl-9-2007",
+      "article": "Art. 13.º — Ruído de Gerador para o Exterior (RGR)",
+      "description": "O nível de ruído do gerador medido na vizinhança ({acoustic.generatorExteriorNoise} dB(A)) excede os limites do RGR. O funcionamento de geradores, mesmo de emergência, deve cumprir os critérios de incomodidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.generatorExteriorNoise",
+          "operator": ">",
+          "value": 55
+        },
+        {
+          "field": "acoustic.hasGenerator",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "acoustic.buildingLocation",
+          "operator": "==",
+          "value": "zona-sensivel"
+        }
+      ],
+      "currentValueTemplate": "LAeq = {acoustic.generatorExteriorNoise} dB(A) na vizinhança",
+      "requiredValue": "Lden ≤ 55 dB(A) na zona sensível (RGR)",
+      "remediation": "Reforçar atenuação: encapsulamento com desempenho superior (Rw ≥ 50 dB), silenciador de escape de duplo estágio (reativo + dissipativo), condutas de ventilação com atenuadores de comprimento ≥ 1500 mm, barreira acústica exterior. Limitar testes de gerador a horários diurnos em dias úteis conforme RGR.",
+      "enabled": true,
+      "tags": ["gerador", "RGR", "vizinhança", "incomodidade", "zona sensível"]
+    },
+    {
+      "id": "ACUS-TRANSF-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º, n.º 1, alínea e) — Isolamento Acústico de Sala de Transformador",
+      "description": "A sala do transformador elétrico não possui isolamento acústico adequado ({acoustic.transformerRoomInsulation} dB). Transformadores emitem ruído tonal a 100 Hz (e harmónicas) que é particularmente perturbante e se transmite eficazmente pela estrutura.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.transformerRoomInsulation",
+          "operator": "<",
+          "value": 55
+        },
+        {
+          "field": "acoustic.hasTransformerRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.transformerRoomInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 55 dB (sala de transformador para habitações)",
+      "remediation": "Isolar a sala do transformador: paredes de betão ≥ 25 cm ou alvenaria dupla com caixa-de-ar ≥ 100 mm, laje com tratamento a baixas frequências (pavimento flutuante com f0 ≤ 15 Hz), porta acústica (Rw ≥ 40 dB), transformador sobre apoios antivibráticos de mola desligados da laje do edifício. Prever absorção a 100 Hz no interior (ressonadores, membranas). A componente tonal exige penalização de +3 dB na avaliação.",
+      "enabled": true,
+      "tags": ["transformador", "isolamento", "tonal", "100 Hz", "vibração"]
+    },
+    {
+      "id": "ACUS-TRANSF-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Vibração de Transformador para Estrutura",
+      "description": "A vibração transmitida pelo transformador à estrutura do edifício não está controlada. Transformadores transmitem vibrações a 100 Hz diretamente à laje e paredes, causando ruído estrutural audível em pisos distantes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.transformerVibrationIsolated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "acoustic.hasTransformerRoom",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional", "hotel", "hoteleiro", "hospital", "hospitalar"]
+        }
+      ],
+      "requiredValue": "Isolamento vibratório com eficiência ≥ 95% a 100 Hz",
+      "remediation": "Isolar o transformador vibraticamente: base inercial de betão (massa ≥ 1.5× a massa do transformador) sobre molas de aço (f0 ≤ 8 Hz, eficiência de isolamento ≥ 95% a 100 Hz), com ligações elétricas flexíveis (cabos com folga). A base não deve ter contacto rígido com a laje do edifício. Verificar ausência de pontes vibratórias (tubos rígidos, cabos tensionados).",
+      "enabled": true,
+      "tags": ["transformador", "vibração", "isolamento vibratório", "molas", "estrutura"]
+    },
+    {
+      "id": "ACUS-PUMP-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º, n.º 1, alínea e) — Isolamento Vibratório de Sala de Bombas",
+      "description": "As bombas da sala de bombagem não estão isoladas vibraticamente da estrutura do edifício. Bombas centrífugas e de pressurização transmitem vibrações pela laje que são audíveis como ruído de baixa frequência em habitações distantes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.pumpVibrationIsolated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "acoustic.hasPumpRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Isolamento vibratório de bombas com eficiência ≥ 90%",
+      "remediation": "Isolar bombas vibraticamente: bases inerciais sobre molas de aço (f0 ≤ 8 Hz para bombas ≤ 1500 rpm) ou coxins de neoprene (f0 ≤ 12 Hz para bombas > 1500 rpm), ligações flexíveis em todas as tubagens (juntas de borracha ou fole metálico), tubagens com suportes resilientes nos primeiros 5 m. Pavimento flutuante na sala de bombas se adjacente a habitações. Verificar ausência de contacto rígido entre tubagens e estrutura.",
+      "enabled": true,
+      "tags": ["bombas", "vibração", "isolamento vibratório", "sala de bombas", "pressurização"]
+    },
+    {
+      "id": "ACUS-PUMP-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Ruído de Sala de Bombas em Habitações Adjacentes",
+      "description": "O nível de ruído da sala de bombas medido na habitação adjacente ({acoustic.pumpRoomNoiseInDwelling} dB(A)) excede o limite regulamentar. O RRAE exige LAr,nT ≤ 32 dB(A) em quartos e ≤ 35 dB(A) em salas de estar para equipamentos coletivos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.pumpRoomNoiseInDwelling",
+          "operator": ">",
+          "value": 32
+        },
+        {
+          "field": "acoustic.hasPumpRoom",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "LAr,nT = {acoustic.pumpRoomNoiseInDwelling} dB(A) (quarto adjacente)",
+      "requiredValue": "LAr,nT ≤ 32 dB(A) em quartos / ≤ 35 dB(A) em salas",
+      "remediation": "Reduzir o ruído transmitido: reforçar isolamento da sala de bombas (paredes Rw ≥ 55 dB, porta acústica Rw ≥ 40 dB), melhorar isolamento vibratório das bombas (molas com f0 mais baixa), instalar juntas flexíveis em tubagens, verificar e eliminar contactos rígidos. Considerar relocação das bombas para cave ou espaço não adjacente a habitações.",
+      "enabled": true,
+      "tags": ["bombas", "ruído", "habitação", "LAr,nT", "equipamentos coletivos"]
+    },
+    {
+      "id": "ACUS-PIPE-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Ruído de Tubagens nas Habitações",
+      "description": "O ruído transmitido por tubagens de abastecimento e drenagem é audível nas habitações ({acoustic.pipeNoiseLevel} dB(A)). A transmissão de ruído por tubagens (fluxo de água, golpe de aríete, ruído de drenagem) é uma queixa frequente em edifícios multifamiliares.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.pipeNoiseLevel",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "acoustic.hasPipesInWalls",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "Ruído de tubagens = {acoustic.pipeNoiseLevel} dB(A)",
+      "requiredValue": "Ruído de tubagens ≤ 30 dB(A) em quartos",
+      "remediation": "Reduzir ruído de tubagens: envolver tubagens com material resiliente (manga isolante ≥ 10 mm), fixar com braçadeiras com componente elástico, instalar válvulas anti-golpe de aríete, utilizar tubos de PVC insonorizado (tipo db) para drenagem, desligar tubagens das paredes com suportes resilientes. Nunca fixar tubagens rigidamente a paredes divisórias entre fogos.",
+      "enabled": true,
+      "tags": ["tubagens", "ruído", "drenagem", "golpe de aríete", "habitação"]
+    },
+    {
+      "id": "ACUS-PIPE-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Tubos de Queda de Drenagem em Paredes Divisórias",
+      "description": "Tubos de queda de drenagem estão localizados em paredes divisórias entre fogos ou entre fogos e zonas comuns. Esta disposição é a principal causa de queixas de ruído de tubagens em edifícios habitacionais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.drainPipeInPartyWall",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "requiredValue": "Tubos de queda fora de paredes divisórias ou com isolamento reforçado",
+      "remediation": "Relocar tubos de queda para ductos técnicos dedicados ou paredes interiores do fogo (nunca em paredes meeiras). Se relocação impossível: envolver tubo com material resiliente de alta densidade (≥ 25 mm), construir contra-parede dessolidarizada do lado da habitação afetada, utilizar tubos de queda insonorizados (tipo db com 3 camadas). O ruído de queda vertical de água em tubos pode atingir 50 dB(A) sem tratamento.",
+      "enabled": true,
+      "tags": ["tubagens", "drenagem", "tubo de queda", "parede divisória", "habitação"]
+    },
+    {
+      "id": "ACUS-WC-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º, n.º 1 — Ruído de Instalações Sanitárias para Quartos Adjacentes",
+      "description": "O ruído das instalações sanitárias é audível em quartos adjacentes ({acoustic.wcNoiseInBedroom} dB(A)). O ruído de descarga de autoclismo, torneiras e drenagem transmitido para quartos do fogo vizinho compromete o descanso noturno.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.wcNoiseInBedroom",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "acoustic.wcAdjacentToBedroom",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "LAr,nT = {acoustic.wcNoiseInBedroom} dB(A) (quarto adjacente)",
+      "requiredValue": "LAr,nT ≤ 30 dB(A) (ruído de IS em quarto adjacente de outro fogo)",
+      "remediation": "Solução integrada: parede de separação IS/quarto com Rw ≥ 56 dB (parede dupla dessolidarizada), autoclismos de baixo ruído (classe I conforme EN 14688), torneiras com limitador de caudal, tubagens com manga isolante e braçadeiras resilientes, pavimento flutuante sob sanitas e bases de duche. Idealmente, não colocar IS adjacente a quartos de fogo vizinho — prever zonas-tampão (armários, corredores).",
+      "enabled": true,
+      "tags": ["instalações sanitárias", "quartos", "ruído noturno", "autoclismo", "habitação"]
+    },
+    {
+      "id": "ACUS-STAIR-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Isolamento de Caixa de Escadas para Habitações Adjacentes",
+      "description": "O isolamento acústico da caixa de escadas para habitações adjacentes ({acoustic.stairwellInsulation} dB) é insuficiente. Caixas de escada são vias de propagação de ruído aéreo (conversas, batidas de portas) e de percussão (passos, arrastar de objetos).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.stairwellInsulation",
+          "operator": "<",
+          "value": 48
+        },
+        {
+          "field": "acoustic.hasStairwell",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "D'nT,w = {acoustic.stairwellInsulation} dB",
+      "requiredValue": "D'nT,w ≥ 48 dB (caixa de escadas para habitações)",
+      "remediation": "Reforçar isolamento: paredes de separação com Rw ≥ 52 dB (alvenaria ≥ 20 cm rebocada ou betão ≥ 18 cm), porta de entrada de habitação com Rw ≥ 28 dB e vedação perimetral, absorção acústica no interior da caixa de escadas (teto falso, painéis nas paredes α_w ≥ 0.70). Prever antecâmara ou hall de entrada entre a caixa de escadas e o interior da habitação.",
+      "enabled": true,
+      "tags": ["escadas", "isolamento", "caixa de escadas", "habitação", "porta"]
+    },
+    {
+      "id": "ACUS-STAIR-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Absorção Acústica em Caixa de Escadas",
+      "description": "A caixa de escadas não possui tratamento de absorção acústica. As superfícies duras típicas (betão, reboco, pedra) criam reverberação elevada que amplifica ruídos de passos, portas e conversas, aumentando a perturbação nas habitações.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.stairwellAbsorption",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasStairwell",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">=",
+          "value": 4
+        }
+      ],
+      "requiredValue": "Absorção acústica com α_w ≥ 0.70 em ≥ 50% do teto",
+      "remediation": "Instalar absorção na caixa de escadas: teto falso acústico nos patamares (α_w ≥ 0.80), painéis absorventes nas paredes laterais acima de 2 m (classe B de reação ao fogo), revestimento resiliente nos degraus (reduz percussão dos passos). A absorção reduz o nível reverberante em 3–6 dB e melhora significativamente o conforto acústico na zona comum.",
+      "enabled": true,
+      "tags": ["escadas", "absorção", "reverberação", "zonas comuns", "patamares"]
+    },
+    {
+      "id": "ACUS-STAIR-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "Art. 5.º — Percussão de Escadas para Habitações",
+      "description": "O ruído de percussão das escadas medido na habitação adjacente ({acoustic.stairImpactNoise} dB) excede o limite regulamentar. Passos nas escadas transmitem-se pela estrutura e são particularmente perturbantes durante o período noturno.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "acoustic.stairImpactNoise",
+          "operator": ">",
+          "value": 60
+        },
+        {
+          "field": "acoustic.hasStairwell",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": ["residential", "housing", "habitacional"]
+        }
+      ],
+      "currentValueTemplate": "L'nT,w = {acoustic.stairImpactNoise} dB",
+      "requiredValue": "L'nT,w ≤ 60 dB (escadas para habitações)",
+      "remediation": "Reduzir percussão: revestimento resiliente nos degraus (borracha, vinil acústico ou alcatifa com ΔLw ≥ 15 dB), dessolidarização estrutural da escada em relação às paredes (apoios elásticos nos patamares), pavimento flutuante nos patamares. Para escadas metálicas: subcamada de amortecimento viscoelástico nos degraus. Evitar escadas com ligação estrutural direta às paredes divisórias dos fogos.",
+      "enabled": true,
+      "tags": ["escadas", "percussão", "passos", "habitação", "revestimento"]
+    },
+    {
+      "id": "ACUS-COMRPT-01",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE Art. 12.º — Relatório de Comissionamento Acústico",
+      "description": "Não foi elaborado relatório de comissionamento acústico do edifício. O comissionamento acústico verifica sistematicamente o cumprimento de todos os requisitos acústicos do RRAE antes da entrega do edifício ao utilizador final.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.hasCommissioningReport",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "project.phase",
+          "operator": "in",
+          "value": ["pré-utilização", "pre-occupation", "commissioning", "comissionamento"]
+        },
+        {
+          "field": "project.requiresLicensing",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Relatório de comissionamento acústico completo",
+      "remediation": "Elaborar relatório de comissionamento acústico incluindo: 1) Ensaios de isolamento a sons aéreos (D'nT,w) entre todas as tipologias de separação, 2) Percussão (L'nT,w) em pavimentos tipo, 3) Fachada (D2m,nT,w) em fachadas representativas, 4) Ruído de equipamentos (LAr,nT) para AVAC, elevadores, bombas, 5) Tempo de reverberação (T) em espaços com requisitos específicos. Mínimo 10% das unidades testadas para cada parâmetro.",
+      "enabled": true,
+      "tags": ["comissionamento", "relatório", "ensaios", "licença", "entrega"]
+    },
+    {
+      "id": "ACUS-COMRPT-02",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE — Amostragem de Ensaios de Comissionamento",
+      "description": "A amostragem de ensaios acústicos de comissionamento ({acoustic.commissioningSampleRate}%) é insuficiente. Para edifícios com mais de 20 unidades, recomenda-se uma taxa mínima de amostragem de 10% das unidades por parâmetro acústico ensaiado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "acoustic.commissioningSampleRate",
+          "operator": "<",
+          "value": 10
+        },
+        {
+          "field": "acoustic.hasCommissioningReport",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "Taxa de amostragem = {acoustic.commissioningSampleRate}%",
+      "requiredValue": "Amostragem ≥ 10% das unidades por parâmetro",
+      "remediation": "Aumentar a amostragem de ensaios: ensaiar no mínimo 10% das unidades para cada parâmetro (sons aéreos, percussão, fachada), incluindo obrigatoriamente as situações mais desfavoráveis (fogos adjacentes a salas de máquinas, garagens, elevadores, fachadas ruidosas). Para edifícios com tipologias repetitivas, ensaiar pelo menos 2 unidades de cada tipologia.",
+      "enabled": true,
+      "tags": ["comissionamento", "amostragem", "ensaios", "estatística", "unidades"]
+    },
+    {
+      "id": "ACUS-COMRPT-03",
+      "regulationId": "dl-96-2008-rrae",
+      "article": "RRAE — Registo de Não Conformidades no Comissionamento",
+      "description": "O relatório de comissionamento não inclui procedimento de registo e resolução de não conformidades acústicas. Todas as não conformidades devem ser documentadas, corrigidas e re-ensaiadas antes da entrega.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "acoustic.hasNonConformityProcedure",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "acoustic.hasCommissioningReport",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "requiredValue": "Procedimento de registo e resolução de não conformidades",
+      "remediation": "Estabelecer procedimento formal: 1) Identificação da não conformidade (parâmetro, localização, valor medido vs limite), 2) Diagnóstico da causa (deficiência construtiva, erro de projeto, transmissão marginal), 3) Proposta de correção pelo consultor acústico, 4) Implementação da correção pelo empreiteiro, 5) Re-ensaio para verificação. Manter registo documental de todo o processo com fotografias e relatórios técnicos.",
+      "enabled": true,
+      "tags": ["comissionamento", "não conformidade", "correção", "registo", "qualidade"]
     }
   ]
 }

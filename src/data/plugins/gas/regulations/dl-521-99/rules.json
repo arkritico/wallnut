@@ -8027,6 +8027,1236 @@
       "remediation": "Instalar unidade de tratamento de biogás antes do ponto de injeção: torre de dessulfurização (carvão ativado impregnado ou biofiltro) para reduzir H₂S a < 5 mg/m³, filtro de carvão ativado para remoção de siloxanos, e desumidificador (refrigeração ou adsorção) para ponto de orvalho < -5°C. Monitorizar continuamente os teores de contaminantes e registar os dados. Substituir os meios filtrantes conforme indicação do fabricante.",
       "enabled": true,
       "tags": ["biogás", "tratamento", "dessulfurização", "siloxanos", "contaminantes"]
+    },
+    {
+      "id": "GAS-EPRESS-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 18.º -- Regulação da Pressão de Entrada da Rede",
+      "description": "A pressão de entrada do gás no edifício deve ser regulada por um regulador de pressão dimensionado para o caudal máximo previsto, reduzindo a pressão da rede de distribuição (até 4 bar em média pressão) para a pressão de utilização (21 mbar para gás natural).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.entryPressure.hasRegulator",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.entryPressure.networkPressureBar",
+          "operator": ">",
+          "value": 0.075
+        }
+      ],
+      "currentValueTemplate": "{gas.entryPressure.hasRegulator}",
+      "requiredValue": "Regulador de pressão de entrada instalado e dimensionado",
+      "remediation": "Instalar regulador de pressão na entrada do edifício, a jusante da válvula de corte geral, dimensionado para o caudal máximo simultâneo da instalação. O regulador deve ser certificado EN 88-1 ou EN 334, com pressão de saída ajustada para 21 mbar (gás natural) ou 37 mbar (GPL). Incluir manómetro de controlo a montante e a jusante.",
+      "enabled": true,
+      "tags": ["pressão", "entrada", "regulador", "rede", "dimensionamento"]
+    },
+    {
+      "id": "GAS-EPRESS-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 12.º -- Segurança contra Sobrepressão na Entrada",
+      "description": "O regulador de pressão de entrada deve incorporar dispositivo de segurança contra sobrepressão (válvula de alívio ou bloqueio por sobrepressão - OPSO) que atue quando a pressão a jusante exceda 1,5 vezes a pressão nominal de serviço.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.entryPressure.hasOverpressureProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.entryPressure.hasRegulator",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.entryPressure.hasOverpressureProtection}",
+      "requiredValue": "Dispositivo de segurança contra sobrepressão (OPSO) integrado no regulador",
+      "remediation": "Substituir o regulador por modelo com dispositivo OPSO (Over Pressure Shut Off) integrado, calibrado para bloquear a passagem de gás quando a pressão a jusante exceder 1,5 vezes a pressão nominal de serviço. Verificar anualmente o correto funcionamento do dispositivo OPSO com ensaio funcional documentado.",
+      "enabled": true,
+      "tags": ["pressão", "sobrepressão", "OPSO", "regulador", "segurança"]
+    },
+    {
+      "id": "GAS-EPRESS-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 18.º-A -- Regulador de Pressão de Entrada - Proteção contra Subpressão",
+      "description": "O regulador de pressão de entrada deve incluir dispositivo de segurança contra subpressão (UPSO - Under Pressure Shut Off) que bloqueie o fornecimento quando a pressão a montante desça abaixo do limiar mínimo de operação segura.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.entryPressure.hasUnderpressureProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.entryPressure.hasRegulator",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.entryPressure.hasUnderpressureProtection}",
+      "requiredValue": "Dispositivo de segurança contra subpressão (UPSO) integrado no regulador",
+      "remediation": "Instalar regulador com dispositivo UPSO (Under Pressure Shut Off) que corte automaticamente o fornecimento de gás quando a pressão de entrada descer abaixo de 50% da pressão nominal mínima de operação. O rearme deve ser manual para evitar reposição automática em condições inseguras.",
+      "enabled": true,
+      "tags": ["pressão", "subpressão", "UPSO", "regulador", "segurança"]
+    },
+    {
+      "id": "GAS-DPRESS-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 19.º -- Classificação de Pressão da Rede Distrital",
+      "description": "As redes de distribuição de gás do distrito devem ser classificadas conforme os escalões de pressão: baixa pressão (≤ 75 mbar), média pressão A (> 75 mbar e ≤ 2 bar), média pressão B (> 2 bar e ≤ 4 bar) e alta pressão (> 4 bar), com as tubagens e acessórios dimensionados para o escalão correspondente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.districtPressure.pressureClassDocumented",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.districtPressure.pressureClassDocumented}",
+      "requiredValue": "Classificação de pressão da rede documentada no projeto",
+      "remediation": "Documentar no projeto de gás a classificação de pressão da rede de distribuição local conforme os escalões regulamentares. Verificar junto da empresa distribuidora a pressão nominal e máxima de serviço no ponto de entrega. Garantir que todos os componentes (tubagens, válvulas, acessórios, reguladores) estão classificados para o escalão de pressão aplicável.",
+      "enabled": true,
+      "tags": ["pressão", "classificação", "rede distrital", "escalão", "projeto"]
+    },
+    {
+      "id": "GAS-DPRESS-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 8.º -- Materiais por Escalão de Pressão",
+      "description": "Os materiais da tubagem devem ser compatíveis com o escalão de pressão da rede: aço ou polietileno PE100 SDR11 para média pressão B, cobre ou aço para média pressão A, e cobre, aço ou multicamada certificada para baixa pressão.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.districtPressure.materialMatchesPressureClass",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.districtPressure.pressureClassDocumented",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.districtPressure.materialMatchesPressureClass}",
+      "requiredValue": "Materiais da tubagem compatíveis com o escalão de pressão",
+      "remediation": "Verificar que os materiais utilizados estão certificados para o escalão de pressão da rede: para média pressão B (> 2 bar), usar exclusivamente aço conforme EN 10208-1 ou PE100 SDR11 conforme EN 1555; para média pressão A (75 mbar a 2 bar), aço ou cobre conforme EN 1057; para baixa pressão (≤ 75 mbar), aço, cobre ou multicamada conforme EN 15875. Substituir quaisquer componentes não conformes.",
+      "enabled": true,
+      "tags": ["pressão", "materiais", "escalão", "tubagem", "certificação"]
+    },
+    {
+      "id": "GAS-ODOR-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 14.º -- Odorização do Gás Natural",
+      "description": "O gás natural distribuído em rede deve ser odorizado com tetra-hidro-tiofeno (THT) ou mercaptano numa concentração que permita a deteção olfativa do gás quando a concentração no ar atinja 1/5 do limite inferior de explosividade (LIE).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.odorization.gasOdorized",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.gasType",
+          "operator": "==",
+          "value": "natural_gas"
+        }
+      ],
+      "currentValueTemplate": "{gas.odorization.gasOdorized}",
+      "requiredValue": "Gás natural odorizado para deteção a 1/5 do LIE",
+      "remediation": "Verificar junto da empresa distribuidora que o gás natural fornecido está odorizado conforme a regulamentação. A concentração de odorizante (THT ou mercaptano) deve permitir a deteção olfativa por pelo menos 90% da população quando a concentração de gás no ar atinja 20% do LIE (1% vol. para gás natural). Em caso de suspeita de falta de odorização, comunicar imediatamente à distribuidora e à DGEG.",
+      "enabled": true,
+      "tags": ["odorização", "THT", "mercaptano", "LIE", "deteção olfativa"]
+    },
+    {
+      "id": "GAS-ODOR-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 14.º-A -- Concentração Mínima de Odorizante",
+      "description": "A concentração mínima de odorizante no gás natural deve ser de 15 mg/m³ de THT (tetra-hidro-tiofeno) ou equivalente em mercaptanos, medida no ponto de entrega ao consumidor.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.odorization.odorantConcentrationMgM3",
+          "operator": "<",
+          "value": 15
+        },
+        {
+          "field": "gas.odorization.gasOdorized",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.odorization.odorantConcentrationMgM3} mg/m³",
+      "requiredValue": ">= 15 mg/m³ de THT ou equivalente no ponto de entrega",
+      "remediation": "Reportar à empresa distribuidora a concentração insuficiente de odorizante medida no ponto de entrega. A distribuidora deve ajustar a dosagem no sistema de odorização centralizado. Efetuar nova medição de confirmação após 48 horas. Manter registos das medições conforme EN 16723-1.",
+      "enabled": true,
+      "tags": ["odorização", "concentração", "THT", "15 mg/m³", "EN 16723-1"]
+    },
+    {
+      "id": "GAS-ODOR-03",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 6.º -- Verificação Periódica da Odorização do GPL",
+      "description": "O GPL (butano ou propano) deve conter odorizante em quantidade suficiente para ser detetado olfativamente a 20% do LIE. Em instalações com reservatório de GPL, a verificação da odorização deve ser feita anualmente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.odorization.lpgOdorizationVerified",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.gasType",
+          "operator": "in",
+          "value": ["lpg_butane", "lpg_propane", "lpg_mix"]
+        }
+      ],
+      "currentValueTemplate": "{gas.odorization.lpgOdorizationVerified}",
+      "requiredValue": "Verificação anual da odorização do GPL documentada",
+      "remediation": "Efetuar verificação anual da odorização do GPL no ponto de utilização, mediante ensaio olfativo normalizado ou medição instrumental da concentração de mercaptano. Registar os resultados em relatório datado e assinado por técnico habilitado. Em instalações com reservatório próprio, verificar também o sistema de injeção de odorizante.",
+      "enabled": true,
+      "tags": ["odorização", "GPL", "verificação", "anual", "mercaptano"]
+    },
+    {
+      "id": "GAS-QUAL-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 13.º -- Monitorização da Qualidade do Gás",
+      "description": "Em edifícios com consumo superior a 100 m³/h de gás natural, deve ser instalado sistema de monitorização contínua da qualidade do gás (poder calorífico, índice de Wobbe, teor de H₂S) no ponto de entrega.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.quality.hasQualityMonitoring",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.consumption.maxFlowM3h",
+          "operator": ">",
+          "value": 100
+        }
+      ],
+      "currentValueTemplate": "{gas.quality.hasQualityMonitoring}",
+      "requiredValue": "Sistema de monitorização contínua da qualidade do gás instalado",
+      "remediation": "Instalar cromatógrafo de gás em linha ou analisador de qualidade no ponto de entrega que monitorize continuamente o poder calorífico superior, o índice de Wobbe (deve estar entre 48,2 e 56,5 MJ/m³ para gás H), e o teor de H₂S (máx. 5 mg/m³). O sistema deve registar os dados e gerar alarme em caso de desvio da especificação conforme EN 16726.",
+      "enabled": true,
+      "tags": ["qualidade", "monitorização", "índice de Wobbe", "poder calorífico", "EN 16726"]
+    },
+    {
+      "id": "GAS-QUAL-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 7.º -- Índice de Wobbe na Receção",
+      "description": "O índice de Wobbe do gás fornecido deve estar dentro dos limites da família de gás declarada (Família H: 48,2-56,5 MJ/m³) para garantir o funcionamento seguro e eficiente dos aparelhos de queima.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.quality.wobbeIndexMJm3",
+          "operator": "not_in_range",
+          "value": [48.2, 56.5]
+        },
+        {
+          "field": "gas.gasType",
+          "operator": "==",
+          "value": "natural_gas"
+        }
+      ],
+      "currentValueTemplate": "{gas.quality.wobbeIndexMJm3} MJ/m³",
+      "requiredValue": "Índice de Wobbe entre 48,2 e 56,5 MJ/m³ (Família H)",
+      "remediation": "Comunicar imediatamente à empresa distribuidora o desvio do índice de Wobbe fora dos limites regulamentares. Suspender a utilização dos aparelhos de queima até confirmação de que a qualidade do gás está reposta dentro da especificação. Verificar se os aparelhos necessitam de reajuste ou substituição de injetores para a qualidade de gás fornecida.",
+      "enabled": true,
+      "tags": ["qualidade", "índice de Wobbe", "família H", "especificação", "aparelhos"]
+    },
+    {
+      "id": "GAS-BYPASS-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 26.º -- Bypass do Contador de Gás",
+      "description": "Em instalações com consumo superior a 25 m³/h, deve ser prevista tubagem de bypass ao contador de gás com válvulas de seccionamento e contra-medidas de segurança, para permitir manutenção ou substituição do contador sem interrupção do fornecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.meterBypass.hasBypass",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.consumption.maxFlowM3h",
+          "operator": ">",
+          "value": 25
+        }
+      ],
+      "currentValueTemplate": "{gas.meterBypass.hasBypass}",
+      "requiredValue": "Bypass do contador instalado com válvulas de seccionamento",
+      "remediation": "Instalar tubagem de bypass ao contador de gás com duas válvulas de seccionamento (uma a montante e outra a jusante do contador) e uma válvula no troço de bypass, selada pela empresa distribuidora. O bypass deve ter o mesmo diâmetro nominal que a tubagem de alimentação. A válvula de bypass deve estar normalmente fechada e selada.",
+      "enabled": true,
+      "tags": ["bypass", "contador", "manutenção", "válvulas", "seccionamento"]
+    },
+    {
+      "id": "GAS-BYPASS-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 18.º -- Selagem do Bypass do Contador",
+      "description": "A válvula de bypass do contador de gás deve estar selada pela empresa distribuidora com selo de segurança numerado, impedindo abertura não autorizada e consumo não contabilizado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.meterBypass.bypassValveSealed",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.meterBypass.hasBypass",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.meterBypass.bypassValveSealed}",
+      "requiredValue": "Válvula de bypass selada pela distribuidora com selo numerado",
+      "remediation": "Contactar a empresa distribuidora para proceder à selagem da válvula de bypass do contador com selo de segurança numerado. O selo deve ser verificado em cada leitura do contador. A abertura do bypass só é permitida mediante autorização escrita da distribuidora, para operações de manutenção ou substituição do contador.",
+      "enabled": true,
+      "tags": ["bypass", "selagem", "selo", "distribuidora", "segurança"]
+    },
+    {
+      "id": "GAS-COLOR-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 33.º -- Código de Cores da Tubagem de Gás",
+      "description": "As tubagens de gás visíveis devem ser pintadas na cor amarela ocre (RAL 1024) conforme norma NP EN 13348 e ISO 14726, permitindo identificação inequívoca do fluido transportado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.colorCoding.pipesCorrectlyPainted",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasVisiblePipes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.colorCoding.pipesCorrectlyPainted}",
+      "requiredValue": "Tubagens visíveis pintadas em amarelo ocre (RAL 1024)",
+      "remediation": "Pintar todas as tubagens de gás visíveis (não embutidas) na cor amarela ocre RAL 1024 com tinta resistente à corrosão e adequada ao ambiente (interior ou exterior). Em zonas industriais ou técnicas, complementar com setas de sentido de fluxo e identificação do tipo de gás conforme ISO 14726.",
+      "enabled": true,
+      "tags": ["cor", "tubagem", "RAL 1024", "amarelo", "identificação"]
+    },
+    {
+      "id": "GAS-COLOR-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 22.º -- Identificação Cromática em Áreas Técnicas",
+      "description": "Em centrais térmicas, casas de caldeiras e áreas técnicas, as tubagens de gás devem apresentar faixa de identificação amarela com largura mínima de 50 mm a cada 3 metros de tubagem e junto a cada acessório, válvula e penetração.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.colorCoding.technicalAreaBandsApplied",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.building.hasTechnicalRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.colorCoding.technicalAreaBandsApplied}",
+      "requiredValue": "Faixas de identificação amarelas (50 mm) a cada 3 m e junto a acessórios",
+      "remediation": "Aplicar faixas de identificação amarelas com largura mínima de 50 mm em todas as tubagens de gás nas áreas técnicas: junto a cada válvula, acessório, penetração de parede/laje, e a cada 3 metros de troço reto. Incluir legenda 'GÁS NATURAL' ou 'GPL' conforme aplicável, e seta indicativa do sentido de fluxo.",
+      "enabled": true,
+      "tags": ["cor", "faixa", "área técnica", "identificação", "50 mm"]
+    },
+    {
+      "id": "GAS-RISER-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 30.º -- Encamisamento da Coluna Montante de Gás",
+      "description": "A coluna montante de gás em edifícios coletivos deve ser instalada em ducto técnico ventilado (courette) ou encamisada com manga de proteção, assegurando a evacuação de eventuais fugas para o exterior.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.riser.hasVentilatedDuct",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isCollective",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.riser.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.riser.hasVentilatedDuct}",
+      "requiredValue": "Coluna montante em ducto técnico ventilado ou com manga de proteção",
+      "remediation": "Instalar a coluna montante de gás em ducto técnico (courette) com ventilação permanente na base e no topo, comunicando com o exterior. O ducto deve ser construído com materiais incombustíveis (classe A1 ou A2-s1,d0) e ter abertura de inspeção em cada piso. Alternativa: encamisar a tubagem com manga de proteção ventilada conforme EN 15001-1.",
+      "enabled": true,
+      "tags": ["coluna montante", "ducto", "courette", "ventilação", "coletiva"]
+    },
+    {
+      "id": "GAS-RISER-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 20.º -- Ventilação do Ducto da Coluna Montante",
+      "description": "O ducto técnico da coluna montante de gás deve possuir ventilação permanente com abertura inferior (à cota do piso térreo ou cave) e abertura superior (acima da cobertura), com secção livre mínima de 200 cm² cada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.riser.ductVentilationAreaCm2",
+          "operator": "<",
+          "value": 200
+        },
+        {
+          "field": "gas.riser.hasVentilatedDuct",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.riser.ductVentilationAreaCm2} cm²",
+      "requiredValue": ">= 200 cm² de secção livre na abertura inferior e superior do ducto",
+      "remediation": "Verificar e corrigir as aberturas de ventilação do ducto da coluna montante: a abertura inferior deve comunicar com o exterior na base do edifício e a abertura superior deve terminar acima da cobertura (mínimo 0,50 m). Cada abertura deve ter secção livre mínima de 200 cm². Não obstruir as aberturas com equipamentos ou materiais.",
+      "enabled": true,
+      "tags": ["coluna montante", "ducto", "ventilação", "200 cm²", "aberturas"]
+    },
+    {
+      "id": "GAS-RFIRE-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 30.º-A -- Compartimentação Corta-Fogo da Coluna Montante",
+      "description": "O ducto técnico da coluna montante de gás deve ser compartimentado com selagem corta-fogo em cada travessia de laje, com classificação mínima EI 60, para impedir a propagação de incêndio entre pisos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.riserFire.hasFireSealingAtFloors",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.riser.exists",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.building.numberOfFloors",
+          "operator": ">",
+          "value": 1
+        }
+      ],
+      "currentValueTemplate": "{gas.riserFire.hasFireSealingAtFloors}",
+      "requiredValue": "Selagem corta-fogo EI 60 em cada travessia de laje do ducto",
+      "remediation": "Instalar selagem corta-fogo certificada com classificação mínima EI 60 em cada travessia de laje no ducto da coluna montante de gás. Utilizar sistema de selagem intumescente ou argamassa corta-fogo compatível com a tubagem de gás (aço ou cobre). A selagem deve ser contínua em todo o perímetro da passagem e identificada com placa indicativa do fabricante e classificação.",
+      "enabled": true,
+      "tags": ["corta-fogo", "coluna montante", "EI 60", "laje", "compartimentação"]
+    },
+    {
+      "id": "GAS-RFIRE-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 30.º-B -- Deteção de Gás na Coluna Montante",
+      "description": "Em edifícios com mais de 8 pisos, o ducto da coluna montante de gás deve dispor de detetor de gás no topo do ducto, interligado com a eletroválvula de corte geral na base do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.riserFire.hasRiserGasDetector",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.building.numberOfFloors",
+          "operator": ">",
+          "value": 8
+        },
+        {
+          "field": "gas.riser.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.riserFire.hasRiserGasDetector}",
+      "requiredValue": "Detetor de gás no topo do ducto da coluna montante interligado com corte geral",
+      "remediation": "Instalar detetor de gás no topo do ducto da coluna montante, na zona de maior acumulação (teto do último piso para gás natural). O detetor deve estar interligado à eletroválvula de corte geral na base do edifício e ao sistema de alarme central. Calibrar semestralmente e ensaiar trimestralmente a interligação com a eletroválvula.",
+      "enabled": true,
+      "tags": ["coluna montante", "detetor", "pisos", "corte geral", "interligação"]
+    },
+    {
+      "id": "GAS-RFIRE-03",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 21.º -- Resistência ao Fogo do Ducto da Coluna Montante",
+      "description": "As paredes do ducto técnico da coluna montante de gás devem ter classificação de resistência ao fogo mínima EI 60 em edifícios até 28 m de altura e EI 90 em edifícios acima de 28 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.riserFire.ductWallFireRatingMinutes",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "gas.riser.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.riserFire.ductWallFireRatingMinutes} minutos",
+      "requiredValue": ">= EI 60 (edifícios ≤ 28 m) ou EI 90 (edifícios > 28 m)",
+      "remediation": "Reforçar as paredes do ducto da coluna montante de gás com revestimento que garanta a classificação de resistência ao fogo exigida: EI 60 para edifícios até 28 m de altura e EI 90 para edifícios acima de 28 m. Utilizar blocos de betão, gesso cartonado corta-fogo ou argamassa projetada. Verificar a classificação com ensaio conforme EN 1366-3.",
+      "enabled": true,
+      "tags": ["corta-fogo", "ducto", "resistência", "EI 60", "EI 90", "paredes"]
+    },
+    {
+      "id": "GAS-EQJNT-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 35.º-B -- Juntas Sísmicas na Tubagem de Gás",
+      "description": "Nos pontos de transição estrutural (juntas de dilatação do edifício, passagem entre edifícios adjacentes, transição fundação-superestrutura), a tubagem de gás deve incorporar junta flexível ou lira de compensação dimensionada para absorver os deslocamentos sísmicos previstos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.earthquakeJoint.hasFlexibleJointsAtTransitions",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.building.hasStructuralExpansionJoints",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.earthquakeJoint.hasFlexibleJointsAtTransitions}",
+      "requiredValue": "Juntas flexíveis ou liras de compensação em todas as transições estruturais",
+      "remediation": "Instalar juntas flexíveis ou liras de compensação em aço inoxidável ou cobre recozido em cada ponto de transição estrutural da tubagem de gás. As juntas devem acomodar deslocamentos mínimos de ±30 mm em qualquer direção. Utilizar produtos certificados conforme EN 15266. Verificar que as juntas não estão bloqueadas por suportes rígidos ou enchimentos.",
+      "enabled": true,
+      "tags": ["sísmico", "junta", "transição estrutural", "lira", "deslocamento"]
+    },
+    {
+      "id": "GAS-EQJNT-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 31.º-A -- Folga Sísmica nas Passagens de Parede",
+      "description": "Nas passagens de parede e laje, a tubagem de gás deve ter folga anular mínima de 15 mm em relação ao orifício, preenchida com material flexível e estanque, para acomodar deslocamentos diferenciais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.earthquakeJoint.wallPenetrationClearanceMm",
+          "operator": "<",
+          "value": 15
+        },
+        {
+          "field": "gas.seismic.seismicZoneIntensity",
+          "operator": ">=",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "{gas.earthquakeJoint.wallPenetrationClearanceMm} mm",
+      "requiredValue": ">= 15 mm de folga anular nas passagens de parede e laje",
+      "remediation": "Alargar os orifícios de passagem nas paredes e lajes para garantir folga anular mínima de 15 mm em torno da tubagem de gás. Preencher a folga com material flexível e estanque ao gás (espuma de silicone resistente ao fogo ou mástique intumescente). Não utilizar argamassa rígida ou cimento nas passagens em zonas sísmicas.",
+      "enabled": true,
+      "tags": ["sísmico", "passagem", "folga", "parede", "15 mm"]
+    },
+    {
+      "id": "GAS-FROST-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 34.º -- Proteção contra Gelo das Tubagens de Gás",
+      "description": "As tubagens de gás expostas a temperaturas inferiores a 0°C (exteriores, caves não aquecidas, coberturas) devem ser protegidas contra congelação mediante isolamento térmico ou traçagem elétrica.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.frostProtection.hasFrostProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasExposedPipesInColdZones",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.frostProtection.hasFrostProtection}",
+      "requiredValue": "Proteção contra gelo instalada nas tubagens expostas a temperaturas negativas",
+      "remediation": "Aplicar isolamento térmico nas tubagens de gás expostas a temperaturas inferiores a 0°C: espuma elastomérica (19 mm mínimo) ou lã mineral com barreira de vapor. Em locais com temperaturas inferiores a -10°C, considerar traçagem elétrica autorregulável com termóstato. Proteger os reguladores de pressão contra formação de gelo (hidrato) com isolamento ou aquecimento.",
+      "enabled": true,
+      "tags": ["gelo", "proteção", "isolamento", "temperatura", "exterior"]
+    },
+    {
+      "id": "GAS-FROST-02",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 34.º-A -- Proteção de Reguladores de Pressão contra Formação de Hidratos",
+      "description": "Os reguladores de pressão de gás natural expostos a temperaturas ambientes inferiores a 5°C devem ser protegidos contra formação de hidratos de gás, que podem bloquear o mecanismo de regulação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.frostProtection.regulatorHydrateProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.entryPressure.hasRegulator",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "gas.frostProtection.minAmbientTemperatureC",
+          "operator": "<",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "{gas.frostProtection.regulatorHydrateProtection}",
+      "requiredValue": "Proteção contra hidratos no regulador de pressão",
+      "remediation": "Instalar proteção contra formação de hidratos no regulador de pressão: caixa isolada termicamente, aquecimento elétrico com termóstato (manter temperatura acima de 5°C), ou injeção de inibidor de hidratos (metanol ou glicol) a montante do regulador. Verificar o funcionamento da proteção antes de cada estação fria.",
+      "enabled": true,
+      "tags": ["gelo", "regulador", "hidratos", "proteção", "temperatura"]
+    },
+    {
+      "id": "GAS-UV-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 33.º-A -- Proteção UV das Tubagens de Gás Exteriores",
+      "description": "As tubagens de gás em materiais poliméricos (PE, multicamada) instaladas no exterior devem ser protegidas contra a degradação por radiação ultravioleta, mediante revestimento opaco, pintura ou instalação em manga de proteção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.uvProtection.hasUVProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasOutdoorPolymerPipes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.uvProtection.hasUVProtection}",
+      "requiredValue": "Proteção UV aplicada em tubagens poliméricas exteriores",
+      "remediation": "Aplicar proteção contra radiação UV nas tubagens poliméricas de gás expostas ao exterior: pintura com tinta acrílica resistente à UV na cor amarela (RAL 1024), manga de proteção opaca em PVC ou chapa metálica, ou substituição por tubagem PE com estabilizador UV (PE100 com negro de carbono, camada exterior preta). Verificar a integridade da proteção anualmente.",
+      "enabled": true,
+      "tags": ["UV", "proteção", "polímero", "exterior", "degradação"]
+    },
+    {
+      "id": "GAS-UV-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 23.º -- Inspeção Periódica da Proteção UV",
+      "description": "A proteção UV das tubagens poliméricas de gás exteriores deve ser inspecionada anualmente para verificação de fissuras, descoloração ou degradação do revestimento, com reparação imediata de quaisquer defeitos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.uvProtection.annualInspectionDone",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.uvProtection.hasUVProtection",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.uvProtection.annualInspectionDone}",
+      "requiredValue": "Inspeção anual da proteção UV documentada",
+      "remediation": "Efetuar inspeção visual anual de todas as tubagens poliméricas de gás expostas ao exterior, verificando: integridade do revestimento ou pintura, ausência de fissuras, descoloração ou fragilização do material. Reparar imediatamente quaisquer defeitos encontrados. Registar a inspeção em relatório datado. Substituir troços com sinais avançados de degradação UV.",
+      "enabled": true,
+      "tags": ["UV", "inspeção", "anual", "degradação", "revestimento"]
+    },
+    {
+      "id": "GAS-DRAIN-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 32.º -- Dreno de Condensados na Tubagem de Gás",
+      "description": "Nos pontos baixos da rede de tubagem de gás onde possa ocorrer acumulação de condensados (água, hidrocarbonetos líquidos), devem ser instalados drenos com sifão e válvula de purga acessível.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.condensateDrain.hasDrainsAtLowPoints",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasLowPointsInPiping",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.condensateDrain.hasDrainsAtLowPoints}",
+      "requiredValue": "Drenos de condensados instalados nos pontos baixos da rede",
+      "remediation": "Instalar dreno de condensados nos pontos baixos da tubagem de gás: pote de condensados em aço ou latão com capacidade mínima de 0,5 litros, válvula de purga manual ou automática, e sifão para impedir a fuga de gás durante a purga. Os drenos devem ser acessíveis para manutenção e purgados periodicamente (mínimo trimestral).",
+      "enabled": true,
+      "tags": ["condensados", "dreno", "pontos baixos", "purga", "sifão"]
+    },
+    {
+      "id": "GAS-DRAIN-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 15.º -- Inclinação Mínima da Tubagem para Drenagem",
+      "description": "As tubagens horizontais de gás devem ter uma inclinação mínima de 1% (1 cm por metro) no sentido dos pontos de drenagem, para facilitar o escoamento natural dos condensados.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.condensateDrain.pipeMinSlopePercent",
+          "operator": "<",
+          "value": 1
+        },
+        {
+          "field": "gas.pipes.hasHorizontalPipes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.condensateDrain.pipeMinSlopePercent}%",
+      "requiredValue": ">= 1% de inclinação no sentido dos drenos",
+      "remediation": "Corrigir a inclinação das tubagens horizontais de gás para garantir um mínimo de 1% (1 cm/m) no sentido dos pontos de drenagem. Ajustar os suportes e braçadeiras para obter a inclinação correta. Verificar com nível que não existem contra-inclinações ou bolsas de acumulação nos troços horizontais.",
+      "enabled": true,
+      "tags": ["condensados", "inclinação", "drenagem", "1%", "tubagem horizontal"]
+    },
+    {
+      "id": "GAS-FILTR-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 20.º -- Filtro na Entrada da Instalação de Gás",
+      "description": "Na entrada da instalação de gás do edifício deve ser instalado filtro para retenção de partículas sólidas, impurezas e resíduos da rede de distribuição, a montante do regulador de pressão e do contador.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.filter.hasEntryFilter",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.filter.hasEntryFilter}",
+      "requiredValue": "Filtro de partículas instalado na entrada da instalação",
+      "remediation": "Instalar filtro de partículas na entrada da instalação de gás, a montante do regulador de pressão, com malha filtrante de 50 μm ou inferior. O filtro deve ser certificado para a pressão de serviço da rede e dotado de indicador de colmatação (manómetro diferencial). Limpar ou substituir o elemento filtrante quando a perda de carga exceder 50 mbar.",
+      "enabled": true,
+      "tags": ["filtro", "partículas", "entrada", "regulador", "manutenção"]
+    },
+    {
+      "id": "GAS-FILTR-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 10.º -- Especificação do Filtro de Gás",
+      "description": "O filtro de gás deve ser dimensionado para o caudal máximo previsto da instalação, com perda de carga máxima de 10 mbar em elemento limpo e classificação de filtração mínima de 50 μm para gás natural.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.filter.filterMaxPressureDropMbar",
+          "operator": ">",
+          "value": 10
+        },
+        {
+          "field": "gas.filter.hasEntryFilter",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.filter.filterMaxPressureDropMbar} mbar",
+      "requiredValue": "<= 10 mbar de perda de carga com elemento filtrante limpo",
+      "remediation": "Substituir o filtro por modelo corretamente dimensionado para o caudal máximo da instalação, com perda de carga ≤ 10 mbar em elemento limpo. Selecionar filtro com malha de 50 μm (gás natural) ou 100 μm (GPL), corpo em alumínio ou aço, e ligações compatíveis com a tubagem. Instalar manómetro diferencial para monitorização da colmatação.",
+      "enabled": true,
+      "tags": ["filtro", "especificação", "perda de carga", "50 μm", "dimensionamento"]
+    },
+    {
+      "id": "GAS-RELIEF-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 22.º -- Válvula de Alívio de Pressão",
+      "description": "Em instalações de média pressão (> 75 mbar), deve ser instalada válvula de alívio de pressão (PSV) a jusante do regulador, dimensionada para descarregar o caudal máximo de fuga do regulador em caso de falha total do obturador.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.pressureRelief.hasPSV",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.entryPressure.networkPressureBar",
+          "operator": ">",
+          "value": 0.075
+        }
+      ],
+      "currentValueTemplate": "{gas.pressureRelief.hasPSV}",
+      "requiredValue": "Válvula de alívio de pressão (PSV) instalada a jusante do regulador",
+      "remediation": "Instalar válvula de alívio de pressão (PSV) certificada EN 13611 a jusante do regulador de pressão. O dimensionamento deve considerar o caudal máximo de fuga em caso de falha total do obturador do regulador (calculado pela fórmula do fabricante). A descarga da PSV deve ser canalizada para o exterior, em local seguro, afastado de aberturas e fontes de ignição.",
+      "enabled": true,
+      "tags": ["alívio", "pressão", "PSV", "regulador", "segurança"]
+    },
+    {
+      "id": "GAS-RELIEF-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 11.º -- Dimensionamento da Válvula de Alívio",
+      "description": "A capacidade de descarga da válvula de alívio de pressão deve ser calculada pela fórmula Q = Kv × √(ΔP/ρ), sendo superior ao caudal máximo de fuga do regulador, e a pressão de abertura não deve exceder 1,5 vezes a pressão de serviço.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.pressureRelief.psvCapacityAdequate",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pressureRelief.hasPSV",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.pressureRelief.psvCapacityAdequate}",
+      "requiredValue": "Capacidade de descarga da PSV superior ao caudal máximo de fuga do regulador",
+      "remediation": "Recalcular o dimensionamento da válvula de alívio: obter o caudal máximo de fuga do regulador (dados do fabricante), calcular a capacidade de descarga necessária pela fórmula Q = Kv × √(ΔP/ρ), e selecionar PSV com capacidade igual ou superior. A pressão de abertura deve ser ajustada para 1,2 a 1,5 vezes a pressão nominal de serviço. Documentar o cálculo de dimensionamento no projeto.",
+      "enabled": true,
+      "tags": ["alívio", "dimensionamento", "caudal", "cálculo", "PSV"]
+    },
+    {
+      "id": "GAS-ZONE-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 23.º -- Zonamento da Instalação de Gás em Grandes Edifícios",
+      "description": "Em edifícios com área total de pavimento superior a 5000 m² ou com mais de 10 frações, a instalação de gás deve ser dividida em zonas independentes, cada uma com válvula de corte e regulador próprio, permitindo isolamento parcial em caso de emergência ou manutenção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.zoning.hasIndependentZones",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.building.totalFloorAreaM2",
+          "operator": ">",
+          "value": 5000
+        }
+      ],
+      "currentValueTemplate": "{gas.zoning.hasIndependentZones}",
+      "requiredValue": "Instalação dividida em zonas independentes com corte e regulação próprios",
+      "remediation": "Dividir a instalação de gás em zonas independentes, agrupando frações por piso, bloco ou utilização. Cada zona deve ter: válvula de corte acessível, regulador de pressão dimensionado para o consumo da zona, e possibilidade de isolamento sem afetar as restantes zonas. Identificar claramente cada zona no esquema da instalação e nas válvulas de corte.",
+      "enabled": true,
+      "tags": ["zonamento", "grande edifício", "isolamento", "zonas", "corte"]
+    },
+    {
+      "id": "GAS-ZONE-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 13.º -- Esquema de Zonamento Documentado",
+      "description": "O projeto de gás de edifícios com instalação zonada deve incluir esquema de zonamento com identificação de cada zona, localização das válvulas de corte, caudal máximo por zona, e procedimento de isolamento de emergência.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.zoning.hasZoningSchematic",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.zoning.hasIndependentZones",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.zoning.hasZoningSchematic}",
+      "requiredValue": "Esquema de zonamento completo incluído no projeto",
+      "remediation": "Elaborar e incluir no projeto de gás o esquema de zonamento com: planta identificando cada zona com cor diferenciada, localização de todas as válvulas de corte de zona, caudal máximo simultâneo por zona, diâmetros das tubagens, e procedimento escrito de isolamento de emergência por zona. Afixar cópia do esquema junto ao quadro geral de válvulas.",
+      "enabled": true,
+      "tags": ["zonamento", "esquema", "documentação", "projeto", "identificação"]
+    },
+    {
+      "id": "GAS-ZONE-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 23.º-A -- Válvulas de Zona com Atuação Remota",
+      "description": "Em edifícios com utilização de risco acrescido (centros comerciais, hotéis, hospitais), as válvulas de corte de zona devem ser motorizadas com possibilidade de atuação remota a partir do posto de segurança.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.zoning.hasRemoteActuatedZoneValves",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.building.riskCategory",
+          "operator": "in",
+          "value": ["high_risk", "hospital", "hotel", "shopping_centre"]
+        },
+        {
+          "field": "gas.zoning.hasIndependentZones",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.zoning.hasRemoteActuatedZoneValves}",
+      "requiredValue": "Válvulas de zona motorizadas com atuação remota",
+      "remediation": "Instalar atuadores elétricos ou pneumáticos nas válvulas de corte de cada zona de gás, com comando remoto a partir do posto de segurança do edifício. Integrar o comando das válvulas no sistema de gestão técnica centralizada (BMS) ou no painel de alarme de gás. Ensaiar trimestralmente o funcionamento da atuação remota com registo documentado.",
+      "enabled": true,
+      "tags": ["zonamento", "válvulas motorizadas", "remoto", "segurança", "BMS"]
+    },
+    {
+      "id": "GAS-KITCH-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 55.º -- Interligação Gás-Ventilação em Cozinhas Comerciais",
+      "description": "Em cozinhas comerciais e industriais, o fornecimento de gás deve ser interligado com o sistema de ventilação/exaustão, de forma que o gás só possa ser ativado quando a ventilação estiver em funcionamento comprovado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.commercialKitchen.gasVentilationInterlock",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercialKitchen.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.commercialKitchen.gasVentilationInterlock}",
+      "requiredValue": "Interligação gás-ventilação obrigatória em cozinhas comerciais",
+      "remediation": "Instalar sistema de interligação entre o fornecimento de gás e a ventilação da cozinha: pressostato diferencial no circuito de exaustão que confirme o funcionamento do ventilador antes de permitir a abertura da eletroválvula de gás. O sistema deve cortar o gás automaticamente se a ventilação parar. Ensaiar mensalmente a interligação.",
+      "enabled": true,
+      "tags": ["cozinha comercial", "interligação", "ventilação", "gás", "segurança"]
+    },
+    {
+      "id": "GAS-KITCH-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 35.º -- Botão de Emergência em Cozinhas Comerciais",
+      "description": "As cozinhas comerciais e industriais devem dispor de botão de emergência de corte de gás, instalado junto à saída principal do compartimento, a uma altura entre 1,2 m e 1,5 m do pavimento, claramente identificado a vermelho.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.commercialKitchen.hasEmergencyButton",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercialKitchen.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.commercialKitchen.hasEmergencyButton}",
+      "requiredValue": "Botão de emergência de corte de gás junto à saída da cozinha",
+      "remediation": "Instalar botão de emergência de corte de gás do tipo cogumelo, cor vermelha, junto à saída principal da cozinha comercial, a uma altura entre 1,2 m e 1,5 m do pavimento. O botão deve atuar sobre eletroválvula de corte na tubagem de alimentação da cozinha. Sinalizar com placa 'CORTE DE EMERGÊNCIA - GÁS' conforme ISO 7010. Ensaiar mensalmente.",
+      "enabled": true,
+      "tags": ["cozinha comercial", "emergência", "botão", "corte", "vermelho"]
+    },
+    {
+      "id": "GAS-KITCH-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 56.º -- Deteção de Gás em Cozinhas Comerciais",
+      "description": "As cozinhas comerciais com potência instalada a gás superior a 50 kW devem dispor de sistema de deteção de gás com alarme sonoro e visual, interligado com a eletroválvula de corte automático e o sistema de ventilação de emergência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.commercialKitchen.hasGasDetectionSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.commercialKitchen.installedPowerKW",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "{gas.commercialKitchen.hasGasDetectionSystem}",
+      "requiredValue": "Sistema de deteção de gás com alarme e corte automático",
+      "remediation": "Instalar sistema de deteção de gás na cozinha comercial com: detetores calibrados para o tipo de gás utilizado (gás natural no teto, GPL no pavimento), central de alarme com sinalização sonora (85 dB mínimo) e visual, interligação com eletroválvula de corte automático e ativação da ventilação de emergência. Calibrar semestralmente os detetores.",
+      "enabled": true,
+      "tags": ["cozinha comercial", "deteção", "alarme", "corte automático", "50 kW"]
+    },
+    {
+      "id": "GAS-LABSH-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 60.º -- Válvula de Corte de Gás em Laboratórios",
+      "description": "Cada laboratório com pontos de utilização de gás deve dispor de válvula de corte geral acessível do exterior do compartimento, permitindo o isolamento rápido em caso de emergência sem necessidade de entrar no laboratório.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.laboratory.hasExternalShutoff",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.hasExternalShutoff}",
+      "requiredValue": "Válvula de corte geral acessível do exterior do laboratório",
+      "remediation": "Instalar válvula de corte geral de gás do laboratório no exterior do compartimento (corredor ou antecâmara), em armário identificado e acessível. A válvula deve ser do tipo esfera com manípulo de ¼ de volta, claramente sinalizada com placa 'CORTE GERAL GÁS - LABORATÓRIO'. Complementar com indicação luminosa do estado aberto/fechado junto à entrada.",
+      "enabled": true,
+      "tags": ["laboratório", "corte", "exterior", "emergência", "segurança"]
+    },
+    {
+      "id": "GAS-LABSH-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 36.º -- Válvulas de Bancada em Laboratórios",
+      "description": "Cada ponto de utilização de gás em bancada de laboratório deve ter válvula de corte individual acessível pelo operador, com identificação do tipo de gás e conformidade com EN 13792.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.laboratory.allOutletsHaveIndividualValves",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.allOutletsHaveIndividualValves}",
+      "requiredValue": "Válvula individual em cada ponto de utilização de bancada",
+      "remediation": "Instalar válvula de corte individual em cada ponto de utilização de gás na bancada do laboratório, conforme EN 13792 (torneiras de laboratório para gases). Cada válvula deve estar identificada com o tipo de gás (gás natural, ar comprimido, azoto, etc.) mediante código de cores e legenda. Verificar anualmente a estanquidade de todas as válvulas de bancada.",
+      "enabled": true,
+      "tags": ["laboratório", "bancada", "válvula individual", "EN 13792", "identificação"]
+    },
+    {
+      "id": "GAS-LABSH-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 61.º -- Corte Automático de Gás em Laboratórios com Deteção",
+      "description": "Laboratórios com utilização de gases combustíveis devem ter sistema de deteção de gás interligado com corte automático e ativação da ventilação de emergência, com alarmes sonoros e visuais dentro e fora do compartimento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.laboratory.hasAutomaticShutoffWithDetection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.laboratory.usesCombustibleGas",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.laboratory.hasAutomaticShutoffWithDetection}",
+      "requiredValue": "Deteção de gás com corte automático e alarmes dentro e fora do laboratório",
+      "remediation": "Instalar sistema de deteção de gás combustível no laboratório com: detetores posicionados conforme a densidade do gás utilizado, central de alarme com sinalização sonora e visual (dentro e fora do compartimento), interligação com eletroválvula de corte automático na alimentação de gás, e ativação automática da ventilação de emergência (mínimo 12 renovações/hora). Calibrar semestralmente.",
+      "enabled": true,
+      "tags": ["laboratório", "deteção", "corte automático", "alarme", "ventilação emergência"]
+    },
+    {
+      "id": "GAS-TRAIN-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 57.º -- Cozinhas de Formação e Ensino",
+      "description": "As cozinhas de formação profissional e ensino (escolas de hotelaria, centros de formação) devem dispor de corte geral de gás acessível ao formador, com botão de emergência junto à secretária ou posto de controlo do instrutor.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "gas.trainingKitchen.hasInstructorEmergencyCutoff",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.trainingKitchen.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.trainingKitchen.hasInstructorEmergencyCutoff}",
+      "requiredValue": "Corte de emergência de gás acessível ao formador/instrutor",
+      "remediation": "Instalar botão de corte de emergência de gás junto ao posto de controlo do instrutor/formador na cozinha de formação. O botão deve atuar sobre eletroválvula de corte que isole o fornecimento de gás a todos os postos de trabalho dos formandos. O instrutor deve ter visibilidade direta de todos os postos. Complementar com indicadores luminosos de estado (verde = ativo, vermelho = cortado).",
+      "enabled": true,
+      "tags": ["cozinha formação", "ensino", "instrutor", "emergência", "corte"]
+    },
+    {
+      "id": "GAS-TRAIN-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 37.º -- Corte Individual por Posto de Trabalho em Cozinhas de Formação",
+      "description": "Cada posto de trabalho individual numa cozinha de formação deve ter válvula de corte própria, acessível ao formando e ao instrutor, permitindo o isolamento independente de cada posto.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.trainingKitchen.allWorkstationsHaveIndividualCutoff",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.trainingKitchen.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.trainingKitchen.allWorkstationsHaveIndividualCutoff}",
+      "requiredValue": "Válvula de corte individual em cada posto de trabalho de formação",
+      "remediation": "Instalar válvula de corte individual de gás em cada posto de trabalho da cozinha de formação, posicionada de forma acessível ao formando e ao instrutor. A válvula deve ser do tipo esfera com manípulo de ¼ de volta, identificada com o número do posto. O instrutor deve poder cortar qualquer posto individualmente a partir do seu posto de controlo.",
+      "enabled": true,
+      "tags": ["cozinha formação", "posto de trabalho", "válvula individual", "formandos", "segurança"]
+    },
+    {
+      "id": "GAS-TAPE-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 33.º-B -- Fita de Identificação em Tubagem Enterrada",
+      "description": "As tubagens de gás enterradas devem ser sinalizadas com fita de aviso amarela de polietileno, instalada a 0,30 m acima da tubagem, com a inscrição 'ATENÇÃO - TUBAGEM DE GÁS' ao longo de todo o percurso.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.identificationTape.hasBuriedPipeWarningTape",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasBuriedPipes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.identificationTape.hasBuriedPipeWarningTape}",
+      "requiredValue": "Fita de aviso amarela instalada 0,30 m acima da tubagem enterrada",
+      "remediation": "Instalar fita de aviso em polietileno de cor amarela, com largura mínima de 150 mm, a uma profundidade de 0,30 m acima da geratriz superior da tubagem de gás enterrada. A fita deve conter a inscrição repetida 'ATENÇÃO - TUBAGEM DE GÁS' em letras pretas e estender-se ao longo de todo o percurso enterrado, incluindo ramais de ligação.",
+      "enabled": true,
+      "tags": ["fita", "identificação", "enterrada", "aviso", "sinalização"]
+    },
+    {
+      "id": "GAS-TAPE-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 24.º -- Fita Adesiva de Identificação em Tubagem Embutida",
+      "description": "As tubagens de gás embutidas em paredes ou pavimentos devem ser identificadas com fita adesiva amarela aplicada sobre o revestimento final, ao longo do percurso da tubagem, indicando a presença da canalização oculta.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.identificationTape.hasEmbeddedPipeIdentification",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasEmbeddedPipes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.identificationTape.hasEmbeddedPipeIdentification}",
+      "requiredValue": "Identificação do percurso da tubagem embutida sobre o revestimento",
+      "remediation": "Aplicar fita adesiva amarela de identificação sobre o revestimento final (reboco, azulejo, pavimento) ao longo do percurso da tubagem de gás embutida. Alternativa: registar fotograficamente o percurso antes do fecho da parede e incluir no projeto as-built. Em alternativa, utilizar detetores de metais para localização futura da tubagem.",
+      "enabled": true,
+      "tags": ["fita", "identificação", "embutida", "revestimento", "oculta"]
+    },
+    {
+      "id": "GAS-TAPE-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 33.º-C -- Fita Detetável em Tubagem de Polietileno Enterrada",
+      "description": "As tubagens de gás em polietileno enterradas devem ser acompanhadas de fita ou fio detetável (com filamento metálico) para localização por equipamento eletromagnético, dado que o PE não é detetável por métodos convencionais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.identificationTape.hasDetectableTracer",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.pipes.hasBuriedPEPipes",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.identificationTape.hasDetectableTracer}",
+      "requiredValue": "Fita ou fio detetável instalado junto à tubagem PE enterrada",
+      "remediation": "Instalar fita detetável com filamento metálico integrado (cobre ou aço inoxidável) junto à tubagem de polietileno enterrada, ao longo de todo o percurso. O filamento deve estar ligado a marcos de superfície para permitir a conexão de equipamento de deteção eletromagnético. Alternativa: instalar fio de cobre nu (4 mm²) ao longo da tubagem com caixas de acesso à superfície.",
+      "enabled": true,
+      "tags": ["fita detetável", "polietileno", "enterrada", "filamento", "localização"]
+    },
+    {
+      "id": "GAS-EPROC-01",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 46.º -- Plano de Emergência para Instalações de Gás",
+      "description": "Todo o edifício com instalação de gás deve dispor de plano de emergência específico para fugas e acidentes com gás, incluindo procedimentos de evacuação, comunicação e primeiros socorros, afixado em local visível.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "gas.emergencyProcedures.hasEmergencyPlan",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergencyProcedures.hasEmergencyPlan}",
+      "requiredValue": "Plano de emergência para gás elaborado e afixado",
+      "remediation": "Elaborar plano de emergência específico para instalações de gás incluindo: procedimentos de atuação em caso de fuga (ventilação, corte do gás, evacuação), contactos de emergência (bombeiros, distribuidora, DGEG), instruções de primeiros socorros para intoxicação por CO, e localização das válvulas de corte. Afixar o plano junto às válvulas de corte e nas zonas de utilização.",
+      "enabled": true,
+      "tags": ["emergência", "plano", "procedimentos", "evacuação", "documentação"]
+    },
+    {
+      "id": "GAS-EPROC-02",
+      "regulationId": "portaria-361-98",
+      "article": "Portaria 361/98 Art. 38.º -- Contactos de Emergência Afixados",
+      "description": "Junto a cada válvula de corte geral de gás e em cada piso de edifícios coletivos deve estar afixada placa com os contactos de emergência: empresa distribuidora, bombeiros, número europeu de emergência (112) e técnico responsável pela instalação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.emergencyProcedures.hasEmergencyContactsPosted",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.hasGasInstallation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergencyProcedures.hasEmergencyContactsPosted}",
+      "requiredValue": "Contactos de emergência afixados junto às válvulas de corte e em cada piso",
+      "remediation": "Afixar placas com contactos de emergência junto a cada válvula de corte geral e em cada piso de edifícios coletivos. A placa deve incluir: número de emergência 112, contacto da empresa distribuidora (linha de emergência 24h), contacto dos bombeiros locais, e nome/contacto do técnico responsável pela manutenção da instalação. Atualizar os contactos anualmente.",
+      "enabled": true,
+      "tags": ["emergência", "contactos", "placa", "112", "distribuidora"]
+    },
+    {
+      "id": "GAS-EPROC-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 47.º -- Formação dos Ocupantes em Procedimentos de Emergência de Gás",
+      "description": "Em edifícios coletivos (habitação, comércio, serviços), os ocupantes e responsáveis pela gestão do edifício devem receber formação sobre os procedimentos de emergência de gás, com simulacro anual obrigatório.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.emergencyProcedures.annualDrillCompleted",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.installation.isCollective",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.emergencyProcedures.annualDrillCompleted}",
+      "requiredValue": "Simulacro anual de emergência de gás realizado e documentado",
+      "remediation": "Organizar simulacro anual de emergência de gás no edifício, incluindo: identificação simulada de fuga, ativação do procedimento de emergência, evacuação dos ocupantes, corte do fornecimento de gás, e comunicação às entidades competentes. Documentar o simulacro com data, participantes e observações. Distribuir folheto informativo aos novos ocupantes com as instruções de emergência.",
+      "enabled": true,
+      "tags": ["emergência", "formação", "simulacro", "ocupantes", "anual"]
+    },
+    {
+      "id": "GAS-DPRESS-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 19.º-A -- Sinalização do Escalão de Pressão nos Armários",
+      "description": "Todos os armários de válvulas, reguladores e contadores de gás devem ostentar sinalização visível indicando o escalão de pressão da rede (BP, MPA, MPB, AP) conforme a classificação aplicável no ponto.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.districtPressure.pressureClassSignageApplied",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.districtPressure.pressureClassDocumented",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "{gas.districtPressure.pressureClassSignageApplied}",
+      "requiredValue": "Sinalização do escalão de pressão em todos os armários de gás",
+      "remediation": "Aplicar sinalização normalizada nos armários de gás indicando o escalão de pressão: 'BP' (baixa pressão ≤ 75 mbar), 'MPA' (média pressão A, 75 mbar a 2 bar), 'MPB' (média pressão B, 2 a 4 bar) ou 'AP' (alta pressão > 4 bar). A sinalização deve ser em placa resistente à intempérie, com letras de altura mínima de 30 mm, cor amarela sobre fundo preto.",
+      "enabled": true,
+      "tags": ["pressão", "sinalização", "escalão", "armário", "identificação"]
+    },
+    {
+      "id": "GAS-QUAL-03",
+      "regulationId": "dl-521-99",
+      "article": "DL 521/99 Art. 13.º-A -- Registo da Qualidade do Gás Fornecido",
+      "description": "O proprietário ou gestor do edifício deve manter registo da qualidade do gás fornecido, incluindo certificados de conformidade emitidos pela empresa distribuidora, pelo período mínimo de 5 anos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "gas.quality.hasQualityCertificateRecords",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "gas.consumption.maxFlowM3h",
+          "operator": ">",
+          "value": 25
+        }
+      ],
+      "currentValueTemplate": "{gas.quality.hasQualityCertificateRecords}",
+      "requiredValue": "Registos de qualidade do gás arquivados por 5 anos",
+      "remediation": "Solicitar à empresa distribuidora os certificados de conformidade da qualidade do gás fornecido (composição, poder calorífico, índice de Wobbe, teor de impurezas) com periodicidade semestral. Arquivar os certificados em pasta dedicada, mantendo os registos por um período mínimo de 5 anos. Os registos devem estar disponíveis para consulta pela DGEG em inspeções.",
+      "enabled": true,
+      "tags": ["qualidade", "registos", "certificados", "distribuidora", "arquivo"]
     }
   ]
 }

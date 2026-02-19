@@ -6854,6 +6854,1338 @@
         "perigosos",
         "LER 17 09 02*"
       ]
+    },
+    {
+      "id": "RCD-PREAUDIT-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º, n.º 1 — Auditoria Prévia à Demolição",
+      "description": "Antes do início de qualquer operação de demolição, deve ser realizada uma auditoria prévia de resíduos que identifique os materiais presentes, quantidades estimadas, presença de substâncias perigosas (amianto, PCB, chumbo, CFC) e potencial de reutilização/reciclagem.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.hasDemolitionPreAudit",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Auditoria prévia à demolição: {waste.hasDemolitionPreAudit}",
+      "requiredValue": "Auditoria prévia obrigatória antes de qualquer demolição",
+      "remediation": "Realizar auditoria prévia à demolição: 1) Contratar técnico qualificado em RCD; 2) Inspeção visual e documental do edifício; 3) Identificar materiais perigosos (amianto, tintas com chumbo, PCB); 4) Estimar quantidades de RCD por código LER; 5) Avaliar potencial de reutilização de elementos (portas, janelas, vigas); 6) Elaborar relatório de auditoria para integrar no PGCD.",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "auditoria-prévia",
+        "perigosos",
+        "pré-demolição"
+      ]
+    },
+    {
+      "id": "RCD-PREAUDIT-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º, n.º 2 — Inventário de Materiais Perigosos na Pré-Auditoria",
+      "description": "A auditoria prévia à demolição deve incluir um inventário detalhado de todos os materiais perigosos identificados, com localização precisa no edifício, quantidades estimadas e procedimentos de remoção segura antes da demolição geral.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.hazardousMaterialInventoryComplete",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Inventário de perigosos completo: {waste.hazardousMaterialInventoryComplete}",
+      "requiredValue": "Inventário detalhado de materiais perigosos obrigatório na pré-auditoria",
+      "remediation": "Completar inventário de materiais perigosos: 1) Mapear localização de amianto (fibrocimento, isolamento, pisos vinílicos); 2) Testar tintas para chumbo (edifícios pré-1990); 3) Verificar selantes para PCB (edifícios 1950-1985); 4) Identificar CFC em equipamentos AVAC; 5) Localizar lâmpadas fluorescentes com mercúrio; 6) Registar tubagens com tinta de chumbo; 7) Incluir plantas com localização exata de cada material perigoso.",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "auditoria-prévia",
+        "inventário",
+        "perigosos"
+      ]
+    },
+    {
+      "id": "RCD-PREAUDIT-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 28.º — Quantificação Prévia de RCD por Fluxo",
+      "description": "A auditoria prévia deve quantificar os resíduos estimados por fluxo (betão, metais, madeira, vidro, plásticos, gesso, cerâmicos, mistos) e por código LER, permitindo o planeamento logístico da demolição e a contratação antecipada de operadores licenciados.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.preAuditWasteQuantification",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Quantificação prévia por fluxo: {waste.preAuditWasteQuantification}",
+      "requiredValue": "Quantificação de RCD por fluxo e código LER na auditoria prévia",
+      "remediation": "Quantificar RCD por fluxo: 1) Estimar volumes com base em plantas e medições in situ; 2) Converter volumes em massas (densidades típicas: betão ~2.400 kg/m³, tijolo ~1.800 kg/m³, madeira ~500 kg/m³); 3) Classificar por código LER (capítulo 17); 4) Identificar frações valorizáveis vs. aterro; 5) Usar resultados para dimensionar contentores e planear logística; 6) Contactar operadores licenciados antecipadamente.",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "auditoria-prévia",
+        "quantificação",
+        "LER"
+      ]
+    },
+    {
+      "id": "RCD-DEMSELET-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º, n.º 3 — Procedimento de Demolição Seletiva",
+      "description": "A demolição seletiva é obrigatória para obras com área bruta de construção superior a 200 m². Deve seguir uma sequência de remoção que privilegie a separação de materiais na origem: 1.º perigosos, 2.º reutilizáveis, 3.º recicláveis, 4.º restantes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.buildingAreaSqm",
+          "operator": ">",
+          "value": 200
+        },
+        {
+          "field": "waste.selectiveDemolitionProcedure",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Demolição seletiva: {waste.selectiveDemolitionProcedure} | Área: {waste.buildingAreaSqm} m²",
+      "requiredValue": "Demolição seletiva obrigatória para edifícios >200 m²",
+      "remediation": "Implementar demolição seletiva: 1) Remover primeiro materiais perigosos (amianto, tintas com chumbo); 2) Desmontar elementos reutilizáveis (portas, janelas, vigas metálicas); 3) Separar frações recicláveis (metais, madeira, vidro); 4) Demolir estrutura restante com separação de betão/alvenaria; 5) Documentar sequência de desmontagem; 6) Registar quantidades por fluxo.",
+      "enabled": true,
+      "tags": [
+        "demolição-seletiva",
+        "sequência",
+        "obrigatório",
+        "separação"
+      ]
+    },
+    {
+      "id": "RCD-DEMSELET-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º, n.º 4 — Sequência de Remoção na Demolição Seletiva",
+      "description": "A sequência de remoção na demolição seletiva deve seguir a ordem inversa da construção: 1) Equipamentos e instalações; 2) Acabamentos interiores; 3) Caixilharias e vidros; 4) Coberturas; 5) Paredes interiores; 6) Paredes exteriores; 7) Estrutura.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.selectiveDemolitionSequenceDefined",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sequência de remoção definida: {waste.selectiveDemolitionSequenceDefined}",
+      "requiredValue": "Sequência de demolição seletiva documentada e aprovada",
+      "remediation": "Definir sequência de remoção: 1) Desconectar utilidades (eletricidade, água, gás); 2) Remover equipamentos AVAC, sanitários, elétricos; 3) Remover acabamentos (revestimentos, pisos, tetos falsos); 4) Desmontar caixilharias e vidros intactos; 5) Desmantelar cobertura; 6) Demolir paredes interiores (separar gesso, tijolo, betão); 7) Demolir paredes exteriores; 8) Demolir estrutura com separação de betão e aço.",
+      "enabled": true,
+      "tags": [
+        "demolição-seletiva",
+        "sequência",
+        "remoção",
+        "procedimento"
+      ]
+    },
+    {
+      "id": "RCD-DEMSELET-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 11.º, n.º 5 — Registo Fotográfico da Demolição Seletiva",
+      "description": "Todas as fases da demolição seletiva devem ser documentadas com registo fotográfico datado, evidenciando a separação de materiais na origem e o correto acondicionamento por fluxo de resíduos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.demolitionPhotoRecordComplete",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Registo fotográfico da demolição: {waste.demolitionPhotoRecordComplete}",
+      "requiredValue": "Registo fotográfico completo de todas as fases da demolição seletiva",
+      "remediation": "Manter registo fotográfico: 1) Fotografar estado inicial antes da demolição; 2) Documentar cada fase de remoção (perigosos, reutilizáveis, recicláveis); 3) Fotografar contentores com identificação de fluxos; 4) Registar carregamento de camiões para transporte; 5) Incluir data e localização em cada fotografia; 6) Compilar relatório fotográfico para arquivo e fiscalização.",
+      "enabled": true,
+      "tags": [
+        "demolição-seletiva",
+        "registo-fotográfico",
+        "documentação",
+        "evidência"
+      ]
+    },
+    {
+      "id": "RCD-MINIMIZ-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 2 — Estratégias de Minimização de Resíduos no Projeto",
+      "description": "O projeto deve incorporar estratégias de minimização de resíduos desde a fase de conceção, incluindo otimização dimensional, estandardização de elementos e seleção de materiais com menor geração de resíduos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.designWasteMinimizationStrategies",
+          "operator": "<",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "Estratégias de minimização no projeto: {waste.designWasteMinimizationStrategies}",
+      "requiredValue": "Mínimo 3 estratégias de minimização de resíduos no projeto",
+      "remediation": "Incorporar estratégias de minimização: 1) Otimização dimensional — coordenar dimensões com módulos standard de materiais (tijolo, placas, perfis); 2) Estandardização — limitar variedade de elementos e acabamentos; 3) Seleção de materiais com baixa geração de resíduos; 4) Prever reutilização de sobrantes; 5) Especificar embalagens retornáveis; 6) Design para desmontagem (DfD).",
+      "enabled": true,
+      "tags": [
+        "minimização",
+        "projeto",
+        "prevenção",
+        "design"
+      ]
+    },
+    {
+      "id": "RCD-MINIMIZ-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 3 — Coordenação Modular para Redução de Desperdício",
+      "description": "O projeto deve utilizar coordenação modular, alinhando dimensões de compartimentos e vãos com os módulos standard dos materiais especificados (ex.: módulo de tijolo 20×30, placas de gesso 1,20 m, painéis OSB 1,22×2,44 m) para minimizar cortes e desperdício.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.hasModularCoordination",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Coordenação modular no projeto: {waste.hasModularCoordination}",
+      "requiredValue": "Coordenação modular implementada para redução de desperdício",
+      "remediation": "Implementar coordenação modular: 1) Alinhar dimensões de paredes com módulo de tijolo (200×300 mm); 2) Coordenar larguras de compartimentos com placas de gesso (1.200 mm); 3) Ajustar vãos de cobertura a dimensões standard de painéis; 4) Especificar módulos de fachada compatíveis com caixilharias standard; 5) Estimar redução de desperdício esperada (tipicamente 5-15%).",
+      "enabled": true,
+      "tags": [
+        "minimização",
+        "coordenação-modular",
+        "projeto",
+        "desperdício"
+      ]
+    },
+    {
+      "id": "RCD-PREFAB-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 4 — Pré-fabricação para Redução de Resíduos",
+      "description": "A utilização de elementos pré-fabricados em fábrica reduz significativamente a geração de resíduos em obra (tipicamente 50-70% menos RCD). O projeto deve avaliar a viabilidade de pré-fabricação para elementos repetitivos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.prefabricationAssessmentDone",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Avaliação de pré-fabricação: {waste.prefabricationAssessmentDone}",
+      "requiredValue": "Avaliação de viabilidade de pré-fabricação realizada",
+      "remediation": "Avaliar pré-fabricação: 1) Identificar elementos repetitivos no projeto (lajes, vigas, paredes, escadas); 2) Solicitar orçamento de pré-fabricação vs. in situ; 3) Estimar redução de resíduos (tipicamente 50-70%); 4) Considerar pré-fabricação de módulos de instalações sanitárias; 5) Avaliar painéis de fachada pré-fabricados; 6) Documentar análise custo-benefício incluindo poupança em gestão de resíduos.",
+      "enabled": true,
+      "tags": [
+        "pré-fabricação",
+        "minimização",
+        "prevenção",
+        "elementos-repetitivos"
+      ]
+    },
+    {
+      "id": "RCD-PREFAB-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 5 — Taxa de Pré-fabricação em Obra",
+      "description": "Para obras novas com mais de 2.000 m² de área bruta, recomenda-se uma taxa de pré-fabricação mínima de 20% (em peso dos materiais estruturais) para reduzir a geração de resíduos em obra.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.buildingAreaSqm",
+          "operator": ">",
+          "value": 2000
+        },
+        {
+          "field": "waste.prefabricationRate",
+          "operator": "<",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "Taxa de pré-fabricação: {waste.prefabricationRate}%",
+      "requiredValue": "Taxa de pré-fabricação recomendada ≥20% para obras >2.000 m²",
+      "remediation": "Aumentar taxa de pré-fabricação: 1) Especificar lajes alveolares pré-esforçadas; 2) Utilizar vigas pré-fabricadas em betão ou aço; 3) Considerar paredes pré-fabricadas em betão; 4) Empregar escadas pré-fabricadas; 5) Calcular percentagem em peso: massa de elementos pré-fabricados / massa total de materiais estruturais × 100.",
+      "enabled": true,
+      "tags": [
+        "pré-fabricação",
+        "taxa",
+        "minimização",
+        "recomendação"
+      ]
+    },
+    {
+      "id": "RCD-CORTMED-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 2, al. b) — Encomenda de Materiais Cortados à Medida",
+      "description": "O PPG deve prever a encomenda de materiais cortados à medida (cut-to-size) quando viável, nomeadamente para aço de armaduras, perfis metálicos, tubagens, placas de revestimento e madeiras, reduzindo sobras e desperdício em obra.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.cutToSizeOrderingPolicy",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Política de encomenda cortada à medida: {waste.cutToSizeOrderingPolicy}",
+      "requiredValue": "Política de encomenda cut-to-size implementada para materiais principais",
+      "remediation": "Implementar política de cut-to-size: 1) Aço de armaduras — encomendar varões cortados e moldados em fábrica (reduz desperdício de 5-10% para <1%); 2) Perfis metálicos — corte em fábrica conforme lista de corte do projeto; 3) Tubagens — encomendar em comprimentos específicos; 4) Placas de revestimento — solicitar corte de fábrica para dimensões do projeto; 5) Madeira — encomendar em dimensões otimizadas.",
+      "enabled": true,
+      "tags": [
+        "cut-to-size",
+        "encomenda",
+        "minimização",
+        "prevenção"
+      ]
+    },
+    {
+      "id": "RCD-CORTMED-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 10.º, n.º 2, al. b) — Lista de Corte Otimizada",
+      "description": "Para materiais lineares (varões, perfis, tubos) e planares (chapas, placas), devem ser elaboradas listas de corte otimizadas que minimizem o desperdício, utilizando algoritmos de nesting/otimização de corte.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.optimizedCutListsUsed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Listas de corte otimizadas: {waste.optimizedCutListsUsed}",
+      "requiredValue": "Listas de corte otimizadas para materiais lineares e planares",
+      "remediation": "Utilizar listas de corte otimizadas: 1) Para aço de armaduras — software de otimização de corte (ex.: aSa, Tekla); 2) Para chapas metálicas — nesting 2D automatizado; 3) Para placas de gesso/madeira — plano de corte por compartimento; 4) Objetivo: taxa de desperdício <3% para materiais lineares e <5% para planares; 5) Incluir sobras reutilizáveis no inventário para uso noutras peças.",
+      "enabled": true,
+      "tags": [
+        "cut-to-size",
+        "otimização",
+        "lista-de-corte",
+        "nesting"
+      ]
+    },
+    {
+      "id": "RCD-SINALIZ-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º, n.º 3 — Sinalização de Zonas de Triagem",
+      "description": "As zonas de triagem e armazenamento de RCD em obra devem possuir sinalização clara e visível, em português e com pictogramas, identificando cada fluxo de resíduos (inertes, não perigosos, perigosos) e o código LER aplicável.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.wasteSegregationSignageInstalled",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sinalização de segregação instalada: {waste.wasteSegregationSignageInstalled}",
+      "requiredValue": "Sinalização completa nas zonas de triagem conforme Art. 8.º",
+      "remediation": "Instalar sinalização de triagem: 1) Placas de identificação em cada contentor/zona (mínimo A3); 2) Texto em português com código LER e descrição do resíduo; 3) Pictogramas de resíduos conforme norma (perigosos: símbolo GHS); 4) Sinalização de proibição de mistura de fluxos; 5) Mapa geral da zona de triagem afixado no escritório de obra; 6) Sinalização resistente a intempéries.",
+      "enabled": true,
+      "tags": [
+        "sinalização",
+        "triagem",
+        "segregação",
+        "pictogramas"
+      ]
+    },
+    {
+      "id": "RCD-SINALIZ-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º, n.º 4 — Sinalização Multilingue em Obra",
+      "description": "Em estaleiros com trabalhadores de diferentes nacionalidades, a sinalização de resíduos deve incluir pictogramas universais e, quando necessário, tradução nas línguas mais representadas da força de trabalho.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.multilingualWorkforce",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.multilingualSignageInstalled",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sinalização multilingue: {waste.multilingualSignageInstalled}",
+      "requiredValue": "Sinalização multilingue para força de trabalho diversa",
+      "remediation": "Implementar sinalização multilingue: 1) Identificar línguas da força de trabalho (frequente: português, romeno, ucraniano, nepalês, inglês); 2) Traduzir sinalização de triagem nas 3 línguas mais frequentes; 3) Privilegiar pictogramas universais e códigos de cores; 4) Incluir exemplos fotográficos de resíduos para cada contentor; 5) Sessão de sensibilização na admissão de cada trabalhador.",
+      "enabled": true,
+      "tags": [
+        "sinalização",
+        "multilingue",
+        "trabalhadores",
+        "comunicação"
+      ]
+    },
+    {
+      "id": "RCD-CORES-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º, n.º 5 — Código de Cores dos Contentores de RCD",
+      "description": "Os contentores de recolha de RCD em obra devem seguir um código de cores padronizado: azul (papel/cartão), amarelo (plásticos/embalagens), verde (vidro), cinzento (inertes/betão), castanho (madeira), vermelho (perigosos), preto (indiferenciados).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.colorCodedBinsImplemented",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Contentores com código de cores: {waste.colorCodedBinsImplemented}",
+      "requiredValue": "Código de cores padronizado em todos os contentores de RCD",
+      "remediation": "Implementar código de cores: 1) Azul — papel e cartão (LER 20 01 01); 2) Amarelo — plásticos e embalagens (LER 17 02 03); 3) Verde — vidro (LER 17 02 02); 4) Cinzento — inertes, betão, alvenaria (LER 17 01); 5) Castanho — madeira (LER 17 02 01); 6) Vermelho — perigosos (LER 17 06, 17 09*); 7) Preto — mistos/indiferenciados (LER 17 09 04); 8) Pintar ou aplicar faixas de cor nos contentores existentes.",
+      "enabled": true,
+      "tags": [
+        "contentores",
+        "código-cores",
+        "triagem",
+        "padronização"
+      ]
+    },
+    {
+      "id": "RCD-CORES-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º, n.º 6 — Manutenção do Código de Cores e Limpeza de Contentores",
+      "description": "Os contentores de RCD devem ser mantidos limpos e com identificação legível. A contaminação cruzada entre fluxos deve ser monitorizada semanalmente, com ações corretivas quando a taxa de contaminação exceder 5%.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.binContaminationRate",
+          "operator": ">",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "Taxa de contaminação cruzada: {waste.binContaminationRate}%",
+      "requiredValue": "Taxa de contaminação cruzada <5% nos contentores de triagem",
+      "remediation": "Reduzir contaminação cruzada: 1) Inspeção visual semanal de cada contentor; 2) Registar tipo e percentagem de materiais contaminantes; 3) Identificar fonte de contaminação (subempreiteiro, equipa específica); 4) Ação corretiva: formação direcionada; 5) Considerar tampas ou redes nos contentores para evitar deposição incorreta; 6) Afixar exemplos fotográficos de materiais aceites em cada contentor.",
+      "enabled": true,
+      "tags": [
+        "contentores",
+        "contaminação",
+        "monitorização",
+        "limpeza"
+      ]
+    },
+    {
+      "id": "RCD-ACESSO-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º, n.º 1 — Acesso de Veículos de Recolha de RCD",
+      "description": "O estaleiro deve prever acessos adequados para veículos de recolha de RCD, com largura mínima de 3,5 m, raio de viragem compatível com camiões de 12 m, piso resistente e zona de manobra junto aos contentores.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.vehicleAccessWidth",
+          "operator": "<",
+          "value": 3.5
+        }
+      ],
+      "currentValueTemplate": "Largura de acesso: {waste.vehicleAccessWidth} m",
+      "requiredValue": "Largura mínima de acesso ≥3,5 m para veículos de recolha",
+      "remediation": "Garantir acesso adequado: 1) Largura mínima de 3,5 m para veículos pesados; 2) Raio de viragem ≥12 m para camiões multibenne; 3) Piso estabilizado com capacidade para 40 t; 4) Zona de manobra mínima 15×15 m junto aos contentores; 5) Sinalização de percurso de veículos pesados; 6) Prever acesso alternativo em caso de bloqueio do principal; 7) Incluir no plano de estaleiro.",
+      "enabled": true,
+      "tags": [
+        "acesso",
+        "veículos",
+        "logística",
+        "estaleiro"
+      ]
+    },
+    {
+      "id": "RCD-ACESSO-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º, n.º 2 — Horário de Recolha e Coordenação Logística",
+      "description": "A recolha de contentores de RCD deve ser coordenada com os horários de trabalho do estaleiro e com as restrições de circulação de veículos pesados da câmara municipal, evitando congestionamento e conflitos com as atividades de construção.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.wasteCollectionScheduleDefined",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Horário de recolha definido: {waste.wasteCollectionScheduleDefined}",
+      "requiredValue": "Horário de recolha de RCD coordenado com estaleiro e câmara municipal",
+      "remediation": "Definir horário de recolha: 1) Consultar restrições de circulação de pesados da câmara municipal; 2) Coordenar com horário de entregas de materiais para evitar conflitos; 3) Preferir recolha em horário de menor atividade no estaleiro; 4) Notificar operador de recolha com 24h de antecedência; 5) Prever contentores de substituição para evitar interrupção da triagem; 6) Registar datas e horas de recolha para rastreabilidade.",
+      "enabled": true,
+      "tags": [
+        "acesso",
+        "recolha",
+        "horário",
+        "coordenação"
+      ]
+    },
+    {
+      "id": "RCD-COMPACT-06",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º, n.º 3 — Especificações de Compactadores de RCD",
+      "description": "Para obras com geração de RCD superior a 50 m³/semana, deve ser considerada a instalação de compactador estacionário para redução de volume dos resíduos não perigosos, com rácio de compactação mínimo de 3:1.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.weeklyWasteVolumeM3",
+          "operator": ">",
+          "value": 50
+        },
+        {
+          "field": "waste.hasCompactorInstalled",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Volume semanal: {waste.weeklyWasteVolumeM3} m³ | Compactador: {waste.hasCompactorInstalled}",
+      "requiredValue": "Compactador recomendado para obras com >50 m³/semana de RCD",
+      "remediation": "Avaliar instalação de compactador: 1) Rácio de compactação mínimo 3:1 (idealmente 5:1); 2) Capacidade compatível com volume semanal de RCD; 3) Alimentação elétrica trifásica (tipicamente 15-30 kW); 4) Zona de instalação com piso de betão nivelado; 5) Manutenção preventiva mensal; 6) Avaliar custo-benefício: redução de transportes vs. custo de aluguer/compra.",
+      "enabled": true,
+      "tags": [
+        "compactador",
+        "volume",
+        "especificações",
+        "redução"
+      ]
+    },
+    {
+      "id": "RCD-COMPACT-07",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 9.º, n.º 4 — Manutenção e Segurança de Compactadores",
+      "description": "Os compactadores de RCD devem ser operados apenas por pessoal com formação específica, com manutenção preventiva documentada e dispositivos de segurança (paragem de emergência, sensor de presença) em conformidade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasCompactorInstalled",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.compactorMaintenanceUpToDate",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Manutenção do compactador atualizada: {waste.compactorMaintenanceUpToDate}",
+      "requiredValue": "Manutenção preventiva do compactador em dia e documentada",
+      "remediation": "Garantir segurança do compactador: 1) Formação de operadores (mínimo 4h) com registo; 2) Manutenção preventiva mensal documentada (óleo hidráulico, vedantes, desgaste); 3) Verificação semanal de dispositivos de segurança; 4) Paragem de emergência acessível e funcional; 5) Sinalização de perigo na zona do compactador; 6) Proibição de compactação de resíduos perigosos; 7) Livro de manutenção atualizado.",
+      "enabled": true,
+      "tags": [
+        "compactador",
+        "manutenção",
+        "segurança",
+        "formação"
+      ]
+    },
+    {
+      "id": "RCD-SOFTWARE-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 49.º — Software de Rastreabilidade de RCD",
+      "description": "Para obras com valor superior a €1.000.000, recomenda-se a utilização de software de rastreabilidade de resíduos de construção que permita o registo digital de pesagens, e-GAR, destinos finais e cálculo automático de taxas de desvio e reciclagem.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.projectValueEuros",
+          "operator": ">",
+          "value": 1000000
+        },
+        {
+          "field": "waste.usesWasteTrackingSoftware",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Software de rastreabilidade: {waste.usesWasteTrackingSoftware}",
+      "requiredValue": "Software de rastreabilidade de RCD recomendado para obras >€1M",
+      "remediation": "Implementar software de rastreabilidade: 1) Selecionar plataforma compatível com e-GAR/SILiAmb; 2) Registar pesagens de cada contentor na saída do estaleiro; 3) Associar e-GAR a cada transporte; 4) Registar destino final e operador licenciado; 5) Dashboard com taxa de desvio e reciclagem em tempo real; 6) Relatórios automáticos para PPGRCD e fiscalização; 7) Integração com sistema de gestão da obra.",
+      "enabled": true,
+      "tags": [
+        "software",
+        "rastreabilidade",
+        "digital",
+        "e-GAR"
+      ]
+    },
+    {
+      "id": "RCD-SOFTWARE-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 49.º, n.º 2 — Pesagem Digital de RCD em Obra",
+      "description": "O registo de pesagens de RCD em obra deve ser realizado com balança calibrada ou estimativa volumétrica documentada, com registo digital associado a cada e-GAR e código LER.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.digitalWeighingRecordKept",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Registo digital de pesagens: {waste.digitalWeighingRecordKept}",
+      "requiredValue": "Registo digital de pesagens de RCD associado a cada e-GAR",
+      "remediation": "Implementar pesagem digital: 1) Instalar balança de plataforma na saída do estaleiro (capacidade ≥40 t) ou utilizar balança do operador; 2) Registar peso bruto, tara e peso líquido de cada contentor; 3) Associar pesagem ao número de e-GAR; 4) Registar código LER e descrição do fluxo; 5) Manter registo digital com data, hora, peso, e-GAR e operador; 6) Calibrar balança anualmente (certificado IPAC).",
+      "enabled": true,
+      "tags": [
+        "software",
+        "pesagem",
+        "digital",
+        "calibração"
+      ]
+    },
+    {
+      "id": "RCD-DESVIO-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 7.º, n.º 3 — Cálculo da Taxa de Desvio de Aterro",
+      "description": "A taxa de desvio de aterro deve ser calculada mensalmente: (massa total de RCD - massa enviada para aterro) / massa total de RCD × 100. A meta mínima é 70% conforme a Diretiva-Quadro de Resíduos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.landfillDiversionRate",
+          "operator": "<",
+          "value": 70
+        }
+      ],
+      "currentValueTemplate": "Taxa de desvio de aterro: {waste.landfillDiversionRate}%",
+      "requiredValue": "Taxa de desvio de aterro ≥70%",
+      "remediation": "Aumentar taxa de desvio: 1) Calcular mensalmente: (RCD total - RCD aterro) / RCD total × 100; 2) Identificar fluxos com maior envio para aterro; 3) Procurar operadores alternativos de reciclagem; 4) Melhorar triagem em obra para aumentar frações valorizáveis; 5) Considerar britagem in situ de inertes para reutilização; 6) Reportar taxa de desvio no relatório mensal de resíduos.",
+      "enabled": true,
+      "tags": [
+        "taxa-desvio",
+        "aterro",
+        "cálculo",
+        "meta-70%"
+      ]
+    },
+    {
+      "id": "RCD-DESVIO-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 7.º, n.º 4 — Relatório Mensal de Desvio de Aterro",
+      "description": "O responsável pela gestão de resíduos em obra deve elaborar relatório mensal com as quantidades de RCD geradas, recicladas, reutilizadas e depositadas em aterro, com cálculo da taxa de desvio por fluxo e acumulada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.monthlyDiversionReportCurrent",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Relatório mensal de desvio atualizado: {waste.monthlyDiversionReportCurrent}",
+      "requiredValue": "Relatório mensal de desvio de aterro atualizado e disponível",
+      "remediation": "Elaborar relatório mensal: 1) Compilar pesagens de todos os transportes do mês por fluxo; 2) Calcular taxa de desvio por fluxo (betão, metais, madeira, etc.); 3) Calcular taxa de desvio global acumulada; 4) Identificar tendências e desvios face à meta; 5) Propor ações corretivas se taxa <70%; 6) Distribuir relatório à direção de obra e ao dono de obra; 7) Arquivar para fiscalização.",
+      "enabled": true,
+      "tags": [
+        "taxa-desvio",
+        "relatório",
+        "mensal",
+        "monitorização"
+      ]
+    },
+    {
+      "id": "RCD-TGR-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 2.º Portaria 115/2011 — Cálculo da Taxa de Gestão de Resíduos para Aterro",
+      "description": "A TGR (Taxa de Gestão de Resíduos) incide sobre a deposição em aterro: €11/tonelada para aterro de inertes, €22/tonelada para aterro de não perigosos e €33/tonelada para aterro de perigosos (valores atualizados).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.tgrCalculationDone",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.hasLandfillDisposal",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cálculo TGR realizado: {waste.tgrCalculationDone}",
+      "requiredValue": "TGR calculada e orçamentada para deposição em aterro",
+      "remediation": "Calcular TGR: 1) Estimar toneladas para aterro por tipo (inertes, não perigosos, perigosos); 2) Aplicar taxas: inertes €11/t, não perigosos €22/t, perigosos €33/t; 3) Incluir TGR no orçamento de gestão de resíduos; 4) Comparar custo de aterro+TGR com custo de reciclagem (frequentemente mais económico); 5) Obter comprovativos de pagamento para relatório final.",
+      "enabled": true,
+      "tags": [
+        "TGR",
+        "aterro",
+        "cálculo",
+        "portaria-115-2011"
+      ]
+    },
+    {
+      "id": "RCD-TGR-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 3.º Portaria 115/2011 — Projeção de Custos TGR no Orçamento",
+      "description": "O orçamento da obra deve incluir uma rubrica específica para custos de deposição em aterro, incluindo TGR, para incentivar a maximização da valorização de resíduos como alternativa economicamente favorável.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.tgrBudgetLineIncluded",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Rubrica TGR no orçamento: {waste.tgrBudgetLineIncluded}",
+      "requiredValue": "Rubrica de custos TGR incluída no orçamento da obra",
+      "remediation": "Incluir rubrica TGR: 1) Estimar volume total de RCD para aterro (m³); 2) Converter para toneladas (densidades típicas); 3) Aplicar taxas TGR por categoria; 4) Adicionar custo de transporte e gate fee do aterro; 5) Comparar com cenário de maximização de reciclagem; 6) Incluir análise custo-benefício no PPG; 7) Rubricar separadamente no orçamento geral da obra.",
+      "enabled": true,
+      "tags": [
+        "TGR",
+        "orçamento",
+        "custos",
+        "projeção"
+      ]
+    },
+    {
+      "id": "RCD-VALORIZ-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 30.º — Certificado de Valorização de RCD",
+      "description": "O operador de gestão de resíduos licenciado deve emitir certificado de valorização para cada lote de RCD rececionado e efetivamente valorizado (reciclado ou reutilizado), indicando código LER, quantidade, operação de valorização e data.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.hasValorizationCertificates",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.rcdSentForRecycling",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Certificados de valorização: {waste.hasValorizationCertificates}",
+      "requiredValue": "Certificados de valorização emitidos para todos os RCD reciclados",
+      "remediation": "Obter certificados de valorização: 1) Solicitar ao operador licenciado certificado para cada entrega; 2) Verificar que inclui: código LER, peso, operação R (R5, R13, etc.), data e n.º de licença; 3) Cruzar com e-GAR para confirmação; 4) Arquivo digital e físico por 5 anos; 5) Compilar certificados para relatório final de obra; 6) Usar como evidência de conformidade com meta de 70%.",
+      "enabled": true,
+      "tags": [
+        "valorização",
+        "certificado",
+        "reciclagem",
+        "operador-licenciado"
+      ]
+    },
+    {
+      "id": "RCD-VALORIZ-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 30.º, n.º 2 — Rastreabilidade da Cadeia de Valorização",
+      "description": "A cadeia de valorização dos RCD deve ser rastreável desde a origem (obra) até ao destino final (produto reciclado ou fim de estatuto de resíduo), com documentação completa em cada etapa.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.fullValorizationChainDocumented",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Cadeia de valorização rastreável: {waste.fullValorizationChainDocumented}",
+      "requiredValue": "Rastreabilidade completa da cadeia de valorização de RCD",
+      "remediation": "Documentar cadeia de valorização: 1) Obra → triagem → transporte → operador → produto; 2) Registar pesagens em cada ponto de transferência; 3) Associar e-GAR a cada transporte; 4) Obter declaração do operador sobre destino do material valorizado; 5) Para agregados reciclados: obter certificado de marcação CE; 6) Manter registos digitais acessíveis por 5 anos.",
+      "enabled": true,
+      "tags": [
+        "valorização",
+        "rastreabilidade",
+        "cadeia",
+        "documentação"
+      ]
+    },
+    {
+      "id": "RCD-PASSPORT-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-B — Passaporte de Materiais da Economia Circular",
+      "description": "Edifícios novos com área >2.000 m² devem possuir passaporte digital de materiais que registe composição, origem, quantidade, vida útil esperada e potencial de reciclagem/reutilização de cada material incorporado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.buildingAreaSqm",
+          "operator": ">",
+          "value": 2000
+        },
+        {
+          "field": "waste.hasDigitalMaterialPassport",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "waste.isNewConstruction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Passaporte digital de materiais: {waste.hasDigitalMaterialPassport}",
+      "requiredValue": "Passaporte digital de materiais obrigatório para edifícios novos >2.000 m²",
+      "remediation": "Criar passaporte digital de materiais: 1) Inventariar todos os materiais por elemento construtivo; 2) Registar: descrição, fabricante, composição, peso, código LER potencial; 3) Classificar potencial de reutilização (alto/médio/baixo); 4) Classificar potencial de reciclagem (alto/médio/baixo); 5) Incluir instruções de desmontagem por elemento; 6) Utilizar formato digital interoperável (BIM, Madaster, ou equivalente); 7) Entregar ao dono de obra com telas finais.",
+      "enabled": true,
+      "tags": [
+        "passaporte-materiais",
+        "economia-circular",
+        "digital",
+        "inventário"
+      ]
+    },
+    {
+      "id": "RCD-PASSPORT-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º-C — Nível de Circularidade no Passaporte de Materiais",
+      "description": "O passaporte de materiais deve incluir um indicador de circularidade do edifício, calculado com base na percentagem de materiais reciclados incorporados, potencial de reciclagem em fim de vida e vida útil dos componentes.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.materialCircularityIndex",
+          "operator": "ordinal_lt",
+          "value": "médio",
+          "scale": [
+            "muito_baixo",
+            "baixo",
+            "médio",
+            "alto",
+            "muito_alto"
+          ]
+        },
+        {
+          "field": "waste.hasDigitalMaterialPassport",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Índice de circularidade: {waste.materialCircularityIndex}",
+      "requiredValue": "Índice de circularidade ≥ médio no passaporte de materiais",
+      "remediation": "Melhorar índice de circularidade: 1) Aumentar percentagem de materiais reciclados incorporados (meta: >10%); 2) Selecionar materiais com alto potencial de reciclagem em fim de vida (aço, alumínio, betão); 3) Evitar materiais compósitos difíceis de separar; 4) Privilegiar ligações mecânicas reversíveis; 5) Prolongar vida útil com materiais duráveis; 6) Recalcular índice com metodologia Material Circularity Indicator (MCI) da Ellen MacArthur Foundation.",
+      "enabled": true,
+      "tags": [
+        "passaporte-materiais",
+        "circularidade",
+        "índice",
+        "economia-circular"
+      ]
+    },
+    {
+      "id": "RCD-REUTEST-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 7.º-D — Reutilização de Elementos Estruturais",
+      "description": "Elementos estruturais recuperados de demolição (vigas metálicas, perfis, lajes pré-fabricadas) podem ser reutilizados em novas obras desde que submetidos a ensaio de integridade estrutural por engenheiro qualificado e certificados pelo IPAC.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.reusesStructuralElements",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.structuralIntegrityTestDone",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ensaio de integridade estrutural: {waste.structuralIntegrityTestDone}",
+      "requiredValue": "Ensaio de integridade obrigatório para elementos estruturais reutilizados",
+      "remediation": "Certificar elementos estruturais reutilizados: 1) Inspeção visual e dimensional por engenheiro de estruturas; 2) Ensaios não destrutivos (ultrassons, magnetometria, esclerometria); 3) Ensaio de tração em provetes (aço) ou carotes (betão) se necessário; 4) Verificação de corrosão, fissuração, deformação permanente; 5) Relatório de aptidão emitido por laboratório acreditado IPAC; 6) Responsabilidade do projetista pela integração no cálculo estrutural.",
+      "enabled": true,
+      "tags": [
+        "reutilização",
+        "estrutural",
+        "ensaio",
+        "certificação"
+      ]
+    },
+    {
+      "id": "RCD-REUTEST-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 7.º-E — Inventário de Elementos para Reutilização",
+      "description": "Antes da demolição, deve ser elaborado inventário dos elementos com potencial de reutilização (vigas metálicas, portas, janelas, sanitários, radiadores, equipamentos) com avaliação do estado de conservação e valor residual.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.isDemolitionProject",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.reuseInventoryPrepared",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Inventário de reutilização: {waste.reuseInventoryPrepared}",
+      "requiredValue": "Inventário de elementos reutilizáveis elaborado antes da demolição",
+      "remediation": "Elaborar inventário de reutilização: 1) Listar elementos com potencial de reutilização; 2) Avaliar estado de conservação (bom/razoável/mau); 3) Fotografar cada elemento; 4) Estimar valor residual de mercado; 5) Contactar mercados de materiais de segunda vida (ex.: plataformas online, revendedores); 6) Planear remoção cuidadosa antes da demolição geral; 7) Armazenar elementos em local protegido.",
+      "enabled": true,
+      "tags": [
+        "reutilização",
+        "inventário",
+        "demolição",
+        "valor-residual"
+      ]
+    },
+    {
+      "id": "RCD-CERTRECL-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 31.º — Certificação de Materiais Reclamados",
+      "description": "Materiais de construção reclamados (segunda vida) que sejam reincorporados em obras devem possuir certificação de conformidade que ateste as suas propriedades técnicas, emitida por laboratório acreditado, garantindo desempenho equivalente ao especificado no projeto.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.usesReclaimedMaterials",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.reclaimedMaterialsCertified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Materiais reclamados certificados: {waste.reclaimedMaterialsCertified}",
+      "requiredValue": "Certificação obrigatória para todos os materiais reclamados reincorporados",
+      "remediation": "Certificar materiais reclamados: 1) Identificar propriedades técnicas exigidas pelo projeto; 2) Ensaiar materiais reclamados em laboratório acreditado IPAC; 3) Para aço: ensaio de tração, resiliência, composição química; 4) Para betão: ensaio de compressão em carotes; 5) Para madeira: classificação visual e ensaio de resistência; 6) Obter certificado de conformidade com referência à norma aplicável; 7) Projetista valida aceitação no projeto.",
+      "enabled": true,
+      "tags": [
+        "certificação",
+        "reclamados",
+        "segunda-vida",
+        "laboratório"
+      ]
+    },
+    {
+      "id": "RCD-CERTRECL-02",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 31.º, n.º 2 — Rastreabilidade de Materiais Reclamados",
+      "description": "Cada lote de material reclamado deve ser rastreável à obra de origem, com documentação que comprove: identificação da obra de origem, data de recuperação, condições de armazenamento e resultados de ensaios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.usesReclaimedMaterials",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.reclaimedMaterialTraceability",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Rastreabilidade de reclamados: {waste.reclaimedMaterialTraceability}",
+      "requiredValue": "Rastreabilidade completa de materiais reclamados até à obra de origem",
+      "remediation": "Garantir rastreabilidade: 1) Registar obra de origem (local, promotor, data de demolição); 2) Documentar condições de recuperação e armazenamento; 3) Etiquetar cada lote com código único; 4) Associar resultados de ensaios ao código do lote; 5) Manter cadeia de custódia documental; 6) Declaração de responsabilidade do fornecedor sobre a origem do material.",
+      "enabled": true,
+      "tags": [
+        "certificação",
+        "reclamados",
+        "rastreabilidade",
+        "cadeia-custódia"
+      ]
+    },
+    {
+      "id": "RCD-FORMACAO-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º — Formação Obrigatória em Gestão de RCD",
+      "description": "Todos os trabalhadores em obra devem receber formação inicial em gestão de resíduos de construção (mínimo 2 horas), abordando triagem, código de cores, materiais perigosos e procedimentos de emergência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.wasteTrainingCompletionRate",
+          "operator": "<",
+          "value": 100
+        }
+      ],
+      "currentValueTemplate": "Taxa de formação em RCD: {waste.wasteTrainingCompletionRate}%",
+      "requiredValue": "100% dos trabalhadores com formação em gestão de RCD",
+      "remediation": "Implementar programa de formação: 1) Formação de integração (2h) para todos os novos trabalhadores; 2) Conteúdos: triagem de resíduos, código de cores de contentores, identificação de perigosos, uso de e-GAR, procedimentos de derrame; 3) Formação em português e línguas da força de trabalho; 4) Registo de presenças assinado; 5) Reciclagem semestral (1h); 6) Avaliação de conhecimentos no final da formação.",
+      "enabled": true,
+      "tags": [
+        "formação",
+        "obrigatória",
+        "trabalhadores",
+        "integração"
+      ]
+    },
+    {
+      "id": "RCD-FORMACAO-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º, n.º 2 — Formação Específica para Responsáveis de Resíduos",
+      "description": "O responsável pela gestão de resíduos em obra deve possuir formação específica de mínimo 16 horas em gestão de RCD, incluindo legislação, classificação LER, e-GAR, perigosos e auditorias.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.wasteManagerTrainingHours",
+          "operator": "<",
+          "value": 16
+        }
+      ],
+      "currentValueTemplate": "Horas de formação do gestor de resíduos: {waste.wasteManagerTrainingHours}h",
+      "requiredValue": "Responsável de resíduos com ≥16 horas de formação específica",
+      "remediation": "Formação do responsável de resíduos: 1) Legislação de RCD (DL 46/2008, DL 102-D/2020, Portaria 417/2008); 2) Classificação LER e identificação de perigosos; 3) Operação do sistema e-GAR e SILiAmb; 4) Planos de gestão de RCD (PPG e PGCD); 5) Auditorias e fiscalização; 6) Gestão de incidentes ambientais; 7) Economia circular e valorização; 8) Certificado de formação acreditada.",
+      "enabled": true,
+      "tags": [
+        "formação",
+        "gestor-resíduos",
+        "específica",
+        "certificada"
+      ]
+    },
+    {
+      "id": "RCD-FORMACAO-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 14.º, n.º 3 — Registos de Formação em Gestão de RCD",
+      "description": "Devem ser mantidos registos atualizados de todas as ações de formação em gestão de resíduos, incluindo conteúdos, duração, formadores, lista de presenças assinada e avaliação de eficácia.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.trainingRecordsUpToDate",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Registos de formação atualizados: {waste.trainingRecordsUpToDate}",
+      "requiredValue": "Registos de formação em RCD completos e atualizados",
+      "remediation": "Manter registos de formação: 1) Dossiê de formação com programa e conteúdos de cada sessão; 2) Lista de presenças assinada por cada participante; 3) Identificação do formador (qualificações); 4) Data, hora e duração de cada sessão; 5) Avaliação de eficácia (teste ou observação em obra); 6) Arquivo digital e físico disponível para fiscalização; 7) Atualizar à entrada de cada novo trabalhador.",
+      "enabled": true,
+      "tags": [
+        "formação",
+        "registos",
+        "documentação",
+        "presenças"
+      ]
+    },
+    {
+      "id": "RCD-INCIDREL-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 15.º — Comunicação Obrigatória de Incidentes Ambientais",
+      "description": "Qualquer incidente ambiental relacionado com resíduos em obra (derrame de perigosos, contaminação de solos, deposição ilegal, incêndio de resíduos) deve ser comunicado à IGAMAOT e à câmara municipal no prazo de 24 horas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.hasUnreportedWasteIncidents",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Incidentes não reportados: {waste.hasUnreportedWasteIncidents}",
+      "requiredValue": "Todos os incidentes ambientais comunicados em 24 horas",
+      "remediation": "Procedimento de comunicação de incidentes: 1) Contenção imediata do incidente (kit de derrame, isolamento da zona); 2) Registo fotográfico e descritivo do incidente; 3) Comunicação à IGAMAOT em 24h (formulário online ou telefone); 4) Notificação à câmara municipal; 5) Se perigosos: contactar APA e bombeiros; 6) Elaborar relatório detalhado em 72h; 7) Implementar ações corretivas e preventivas.",
+      "enabled": true,
+      "tags": [
+        "incidente",
+        "comunicação",
+        "IGAMAOT",
+        "obrigatório"
+      ]
+    },
+    {
+      "id": "RCD-INCIDREL-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 15.º, n.º 2 — Registo de Incidentes e Não Conformidades de Resíduos",
+      "description": "Deve ser mantido um registo atualizado de todos os incidentes e não conformidades relacionados com a gestão de resíduos em obra, incluindo causa raiz, ações corretivas implementadas e verificação de eficácia.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.wasteIncidentRegisterMaintained",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Registo de incidentes mantido: {waste.wasteIncidentRegisterMaintained}",
+      "requiredValue": "Registo atualizado de incidentes e não conformidades de resíduos",
+      "remediation": "Manter registo de incidentes: 1) Criar modelo de ficha de incidente/não conformidade; 2) Registar: data, hora, local, descrição, causa, consequências; 3) Classificar gravidade (menor, significativo, grave); 4) Identificar causa raiz (5 porquês); 5) Definir ações corretivas com responsável e prazo; 6) Verificar eficácia das ações; 7) Análise estatística mensal de tendências.",
+      "enabled": true,
+      "tags": [
+        "incidente",
+        "registo",
+        "não-conformidade",
+        "ações-corretivas"
+      ]
+    },
+    {
+      "id": "RCD-ILEGAL-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 16.º — Prevenção de Deposição Ilegal de RCD",
+      "description": "É proibida a deposição de RCD em locais não licenciados. O produtor de resíduos (dono de obra ou empreiteiro) é responsável pelo destino correto dos resíduos e pode ser responsabilizado pela deposição ilegal, mesmo se realizada por terceiros contratados.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.illegalDumpingPreventionMeasures",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Medidas de prevenção de deposição ilegal: {waste.illegalDumpingPreventionMeasures}",
+      "requiredValue": "Medidas de prevenção de deposição ilegal implementadas",
+      "remediation": "Prevenir deposição ilegal: 1) Verificar licença de todos os operadores de transporte e destino (MIRR/SILiAmb); 2) Emitir e-GAR para todos os transportes; 3) Confirmar receção no destino (e-GAR fechada); 4) Cláusula contratual de responsabilidade com transportadores; 5) Visitar instalações dos operadores de destino periodicamente; 6) Manter registos de rastreabilidade completos; 7) Denunciar deposições ilegais à GNR/SEPNA.",
+      "enabled": true,
+      "tags": [
+        "deposição-ilegal",
+        "prevenção",
+        "responsabilidade",
+        "fiscalização"
+      ]
+    },
+    {
+      "id": "RCD-ILEGAL-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 16.º, n.º 2 — Verificação de Licenciamento de Operadores",
+      "description": "Antes de contratar qualquer operador de transporte ou gestão de resíduos, deve ser verificado o seu licenciamento válido no SILiAmb/MIRR e a compatibilidade dos códigos LER autorizados com os resíduos a encaminhar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.allOperatorsLicenseVerified",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Licenciamento de operadores verificado: {waste.allOperatorsLicenseVerified}",
+      "requiredValue": "Licenciamento de todos os operadores de resíduos verificado e documentado",
+      "remediation": "Verificar licenciamento: 1) Consultar SILiAmb para confirmar licença ativa do operador; 2) Verificar códigos LER autorizados na licença; 3) Confirmar que operações autorizadas (R ou D) correspondem ao destino pretendido; 4) Guardar cópia da licença no dossiê de obra; 5) Renovar verificação anualmente; 6) Nunca entregar resíduos a operadores sem licença verificada; 7) Cláusula contratual exigindo manutenção da licença.",
+      "enabled": true,
+      "tags": [
+        "deposição-ilegal",
+        "licenciamento",
+        "operadores",
+        "SILiAmb"
+      ]
+    },
+    {
+      "id": "RCD-ILEGAL-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 16.º, n.º 3 — Vigilância e Segurança da Zona de Resíduos",
+      "description": "A zona de armazenamento temporário de RCD em obra deve ser vedada, com acesso controlado, para prevenir deposição de resíduos externos e remoção não autorizada de materiais, especialmente perigosos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.wasteStorageAreaSecured",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Zona de resíduos vedada e segura: {waste.wasteStorageAreaSecured}",
+      "requiredValue": "Zona de armazenamento de RCD vedada com acesso controlado",
+      "remediation": "Garantir segurança da zona de resíduos: 1) Vedação perimetral com portão de acesso; 2) Portão fechado fora do horário de trabalho; 3) Sinalização de proibição de acesso não autorizado; 4) Zona de perigosos com fechadura adicional; 5) Registo de entradas e saídas de resíduos; 6) Iluminação noturna dissuasora; 7) Considerar videovigilância para obras de grande dimensão.",
+      "enabled": true,
+      "tags": [
+        "deposição-ilegal",
+        "segurança",
+        "vedação",
+        "acesso-controlado"
+      ]
+    },
+    {
+      "id": "RCD-AUDITPLAN-01",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 13.º — Auditoria ao Plano de Gestão de RCD",
+      "description": "O plano de gestão de RCD (PPG/PGCD) deve ser auditado pelo menos trimestralmente durante a execução da obra, verificando conformidade das práticas em obra com o planeado e identificando desvios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.lastPlanAuditDaysAgo",
+          "operator": ">",
+          "value": 90
+        }
+      ],
+      "currentValueTemplate": "Última auditoria ao plano: há {waste.lastPlanAuditDaysAgo} dias",
+      "requiredValue": "Auditoria ao plano de gestão de RCD a cada 90 dias",
+      "remediation": "Realizar auditoria trimestral ao PPG/PGCD: 1) Verificar conformidade das práticas de triagem com o plano; 2) Comparar quantidades reais vs. estimadas por fluxo; 3) Verificar documentação (e-GAR, pesagens, certificados); 4) Inspecionar zona de armazenamento e contentores; 5) Verificar formação de trabalhadores; 6) Entrevistar encarregados sobre procedimentos; 7) Elaborar relatório com não conformidades e ações corretivas.",
+      "enabled": true,
+      "tags": [
+        "auditoria",
+        "plano",
+        "trimestral",
+        "conformidade"
+      ]
+    },
+    {
+      "id": "RCD-AUDITPLAN-02",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 13.º, n.º 2 — Checklist de Auditoria ao Sistema de Gestão de RCD",
+      "description": "A auditoria ao sistema de gestão de RCD deve seguir uma checklist padronizada que abranja todos os requisitos legais: PPG, triagem, armazenamento, transporte, e-GAR, destino final, perigosos, formação e documentação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.standardAuditChecklistUsed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Checklist de auditoria padronizada: {waste.standardAuditChecklistUsed}",
+      "requiredValue": "Checklist de auditoria padronizada implementada",
+      "remediation": "Implementar checklist de auditoria: 1) PPG aprovado e atualizado; 2) Zona de triagem com mínimo de fluxos exigidos; 3) Contentores com código de cores e sinalização; 4) Armazenamento de perigosos conforme requisitos; 5) e-GAR emitidas para todos os transportes; 6) Pesagens registadas; 7) Operadores com licença verificada; 8) Formação de trabalhadores documentada; 9) Taxa de desvio ≥70%; 10) Registos digitais atualizados.",
+      "enabled": true,
+      "tags": [
+        "auditoria",
+        "checklist",
+        "padronização",
+        "requisitos"
+      ]
+    },
+    {
+      "id": "RCD-AUDITPLAN-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 50.º — Auditoria Independente para Obras Públicas",
+      "description": "Em obras públicas com valor superior a €2.000.000, a gestão de RCD deve ser auditada por entidade independente, acreditada pelo IPAC, no mínimo semestralmente, com relatório entregue ao dono de obra e à câmara municipal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "waste.isPublicWork",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "waste.projectValueEuros",
+          "operator": ">",
+          "value": 2000000
+        },
+        {
+          "field": "waste.independentAuditCompleted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Auditoria independente: {waste.independentAuditCompleted}",
+      "requiredValue": "Auditoria independente semestral obrigatória para obras públicas >€2M",
+      "remediation": "Contratar auditoria independente: 1) Selecionar entidade acreditada pelo IPAC para auditorias ambientais; 2) Frequência mínima semestral; 3) Âmbito: conformidade com PPG, legislação e boas práticas; 4) Relatório com classificação de conformidade (conforme/não conforme/observação); 5) Plano de ações corretivas para não conformidades; 6) Entregar relatório ao dono de obra público e câmara municipal; 7) Seguimento de ações na auditoria seguinte.",
+      "enabled": true,
+      "tags": [
+        "auditoria",
+        "independente",
+        "obras-públicas",
+        "IPAC"
+      ]
+    },
+    {
+      "id": "RCD-MINIMIZ-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 6 — Meta de Redução de Resíduos por m² de Construção",
+      "description": "A geração de resíduos por metro quadrado de construção nova deve ser monitorizada e comparada com benchmarks do setor. O objetivo é não exceder 80 kg/m² para construção nova e 500 kg/m² para reabilitação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.wastePerSqm",
+          "operator": "formula_gt",
+          "value": "waste.isNewConstruction ? 80 : 500"
+        }
+      ],
+      "currentValueTemplate": "Resíduos gerados: {waste.wastePerSqm} kg/m²",
+      "requiredValue": "≤80 kg/m² (construção nova) ou ≤500 kg/m² (reabilitação)",
+      "remediation": "Reduzir geração de resíduos por m²: 1) Monitorizar peso total de RCD e dividir por área bruta; 2) Comparar com benchmark do setor (nova: 50-80 kg/m², reabilitação: 300-500 kg/m²); 3) Se acima do benchmark: rever práticas de encomenda (just-in-time, cut-to-size); 4) Verificar armazenamento de materiais (proteção contra intempéries e danos); 5) Reforçar formação de trabalhadores; 6) Identificar subempreiteiros com maior geração de resíduos.",
+      "enabled": true,
+      "tags": [
+        "minimização",
+        "benchmark",
+        "kg/m²",
+        "monitorização"
+      ]
+    },
+    {
+      "id": "RCD-PREFAB-03",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 7.º, n.º 7 — Embalagens Retornáveis e Reutilizáveis",
+      "description": "O caderno de encargos deve especificar a utilização de embalagens retornáveis e paletes reutilizáveis para materiais de construção, com acordos de devolução com fornecedores, reduzindo significativamente os resíduos de embalagem.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.returnablePackagingPolicy",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Política de embalagens retornáveis: {waste.returnablePackagingPolicy}",
+      "requiredValue": "Política de embalagens retornáveis implementada com fornecedores",
+      "remediation": "Implementar embalagens retornáveis: 1) Incluir cláusula no caderno de encargos exigindo embalagens retornáveis; 2) Acordar com fornecedores sistema de devolução de paletes; 3) Solicitar big bags reutilizáveis em vez de descartáveis; 4) Contentores retornáveis para ferragens e acessórios; 5) Zona de armazenamento de embalagens para devolução; 6) Registar taxa de devolução por fornecedor; 7) Redução estimada: 30-50% dos resíduos de embalagem.",
+      "enabled": true,
+      "tags": [
+        "pré-fabricação",
+        "embalagens",
+        "retornáveis",
+        "prevenção"
+      ]
+    },
+    {
+      "id": "RCD-SINALIZ-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 8.º, n.º 7 — Mapa de Localização de Pontos de Triagem",
+      "description": "O plano de estaleiro deve incluir a localização de todos os pontos de triagem e armazenamento de RCD, com distâncias otimizadas relativamente às zonas de trabalho para facilitar a segregação na origem.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.wastePointsOnSitePlan",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Pontos de triagem no plano de estaleiro: {waste.wastePointsOnSitePlan}",
+      "requiredValue": "Pontos de triagem mapeados no plano de estaleiro",
+      "remediation": "Incluir pontos de triagem no plano de estaleiro: 1) Definir localização de contentores por piso/zona; 2) Distância máxima de 50 m das zonas de trabalho principais; 3) Contentores em cada piso para obras em altura; 4) Ponto central de consolidação junto ao acesso de veículos; 5) Zona específica para perigosos (coberta, bacia de retenção); 6) Atualizar plano à medida que a obra evolui; 7) Afixar plano em local visível.",
+      "enabled": true,
+      "tags": [
+        "sinalização",
+        "plano-estaleiro",
+        "pontos-triagem",
+        "localização"
+      ]
+    },
+    {
+      "id": "RCD-TRACKING-01",
+      "regulationId": "dl-102-d-2020",
+      "article": "Art. 49.º, n.º 3 — Dashboard de Gestão de RCD em Tempo Real",
+      "description": "Para obras com duração superior a 12 meses, recomenda-se a utilização de dashboard digital com indicadores de gestão de RCD em tempo real: taxa de desvio, custo por tonelada, conformidade de e-GAR e tendência mensal.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "waste.projectDurationMonths",
+          "operator": ">",
+          "value": 12
+        },
+        {
+          "field": "waste.hasWasteDashboard",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Dashboard de RCD: {waste.hasWasteDashboard}",
+      "requiredValue": "Dashboard digital de gestão de RCD recomendado para obras >12 meses",
+      "remediation": "Implementar dashboard de RCD: 1) Indicadores-chave: taxa de desvio (%), custo de gestão (€/m²), peso por fluxo (t); 2) Gráfico de tendência mensal de geração vs. meta; 3) Estado de conformidade de e-GAR (emitidas vs. fechadas); 4) Comparação com benchmark do setor; 5) Alertas automáticos quando taxa de desvio <70%; 6) Acesso via web/mobile para equipa de obra e direção.",
+      "enabled": true,
+      "tags": [
+        "software",
+        "dashboard",
+        "indicadores",
+        "tempo-real"
+      ]
+    },
+    {
+      "id": "RCD-DESVIO-03",
+      "regulationId": "dl-46-2008",
+      "article": "Art. 7.º, n.º 5 — Meta de Desvio por Fluxo Específico",
+      "description": "Além da meta global de 70%, devem ser monitorizadas metas de desvio por fluxo específico: metais ≥95%, madeira ≥80%, betão/inertes ≥90%, plásticos ≥50%, gesso ≥70%.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "waste.metalsDiversionRate",
+          "operator": "<",
+          "value": 95
+        }
+      ],
+      "currentValueTemplate": "Taxa de desvio de metais: {waste.metalsDiversionRate}%",
+      "requiredValue": "Taxa de desvio de metais ≥95%",
+      "remediation": "Aumentar desvio de metais: 1) Separação magnética no ponto de triagem; 2) Contentores exclusivos para metais ferrosos e não ferrosos; 3) Recuperação de cablagem elétrica (cobre); 4) Acordos com sucateiros para recolha regular; 5) Incentivo económico: metais têm valor positivo no mercado; 6) Verificar subempreiteiros de serralharia/canalização para triagem de sobras.",
+      "enabled": true,
+      "tags": [
+        "taxa-desvio",
+        "metais",
+        "fluxo-específico",
+        "meta"
+      ]
     }
   ]
 }
