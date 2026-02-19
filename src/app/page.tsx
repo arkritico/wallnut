@@ -919,20 +919,22 @@ export default function Home() {
                 <h1 className="text-3xl font-bold text-gray-900">
                   {lang === "pt" ? "Gestão de Regulamentos" : "Regulations Management"}
                 </h1>
-                <button
-                  onClick={() => setView("audit")}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  {lang === "pt" ? "Auditoria" : "Audit"}
-                </button>
-                <button
-                  onClick={() => setView("graph")}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="8" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7"/><line x1="7.5" y1="8.5" x2="10.5" y2="16"/><line x1="15" y1="10.5" x2="13.5" y2="16"/></svg>
-                  {lang === "pt" ? "Ver Grafo 3D" : "View 3D Graph"}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setView("audit")}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    {lang === "pt" ? "Auditoria" : "Audit"}
+                  </button>
+                  <button
+                    onClick={() => setView("graph")}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="8" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7"/><line x1="7.5" y1="8.5" x2="10.5" y2="16"/><line x1="15" y1="10.5" x2="13.5" y2="16"/></svg>
+                    {lang === "pt" ? "Ver Grafo 3D" : "View 3D Graph"}
+                  </button>
+                </div>
               </div>
               <p className="text-gray-600">
                 {lang === "pt"

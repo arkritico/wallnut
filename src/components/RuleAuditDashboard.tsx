@@ -12,7 +12,18 @@ import {
   CheckCircle,
   Filter,
   X,
+  Eye,
+  EyeOff,
+  Wrench,
+  MessageSquare,
 } from "lucide-react";
+import {
+  getAnnotations,
+  setAnnotation as saveAnnotation,
+  removeAnnotation,
+  type RuleAnnotation,
+  type AnnotationStatus,
+} from "@/lib/rule-annotations";
 
 // ============================================================
 // Types
@@ -85,6 +96,12 @@ const SEVERITY_CONFIG = {
   pass: { icon: CheckCircle, color: "text-green-600", bg: "bg-green-50", border: "border-green-200", label: "OK" },
 } as const;
 
+const ANNOTATION_CONFIG: Record<AnnotationStatus, { icon: React.ComponentType<{ className?: string }>; color: string; bg: string; border: string; label: string }> = {
+  reviewed: { icon: Eye, color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", label: "Revista" },
+  irrelevant: { icon: EyeOff, color: "text-gray-500", bg: "bg-gray-100", border: "border-gray-300", label: "Irrelevante" },
+  "needs-fix": { icon: Wrench, color: "text-orange-700", bg: "bg-orange-50", border: "border-orange-200", label: "Corrigir" },
+};
+
 const STATUS_COLORS: Record<string, string> = {
   active: "bg-green-100 text-green-800",
   amended: "bg-yellow-100 text-yellow-800",
@@ -112,6 +129,9 @@ export default function RuleAuditDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("rules");
 
+  // Annotations
+  const [annotations, setAnnotations] = useState<Record<string, RuleAnnotation>>({});
+
   // Filters
   const [search, setSearch] = useState("");
   const [filterSpecialty, setFilterSpecialty] = useState("");
@@ -119,6 +139,7 @@ export default function RuleAuditDashboard() {
   const [filterRegulation, setFilterRegulation] = useState("");
   const [filterScope, setFilterScope] = useState("");
   const [filterEnabled, setFilterEnabled] = useState<"" | "enabled" | "disabled">("");
+  const [filterAnnotation, setFilterAnnotation] = useState<"" | AnnotationStatus | "none">("");
   const [showFilters, setShowFilters] = useState(false);
 
   // Sort
@@ -133,8 +154,9 @@ export default function RuleAuditDashboard() {
   const [expandedRegs, setExpandedRegs] = useState<Set<string>>(new Set());
   const [expandedPlugins, setExpandedPlugins] = useState<Set<string>>(new Set());
 
-  // Fetch data
+  // Fetch data + annotations
   useEffect(() => {
+    setAnnotations(getAnnotations());
     fetch("/api/rule-audit")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -144,6 +166,31 @@ export default function RuleAuditDashboard() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  // Annotation handlers
+  const handleSetAnnotation = useCallback((ruleId: string, status: AnnotationStatus, note?: string) => {
+    const ann: RuleAnnotation = { status, note, updatedAt: new Date().toISOString() };
+    saveAnnotation(ruleId, ann);
+    setAnnotations((prev) => ({ ...prev, [ruleId]: ann }));
+  }, []);
+
+  const handleRemoveAnnotation = useCallback((ruleId: string) => {
+    removeAnnotation(ruleId);
+    setAnnotations((prev) => {
+      const next = { ...prev };
+      delete next[ruleId];
+      return next;
+    });
+  }, []);
+
+  // Annotation stats
+  const annotationStats = useMemo(() => {
+    const stats = { reviewed: 0, irrelevant: 0, "needs-fix": 0 };
+    for (const ann of Object.values(annotations)) {
+      stats[ann.status] = (stats[ann.status] ?? 0) + 1;
+    }
+    return stats;
+  }, [annotations]);
 
   // Derive specialty list
   const specialties = useMemo(() => {
@@ -178,6 +225,11 @@ export default function RuleAuditDashboard() {
     if (filterScope) rules = rules.filter((r) => r.projectScope === filterScope);
     if (filterEnabled === "enabled") rules = rules.filter((r) => r.enabled);
     if (filterEnabled === "disabled") rules = rules.filter((r) => !r.enabled);
+    if (filterAnnotation === "none") {
+      rules = rules.filter((r) => !annotations[r.id]);
+    } else if (filterAnnotation) {
+      rules = rules.filter((r) => annotations[r.id]?.status === filterAnnotation);
+    }
     if (search) {
       const q = search.toLowerCase();
       rules = rules.filter(
@@ -203,6 +255,12 @@ export default function RuleAuditDashboard() {
           va = order[a.severity]; vb = order[b.severity]; break;
         }
         case "conditions": va = a.conditionCount; vb = b.conditionCount; break;
+        case "audit": {
+          const order: Record<string, number> = { "needs-fix": 0, reviewed: 1, irrelevant: 2 };
+          va = annotations[a.id] ? order[annotations[a.id].status] ?? 3 : 4;
+          vb = annotations[b.id] ? order[annotations[b.id].status] ?? 3 : 4;
+          break;
+        }
         default: va = a.id; vb = b.id;
       }
       const cmp = typeof va === "number" ? va - (vb as number) : String(va).localeCompare(String(vb));
@@ -210,14 +268,14 @@ export default function RuleAuditDashboard() {
     });
 
     return rules;
-  }, [data, filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, search, sortCol, sortDir]);
+  }, [data, annotations, filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, filterAnnotation, search, sortCol, sortDir]);
 
   // Paged rules
   const pagedRules = useMemo(() => filteredRules.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE), [filteredRules, page]);
   const totalPages = Math.ceil(filteredRules.length / PAGE_SIZE);
 
   // Reset page when filters change
-  useEffect(() => { setPage(0); }, [filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, search]);
+  useEffect(() => { setPage(0); }, [filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, filterAnnotation, search]);
 
   // Sort handler
   const handleSort = useCallback((col: string) => {
@@ -253,19 +311,24 @@ export default function RuleAuditDashboard() {
     });
   }, []);
 
-  // CSV export
+  // CSV export (with annotation columns)
   const exportCSV = useCallback(() => {
     if (!filteredRules.length) return;
-    const headers = ["ID", "Specialty", "Regulation", "Article", "Severity", "Description", "Conditions", "Remediation", "Tags", "Enabled", "Scope"];
-    const rows = filteredRules.map((r) => [
-      r.id, r.specialtyName, r.regulationRef, r.article, r.severity,
-      `"${r.description.replace(/"/g, '""')}"`,
-      r.conditionCount,
-      `"${r.remediation.replace(/"/g, '""')}"`,
-      `"${r.tags.join(", ")}"`,
-      r.enabled ? "Yes" : "No",
-      r.projectScope,
-    ]);
+    const headers = ["ID", "Specialty", "Regulation", "Article", "Severity", "Description", "Conditions", "Remediation", "Tags", "Enabled", "Scope", "Audit Status", "Audit Note"];
+    const rows = filteredRules.map((r) => {
+      const ann = annotations[r.id];
+      return [
+        r.id, r.specialtyName, r.regulationRef, r.article, r.severity,
+        `"${r.description.replace(/"/g, '""')}"`,
+        r.conditionCount,
+        `"${r.remediation.replace(/"/g, '""')}"`,
+        `"${r.tags.join(", ")}"`,
+        r.enabled ? "Yes" : "No",
+        r.projectScope,
+        ann?.status ?? "",
+        ann?.note ? `"${ann.note.replace(/"/g, '""')}"` : "",
+      ];
+    });
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -274,22 +337,23 @@ export default function RuleAuditDashboard() {
     a.download = `wallnut-rules-audit-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [filteredRules]);
+  }, [filteredRules, annotations]);
 
-  // JSON export
+  // JSON export (with annotations)
   const exportJSON = useCallback(() => {
     if (!data) return;
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const exported = { ...data, annotations };
+    const blob = new Blob([JSON.stringify(exported, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = `wallnut-rules-audit-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [data]);
+  }, [data, annotations]);
 
   // Active filter count
-  const activeFilterCount = [filterSpecialty, filterRegulation, filterScope, filterEnabled].filter(Boolean).length + filterSeverity.length;
+  const activeFilterCount = [filterSpecialty, filterRegulation, filterScope, filterEnabled, filterAnnotation].filter(Boolean).length + filterSeverity.length;
 
   const clearFilters = useCallback(() => {
     setFilterSpecialty("");
@@ -297,6 +361,7 @@ export default function RuleAuditDashboard() {
     setFilterRegulation("");
     setFilterScope("");
     setFilterEnabled("");
+    setFilterAnnotation("");
     setSearch("");
   }, []);
 
@@ -321,6 +386,8 @@ export default function RuleAuditDashboard() {
     );
   }
 
+  const totalAnnotated = Object.keys(annotations).length;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -341,8 +408,8 @@ export default function RuleAuditDashboard() {
         </div>
       </div>
 
-      {/* Severity summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {/* Severity + annotation summary cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
         {(["critical", "warning", "info", "pass"] as const).map((sev) => {
           const cfg = SEVERITY_CONFIG[sev];
           const Icon = cfg.icon;
@@ -368,7 +435,42 @@ export default function RuleAuditDashboard() {
             </button>
           );
         })}
+        {(["reviewed", "irrelevant", "needs-fix"] as const).map((status) => {
+          const cfg = ANNOTATION_CONFIG[status];
+          const Icon = cfg.icon;
+          const count = annotationStats[status];
+          return (
+            <button
+              key={status}
+              onClick={() => {
+                setFilterAnnotation((prev) => prev === status ? "" : status);
+                setTab("rules");
+              }}
+              className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                filterAnnotation === status ? `${cfg.bg} ${cfg.border}` : "bg-white border-gray-200 hover:border-gray-300"
+              }`}
+            >
+              <Icon className={`w-5 h-5 ${cfg.color}`} />
+              <div className="text-left">
+                <div className="text-lg font-bold text-gray-900">{count}</div>
+                <div className="text-xs text-gray-500">{cfg.label}</div>
+              </div>
+            </button>
+          );
+        })}
       </div>
+
+      {/* Audit progress bar */}
+      {totalAnnotated > 0 && (
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-gray-500">Progresso da auditoria:</span>
+          <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${Math.round((totalAnnotated / data.stats.totalRules) * 100)}%` }} />
+          </div>
+          <span className="text-gray-700 font-medium">{totalAnnotated}/{data.stats.totalRules}</span>
+          <span className="text-gray-400">({Math.round((totalAnnotated / data.stats.totalRules) * 100)}%)</span>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -435,7 +537,7 @@ export default function RuleAuditDashboard() {
 
           {/* Filter panel */}
           {showFilters && (
-            <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-lg grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Especialidade</label>
                 <select value={filterSpecialty} onChange={(e) => setFilterSpecialty(e.target.value)} className="w-full text-sm border border-gray-300 rounded px-2 py-1.5">
@@ -465,6 +567,16 @@ export default function RuleAuditDashboard() {
                   <option value="">Todos</option>
                   <option value="enabled">Ativa</option>
                   <option value="disabled">Desativada</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Auditoria</label>
+                <select value={filterAnnotation} onChange={(e) => setFilterAnnotation(e.target.value as "" | AnnotationStatus | "none")} className="w-full text-sm border border-gray-300 rounded px-2 py-1.5">
+                  <option value="">Todas</option>
+                  <option value="reviewed">Revista</option>
+                  <option value="irrelevant">Irrelevante</option>
+                  <option value="needs-fix">Corrigir</option>
+                  <option value="none">Sem anotação</option>
                 </select>
               </div>
               <div>
@@ -504,9 +616,8 @@ export default function RuleAuditDashboard() {
                     { key: "id", label: "ID" },
                     { key: "specialty", label: "Especialidade" },
                     { key: "regulation", label: "Regulamento" },
-                    { key: "article", label: "Artigo" },
                     { key: "severity", label: "Severidade" },
-                    { key: "conditions", label: "Cond." },
+                    { key: "audit", label: "Auditoria" },
                   ].map(({ key, label }) => (
                     <th
                       key={key}
@@ -523,21 +634,21 @@ export default function RuleAuditDashboard() {
               <tbody className="divide-y divide-gray-100">
                 {pagedRules.map((rule) => {
                   const isExpanded = expandedRules.has(rule.id);
-                  const sev = SEVERITY_CONFIG[rule.severity];
-                  const SevIcon = sev.icon;
+                  const ann = annotations[rule.id];
                   return (
                     <RuleRow
                       key={rule.id}
                       rule={rule}
+                      annotation={ann}
                       isExpanded={isExpanded}
                       onToggle={toggleRule}
-                      sevConfig={sev}
-                      SevIcon={SevIcon}
+                      onSetAnnotation={handleSetAnnotation}
+                      onRemoveAnnotation={handleRemoveAnnotation}
                     />
                   );
                 })}
                 {pagedRules.length === 0 && (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-400">Nenhuma regra encontrada</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-400">Nenhuma regra encontrada</td></tr>
                 )}
               </tbody>
             </table>
@@ -673,22 +784,33 @@ export default function RuleAuditDashboard() {
 
 function RuleRow({
   rule,
+  annotation,
   isExpanded,
   onToggle,
-  sevConfig,
-  SevIcon,
+  onSetAnnotation,
+  onRemoveAnnotation,
 }: {
   rule: AuditRule;
+  annotation?: RuleAnnotation;
   isExpanded: boolean;
   onToggle: (id: string) => void;
-  sevConfig: (typeof SEVERITY_CONFIG)[keyof typeof SEVERITY_CONFIG];
-  SevIcon: React.ComponentType<{ className?: string }>;
+  onSetAnnotation: (ruleId: string, status: AnnotationStatus, note?: string) => void;
+  onRemoveAnnotation: (ruleId: string) => void;
 }) {
+  const sev = SEVERITY_CONFIG[rule.severity];
+  const SevIcon = sev.icon;
+  const isIrrelevant = annotation?.status === "irrelevant";
+  const [noteText, setNoteText] = useState(annotation?.note ?? "");
+  const [showNote, setShowNote] = useState(false);
+
+  // Sync note text when annotation changes externally
+  useEffect(() => { setNoteText(annotation?.note ?? ""); }, [annotation?.note]);
+
   return (
     <>
       <tr
         onClick={() => onToggle(rule.id)}
-        className={`cursor-pointer hover:bg-gray-50 transition-colors ${!rule.enabled ? "opacity-50" : ""}`}
+        className={`cursor-pointer hover:bg-gray-50 transition-colors ${!rule.enabled ? "opacity-50" : ""} ${isIrrelevant ? "opacity-40" : ""}`}
       >
         <td className="px-3 py-2">
           {isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -696,19 +818,104 @@ function RuleRow({
         <td className="px-3 py-2 font-mono text-xs">{rule.id}</td>
         <td className="px-3 py-2 text-gray-600">{rule.specialtyName}</td>
         <td className="px-3 py-2 text-gray-600">{rule.regulationRef}</td>
-        <td className="px-3 py-2 text-gray-500">{rule.article}</td>
         <td className="px-3 py-2">
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sevConfig.bg} ${sevConfig.color}`}>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sev.bg} ${sev.color}`}>
             <SevIcon className="w-3 h-3" />
-            {sevConfig.label}
+            {sev.label}
           </span>
         </td>
-        <td className="px-3 py-2 text-center text-gray-500">{rule.conditionCount}</td>
-        <td className="px-3 py-2 text-gray-700 truncate max-w-[300px]">{rule.description}</td>
+        <td className="px-3 py-2">
+          {annotation ? (() => {
+            const cfg = ANNOTATION_CONFIG[annotation.status];
+            const AnnIcon = cfg.icon;
+            return (
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.bg} ${cfg.color}`}>
+                <AnnIcon className="w-3 h-3" />
+                {cfg.label}
+              </span>
+            );
+          })() : (
+            <span className="text-xs text-gray-300">&mdash;</span>
+          )}
+        </td>
+        <td className={`px-3 py-2 text-gray-700 truncate max-w-[300px] ${isIrrelevant ? "line-through" : ""}`}>{rule.description}</td>
       </tr>
       {isExpanded && (
         <tr>
-          <td colSpan={8} className="bg-gray-50 px-6 py-4">
+          <td colSpan={7} className="bg-gray-50 px-6 py-4">
+            {/* Annotation toolbar */}
+            <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200">
+              <span className="text-xs font-medium text-gray-500 mr-1">Classificar:</span>
+              {(["reviewed", "irrelevant", "needs-fix"] as const).map((status) => {
+                const cfg = ANNOTATION_CONFIG[status];
+                const AnnIcon = cfg.icon;
+                const isActive = annotation?.status === status;
+                return (
+                  <button
+                    key={status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isActive) {
+                        onRemoveAnnotation(rule.id);
+                      } else {
+                        onSetAnnotation(rule.id, status, noteText || undefined);
+                      }
+                    }}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                      isActive
+                        ? `${cfg.bg} ${cfg.border} ${cfg.color}`
+                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-400"
+                    }`}
+                  >
+                    <AnnIcon className="w-3.5 h-3.5" />
+                    {cfg.label}
+                  </button>
+                );
+              })}
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowNote(!showNote); }}
+                className={`inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs border transition-colors ${
+                  showNote || annotation?.note ? "border-blue-300 text-blue-600 bg-blue-50" : "border-gray-200 text-gray-400 hover:text-gray-600"
+                }`}
+                title="Adicionar nota"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                {annotation?.note ? "Nota" : ""}
+              </button>
+            </div>
+
+            {/* Note field */}
+            {showNote && (
+              <div className="mb-4 flex gap-2">
+                <input
+                  type="text"
+                  value={noteText}
+                  onChange={(e) => setNoteText(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && annotation) {
+                      onSetAnnotation(rule.id, annotation.status, noteText || undefined);
+                      setShowNote(false);
+                    }
+                  }}
+                  placeholder="Nota do engenheiro..."
+                  className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (annotation) {
+                      onSetAnnotation(rule.id, annotation.status, noteText || undefined);
+                    }
+                    setShowNote(false);
+                  }}
+                  className="px-3 py-1.5 text-xs bg-accent text-white rounded-lg hover:bg-accent-hover"
+                >
+                  Guardar
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Descrição completa</h4>
@@ -745,6 +952,10 @@ function RuleRow({
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">Metadados</h4>
                 <div className="space-y-1.5">
+                  <div className="flex gap-2">
+                    <span className="text-gray-500">Artigo:</span>
+                    <span className="text-gray-800">{rule.article}</span>
+                  </div>
                   <div className="flex gap-2">
                     <span className="text-gray-500">Âmbito:</span>
                     <span className="text-gray-800">
