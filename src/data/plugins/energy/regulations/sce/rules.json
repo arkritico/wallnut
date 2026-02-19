@@ -256,7 +256,7 @@
         {
           "field": "energy.ntcNtRatio",
           "operator": ">",
-          "value": 1.0
+          "value": 1
         },
         {
           "field": "isRehabilitation",
@@ -310,7 +310,7 @@
         {
           "field": "energy.ntcNtRatio",
           "operator": ">",
-          "value": 1.0
+          "value": 1
         },
         {
           "field": "isRehabilitation",
@@ -583,7 +583,7 @@
         {
           "field": "energy.primaryEnergyRatio",
           "operator": ">",
-          "value": 1.0
+          "value": 1
         },
         {
           "field": "buildingType",
@@ -2388,7 +2388,7 @@
         {
           "field": "energy.formFactor",
           "operator": ">",
-          "value": 1.0
+          "value": 1
         }
       ],
       "currentValueTemplate": "Fator de forma: {energy.formFactor}",
@@ -2412,7 +2412,7 @@
         {
           "field": "energy.daylightFactorAvg",
           "operator": "<",
-          "value": 2.0
+          "value": 2
         }
       ],
       "currentValueTemplate": "Fator de luz do dia médio: {energy.daylightFactorAvg}%",
@@ -4208,7 +4208,7 @@
         {
           "field": "energy.ntcNtRatio",
           "operator": ">",
-          "value": 1.0
+          "value": 1
         },
         {
           "field": "isRehabilitation",
@@ -5663,7 +5663,7 @@
         {
           "field": "energy.solarThermal.areaPerOccupant",
           "operator": "<",
-          "value": 1.0
+          "value": 1
         },
         {
           "field": "systems.hasSolarThermal",
@@ -6287,6 +6287,1534 @@
         "financiamento",
         "Fundo Ambiental",
         "PRR"
+      ]
+    },
+    {
+      "id": "ENE-EMBOD-01",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Energia Incorporada: Limite de Carbono Incorporado em Edifícios NZEB",
+      "description": "O edifício NZEB não apresenta cálculo da energia incorporada (embodied energy) dos materiais de construção, conforme exigido para verificação do impacto ambiental do ciclo de vida.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.embodiedEnergy.calculated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isNZEB",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cálculo de energia incorporada: não realizado",
+      "requiredValue": "Cálculo obrigatório de energia incorporada (kWh/m²) para edifícios NZEB conforme EN 15978",
+      "remediation": "Realizar cálculo de energia incorporada dos materiais de construção conforme EN 15978: (1) utilizar dados EPD (Environmental Product Declarations) dos materiais; (2) incluir fases A1-A3 (produção), A4-A5 (transporte e construção); (3) objetivo: < 500 kWh/m² para estrutura e envolvente; (4) ferramentas: One Click LCA, eLCA, ou cálculo manual com base de dados INIES/Ecoinvent.",
+      "enabled": true,
+      "tags": [
+        "energia incorporada",
+        "embodied energy",
+        "NZEB",
+        "LCA",
+        "carbono"
+      ]
+    },
+    {
+      "id": "ENE-EMBOD-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Energia Incorporada: Limite por m² de Área Bruta",
+      "description": "A energia incorporada total dos materiais de construção excede o limite recomendado de 800 kWh/m² de área bruta, indicando utilização excessiva de materiais com elevado impacto energético na produção.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.embodiedEnergy.totalPerM2",
+          "operator": ">",
+          "value": 800
+        }
+      ],
+      "currentValueTemplate": "Energia incorporada total: {energy.embodiedEnergy.totalPerM2} kWh/m²",
+      "requiredValue": "≤ 800 kWh/m² de energia incorporada (fases A1-A5) para edifícios residenciais",
+      "remediation": "Reduzir a energia incorporada: (1) substituir betão convencional por betão com incorporação de cinzas volantes ou escória (redução 20-40%); (2) utilizar madeira certificada em estrutura e revestimentos; (3) maximizar utilização de materiais reciclados (aço reciclado, agregados reciclados); (4) reduzir espessuras através de otimização estrutural; (5) utilizar isolamentos de baixa energia incorporada (cortiça, lã de rocha vs. XPS).",
+      "enabled": true,
+      "tags": [
+        "energia incorporada",
+        "materiais",
+        "redução",
+        "sustentabilidade"
+      ]
+    },
+    {
+      "id": "ENE-LCA-01",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Avaliação de Ciclo de Vida Energético (LCA) do Edifício",
+      "description": "O edifício novo não possui avaliação de ciclo de vida energético (LCA) que integre energia operacional e energia incorporada ao longo de 50 anos, conforme recomendado para edifícios NZEB.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.lca.completed",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isNZEB",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Avaliação LCA energética: não realizada",
+      "requiredValue": "LCA energético obrigatório para NZEB: fases A1-A5, B1-B7, C1-C4, D (EN 15978, período 50 anos)",
+      "remediation": "Realizar LCA energético conforme EN 15978 com período de referência de 50 anos: (1) fase de produção e construção (A1-A5); (2) fase de utilização incluindo energia operacional (B6), água (B7), manutenção (B2), substituições (B4); (3) fase de fim de vida (C1-C4); (4) benefícios além do ciclo de vida (D — reciclagem, recuperação energética). Utilizar ferramentas certificadas Level(s).",
+      "enabled": true,
+      "tags": [
+        "LCA",
+        "ciclo de vida",
+        "EN 15978",
+        "NZEB",
+        "Level(s)"
+      ]
+    },
+    {
+      "id": "ENE-LCA-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Rácio Energia Incorporada vs. Energia Operacional",
+      "description": "O rácio entre energia incorporada e energia operacional ao longo do ciclo de vida do edifício excede 40%, indicando que as medidas de eficiência operacional estão a ser anuladas pelo impacto dos materiais.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.lca.embodiedToOperationalRatio",
+          "operator": ">",
+          "value": 0.4
+        }
+      ],
+      "currentValueTemplate": "Rácio energia incorporada/operacional: {energy.lca.embodiedToOperationalRatio}",
+      "requiredValue": "Rácio energia incorporada / energia operacional ≤ 40% ao longo de 50 anos (recomendado para NZEB)",
+      "remediation": "Reequilibrar o perfil energético do ciclo de vida: (1) se a energia operacional é muito baixa (NZEB), a energia incorporada domina — reduzir com materiais de baixo impacto; (2) se a energia incorporada é elevada, considerar soluções construtivas alternativas (madeira CLT vs. betão); (3) otimizar durabilidade dos materiais para reduzir substituições (fase B4); (4) prever desmontabilidade para reuso no fim de vida (fase D).",
+      "enabled": true,
+      "tags": [
+        "LCA",
+        "rácio energético",
+        "ciclo de vida",
+        "equilíbrio"
+      ]
+    },
+    {
+      "id": "ENE-POVERTY-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Limiar de Pobreza Energética: Custo Energético vs. Rendimento",
+      "description": "O custo energético anual estimado do edifício excede 10% do rendimento mediano das famílias da região, indicando risco de pobreza energética para os ocupantes.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.poverty.energyCostToIncomeRatio",
+          "operator": ">",
+          "value": 0.1
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        }
+      ],
+      "currentValueTemplate": "Rácio custo energético/rendimento: {energy.poverty.energyCostToIncomeRatio}",
+      "requiredValue": "Custo energético anual ≤ 10% do rendimento mediano familiar (limiar de pobreza energética)",
+      "remediation": "Reduzir o custo energético para mitigar pobreza energética: (1) reforçar isolamento térmico (reduzir necessidades de aquecimento); (2) instalar bomba de calor eficiente (COP > 3.0) em substituição de resistência elétrica; (3) instalar PV para autoconsumo (reduzir fatura elétrica); (4) verificar elegibilidade para tarifa social de energia (TSE); (5) candidatar a programas de apoio (Vale Eficiência, PRR); (6) implementar medidas comportamentais de poupança.",
+      "enabled": true,
+      "tags": [
+        "pobreza energética",
+        "custo energético",
+        "rendimento",
+        "tarifa social"
+      ]
+    },
+    {
+      "id": "ENE-POVERTY-02",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Pobreza Energética: Conforto Térmico Mínimo",
+      "description": "A simulação energética indica que o edifício não consegue manter a temperatura interior mínima de conforto (18°C no inverno) com um custo de energia razoável, indicando risco de pobreza energética.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.poverty.canMaintainMinTemp",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "residential"
+        }
+      ],
+      "currentValueTemplate": "Não é possível manter 18°C com custo razoável",
+      "requiredValue": "Temperatura interior mínima de 18°C mantida com custo energético ≤ 10% do rendimento mediano",
+      "remediation": "Priorizar intervenções que garantam conforto mínimo: (1) isolamento de coberturas e paredes (redução de perdas térmicas 30-50%); (2) eliminação de infiltrações de ar excessivas (caixilharia, caixas de estore); (3) instalação de bomba de calor ar-ar (COP 3-4, investimento reduzido); (4) aproveitamento de ganhos solares passivos (sul); (5) candidatura ao Fundo Ambiental ou programa municipal de combate à pobreza energética.",
+      "enabled": true,
+      "tags": [
+        "pobreza energética",
+        "conforto térmico",
+        "temperatura mínima",
+        "habitação"
+      ]
+    },
+    {
+      "id": "ENE-POVERTY-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Classe Energética Mínima para Arrendamento Social",
+      "description": "O edifício destinado a arrendamento social ou acessível apresenta classe energética inferior a C, não garantindo custos energéticos controlados para os inquilinos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.energyClass",
+          "operator": "ordinal_lt",
+          "value": "C",
+          "scale": [
+            "A+",
+            "A",
+            "B",
+            "B-",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        },
+        {
+          "field": "building.isSocialHousing",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Classe energética: {energy.energyClass}",
+      "requiredValue": "Classe energética ≥ C para habitação social (recomendação de boa prática)",
+      "remediation": "Melhorar a classe energética para pelo menos C: (1) reforçar envolvente (ETICS, cobertura, caixilharia); (2) instalar sistema de AQS eficiente (bomba de calor ou solar térmico); (3) instalar PV para autoconsumo coletivo; (4) recorrer a financiamento PRR para habitação social; (5) a melhoria da classe energética reduz o custo de energia para os inquilinos em 30-50%.",
+      "enabled": true,
+      "tags": [
+        "pobreza energética",
+        "habitação social",
+        "classe energética",
+        "arrendamento"
+      ]
+    },
+    {
+      "id": "ENE-COMUN-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 Art. 5.º — Comunidade de Energia Renovável: Rácio de Partilha",
+      "description": "A comunidade de energia renovável (CER) não atinge o rácio mínimo de partilha de 50% da energia produzida entre os membros, indicando concentração excessiva num único consumidor.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.community.sharingRatio",
+          "operator": "<",
+          "value": 0.5
+        },
+        {
+          "field": "energy.community.isCER",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rácio de partilha CER: {energy.community.sharingRatio}",
+      "requiredValue": "≥ 50% da energia produzida partilhada entre membros da CER (boa prática DL 162/2019)",
+      "remediation": "Aumentar a partilha de energia na CER: (1) diversificar perfis de consumo dos membros (residencial + comercial + serviços); (2) instalar bateria comunitária para gestão de excedentes; (3) implementar algoritmo de repartição dinâmica (priorizar membros com maior consumo instantâneo); (4) considerar inclusão de carregamento VE como carga flexível; (5) garantir contabilização individual via plataforma de gestão CER.",
+      "enabled": true,
+      "tags": [
+        "CER",
+        "comunidade energética",
+        "partilha",
+        "DL 162/2019"
+      ]
+    },
+    {
+      "id": "ENE-COMUN-02",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Comunidade de Energia: Registo e Estatutos da CER",
+      "description": "A comunidade de energia renovável (CER) não está formalmente constituída com estatutos e registo na DGEG conforme exigido pelo DL 162/2019.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.community.registeredDGEG",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.community.isCER",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "CER não registada na DGEG",
+      "requiredValue": "CER registada na DGEG com estatutos aprovados, NIF e representante legal designado",
+      "remediation": "Formalizar a CER: (1) constituir entidade jurídica (associação, cooperativa ou outra forma legal); (2) elaborar estatutos com regras de adesão, partilha e governação; (3) registar na DGEG via portal SERUP; (4) designar representante legal e gestor técnico; (5) obter contrato de acesso à rede com o operador de distribuição (E-REDES); (6) implementar plataforma de contabilização da energia partilhada.",
+      "enabled": true,
+      "tags": [
+        "CER",
+        "registo",
+        "DGEG",
+        "estatutos",
+        "constituição"
+      ]
+    },
+    {
+      "id": "ENE-SMART-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Indicador de Prontidão para Redes Inteligentes (SRI)",
+      "description": "O edifício de serviços novo não avaliou o indicador de prontidão para redes inteligentes (Smart Readiness Indicator — SRI) conforme previsto na Diretiva EPBD 2018/844.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.smartGrid.sriAssessed",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "office"
+          ]
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "SRI não avaliado",
+      "requiredValue": "Avaliação SRI (Smart Readiness Indicator) recomendada para edifícios de serviços novos (EPBD art. 8.º)",
+      "remediation": "Avaliar o SRI do edifício conforme metodologia europeia: (1) domínios: aquecimento, arrefecimento, ventilação, AQS, iluminação, eletricidade, carregamento VE, envolvente dinâmica, monitorização; (2) critérios: eficiência energética, resposta à rede, conforto, conveniência; (3) classificação de 0% a 100%; (4) objetivo mínimo recomendado: 40% para edifícios novos; (5) utilizar ferramenta de cálculo SRI da Comissão Europeia.",
+      "enabled": true,
+      "tags": [
+        "SRI",
+        "smart readiness",
+        "rede inteligente",
+        "EPBD"
+      ]
+    },
+    {
+      "id": "ENE-SMART-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Infraestrutura de Comunicação para Smart Grid",
+      "description": "O edifício não dispõe de infraestrutura de comunicação (rede de dados, gateways, protocolos abertos) para integração com redes inteligentes e gestão de energia em tempo real.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.smartGrid.communicationInfra",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem infraestrutura de comunicação smart grid",
+      "requiredValue": "Rede de dados (Ethernet/fibra), gateway IoT, protocolos abertos (BACnet, Modbus, MQTT) para GES",
+      "remediation": "Instalar infraestrutura de comunicação: (1) rede Ethernet/fibra até quadros elétricos e equipamentos AVAC; (2) gateway IoT para integração de contadores e sensores; (3) adotar protocolos abertos (BACnet IP para AVAC, Modbus TCP para contadores, MQTT para IoT); (4) prever API aberta para integração com plataformas de gestão de energia e operador de rede; (5) garantir cibersegurança (firewall, VPN, segmentação de rede).",
+      "enabled": true,
+      "tags": [
+        "smart grid",
+        "comunicação",
+        "IoT",
+        "BACnet",
+        "infraestrutura"
+      ]
+    },
+    {
+      "id": "ENE-SMART-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Contador Inteligente (Smart Meter) Bidirecional",
+      "description": "O edifício com produção renovável não dispõe de contador inteligente bidirecional para contabilização da energia injetada na rede e consumida.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.smartGrid.hasBidirectionalMeter",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.pv.installedPower",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Sem contador inteligente bidirecional",
+      "requiredValue": "Contador bidirecional (smart meter) obrigatório para UPAC com injeção na rede",
+      "remediation": "Solicitar à E-REDES a instalação de contador inteligente bidirecional: (1) obrigatório para UPAC com potência > 350 W; (2) o contador deve registar energia importada e exportada em intervalos de 15 minutos; (3) garantir compatibilidade com o sistema de gestão de energia; (4) ativar telecontagem para acesso a dados de consumo em tempo real via portal E-REDES.",
+      "enabled": true,
+      "tags": [
+        "smart meter",
+        "contador bidirecional",
+        "telecontagem",
+        "E-REDES"
+      ]
+    },
+    {
+      "id": "ENE-DEMAND-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Capacidade de Resposta à Procura (Demand Response)",
+      "description": "O edifício de serviços com potência contratada > 41.4 kVA não possui capacidade de modulação de carga para participação em programas de resposta à procura (demand response).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.demandResponse.capable",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.contractedPowerKva",
+          "operator": ">",
+          "value": 41.4
+        }
+      ],
+      "currentValueTemplate": "Sem capacidade de demand response",
+      "requiredValue": "Capacidade de modulação de carga ≥ 10% da potência contratada para demand response",
+      "remediation": "Implementar capacidade de demand response: (1) identificar cargas flexíveis (AVAC — pré-arrefecimento/aquecimento, AQS, carregamento VE, iluminação não crítica); (2) instalar controladores que aceitem sinais externos (OpenADR, sinal tarifário); (3) definir perfis de conforto com bandas de tolerância (±1°C para AVAC); (4) estimar potência modulável (objetivo: ≥ 10% da contratada); (5) contactar comercializador para adesão a programa de demand response.",
+      "enabled": true,
+      "tags": [
+        "demand response",
+        "modulação carga",
+        "flexibilidade",
+        "rede"
+      ]
+    },
+    {
+      "id": "ENE-DEMAND-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Gestão de Cargas para Resposta Tarifária",
+      "description": "O sistema de gestão técnica do edifício não implementa gestão automática de cargas em função do perfil tarifário (horas de ponta, cheia, vazio e super-vazio).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.demandResponse.tariffManagement",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem gestão automática de cargas por tarifa",
+      "requiredValue": "Gestão automática de cargas em função de períodos tarifários (ponta, cheia, vazio, super-vazio)",
+      "remediation": "Implementar gestão tarifária de cargas: (1) programar AVAC para pré-condicionar em horas de vazio/super-vazio; (2) agendar carregamento VE para super-vazio (00h-06h); (3) programar AQS com bomba de calor para horas de vazio; (4) deslastre automático de cargas não críticas em horas de ponta; (5) integrar sinal tarifário no BMS/GTC; (6) poupança estimada: 10-20% na fatura elétrica.",
+      "enabled": true,
+      "tags": [
+        "gestão tarifária",
+        "cargas",
+        "ponta",
+        "vazio",
+        "BMS"
+      ]
+    },
+    {
+      "id": "ENE-DEMAND-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Pré-condicionamento Térmico para Demand Response",
+      "description": "O edifício com armazenamento térmico (massa térmica ou depósito) não utiliza estratégia de pré-condicionamento para deslocar a procura energética das horas de ponta.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.demandResponse.preConditioningEnabled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.hvacInstalledPower",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Pré-condicionamento térmico não ativado",
+      "requiredValue": "Pré-condicionamento térmico ativo em horas de vazio para sistemas AVAC > 50 kW",
+      "remediation": "Ativar pré-condicionamento térmico: (1) iniciar aquecimento/arrefecimento 1-2h antes da ocupação em tarifa de vazio; (2) utilizar a massa térmica do edifício como armazenamento (lajes de betão absorvem 20-30 Wh/m²·K); (3) para sistemas com depósito de gelo ou água gelada, carregar em super-vazio; (4) definir setpoints dinâmicos: T_conforto ± 2°C nas horas de pré-condicionamento; (5) monitorizar e ajustar sazonalmente.",
+      "enabled": true,
+      "tags": [
+        "pré-condicionamento",
+        "demand response",
+        "massa térmica",
+        "armazenamento"
+      ]
+    },
+    {
+      "id": "ENE-BATT-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Dimensionamento de Bateria para Autoconsumo Residencial",
+      "description": "O sistema de armazenamento por bateria não está corretamente dimensionado em relação à produção PV e ao perfil de consumo, resultando em baixa utilização ou excesso de investimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.battery.capacityToProductionRatio",
+          "operator": "not_in_range",
+          "value": [
+            0.8,
+            2.5
+          ]
+        },
+        {
+          "field": "energy.battery.installed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rácio bateria/produção PV diária: {energy.battery.capacityToProductionRatio}",
+      "requiredValue": "Capacidade da bateria: 0.8× a 2.5× a produção PV diária média (kWh/dia)",
+      "remediation": "Redimensionar a bateria: (1) regra expedita residencial: 1.0-1.5 kWh de bateria por kWp PV instalado; (2) para T2/T3: bateria de 5-10 kWh com PV de 3-5 kWp; (3) analisar perfil de consumo horário (curva de carga); (4) simular autoconsumo com e sem bateria para calcular payback; (5) considerar degradação da bateria (80% de capacidade aos 10 anos); (6) bateria LFP preferível (maior duração, maior segurança).",
+      "enabled": true,
+      "tags": [
+        "bateria",
+        "armazenamento",
+        "dimensionamento",
+        "autoconsumo"
+      ]
+    },
+    {
+      "id": "ENE-BATT-02",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Segurança e Instalação de Sistemas de Bateria",
+      "description": "O sistema de armazenamento por bateria não cumpre os requisitos de segurança para instalação em edifício (ventilação, proteção contra incêndio, desconexão de emergência).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.battery.safetyCompliant",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.battery.installed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sistema de bateria não conforme com requisitos de segurança",
+      "requiredValue": "Bateria conforme IEC 62619/UL 9540, ventilação adequada, desconexão de emergência, proteção contra incêndio",
+      "remediation": "Garantir conformidade de segurança da bateria: (1) certificação IEC 62619 (baterias de lítio) ou IEC 62485 (chumbo-ácido); (2) instalar em espaço ventilado (natural ou forçada, taxa mínima conforme fabricante); (3) desconexão de emergência acessível (interruptor DC + AC); (4) proteção contra incêndio: detetor de fumo, extintor classe D, separação de materiais combustíveis; (5) sinalização de perigo elétrico e químico; (6) distância mínima de 1m de quadros elétricos.",
+      "enabled": true,
+      "tags": [
+        "bateria",
+        "segurança",
+        "incêndio",
+        "IEC 62619",
+        "instalação"
+      ]
+    },
+    {
+      "id": "ENE-BATT-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Eficiência de Ida e Volta (Round-trip) do Sistema de Bateria",
+      "description": "A eficiência de ida e volta (round-trip efficiency) do sistema de armazenamento por bateria é inferior ao mínimo recomendado, reduzindo o benefício do autoconsumo.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.battery.roundTripEfficiency",
+          "operator": "<",
+          "value": 0.85
+        },
+        {
+          "field": "energy.battery.installed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Eficiência round-trip: {energy.battery.roundTripEfficiency}",
+      "requiredValue": "Eficiência round-trip ≥ 85% (incluindo perdas do inversor de bateria)",
+      "remediation": "Verificar e melhorar a eficiência do sistema de bateria: (1) baterias LFP/NMC modernas: 92-96% de eficiência de célula; (2) verificar eficiência do inversor de bateria (≥ 96%); (3) eficiência total do sistema (célula × inversor × cabos): ≥ 85%; (4) se a eficiência é baixa, verificar estado de saúde (SOH) da bateria; (5) minimizar perdas em standby (< 1% da capacidade/dia); (6) otimizar estratégia de carga/descarga (evitar micro-ciclos).",
+      "enabled": true,
+      "tags": [
+        "bateria",
+        "eficiência",
+        "round-trip",
+        "armazenamento"
+      ]
+    },
+    {
+      "id": "ENE-PPA-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Contrato de Compra de Energia Renovável (PPA) para GES",
+      "description": "O grande edifício de serviços não avaliou a viabilidade de um contrato de compra de energia renovável (PPA) para garantir preços estáveis e reduzir a pegada de carbono operacional.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.ppa.evaluated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.annualConsumptionMWh",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "currentValueTemplate": "PPA não avaliado para consumo anual de {energy.annualConsumptionMWh} MWh",
+      "requiredValue": "Avaliação de PPA recomendada para GES com consumo > 500 MWh/ano",
+      "remediation": "Avaliar opções de PPA: (1) PPA físico on-site (PV na cobertura com investidor terceiro); (2) PPA virtual/financeiro (contrato com parque eólico/solar remoto); (3) duração típica: 10-15 anos; (4) preço fixo ou indexado com cap; (5) solicitar propostas a pelo menos 3 comercializadores; (6) verificar compatibilidade com regime de autoconsumo DL 162/2019; (7) incluir garantias de origem (GdO) para certificação renovável.",
+      "enabled": true,
+      "tags": [
+        "PPA",
+        "energia renovável",
+        "contrato",
+        "GES",
+        "garantia de origem"
+      ]
+    },
+    {
+      "id": "ENE-PPA-02",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — PPA: Garantias de Origem da Energia Renovável",
+      "description": "O edifício que alega consumo de energia 100% renovável não possui garantias de origem (GdO) certificadas para toda a eletricidade consumida.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.ppa.guaranteesOfOriginComplete",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.claimsRenewableElectricity",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Garantias de origem incompletas para alegação de 100% renovável",
+      "requiredValue": "GdO (Garantias de Origem) certificadas para 100% da eletricidade consumida (Diretiva 2018/2001)",
+      "remediation": "Obter garantias de origem: (1) adquirir GdO emitidas pela DGEG (entidade emissora em Portugal) para cada MWh consumido; (2) as GdO devem ser emitidas para produção no mesmo ano de consumo; (3) para PPA, as GdO estão geralmente incluídas no contrato; (4) para compra no mercado spot, adquirir GdO separadamente via comercializador; (5) as GdO são canceladas após utilização (evitar dupla contagem); (6) reportar no relatório de sustentabilidade.",
+      "enabled": true,
+      "tags": [
+        "garantia de origem",
+        "GdO",
+        "renovável",
+        "certificação",
+        "PPA"
+      ]
+    },
+    {
+      "id": "ENE-GREEN-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Critérios Energéticos para Certificação BREEAM/LEED",
+      "description": "O edifício que visa certificação de sustentabilidade (BREEAM, LEED) não atinge os créditos mínimos na categoria de energia para o nível de certificação pretendido.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.greenCert.energyCreditsAchieved",
+          "operator": "<",
+          "value": 6
+        },
+        {
+          "field": "energy.greenCert.targeted",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Créditos energia alcançados: {energy.greenCert.energyCreditsAchieved}",
+      "requiredValue": "≥ 6 créditos na categoria energia para BREEAM Very Good; ≥ 10 para Excellent",
+      "remediation": "Melhorar créditos energéticos para certificação verde: (1) Ene 01 — Redução de emissões de CO₂ (até 15 créditos, via simulação SBEM/DSM); (2) Ene 02 — Monitorização energética (2 créditos, sub-metering por uso final); (3) Ene 04 — Tecnologias LZC (5 créditos, PV + bomba de calor); (4) Ene 05 — Energia eficiente do frigorífico (1 crédito); (5) Ene 06 — Elevadores eficientes (2 créditos, VSD + regeneração); (6) garantir cumprimento prévio do SCE para baseline.",
+      "enabled": true,
+      "tags": [
+        "BREEAM",
+        "LEED",
+        "certificação verde",
+        "créditos energia"
+      ]
+    },
+    {
+      "id": "ENE-GREEN-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Level(s): Indicador de Desempenho Energético do Edifício",
+      "description": "O edifício novo não reporta o indicador Level(s) 1.1 (Uso de Energia Primária) conforme o quadro europeu de sustentabilidade para edifícios, recomendado para contratação pública.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.greenCert.levelsIndicator11",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Indicador Level(s) 1.1 não reportado",
+      "requiredValue": "Reportar indicador Level(s) 1.1 — Uso de energia primária total (kWh/m²·ano) conforme EN 52000-1",
+      "remediation": "Calcular e reportar o indicador Level(s) 1.1: (1) energia primária total (renovável + não-renovável) em kWh/m²·ano; (2) desagregar por uso: aquecimento, arrefecimento, AQS, ventilação, iluminação; (3) utilizar fatores de conversão de energia primária do Despacho 15793-E/2013; (4) incluir produção renovável (PV, solar térmico); (5) o Level(s) é o quadro europeu de sustentabilidade — crescente adoção em contratação pública.",
+      "enabled": true,
+      "tags": [
+        "Level(s)",
+        "indicador",
+        "energia primária",
+        "sustentabilidade",
+        "contratação pública"
+      ]
+    },
+    {
+      "id": "ENE-EPC-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Contrato de Desempenho Energético (EPC) para GES",
+      "description": "O grande edifício de serviços com potencial de poupança identificado na auditoria não avaliou a modalidade de contrato de desempenho energético (EPC) com ESCO para financiar as medidas de melhoria.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.epc.evaluated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.audit.savingsPotentialPct",
+          "operator": ">",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "EPC não avaliado (potencial de poupança: {energy.audit.savingsPotentialPct}%)",
+      "requiredValue": "Avaliação de EPC recomendada quando potencial de poupança > 20% (DL 118/2013 Art. 31.º)",
+      "remediation": "Avaliar contrato de desempenho energético: (1) modelo de poupanças partilhadas (shared savings): ESCO financia, proprietário partilha poupanças; (2) modelo de poupanças garantidas: ESCO garante % de poupança mínima; (3) duração típica: 7-15 anos; (4) solicitar propostas a ESCOs registadas na ADENE; (5) incluir protocolo IPMVP para verificação de poupanças; (6) especificar baseline energético (consumo pré-intervenção normalizado pelo clima).",
+      "enabled": true,
+      "tags": [
+        "EPC",
+        "ESCO",
+        "contrato desempenho",
+        "poupança",
+        "financiamento"
+      ]
+    },
+    {
+      "id": "ENE-EPC-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Baseline Energético para Contratos de Desempenho (EPC)",
+      "description": "O baseline energético (consumo de referência pré-intervenção) para o contrato de desempenho energético não foi estabelecido com dados de pelo menos 24 meses, normalizados climaticamente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.epc.baselineMonths",
+          "operator": "<",
+          "value": 24
+        },
+        {
+          "field": "energy.epc.active",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Baseline estabelecido com {energy.epc.baselineMonths} meses de dados",
+      "requiredValue": "Baseline energético com ≥ 24 meses de dados de consumo normalizados climaticamente (IPMVP)",
+      "remediation": "Estabelecer baseline robusto: (1) recolher dados de consumo de pelo menos 24 meses (36 meses preferível); (2) normalizar pelo clima (graus-dia de aquecimento e arrefecimento); (3) normalizar pela ocupação e horários de funcionamento; (4) identificar e excluir períodos anómalos (obras, avarias); (5) documentar variáveis independentes (área, ocupação, horário, produção); (6) validar com regressão linear (R² ≥ 0.75); (7) seguir IPMVP (International Performance Measurement and Verification Protocol).",
+      "enabled": true,
+      "tags": [
+        "EPC",
+        "baseline",
+        "IPMVP",
+        "normalização",
+        "consumo"
+      ]
+    },
+    {
+      "id": "ENE-MV-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Protocolo de Medição e Verificação (M&V) de Poupanças",
+      "description": "O edifício com medidas de eficiência energética implementadas não possui protocolo de medição e verificação (M&V) para confirmar as poupanças reais alcançadas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.mv.protocolDefined",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.retrofit.measuresImplemented",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Protocolo M&V não definido",
+      "requiredValue": "Protocolo M&V conforme IPMVP (Opção A, B, C ou D) para verificação de poupanças",
+      "remediation": "Definir protocolo M&V conforme IPMVP: (1) Opção A — medição parcial isolada (para medidas individuais, ex: iluminação LED); (2) Opção B — medição completa isolada (para equipamentos com contagem dedicada); (3) Opção C — medição de toda a instalação (análise de faturas, adequada para múltiplas medidas); (4) Opção D — simulação calibrada (para edifícios complexos); (5) definir frequência de reporte (mensal/trimestral); (6) designar responsável pela M&V.",
+      "enabled": true,
+      "tags": [
+        "M&V",
+        "IPMVP",
+        "poupança",
+        "verificação",
+        "protocolo"
+      ]
+    },
+    {
+      "id": "ENE-MV-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Verificação de Poupanças por Automatização (BAC)",
+      "description": "As poupanças energéticas atribuídas à instalação/melhoria do sistema de automatização (BAC) não foram verificadas com dados reais de consumo pós-intervenção.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.mv.bacSavingsVerified",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.bac.upgraded",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Poupanças BAC não verificadas com dados reais",
+      "requiredValue": "Verificação de poupanças BAC com ≥ 12 meses de dados pós-intervenção (EN 15232, IPMVP Opção C)",
+      "remediation": "Verificar poupanças BAC: (1) comparar consumo pré e pós-intervenção normalizados (clima, ocupação); (2) período mínimo pós-intervenção: 12 meses; (3) a EN 15232 estima 10-30% de poupança em aquecimento e 10-40% em arrefecimento para subida de classe D para B; (4) documentar medidas implementadas (horários, setpoints, free-cooling, etc.); (5) utilizar dados do BMS para análise granular por sistema.",
+      "enabled": true,
+      "tags": [
+        "M&V",
+        "BAC",
+        "poupança",
+        "automatização",
+        "verificação"
+      ]
+    },
+    {
+      "id": "ENE-SUBMTR-01",
+      "regulationId": "en-15232",
+      "article": "EN 15232 / DL 118/2013 — Sub-contagem por Zona Térmica",
+      "description": "O edifício de serviços com múltiplas zonas térmicas não dispõe de sub-contagem de energia por zona, impossibilitando a identificação de zonas com desempenho energético deficiente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.subMetering.byZoneInstalled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.thermalZones",
+          "operator": ">",
+          "value": 3
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem sub-contagem por zona térmica ({energy.thermalZones} zonas)",
+      "requiredValue": "Sub-contagem de energia (elétrica e térmica) por zona para edifícios GES com > 3 zonas térmicas",
+      "remediation": "Instalar sub-contagem por zona térmica: (1) contadores de energia elétrica nos quadros parciais de cada zona; (2) contadores de energia térmica (calorímetros) nos circuitos de AVAC por zona; (3) integrar no BMS para monitorização em tempo real; (4) definir indicadores por zona (kWh/m²·mês); (5) estabelecer alertas para desvios > 20% face ao benchmark; (6) mínimo: separar zonas de escritórios, zonas comerciais, áreas técnicas, estacionamento.",
+      "enabled": true,
+      "tags": [
+        "sub-metering",
+        "zona térmica",
+        "contagem",
+        "GES",
+        "monitorização"
+      ]
+    },
+    {
+      "id": "ENE-SUBMTR-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Sub-contagem por Piso em Edifícios Multi-piso",
+      "description": "O edifício de serviços multi-piso não dispõe de contagem de energia individualizada por piso, dificultando a identificação de consumos anómalos e a alocação de custos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.subMetering.byFloorInstalled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.floors",
+          "operator": ">",
+          "value": 4
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem sub-contagem por piso (edifício de {building.floors} pisos)",
+      "requiredValue": "Sub-contagem elétrica por piso em edifícios GES com > 4 pisos",
+      "remediation": "Instalar sub-contagem por piso: (1) analisador de rede ou contador no quadro parcial de cada piso; (2) medir eletricidade (ativa, reativa, potência) e, se possível, energia térmica; (3) transmitir dados via Modbus TCP ou pulsos para o BMS; (4) criar dashboard com consumo por piso normalizado pela área (kWh/m²); (5) definir alertas para consumos fora do horário de ocupação; (6) permite imputação justa de custos energéticos em edifícios multi-inquilino.",
+      "enabled": true,
+      "tags": [
+        "sub-metering",
+        "piso",
+        "multi-inquilino",
+        "contagem",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-TENANT-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Faturação Energética Individualizada a Inquilinos",
+      "description": "O edifício multi-inquilino não dispõe de sistema de faturação energética individualizada, impossibilitando que cada inquilino pague em função do seu consumo real.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.tenant.individualBilling",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isMultiTenant",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem faturação energética individualizada por inquilino",
+      "requiredValue": "Faturação individualizada de energia por inquilino com base em contagem real (não por permilagem)",
+      "remediation": "Implementar faturação individualizada: (1) instalar contadores de eletricidade por fração/inquilino (contadores MID classe B); (2) para AVAC centralizado, instalar calorímetros por circuito de inquilino; (3) implementar plataforma de billing com leituras automáticas (telecontagem); (4) definir tarifas: componente fixa (potência disponibilizada) + componente variável (consumo real); (5) facturar mensalmente com detalhe por uso final; (6) a faturação real incentiva poupança (20-30% vs. rateio por área).",
+      "enabled": true,
+      "tags": [
+        "faturação",
+        "inquilino",
+        "individualizada",
+        "multi-tenant",
+        "contagem"
+      ]
+    },
+    {
+      "id": "ENE-TENANT-02",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Divulgação de Classe Energética ao Inquilino",
+      "description": "O proprietário do edifício em arrendamento não disponibilizou ao inquilino informação sobre a classe energética e os custos energéticos estimados da fração.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.tenant.energyClassDisclosed",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isRented",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Classe energética não divulgada ao inquilino",
+      "requiredValue": "Classe energética e custo estimado divulgados ao inquilino (DL 68-A/2015, certificado SCE)",
+      "remediation": "Divulgar informação energética ao inquilino: (1) disponibilizar cópia do certificado energético SCE antes da celebração do contrato; (2) incluir a classe energética no anúncio de arrendamento (obrigatório); (3) indicar o custo energético anual estimado (indicado no certificado SCE); (4) informar sobre medidas de melhoria recomendadas pelo PQ; (5) a não disponibilização constitui contraordenação (DL 68-A/2015).",
+      "enabled": true,
+      "tags": [
+        "inquilino",
+        "classe energética",
+        "divulgação",
+        "arrendamento",
+        "certificado"
+      ]
+    },
+    {
+      "id": "ENE-COMMON-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Alocação de Energia das Áreas Comuns em Condomínio",
+      "description": "O edifício em regime de condomínio não possui metodologia definida para alocação do consumo energético das áreas comuns (iluminação, elevadores, bombas) às frações individuais.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.commonArea.allocationDefined",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isCondominium",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem metodologia de alocação de energia das áreas comuns",
+      "requiredValue": "Metodologia de alocação definida (permilagem, área útil, ou consumo proporcional) para áreas comuns",
+      "remediation": "Definir metodologia de alocação: (1) opção A — por permilagem (mais simples, proporcional ao valor da fração); (2) opção B — por área útil da fração (mais justo para frações heterogéneas); (3) opção C — proporcional ao consumo individual (requer contadores individuais); (4) instalar contador dedicado para áreas comuns; (5) incluir: iluminação comum, elevadores, bombas de pressurização, AVAC áreas comuns, portões automáticos; (6) aprovar em assembleia de condomínio.",
+      "enabled": true,
+      "tags": [
+        "áreas comuns",
+        "alocação",
+        "condomínio",
+        "energia",
+        "permilagem"
+      ]
+    },
+    {
+      "id": "ENE-COMMON-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Eficiência Energética da Iluminação de Áreas Comuns",
+      "description": "A iluminação das áreas comuns do edifício (corredores, escadas, garagem, hall) não utiliza tecnologia eficiente (LED) nem controlo por presença/luminosidade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.commonArea.lightingEfficient",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isCondominium",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Iluminação de áreas comuns não eficiente (sem LED e/ou sem controlo)",
+      "requiredValue": "Iluminação LED com controlo por presença/luminosidade em todas as áreas comuns",
+      "remediation": "Melhorar iluminação de áreas comuns: (1) substituir toda a iluminação por LED (payback < 2 anos); (2) instalar detetores de presença em corredores, escadas e garagem; (3) instalar detetores crepusculares em áreas com luz natural (hall de entrada); (4) utilizar regulação dimmer em zonas de circulação (iluminação mínima + boost por presença); (5) poupança típica: 60-80% face a iluminação convencional; (6) incluir iluminação de emergência LED.",
+      "enabled": true,
+      "tags": [
+        "áreas comuns",
+        "iluminação",
+        "LED",
+        "detetor presença",
+        "condomínio"
+      ]
+    },
+    {
+      "id": "ENE-ELEVNRG-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Monitorização do Consumo Energético de Elevadores",
+      "description": "Os elevadores do edifício não dispõem de contagem de energia dedicada para monitorização do consumo e identificação de oportunidades de melhoria.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.elevator.hasEnergyMonitoring",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.elevator.count",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Sem monitorização energética dos elevadores ({energy.elevator.count} unidades)",
+      "requiredValue": "Contagem de energia dedicada por elevador ou grupo de elevadores",
+      "remediation": "Instalar monitorização energética dos elevadores: (1) contador de energia dedicado no quadro de cada elevador; (2) medir consumo em viagem (tração) e em standby (iluminação cabina, eletrónica, ventilação); (3) calcular indicador VDI 4707: kWh por viagem e kWh/ano; (4) o standby representa tipicamente 30-70% do consumo total; (5) integrar no BMS para monitorização contínua; (6) benchmark: classe A (VDI 4707) < 0.56 mWh/(kg·m) por viagem.",
+      "enabled": true,
+      "tags": [
+        "elevador",
+        "monitorização",
+        "consumo",
+        "VDI 4707",
+        "contagem"
+      ]
+    },
+    {
+      "id": "ENE-ELEVNRG-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Classe Energética dos Elevadores (VDI 4707)",
+      "description": "Os elevadores do edifício de serviços não atingem a classe energética mínima C conforme VDI 4707, indicando elevado consumo de energia em tração e/ou standby.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.elevator.energyClass",
+          "operator": "ordinal_gt",
+          "value": "C",
+          "scale": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G"
+          ]
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Classe energética elevadores: {energy.elevator.energyClass}",
+      "requiredValue": "Classe energética ≥ C (VDI 4707) para elevadores em GES; classe A/B recomendada para NZEB",
+      "remediation": "Melhorar classe energética dos elevadores: (1) instalar variador de velocidade (VSD) no motor de tração; (2) substituir motor por motor de ímanes permanentes (gearless); (3) instalar sistema de regeneração de energia (recuperação na descida/desaceleração); (4) LED na cabina com desligamento automático; (5) modo standby com desligamento de ventilação e iluminação após 5 min; (6) controlo de tráfego inteligente (agrupamento de chamadas); (7) poupança potencial: 30-60%.",
+      "enabled": true,
+      "tags": [
+        "elevador",
+        "classe energética",
+        "VDI 4707",
+        "regeneração",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-ELEVNRG-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Elevadores com Regeneração de Energia",
+      "description": "Os elevadores do edifício com mais de 6 pisos não possuem sistema de regeneração de energia, que permite devolver energia à rede quando a cabina desce com carga ou sobe vazia.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.elevator.hasRegeneration",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.floors",
+          "operator": ">",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "Elevadores sem regeneração de energia",
+      "requiredValue": "Sistema de regeneração de energia recomendado para elevadores em edifícios > 6 pisos",
+      "remediation": "Instalar sistema de regeneração: (1) inversor regenerativo que devolve energia à rede (em substituição de resistência de frenagem); (2) poupança de 20-35% no consumo do elevador; (3) payback típico: 3-5 anos para edifícios com elevado tráfego; (4) alternativa: bateria de supercondensadores para armazenar e reutilizar energia de frenagem; (5) compatível com motores gearless existentes; (6) benefício adicional: redução da carga térmica da casa de máquinas.",
+      "enabled": true,
+      "tags": [
+        "elevador",
+        "regeneração",
+        "eficiência",
+        "inversor regenerativo"
+      ]
+    },
+    {
+      "id": "ENE-DC-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 / RECS — PUE de Centro de Dados: Indicador de Eficiência",
+      "description": "O centro de dados ou sala de servidores do edifício apresenta um PUE (Power Usage Effectiveness) superior ao limite recomendado, indicando que os sistemas de suporte (arrefecimento, UPS) consomem energia excessiva.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.dataCenter.pue",
+          "operator": ">",
+          "value": 1.6
+        },
+        {
+          "field": "energy.dataCenter.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "PUE do centro de dados: {energy.dataCenter.pue}",
+      "requiredValue": "PUE ≤ 1.6 (boa prática); PUE ≤ 1.4 (best practice); PUE ≤ 1.2 (estado da arte)",
+      "remediation": "Reduzir o PUE do centro de dados: (1) otimizar arrefecimento: free-cooling direto/indireto (PUE < 1.2 possível em Portugal); (2) aumentar setpoint de corredor frio para 27°C (ASHRAE A1); (3) separar corredores quentes e frios (contenção); (4) melhorar eficiência UPS (modo eco, UPS modulares, eficiência > 96%); (5) consolidar e virtualizar servidores; (6) monitorizar PUE em tempo real (mensal no mínimo); (7) benchmark: PUE médio EU = 1.8, melhor prática = 1.2.",
+      "enabled": true,
+      "tags": [
+        "data center",
+        "PUE",
+        "eficiência",
+        "arrefecimento",
+        "servidores"
+      ]
+    },
+    {
+      "id": "ENE-DC-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Arrefecimento de Centro de Dados: Free-cooling",
+      "description": "O centro de dados não utiliza free-cooling direto ou indireto apesar do clima de Portugal permitir mais de 4000 horas/ano de free-cooling, resultando em consumo excessivo de arrefecimento mecânico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.dataCenter.hasFreeCooling",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.dataCenter.coolingPowerKw",
+          "operator": ">",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "Centro de dados sem free-cooling (potência arrefecimento: {energy.dataCenter.coolingPowerKw} kW)",
+      "requiredValue": "Free-cooling obrigatório para centros de dados > 20 kW de arrefecimento em Portugal continental",
+      "remediation": "Implementar free-cooling no centro de dados: (1) free-cooling direto por ar (economizador): Portugal permite > 4500 horas/ano; (2) free-cooling indireto (permutador ar-água): mais seguro para qualidade do ar interior; (3) adiabático: estende as horas de free-cooling em mais 1000-2000h; (4) definir setpoint de comutação: free-cooling quando T_ext < 20°C; (5) poupança estimada: 40-60% no consumo de arrefecimento; (6) redução de PUE de 0.2-0.4 pontos.",
+      "enabled": true,
+      "tags": [
+        "data center",
+        "free-cooling",
+        "arrefecimento",
+        "PUE",
+        "eficiência"
+      ]
+    },
+    {
+      "id": "ENE-COLD-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Eficiência Energética de Câmaras Frigoríficas",
+      "description": "As câmaras frigoríficas do edifício comercial apresentam consumo energético específico (kWh/m³·ano) superior ao benchmark para a gama de temperatura de operação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.coldStorage.specificConsumption",
+          "operator": ">",
+          "value": 120
+        },
+        {
+          "field": "energy.coldStorage.exists",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Consumo específico câmaras frigoríficas: {energy.coldStorage.specificConsumption} kWh/m³·ano",
+      "requiredValue": "≤ 120 kWh/m³·ano para câmaras de conservação (0°C a 5°C); ≤ 200 kWh/m³·ano para congelação (-18°C a -25°C)",
+      "remediation": "Melhorar eficiência das câmaras frigoríficas: (1) reforçar isolamento (espessura painel: ≥ 100mm para conservação, ≥ 150mm para congelação); (2) instalar portas rápidas ou cortinas de ar em zonas de carga; (3) substituir compressor por modelo inverter (VSD); (4) otimizar condensador (limpeza, sub-arrefecimento, free-cooling noturno); (5) instalar cortinas de tiras em portas de câmaras; (6) LED com detetor de presença no interior; (7) descongelação por demanda (vs. temporizada).",
+      "enabled": true,
+      "tags": [
+        "câmara frigorífica",
+        "frio",
+        "eficiência",
+        "isolamento",
+        "compressor"
+      ]
+    },
+    {
+      "id": "ENE-COLD-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Monitorização Contínua de Sistemas de Frio Comercial",
+      "description": "Os sistemas de frio comercial do edifício (câmaras, expositores, bancadas) não dispõem de monitorização contínua de temperatura e consumo energético.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.coldStorage.continuousMonitoring",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.coldStorage.installedPowerKw",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "currentValueTemplate": "Sem monitorização contínua do frio comercial ({energy.coldStorage.installedPowerKw} kW instalados)",
+      "requiredValue": "Monitorização contínua de temperatura e energia para sistemas de frio > 15 kW (HACCP + eficiência)",
+      "remediation": "Implementar monitorização contínua: (1) sensores de temperatura em cada câmara/expositor com registo automático (HACCP); (2) contagem de energia por circuito frigorífico; (3) alertas de temperatura fora da gama (abertura de porta prolongada, avaria); (4) análise de tendências para deteção precoce de degradação de eficiência (aumento gradual de consumo = fuga de refrigerante, condensador sujo); (5) integração com BMS e sistema de alarmes.",
+      "enabled": true,
+      "tags": [
+        "frio comercial",
+        "monitorização",
+        "HACCP",
+        "temperatura",
+        "alarmes"
+      ]
+    },
+    {
+      "id": "ENE-PROC-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Otimização Energética de Processos em Edifícios de Serviços",
+      "description": "O edifício de serviços com processos consumidores de energia significativos (cozinhas, lavandaria, piscina, esterilização) não realizou otimização energética destes processos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.process.optimizationAssessed",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.process.consumptionPct",
+          "operator": ">",
+          "value": 0.15
+        }
+      ],
+      "currentValueTemplate": "Processos representam {energy.process.consumptionPct} do consumo total sem otimização",
+      "requiredValue": "Otimização energética de processos quando representam > 15% do consumo total do edifício",
+      "remediation": "Otimizar processos consumidores de energia: (1) cozinhas: equipamentos com etiqueta Energy Star, recuperação de calor das hottes, isolamento de fornos; (2) lavandaria: máquinas classe A, recuperação de calor das águas de lavagem; (3) piscinas: cobertura isotérmica (reduz 50% das perdas de evaporação), bomba de calor para AQP, desumidificação com recuperação de calor; (4) esterilização: autoclaves com recuperação de vapor; (5) monitorizar consumo por processo.",
+      "enabled": true,
+      "tags": [
+        "processo",
+        "otimização",
+        "cozinha",
+        "piscina",
+        "lavandaria"
+      ]
+    },
+    {
+      "id": "ENE-PROC-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Eficiência de Bombagem em Sistemas Hidráulicos",
+      "description": "O sistema de bombagem do edifício (AVAC, AQS, pressurização) apresenta eficiência global inferior ao mínimo, considerando motor, bomba e regulação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.process.pumpSystemEfficiency",
+          "operator": "<",
+          "value": 0.4
+        },
+        {
+          "field": "energy.process.pumpPowerTotalKw",
+          "operator": ">",
+          "value": 10
+        }
+      ],
+      "currentValueTemplate": "Eficiência global do sistema de bombagem: {energy.process.pumpSystemEfficiency}",
+      "requiredValue": "Eficiência global ≥ 40% (motor IE3 × bomba × VSD × tubagem) para sistemas > 10 kW",
+      "remediation": "Melhorar eficiência do sistema de bombagem: (1) motores IE3 (obrigatório) ou IE4 (recomendado) para potências > 0.75 kW; (2) bombas de alto rendimento (EN 16480, MEI ≥ 0.7); (3) VSD em todas as bombas > 5.5 kW (obrigatório RECS); (4) otimizar tubagem (reduzir perdas de carga, eliminar restrições); (5) controlo de pressão diferencial (vs. pressão constante); (6) poupança típica com VSD: 30-50%.",
+      "enabled": true,
+      "tags": [
+        "bombagem",
+        "eficiência",
+        "VSD",
+        "motor IE3",
+        "RECS"
+      ]
+    },
+    {
+      "id": "ENE-WHR-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Recuperação de Calor Residual de Equipamentos",
+      "description": "O edifício de serviços não recupera o calor residual de equipamentos que geram calor significativo (compressores de frio, centro de dados, processos industriais) para pré-aquecimento de AQS ou aquecimento ambiente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.wasteHeat.recoveryInstalled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.wasteHeat.availablePowerKw",
+          "operator": ">",
+          "value": 20
+        }
+      ],
+      "currentValueTemplate": "Calor residual disponível: {energy.wasteHeat.availablePowerKw} kW (não recuperado)",
+      "requiredValue": "Recuperação de calor residual obrigatória quando disponível > 20 kW térmicos (boa prática RECS)",
+      "remediation": "Implementar recuperação de calor residual: (1) compressores de frio: dessuperaquecedor para pré-aquecimento AQS (recupera 10-15% da potência de arrefecimento); (2) centro de dados: permutador ar-água no retorno quente para aquecimento de AQS ou aquecimento ambiente; (3) ar de exaustão de cozinhas: permutador de calor cruzado; (4) águas residuais quentes (lavandaria, cozinha): permutador de esgotos; (5) payback típico: 2-5 anos; (6) dimensionar para cobrir pelo menos 50% da potência disponível.",
+      "enabled": true,
+      "tags": [
+        "calor residual",
+        "recuperação",
+        "waste heat",
+        "AQS",
+        "dessuperaquecedor"
+      ]
+    },
+    {
+      "id": "ENE-WHR-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Recuperação de Calor no Condensador do Chiller",
+      "description": "O chiller do edifício de serviços não possui dessuperaquecedor ou permutador de recuperação no circuito de condensação para aproveitamento do calor rejeitado.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.wasteHeat.chillerRecovery",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.chillerPowerKw",
+          "operator": ">",
+          "value": 100
+        }
+      ],
+      "currentValueTemplate": "Chiller > 100 kW sem recuperação de calor do condensador",
+      "requiredValue": "Dessuperaquecedor ou permutador de recuperação recomendado em chillers > 100 kW",
+      "remediation": "Instalar recuperação de calor no chiller: (1) dessuperaquecedor: recupera gás sobreaquecido à saída do compressor (T_saída ≈ 60-80°C) para pré-aquecimento AQS; (2) recupera 10-15% da potência de arrefecimento sem penalizar o COP; (3) para chillers água-água: permutador série no circuito de condensação; (4) para chillers ar-água: condensador duplo (ar + água); (5) ideal para edifícios com necessidades simultâneas de frio e AQS (hotéis, hospitais, piscinas).",
+      "enabled": true,
+      "tags": [
+        "calor residual",
+        "chiller",
+        "dessuperaquecedor",
+        "condensação",
+        "recuperação"
+      ]
+    },
+    {
+      "id": "ENE-WHR-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Recuperação de Calor de Águas Residuais (Drainwater Heat Recovery)",
+      "description": "O edifício com elevado consumo de AQS (hotel, piscina, hospital, lavandaria) não recupera calor das águas residuais quentes para pré-aquecimento da água fria de rede.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.wasteHeat.drainwaterRecovery",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.aqsConsumptionLitersDay",
+          "operator": ">",
+          "value": 2000
+        }
+      ],
+      "currentValueTemplate": "Consumo AQS: {energy.aqsConsumptionLitersDay} L/dia sem recuperação de calor de águas residuais",
+      "requiredValue": "Recuperação de calor de águas residuais recomendada quando consumo AQS > 2000 L/dia",
+      "remediation": "Instalar sistema de recuperação de calor de águas residuais: (1) permutador de calor na coluna de queda (GFX/PowerPipe): eficiência 30-50%, pré-aquece água fria de rede de 15°C para 25-30°C; (2) depósito tampão com permutador para efluentes de chuveiros/cozinha; (3) bomba de calor dedicada a águas residuais (COP 4-6 com fonte a 25-35°C); (4) payback: 3-6 anos para hotéis e piscinas; (5) especialmente eficaz em edifícios com elevada simultaneidade (balneários, cozinhas industriais).",
+      "enabled": true,
+      "tags": [
+        "calor residual",
+        "águas residuais",
+        "drainwater",
+        "AQS",
+        "recuperação"
+      ]
+    },
+    {
+      "id": "ENE-NETZERO-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Verificação de Edifício com Balanço Energético Nulo (Net Zero Energy)",
+      "description": "O edifício que alega estatuto de edifício com balanço energético nulo (net zero energy building) não demonstra que a produção renovável anual iguala ou excede o consumo de energia primária total.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.netZero.annualBalance",
+          "operator": "<",
+          "value": 0
+        },
+        {
+          "field": "energy.netZero.claimed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Balanço energético anual: {energy.netZero.annualBalance} kWh/m²·ano (negativo = défice)",
+      "requiredValue": "Balanço energético anual ≥ 0 kWh_ep/m²·ano (produção renovável ≥ consumo primário)",
+      "remediation": "Para verificar estatuto net zero: (1) calcular consumo de energia primária total (Ntc em kWhep/m²·ano) conforme SCE; (2) calcular produção renovável anual (PV + solar térmico + biomassa) em energia primária equivalente; (3) balanço = produção - consumo ≥ 0; (4) se negativo: aumentar produção PV, reduzir consumo (eficiência da envolvente, sistemas), ou combinar ambos; (5) verificar com 12 meses de dados reais de operação; (6) documentar metodologia de cálculo (EN 52000-1).",
+      "enabled": true,
+      "tags": [
+        "net zero",
+        "balanço energético",
+        "verificação",
+        "energia primária"
+      ]
+    },
+    {
+      "id": "ENE-NETZERO-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Net Zero: Desempenho Real vs. Projetado (Performance Gap)",
+      "description": "O consumo energético real do edifício (medido em operação) excede em mais de 30% o consumo projetado na fase de certificação, indicando um performance gap significativo que compromete a meta net zero.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.netZero.performanceGapRatio",
+          "operator": ">",
+          "value": 0.3
+        },
+        {
+          "field": "energy.netZero.claimed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Performance gap: {energy.netZero.performanceGapRatio} (consumo real vs. projetado)",
+      "requiredValue": "Desvio consumo real/projetado ≤ 30% para manutenção do estatuto net zero",
+      "remediation": "Investigar e corrigir o performance gap: (1) verificar horários reais de ocupação e funcionamento de sistemas (vs. pressupostos do projeto); (2) auditar setpoints de AVAC (frequentemente mais exigentes que o projetado); (3) verificar infiltrações de ar (teste blower door); (4) avaliar cargas de equipamentos (plug loads) reais vs. projetadas; (5) verificar comissionamento dos sistemas (válvulas, registos, controlo); (6) recalibrar modelo energético com dados reais para identificar causas.",
+      "enabled": true,
+      "tags": [
+        "net zero",
+        "performance gap",
+        "consumo real",
+        "comissionamento"
+      ]
+    },
+    {
+      "id": "ENE-NETZERO-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Net Zero: Balanço Mensal de Produção e Consumo",
+      "description": "O edifício net zero não demonstra um perfil de balanço energético mensal equilibrado, com meses de inverno apresentando défice superior a 200% do excedente médio de verão.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.netZero.worstMonthDeficitRatio",
+          "operator": ">",
+          "value": 2
+        },
+        {
+          "field": "energy.netZero.claimed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rácio défice pior mês / excedente médio: {energy.netZero.worstMonthDeficitRatio}",
+      "requiredValue": "Défice do pior mês ≤ 200% do excedente médio mensal (equilíbrio sazonal aceitável)",
+      "remediation": "Equilibrar o perfil sazonal: (1) aumentar capacidade de bateria para armazenamento diário; (2) instalar PV com inclinação mista (30° + 60°) para melhor produção no inverno; (3) considerar microeólica para complementar PV no inverno; (4) reduzir consumo de aquecimento (maior isolamento, bomba de calor eficiente); (5) implementar armazenamento sazonal se viável (solar térmico com depósito sazonal); (6) aderir a comunidade energética (CER) para partilha de excedentes.",
+      "enabled": true,
+      "tags": [
+        "net zero",
+        "balanço mensal",
+        "sazonal",
+        "armazenamento"
+      ]
+    },
+    {
+      "id": "ENE-GREEN-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Taxonomia Verde da UE: Requisitos Energéticos para Investimento Sustentável",
+      "description": "O edifício novo não cumpre os critérios técnicos de avaliação da Taxonomia Verde da UE para ser classificado como investimento sustentável na atividade de construção de edifícios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.greenCert.taxonomyCompliant",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Não conforme com Taxonomia Verde da UE para atividade 7.1",
+      "requiredValue": "Necessidades energia primária ≤ -10% vs. requisitos NZEB nacionais (Taxonomia UE, Ato Delegado Clima)",
+      "remediation": "Cumprir critérios da Taxonomia Verde: (1) necessidades de energia primária 10% abaixo dos requisitos NZEB nacionais; (2) para edifícios > 5000 m²: teste de estanquidade ao ar (n50 ≤ 3.0 h⁻¹); (3) potencial de aquecimento global do ciclo de vida calculado e divulgado (para > 5000 m²); (4) conformidade DNSH (Do No Significant Harm) em adaptação climática, água, economia circular, poluição, biodiversidade; (5) relevante para acesso a financiamento verde e reportes CSRD/SFDR.",
+      "enabled": true,
+      "tags": [
+        "taxonomia verde",
+        "UE",
+        "investimento sustentável",
+        "NZEB",
+        "financiamento"
+      ]
+    },
+    {
+      "id": "ENE-MV-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Reporte Anual de Desempenho Energético Pós-ocupação",
+      "description": "O edifício em operação não produz relatório anual de desempenho energético comparando o consumo real com o consumo de referência (baseline) e identificando desvios.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.mv.annualReportProduced",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem relatório anual de desempenho energético",
+      "requiredValue": "Relatório anual de desempenho energético para GES (comparação real vs. baseline, análise de desvios)",
+      "remediation": "Produzir relatório anual: (1) comparar consumo real (por uso final) com baseline normalizado; (2) calcular indicadores: IEE real (kWhep/m²·ano), rácio renovável, emissões CO₂; (3) analisar desvios > 10% por uso final; (4) identificar medidas corretivas e preventivas; (5) documentar eventos excecionais (avarias, obras, alterações de ocupação); (6) comparar com edifícios similares (benchmarking ADENE); (7) submeter à administração e ao gestor de energia; (8) base para PRE atualizado.",
+      "enabled": true,
+      "tags": [
+        "relatório anual",
+        "desempenho",
+        "pós-ocupação",
+        "GES",
+        "baseline"
+      ]
+    },
+    {
+      "id": "ENE-PROC-03",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Recuperação de Calor em Cogeração de Pequena Escala",
+      "description": "O edifício de serviços com necessidades simultâneas de eletricidade e calor (hotel, hospital, piscina) não avaliou a viabilidade de micro-cogeração para aproveitamento integrado.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.process.cogenerationEvaluated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.thermalBaseloadKw",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "energy.operatingHoursYear",
+          "operator": ">",
+          "value": 4500
+        }
+      ],
+      "currentValueTemplate": "Carga base térmica: {energy.thermalBaseloadKw} kW, {energy.operatingHoursYear} h/ano (cogeração não avaliada)",
+      "requiredValue": "Avaliação de cogeração para carga base térmica > 30 kW e > 4500 h/ano de operação",
+      "remediation": "Avaliar micro-cogeração: (1) motor a gás natural (η_el 30-35%, η_térmico 50-55%, η_global > 85%); (2) dimensionar para carga base térmica (não para pico); (3) horas de funcionamento mínimas: 4500 h/ano para viabilidade; (4) recuperar calor para AQS e/ou aquecimento; (5) calcular PES (Primary Energy Savings) > 10% para qualificação como cogeração de alto rendimento; (6) comparar com bomba de calor + PV (alternativa cada vez mais competitiva); (7) registo na DGEG como unidade de micro-produção.",
+      "enabled": true,
+      "tags": [
+        "cogeração",
+        "CHP",
+        "calor residual",
+        "eficiência",
+        "processo"
       ]
     }
   ]

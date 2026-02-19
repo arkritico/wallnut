@@ -5316,6 +5316,1811 @@
         "categoria",
         "espaço sensível"
       ]
+    },
+    {
+      "id": "REH-RENMIN-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 9.º — Requisito Mínimo de U de Paredes em Grande Reabilitação",
+      "description": "Na grande reabilitação, o coeficiente de transmissão térmica das paredes exteriores intervencionadas ({envelope.rehabWallUValue} W/(m².K)) não cumpre o valor máximo admissível para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.rehabWallUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_walls_rehab",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Reforçar o isolamento térmico das paredes exteriores intervencionadas. Em reabilitação, os valores máximos são menos restritivos que em construção nova, mas devem ser cumpridos nos elementos intervencionados. Soluções: ETICS, isolamento na caixa-de-ar, isolamento pelo interior com barreira pára-vapor.",
+      "currentValueTemplate": "U parede reabilitada = {envelope.rehabWallUValue} W/(m².K)",
+      "requiredValue": "Consultar Despacho 15793-K/2013 — valores máximos em reabilitação por zona climática: I1 ≤ 0.70 / I2 ≤ 0.60 / I3 ≤ 0.50 W/(m².K)",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "renovação",
+        "paredes",
+        "valor-U",
+        "requisito mínimo"
+      ]
+    },
+    {
+      "id": "REH-RENMIN-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 9.º — Requisito Mínimo de U de Cobertura em Grande Reabilitação",
+      "description": "Na grande reabilitação, o coeficiente de transmissão térmica da cobertura intervencionada ({envelope.rehabRoofUValue} W/(m².K)) não cumpre o valor máximo para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.rehabRoofUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_roofs_rehab",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Reforçar o isolamento térmico da cobertura intervencionada. A cobertura é o elemento com maior potencial de poupança energética em reabilitação. Soluções: isolamento sobre a laje de esteira (sótão), isolamento nas vertentes, cobertura invertida com XPS.",
+      "currentValueTemplate": "U cobertura reabilitada = {envelope.rehabRoofUValue} W/(m².K)",
+      "requiredValue": "Consultar Despacho 15793-K/2013 — valores máximos em reabilitação por zona climática: I1 ≤ 0.50 / I2 ≤ 0.45 / I3 ≤ 0.40 W/(m².K)",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "renovação",
+        "cobertura",
+        "valor-U",
+        "requisito mínimo"
+      ]
+    },
+    {
+      "id": "REH-RENMIN-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 9.º — Requisito Mínimo de U de Envidraçados em Renovação",
+      "description": "Na renovação térmica, o coeficiente de transmissão térmica dos envidraçados substituídos ({envelope.rehabWindowUValue} W/(m².K)) não cumpre o valor máximo para a zona climática {location.climateZoneWinter}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.rehabWindowUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_windows_rehab",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Substituir os vãos envidraçados por soluções que cumpram os valores máximos de U em renovação. Soluções: vidro duplo com caixilharia de corte térmico, vidro duplo low-e, ou segunda janela interior. A substituição de envidraçados é uma das medidas com melhor relação custo-benefício em reabilitação.",
+      "currentValueTemplate": "U envidraçado substituído = {envelope.rehabWindowUValue} W/(m².K)",
+      "requiredValue": "Consultar Despacho 15793-K/2013 — valores máximos em reabilitação: I1 ≤ 3.30 / I2 ≤ 3.00 / I3 ≤ 2.80 W/(m².K)",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "renovação",
+        "envidraçados",
+        "valor-U",
+        "caixilharia"
+      ]
+    },
+    {
+      "id": "REH-COSTBEN-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º — Análise Custo-Benefício: Payback de Reforço de Isolamento",
+      "description": "O período de retorno do investimento em reforço de isolamento térmico ({renovation.insulationPaybackYears} anos) excede o horizonte máximo aceitável de 15 anos, tornando a medida economicamente inviável conforme a análise custo-benefício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "renovation.insulationPaybackYears",
+          "operator": ">",
+          "value": 15
+        }
+      ],
+      "remediation": "Reconsiderar a espessura e tipo de isolamento para reduzir o custo do investimento, ou combinar com outras intervenções na envolvente para maximizar a poupança energética. Em reabilitação profunda, o payback do isolamento pode ser reduzido se combinado com substituição de sistemas e aproveitamento de renováveis.",
+      "currentValueTemplate": "Payback isolamento = {renovation.insulationPaybackYears} anos",
+      "requiredValue": "Payback ≤ 15 anos (horizonte económico de referência para edifícios residenciais)",
+      "enabled": true,
+      "tags": [
+        "custo-benefício",
+        "payback",
+        "isolamento",
+        "renovação",
+        "investimento"
+      ]
+    },
+    {
+      "id": "REH-COSTBEN-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º — Análise Custo-Benefício: Poupança Energética Mínima",
+      "description": "A poupança energética estimada com a intervenção de renovação térmica ({renovation.energySavingsPercent}%) é inferior ao limiar mínimo de 25% para justificar o investimento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "renovation.energySavingsPercent",
+          "operator": "<",
+          "value": 25
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Reavaliar o pacote de medidas de renovação para atingir uma poupança energética mínima de 25%. Considerar intervenções integradas: envolvente + sistemas + renováveis. O Fundo de Eficiência Energética (FEE) e outros incentivos requerem geralmente poupanças demonstráveis superiores a 25%.",
+      "currentValueTemplate": "Poupança energética estimada = {renovation.energySavingsPercent}%",
+      "requiredValue": "≥ 25% de poupança energética para viabilidade custo-benefício e acesso a incentivos",
+      "enabled": true,
+      "tags": [
+        "custo-benefício",
+        "poupança energética",
+        "renovação",
+        "incentivos",
+        "FEE"
+      ]
+    },
+    {
+      "id": "REH-COSTBEN-03",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 32.º — Análise Custo-Benefício: Custo Óptimo de Renovação Térmica",
+      "description": "O custo global de renovação térmica ({renovation.globalCostPerM2} EUR/m²) excede o nível de custo óptimo para o nível de desempenho energético pretendido.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "renovation.globalCostPerM2",
+          "operator": ">",
+          "value": 350
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Optimizar o pacote de medidas para reduzir o custo global. Priorizar medidas com melhor relação custo-eficácia: isolamento da cobertura (maior impacto, menor custo), substituição de envidraçados, ETICS. Considerar faseamento da intervenção e acesso a programas de financiamento (IFRRU 2020, PRR).",
+      "currentValueTemplate": "Custo global renovação = {renovation.globalCostPerM2} EUR/m²",
+      "requiredValue": "≤ 350 EUR/m² (nível de custo óptimo de referência para habitação em Portugal)",
+      "enabled": true,
+      "tags": [
+        "custo-benefício",
+        "custo óptimo",
+        "renovação",
+        "financiamento",
+        "IFRRU"
+      ]
+    },
+    {
+      "id": "REH-ISOMAT-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Condutividade Térmica do Isolamento Aplicado",
+      "description": "A condutividade térmica declarada do material de isolamento ({insulation.thermalConductivity} W/(m.K)) excede o valor máximo aceitável de 0.065 W/(m.K) para ser considerado como isolamento térmico no cálculo REH.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.thermalConductivity",
+          "operator": ">",
+          "value": 0.065
+        }
+      ],
+      "remediation": "Utilizar materiais de isolamento com condutividade térmica declarada (lambda_D) inferior a 0.065 W/(m.K). Materiais típicos: EPS (0.037-0.040), XPS (0.033-0.036), lã mineral (0.035-0.040), PIR (0.022-0.026), cortiça expandida (0.040-0.045), aerogel (0.013-0.020). Verificar valores certificados conforme EN 13162 a EN 13171.",
+      "currentValueTemplate": "λ_D = {insulation.thermalConductivity} W/(m.K)",
+      "requiredValue": "λ_D ≤ 0.065 W/(m.K) para ser classificado como isolamento térmico",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "condutividade",
+        "material",
+        "lambda",
+        "selecção"
+      ]
+    },
+    {
+      "id": "REH-ISOMAT-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Espessura Mínima de Isolamento para Conformidade U",
+      "description": "A espessura do isolamento térmico aplicado ({insulation.thicknessMM} mm) é insuficiente para atingir o valor U máximo da envolvente na zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.thicknessMM",
+          "operator": "<",
+          "value": 40
+        },
+        {
+          "field": "location.climateZoneWinter",
+          "operator": "in",
+          "value": ["I2", "I3"]
+        }
+      ],
+      "remediation": "Aumentar a espessura do isolamento térmico para garantir o cumprimento dos valores U máximos. Para zonas I2/I3, espessuras mínimas típicas: paredes (60-100mm EPS/MW), cobertura (80-120mm), pavimento (60-80mm). Calcular a espessura necessária em função da condutividade do isolamento e da resistência térmica do elemento construtivo base.",
+      "currentValueTemplate": "Espessura isolamento = {insulation.thicknessMM} mm",
+      "requiredValue": "≥ 40 mm mínimo absoluto; espessura real depende de λ_D do material e U_máx por zona climática",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "espessura",
+        "material",
+        "selecção",
+        "zona climática"
+      ]
+    },
+    {
+      "id": "REH-ISOMAT-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Certificação CE do Material de Isolamento",
+      "description": "O material de isolamento térmico não possui marcação CE válida conforme as normas harmonizadas EN 13162 a EN 13171 ({insulation.hasCEMarking}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.hasCEMarking",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Substituir o material de isolamento por produto com marcação CE conforme as normas harmonizadas europeias: EN 13162 (lã mineral), EN 13163 (EPS), EN 13164 (XPS), EN 13165 (PUR/PIR), EN 13166 (resinas fenólicas), EN 13167 (vidro celular), EN 13168 (lã de madeira), EN 13169 (perlite), EN 13170 (cortiça expandida), EN 13171 (fibra de madeira). A Declaração de Desempenho (DoP) é obrigatória.",
+      "currentValueTemplate": "Marcação CE: {insulation.hasCEMarking}",
+      "requiredValue": "Marcação CE obrigatória conforme Regulamento (UE) 305/2011 (CPR)",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "marcação CE",
+        "certificação",
+        "CPR",
+        "material"
+      ]
+    },
+    {
+      "id": "REH-ETICS-FIRE-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 + SCIE — Barreira Corta-Fogo em ETICS com EPS (Edifícios > 28m)",
+      "description": "O sistema ETICS com EPS aplicado em edifício com altura superior a 28m ({building.heightM} m) não possui barreiras corta-fogo horizontais em lã mineral ({insulation.eticsFireBarriers}).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "building.heightM",
+          "operator": ">",
+          "value": 28
+        },
+        {
+          "field": "insulation.eticsInsulationType",
+          "operator": "==",
+          "value": "EPS"
+        },
+        {
+          "field": "insulation.eticsFireBarriers",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Instalar barreiras corta-fogo horizontais em lã mineral (MW) de classe A1/A2 em toda a largura da fachada, a cada 2 pisos (máximo 6m de altura). As barreiras devem ter largura mínima de 200mm e espessura igual à do EPS. Em alternativa, utilizar lã mineral (MW) como isolamento principal do ETICS em edifícios > 28m. Conforme ETAG 004 e regulamento SCIE.",
+      "currentValueTemplate": "Edifício {building.heightM}m com ETICS-EPS sem barreiras corta-fogo",
+      "requiredValue": "Barreiras corta-fogo MW obrigatórias a cada 2 pisos em ETICS-EPS para edifícios > 28m",
+      "enabled": true,
+      "tags": [
+        "ETICS",
+        "fogo",
+        "barreira corta-fogo",
+        "EPS",
+        "lã mineral",
+        "segurança"
+      ]
+    },
+    {
+      "id": "REH-ETICS-FIRE-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 + SCIE — Reacção ao Fogo do ETICS (Classe Mínima)",
+      "description": "A classe de reacção ao fogo do sistema ETICS ({insulation.eticsFireClass}) não cumpre a classe mínima exigida para a utilização-tipo e altura do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.eticsFireClass",
+          "operator": "ordinal_gt",
+          "value": "B-s2,d0",
+          "scale": [
+            "A1",
+            "A2-s1,d0",
+            "B-s1,d0",
+            "B-s2,d0",
+            "C-s2,d0",
+            "D-s2,d0",
+            "E",
+            "F"
+          ]
+        },
+        {
+          "field": "building.heightM",
+          "operator": ">",
+          "value": 9
+        }
+      ],
+      "remediation": "Substituir o sistema ETICS por uma solução com classe de reacção ao fogo igual ou superior a B-s2,d0 para edifícios com altura > 9m. Para edifícios > 28m, considerar classe A2-s1,d0. O ETA (European Technical Assessment) do sistema ETICS deve declarar a classe de reacção ao fogo do sistema completo (não apenas do isolamento). Utilizar lã mineral (classe A1) para máxima segurança.",
+      "currentValueTemplate": "Classe de reacção ao fogo ETICS: {insulation.eticsFireClass}",
+      "requiredValue": "≤ B-s2,d0 para edifícios > 9m; ≤ A2-s1,d0 para edifícios > 28m",
+      "enabled": true,
+      "tags": [
+        "ETICS",
+        "fogo",
+        "reacção ao fogo",
+        "Euroclass",
+        "segurança"
+      ]
+    },
+    {
+      "id": "REH-ETICS-FIRE-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 + SCIE — Protecção de Vãos em ETICS (Faixas Incombustíveis)",
+      "description": "O sistema ETICS com isolamento combustível não possui faixas incombustíveis de lã mineral em torno dos vãos de janela ({insulation.eticsWindowFireStrips}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.eticsInsulationType",
+          "operator": "in",
+          "value": ["EPS", "XPS", "PUR", "PIR"]
+        },
+        {
+          "field": "insulation.eticsWindowFireStrips",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.heightM",
+          "operator": ">",
+          "value": 9
+        }
+      ],
+      "remediation": "Instalar faixas de lã mineral (MW classe A1) em torno de todos os vãos de janela e porta, com largura mínima de 200mm, como protecção contra propagação de fogo pela fachada. Esta medida é particularmente importante na verga (parte superior do vão) para evitar que as chamas do andar inferior inflamem o isolamento do andar superior.",
+      "currentValueTemplate": "ETICS com isolamento combustível sem faixas MW nos vãos",
+      "requiredValue": "Faixas MW classe A1 ≥ 200mm em torno de todos os vãos para edifícios > 9m",
+      "enabled": true,
+      "tags": [
+        "ETICS",
+        "fogo",
+        "vãos",
+        "lã mineral",
+        "faixas incombustíveis"
+      ]
+    },
+    {
+      "id": "REH-ISOMOIST-01",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 — Resistência à Difusão de Vapor do Isolamento em Coberturas",
+      "description": "O fator de resistência à difusão de vapor (μ) do isolamento aplicado na cobertura ({insulation.roofMuFactor}) é inadequado para a posição na secção construtiva, podendo causar condensações intersticiais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.roofMuFactor",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "insulation.roofPosition",
+          "operator": "==",
+          "value": "exterior"
+        },
+        {
+          "field": "insulation.hasVaporBarrier",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Em coberturas com isolamento exterior permeável ao vapor (lã mineral, μ ≈ 1-3), é essencial instalar barreira pára-vapor na face quente (interior). Em alternativa, utilizar isolamento com μ elevado (XPS μ ≈ 80-200, PUR μ ≈ 30-100) que funciona simultaneamente como barreira ao vapor. Verificar o perfil de condensações pelo método de Glaser conforme EN ISO 13788.",
+      "currentValueTemplate": "μ isolamento cobertura = {insulation.roofMuFactor}; posição: {insulation.roofPosition}; barreira pára-vapor: {insulation.hasVaporBarrier}",
+      "requiredValue": "Se μ < 30 e posição exterior → barreira pára-vapor obrigatória na face quente",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "humidade",
+        "vapor",
+        "cobertura",
+        "condensação",
+        "barreira pára-vapor"
+      ]
+    },
+    {
+      "id": "REH-ISOMOIST-02",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 — Absorção de Água do Isolamento em Contacto com Solo",
+      "description": "O isolamento térmico em contacto com o solo ({insulation.groundContactType}) possui absorção de água a longo prazo (WL(T)) superior a 3%, comprometendo o desempenho térmico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.groundContactWaterAbsorption",
+          "operator": ">",
+          "value": 3
+        },
+        {
+          "field": "insulation.isGroundContact",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Utilizar exclusivamente isolamento com baixa absorção de água em contacto com o solo: XPS (WL(T) ≤ 0.7%), vidro celular (WL(T) ≈ 0%), ou PUR de célula fechada com membrana impermeável. EPS e lã mineral não são adequados para aplicação em contacto directo com solo ou água. Verificar WL(T) conforme EN 12087.",
+      "currentValueTemplate": "Absorção de água WL(T) = {insulation.groundContactWaterAbsorption}%",
+      "requiredValue": "WL(T) ≤ 3% para isolamento em contacto com solo (recomendado ≤ 1%)",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "humidade",
+        "absorção de água",
+        "solo",
+        "XPS",
+        "fundação"
+      ]
+    },
+    {
+      "id": "REH-ISOMOIST-03",
+      "regulationId": "en-iso-13788",
+      "article": "EN ISO 13788 — Resistência à Humidade do Isolamento em Paredes Enterradas",
+      "description": "O isolamento térmico em paredes enterradas ({insulation.basementWallType}) não é resistente à humidade, podendo degradar-se e perder desempenho térmico.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.basementWallType",
+          "operator": "in",
+          "value": ["EPS", "mineral_wool", "wood_fiber"]
+        },
+        {
+          "field": "insulation.basementWallDepthM",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "insulation.basementWallWaterproofing",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Em paredes enterradas, utilizar XPS (extrudido) ou vidro celular como isolamento, ou proteger EPS/lã mineral com membrana impermeabilizante contínua (membrana de bentonite, membrana betuminosa, ou membrana drenante tipo noppenbahn). Garantir drenagem perimetral adequada para reduzir a pressão hidrostática sobre a impermeabilização.",
+      "currentValueTemplate": "Isolamento {insulation.basementWallType} em parede enterrada sem protecção",
+      "requiredValue": "Isolamento resistente à humidade (XPS, vidro celular) ou protecção impermeável contínua",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "humidade",
+        "parede enterrada",
+        "cave",
+        "impermeabilização"
+      ]
+    },
+    {
+      "id": "REH-VENTFAC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 + Despacho 15793-K/2013 — U Total de Fachada Ventilada",
+      "description": "O coeficiente de transmissão térmica total da fachada ventilada ({envelope.ventilatedFacadeUValue} W/(m².K)) excede o valor máximo para a zona climática {location.climateZoneWinter}. O cálculo deve considerar a resistência térmica da caixa-de-ar ventilada (Rsi interior conforme EN ISO 6946).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.ventilatedFacadeUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_walls",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Reforçar o isolamento na fachada ventilada. No cálculo de U, a caixa-de-ar fortemente ventilada elimina a contribuição das camadas exteriores ao isolamento — o U é calculado apenas com as camadas do suporte para o interior + Rse = Rsi = 0.13 m².K/W. Aumentar a espessura de isolamento (MW ou PIR fixados ao suporte), garantindo continuidade e fixação mecânica adequada.",
+      "currentValueTemplate": "U fachada ventilada = {envelope.ventilatedFacadeUValue} W/(m².K)",
+      "requiredValue": "Consultar Despacho 15793-K/2013 Tabela I.01 — mesmos limites que paredes exteriores por zona climática",
+      "enabled": true,
+      "tags": [
+        "fachada ventilada",
+        "valor-U",
+        "caixa-de-ar",
+        "isolamento",
+        "cálculo térmico"
+      ]
+    },
+    {
+      "id": "REH-VENTFAC-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Espessura Mínima da Caixa-de-Ar em Fachada Ventilada",
+      "description": "A espessura da caixa-de-ar ventilada ({envelope.ventilatedFacadeAirGapMM} mm) é inferior ao mínimo de 20mm para garantir ventilação efectiva.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.ventilatedFacadeAirGapMM",
+          "operator": "<",
+          "value": 20
+        }
+      ],
+      "remediation": "Aumentar a espessura da caixa-de-ar ventilada para um mínimo de 20mm (recomendado 30-50mm). Garantir aberturas de ventilação inferior e superior com área mínima de 50 cm² por metro linear de fachada. A ventilação da caixa-de-ar é essencial para a evacuação da humidade e para o efeito chaminé que melhora o desempenho em verão.",
+      "currentValueTemplate": "Caixa-de-ar fachada ventilada = {envelope.ventilatedFacadeAirGapMM} mm",
+      "requiredValue": "≥ 20 mm (recomendado 30-50 mm conforme EN 13947)",
+      "enabled": true,
+      "tags": [
+        "fachada ventilada",
+        "caixa-de-ar",
+        "ventilação",
+        "espessura"
+      ]
+    },
+    {
+      "id": "REH-VENTFAC-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Protecção Contra a Chuva do Isolamento em Fachada Ventilada",
+      "description": "O isolamento em fachada ventilada não possui protecção adequada contra a infiltração de água de chuva ({insulation.ventFacadeRainProtection}).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.ventFacadeRainProtection",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "insulation.ventFacadeInsulationType",
+          "operator": "in",
+          "value": ["mineral_wool", "wood_fiber"]
+        }
+      ],
+      "remediation": "Aplicar membrana permeável ao vapor mas impermeável à água (tipo Tyvek) na face exterior do isolamento em fachada ventilada, especialmente com lã mineral ou fibra de madeira. A membrana impede a penetração de chuva batida na caixa-de-ar ventilada mas permite a difusão de vapor do interior para o exterior. Sd da membrana deve ser ≤ 0.2m.",
+      "currentValueTemplate": "Isolamento em fachada ventilada sem protecção contra chuva",
+      "requiredValue": "Membrana permeável ao vapor (Sd ≤ 0.2m) na face exterior do isolamento",
+      "enabled": true,
+      "tags": [
+        "fachada ventilada",
+        "humidade",
+        "chuva",
+        "membrana",
+        "protecção"
+      ]
+    },
+    {
+      "id": "REH-CURTWALL-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — U Máximo de Fachada Cortina",
+      "description": "O coeficiente de transmissão térmica da fachada cortina ({envelope.curtainWallUcw} W/(m².K)) excede o valor máximo para a zona climática {location.climateZoneWinter}. A fachada cortina deve cumprir requisitos idênticos aos dos vãos envidraçados.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.curtainWallUcw",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_curtain_wall",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Melhorar o desempenho térmico da fachada cortina: utilizar vidro duplo ou triplo com capa low-e (Ug ≤ 1.1 W/(m².K)), perfis com corte térmico (poliamida ≥ 24mm), painéis de enchimento (spandrel) com isolamento. Calcular Ucw conforme EN 13947 considerando as áreas de vidro, perfil e painel. Verificar factor solar para evitar sobreaquecimento.",
+      "currentValueTemplate": "U fachada cortina = {envelope.curtainWallUcw} W/(m².K)",
+      "requiredValue": "Consultar Portaria 379-A/2015 e Despacho 15793-K/2013 — limites de Ucw por zona climática",
+      "enabled": true,
+      "tags": [
+        "fachada cortina",
+        "curtain wall",
+        "valor-U",
+        "vidro",
+        "corte térmico"
+      ]
+    },
+    {
+      "id": "REH-CURTWALL-02",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Factor Solar da Fachada Cortina",
+      "description": "O factor solar dos panos envidraçados da fachada cortina com protecção solar ({envelope.curtainWallGTvc}) excede o valor máximo para a zona climática de verão {location.climateZoneSummer}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.curtainWallGTvc",
+          "operator": ">",
+          "value": 0.56
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": ["V2", "V3"]
+        }
+      ],
+      "remediation": "Reduzir o factor solar da fachada cortina: utilizar vidro de controlo solar (g ≤ 0.30), instalar protecções solares interiores ou exteriores (estores, screen), aplicar película de controlo solar. Para zonas V2/V3, gT,vc deve ser calculado conforme o método do factor solar corrigido do REH, incluindo sombreamento exterior se aplicável.",
+      "currentValueTemplate": "gT,vc fachada cortina = {envelope.curtainWallGTvc}",
+      "requiredValue": "gT,vc ≤ 0.56 para zonas V2/V3 (verificar por orientação e tipo de vão)",
+      "enabled": true,
+      "tags": [
+        "fachada cortina",
+        "factor solar",
+        "sobreaquecimento",
+        "controlo solar"
+      ]
+    },
+    {
+      "id": "REH-INSREND-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — U de Sistema de Reboco Isolante (Reboco Térmico)",
+      "description": "O coeficiente de transmissão térmica da parede com sistema de reboco isolante ({envelope.insulatedRenderUValue} W/(m².K)) excede o valor máximo para a zona climática {location.climateZoneWinter}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.insulatedRenderUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_walls",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "O reboco isolante (à base de cortiça, perlite, EPS ou aerogel) tem condutividade típica de 0.040-0.080 W/(m.K), exigindo espessuras maiores que isolamento convencional. Para atingir U ≤ 0.50 em zona I1, uma parede de tijolo 22cm pode necessitar de 40-60mm de reboco térmico. Para zonas I2/I3, considerar combinar com isolamento convencional ou usar reboco de aerogel (λ ≈ 0.028).",
+      "currentValueTemplate": "U com reboco isolante = {envelope.insulatedRenderUValue} W/(m².K)",
+      "requiredValue": "Consultar Despacho 15793-K/2013 — mesmos limites que paredes exteriores",
+      "enabled": true,
+      "tags": [
+        "reboco isolante",
+        "reboco térmico",
+        "valor-U",
+        "cortiça",
+        "aerogel"
+      ]
+    },
+    {
+      "id": "REH-INSREND-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Espessura Mínima de Reboco Isolante",
+      "description": "A espessura do reboco isolante aplicado ({insulation.insulatedRenderThicknessMM} mm) é inferior ao mínimo recomendado de 20mm para garantir desempenho térmico e durabilidade.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "insulation.insulatedRenderThicknessMM",
+          "operator": "<",
+          "value": 20
+        }
+      ],
+      "remediation": "Aumentar a espessura do reboco isolante para no mínimo 20mm (recomendado 30-60mm). Com espessura inferior a 20mm, o reboco isolante não oferece desempenho térmico significativo e pode apresentar problemas de fissuração. Aplicar em duas ou mais camadas com rede de fibra de vidro entre camadas para espessuras > 30mm.",
+      "currentValueTemplate": "Espessura reboco isolante = {insulation.insulatedRenderThicknessMM} mm",
+      "requiredValue": "≥ 20 mm mínimo; recomendado 30-60 mm para desempenho térmico significativo",
+      "enabled": true,
+      "tags": [
+        "reboco isolante",
+        "espessura",
+        "durabilidade",
+        "aplicação"
+      ]
+    },
+    {
+      "id": "REH-CAVITY-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Preenchimento Total da Caixa-de-Ar em Parede Dupla",
+      "description": "A caixa-de-ar da parede dupla não está totalmente preenchida com isolamento ({envelope.cavityFullFill}), reduzindo o desempenho térmico e criando risco de convecção na caixa-de-ar residual.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.cavityFullFill",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "envelope.cavityInsulationThicknessMM",
+          "operator": "<",
+          "value": 40
+        }
+      ],
+      "remediation": "Preencher totalmente a caixa-de-ar com isolamento ou garantir que o isolamento parcial tem espessura suficiente (mínimo 40mm). Em preenchimento total, utilizar lã mineral semi-rígida, EPS com encaixe, ou injecção de espuma/grânulos. Deixar caixa-de-ar residual de 10-15mm no lado exterior apenas se o pano exterior não for estanque à chuva. O preenchimento total elimina a convecção interna que degrada o desempenho.",
+      "currentValueTemplate": "Caixa-de-ar não totalmente preenchida; isolamento = {envelope.cavityInsulationThicknessMM} mm",
+      "requiredValue": "Preenchimento total da caixa-de-ar ou isolamento parcial ≥ 40mm com caixa-de-ar residual ≤ 15mm",
+      "enabled": true,
+      "tags": [
+        "caixa-de-ar",
+        "parede dupla",
+        "preenchimento",
+        "isolamento",
+        "convecção"
+      ]
+    },
+    {
+      "id": "REH-CAVITY-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Espessura Mínima da Caixa-de-Ar Isolada",
+      "description": "A espessura total da caixa-de-ar em parede dupla ({envelope.cavityWidthMM} mm) é insuficiente para acomodar o isolamento necessário ao cumprimento do U máximo na zona climática {location.climateZoneWinter}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.cavityWidthMM",
+          "operator": "<",
+          "value": 40
+        },
+        {
+          "field": "location.climateZoneWinter",
+          "operator": "in",
+          "value": ["I2", "I3"]
+        }
+      ],
+      "remediation": "Para zonas I2/I3, a caixa-de-ar deve ter no mínimo 40-60mm para acomodar isolamento suficiente. Se a caixa-de-ar existente é estreita, considerar isolamento pelo exterior (ETICS) ou pelo interior como complemento. Em construção nova, dimensionar a caixa-de-ar para ≥ 60mm (I2) ou ≥ 80mm (I3).",
+      "currentValueTemplate": "Largura caixa-de-ar = {envelope.cavityWidthMM} mm",
+      "requiredValue": "≥ 40 mm para I2; ≥ 60 mm para I3 (para acomodar isolamento adequado)",
+      "enabled": true,
+      "tags": [
+        "caixa-de-ar",
+        "parede dupla",
+        "espessura",
+        "zona climática"
+      ]
+    },
+    {
+      "id": "REH-BLOWNIN-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Isolamento Injectado/Insuflado na Caixa-de-Ar: Densidade Mínima",
+      "description": "A densidade do isolamento injectado/insuflado na caixa-de-ar ({insulation.blownInDensity} kg/m³) é inferior ao mínimo para evitar assentamento ao longo do tempo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.blownInDensity",
+          "operator": "<",
+          "value": 25
+        },
+        {
+          "field": "insulation.applicationType",
+          "operator": "==",
+          "value": "blown_in"
+        }
+      ],
+      "remediation": "Aumentar a densidade do isolamento insuflado para evitar assentamento e pontes térmicas no topo da parede. Densidades mínimas recomendadas: lã mineral insuflada ≥ 25 kg/m³, grânulos de EPS ≥ 15 kg/m³ (com ligante), celulose insuflada ≥ 45 kg/m³ em paredes (para evitar assentamento). Verificar conforme EN 14064 (lã mineral) ou ETA específico do produto.",
+      "currentValueTemplate": "Densidade isolamento insuflado = {insulation.blownInDensity} kg/m³",
+      "requiredValue": "≥ 25 kg/m³ (lã mineral); ≥ 45 kg/m³ (celulose) conforme EN 14064 e ETAs",
+      "enabled": true,
+      "tags": [
+        "isolamento insuflado",
+        "blown-in",
+        "densidade",
+        "assentamento",
+        "caixa-de-ar"
+      ]
+    },
+    {
+      "id": "REH-BLOWNIN-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Isolamento Insuflado: Verificação de Preenchimento Completo",
+      "description": "O isolamento insuflado na caixa-de-ar não tem confirmação de preenchimento completo sem vazios ({insulation.blownInFillVerified}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "insulation.blownInFillVerified",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "insulation.applicationType",
+          "operator": "==",
+          "value": "blown_in"
+        }
+      ],
+      "remediation": "Verificar o preenchimento completo da caixa-de-ar após insuflação: utilizar câmara endoscópica ou termografia infravermelha para confirmar ausência de vazios e assentamento. A declaração de conformidade do instalador deve incluir a densidade de aplicação, a área tratada, e a confirmação de preenchimento. Abrir pontos de inspecção no topo da parede para verificar o nível do isolamento.",
+      "currentValueTemplate": "Preenchimento verificado: {insulation.blownInFillVerified}",
+      "requiredValue": "Verificação obrigatória de preenchimento completo com relatório do instalador",
+      "enabled": true,
+      "tags": [
+        "isolamento insuflado",
+        "blown-in",
+        "verificação",
+        "qualidade",
+        "termografia"
+      ]
+    },
+    {
+      "id": "REH-SPRAY-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Espessura Máxima de Espuma de Poliuretano Projectada (PUR)",
+      "description": "A espessura de espuma de poliuretano projectada ({insulation.sprayFoamThicknessMM} mm) excede o máximo recomendado por camada de aplicação ({insulation.sprayFoamMaxLayerMM} mm), comprometendo a qualidade da cura e a aderência.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.sprayFoamThicknessMM",
+          "operator": ">",
+          "value": 50
+        },
+        {
+          "field": "insulation.sprayFoamLayers",
+          "operator": "==",
+          "value": 1
+        }
+      ],
+      "remediation": "Aplicar a espuma de poliuretano projectada em camadas sucessivas, com espessura máxima de 30-50mm por camada, permitindo a cura entre camadas (mínimo 15 minutos). Espessura total em camada única > 50mm pode causar: cura incompleta no interior, fissuras térmicas, descolamento do suporte, e risco de incêndio durante a aplicação. Para espessuras totais > 80mm, aplicar em 2-3 camadas.",
+      "currentValueTemplate": "Espessura PUR projectada = {insulation.sprayFoamThicknessMM} mm em {insulation.sprayFoamLayers} camada(s)",
+      "requiredValue": "≤ 50 mm por camada; espessuras superiores em camadas múltiplas com cura entre camadas",
+      "enabled": true,
+      "tags": [
+        "spray foam",
+        "poliuretano",
+        "espessura",
+        "aplicação",
+        "qualidade"
+      ]
+    },
+    {
+      "id": "REH-SPRAY-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Espuma Projectada: Reacção ao Fogo Mínima",
+      "description": "A espuma de poliuretano projectada ({insulation.sprayFoamFireClass}) não cumpre a classe de reacção ao fogo mínima para a aplicação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.sprayFoamFireClass",
+          "operator": "ordinal_gt",
+          "value": "E",
+          "scale": [
+            "A1",
+            "A2",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        }
+      ],
+      "remediation": "A espuma de poliuretano projectada deve atingir no mínimo classe E de reacção ao fogo (Euroclass). Para aplicações em edifícios de habitação, classe E é o mínimo regulamentar. Se a espuma ficar exposta (sem revestimento incombustível), considerar PUR com retardante de chama ou aplicar revestimento de protecção (gesso cartonado BA13, reboco cimentício ≥ 15mm). Em caves e vias de evacuação, classe mínima B-s2,d0.",
+      "currentValueTemplate": "Reacção ao fogo PUR: {insulation.sprayFoamFireClass}",
+      "requiredValue": "≤ classe E (Euroclass); classe B-s2,d0 em vias de evacuação",
+      "enabled": true,
+      "tags": [
+        "spray foam",
+        "poliuretano",
+        "fogo",
+        "reacção ao fogo",
+        "segurança"
+      ]
+    },
+    {
+      "id": "REH-PIRXPS-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Comparação PIR vs XPS: Desempenho Térmico por Espessura",
+      "description": "Para a espessura disponível ({insulation.availableThicknessMM} mm), a selecção de XPS em vez de PIR resulta num valor U superior ao máximo permitido. PIR (λ ≈ 0.022) atinge o mesmo desempenho com ~65% da espessura do XPS (λ ≈ 0.034).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "insulation.selectedType",
+          "operator": "==",
+          "value": "XPS"
+        },
+        {
+          "field": "insulation.availableThicknessMM",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "insulation.resultingUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_walls",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Considerar substituir XPS (λ_D ≈ 0.034 W/(m.K)) por PIR (λ_D ≈ 0.022 W/(m.K)) quando o espaço é limitado. Comparação para R = 2.0 m².K/W: XPS necessita ~68mm, PIR necessita ~44mm. O PIR é mais caro por m² mas permite cumprir requisitos em espessuras menores. Verificar compatibilidade com o sistema construtivo (PIR requer protecção ao fogo em aplicação exposta).",
+      "currentValueTemplate": "XPS {insulation.availableThicknessMM}mm → U = {insulation.resultingUValue} W/(m².K)",
+      "requiredValue": "PIR com {insulation.availableThicknessMM}mm atingiria U mais baixo — consultar tabela de U por zona climática",
+      "enabled": true,
+      "tags": [
+        "PIR",
+        "XPS",
+        "comparação",
+        "espessura",
+        "selecção material"
+      ]
+    },
+    {
+      "id": "REH-PIRXPS-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Comparação PIR vs XPS: Resistência à Humidade em Cobertura Invertida",
+      "description": "O isolamento PIR foi especificado para cobertura invertida ({insulation.invertedRoofType}), mas PIR não é adequado para imersão prolongada em água. XPS é o material de referência para coberturas invertidas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.invertedRoofType",
+          "operator": "==",
+          "value": "PIR"
+        },
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "inverted"
+        }
+      ],
+      "remediation": "Em coberturas invertidas, substituir PIR por XPS. O XPS é o único isolamento corrente adequado para cobertura invertida (sobre a impermeabilização) devido à sua baixa absorção de água (WL(T) ≤ 0.7%), resistência à compressão elevada, e estabilidade dimensional em contacto com água. PIR, apesar de melhor λ, absorve água e perde desempenho térmico quando colocado sobre a impermeabilização.",
+      "currentValueTemplate": "PIR em cobertura invertida — material inadequado",
+      "requiredValue": "XPS obrigatório em cobertura invertida (WL(T) ≤ 0.7%, CS(10) ≥ 200 kPa)",
+      "enabled": true,
+      "tags": [
+        "PIR",
+        "XPS",
+        "cobertura invertida",
+        "humidade",
+        "selecção material"
+      ]
+    },
+    {
+      "id": "REH-FIXPTL-01",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Ponte Térmica Pontual por Fixações Mecânicas do Isolamento",
+      "description": "As fixações mecânicas do isolamento (buchas de fixação) introduzem ponte térmica pontual significativa. O número de fixações ({insulation.fixingsPerM2} un/m²) e o tipo ({insulation.fixingType}) excedem o impacto admissível.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "insulation.fixingsPerM2",
+          "operator": ">",
+          "value": 8
+        },
+        {
+          "field": "insulation.fixingType",
+          "operator": "==",
+          "value": "metallic"
+        }
+      ],
+      "remediation": "Reduzir o impacto das fixações mecânicas: utilizar buchas com cabeça de plástico expandido (χ ≈ 0.002 W/K vs 0.008 W/K para buchas metálicas), reduzir o número de fixações ao mínimo estruturalmente necessário (4-6/m² é típico), ou utilizar fixação colada em vez de mecânica quando o suporte permite. O acréscimo de U por fixações pode ser calculado: ΔU = n × χ, onde n é o nº de fixações/m².",
+      "currentValueTemplate": "{insulation.fixingsPerM2} fixações metálicas/m² → ΔU = {insulation.fixingsPerM2} × 0.008 = {insulation.fixingsDeltaU} W/(m².K)",
+      "requiredValue": "≤ 8 fixações/m² com buchas metálicas; usar buchas de plástico para χ < 0.003 W/K",
+      "enabled": true,
+      "tags": [
+        "fixações",
+        "ponte térmica pontual",
+        "buchas",
+        "ETICS",
+        "ΔU"
+      ]
+    },
+    {
+      "id": "REH-FIXPTL-02",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Correcção ΔU por Fixações Mecânicas no Cálculo de U",
+      "description": "O cálculo do coeficiente U não inclui a correcção ΔU devida às fixações mecânicas do isolamento ({insulation.fixingsCorrectionApplied}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "insulation.fixingsCorrectionApplied",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "insulation.fixingsPerM2",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "remediation": "Incluir a correcção ΔU por fixações mecânicas no cálculo do U conforme EN ISO 6946 Anexo D. ΔUf = n × χ × (d_fix / d_iso)², onde n = número de fixações/m², χ = coeficiente pontual da bucha, d_fix = diâmetro da fixação, d_iso = espessura do isolamento. Para ETICS com buchas plásticas típicas (6/m²), ΔU ≈ 0.01-0.02 W/(m².K). Esta correcção pode ser decisiva em edifícios próximos do limite U máximo.",
+      "currentValueTemplate": "Correcção ΔU por fixações não aplicada",
+      "requiredValue": "Incluir ΔU conforme EN ISO 6946 Anexo D no cálculo de U total",
+      "enabled": true,
+      "tags": [
+        "fixações",
+        "ΔU",
+        "correcção",
+        "EN ISO 6946",
+        "cálculo"
+      ]
+    },
+    {
+      "id": "REH-WARMROOF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Cobertura Quente: Isolamento sobre a Laje (Warm Roof)",
+      "description": "Na cobertura quente (warm roof), o isolamento colocado sobre a laje estrutural não possui barreira pára-vapor na face inferior ({insulation.warmRoofVaporBarrier}), criando risco de condensações.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "warm"
+        },
+        {
+          "field": "insulation.warmRoofVaporBarrier",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Em cobertura quente (isolamento sobre a laje, sob a impermeabilização), instalar barreira pára-vapor na face inferior do isolamento (sobre a laje). A barreira deve ter Sd ≥ 100m (ex: membrana betuminosa, folha de polietileno 200μm). Sem barreira, o vapor difunde para cima, condensa sob a impermeabilização (fria), e degrada o isolamento. Verificar pelo método de Glaser (EN ISO 13788).",
+      "currentValueTemplate": "Cobertura quente sem barreira pára-vapor",
+      "requiredValue": "Barreira pára-vapor obrigatória (Sd ≥ 100m) na face quente do isolamento",
+      "enabled": true,
+      "tags": [
+        "cobertura quente",
+        "warm roof",
+        "barreira pára-vapor",
+        "condensação",
+        "isolamento"
+      ]
+    },
+    {
+      "id": "REH-COLDROOF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Cobertura Fria: Ventilação do Desvão (Cold Roof)",
+      "description": "Na cobertura fria (cold roof), o desvão ventilado não possui ventilação suficiente ({envelope.coldRoofVentilationRatio}% da área em planta).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "cold"
+        },
+        {
+          "field": "envelope.coldRoofVentilationRatio",
+          "operator": "<",
+          "value": 0.5
+        }
+      ],
+      "remediation": "Garantir ventilação adequada do desvão em cobertura fria: área de aberturas de ventilação ≥ 1/300 da área em planta (≈ 0.33%), distribuída entre beiral (entrada) e cumeeira (saída). Para coberturas com inclinação < 15°, aumentar para 1/150 (≈ 0.67%). A ventilação do desvão evita condensações na face inferior das telhas e mantém o isolamento seco. Utilizar grelhas anti-insectos nas aberturas.",
+      "currentValueTemplate": "Ventilação desvão = {envelope.coldRoofVentilationRatio}% da área em planta",
+      "requiredValue": "≥ 0.33% (1/300) para inclinação ≥ 15°; ≥ 0.67% (1/150) para inclinação < 15°",
+      "enabled": true,
+      "tags": [
+        "cobertura fria",
+        "cold roof",
+        "desvão",
+        "ventilação",
+        "condensação"
+      ]
+    },
+    {
+      "id": "REH-COLDROOF-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Isolamento na Esteira em Cobertura Fria",
+      "description": "O isolamento na laje de esteira da cobertura fria ({insulation.ceilingInsulationMM} mm) é insuficiente para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "cold"
+        },
+        {
+          "field": "insulation.ceilingInsulationMM",
+          "operator": "<",
+          "value": 80
+        },
+        {
+          "field": "location.climateZoneWinter",
+          "operator": "in",
+          "value": ["I2", "I3"]
+        }
+      ],
+      "remediation": "Aumentar o isolamento na laje de esteira para cumprir U máximo da cobertura. Em cobertura fria, o isolamento é colocado sobre a laje do último piso (esteira). Espessuras típicas para lã mineral (λ ≈ 0.040): I1 ≥ 80mm, I2 ≥ 100mm, I3 ≥ 120mm. Cruzar duas camadas perpendiculares para eliminar juntas. Não comprimir o isolamento com objectos armazenados — usar passadiços sobre a lã mineral.",
+      "currentValueTemplate": "Isolamento esteira = {insulation.ceilingInsulationMM} mm",
+      "requiredValue": "≥ 80mm (I2); ≥ 100mm (I3) para lã mineral λ ≈ 0.040 W/(m.K)",
+      "enabled": true,
+      "tags": [
+        "cobertura fria",
+        "esteira",
+        "isolamento",
+        "lã mineral",
+        "zona climática"
+      ]
+    },
+    {
+      "id": "REH-FLATROOF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — U Máximo de Cobertura Plana",
+      "description": "O coeficiente de transmissão térmica da cobertura plana ({envelope.flatRoofUValue} W/(m².K)) excede o valor máximo para a zona climática {location.climateZoneWinter}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "envelope.flatRoofUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_roofs",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Reforçar o isolamento da cobertura plana. Sistemas possíveis: cobertura convencional (isolamento sob impermeabilização) com barreira pára-vapor, cobertura invertida (XPS sobre impermeabilização), ou cobertura ajardinada (substrato + isolamento). A cobertura plana tem área de exposição solar máxima no verão — considerar acabamento reflectante (cool roof) ou cobertura verde para reduzir sobreaquecimento.",
+      "currentValueTemplate": "U cobertura plana = {envelope.flatRoofUValue} W/(m².K)",
+      "requiredValue": "Consultar Despacho 15793-K/2013: I1 ≤ 0.40 / I2 ≤ 0.35 / I3 ≤ 0.30 W/(m².K)",
+      "enabled": true,
+      "tags": [
+        "cobertura plana",
+        "flat roof",
+        "valor-U",
+        "isolamento",
+        "impermeabilização"
+      ]
+    },
+    {
+      "id": "REH-FLATROOF-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Cobertura Plana Invertida: Resistência à Compressão do XPS",
+      "description": "A resistência à compressão do XPS em cobertura plana invertida transitável ({insulation.flatRoofXPSCompStrength} kPa) é insuficiente para a utilização prevista.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.roofType",
+          "operator": "==",
+          "value": "inverted"
+        },
+        {
+          "field": "insulation.flatRoofXPSCompStrength",
+          "operator": "<",
+          "value": 300
+        },
+        {
+          "field": "envelope.flatRoofTrafficable",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Para cobertura plana invertida transitável, utilizar XPS com resistência à compressão CS(10) ≥ 300 kPa (tipo IV conforme classificação EPS/XPS). Para terraços com cargas pesadas (vasos, equipamentos AVAC), considerar CS(10) ≥ 500 kPa. O XPS deve ser colocado com juntas desencontradas, protegido por geotêxtil e laje de betão ou pavimento flutuante sobre apoios reguláveis.",
+      "currentValueTemplate": "CS(10) XPS = {insulation.flatRoofXPSCompStrength} kPa",
+      "requiredValue": "CS(10) ≥ 300 kPa para cobertura transitável; ≥ 500 kPa para cargas pesadas",
+      "enabled": true,
+      "tags": [
+        "cobertura plana",
+        "invertida",
+        "XPS",
+        "resistência compressão",
+        "transitável"
+      ]
+    },
+    {
+      "id": "REH-DORMER-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 + EN ISO 10211 — Isolamento Térmico da Trapeira (Dormer)",
+      "description": "O coeficiente de transmissão térmica da envolvente da trapeira ({envelope.dormerUValue} W/(m².K)) excede o valor máximo para a zona climática {location.climateZoneWinter}. A trapeira inclui faces verticais (paredes) e cobertura própria.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.dormerUValue",
+          "operator": "lookup_gt",
+          "value": null,
+          "table": "max_u_walls",
+          "keys": [
+            "location.climateZoneWinter"
+          ]
+        }
+      ],
+      "remediation": "Isolar todas as faces da trapeira: paredes laterais e frontal (como parede exterior), cobertura da trapeira (como cobertura, U mais restritivo), e garantir continuidade com o isolamento da cobertura principal. As junções trapeira-cobertura são pontes térmicas lineares significativas — prever sobreposição do isolamento ≥ 150mm nestas ligações.",
+      "currentValueTemplate": "U envolvente trapeira = {envelope.dormerUValue} W/(m².K)",
+      "requiredValue": "Paredes da trapeira: mesmo U_máx que paredes; cobertura da trapeira: mesmo U_máx que cobertura",
+      "enabled": true,
+      "tags": [
+        "trapeira",
+        "dormer",
+        "valor-U",
+        "isolamento",
+        "cobertura"
+      ]
+    },
+    {
+      "id": "REH-DORMER-02",
+      "regulationId": "en-iso-10211",
+      "article": "EN ISO 10211 — Pontes Térmicas Lineares nas Junções da Trapeira",
+      "description": "As pontes térmicas lineares nas junções da trapeira com a cobertura principal ({envelope.dormerJunctionPsi} W/(m·K)) excedem o valor de referência.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.dormerJunctionPsi",
+          "operator": ">",
+          "value": 0.3
+        }
+      ],
+      "remediation": "Reduzir as pontes térmicas nas junções da trapeira: garantir sobreposição contínua do isolamento na ligação trapeira-cobertura (mínimo 150mm), utilizar isolamento flexível (lã mineral) para preencher geometrias complexas, prever corte térmico na base da trapeira se estrutura metálica. Modelação 3D conforme EN ISO 10211 é recomendada para quantificar ψ e χ nas ligações.",
+      "currentValueTemplate": "ψ junção trapeira-cobertura = {envelope.dormerJunctionPsi} W/(m·K)",
+      "requiredValue": "ψ ≤ 0.30 W/(m·K) com tratamento adequado das ligações",
+      "enabled": true,
+      "tags": [
+        "trapeira",
+        "dormer",
+        "ponte térmica",
+        "junção",
+        "ψ"
+      ]
+    },
+    {
+      "id": "REH-BLOWER-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 Art. 2.º — Ensaio Blower Door (Estanquidade ao Ar)",
+      "description": "O ensaio de pressurização blower door não foi realizado ou o resultado n50 ({thermal.n50Value} Rph) excede o limite regulamentar. O ensaio é obrigatório quando se pretende utilizar o valor medido para cálculo de Rph e pode substituir os valores por defeito do REH.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.n50Value",
+          "operator": ">",
+          "value": 4.0
+        }
+      ],
+      "remediation": "Melhorar a estanquidade ao ar do edifício e repetir o ensaio blower door conforme EN ISO 9972 (método B — edifício em uso). Pontos críticos a selar: caixas de estore, caixilharia (interface com parede), passagens de tubagens/cabos, portas exteriores (vedantes), tampas de acesso ao sótão, tomadas/interruptores em paredes exteriores. Objectivo: n50 ≤ 4.0 Rph (convencional) ou ≤ 1.0 Rph (Passive House).",
+      "currentValueTemplate": "n50 = {thermal.n50Value} Rph @ 50 Pa",
+      "requiredValue": "n50 ≤ 4.0 Rph (REH convencional); ≤ 3.0 Rph (NZEB); ≤ 0.6 Rph (Passive House)",
+      "enabled": true,
+      "tags": [
+        "blower door",
+        "estanquidade",
+        "n50",
+        "pressurização",
+        "EN ISO 9972"
+      ]
+    },
+    {
+      "id": "REH-BLOWER-02",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Protocolo de Ensaio Blower Door (EN ISO 9972)",
+      "description": "O ensaio blower door não foi realizado conforme o protocolo da norma EN ISO 9972 ({thermal.blowerDoorProtocolCompliant}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.blowerDoorProtocolCompliant",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Repetir o ensaio blower door conforme EN ISO 9972: método A (teste do edifício) ou método B (teste da envolvente). Requisitos: velocidade do vento ≤ 6 m/s, diferença de temperatura interior-exterior × altura do edifício ≤ 500 m.K, mínimo 5 pontos de pressão entre 10-60 Pa, despressurização e pressurização, incerteza do resultado < 15%. O relatório deve incluir condições atmosféricas, preparação do edifício, e curva de regressão.",
+      "currentValueTemplate": "Protocolo EN ISO 9972 cumprido: {thermal.blowerDoorProtocolCompliant}",
+      "requiredValue": "Ensaio conforme EN ISO 9972 método B, com relatório completo",
+      "enabled": true,
+      "tags": [
+        "blower door",
+        "protocolo",
+        "EN ISO 9972",
+        "ensaio",
+        "relatório"
+      ]
+    },
+    {
+      "id": "REH-INFILT-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 7.º — Taxa de Renovação do Ar (Rph) Mínima",
+      "description": "A taxa de renovação do ar da fracção ({ventilation.airChangeRate} Rph) é inferior ao mínimo regulamentar de 0.4 Rph, comprometendo a qualidade do ar interior.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ventilation.airChangeRate",
+          "operator": "<",
+          "value": 0.4
+        }
+      ],
+      "remediation": "Aumentar a taxa de renovação do ar para no mínimo 0.4 Rph. Soluções: instalar grelhas de admissão auto-reguláveis nos compartimentos principais (2 m do pavimento, ou na caixilharia), instalar extractores nos compartimentos de serviço (cozinha, IS), verificar passagens de ar sob as portas interiores (folga ≥ 8mm). Em edifícios estanques (n50 < 2), considerar VMC (Ventilação Mecânica Controlada) com recuperação de calor.",
+      "currentValueTemplate": "Rph = {ventilation.airChangeRate} Rph",
+      "requiredValue": "Rph ≥ 0.4 h⁻¹ (mínimo REH para qualidade do ar interior)",
+      "enabled": true,
+      "tags": [
+        "infiltração",
+        "renovação do ar",
+        "Rph",
+        "qualidade do ar",
+        "ventilação"
+      ]
+    },
+    {
+      "id": "REH-INFILT-02",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 7.º — Taxa de Infiltração Excessiva (Rph > 0.9 sem VMC)",
+      "description": "A taxa de renovação do ar ({ventilation.airChangeRate} Rph) é excessiva (> 0.9 Rph), aumentando significativamente as necessidades de aquecimento sem benefício adicional para a qualidade do ar interior.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ventilation.airChangeRate",
+          "operator": ">",
+          "value": 0.9
+        },
+        {
+          "field": "ventilation.hasMechanicalVentilation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Reduzir a taxa de infiltração para o intervalo óptimo de 0.4-0.6 Rph. Infiltração excessiva indica problemas de estanquidade: selar caixas de estore, substituir vedantes de caixilharia degradados, verificar portas exteriores, colmatar fissuras na envolvente. Realizar ensaio blower door para identificar fugas. Cada 0.1 Rph acima de 0.6 aumenta Nic em ~3-5 kWh/(m².ano).",
+      "currentValueTemplate": "Rph = {ventilation.airChangeRate} Rph",
+      "requiredValue": "0.4 ≤ Rph ≤ 0.6 Rph (óptimo sem VMC); ≤ 0.9 Rph (aceitável)",
+      "enabled": true,
+      "tags": [
+        "infiltração",
+        "renovação do ar",
+        "Rph",
+        "estanquidade",
+        "perdas térmicas"
+      ]
+    },
+    {
+      "id": "REH-INFILT-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Rph por Defeito vs Rph Medido",
+      "description": "O cálculo REH utiliza o Rph por defeito ({ventilation.rphDefault} Rph) em vez do valor medido. O valor por defeito é conservativo e pode penalizar o desempenho calculado do edifício.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ventilation.rphSource",
+          "operator": "==",
+          "value": "default"
+        },
+        {
+          "field": "ventilation.rphDefault",
+          "operator": ">",
+          "value": 0.6
+        }
+      ],
+      "remediation": "Realizar ensaio blower door (EN ISO 9972) para obter o valor medido de n50 e calcular o Rph real. O Rph por defeito do REH é calculado com base no tipo de caixilharia e exposição ao vento, sendo frequentemente conservativo (0.6-0.9 Rph). Um ensaio pode demonstrar Rph inferior, melhorando a classe energética. Custo do ensaio: ~200-400 EUR para habitação unifamiliar.",
+      "currentValueTemplate": "Rph usado no cálculo: {ventilation.rphDefault} Rph (por defeito)",
+      "requiredValue": "Considerar ensaio blower door para obter Rph medido (potencialmente inferior)",
+      "enabled": true,
+      "tags": [
+        "infiltração",
+        "Rph",
+        "blower door",
+        "valor por defeito",
+        "optimização"
+      ]
+    },
+    {
+      "id": "REH-HLOSS-01",
+      "regulationId": "despacho-15793k-2013",
+      "article": "Despacho 15793-K/2013 — Cálculo de Perdas Térmicas pela Envolvente (Qtr)",
+      "description": "As perdas térmicas por transmissão pela envolvente ({thermal.transmissionHeatLoss} W/K) excedem o valor de referência para a área de envolvente e zona climática, indicando isolamento insuficiente ou área excessiva de envolvente.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.transmissionHeatLoss",
+          "operator": "formula_gt",
+          "value": "thermal.transmissionHeatLossRef"
+        }
+      ],
+      "remediation": "Reduzir as perdas por transmissão: reforçar isolamento dos elementos com maior HTR (tipicamente cobertura e paredes exteriores), tratar pontes térmicas lineares e planas, melhorar envidraçados. O coeficiente de transferência por transmissão Htr = Σ(Ui × Ai) + Σ(ψj × Bj) + Σ(χk). Priorizar elementos com maior contribuição (Ui × Ai) no cálculo.",
+      "currentValueTemplate": "Htr = {thermal.transmissionHeatLoss} W/K",
+      "requiredValue": "Htr ≤ {thermal.transmissionHeatLossRef} W/K (valor de referência para a envolvente)",
+      "enabled": true,
+      "tags": [
+        "perdas térmicas",
+        "transmissão",
+        "Htr",
+        "envolvente",
+        "cálculo"
+      ]
+    },
+    {
+      "id": "REH-HLOSS-02",
+      "regulationId": "despacho-15793k-2013",
+      "article": "Despacho 15793-K/2013 — Perdas Térmicas por Ventilação (Qve)",
+      "description": "As perdas térmicas por ventilação ({thermal.ventilationHeatLoss} W/K) são excessivas face ao Rph e volume do edifício, indicando infiltração descontrolada ou ventilação sobre-dimensionada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "thermal.ventilationHeatLoss",
+          "operator": "formula_gt",
+          "value": "thermal.ventilationHeatLossRef"
+        }
+      ],
+      "remediation": "Reduzir as perdas por ventilação: Hve = 0.34 × Rph × Ap × Pd. Melhorar a estanquidade ao ar (reduzir Rph), instalar VMC com recuperação de calor (eficiência ≥ 70%), dimensionar a ventilação para o Rph mínimo (0.4 Rph). Em edifícios com Rph elevado, a VMC com recuperação pode reduzir as perdas por ventilação em 50-70%.",
+      "currentValueTemplate": "Hve = {thermal.ventilationHeatLoss} W/K",
+      "requiredValue": "Hve ≤ {thermal.ventilationHeatLossRef} W/K (referência para Rph = 0.4-0.6)",
+      "enabled": true,
+      "tags": [
+        "perdas térmicas",
+        "ventilação",
+        "Hve",
+        "recuperação de calor",
+        "VMC"
+      ]
+    },
+    {
+      "id": "REH-HLOSS-03",
+      "regulationId": "despacho-15793k-2013",
+      "article": "Despacho 15793-K/2013 — Balanço Energético: Razão Ganhos/Perdas",
+      "description": "A razão entre ganhos solares e internos e as perdas térmicas totais ({thermal.gainLossRatio}) é inferior a 0.3, indicando que o edifício beneficia pouco dos ganhos passivos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.gainLossRatio",
+          "operator": "<",
+          "value": 0.3
+        }
+      ],
+      "remediation": "Aumentar a razão ganhos/perdas: maximizar ganhos solares de inverno (envidraçados orientados a sul, sem sombreamento excessivo de inverno), reduzir perdas pela envolvente (isolamento), e optimizar inércia térmica para aproveitar ganhos intermitentes. Uma razão ganhos/perdas de 0.4-0.6 indica bom equilíbrio passivo. Edifícios com ratio < 0.3 dependem excessivamente de aquecimento activo.",
+      "currentValueTemplate": "Razão ganhos/perdas = {thermal.gainLossRatio}",
+      "requiredValue": "≥ 0.30 (recomendado 0.40-0.60 para bom balanço passivo)",
+      "enabled": true,
+      "tags": [
+        "balanço energético",
+        "ganhos solares",
+        "perdas térmicas",
+        "passivo",
+        "razão"
+      ]
+    },
+    {
+      "id": "REH-HDD-01",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Graus-Dia de Aquecimento: Correcção por Altitude",
+      "description": "Os graus-dia de aquecimento utilizados ({location.heatingDegreeDays} GD) não foram corrigidos para a altitude real do edifício ({location.altitudeM} m), resultando em cálculo impreciso das necessidades de aquecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "location.heatingDegreeDaysAdjusted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "location.altitudeM",
+          "operator": ">",
+          "value": 200
+        }
+      ],
+      "remediation": "Corrigir os graus-dia de aquecimento para a altitude real conforme Despacho 15793-F/2013: GD_corrigido = GD_ref + a × (z - z_ref), onde a é o declive de ajustamento por município (tipicamente 1.5-2.5 GD/m), z a altitude real, e z_ref a altitude de referência do município. Para cada 100m de altitude adicional, os GD aumentam ~150-250 GD, o que pode alterar a zona climática de inverno.",
+      "currentValueTemplate": "GD = {location.heatingDegreeDays} (sem correcção altitude); altitude = {location.altitudeM} m",
+      "requiredValue": "GD corrigidos para altitude real conforme Despacho 15793-F/2013 Tabela 01",
+      "enabled": true,
+      "tags": [
+        "graus-dia",
+        "GD",
+        "altitude",
+        "correcção",
+        "zona climática"
+      ]
+    },
+    {
+      "id": "REH-HDD-02",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Duração da Estação de Aquecimento (M) por Graus-Dia",
+      "description": "A duração da estação de aquecimento ({location.heatingSeasonMonths} meses) não é coerente com os graus-dia corrigidos ({location.heatingDegreeDays} GD) para o município.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "location.heatingSeasonMonths",
+          "operator": "<",
+          "value": 4
+        },
+        {
+          "field": "location.heatingDegreeDays",
+          "operator": ">",
+          "value": 1300
+        }
+      ],
+      "remediation": "Verificar a coerência entre GD e duração da estação de aquecimento M conforme Despacho 15793-F/2013: M = M_ref + a × (z - z_ref). Para GD > 1300, a estação de aquecimento é tipicamente ≥ 6 meses. A duração M é utilizada no cálculo de Ni e afecta directamente as necessidades de aquecimento. Limiares: I1 (GD ≤ 1300, M ≤ 5.3), I2 (1300 < GD ≤ 1800, 5.3 < M ≤ 7.3), I3 (GD > 1800, M > 7.3).",
+      "currentValueTemplate": "M = {location.heatingSeasonMonths} meses; GD = {location.heatingDegreeDays}",
+      "requiredValue": "M coerente com GD: para GD > 1300, M ≥ 5.3 meses (tipicamente ≥ 6 meses)",
+      "enabled": true,
+      "tags": [
+        "graus-dia",
+        "GD",
+        "estação aquecimento",
+        "duração",
+        "M"
+      ]
+    },
+    {
+      "id": "REH-HDD-03",
+      "regulationId": "despacho-15793f-2013",
+      "article": "Despacho 15793-F/2013 — Temperatura Exterior de Verão: Correcção por Distância ao Litoral",
+      "description": "A temperatura exterior média de verão ({location.summerExteriorTemp}°C) não foi corrigida para a distância real ao litoral ({location.distanceToCoastKm} km), afectando a zona climática de verão.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "location.summerTempAdjusted",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "location.distanceToCoastKm",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "remediation": "Corrigir a temperatura exterior de verão para a distância real ao litoral conforme Despacho 15793-F/2013: θ_ext,v_corrigido = θ_ext,v_ref + b × (d - d_ref), onde b é o declive por município e d a distância ao litoral. A proximidade do mar modera as temperaturas de verão. Para locais a > 30km do litoral, a temperatura pode ser 1-3°C superior ao litoral, passando de V1/V2 para V2/V3.",
+      "currentValueTemplate": "θ_ext,v = {location.summerExteriorTemp}°C; distância litoral = {location.distanceToCoastKm} km",
+      "requiredValue": "θ_ext,v corrigida para distância ao litoral conforme Despacho 15793-F/2013",
+      "enabled": true,
+      "tags": [
+        "temperatura verão",
+        "litoral",
+        "correcção",
+        "zona climática",
+        "V1/V2/V3"
+      ]
+    },
+    {
+      "id": "REH-RENMIN-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 9.º — Melhoria do Factor Solar em Renovação",
+      "description": "Na renovação térmica, o factor solar dos envidraçados substituídos com protecção ({envelope.rehabGTvc}) excede o máximo para a zona climática de verão {location.climateZoneSummer}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.rehabGTvc",
+          "operator": ">",
+          "value": 0.56
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": ["V2", "V3"]
+        }
+      ],
+      "remediation": "Instalar protecções solares exteriores nos envidraçados substituídos (estores, portadas, screen). Em renovação, aproveitar a substituição de janelas para integrar sombreamento exterior eficaz. Para zonas V2/V3, gT,vc ≤ 0.56 para envidraçados a Sul, Este e Oeste. Considerar vidro de controlo solar para reduzir o gT,vi base.",
+      "currentValueTemplate": "gT,vc envidraçado renovado = {envelope.rehabGTvc}",
+      "requiredValue": "gT,vc ≤ 0.56 para zonas V2/V3 conforme Portaria 349-B/2013",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "renovação",
+        "factor solar",
+        "envidraçados",
+        "sombreamento"
+      ]
+    },
+    {
+      "id": "REH-BLOWER-03",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Estanquidade: Classe de Permeabilidade da Caixilharia",
+      "description": "A classe de permeabilidade ao ar da caixilharia ({envelope.windowAirPermeabilityClass}) é insuficiente para garantir a estanquidade ao ar mínima do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.windowAirPermeabilityClass",
+          "operator": "ordinal_lt",
+          "value": "3",
+          "scale": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ]
+        }
+      ],
+      "remediation": "Substituir a caixilharia por modelos com classe de permeabilidade ao ar ≥ 3 (conforme EN 12207). Classe 3 corresponde a fugas ≤ 9 m³/(h.m²) a 100 Pa. Para edifícios NZEB ou Passive House, exigir classe 4 (≤ 3 m³/(h.m²) a 100 Pa). A classe de permeabilidade é essencial para controlar a infiltração e é o factor dominante na estanquidade ao ar do edifício.",
+      "currentValueTemplate": "Classe permeabilidade caixilharia: {envelope.windowAirPermeabilityClass}",
+      "requiredValue": "≥ classe 3 (EN 12207); classe 4 para NZEB/Passive House",
+      "enabled": true,
+      "tags": [
+        "estanquidade",
+        "caixilharia",
+        "permeabilidade ao ar",
+        "EN 12207",
+        "classe"
+      ]
+    },
+    {
+      "id": "REH-ENVTEST-01",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Requisito de Ensaio de Estanquidade da Envolvente",
+      "description": "O edifício com classe energética pretendida A ou superior não realizou ensaio de estanquidade da envolvente (blower door) para demonstrar conformidade ({thermal.blowerDoorTestPerformed}).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "thermal.blowerDoorTestPerformed",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.targetEnergyClass",
+          "operator": "ordinal_lte",
+          "value": "A",
+          "scale": [
+            "A+",
+            "A",
+            "B",
+            "B-",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        }
+      ],
+      "remediation": "Realizar ensaio blower door conforme EN ISO 9972 para validar a estanquidade da envolvente. Para classe A ou superior, o ensaio permite: (1) usar o Rph medido em vez do valor por defeito (geralmente mais favorável), (2) demonstrar qualidade construtiva, (3) identificar e corrigir fugas antes da utilização. Custo do ensaio: ~200-400 EUR, com potencial benefício significativo na classificação energética.",
+      "currentValueTemplate": "Ensaio blower door realizado: {thermal.blowerDoorTestPerformed}",
+      "requiredValue": "Recomendado para classe A/A+ — permite Rph medido no cálculo REH",
+      "enabled": true,
+      "tags": [
+        "blower door",
+        "ensaio",
+        "estanquidade",
+        "classe energética",
+        "envolvente"
+      ]
+    },
+    {
+      "id": "REH-HLOSS-04",
+      "regulationId": "despacho-15793k-2013",
+      "article": "Despacho 15793-K/2013 — Factor de Conversão de Energia Primária (Fpu) Aplicado",
+      "description": "O factor de conversão de energia primária (Fpu) para electricidade utilizado no cálculo ({thermal.fpuElectricity}) difere do valor regulamentar de 2.5 kWhEP/kWh conforme Despacho 15793-K/2013.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "thermal.fpuElectricity",
+          "operator": "!=",
+          "value": 2.5
+        }
+      ],
+      "remediation": "Corrigir o Fpu de electricidade para 2.5 kWhEP/kWh conforme Despacho 15793-K/2013. O Fpu converte energia final em energia primária para o cálculo de Ntc. Valores regulamentares: electricidade Fpu = 2.5, gás natural Fpu = 1.0, GPL Fpu = 1.0, gasóleo Fpu = 1.0, biomassa Fpu = 1.0, renováveis produzidas no local Fpu = 1.0 (para exportação = 2.5).",
+      "currentValueTemplate": "Fpu electricidade = {thermal.fpuElectricity} kWhEP/kWh",
+      "requiredValue": "Fpu = 2.5 kWhEP/kWh conforme Despacho 15793-K/2013",
+      "enabled": true,
+      "tags": [
+        "Fpu",
+        "energia primária",
+        "electricidade",
+        "conversão",
+        "Ntc"
+      ]
+    },
+    {
+      "id": "REH-CAVITY-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Ponte Térmica na Caixa-de-Ar: Grampos Metálicos",
+      "description": "A parede dupla com caixa-de-ar possui grampos metálicos de ligação entre panos ({envelope.cavityWallMetalTies}) sem isolamento, criando pontes térmicas pontuais significativas.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.cavityWallMetalTies",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "envelope.cavityTiesInsulated",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Utilizar grampos de ligação em aço inoxidável com disco de isolamento térmico (break térmico) ou grampos em material compósito (fibra de vidro, basalto). Cada grampo metálico sem isolamento introduz χ ≈ 0.002-0.005 W/K. Com 4-6 grampos/m², o acréscimo ΔU pode atingir 0.01-0.03 W/(m².K). Grampos com disco isolante reduzem χ para < 0.001 W/K.",
+      "currentValueTemplate": "Grampos metálicos sem isolamento na caixa-de-ar",
+      "requiredValue": "Grampos com corte térmico ou material compósito (χ < 0.001 W/K)",
+      "enabled": true,
+      "tags": [
+        "caixa-de-ar",
+        "grampos",
+        "ponte térmica pontual",
+        "χ",
+        "parede dupla"
+      ]
+    },
+    {
+      "id": "REH-FLATROOF-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Cobertura Plana: Acabamento Reflectante (Cool Roof)",
+      "description": "A cobertura plana não possui acabamento reflectante ({envelope.flatRoofCoolRoofApplied}) em zona climática de verão V2 ou V3, aumentando as necessidades de arrefecimento.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "envelope.flatRoofCoolRoofApplied",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "location.climateZoneSummer",
+          "operator": "in",
+          "value": ["V2", "V3"]
+        },
+        {
+          "field": "envelope.hasFlatRoof",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "remediation": "Aplicar acabamento reflectante (cool roof) na cobertura plana: tinta reflectante branca com coeficiente de absorção solar α ≤ 0.40 (recomendado α ≤ 0.30). Alternativas: membrana de impermeabilização de cor clara, cobertura verde (substrato + vegetação), ou seixo branco. Em zonas V2/V3, o cool roof pode reduzir a temperatura superficial da cobertura em 20-30°C e as necessidades de arrefecimento em 10-25%.",
+      "currentValueTemplate": "Cool roof aplicado: {envelope.flatRoofCoolRoofApplied}",
+      "requiredValue": "Recomendado em zonas V2/V3: α ≤ 0.40 (reflectância solar ≥ 0.60)",
+      "enabled": true,
+      "tags": [
+        "cobertura plana",
+        "cool roof",
+        "reflectante",
+        "arrefecimento",
+        "absorção solar"
+      ]
+    },
+    {
+      "id": "REH-ISOMAT-04",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Resistência ao Fogo do Isolamento em Vias de Evacuação",
+      "description": "O isolamento térmico em vias de evacuação ({insulation.evacuationRouteType}) não atinge a classe de reacção ao fogo A2-s1,d0 exigida para estes espaços.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "insulation.isEvacuationRoute",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "insulation.evacuationRouteFireClass",
+          "operator": "ordinal_gt",
+          "value": "A2-s1,d0",
+          "scale": [
+            "A1",
+            "A2-s1,d0",
+            "B-s1,d0",
+            "B-s2,d0",
+            "C-s2,d0",
+            "D-s2,d0",
+            "E",
+            "F"
+          ]
+        }
+      ],
+      "remediation": "Em vias de evacuação (escadas, corredores de acesso), utilizar exclusivamente isolamento de classe A1 (lã mineral, vidro celular) ou A2-s1,d0 (lã mineral com revestimento). EPS, XPS, PUR e PIR não são admissíveis em vias de evacuação sem protecção por barreira incombustível (ex: gesso cartonado tipo F, 2 × BA13). Verificar conformidade com SCIE (Regulamento de Segurança Contra Incêndios).",
+      "currentValueTemplate": "Isolamento em via de evacuação: {insulation.evacuationRouteFireClass}",
+      "requiredValue": "Classe A1 ou A2-s1,d0 em vias de evacuação (SCIE)",
+      "enabled": true,
+      "tags": [
+        "isolamento",
+        "fogo",
+        "via de evacuação",
+        "SCIE",
+        "segurança"
+      ]
+    },
+    {
+      "id": "REH-CURTWALL-03",
+      "regulationId": "portaria-379a-2015",
+      "article": "Portaria 379-A/2015 — Corte Térmico dos Perfis da Fachada Cortina",
+      "description": "Os perfis da fachada cortina não possuem corte térmico adequado ({envelope.curtainWallThermalBreak}). Perfis sem corte térmico (alumínio contínuo) têm Uf > 5.0 W/(m².K), degradando significativamente o Ucw global.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "envelope.curtainWallThermalBreak",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Especificar perfis de fachada cortina com corte térmico em poliamida (PA6.6) com espessura ≥ 24mm. O Uf dos perfis com corte térmico típico: 2.0-3.5 W/(m².K) vs 5.0-7.0 W/(m².K) sem corte térmico. Para desempenho elevado (NZEB), considerar perfis com Uf ≤ 1.8 W/(m².K) (corte térmico ≥ 34mm com preenchimento de espuma isolante). A contribuição dos perfis no Ucw é significativa (10-20% da área).",
+      "currentValueTemplate": "Corte térmico fachada cortina: {envelope.curtainWallThermalBreak}",
+      "requiredValue": "Corte térmico PA6.6 ≥ 24mm nos perfis (Uf ≤ 3.5 W/(m².K))",
+      "enabled": true,
+      "tags": [
+        "fachada cortina",
+        "corte térmico",
+        "perfis",
+        "alumínio",
+        "Uf"
+      ]
+    },
+    {
+      "id": "REH-RENMIN-05",
+      "regulationId": "dl-101d-2020-nzeb",
+      "article": "DL 101-D/2020 — Classe Energética Mínima Após Grande Renovação",
+      "description": "Após grande renovação, a classe energética do edifício ({energy.postRenovationClass}) não atinge o mínimo de B- exigido pelo REH.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "renovation.isMajorRenovation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.postRenovationClass",
+          "operator": "ordinal_gt",
+          "value": "B-",
+          "scale": [
+            "A+",
+            "A",
+            "B",
+            "B-",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        }
+      ],
+      "remediation": "Em grande renovação (intervenção em > 25% da envolvente ou custo > 25% do valor do edifício), o edifício deve atingir classe energética B- ou superior (Ntc/Nt ≤ 1.0). Reforçar o pacote de medidas: envolvente (ETICS, cobertura, envidraçados), sistemas (bomba de calor, VMC), e renováveis (solar térmico, PV). Considerar o apoio financeiro do Fundo Ambiental e PRR.",
+      "currentValueTemplate": "Classe energética pós-renovação: {energy.postRenovationClass}",
+      "requiredValue": "≥ B- (Ntc/Nt ≤ 1.0) para grande renovação",
+      "enabled": true,
+      "tags": [
+        "reabilitação",
+        "grande renovação",
+        "classe energética",
+        "B-",
+        "obrigatório"
+      ]
     }
   ]
 }

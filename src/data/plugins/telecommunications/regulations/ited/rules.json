@@ -7893,6 +7893,1507 @@
         "plantas",
         "simbologia"
       ]
+    },
+    {
+      "id": "ITED_101",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.1 — Arquitetura de Rede GPON no Edifício",
+      "description": "O edifício não prevê infraestrutura compatível com rede GPON (Gigabit Passive Optical Network). Em edifícios novos com mais de 6 frações, a rede de fibra óptica deve ser dimensionada para suportar topologia GPON com splitters passivos no ATE ou CEMU, garantindo cobertura FTTH a todas as frações.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.gpon.hasGPONArchitecture",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">",
+          "value": 6
+        }
+      ],
+      "currentValueTemplate": "Arquitetura GPON prevista: {ited.gpon.hasGPONArchitecture}",
+      "requiredValue": "Infraestrutura GPON obrigatória em edifícios com >6 frações",
+      "remediation": "Dimensionar a rede de fibra óptica do edifício para topologia GPON com splitters passivos 1:8 ou 1:16 instalados no ATE ou CEMU. Prever espaço para OLT do operador e ODF com capacidade para o número de frações. A rede deve permitir a ligação de múltiplos operadores GPON em paralelo.",
+      "enabled": true,
+      "tags": [
+        "GPON",
+        "fibra óptica",
+        "FTTH",
+        "splitter",
+        "rede passiva"
+      ]
+    },
+    {
+      "id": "ITED_102",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.2 — Rácio de Splitting GPON",
+      "description": "O rácio de splitting GPON previsto excede 1:64, ultrapassando o máximo recomendado para garantir o power budget adequado. Rácios superiores a 1:64 comprometem o nível de sinal óptico nas frações mais distantes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.gpon.splitRatio",
+          "operator": ">",
+          "value": 64
+        }
+      ],
+      "currentValueTemplate": "Rácio de splitting: 1:{ited.gpon.splitRatio}",
+      "requiredValue": "≤ 1:64 para GPON classe B+ / C+",
+      "remediation": "Reduzir o rácio de splitting para ≤ 1:64. Para edifícios com muitas frações, utilizar splitting em dois níveis (ex.: 1:8 no ATE + 1:8 por piso) ou prever múltiplas portas PON do operador. Verificar o power budget total do percurso óptico.",
+      "enabled": true,
+      "tags": [
+        "GPON",
+        "splitting",
+        "power budget",
+        "rácio"
+      ]
+    },
+    {
+      "id": "ITED_103",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.3 — Localização dos Splitters GPON",
+      "description": "Os splitters ópticos GPON não estão instalados no ATE ou CEMU. Os splitters passivos devem ser instalados em local acessível para manutenção e com proteção adequada contra poeiras e humidade.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.gpon.splitterLocation",
+          "operator": "not_in",
+          "value": [
+            "ATE",
+            "CEMU",
+            "ATE_CEMU"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Localização dos splitters: {ited.gpon.splitterLocation}",
+      "requiredValue": "Splitters instalados no ATE ou CEMU",
+      "remediation": "Reinstalar os splitters ópticos GPON no ATE ou CEMU do edifício. Os splitters devem ser montados em bandeja ou cassete dedicada, devidamente identificados, e acessíveis para manutenção e substituição por parte dos operadores.",
+      "enabled": true,
+      "tags": [
+        "GPON",
+        "splitter",
+        "ATE",
+        "CEMU",
+        "instalação"
+      ]
+    },
+    {
+      "id": "ITED_104",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.4 — Especificações XGS-PON — Comprimento de Onda",
+      "description": "A infraestrutura de fibra óptica não suporta os comprimentos de onda XGS-PON (1270 nm upstream / 1577 nm downstream). Os componentes passivos (splitters, conectores, patch cords) devem ser compatíveis com a gama de comprimentos de onda 1260–1625 nm para permitir a coexistência GPON e XGS-PON.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.gpon.xgsponCompatible",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.gpon.hasGPONArchitecture",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Compatibilidade XGS-PON: {ited.gpon.xgsponCompatible}",
+      "requiredValue": "Componentes compatíveis com gama 1260–1625 nm (GPON + XGS-PON)",
+      "remediation": "Especificar componentes passivos (splitters, conectores, patch cords) compatíveis com a gama completa de comprimentos de onda 1260–1625 nm. Isto permite a coexistência de GPON (1310/1490 nm) e XGS-PON (1270/1577 nm) na mesma infraestrutura sem necessidade de alterações futuras.",
+      "enabled": true,
+      "tags": [
+        "XGS-PON",
+        "GPON",
+        "comprimento de onda",
+        "compatibilidade",
+        "futuro"
+      ]
+    },
+    {
+      "id": "ITED_105",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.2.5 — Débito Mínimo XGS-PON por Fração",
+      "description": "A rede óptica dimensionada não garante o débito mínimo de 10 Gbps simétrico por porta PON XGS-PON. O dimensionamento deve considerar o débito agregado necessário para o número de frações servidas por cada porta PON.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.gpon.xgsponBandwidthPerPortGbps",
+          "operator": "<",
+          "value": 10
+        }
+      ],
+      "currentValueTemplate": "{ited.gpon.xgsponBandwidthPerPortGbps} Gbps por porta PON",
+      "requiredValue": "≥ 10 Gbps simétrico por porta XGS-PON",
+      "remediation": "Rever o dimensionamento da rede PON para garantir que cada porta XGS-PON serve no máximo o número de frações compatível com o débito mínimo garantido por utilizador. Para 10 Gbps simétrico com rácio 1:32, cada fração dispõe de ~312 Mbps garantidos em regime de contenção.",
+      "enabled": true,
+      "tags": [
+        "XGS-PON",
+        "débito",
+        "10 Gbps",
+        "dimensionamento"
+      ]
+    },
+    {
+      "id": "ITED_106",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.1 — Fibra à Secretária (FTTD) — Ponto de Consolidação",
+      "description": "Em edifícios de escritórios ou serviços, a rede de fibra óptica individual não prevê pontos de consolidação (Consolidation Points) para distribuição de fibra à secretária (FTTD). Os pontos de consolidação são necessários para flexibilidade de reconfiguração do espaço de trabalho.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fttd.hasConsolidationPoints",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "office",
+            "services",
+            "commercial"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Pontos de consolidação FTTD: {ited.fttd.hasConsolidationPoints}",
+      "requiredValue": "Pontos de consolidação obrigatórios em edifícios de escritórios para FTTD",
+      "remediation": "Prever pontos de consolidação (CP) na rede de fibra óptica individual para suportar FTTD (Fiber To The Desk). Os CP devem ser instalados em zonas de teto falso ou pavimento técnico, com cassetes de fusão para transição entre cabo de distribuição e cabo de utilizador. Dimensionar para densidade de 1 CP por cada 12 postos de trabalho.",
+      "enabled": true,
+      "tags": [
+        "FTTD",
+        "fibra à secretária",
+        "ponto de consolidação",
+        "escritórios"
+      ]
+    },
+    {
+      "id": "ITED_107",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.2 — Fibra à Secretária (FTTD) — Tipo de Conector",
+      "description": "As tomadas de fibra óptica para FTTD não utilizam conectores LC/APC ou LC/UPC duplex. O conector LC duplex é o standard para aplicações FTTD, garantindo compatibilidade com transceptores SFP+ dos equipamentos de rede.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.fttd.connectorType",
+          "operator": "not_in",
+          "value": [
+            "LC/APC",
+            "LC/UPC",
+            "LC_duplex"
+          ]
+        },
+        {
+          "field": "ited.fttd.hasConsolidationPoints",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Conector FTTD: {ited.fttd.connectorType}",
+      "requiredValue": "Conector LC/APC ou LC/UPC duplex nas tomadas FTTD",
+      "remediation": "Substituir os conectores nas tomadas FTTD por LC/APC ou LC/UPC duplex. O conector LC é compatível com transceptores SFP/SFP+ standard e permite densidade elevada nos patch panels. Para redes PON, utilizar LC/APC (angulado) para minimizar reflexões.",
+      "enabled": true,
+      "tags": [
+        "FTTD",
+        "conector LC",
+        "tomada óptica",
+        "SFP+"
+      ]
+    },
+    {
+      "id": "ITED_108",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.1 — Seleção de Fibra Monomodo vs Multimodo — Rede Coletiva",
+      "description": "A rede coletiva do edifício utiliza fibra multimodo (OM1/OM2/OM3/OM4) em vez de fibra monomodo OS2. A fibra monomodo OS2 (ITU-T G.652.D) é obrigatória na rede coletiva (ATE→ATI) para suportar serviços PON dos operadores e distâncias superiores a 300 m.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.collectiveNetwork.fiberClass",
+          "operator": "in",
+          "value": [
+            "OM1",
+            "OM2",
+            "OM3",
+            "OM4",
+            "OM5"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Classe de fibra na rede coletiva: {ited.collectiveNetwork.fiberClass}",
+      "requiredValue": "Fibra monomodo OS2 (ITU-T G.652.D) obrigatória na rede coletiva",
+      "remediation": "Substituir toda a fibra multimodo na rede coletiva por fibra monomodo OS2 conforme ITU-T G.652.D. A fibra multimodo (OM1–OM5) é apenas aceitável na rede individual (ATI→tomadas) para ligações de curta distância em ambientes de escritório. A rede coletiva e de edifício deve ser exclusivamente monomodo.",
+      "enabled": true,
+      "tags": [
+        "fibra monomodo",
+        "fibra multimodo",
+        "OS2",
+        "OM3",
+        "rede coletiva",
+        "seleção"
+      ]
+    },
+    {
+      "id": "ITED_109",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.3.3 — Seleção de Fibra Multimodo na Rede Individual de Escritórios",
+      "description": "A rede individual de fibra óptica em edifício de escritórios utiliza fibra multimodo de classe inferior a OM3. Para ligações FTTD de curta distância (< 100 m), a fibra mínima é OM3 (50/125 μm) para suportar 10 Gigabit Ethernet.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.individualNetwork.multimodeClass",
+          "operator": "ordinal_lt",
+          "value": "OM3",
+          "scale": [
+            "OM1",
+            "OM2",
+            "OM3",
+            "OM4",
+            "OM5"
+          ]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "office",
+            "services"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Classe multimodo na rede individual: {ited.individualNetwork.multimodeClass}",
+      "requiredValue": "≥ OM3 (50/125 μm) para ligações FTTD em escritórios",
+      "remediation": "Utilizar fibra multimodo de classe OM3 ou superior (OM4/OM5) na rede individual de escritórios para ligações FTTD. A fibra OM3 suporta 10GBASE-SR até 300 m e é compatível com transceptores SFP+ de baixo custo. Para futuras necessidades de 25G/40G, considerar OM4 ou OM5.",
+      "enabled": true,
+      "tags": [
+        "fibra multimodo",
+        "OM3",
+        "OM4",
+        "rede individual",
+        "FTTD",
+        "escritórios"
+      ]
+    },
+    {
+      "id": "ITED_110",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.5 — Cálculo do Power Budget Óptico",
+      "description": "O power budget óptico calculado para o percurso OLT→ONT não está documentado ou excede o limite da classe PON utilizada. O power budget deve considerar: atenuação da fibra (0.35 dB/km a 1310 nm), perdas nos splitters, perdas nos conectores (0.3 dB cada) e perdas nas fusões (0.1 dB cada).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.gpon.powerBudgetDocumented",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.gpon.hasGPONArchitecture",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Power budget documentado: {ited.gpon.powerBudgetDocumented}",
+      "requiredValue": "Cálculo de power budget óptico obrigatório e documentado",
+      "remediation": "Elaborar e documentar o cálculo do power budget óptico para cada percurso OLT→ONT. Incluir: (1) Atenuação da fibra: 0.35 dB/km a 1310 nm, 0.22 dB/km a 1550 nm; (2) Perdas nos splitters: 1:8 = 10.5 dB, 1:16 = 13.5 dB, 1:32 = 17 dB, 1:64 = 20.5 dB; (3) Perdas nos conectores: 0.3 dB cada; (4) Perdas nas fusões: 0.1 dB cada; (5) Margem de sistema: 3 dB. O total não deve exceder 28 dB para GPON classe B+ ou 32 dB para classe C+.",
+      "enabled": true,
+      "tags": [
+        "power budget",
+        "atenuação",
+        "GPON",
+        "cálculo óptico",
+        "OLT",
+        "ONT"
+      ]
+    },
+    {
+      "id": "ITED_111",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.6 — Power Budget — Margem de Sistema",
+      "description": "A margem de sistema no cálculo do power budget óptico é inferior a 3 dB. Uma margem mínima de 3 dB é necessária para compensar o envelhecimento da fibra, reparações futuras com fusões adicionais e variações de temperatura.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.gpon.systemMarginDb",
+          "operator": "<",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "Margem de sistema: {ited.gpon.systemMarginDb} dB",
+      "requiredValue": "≥ 3 dB de margem de sistema no power budget",
+      "remediation": "Aumentar a margem de sistema para ≥ 3 dB no cálculo do power budget óptico. Se necessário, reduzir o rácio de splitting, encurtar percursos de fibra ou eliminar conectores intermédios para obter margem suficiente.",
+      "enabled": true,
+      "tags": [
+        "power budget",
+        "margem de sistema",
+        "atenuação",
+        "GPON"
+      ]
+    },
+    {
+      "id": "ITED_112",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 4.1.7 — Power Budget — Atenuação Máxima Total",
+      "description": "A atenuação total do percurso óptico OLT→ONT excede o power budget máximo da classe PON especificada. Para GPON classe B+, o máximo é 28 dB; para classe C+, o máximo é 32 dB.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.gpon.totalAttenuationDb",
+          "operator": ">",
+          "value": 28
+        },
+        {
+          "field": "ited.gpon.ponClass",
+          "operator": "==",
+          "value": "B+"
+        }
+      ],
+      "currentValueTemplate": "Atenuação total: {ited.gpon.totalAttenuationDb} dB (classe {ited.gpon.ponClass})",
+      "requiredValue": "≤ 28 dB para GPON classe B+",
+      "remediation": "Reduzir a atenuação total do percurso óptico para dentro do power budget da classe B+ (≤ 28 dB). Estratégias: (1) reduzir o rácio de splitting; (2) eliminar conectores intermédios substituindo por fusões; (3) reduzir o comprimento de fibra; (4) considerar upgrade para classe C+ (32 dB) se o operador disponibilizar equipamento compatível.",
+      "enabled": true,
+      "tags": [
+        "power budget",
+        "atenuação total",
+        "classe B+",
+        "GPON",
+        "OLT",
+        "ONT"
+      ]
+    },
+    {
+      "id": "ITED_113",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.3.2 — Amplificador de Distribuição CATV — Nível de Saída",
+      "description": "O nível de saída do amplificador de distribuição CATV excede o máximo de 110 dBμV na saída do amplificador principal no ATE. Níveis excessivos provocam distorção por intermodulação (CSO/CTB) e degradação da qualidade de imagem.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.catv.amplifierOutputLevel",
+          "operator": ">",
+          "value": 110
+        }
+      ],
+      "currentValueTemplate": "Nível de saída do amplificador: {ited.catv.amplifierOutputLevel} dBμV",
+      "requiredValue": "≤ 110 dBμV na saída do amplificador de distribuição",
+      "remediation": "Reduzir o nível de saída do amplificador de distribuição CATV para ≤ 110 dBμV. Ajustar o ganho do amplificador ou utilizar atenuadores na entrada. Se o nível de sinal de entrada for muito elevado, considerar substituição por amplificador com controlo automático de ganho (AGC).",
+      "enabled": true,
+      "tags": [
+        "CATV",
+        "amplificador",
+        "nível de saída",
+        "distorção",
+        "AGC"
+      ]
+    },
+    {
+      "id": "ITED_114",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.3.3 — Amplificador CATV — Resposta em Frequência",
+      "description": "O amplificador de distribuição CATV não cobre a gama de frequências completa de 47–862 MHz. A gama deve abranger todas as frequências de televisão terrestre e por cabo, incluindo banda de retorno (5–65 MHz) para serviços interativos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.catv.amplifierFreqRangeMaxMHz",
+          "operator": "<",
+          "value": 862
+        }
+      ],
+      "currentValueTemplate": "Gama de frequências do amplificador: até {ited.catv.amplifierFreqRangeMaxMHz} MHz",
+      "requiredValue": "Amplificador CATV com gama 47–862 MHz (ou 5–862 MHz com retorno)",
+      "remediation": "Substituir o amplificador CATV por modelo com gama de frequências de 47–862 MHz (forward) e 5–65 MHz (retorno, se aplicável). Para edifícios com serviços DOCSIS, a gama deve estender-se até 1002 MHz ou 1218 MHz conforme requisitos do operador.",
+      "enabled": true,
+      "tags": [
+        "CATV",
+        "amplificador",
+        "frequência",
+        "47–862 MHz",
+        "DOCSIS"
+      ]
+    },
+    {
+      "id": "ITED_115",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.3.4 — Amplificador CATV — Figura de Ruído",
+      "description": "A figura de ruído (NF) do amplificador de distribuição CATV excede 9 dB. Uma figura de ruído elevada degrada a relação sinal/ruído (C/N) e a qualidade de imagem, especialmente nos canais mais elevados da banda.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.catv.amplifierNoiseFigureDb",
+          "operator": ">",
+          "value": 9
+        }
+      ],
+      "currentValueTemplate": "Figura de ruído: {ited.catv.amplifierNoiseFigureDb} dB",
+      "requiredValue": "≤ 9 dB de figura de ruído no amplificador CATV",
+      "remediation": "Substituir o amplificador CATV por modelo com figura de ruído ≤ 9 dB. Amplificadores de baixo ruído são especialmente importantes em instalações com múltiplos andares de amplificação em cascata, onde o ruído se acumula.",
+      "enabled": true,
+      "tags": [
+        "CATV",
+        "amplificador",
+        "figura de ruído",
+        "C/N",
+        "qualidade"
+      ]
+    },
+    {
+      "id": "ITED_116",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4.1 — Distribuição de TV Satélite — Gama de Frequências FI",
+      "description": "A rede de distribuição de TV por satélite não suporta a gama completa de frequências intermédias (FI) de 950–2150 MHz. A gama de FI deve cobrir todas as bandas de satélite (low/high, horizontal/vertical) para permitir receção de todos os canais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.satellite.ifFreqRangeMaxMHz",
+          "operator": "<",
+          "value": 2150
+        }
+      ],
+      "currentValueTemplate": "Gama FI satélite: até {ited.satellite.ifFreqRangeMaxMHz} MHz",
+      "requiredValue": "Gama FI 950–2150 MHz para distribuição satélite completa",
+      "remediation": "Garantir que todos os componentes da rede de distribuição satélite (cabos coaxiais, divisores, tomadas, amplificadores FI) suportam a gama 950–2150 MHz. Substituir componentes que limitem a banda passante, nomeadamente divisores e tomadas com atenuação excessiva acima de 1500 MHz.",
+      "enabled": true,
+      "tags": [
+        "TV satélite",
+        "frequência intermédia",
+        "950–2150 MHz",
+        "distribuição",
+        "FI"
+      ]
+    },
+    {
+      "id": "ITED_117",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4.2 — TV Satélite — Tomada de Utilizador com Passagem DC",
+      "description": "As tomadas de satélite não preveem passagem de corrente contínua (DC pass) para alimentação do LNB. Pelo menos uma tomada por fração deve permitir a passagem de DC (13/18V) do recetor de satélite para o LNB na antena parabólica.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.satellite.hasDCPassOutlet",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.satellite.hasDistribution",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Tomada com DC pass: {ited.satellite.hasDCPassOutlet}",
+      "requiredValue": "≥ 1 tomada por fração com passagem DC para LNB",
+      "remediation": "Instalar pelo menos uma tomada de satélite por fração com passagem de corrente contínua (DC pass-through). A tomada DC pass deve ser claramente identificada e ligada ao percurso coaxial que alimenta o LNB. Em sistemas com multiswitch, a alimentação DC é gerida centralmente e as tomadas podem ser todas terminadas.",
+      "enabled": true,
+      "tags": [
+        "TV satélite",
+        "DC pass",
+        "LNB",
+        "tomada satélite",
+        "alimentação"
+      ]
+    },
+    {
+      "id": "ITED_118",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.4.3 — TV Satélite — Sistema Multiswitch",
+      "description": "Em edifícios com mais de 4 frações, a distribuição de TV por satélite deve utilizar sistema multiswitch centralizado no ATE, permitindo receção independente de todos os transponders por cada fração, sem necessidade de LNB individual.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.satellite.hasMultiswitch",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfDwellings",
+          "operator": ">",
+          "value": 4
+        },
+        {
+          "field": "ited.satellite.hasDistribution",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sistema multiswitch: {ited.satellite.hasMultiswitch}",
+      "requiredValue": "Multiswitch centralizado recomendado para >4 frações",
+      "remediation": "Instalar sistema multiswitch centralizado no ATE para distribuição de TV por satélite. O multiswitch recebe os 4 sinais do LNB Quattro (low H/V, high H/V) e distribui a cada fração o transponder selecionado pelo recetor. Prever alimentação elétrica no ATE e espaço para o multiswitch e respetiva cablagem.",
+      "enabled": true,
+      "tags": [
+        "TV satélite",
+        "multiswitch",
+        "distribuição centralizada",
+        "LNB Quattro"
+      ]
+    },
+    {
+      "id": "ITED_119",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.5.1 — Infraestrutura IP-TV — Largura de Banda por Fração",
+      "description": "A infraestrutura de rede não garante largura de banda mínima de 50 Mbps por fração para suporte de serviços IP-TV (IPTV). Para receção simultânea de 2 streams HD (15 Mbps cada) mais dados, é necessário garantir largura de banda dedicada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.iptv.bandwidthPerDwellingMbps",
+          "operator": "<",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Largura de banda IP-TV: {ited.iptv.bandwidthPerDwellingMbps} Mbps por fração",
+      "requiredValue": "≥ 50 Mbps dedicados para serviços IP-TV por fração",
+      "remediation": "Dimensionar a rede para garantir ≥ 50 Mbps por fração para serviços IP-TV. Considerar: (1) cada stream IPTV HD requer ~15 Mbps, UHD/4K ~25 Mbps; (2) serviço triple-play requer capacidade para 2–3 streams simultâneos + dados + VoIP; (3) a rede de fibra GPON/XGS-PON deve ser dimensionada com contenção adequada.",
+      "enabled": true,
+      "tags": [
+        "IP-TV",
+        "IPTV",
+        "largura de banda",
+        "streaming",
+        "triple-play"
+      ]
+    },
+    {
+      "id": "ITED_120",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.5.2 — IP-TV — Suporte Multicast na Rede do Edifício",
+      "description": "A infraestrutura de rede do edifício não prevê suporte para tráfego multicast IGMP (Internet Group Management Protocol), necessário para a distribuição eficiente de serviços IP-TV. Sem suporte multicast, cada stream IPTV é enviado individualmente a cada utilizador, consumindo largura de banda excessiva.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.iptv.multicastSupport",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Suporte multicast IGMP: {ited.iptv.multicastSupport}",
+      "requiredValue": "Rede do edifício com suporte IGMP snooping para IP-TV",
+      "remediation": "Garantir que os equipamentos de rede do edifício (switches, ONTs) suportam IGMP snooping v2/v3 para distribuição eficiente de tráfego multicast IP-TV. A configuração de IGMP snooping nos switches de distribuição evita a inundação de tráfego multicast em todas as portas e preserva a largura de banda.",
+      "enabled": true,
+      "tags": [
+        "IP-TV",
+        "multicast",
+        "IGMP",
+        "snooping",
+        "eficiência"
+      ]
+    },
+    {
+      "id": "ITED_121",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.5.3 — IP-TV — Qualidade de Serviço (QoS)",
+      "description": "A rede do edifício não prevê configuração de QoS (Quality of Service) para priorização do tráfego IP-TV. O tráfego de vídeo IPTV deve ter prioridade sobre tráfego best-effort para garantir qualidade de imagem sem artefactos ou congelamentos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.iptv.qosConfigured",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.iptv.bandwidthPerDwellingMbps",
+          "operator": ">=",
+          "value": 1
+        }
+      ],
+      "currentValueTemplate": "QoS configurado para IP-TV: {ited.iptv.qosConfigured}",
+      "requiredValue": "QoS com priorização de tráfego IPTV na rede do edifício",
+      "remediation": "Configurar QoS na rede do edifício com priorização para tráfego IP-TV (DSCP EF ou CS5). Definir filas de prioridade nos switches: (1) voz/VoIP — prioridade máxima; (2) vídeo/IPTV — prioridade elevada; (3) dados — best-effort. Garantir que a largura de banda reservada para IP-TV não é consumida por outros serviços.",
+      "enabled": true,
+      "tags": [
+        "IP-TV",
+        "QoS",
+        "priorização",
+        "DSCP",
+        "qualidade de serviço"
+      ]
+    },
+    {
+      "id": "ITED_122",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.6.1 — Sistema de Intercomunicação — Cablagem Dedicada",
+      "description": "O sistema de intercomunicação (porteiro eletrónico ou videoporteiro) não possui cablagem dedicada separada da rede de telecomunicações. A cablagem do sistema de intercomunicação deve ser independente para evitar interferências e garantir funcionamento autónomo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.intercom.hasDedicatedCabling",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.intercom.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cablagem dedicada para intercomunicação: {ited.intercom.hasDedicatedCabling}",
+      "requiredValue": "Cablagem dedicada e independente para sistema de intercomunicação",
+      "remediation": "Instalar cablagem dedicada para o sistema de intercomunicação, separada fisicamente da rede de telecomunicações ITED. Utilizar cabo UTP Cat.5e ou superior para videoporteiros IP, ou cabo específico do fabricante para sistemas analógicos. A cablagem deve percorrer tubagem dedicada ou, no mínimo, estar em calha separada.",
+      "enabled": true,
+      "tags": [
+        "intercomunicação",
+        "videoporteiro",
+        "porteiro eletrónico",
+        "cablagem dedicada"
+      ]
+    },
+    {
+      "id": "ITED_123",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.6.2 — Sistema de Intercomunicação IP — Integração na Rede ITED",
+      "description": "O sistema de videoporteiro IP utiliza a mesma VLAN que a rede de dados do edifício, sem segmentação de rede. Sistemas de intercomunicação IP devem utilizar VLAN dedicada para segurança e qualidade de serviço.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.intercom.hasDedicatedVLAN",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.intercom.isIPBased",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "VLAN dedicada para intercomunicação IP: {ited.intercom.hasDedicatedVLAN}",
+      "requiredValue": "VLAN dedicada para sistema de intercomunicação IP",
+      "remediation": "Configurar VLAN dedicada para o sistema de intercomunicação IP, segregada da rede de dados do edifício. Aplicar ACLs (Access Control Lists) para limitar o tráfego da VLAN de intercomunicação apenas aos dispositivos autorizados (painéis de entrada, monitores das frações, servidor de gestão).",
+      "enabled": true,
+      "tags": [
+        "intercomunicação",
+        "videoporteiro IP",
+        "VLAN",
+        "segmentação",
+        "segurança"
+      ]
+    },
+    {
+      "id": "ITED_124",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.7.1 — Videovigilância (CCTV) — Especificação de Cabo",
+      "description": "A cablagem de videovigilância IP (CCTV) não utiliza cabo UTP Cat.6 ou superior com suporte PoE+. As câmaras IP requerem alimentação Power over Ethernet e largura de banda suficiente para transmissão de vídeo HD/4K.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.cctv.cableCategory",
+          "operator": "ordinal_lt",
+          "value": "Cat6",
+          "scale": [
+            "Cat5",
+            "Cat5e",
+            "Cat6",
+            "Cat6A",
+            "Cat7",
+            "Cat8"
+          ]
+        },
+        {
+          "field": "ited.cctv.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cabo CCTV: {ited.cctv.cableCategory}",
+      "requiredValue": "≥ Cat.6 UTP com suporte PoE+ para câmaras CCTV IP",
+      "remediation": "Substituir a cablagem do sistema CCTV por cabo UTP Cat.6 ou Cat.6A com suporte para PoE+ (IEEE 802.3at, 30W) ou PoE++ (IEEE 802.3bt, 60/90W) para câmaras PTZ ou com aquecimento. Cada cabo não deve exceder 100 m entre o switch PoE e a câmara. Para distâncias superiores, utilizar media converters ou repetidores PoE.",
+      "enabled": true,
+      "tags": [
+        "CCTV",
+        "videovigilância",
+        "cabo Cat.6",
+        "PoE+",
+        "câmaras IP"
+      ]
+    },
+    {
+      "id": "ITED_125",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.7.2 — Videovigilância (CCTV) — Largura de Banda de Gravação",
+      "description": "A largura de banda da rede destinada ao sistema CCTV é insuficiente para o número de câmaras previstas. Cada câmara IP em resolução Full HD (1080p) a 25 fps requer ~8 Mbps; câmaras 4K requerem ~25 Mbps.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.cctv.availableBandwidthMbps",
+          "operator": "<",
+          "value": 100
+        },
+        {
+          "field": "ited.cctv.cameraCount",
+          "operator": ">",
+          "value": 8
+        }
+      ],
+      "currentValueTemplate": "Largura de banda CCTV: {ited.cctv.availableBandwidthMbps} Mbps para {ited.cctv.cameraCount} câmaras",
+      "requiredValue": "Largura de banda adequada ao número e resolução das câmaras (mín. 100 Mbps para >8 câmaras)",
+      "remediation": "Dimensionar a rede CCTV com largura de banda adequada: calcular o débito total necessário (número de câmaras × débito por câmara × fator de compressão). Prever uplinks de 1 Gbps entre switches de acesso e o NVR/servidor de gravação. Para sistemas com >16 câmaras 4K, considerar uplinks 10 Gbps ao servidor.",
+      "enabled": true,
+      "tags": [
+        "CCTV",
+        "videovigilância",
+        "largura de banda",
+        "NVR",
+        "gravação"
+      ]
+    },
+    {
+      "id": "ITED_126",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.7.3 — Videovigilância (CCTV) — VLAN Dedicada",
+      "description": "O sistema de videovigilância (CCTV) não utiliza VLAN dedicada, partilhando a rede com tráfego de dados ou voz. A segregação de rede é obrigatória por razões de segurança e desempenho.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.cctv.hasDedicatedVLAN",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.cctv.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "VLAN dedicada CCTV: {ited.cctv.hasDedicatedVLAN}",
+      "requiredValue": "VLAN dedicada obrigatória para sistema CCTV",
+      "remediation": "Criar VLAN dedicada para o sistema CCTV, isolada da rede de dados do edifício. Configurar ACLs para permitir apenas tráfego entre câmaras, NVR e estações de monitorização autorizadas. O isolamento impede acesso não autorizado às câmaras e protege contra ataques de rede ao sistema de videovigilância.",
+      "enabled": true,
+      "tags": [
+        "CCTV",
+        "videovigilância",
+        "VLAN",
+        "segurança de rede",
+        "isolamento"
+      ]
+    },
+    {
+      "id": "ITED_127",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.8.1 — Controlo de Acessos — Rede Dedicada",
+      "description": "O sistema de controlo de acessos do edifício não possui rede dedicada ou VLAN separada. Controladores de acesso, leitores de cartão e fechaduras eletrónicas devem estar em rede segregada para garantir a segurança física e cibernética do edifício.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.accessControl.hasDedicatedNetwork",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.accessControl.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rede dedicada para controlo de acessos: {ited.accessControl.hasDedicatedNetwork}",
+      "requiredValue": "Rede dedicada ou VLAN segregada obrigatória para controlo de acessos",
+      "remediation": "Implementar rede dedicada ou VLAN segregada para o sistema de controlo de acessos. A rede deve ser fisicamente separada ou logicamente isolada com ACLs restritivas. Os controladores de porta devem comunicar apenas com o servidor de gestão de acessos. Prever alimentação PoE para leitores e fechaduras eletrónicas.",
+      "enabled": true,
+      "tags": [
+        "controlo de acessos",
+        "rede dedicada",
+        "VLAN",
+        "segurança física",
+        "leitores"
+      ]
+    },
+    {
+      "id": "ITED_128",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.8.2 — Controlo de Acessos — Cablagem RS-485 ou IP",
+      "description": "A cablagem do sistema de controlo de acessos não cumpre as especificações mínimas. Sistemas RS-485 requerem cabo de par trançado blindado (STP) com impedância de 120 Ω; sistemas IP requerem Cat.6 com PoE.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.accessControl.cablingCompliant",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.accessControl.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cablagem de controlo de acessos conforme: {ited.accessControl.cablingCompliant}",
+      "requiredValue": "Cablagem conforme especificações: STP 120Ω (RS-485) ou Cat.6 PoE (IP)",
+      "remediation": "Para sistemas RS-485: instalar cabo de par trançado blindado (STP) com impedância de 120 Ω, comprimento máximo de 1200 m, com resistências de terminação nas extremidades do barramento. Para sistemas IP: instalar cabo UTP Cat.6 com comprimento máximo de 100 m por segmento, com switch PoE (IEEE 802.3af/at) para alimentação dos leitores e controladores.",
+      "enabled": true,
+      "tags": [
+        "controlo de acessos",
+        "cablagem",
+        "RS-485",
+        "Cat.6",
+        "PoE"
+      ]
+    },
+    {
+      "id": "ITED_129",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.9.1 — Sistema de Chamada de Enfermagem — Infraestrutura de Rede",
+      "description": "O edifício de saúde ou residência sénior não prevê infraestrutura de rede dedicada para o sistema de chamada de enfermagem (nurse call). O sistema deve ter cablagem e rede independentes para garantir disponibilidade e fiabilidade em situações de emergência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.nurseCall.hasDedicatedInfrastructure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "hospital",
+            "clinic",
+            "senior_residence",
+            "healthcare"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Infraestrutura dedicada nurse call: {ited.nurseCall.hasDedicatedInfrastructure}",
+      "requiredValue": "Infraestrutura de rede dedicada obrigatória para sistema de chamada de enfermagem",
+      "remediation": "Prever infraestrutura de rede dedicada para o sistema de chamada de enfermagem, incluindo: (1) cablagem UTP Cat.6 dedicada entre cada ponto de chamada e o painel central; (2) VLAN dedicada se o sistema for IP-based; (3) alimentação redundante com UPS; (4) percursos de cabo resistentes ao fogo (DIN 4102-12). O sistema deve funcionar de forma autónoma, independente da rede de dados do edifício.",
+      "enabled": true,
+      "tags": [
+        "nurse call",
+        "chamada de enfermagem",
+        "saúde",
+        "infraestrutura dedicada",
+        "emergência"
+      ]
+    },
+    {
+      "id": "ITED_130",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.9.2 — Sistema de Chamada de Enfermagem — Redundância de Cablagem",
+      "description": "O sistema de chamada de enfermagem não prevê percursos de cablagem redundantes para o painel central. Em edifícios de saúde, a falha de um cabo não deve comprometer o funcionamento de todo o sistema.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.nurseCall.hasRedundantPaths",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "hospital",
+            "clinic"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Percursos redundantes nurse call: {ited.nurseCall.hasRedundantPaths}",
+      "requiredValue": "Percursos de cablagem redundantes para o painel central de nurse call",
+      "remediation": "Dimensionar percursos de cablagem redundantes para o sistema de chamada de enfermagem: (1) prever dois percursos físicos distintos entre cada ala/piso e o painel central; (2) os percursos devem utilizar colunas montantes diferentes; (3) garantir que uma falha num percurso (incêndio, dano mecânico) não compromete a cobertura total do sistema.",
+      "enabled": true,
+      "tags": [
+        "nurse call",
+        "redundância",
+        "cablagem",
+        "percursos alternativos",
+        "hospital"
+      ]
+    },
+    {
+      "id": "ITED_131",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.10.1 — Rede BMS (Building Management System) — Backbone IP",
+      "description": "A rede de gestão técnica do edifício (BMS/GTC) não possui backbone IP dedicado. O BMS deve utilizar rede IP segregada (VLAN ou rede física separada) para comunicação entre controladores de AVAC, iluminação, energia, e o servidor central de gestão.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.bms.hasIPBackbone",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.bms.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Backbone IP para BMS: {ited.bms.hasIPBackbone}",
+      "requiredValue": "Backbone IP dedicado ou VLAN segregada para rede BMS",
+      "remediation": "Implementar backbone IP dedicado para a rede BMS, com VLAN segregada e ACLs restritivas. A rede BMS deve interligar todos os controladores (AVAC, iluminação, energia, incêndio, elevadores) ao servidor central de gestão. Utilizar protocolos standard (BACnet/IP, Modbus TCP) sobre infraestrutura Cat.6. Prever switches geridos com suporte SNMP para monitorização da rede BMS.",
+      "enabled": true,
+      "tags": [
+        "BMS",
+        "gestão técnica",
+        "backbone IP",
+        "VLAN",
+        "BACnet"
+      ]
+    },
+    {
+      "id": "ITED_132",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.10.2 — Rede BMS — Segregação de Rede OT/IT",
+      "description": "A rede BMS (rede operacional/OT) não está segregada da rede IT do edifício. A convergência OT/IT sem segregação adequada expõe os sistemas de controlo do edifício a vulnerabilidades de cibersegurança e ataques de rede.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.bms.otItSegregation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.bms.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Segregação OT/IT na rede BMS: {ited.bms.otItSegregation}",
+      "requiredValue": "Segregação obrigatória entre rede OT (BMS) e rede IT do edifício",
+      "remediation": "Implementar segregação entre a rede operacional (OT) do BMS e a rede IT do edifício conforme modelo Purdue/IEC 62443. Utilizar firewall industrial ou DMZ entre as redes OT e IT. O acesso ao BMS a partir da rede IT deve ser feito exclusivamente através de gateway seguro com autenticação multifator. Desativar protocolos e serviços desnecessários nos controladores BMS.",
+      "enabled": true,
+      "tags": [
+        "BMS",
+        "OT/IT",
+        "segregação",
+        "cibersegurança",
+        "IEC 62443"
+      ]
+    },
+    {
+      "id": "ITED_133",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.10.3 — Rede BMS — Pontos de Ligação por Piso",
+      "description": "O número de pontos de rede BMS previstos por piso é insuficiente para o número de controladores e sensores IP. Cada controlador AVAC, quadro de iluminação e medidor de energia IP requer uma porta de rede dedicada.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.bms.networkPointsPerFloor",
+          "operator": "<",
+          "value": 4
+        },
+        {
+          "field": "ited.bms.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pontos de rede BMS por piso: {ited.bms.networkPointsPerFloor}",
+      "requiredValue": "≥ 4 pontos de rede BMS por piso (controladores AVAC, iluminação, energia, reserva)",
+      "remediation": "Aumentar o número de pontos de rede BMS por piso para no mínimo 4, cobrindo: (1) controlador AVAC; (2) controlador de iluminação; (3) medidor de energia IP; (4) ponto de reserva para futuras expansões. Em pisos técnicos ou com múltiplas UTA, aumentar proporcionalmente. Prever switch PoE no quadro técnico de piso para alimentação dos controladores.",
+      "enabled": true,
+      "tags": [
+        "BMS",
+        "pontos de rede",
+        "controladores",
+        "AVAC",
+        "piso"
+      ]
+    },
+    {
+      "id": "ITED_134",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.11.1 — Infraestrutura IoT — Rede LoRaWAN/NB-IoT no Edifício",
+      "description": "O edifício não prevê infraestrutura para rede IoT (Internet of Things) de área ampla de baixa potência (LPWAN). Para edifícios inteligentes, é recomendável prever gateway LoRaWAN ou cobertura NB-IoT para sensores de ambiente, contadores inteligentes e dispositivos de monitorização.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.iot.hasLPWANInfrastructure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.bms.hasSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Infraestrutura LPWAN/IoT: {ited.iot.hasLPWANInfrastructure}",
+      "requiredValue": "Infraestrutura IoT LPWAN recomendada para edifícios inteligentes",
+      "remediation": "Prever infraestrutura para rede IoT no edifício: (1) instalar gateway LoRaWAN no ATE ou cobertura com ligação IP ao servidor de rede; (2) garantir cobertura de sinal LoRa em todos os pisos com antenas interiores se necessário; (3) prever ponto de rede e alimentação PoE para cada gateway; (4) alternativamente, verificar cobertura NB-IoT/LTE-M do operador móvel no interior do edifício.",
+      "enabled": true,
+      "tags": [
+        "IoT",
+        "LoRaWAN",
+        "NB-IoT",
+        "sensores",
+        "edifício inteligente"
+      ]
+    },
+    {
+      "id": "ITED_135",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.11.2 — Infraestrutura IoT — VLAN Dedicada para Dispositivos IoT",
+      "description": "Os dispositivos IoT do edifício (sensores, atuadores, contadores inteligentes) não estão segregados numa VLAN dedicada. Dispositivos IoT frequentemente possuem vulnerabilidades de segurança e devem ser isolados da rede de dados e das redes de sistemas críticos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.iot.hasDedicatedVLAN",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.iot.hasDevices",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "VLAN dedicada IoT: {ited.iot.hasDedicatedVLAN}",
+      "requiredValue": "VLAN dedicada obrigatória para dispositivos IoT",
+      "remediation": "Criar VLAN dedicada para todos os dispositivos IoT do edifício, isolada das redes de dados, voz, BMS e segurança. Configurar ACLs para permitir apenas tráfego IoT→servidor de gestão e bloquear comunicação lateral entre dispositivos IoT e outras redes. Implementar NAC (Network Access Control) para autenticar dispositivos IoT antes de aceder à rede.",
+      "enabled": true,
+      "tags": [
+        "IoT",
+        "VLAN",
+        "segmentação",
+        "segurança",
+        "NAC"
+      ]
+    },
+    {
+      "id": "ITED_136",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.11.3 — Infraestrutura IoT — Alimentação PoE para Sensores IP",
+      "description": "A rede não prevê alimentação PoE (Power over Ethernet) para sensores IoT IP instalados em locais sem tomada elétrica próxima. Sensores de qualidade do ar, ocupação, luminosidade e temperatura IP requerem alimentação PoE (IEEE 802.3af, máx. 15.4W).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.iot.poeSwitchAvailable",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.iot.hasIPSensors",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Switch PoE para sensores IoT: {ited.iot.poeSwitchAvailable}",
+      "requiredValue": "Switch PoE disponível para alimentação de sensores IoT IP",
+      "remediation": "Instalar switches PoE (IEEE 802.3af/at) nos quadros técnicos de piso para alimentação de sensores IoT IP. Dimensionar o power budget total do switch considerando o consumo de cada sensor (tipicamente 5–12W). Para sensores em locais remotos (coberturas, caves), considerar injetores PoE mid-span ou extensores PoE para distâncias superiores a 100 m.",
+      "enabled": true,
+      "tags": [
+        "IoT",
+        "PoE",
+        "sensores IP",
+        "alimentação",
+        "IEEE 802.3af"
+      ]
+    },
+    {
+      "id": "ITED_137",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.1 — WiFi Mesh — Backhaul Cablado Obrigatório",
+      "description": "O sistema de WiFi mesh do edifício utiliza backhaul sem fios (wireless backhaul) em vez de backhaul cablado. Para desempenho e fiabilidade consistentes, cada ponto de acesso mesh deve ter ligação Ethernet cablada ao switch de distribuição.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.wifi.meshBackhaulType",
+          "operator": "!=",
+          "value": "wired"
+        },
+        {
+          "field": "ited.wifi.hasMeshSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Tipo de backhaul mesh: {ited.wifi.meshBackhaulType}",
+      "requiredValue": "Backhaul cablado (Ethernet) para cada ponto de acesso mesh",
+      "remediation": "Prever cablagem Ethernet Cat.6 dedicada para cada ponto de acesso WiFi mesh, desde o switch de distribuição até ao local de instalação do AP. O backhaul cablado elimina a perda de largura de banda associada ao backhaul wireless (tipicamente 50% por salto) e garante latência consistente. Cada ponto de ligação deve incluir alimentação PoE+ (IEEE 802.3at, 30W).",
+      "enabled": true,
+      "tags": [
+        "WiFi mesh",
+        "backhaul cablado",
+        "ponto de acesso",
+        "Ethernet",
+        "PoE+"
+      ]
+    },
+    {
+      "id": "ITED_138",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.2 — WiFi Mesh — Densidade de Pontos de Acesso",
+      "description": "O número de pontos de acesso WiFi mesh previstos é insuficiente para a área do edifício. Recomenda-se um ponto de acesso por cada 150 m² de área útil em edifícios de escritórios, ou por cada 80 m² em áreas de alta densidade de utilizadores.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.wifi.apDensityPerSqm",
+          "operator": ">",
+          "value": 150
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "office",
+            "services",
+            "commercial"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Densidade AP: 1 AP por {ited.wifi.apDensityPerSqm} m²",
+      "requiredValue": "≤ 150 m² por AP em escritórios; ≤ 80 m² em áreas de alta densidade",
+      "remediation": "Aumentar o número de pontos de acesso WiFi para garantir cobertura adequada: (1) escritórios: 1 AP por 150 m²; (2) salas de reunião/auditórios: 1 AP por 50–80 m²; (3) áreas comuns: 1 AP por 200 m². Realizar estudo de cobertura (site survey) para otimizar a localização e minimizar interferências entre APs. Prever ponto de rede Cat.6 com PoE+ em cada localização de AP.",
+      "enabled": true,
+      "tags": [
+        "WiFi mesh",
+        "densidade AP",
+        "cobertura",
+        "site survey",
+        "dimensionamento"
+      ]
+    },
+    {
+      "id": "ITED_139",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.3 — WiFi Convidados — Segregação de Rede",
+      "description": "A rede WiFi de convidados (guest WiFi) não está segregada da rede corporativa ou residencial do edifício. A rede de convidados deve utilizar VLAN dedicada com acesso restrito apenas à Internet, sem possibilidade de aceder a recursos internos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.wifi.guestNetworkSegregated",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.wifi.hasGuestNetwork",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rede de convidados segregada: {ited.wifi.guestNetworkSegregated}",
+      "requiredValue": "VLAN dedicada com isolamento total para WiFi de convidados",
+      "remediation": "Implementar segregação completa da rede WiFi de convidados: (1) criar VLAN dedicada para guest WiFi; (2) configurar firewall para permitir apenas acesso à Internet (HTTP/HTTPS/DNS); (3) bloquear tráfego entre dispositivos de convidados (client isolation); (4) implementar portal cativo com aceitação de termos de utilização; (5) limitar a largura de banda por utilizador convidado para proteger a ligação principal.",
+      "enabled": true,
+      "tags": [
+        "WiFi convidados",
+        "guest WiFi",
+        "segregação",
+        "VLAN",
+        "portal cativo"
+      ]
+    },
+    {
+      "id": "ITED_140",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.4 — WiFi Convidados — Limitação de Largura de Banda",
+      "description": "A rede WiFi de convidados não possui limitação de largura de banda por utilizador. Sem rate limiting, um número elevado de convidados ou um único utilizador com tráfego excessivo pode degradar o serviço para todos os utilizadores da rede principal.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.wifi.guestBandwidthLimited",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.wifi.hasGuestNetwork",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Limitação de banda guest WiFi: {ited.wifi.guestBandwidthLimited}",
+      "requiredValue": "Rate limiting obrigatório na rede WiFi de convidados",
+      "remediation": "Configurar limitação de largura de banda (rate limiting) na rede WiFi de convidados: (1) definir limite por utilizador (ex.: 10/5 Mbps down/up); (2) definir limite agregado para toda a rede de convidados (ex.: 20% da largura de banda total da ligação); (3) implementar fair queuing para distribuir a capacidade equitativamente entre utilizadores ativos.",
+      "enabled": true,
+      "tags": [
+        "WiFi convidados",
+        "rate limiting",
+        "largura de banda",
+        "QoS",
+        "fair queuing"
+      ]
+    },
+    {
+      "id": "ITED_141",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.5 — WiFi Exterior — Grau de Proteção dos APs",
+      "description": "Os pontos de acesso WiFi instalados em espaços exteriores não possuem grau de proteção IP67 ou superior. APs outdoor devem resistir a chuva, poeiras, variações de temperatura e radiação UV.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.wifi.outdoorAPProtectionRating",
+          "operator": "ordinal_lt",
+          "value": "IP67",
+          "scale": [
+            "IP20",
+            "IP44",
+            "IP54",
+            "IP55",
+            "IP65",
+            "IP66",
+            "IP67",
+            "IP68"
+          ]
+        },
+        {
+          "field": "ited.wifi.hasOutdoorAPs",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção dos APs outdoor: {ited.wifi.outdoorAPProtectionRating}",
+      "requiredValue": "≥ IP67 para pontos de acesso WiFi em espaços exteriores",
+      "remediation": "Substituir os pontos de acesso WiFi outdoor por modelos com grau de proteção IP67 ou superior. Os APs outdoor devem também suportar: (1) gama de temperatura operacional de -30°C a +60°C; (2) proteção contra descargas atmosféricas com supressor de surto na porta Ethernet; (3) fixação anti-vandalismo; (4) antenas omnidirecionais ou sectoriais adequadas à área de cobertura.",
+      "enabled": true,
+      "tags": [
+        "WiFi outdoor",
+        "IP67",
+        "proteção",
+        "ponto de acesso",
+        "exterior"
+      ]
+    },
+    {
+      "id": "ITED_142",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.6 — WiFi Exterior — Alimentação e Cablagem",
+      "description": "Os pontos de acesso WiFi outdoor não possuem alimentação PoE com proteção contra surtos. A cablagem Ethernet para APs exteriores deve incluir proteção contra descargas atmosféricas na transição interior/exterior do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.wifi.outdoorAPSurgeProtection",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.wifi.hasOutdoorAPs",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Proteção contra surtos APs outdoor: {ited.wifi.outdoorAPSurgeProtection}",
+      "requiredValue": "Proteção contra surtos obrigatória na cablagem de APs outdoor",
+      "remediation": "Instalar supressores de surto (SPD) na cablagem Ethernet de cada AP outdoor, na transição interior/exterior do edifício. Utilizar cabo Ethernet para exterior (UV-resistant, PE jacket) ou cabo com gel de enchimento (gel-filled) para percursos expostos. Garantir que a terra do supressor de surto está ligada ao barramento de terras do edifício com impedância ≤ 10 Ω.",
+      "enabled": true,
+      "tags": [
+        "WiFi outdoor",
+        "proteção surtos",
+        "SPD",
+        "cablagem exterior",
+        "PoE"
+      ]
+    },
+    {
+      "id": "ITED_143",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.13.1 — Repetidor de Sinal Celular — Infraestrutura de Suporte",
+      "description": "O edifício não prevê infraestrutura para instalação de repetidor de sinal celular (cell signal booster). Em edifícios com mais de 4 pisos ou com estrutura que atenue significativamente o sinal móvel, deve ser prevista tubagem e cablagem para sistema DAS (Distributed Antenna System) ou repetidor.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.cellular.hasBoosterInfrastructure",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfFloors",
+          "operator": ">",
+          "value": 4
+        }
+      ],
+      "currentValueTemplate": "Infraestrutura para repetidor celular: {ited.cellular.hasBoosterInfrastructure}",
+      "requiredValue": "Infraestrutura para repetidor de sinal celular recomendada em edifícios >4 pisos",
+      "remediation": "Prever infraestrutura para sistema de reforço de sinal celular: (1) ponto de antena exterior (donor antenna) na cobertura do edifício com cabo coaxial até ao ATE; (2) tubagem dedicada para cablagem coaxial entre o ATE e antenas interiores em cada piso; (3) alimentação elétrica para o repetidor/amplificador no ATE; (4) em alternativa, prever infraestrutura para small cells ou femtocells com backhaul IP.",
+      "enabled": true,
+      "tags": [
+        "sinal celular",
+        "repetidor",
+        "DAS",
+        "cobertura móvel",
+        "infraestrutura"
+      ]
+    },
+    {
+      "id": "ITED_144",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.13.2 — Repetidor de Sinal Celular — Licenciamento ANACOM",
+      "description": "O sistema de repetidor de sinal celular previsto não contempla o licenciamento obrigatório pela ANACOM. A instalação de repetidores/amplificadores de sinal celular requer autorização prévia da ANACOM e do operador de telecomunicações.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.cellular.hasANACOMLicense",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.cellular.hasBoosterSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Licenciamento ANACOM repetidor celular: {ited.cellular.hasANACOMLicense}",
+      "requiredValue": "Licença ANACOM obrigatória para repetidores de sinal celular",
+      "remediation": "Obter autorização prévia da ANACOM para instalação do repetidor de sinal celular. O processo inclui: (1) requerimento à ANACOM com especificações técnicas do equipamento; (2) coordenação com o(s) operador(es) de telecomunicações móveis afetados; (3) certificação do equipamento conforme Diretiva RED (2014/53/UE); (4) o repetidor deve limitar-se à potência autorizada e não causar interferências.",
+      "enabled": true,
+      "tags": [
+        "sinal celular",
+        "ANACOM",
+        "licenciamento",
+        "repetidor",
+        "autorização"
+      ]
+    },
+    {
+      "id": "ITED_145",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.13.3 — Cobertura Móvel Indoor — Medição de Nível de Sinal",
+      "description": "Não foi realizada medição do nível de sinal celular no interior do edifício para verificar a necessidade de sistema de reforço de cobertura. A medição deve abranger todas as bandas de frequência dos operadores nacionais (800/900/1800/2100/2600 MHz e bandas 5G NR).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "ited.cellular.signalSurveyCompleted",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "numberOfFloors",
+          "operator": ">",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Medição de sinal celular indoor: {ited.cellular.signalSurveyCompleted}",
+      "requiredValue": "Medição de sinal celular indoor recomendada em edifícios >2 pisos",
+      "remediation": "Realizar medição de nível de sinal celular (RF site survey) no interior do edifício após construção. Medir o RSRP (Reference Signal Received Power) para LTE e SS-RSRP para 5G NR em todos os pisos e zonas críticas. O nível mínimo aceitável é -105 dBm para LTE e -110 dBm para 5G NR. Se os níveis forem inferiores, dimensionar sistema DAS ou small cells para reforço de cobertura.",
+      "enabled": true,
+      "tags": [
+        "cobertura móvel",
+        "indoor",
+        "site survey",
+        "RSRP",
+        "medição"
+      ]
+    },
+    {
+      "id": "ITED_146",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.13.4 — Cobertura Móvel Indoor — Sistema DAS",
+      "description": "O sistema DAS (Distributed Antenna System) para cobertura móvel indoor não cobre todos os pisos do edifício. Em edifícios com DAS, a cobertura deve ser garantida em 95% da área útil, incluindo caves, estacionamentos e escadas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.cellular.dasFloorCoveragePercent",
+          "operator": "<",
+          "value": 95
+        },
+        {
+          "field": "ited.cellular.hasDASSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cobertura DAS: {ited.cellular.dasFloorCoveragePercent}% da área útil",
+      "requiredValue": "≥ 95% de cobertura DAS em toda a área útil do edifício",
+      "remediation": "Ampliar o sistema DAS para cobrir ≥ 95% da área útil do edifício, incluindo: (1) todos os pisos de escritórios/habitação; (2) estacionamentos subterrâneos; (3) escadas e corredores; (4) áreas técnicas e caves. Adicionar antenas interiores omnidirecionais nos pisos/zonas sem cobertura. Rever o link budget para garantir nível de sinal ≥ -85 dBm em todos os pontos cobertos.",
+      "enabled": true,
+      "tags": [
+        "DAS",
+        "cobertura móvel",
+        "indoor",
+        "antenas interiores",
+        "95%"
+      ]
+    },
+    {
+      "id": "ITED_147",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 64.º — Telas Finais (As-Built) — Obrigatoriedade",
+      "description": "O projeto ITED não prevê elaboração de telas finais (documentação as-built). As telas finais são obrigatórias após conclusão da instalação e devem refletir fielmente a infraestrutura instalada, incluindo todas as alterações ao projeto inicial.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.asBuilt.hasAsBuiltDocumentation",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Telas finais (as-built): {ited.asBuilt.hasAsBuiltDocumentation}",
+      "requiredValue": "Telas finais obrigatórias conforme DL 123/2009, Art. 64.º",
+      "remediation": "Elaborar telas finais (documentação as-built) após conclusão da instalação ITED. As telas finais devem incluir: (1) plantas atualizadas com percursos reais de tubagem e cablagem; (2) esquemas de ligações efetivamente executados no ODF, patch panels e repartidores; (3) relatórios de ensaios com resultados; (4) lista de materiais e equipamentos instalados com referências e quantidades. As telas finais devem ser assinadas pelo instalador credenciado ANACOM.",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "as-built",
+        "documentação",
+        "DL 123/2009",
+        "obrigatório"
+      ]
+    },
+    {
+      "id": "ITED_148",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 64.º — Telas Finais (As-Built) — Formato Digital",
+      "description": "As telas finais não estão disponíveis em formato digital (DWG/PDF). O arquivo digital facilita a consulta, atualização e transmissão da documentação técnica ao longo da vida do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "ited.asBuilt.hasDigitalFormat",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.asBuilt.hasAsBuiltDocumentation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Formato digital as-built: {ited.asBuilt.hasDigitalFormat}",
+      "requiredValue": "Telas finais em formato digital (DWG e/ou PDF)",
+      "remediation": "Disponibilizar as telas finais em formato digital: (1) peças desenhadas em formato DWG editável e PDF para consulta; (2) peças escritas em formato PDF pesquisável; (3) relatórios de ensaios em PDF com dados tabelados; (4) entregar cópia digital ao dono de obra, ao administrador do condomínio e manter cópia no ATE em suporte adequado (pen USB ou acesso a cloud).",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "as-built",
+        "formato digital",
+        "DWG",
+        "PDF"
+      ]
+    },
+    {
+      "id": "ITED_149",
+      "regulationId": "dl-123-2009-ited",
+      "article": "DL 123/2009, Art. 64.º — Telas Finais (As-Built) — Conformidade com Instalação Real",
+      "description": "As telas finais não foram verificadas contra a instalação real. As telas finais devem corresponder fielmente à infraestrutura instalada, e qualquer desvio ao projeto original deve estar documentado e justificado.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.asBuilt.verifiedAgainstInstallation",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "ited.asBuilt.hasAsBuiltDocumentation",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Telas finais verificadas: {ited.asBuilt.verifiedAgainstInstallation}",
+      "requiredValue": "Telas finais verificadas e conformes com a instalação real",
+      "remediation": "Realizar verificação de conformidade entre as telas finais e a instalação real: (1) percorrer todos os percursos de tubagem e cablagem confirmando correspondência com as plantas; (2) verificar todas as ligações no ODF, patch panels e repartidores; (3) confirmar a localização e tipo de cada tomada; (4) documentar e justificar todos os desvios ao projeto original; (5) fazer assinar a verificação pelo instalador credenciado ANACOM.",
+      "enabled": true,
+      "tags": [
+        "telas finais",
+        "as-built",
+        "verificação",
+        "conformidade",
+        "instalação"
+      ]
+    },
+    {
+      "id": "ITED_150",
+      "regulationId": "portaria-264-2023-ited4",
+      "article": "Manual ITED 4ª Ed., Cap. 5.12.7 — WiFi Exterior — Conformidade com Limites de Potência ANACOM",
+      "description": "A potência de transmissão dos pontos de acesso WiFi exteriores excede os limites regulamentares definidos pela ANACOM para a banda de 5 GHz em espaços exteriores. A potência EIRP máxima para WiFi outdoor na banda 5150–5350 MHz é de 200 mW (23 dBm) e na banda 5470–5725 MHz é de 1 W (30 dBm).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "ited.wifi.outdoorAPTransmitPowerDbm",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "ited.wifi.hasOutdoorAPs",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Potência TX dos APs outdoor: {ited.wifi.outdoorAPTransmitPowerDbm} dBm EIRP",
+      "requiredValue": "≤ 30 dBm EIRP na banda 5470–5725 MHz; ≤ 23 dBm na banda 5150–5350 MHz",
+      "remediation": "Ajustar a potência de transmissão dos APs outdoor para dentro dos limites ANACOM: (1) banda 5150–5350 MHz: máx. 200 mW (23 dBm) EIRP — uso interior apenas em Portugal; (2) banda 5470–5725 MHz: máx. 1 W (30 dBm) EIRP com DFS e TPC obrigatórios; (3) banda 2.4 GHz: máx. 100 mW (20 dBm) EIRP. Configurar DFS (Dynamic Frequency Selection) e TPC (Transmit Power Control) em conformidade.",
+      "enabled": true,
+      "tags": [
+        "WiFi outdoor",
+        "potência TX",
+        "ANACOM",
+        "EIRP",
+        "5 GHz",
+        "DFS"
+      ]
     }
   ]
 }

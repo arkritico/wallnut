@@ -9112,6 +9112,1853 @@
         "alinhamento",
         "EN 81-20"
       ]
+    },
+    {
+      "id": "ELEV-CXESTR-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.1.1 — Carga Estrutural das Paredes da Caixa do Ascensor",
+      "description": "As paredes da caixa do ascensor devem suportar uma carga horizontal mínima de {elevator.shaftWallLoadN} N. O valor mínimo é de 300 N aplicados numa área de 5 cm² em qualquer ponto da parede.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.shaftWallLoadCapacityN",
+          "operator": "<",
+          "value": 300
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Capacidade de carga da parede da caixa: {elevator.shaftWallLoadCapacityN} N",
+      "requiredValue": ">= 300 N em área de 5 cm²",
+      "remediation": "Reforçar paredes da caixa do ascensor: (1) verificar espessura e tipo de material (betão, alvenaria, chapa); (2) aplicar reforço estrutural se necessário (malha eletrossoldada, betão projetado); (3) solicitar ensaio de carga por engenheiro de estruturas; (4) garantir conformidade com EN 81-20 §5.2.1.1.",
+      "enabled": true,
+      "tags": [
+        "caixa",
+        "estrutura",
+        "carga",
+        "parede",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-CXESTR-02",
+      "regulationId": "en-81-50",
+      "article": "EN 81-50 §5.5 — Resistência do Pavimento do Poço ao Peso do Amortecedor e Carga",
+      "description": "O pavimento do poço deve suportar a carga estática e dinâmica do amortecedor sob impacto. A capacidade atual é de {elevator.pitFloorLoadCapacityKN} kN. O mínimo recomendado para ascensores com carga nominal > 1000 kg é de 50 kN.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.pitFloorLoadCapacityKN",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "elevator.ratedLoadKg",
+          "operator": ">",
+          "value": 1000
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Capacidade de carga do pavimento do poço: {elevator.pitFloorLoadCapacityKN} kN",
+      "requiredValue": ">= 50 kN para ascensores com carga nominal > 1000 kg",
+      "remediation": "Reforçar pavimento do poço: (1) verificar projeto estrutural original da laje de fundo; (2) calcular carga de impacto conforme EN 81-50 §5.5; (3) reforçar laje com betão armado adicional se necessário; (4) verificar que as fundações do amortecedor estão dimensionadas para a força de reação.",
+      "enabled": true,
+      "tags": [
+        "poço",
+        "estrutura",
+        "pavimento",
+        "amortecedor",
+        "EN 81-50"
+      ]
+    },
+    {
+      "id": "ELEV-CXESTR-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.1.2 — Resistência das Guias de Fixação à Parede da Caixa",
+      "description": "Os suportes de fixação das guias à parede da caixa devem resistir às forças resultantes da ação do para-quedas e condições de carga. A distância entre suportes é de {elevator.guideFixingDistanceMm} mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.guideFixingDistanceMm",
+          "operator": ">",
+          "value": 2500
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Distância entre suportes de guia: {elevator.guideFixingDistanceMm} mm",
+      "requiredValue": "<= 2500 mm entre suportes de fixação das guias",
+      "remediation": "Ajustar fixações das guias: (1) adicionar suportes intermédios para reduzir distância entre fixações; (2) verificar estado dos chumbadores e ancoragens; (3) garantir que os suportes são dimensionados para forças de para-quedas conforme EN 81-50; (4) documentar cálculo de deflexão das guias.",
+      "enabled": true,
+      "tags": [
+        "guias",
+        "fixação",
+        "caixa",
+        "estrutura",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-CONTPROT-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.4.1 — Proteção (Ecrã) do Contrapeso",
+      "description": "O contrapeso deve ser dotado de ecrã de proteção na parte inferior se o percurso do contrapeso passa por espaços acessíveis. O ecrã deve estender-se até uma altura mínima de 2,5 m acima do pavimento mais baixo acessível.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.counterweightScreenInstalled",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.counterweightPassesAccessibleArea",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Ecrã de proteção do contrapeso: {elevator.counterweightScreenInstalled}",
+      "requiredValue": "Ecrã de proteção instalado quando contrapeso passa por zona acessível",
+      "remediation": "Instalar ecrã de proteção do contrapeso: (1) ecrã metálico perfurado ou chapa lisa na parte inferior da caixa; (2) altura mínima de 2,5 m acima do piso mais baixo; (3) largura igual à largura do contrapeso mais 100 mm de cada lado; (4) fixação robusta à estrutura da caixa. Conforme EN 81-20 §5.4.4.1.",
+      "enabled": true,
+      "tags": [
+        "contrapeso",
+        "ecrã",
+        "proteção",
+        "segurança",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-CONTPROT-02",
+      "regulationId": "en-81-50",
+      "article": "EN 81-50 §5.7.1 — Massa do Contrapeso e Tolerância",
+      "description": "A massa do contrapeso é de {elevator.counterweightMassKg} kg. A massa deve ser calibrada para equilibrar a cabina com 40–50% da carga nominal. A tolerância máxima é de ±5% da massa calculada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.counterweightMassDeviationPercent",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Desvio de massa do contrapeso: {elevator.counterweightMassDeviationPercent}%",
+      "requiredValue": "<= 5% de desvio da massa calculada de contrapeso",
+      "remediation": "Corrigir massa do contrapeso: (1) verificar cálculo de balanceamento (cabina + 40–50% carga nominal); (2) adicionar ou remover blocos de massa; (3) verificar fixação dos blocos; (4) repetir ensaio de tração após ajuste. Conforme EN 81-50 §5.7.1.",
+      "enabled": true,
+      "tags": [
+        "contrapeso",
+        "massa",
+        "balanceamento",
+        "EN 81-50"
+      ]
+    },
+    {
+      "id": "ELEV-PESOCAB-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.1.2 — Dispositivo de Pesagem / Sensor de Sobrecarga da Cabina",
+      "description": "A cabina deve dispor de dispositivo de pesagem calibrado que impeça o arranque quando a carga excede 110% da carga nominal. A última calibração do sensor de peso foi há {elevator.weightSensorCalibrationMonths} meses.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.weightSensorCalibrationMonths",
+          "operator": ">",
+          "value": 12
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Última calibração do sensor de peso: há {elevator.weightSensorCalibrationMonths} meses",
+      "requiredValue": "Calibração do sensor de peso a cada 12 meses",
+      "remediation": "Calibrar sensor de peso da cabina: (1) colocar pesos padrão na cabina (25%, 50%, 75%, 100%, 110% da carga nominal); (2) verificar leitura do dispositivo de pesagem em cada patamar; (3) ajustar sinal de sobrecarga para 110% da carga nominal; (4) emitir certificado de calibração; (5) registar no livro de manutenção. Conforme EN 81-20 §5.12.1.2.",
+      "enabled": true,
+      "tags": [
+        "pesagem",
+        "calibração",
+        "sobrecarga",
+        "sensor",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-PESOCAB-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.1.2 — Precisão do Dispositivo de Pesagem",
+      "description": "A precisão do dispositivo de pesagem da cabina é de ±{elevator.weightSensorAccuracyPercent}%. A precisão mínima requerida é de ±5% da carga nominal para deteção fiável de sobrecarga.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.weightSensorAccuracyPercent",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Precisão do sensor de peso: ±{elevator.weightSensorAccuracyPercent}%",
+      "requiredValue": "Precisão <= ±5% da carga nominal",
+      "remediation": "Melhorar precisão do sensor de pesagem: (1) substituir células de carga por modelo de maior resolução; (2) verificar ligações elétricas e estado dos cabos; (3) recalibrar com pesos padrão rastreáveis; (4) compensar variação térmica se necessário; (5) considerar sistema de pesagem digital. Conforme EN 81-20 §5.12.1.2.",
+      "enabled": true,
+      "tags": [
+        "pesagem",
+        "precisão",
+        "sensor",
+        "carga",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-REABERT-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.6.2.1 — Dispositivo de Reabertura de Portas (Cortina de Luz)",
+      "description": "As portas automáticas devem ser equipadas com dispositivo de proteção de reabertura. O número de feixes da cortina de luz é de {elevator.doorReopenDeviceBeams}. O mínimo recomendado é de 40 feixes para cobertura total da abertura.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.doorReopenDeviceBeams",
+          "operator": "<",
+          "value": 40
+        },
+        {
+          "field": "elevator.doorType",
+          "operator": "==",
+          "value": "automatic"
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Feixes da cortina de luz: {elevator.doorReopenDeviceBeams}",
+      "requiredValue": ">= 40 feixes para proteção total da abertura",
+      "remediation": "Melhorar dispositivo de reabertura de portas: (1) substituir sensor de borda mecânica por cortina de luz com >= 40 feixes; (2) verificar cobertura total da altura da abertura (mínimo de 25 mm acima do piso a 1800 mm); (3) testar tempo de resposta (< 50 ms); (4) verificar funcionamento em modo de incêndio (desativação). Conforme EN 81-20 §5.3.6.2.1.",
+      "enabled": true,
+      "tags": [
+        "portas",
+        "reabertura",
+        "cortina de luz",
+        "segurança",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-REABERT-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.6.2.2 — Tempo de Reabertura das Portas",
+      "description": "O tempo de inversão das portas após deteção de obstáculo é de {elevator.doorReopenTimeSec} segundos. O tempo máximo de inversão deve ser inferior a 1 segundo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.doorReopenTimeSec",
+          "operator": ">=",
+          "value": 1
+        },
+        {
+          "field": "elevator.doorType",
+          "operator": "==",
+          "value": "automatic"
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Tempo de inversão de porta: {elevator.doorReopenTimeSec} s",
+      "requiredValue": "< 1 s após deteção de obstáculo",
+      "remediation": "Reduzir tempo de inversão de portas: (1) verificar estado do motor de portas e variador; (2) ajustar parâmetros de velocidade de inversão no controlador; (3) verificar que o sensor envia sinal imediatamente (sem atraso lógico); (4) lubrificar guias de porta se houver resistência mecânica. Conforme EN 81-20 §5.3.6.2.2.",
+      "enabled": true,
+      "tags": [
+        "portas",
+        "reabertura",
+        "tempo",
+        "segurança",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-REABERT-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.3.6.2.3 — Dispositivo de Reabertura com Desativação Temporizada",
+      "description": "O dispositivo de reabertura deve desativar-se após {elevator.doorNudgingDelaySec} segundos de obstrução contínua, permitindo o fecho forçado (nudging) a velocidade reduzida. O tempo padrão de nudging é de 20 segundos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.doorNudgingDelaySec",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "elevator.doorType",
+          "operator": "==",
+          "value": "automatic"
+        }
+      ],
+      "currentValueTemplate": "Tempo de nudging: {elevator.doorNudgingDelaySec} s",
+      "requiredValue": "Nudging ativado entre 15–30 s de obstrução",
+      "remediation": "Ajustar tempo de nudging: (1) parametrizar controlador para ativar nudging entre 15–30 s; (2) verificar que a velocidade de fecho em modo nudging é <= 0,1 m/s; (3) ativar sinal sonoro (buzzer) durante nudging; (4) verificar que a força de fecho em nudging não excede 150 N. Conforme EN 81-20 §5.3.6.2.3.",
+      "enabled": true,
+      "tags": [
+        "portas",
+        "nudging",
+        "reabertura",
+        "temporização",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-VANDAL-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.7 — Botoneira Antivandálica — Resistência ao Impacto",
+      "description": "A botoneira da cabina deve ser resistente a vandalismo. A resistência ao impacto é de {elevator.buttonPanelImpactResistanceJ} J. O mínimo para classificação antivandálica é de 6 J (IK08).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.buttonPanelImpactResistanceJ",
+          "operator": "<",
+          "value": 6
+        },
+        {
+          "field": "elevator.vandalResistantRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Resistência ao impacto da botoneira: {elevator.buttonPanelImpactResistanceJ} J",
+      "requiredValue": ">= 6 J (IK08) para classificação antivandálica",
+      "remediation": "Instalar botoneira antivandálica: (1) substituir por painel em aço inoxidável com botões flush (embutidos); (2) classificação mínima IK08 (6 J); (3) botões piezoelétricos ou capacitivos sem peças móveis; (4) proteger indicadores LED com vidro temperado; (5) considerar IK10 (20 J) para edifícios de uso público intenso. Conforme EN 81-20 §5.4.7.",
+      "enabled": true,
+      "tags": [
+        "vandalismo",
+        "botoneira",
+        "impacto",
+        "IK08",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-VANDAL-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.7 — Botoneira Antivandálica — Material e Construção",
+      "description": "Os botões da botoneira da cabina devem ser de tipo embutido (flush) em painel antivandálico. O tipo atual dos botões é '{elevator.buttonType}'. Para instalações com requisito antivandálico, devem ser piezoelétricos ou capacitivos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.buttonType",
+          "operator": "in",
+          "value": [
+            "protruding",
+            "mechanical_standard"
+          ]
+        },
+        {
+          "field": "elevator.vandalResistantRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Tipo de botões: {elevator.buttonType}",
+      "requiredValue": "Botões piezoelétricos, capacitivos ou flush para instalação antivandálica",
+      "remediation": "Substituir botões por tipo antivandálico: (1) botões piezoelétricos (sem peças móveis, vida útil > 10 milhões de acionamentos); (2) botões capacitivos com superfície plana; (3) painel em aço inoxidável escovado (AISI 316 para zonas costeiras); (4) fixação por trás do painel (sem parafusos visíveis). Conforme EN 81-20 §5.4.7.",
+      "enabled": true,
+      "tags": [
+        "vandalismo",
+        "botoneira",
+        "botões",
+        "piezoelétrico",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-VANDAL-03",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.2 / EN 81-20 §5.4.7 — Botoneira Antivandálica Acessível",
+      "description": "A botoneira antivandálica deve manter acessibilidade PMR com sinalização tátil e Braille. O contraste visual da botoneira é de {elevator.buttonPanelContrastPoints} pontos. O mínimo é de 30 pontos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.buttonPanelContrastPoints",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "elevator.vandalResistantRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Contraste visual da botoneira: {elevator.buttonPanelContrastPoints} pontos",
+      "requiredValue": ">= 30 pontos de contraste, com Braille e tátil",
+      "remediation": "Garantir acessibilidade da botoneira antivandálica: (1) manter sinalização Braille adjacente a cada botão; (2) garantir contraste >= 30 pontos entre botão e fundo; (3) indicação tátil em relevo (>= 0,8 mm); (4) feedback luminoso e sonoro do acionamento; (5) altura de botões entre 900–1200 mm do piso. Conforme EN 81-70 §5.4.2.",
+      "enabled": true,
+      "tags": [
+        "vandalismo",
+        "acessibilidade",
+        "Braille",
+        "contraste",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-CCTV-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º / Regulamento de Segurança Contra Incêndio — CCTV em Cabina",
+      "description": "A cabina do ascensor em edifício de utilização-tipo com mais de {building.numberOfFloors} pisos deve dispor de câmara CCTV para segurança. A câmara CCTV está {elevator.hasCCTV}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.hasCCTV",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "building.numberOfFloors",
+          "operator": ">=",
+          "value": 8
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "CCTV na cabina: {elevator.hasCCTV}",
+      "requiredValue": "Câmara CCTV obrigatória em edifícios >= 8 pisos",
+      "remediation": "Instalar câmara CCTV na cabina: (1) câmara tipo domo antivandalismo com ângulo >= 130°; (2) resolução mínima de 1080p; (3) iluminação infravermelha para funcionamento no escuro; (4) gravação mínima de 30 dias; (5) ligação ao sistema de videovigilância do edifício; (6) sinalização de CCTV visível conforme RGPD. Conforme DL 320/2002 Art. 4.º.",
+      "enabled": true,
+      "tags": [
+        "CCTV",
+        "câmara",
+        "segurança",
+        "videovigilância",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-CCTV-02",
+      "regulationId": "dl-320-2002",
+      "article": "Lei 58/2019 (RGPD) / DL 320/2002 — Conformidade RGPD da Videovigilância na Cabina",
+      "description": "O sistema de CCTV da cabina deve cumprir o RGPD. O período de retenção de imagens é de {elevator.cctvRetentionDays} dias. O máximo permitido é de 30 dias conforme CNPD.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.cctvRetentionDays",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "elevator.hasCCTV",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Retenção de imagens CCTV: {elevator.cctvRetentionDays} dias",
+      "requiredValue": "<= 30 dias de retenção conforme CNPD/RGPD",
+      "remediation": "Ajustar retenção de imagens CCTV: (1) configurar eliminação automática após 30 dias; (2) afixar aviso de videovigilância na cabina com identificação do responsável; (3) registar tratamento de dados no RPDT; (4) permitir acesso às imagens apenas a pessoal autorizado; (5) documentar base legal (interesse legítimo de segurança). Conforme Lei 58/2019 e orientações CNPD.",
+      "enabled": true,
+      "tags": [
+        "CCTV",
+        "RGPD",
+        "retenção",
+        "privacidade",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-CLIMA-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.6.1 — Ventilação e Ar Condicionado da Cabina",
+      "description": "A temperatura no interior da cabina é de {elevator.cabinTemperatureC}°C. Em climas quentes, a temperatura máxima na cabina deve ser limitada a 35°C com ventilação ou ar condicionado adequado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.cabinTemperatureC",
+          "operator": ">",
+          "value": 35
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Temperatura na cabina: {elevator.cabinTemperatureC}°C",
+      "requiredValue": "<= 35°C no interior da cabina",
+      "remediation": "Controlar temperatura da cabina: (1) instalar ventilador de extração no topo da cabina (mínimo 40 m³/h); (2) para percursos longos ou climas quentes, instalar unidade de ar condicionado de cabina (1–3 kW); (3) garantir ventilação da caixa (1% da secção transversal no topo e fundo); (4) considerar sensores de temperatura com desligamento de emergência a 45°C. Conforme EN 81-20 §5.4.6.1.",
+      "enabled": true,
+      "tags": [
+        "temperatura",
+        "ar condicionado",
+        "ventilação",
+        "cabina",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-CLIMA-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.6.2 — Taxa de Renovação de Ar da Cabina",
+      "description": "A taxa de renovação de ar da cabina é de {elevator.cabinAirRenewalM3H} m³/h. O mínimo é de 1% da área da secção transversal da cabina tanto no topo como na base, correspondendo tipicamente a 40 m³/h para uma cabina de 8 pessoas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.cabinAirRenewalM3H",
+          "operator": "<",
+          "value": 40
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Taxa de renovação de ar: {elevator.cabinAirRenewalM3H} m³/h",
+      "requiredValue": ">= 40 m³/h (ou 1% da secção transversal da cabina no topo e base)",
+      "remediation": "Aumentar renovação de ar na cabina: (1) verificar aberturas de ventilação no topo e base da cabina (mínimo 1% da secção transversal cada); (2) instalar ou substituir ventilador por modelo de maior caudal; (3) verificar que a caixa tem ventilação adequada (abertura no topo e fundo); (4) medir taxa de renovação com anemómetro. Conforme EN 81-20 §5.4.6.2.",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "renovação de ar",
+        "cabina",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-PAVIM-01",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.3.1 — Resistência ao Escorregamento do Pavimento da Cabina",
+      "description": "O pavimento da cabina deve ter resistência ao escorregamento adequada. O coeficiente de atrito é de {elevator.floorSlipResistanceR}. O valor mínimo R é de 10 (classificação R10) conforme DIN 51130.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.floorSlipResistanceR",
+          "operator": "<",
+          "value": 10
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Resistência ao escorregamento: R{elevator.floorSlipResistanceR}",
+      "requiredValue": ">= R10 conforme DIN 51130",
+      "remediation": "Melhorar resistência ao escorregamento do pavimento da cabina: (1) substituir pavimento por material com classificação >= R10; (2) aplicar revestimento antiderrapante; (3) evitar materiais polidos ou encerados; (4) manter pavimento limpo e seco; (5) se necessário, aplicar fitas antiderrapantes nas bordas. Conforme EN 81-70 §5.3.3.1 e DIN 51130.",
+      "enabled": true,
+      "tags": [
+        "pavimento",
+        "escorregamento",
+        "antiderrapante",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-PAVIM-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.3.2 — Contraste do Pavimento da Cabina com o Patamar",
+      "description": "O pavimento da cabina deve ter contraste visual com o pavimento do patamar para orientação de utilizadores com deficiência visual. O contraste medido é de {elevator.floorContrastPoints} pontos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.floorContrastPoints",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Contraste pavimento cabina/patamar: {elevator.floorContrastPoints} pontos",
+      "requiredValue": ">= 30 pontos de contraste para orientação visual",
+      "remediation": "Melhorar contraste do pavimento: (1) escolher cor de pavimento da cabina contrastante com o patamar típico; (2) medir contraste com luminancímetro (fórmula EN 81-70); (3) considerar faixa contrastante na soleira da cabina; (4) mínimo de 30 pontos de diferença de contraste. Conforme EN 81-70 §5.3.3.2.",
+      "enabled": true,
+      "tags": [
+        "pavimento",
+        "contraste",
+        "acessibilidade",
+        "deficiência visual",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-CORRIM-01",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.2.1 — Corrimão na Cabina — Altura de Instalação",
+      "description": "O corrimão da cabina está instalado a {elevator.handrailHeightMm} mm do piso. A altura deve estar entre 875 mm e 925 mm (nominalmente 900 mm) para acessibilidade PMR.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.handrailHeightMm",
+          "operator": ">",
+          "value": 925
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Altura do corrimão: {elevator.handrailHeightMm} mm",
+      "requiredValue": "875–925 mm (nominalmente 900 mm)",
+      "remediation": "Ajustar altura do corrimão da cabina: (1) reinstalar corrimão a 900 mm do piso acabado; (2) tolerância de ±25 mm (875–925 mm); (3) fixar em pelo menos 3 paredes da cabina; (4) secção circular de diâmetro 30–45 mm; (5) espaçamento de 35–50 mm da parede. Conforme EN 81-70 §5.3.2.1.",
+      "enabled": true,
+      "tags": [
+        "corrimão",
+        "altura",
+        "acessibilidade",
+        "PMR",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-CORRIM-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.2.1 — Corrimão na Cabina — Altura Inferior ao Mínimo",
+      "description": "O corrimão da cabina está instalado a {elevator.handrailHeightMm} mm do piso, abaixo do mínimo de 875 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.handrailHeightMm",
+          "operator": "<",
+          "value": 875
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Altura do corrimão: {elevator.handrailHeightMm} mm",
+      "requiredValue": ">= 875 mm do piso acabado",
+      "remediation": "Elevar corrimão da cabina: (1) reposicionar suportes para atingir altura de 900 mm (±25 mm); (2) verificar fixação aos painéis da cabina; (3) garantir continuidade do corrimão em pelo menos 3 paredes. Conforme EN 81-70 §5.3.2.1.",
+      "enabled": true,
+      "tags": [
+        "corrimão",
+        "altura",
+        "mínimo",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-CORRIM-03",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.2.2 — Corrimão na Cabina — Secção e Espaçamento",
+      "description": "O diâmetro do corrimão é de {elevator.handrailDiameterMm} mm. A secção deve ser circular com diâmetro entre 30 mm e 45 mm, e o espaçamento à parede deve ser de 35–50 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.handrailDiameterMm",
+          "operator": ">",
+          "value": 45
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Diâmetro do corrimão: {elevator.handrailDiameterMm} mm",
+      "requiredValue": "30–45 mm de diâmetro, 35–50 mm de espaçamento à parede",
+      "remediation": "Substituir corrimão: (1) instalar corrimão de secção circular com diâmetro 30–45 mm; (2) material metálico ou sintético de fácil preensão; (3) espaçamento à parede de 35–50 mm; (4) acabamento liso sem arestas; (5) contraste visual com a parede da cabina (>= 30 pontos). Conforme EN 81-70 §5.3.2.2.",
+      "enabled": true,
+      "tags": [
+        "corrimão",
+        "diâmetro",
+        "secção",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-ESPELHO-01",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.1.5 — Espelho na Parede Posterior da Cabina",
+      "description": "A cabina acessível deve dispor de espelho na parede posterior para permitir manobra de utilizadores em cadeira de rodas. O espelho está {elevator.hasMirrorRearWall}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.hasMirrorRearWall",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Espelho na parede posterior: {elevator.hasMirrorRearWall}",
+      "requiredValue": "Espelho obrigatório na parede posterior da cabina acessível",
+      "remediation": "Instalar espelho na parede posterior da cabina: (1) espelho de largura total da parede posterior; (2) altura do bordo inferior: 300 mm do piso (para ser visível em cadeira de rodas); (3) altura do bordo superior: mínimo 1800 mm; (4) vidro de segurança (temperado ou laminado) conforme EN 12600; (5) fixação anti-vandalismo. Conforme EN 81-70 §5.3.1.5.",
+      "enabled": true,
+      "tags": [
+        "espelho",
+        "cadeira de rodas",
+        "acessibilidade",
+        "parede posterior",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-ESPELHO-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.3.1.5 — Dimensões do Espelho da Cabina",
+      "description": "A altura do bordo inferior do espelho é de {elevator.mirrorBottomEdgeMm} mm do piso. Para visibilidade em cadeira de rodas, o bordo inferior deve estar a no máximo 300 mm do piso.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.mirrorBottomEdgeMm",
+          "operator": ">",
+          "value": 300
+        },
+        {
+          "field": "elevator.hasMirrorRearWall",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Bordo inferior do espelho: {elevator.mirrorBottomEdgeMm} mm do piso",
+      "requiredValue": "<= 300 mm do piso para visibilidade em cadeira de rodas",
+      "remediation": "Reposicionar espelho: (1) baixar bordo inferior para <= 300 mm do piso acabado; (2) manter bordo superior a >= 1800 mm; (3) largura igual à da parede posterior se possível; (4) se o espelho não puder ser baixado, instalar espelho adicional a baixa altura. Conforme EN 81-70 §5.3.1.5.",
+      "enabled": true,
+      "tags": [
+        "espelho",
+        "dimensões",
+        "cadeira de rodas",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-INDPOS-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.7.2 — Indicador de Posição da Cabina (Interior)",
+      "description": "A cabina deve dispor de indicador de posição (piso) visível do interior. A dimensão dos caracteres do indicador é de {elevator.carPositionIndicatorSizeMm} mm. O mínimo é de 30 mm.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.carPositionIndicatorSizeMm",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Dimensão do indicador de posição: {elevator.carPositionIndicatorSizeMm} mm",
+      "requiredValue": ">= 30 mm de altura dos caracteres",
+      "remediation": "Substituir indicador de posição da cabina: (1) instalar display com caracteres de altura >= 30 mm; (2) tipo LED ou LCD retroiluminado; (3) cor contrastante com o fundo (mínimo 30 pontos); (4) posicionar entre 1800 mm e 2200 mm do piso; (5) visível da posição de utilizador em cadeira de rodas. Conforme EN 81-20 §5.4.7.2 e EN 81-70 §5.4.2.",
+      "enabled": true,
+      "tags": [
+        "indicador",
+        "posição",
+        "piso",
+        "display",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-INDPOS-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.3 — Indicador de Posição com Anúncio Sonoro de Piso",
+      "description": "O indicador de posição deve incluir anúncio sonoro (sintetizador de voz ou gong) do piso atingido. O anúncio sonoro está {elevator.carPositionAudioAnnouncement}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.carPositionAudioAnnouncement",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Anúncio sonoro de piso: {elevator.carPositionAudioAnnouncement}",
+      "requiredValue": "Anúncio sonoro de piso obrigatório em cabina acessível",
+      "remediation": "Instalar anúncio sonoro de piso: (1) sintetizador de voz com indicação do número do piso; (2) volume ajustável (mínimo 35 dB(A), máximo 55 dB(A)); (3) linguagem clara em português; (4) alternativa: gong diferenciado por piso (subida/descida); (5) integrar com sistema de anel de indução existente. Conforme EN 81-70 §5.4.3.",
+      "enabled": true,
+      "tags": [
+        "indicador",
+        "anúncio sonoro",
+        "sintetizador",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-LANTERN-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.7.1 — Lanterna de Patamar (Hall Lantern)",
+      "description": "O patamar deve dispor de lanterna indicadora de direção (subida/descida) do ascensor. A lanterna está {elevator.hasHallLantern}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.hasHallLantern",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.numberOfElevators",
+          "operator": ">=",
+          "value": 2
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Lanterna de patamar: {elevator.hasHallLantern}",
+      "requiredValue": "Lanterna de patamar obrigatória quando >= 2 ascensores",
+      "remediation": "Instalar lanternas de patamar: (1) instalar acima de cada porta de patamar (mínimo 1800 mm do piso); (2) seta luminosa indicando direção (subida verde, descida vermelha ou seta direcional); (3) dimensão mínima de 40 mm; (4) visível a >= 5 m de distância; (5) instalar em todos os pisos servidos. Conforme EN 81-20 §5.4.7.1.",
+      "enabled": true,
+      "tags": [
+        "lanterna",
+        "patamar",
+        "hall lantern",
+        "direção",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-LANTERN-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.1 — Lanterna de Patamar com Sinal Sonoro para PMR",
+      "description": "A lanterna de patamar deve incluir sinal sonoro de direção para utilizadores com deficiência visual. O sinal sonoro está {elevator.hallLanternAudioSignal}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.hallLanternAudioSignal",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasHallLantern",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sinal sonoro na lanterna de patamar: {elevator.hallLanternAudioSignal}",
+      "requiredValue": "Sinal sonoro direcional obrigatório na lanterna de patamar acessível",
+      "remediation": "Instalar sinal sonoro na lanterna de patamar: (1) um toque para subida, dois toques para descida (ou vice-versa, mas consistente); (2) frequência audível 1000–3000 Hz; (3) volume entre 35–55 dB(A); (4) duração de cada toque 0,3–0,5 s; (5) ativação simultânea com a lanterna visual. Conforme EN 81-70 §5.4.1.",
+      "enabled": true,
+      "tags": [
+        "lanterna",
+        "sinal sonoro",
+        "acessibilidade",
+        "direção",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-GONG-01",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.1 — Gong de Chegada ao Piso",
+      "description": "O ascensor deve emitir gong/chime de chegada ao piso de destino. O nível sonoro do gong é de {elevator.arrivalGongDBA} dB(A). O nível recomendado é entre 35 e 55 dB(A).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.arrivalGongDBA",
+          "operator": ">",
+          "value": 55
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Nível sonoro do gong: {elevator.arrivalGongDBA} dB(A)",
+      "requiredValue": "35–55 dB(A) para gong de chegada",
+      "remediation": "Ajustar nível sonoro do gong de chegada: (1) reduzir volume do emissor sonoro para <= 55 dB(A); (2) verificar frequência (1000–3000 Hz recomendado); (3) garantir audibilidade mínima de 35 dB(A) a 1 m; (4) considerar ajuste automático de volume baseado em ruído ambiente. Conforme EN 81-70 §5.4.1.",
+      "enabled": true,
+      "tags": [
+        "gong",
+        "chime",
+        "chegada",
+        "som",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-GONG-02",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.1 — Diferenciação Sonora de Direção",
+      "description": "O sinal sonoro de chegada deve diferenciar subida de descida. A diferenciação está {elevator.arrivalGongDirectionDiff}. O padrão é: um toque = subida, dois toques = descida.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.arrivalGongDirectionDiff",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Diferenciação sonora de direção: {elevator.arrivalGongDirectionDiff}",
+      "requiredValue": "Diferenciação sonora de direção (1 toque subida / 2 toques descida)",
+      "remediation": "Implementar diferenciação sonora: (1) programar controlador para 1 toque (subida) e 2 toques (descida); (2) frequência e duração iguais para ambos; (3) informar utilizadores com sinalização; (4) manter consistência em todos os pisos e ascensores do grupo. Conforme EN 81-70 §5.4.1.",
+      "enabled": true,
+      "tags": [
+        "gong",
+        "direção",
+        "diferenciação",
+        "acessibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-FUMO-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 / SCIE (RT-SCIE Art. 125.º) — Deteção de Fumo na Caixa do Ascensor",
+      "description": "A caixa do ascensor deve dispor de detetor de fumo no topo. O detetor está {elevator.shaftSmokeDetector}. A deteção de fumo é obrigatória para ascensores em edifícios com mais de 2 pisos abaixo do solo.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.shaftSmokeDetector",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "building.basementFloors",
+          "operator": ">",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Detetor de fumo na caixa: {elevator.shaftSmokeDetector}",
+      "requiredValue": "Detetor de fumo obrigatório na caixa para edifícios com > 2 pisos enterrados",
+      "remediation": "Instalar deteção de fumo na caixa do ascensor: (1) detetor ótico de fumo no topo da caixa; (2) ligação ao painel de incêndio do edifício (SADI); (3) programar recall do ascensor ao piso de evacuação em caso de alarme; (4) instalar detetor adicional no poço se profundidade > 5 m; (5) manutenção anual do detetor. Conforme RT-SCIE Art. 125.º.",
+      "enabled": true,
+      "tags": [
+        "fumo",
+        "deteção",
+        "incêndio",
+        "caixa",
+        "SCIE"
+      ]
+    },
+    {
+      "id": "ELEV-FUMO-02",
+      "regulationId": "dl-320-2002",
+      "article": "RT-SCIE Art. 125.º — Deteção de Fumo no Patamar do Ascensor",
+      "description": "Os patamares do ascensor no piso de entrada e pisos de evacuação devem dispor de detecção de fumo para acionar o recall. O detetor de patamar está {elevator.lobbySmokeSensor}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.lobbySmokeSensor",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Detetor de fumo no patamar: {elevator.lobbySmokeSensor}",
+      "requiredValue": "Detetor de fumo no patamar do piso de entrada e evacuação",
+      "remediation": "Instalar detetor de fumo nos patamares: (1) detetor ótico no teto do patamar do piso de evacuação designado; (2) ligação ao SADI e ao controlador do ascensor; (3) em caso de alarme, ascensor regressa ao piso de evacuação e abre portas; (4) sinalização de proibição de uso em caso de incêndio. Conforme RT-SCIE Art. 125.º.",
+      "enabled": true,
+      "tags": [
+        "fumo",
+        "deteção",
+        "patamar",
+        "recall",
+        "SCIE"
+      ]
+    },
+    {
+      "id": "ELEV-FUMO-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.5.3 — Deteção de Fumo na Casa de Máquinas",
+      "description": "A casa de máquinas deve dispor de detetor de fumo ligado ao sistema de alarme de incêndio. O detetor está {elevator.machineRoomSmokeDetector}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.machineRoomSmokeDetector",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasMachineRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Detetor de fumo na casa de máquinas: {elevator.machineRoomSmokeDetector}",
+      "requiredValue": "Detetor de fumo obrigatório na casa de máquinas",
+      "remediation": "Instalar detetor de fumo na casa de máquinas: (1) detetor ótico no teto; (2) ligação ao painel de incêndio; (3) programar desligamento seguro do ascensor em caso de alarme; (4) extintores CO2 ou pó ABC acessíveis na casa de máquinas; (5) manutenção semestral. Conforme EN 81-20 §5.2.5.3.",
+      "enabled": true,
+      "tags": [
+        "fumo",
+        "deteção",
+        "casa de máquinas",
+        "incêndio",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-DRENAG-01",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.2.3 — Drenagem do Poço do Ascensor",
+      "description": "O poço do ascensor deve dispor de sistema de drenagem para evitar acumulação de água. O sistema de drenagem está {elevator.pitDrainageSystem}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.pitDrainageSystem",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Sistema de drenagem do poço: {elevator.pitDrainageSystem}",
+      "requiredValue": "Sistema de drenagem obrigatório no poço do ascensor",
+      "remediation": "Instalar sistema de drenagem no poço: (1) ralo com ligação ao sistema de águas pluviais ou bomba de esvaziamento; (2) bomba submersível automática com boia se o poço estiver abaixo do nível de esgoto; (3) impermeabilizar paredes e fundo do poço; (4) detetor de nível de água com alarme; (5) inspeção trimestral do sistema de drenagem. Conforme EN 81-20 §5.2.2.3.",
+      "enabled": true,
+      "tags": [
+        "drenagem",
+        "poço",
+        "água",
+        "impermeabilização",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-DRENAG-02",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.2.3 — Detetor de Nível de Água no Poço",
+      "description": "O poço deve dispor de detetor de nível de água que impeça o funcionamento do ascensor quando o nível de água atinge {elevator.pitWaterLevelAlarmMm} mm. O nível máximo antes de alarme deve ser 200 mm.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.pitWaterLevelAlarmMm",
+          "operator": ">",
+          "value": 200
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Nível de alarme de água: {elevator.pitWaterLevelAlarmMm} mm",
+      "requiredValue": "<= 200 mm para nível de alarme de água no poço",
+      "remediation": "Ajustar detetor de nível de água no poço: (1) instalar boia ou sensor capacitivo a 200 mm do fundo do poço; (2) programar alarme ao sistema de gestão do edifício; (3) segundo nível de alarme a 500 mm para paragem automática do ascensor; (4) verificar funcionamento semestralmente. Conforme EN 81-20 §5.2.2.3.",
+      "enabled": true,
+      "tags": [
+        "drenagem",
+        "poço",
+        "detetor",
+        "nível de água",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-REGMANUT-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º §3 — Registo de Manutenção no Livro de Ascensor",
+      "description": "Todas as intervenções de manutenção devem ser registadas no livro do ascensor. O número de registos nos últimos 12 meses é de {elevator.maintenanceLogEntries12Months}. O mínimo obrigatório é de 12 intervenções/ano (mensal).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.maintenanceLogEntries12Months",
+          "operator": "<",
+          "value": 12
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Registos de manutenção (12 meses): {elevator.maintenanceLogEntries12Months}",
+      "requiredValue": ">= 12 registos de manutenção nos últimos 12 meses",
+      "remediation": "Regularizar registos de manutenção: (1) exigir à EMA o cumprimento da periodicidade mensal; (2) cada registo deve incluir: data, técnico, operações realizadas, peças substituídas, anomalias; (3) verificar assinatura do técnico e visto do proprietário; (4) manter livro acessível para inspeção do EI. Conforme DL 320/2002 Art. 4.º §3.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "registo",
+        "livro",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-REGMANUT-02",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º §4 — Conteúdo do Registo de Manutenção",
+      "description": "Os registos de manutenção devem incluir detalhes das peças substituídas. O registo de peças substituídas está {elevator.maintenancePartsRecorded}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.maintenancePartsRecorded",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Registo de peças substituídas: {elevator.maintenancePartsRecorded}",
+      "requiredValue": "Registo obrigatório de peças substituídas em cada intervenção",
+      "remediation": "Exigir registo completo de peças: (1) referência e modelo de cada peça substituída; (2) motivo da substituição (desgaste, avaria, preventiva); (3) referência do fabricante e compatibilidade; (4) data de instalação para rastreio de garantia; (5) manter arquivo de fichas técnicas das peças. Conforme DL 320/2002 Art. 4.º §4.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "registo",
+        "peças",
+        "rastreabilidade",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-REGMANUT-03",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º — Registo Digital de Manutenção",
+      "description": "Recomenda-se manter registo digital das intervenções de manutenção para facilitar consulta e auditoria. O registo digital está {elevator.digitalMaintenanceLog}.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.digitalMaintenanceLog",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Registo digital de manutenção: {elevator.digitalMaintenanceLog}",
+      "requiredValue": "Recomendado registo digital complementar ao livro físico",
+      "remediation": "Implementar registo digital de manutenção: (1) plataforma digital com histórico de todas as intervenções; (2) fotografias de anomalias e reparações; (3) alertas automáticos de próxima manutenção; (4) acesso remoto para proprietário e EI; (5) exportação para formato PDF para arquivo. Conforme boas práticas e DL 320/2002.",
+      "enabled": true,
+      "tags": [
+        "manutenção",
+        "digital",
+        "registo",
+        "plataforma",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-INSPANUAL-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 5.º — Inspeção Periódica Anual",
+      "description": "O ascensor deve ser inspecionado periodicamente por entidade inspetora (EI). A última inspeção foi há {elevator.lastInspectionMonths} meses. A inspeção é obrigatória a cada 24 meses para ascensores em edifícios de habitação e 12 meses para uso público.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.lastInspectionMonths",
+          "operator": ">",
+          "value": 12
+        },
+        {
+          "field": "elevator.publicUse",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Última inspeção: há {elevator.lastInspectionMonths} meses",
+      "requiredValue": "Inspeção a cada 12 meses para ascensores de uso público",
+      "remediation": "Agendar inspeção periódica: (1) contactar entidade inspetora (EI) reconhecida pelo IMPIC; (2) preparar livro do ascensor atualizado; (3) verificar que a EMA realizou todas as manutenções; (4) corrigir anomalias pendentes antes da inspeção; (5) assegurar acesso à casa de máquinas, poço e todos os pisos. Conforme DL 320/2002 Art. 5.º.",
+      "enabled": true,
+      "tags": [
+        "inspeção",
+        "anual",
+        "EI",
+        "periódica",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-INSPANUAL-02",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 5.º — Inspeção Bienal para Habitação",
+      "description": "O ascensor de edifício de habitação deve ser inspecionado a cada 24 meses. A última inspeção foi há {elevator.lastInspectionMonths} meses.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.lastInspectionMonths",
+          "operator": ">",
+          "value": 24
+        },
+        {
+          "field": "elevator.publicUse",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Última inspeção: há {elevator.lastInspectionMonths} meses",
+      "requiredValue": "Inspeção a cada 24 meses para ascensores de habitação",
+      "remediation": "Agendar inspeção bienal: (1) contactar entidade inspetora (EI); (2) verificar estado geral do ascensor; (3) garantir que o livro de registo está atualizado; (4) corrigir eventuais não-conformidades da inspeção anterior; (5) prever custos de inspeção no orçamento do condomínio. Conforme DL 320/2002 Art. 5.º.",
+      "enabled": true,
+      "tags": [
+        "inspeção",
+        "bienal",
+        "habitação",
+        "EI",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-INSPANUAL-03",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 5.º §2 — Checklist de Inspeção Anual",
+      "description": "A inspeção periódica deve cobrir todos os itens da checklist regulamentar. O número de itens verificados na última inspeção foi de {elevator.inspectionChecklistItemsVerified} de {elevator.inspectionChecklistItemsTotal} obrigatórios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.inspectionChecklistItemsVerified",
+          "operator": "<",
+          "value": 50
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Itens verificados: {elevator.inspectionChecklistItemsVerified} de {elevator.inspectionChecklistItemsTotal}",
+      "requiredValue": "Todos os itens da checklist regulamentar verificados (mínimo 50)",
+      "remediation": "Completar checklist de inspeção: (1) verificar todos os itens obrigatórios incluindo: dispositivos de segurança, portas, amortecedores, cabos, guias, iluminação, ventilação, comunicação de emergência, sinalização; (2) fotografar anomalias; (3) classificar cada anomalia (A, B, C); (4) emitir relatório completo com prazo de correção. Conforme DL 320/2002 Art. 5.º §2.",
+      "enabled": true,
+      "tags": [
+        "inspeção",
+        "checklist",
+        "itens",
+        "verificação",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-INSP5A-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 5.º-A — Inspeção Quinquenal Aprofundada",
+      "description": "A cada 5 anos deve ser realizada inspeção aprofundada incluindo ensaio de carga e verificação de desgaste de componentes críticos. A última inspeção quinquenal foi há {elevator.lastComprehensiveInspectionYears} anos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.lastComprehensiveInspectionYears",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Última inspeção quinquenal: há {elevator.lastComprehensiveInspectionYears} anos",
+      "requiredValue": "Inspeção quinquenal aprofundada a cada 5 anos",
+      "remediation": "Agendar inspeção quinquenal: (1) ensaio de carga a 125% da carga nominal; (2) verificação de desgaste de cabos (descarte se desgaste > 6% do diâmetro); (3) verificação de guias e fixações; (4) ensaio do para-quedas; (5) verificação de estanquicidade do circuito hidráulico (se aplicável); (6) avaliação de risco conforme EN 81-80 para ascensores com > 15 anos. Conforme DL 320/2002 Art. 5.º-A.",
+      "enabled": true,
+      "tags": [
+        "inspeção",
+        "quinquenal",
+        "ensaio de carga",
+        "aprofundada",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-INSP5A-02",
+      "regulationId": "en-81-50",
+      "article": "EN 81-50 §5.3 / DL 320/2002 — Ensaio de Carga na Inspeção Quinquenal",
+      "description": "O ensaio de carga quinquenal deve testar a 125% da carga nominal. O último ensaio registou uma carga máxima de {elevator.loadTestMaxPercent}% da carga nominal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.loadTestMaxPercent",
+          "operator": "<",
+          "value": 125
+        },
+        {
+          "field": "elevator.lastComprehensiveInspectionYears",
+          "operator": "<=",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "Carga máxima testada: {elevator.loadTestMaxPercent}% da nominal",
+      "requiredValue": "Ensaio a 125% da carga nominal na inspeção quinquenal",
+      "remediation": "Repetir ensaio de carga: (1) utilizar pesos calibrados para atingir 125% da carga nominal; (2) verificar funcionamento de todos os dispositivos de segurança sob carga máxima; (3) medir deflexão das guias; (4) verificar amortecedores; (5) documentar resultados com certificado de ensaio. Conforme EN 81-50 §5.3.",
+      "enabled": true,
+      "tags": [
+        "inspeção",
+        "quinquenal",
+        "ensaio de carga",
+        "125%",
+        "EN 81-50"
+      ]
+    },
+    {
+      "id": "ELEV-ACID-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 8.º — Reporte Obrigatório de Acidentes",
+      "description": "Todo o acidente envolvendo o ascensor deve ser reportado ao IMPIC no prazo de {elevator.accidentReportingDelayHours} horas. O prazo máximo é de 24 horas após a ocorrência.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.accidentReportingDelayHours",
+          "operator": ">",
+          "value": 24
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Tempo de reporte de acidente: {elevator.accidentReportingDelayHours} horas",
+      "requiredValue": "<= 24 horas para reporte de acidente ao IMPIC",
+      "remediation": "Implementar procedimento de reporte de acidentes: (1) notificar IMPIC por via eletrónica dentro de 24 horas; (2) preservar local do acidente para investigação; (3) contactar EMA para imobilização do ascensor; (4) elaborar relatório detalhado incluindo: circunstâncias, vítimas, causas prováveis; (5) arquivar cópia no livro do ascensor. Conforme DL 320/2002 Art. 8.º.",
+      "enabled": true,
+      "tags": [
+        "acidente",
+        "reporte",
+        "IMPIC",
+        "segurança",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-ACID-02",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 8.º §2 — Investigação de Acidente",
+      "description": "Após acidente, deve ser realizada investigação por entidade independente. A investigação está {elevator.accidentInvestigationCompleted}. O ascensor deve permanecer imobilizado até conclusão da investigação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.accidentInvestigationCompleted",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasReportedAccident",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Investigação de acidente concluída: {elevator.accidentInvestigationCompleted}",
+      "requiredValue": "Investigação obrigatória antes de recolocação em serviço",
+      "remediation": "Concluir investigação de acidente: (1) manter ascensor imobilizado e sinalizado; (2) solicitar investigação à EI ou perito independente; (3) identificar causa raiz do acidente; (4) implementar medidas corretivas; (5) obter parecer favorável da EI para recolocação em serviço; (6) atualizar avaliação de risco. Conforme DL 320/2002 Art. 8.º §2.",
+      "enabled": true,
+      "tags": [
+        "acidente",
+        "investigação",
+        "imobilização",
+        "segurança",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-ACID-03",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 8.º §3 — Registo de Incidentes e Quase-Acidentes",
+      "description": "Devem ser registados não apenas acidentes mas também incidentes e quase-acidentes. O número de incidentes registados nos últimos 12 meses é de {elevator.incidentLogCount12Months}.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.incidentLogCount12Months",
+          "operator": "==",
+          "value": 0
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        },
+        {
+          "field": "elevator.installationYear",
+          "operator": "<",
+          "value": 2010
+        }
+      ],
+      "currentValueTemplate": "Incidentes registados (12 meses): {elevator.incidentLogCount12Months}",
+      "requiredValue": "Registo de todos os incidentes e quase-acidentes",
+      "remediation": "Implementar registo de incidentes: (1) criar formulário de reporte de incidentes acessível a todos os utilizadores; (2) incluir: aprisionamentos, falhas de porta, ruídos anómalos, vibrações, falhas de nivelamento; (3) analisar tendências trimestralmente; (4) comunicar à EMA para ação preventiva; (5) manter arquivo no livro do ascensor. Conforme DL 320/2002 Art. 8.º §3 e boas práticas.",
+      "enabled": true,
+      "tags": [
+        "incidentes",
+        "quase-acidentes",
+        "registo",
+        "preventivo",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-PECAS-01",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º §5 — Disponibilidade de Peças de Reposição",
+      "description": "A EMA deve garantir disponibilidade de peças de reposição críticas. O tempo médio de entrega de peças é de {elevator.sparePartsDeliveryDays} dias. O máximo aceitável é de 5 dias úteis para peças críticas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.sparePartsDeliveryDays",
+          "operator": ">",
+          "value": 5
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Tempo de entrega de peças: {elevator.sparePartsDeliveryDays} dias",
+      "requiredValue": "<= 5 dias úteis para peças críticas de reposição",
+      "remediation": "Melhorar disponibilidade de peças: (1) exigir contratualmente à EMA prazo máximo de entrega de peças críticas; (2) manter stock local de peças de desgaste (contactores, fusíveis, lâmpadas, rolamentos de portas); (3) verificar compatibilidade de peças genéricas para modelos descontinuados; (4) considerar contrato de manutenção com peças incluídas. Conforme DL 320/2002 Art. 4.º §5.",
+      "enabled": true,
+      "tags": [
+        "peças",
+        "reposição",
+        "disponibilidade",
+        "EMA",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-PECAS-02",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º / EN 81-80 — Garantia de Peças para Ascensores Antigos",
+      "description": "Para ascensores com mais de 20 anos, a disponibilidade de peças originais é frequentemente limitada. A idade do ascensor é de {elevator.elevatorAgeYears} anos e a disponibilidade de peças originais é '{elevator.originalPartsAvailability}'.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.elevatorAgeYears",
+          "operator": ">",
+          "value": 20
+        },
+        {
+          "field": "elevator.originalPartsAvailability",
+          "operator": "in",
+          "value": [
+            "limited",
+            "unavailable",
+            "discontinued"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Idade: {elevator.elevatorAgeYears} anos — Peças originais: {elevator.originalPartsAvailability}",
+      "requiredValue": "Plano de obsolescência para ascensores com > 20 anos",
+      "remediation": "Gerir obsolescência de peças: (1) identificar componentes críticos sem substituto direto; (2) contactar fornecedores de peças compatíveis/recondicionadas; (3) considerar modernização parcial (controlador, portas, cabos) com componentes atuais; (4) avaliar custo-benefício de modernização vs. manutenção com peças adaptadas; (5) realizar avaliação de risco EN 81-80. Conforme DL 320/2002 Art. 4.º e EN 81-80.",
+      "enabled": true,
+      "tags": [
+        "peças",
+        "obsolescência",
+        "antigo",
+        "modernização",
+        "EN 81-80"
+      ]
+    },
+    {
+      "id": "ELEV-PECAS-03",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 4.º §5 — Stock Mínimo de Peças no Local",
+      "description": "Recomenda-se manter stock mínimo de peças de desgaste no local para reduzir tempo de indisponibilidade. O stock local está {elevator.localSparePartsStock}.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.localSparePartsStock",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.numberOfElevators",
+          "operator": ">=",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "Stock local de peças: {elevator.localSparePartsStock}",
+      "requiredValue": "Stock local recomendado para edifícios com >= 3 ascensores",
+      "remediation": "Implementar stock local de peças: (1) contactores de portas e segurança; (2) fusíveis e relés do quadro de comando; (3) lâmpadas/LEDs de cabina e patamar; (4) rolamentos e guias de portas; (5) fotocélulas/cortina de luz sobresselente; (6) armazenar em local seco na casa de máquinas ou arrecadação designada. Conforme boas práticas e DL 320/2002.",
+      "enabled": true,
+      "tags": [
+        "peças",
+        "stock",
+        "local",
+        "disponibilidade",
+        "DL 320/2002"
+      ]
+    },
+    {
+      "id": "ELEV-CXESTR-04",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.1.3 — Resistência do Teto da Caixa à Carga de Equipamentos",
+      "description": "O teto da caixa deve suportar equipamentos instalados (máquina de tração para MRL, polias, etc.). A capacidade de carga do teto é de {elevator.shaftTopLoadCapacityKN} kN.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.shaftTopLoadCapacityKN",
+          "operator": "<",
+          "value": 30
+        },
+        {
+          "field": "elevator.machineRoomless",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Capacidade de carga do teto da caixa: {elevator.shaftTopLoadCapacityKN} kN",
+      "requiredValue": ">= 30 kN para ascensores MRL (sem casa de máquinas)",
+      "remediation": "Reforçar teto da caixa: (1) calcular carga total de equipamentos (máquina + polias + quadro de comando); (2) reforçar viga de suporte da máquina; (3) verificar transferência de cargas para a estrutura do edifício; (4) solicitar verificação por engenheiro de estruturas; (5) documentar cálculos para arquivo técnico. Conforme EN 81-20 §5.2.1.3.",
+      "enabled": true,
+      "tags": [
+        "caixa",
+        "teto",
+        "estrutura",
+        "MRL",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-CONTPROT-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.4.2 — Retenção dos Blocos do Contrapeso",
+      "description": "Os blocos de massa do contrapeso devem ser retidos de forma a não poderem deslocar-se ou cair. O sistema de retenção está {elevator.counterweightBlockRetention}.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "elevator.counterweightBlockRetention",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Retenção de blocos do contrapeso: {elevator.counterweightBlockRetention}",
+      "requiredValue": "Sistema de retenção de blocos obrigatório",
+      "remediation": "Verificar retenção de blocos do contrapeso: (1) inspecionar estrutura do contrapeso e barras de retenção; (2) verificar aperto dos parafusos de fixação; (3) garantir que não há blocos soltos ou com folga excessiva; (4) instalar tampa superior de retenção se inexistente; (5) registar verificação no relatório de manutenção. Conforme EN 81-20 §5.4.4.2.",
+      "enabled": true,
+      "tags": [
+        "contrapeso",
+        "blocos",
+        "retenção",
+        "segurança",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-PESOCAB-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.12.1.3 — Pré-carga e Indicação de Sobrecarga na Cabina",
+      "description": "A cabina deve dispor de indicação visual e sonora de sobrecarga para os utilizadores. A indicação de sobrecarga está {elevator.overloadIndicator}.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.overloadIndicator",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Indicação de sobrecarga: {elevator.overloadIndicator}",
+      "requiredValue": "Indicação visual e sonora de sobrecarga obrigatória",
+      "remediation": "Instalar indicação de sobrecarga: (1) sinal luminoso visível no interior da cabina (pictograma de peso); (2) alarme sonoro intermitente acionado a 110% da carga nominal; (3) impedir fecho de portas e arranque; (4) manter portas abertas até alívio de carga; (5) integrar com sistema de pesagem calibrado. Conforme EN 81-20 §5.12.1.3.",
+      "enabled": true,
+      "tags": [
+        "sobrecarga",
+        "indicação",
+        "sinal",
+        "pesagem",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-INDPOS-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.7.3 — Indicador de Posição no Patamar",
+      "description": "Cada patamar deve dispor de indicador de posição da cabina. O indicador de patamar está {elevator.hallPositionIndicator}. É obrigatório quando existem >= 2 ascensores no grupo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.hallPositionIndicator",
+          "operator": "!=",
+          "value": true
+        },
+        {
+          "field": "elevator.numberOfElevators",
+          "operator": ">=",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "Indicador de posição no patamar: {elevator.hallPositionIndicator}",
+      "requiredValue": "Indicador de posição no patamar obrigatório para >= 2 ascensores",
+      "remediation": "Instalar indicador de posição nos patamares: (1) display digital acima ou ao lado de cada porta de patamar; (2) caracteres de altura >= 25 mm; (3) retroiluminado para visibilidade em condições de baixa luz; (4) indicar piso atual e direção de viagem; (5) para grupo de ascensores, um indicador por ascensor. Conforme EN 81-20 §5.4.7.3.",
+      "enabled": true,
+      "tags": [
+        "indicador",
+        "posição",
+        "patamar",
+        "display",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-LANTERN-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.4.7.1 — Altura de Instalação da Lanterna de Patamar",
+      "description": "A lanterna de patamar está instalada a {elevator.hallLanternHeightMm} mm do piso. A altura mínima recomendada é de 1800 mm e máxima de 2500 mm para visibilidade adequada.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "elevator.hallLanternHeightMm",
+          "operator": "<",
+          "value": 1800
+        },
+        {
+          "field": "elevator.hasHallLantern",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Altura da lanterna de patamar: {elevator.hallLanternHeightMm} mm",
+      "requiredValue": "1800–2500 mm do piso para visibilidade adequada",
+      "remediation": "Reposicionar lanterna de patamar: (1) elevar para altura entre 1800 mm e 2500 mm do piso; (2) garantir visibilidade a >= 5 m de distância; (3) se impossível elevar, considerar lanterna no aro da porta; (4) manter sinal sonoro associado. Conforme EN 81-20 §5.4.7.1.",
+      "enabled": true,
+      "tags": [
+        "lanterna",
+        "patamar",
+        "altura",
+        "visibilidade",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-GONG-03",
+      "regulationId": "en-81-70",
+      "article": "EN 81-70 §5.4.1 — Gong de Chegada — Nível Sonoro Mínimo",
+      "description": "O nível sonoro do gong de chegada é de {elevator.arrivalGongDBA} dB(A). O nível mínimo para audibilidade é de 35 dB(A) a 1 m de distância.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.arrivalGongDBA",
+          "operator": "<",
+          "value": 35
+        },
+        {
+          "field": "elevator.isAccessible",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Nível sonoro do gong: {elevator.arrivalGongDBA} dB(A)",
+      "requiredValue": ">= 35 dB(A) a 1 m para audibilidade mínima",
+      "remediation": "Aumentar nível sonoro do gong: (1) verificar altifalante e amplificador; (2) ajustar volume no controlador; (3) substituir altifalante por modelo de maior potência se necessário; (4) verificar que o som é audível acima do ruído ambiente típico do patamar; (5) considerar volume autoajustável com sensor de ruído ambiente. Conforme EN 81-70 §5.4.1.",
+      "enabled": true,
+      "tags": [
+        "gong",
+        "nível sonoro",
+        "mínimo",
+        "audibilidade",
+        "EN 81-70"
+      ]
+    },
+    {
+      "id": "ELEV-DRENAG-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.2.3 — Impermeabilização do Poço",
+      "description": "O poço do ascensor deve ser impermeabilizado para prevenir infiltrações. O estado de impermeabilização é '{elevator.pitWaterproofingCondition}'. Condição aceitável: 'good' ou 'excellent'.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.pitWaterproofingCondition",
+          "operator": "in",
+          "value": [
+            "poor",
+            "degraded",
+            "absent"
+          ]
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Impermeabilização do poço: {elevator.pitWaterproofingCondition}",
+      "requiredValue": "Impermeabilização em bom estado ('good' ou 'excellent')",
+      "remediation": "Reparar impermeabilização do poço: (1) drenar água existente; (2) aplicar membrana impermeabilizante cimentícia ou betuminosa nas paredes e fundo; (3) tratar juntas de construção com mástique expansivo; (4) verificar passagens de cabos e tubagens; (5) instalar ou reparar bomba de esvaziamento; (6) programar verificação anual. Conforme EN 81-20 §5.2.2.3.",
+      "enabled": true,
+      "tags": [
+        "drenagem",
+        "impermeabilização",
+        "poço",
+        "infiltrações",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-CLIMA-03",
+      "regulationId": "en-81-20",
+      "article": "EN 81-20 §5.2.5.2 — Temperatura na Casa de Máquinas",
+      "description": "A temperatura na casa de máquinas é de {elevator.machineRoomTemperatureC}°C. A temperatura deve ser mantida entre 5°C e 40°C para funcionamento correto dos equipamentos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.machineRoomTemperatureC",
+          "operator": ">",
+          "value": 40
+        },
+        {
+          "field": "elevator.hasMachineRoom",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Temperatura na casa de máquinas: {elevator.machineRoomTemperatureC}°C",
+      "requiredValue": "5–40°C na casa de máquinas",
+      "remediation": "Controlar temperatura na casa de máquinas: (1) instalar ventilação forçada se temperatura excede 40°C; (2) verificar aberturas de ventilação (mínimo 1% da área do piso ou 0,5 m²); (3) instalar ar condicionado se necessário para equipamentos sensíveis (variadores de frequência); (4) instalar termómetro com alarme remoto; (5) verificar isolamento térmico da cobertura. Conforme EN 81-20 §5.2.5.2.",
+      "enabled": true,
+      "tags": [
+        "temperatura",
+        "casa de máquinas",
+        "ventilação",
+        "EN 81-20"
+      ]
+    },
+    {
+      "id": "ELEV-REGMANUT-04",
+      "regulationId": "dl-320-2002",
+      "article": "DL 320/2002 Art. 6.º — Livro de Registo de Ascensor Atualizado",
+      "description": "O livro de registo do ascensor deve conter toda a documentação técnica, resultados de inspeções e histórico de manutenção. A última atualização do livro foi há {elevator.logBookLastUpdateMonths} meses.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "elevator.logBookLastUpdateMonths",
+          "operator": ">",
+          "value": 3
+        },
+        {
+          "field": "elevator.hasElevator",
+          "operator": "exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Última atualização do livro: há {elevator.logBookLastUpdateMonths} meses",
+      "requiredValue": "Livro atualizado pelo menos trimestralmente",
+      "remediation": "Atualizar livro de registo do ascensor: (1) verificar que todas as manutenções mensais estão registadas e assinadas; (2) incluir relatórios de inspeção da EI; (3) registar anomalias e medidas corretivas; (4) anexar certificados de calibração de dispositivos de segurança; (5) manter junto ao ascensor ou em local acessível definido. Conforme DL 320/2002 Art. 6.º.",
+      "enabled": true,
+      "tags": [
+        "livro",
+        "registo",
+        "atualização",
+        "documentação",
+        "DL 320/2002"
+      ]
     }
   ]
 }

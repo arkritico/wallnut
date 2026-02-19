@@ -4,7 +4,7 @@
   "extractedBy": "claude-regulatory-expansion",
   "extractedAt": "2026-02-17",
   "version": "2.0",
-  "totalRules": 211,
+  "totalRules": 261,
   "coverage": {
     "regulations": [
       "DL 38 382/1951 (RGEU) — Arts. 46.º-72.º",
@@ -3297,6 +3297,815 @@
       "remediation": "Aumentar a área do quarto duplo para o mínimo de 10.50 m², com espaço para 2 camas ou beliche, 2 secretárias de estudo, roupeiros individuais e circulação adequada conforme Art. 65.º do RGEU.",
       "enabled": true,
       "tags": ["residência estudantil", "quarto duplo", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-PENTHOUSE-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Recuo Obrigatório do Último Piso (Penthouse)",
+      "description": "O recuo do último piso (penthouse) em relação ao plano da fachada ({architecture.penthouseSetback} m) é inferior ao mínimo de 3.00 m exigido para edifícios com mais de 4 pisos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasPenthouse", "operator": "==", "value": true },
+        { "field": "architecture.numberOfFloors", "operator": ">", "value": 4 },
+        { "field": "architecture.penthouseSetback", "operator": "<", "value": 3.00 }
+      ],
+      "currentValueTemplate": "Recuo penthouse: {architecture.penthouseSetback} m",
+      "requiredValue": "≥ 3.00 m de recuo relativamente ao plano da fachada",
+      "remediation": "Recuar o volume do último piso (penthouse) pelo menos 3.00 m em relação ao plano da fachada principal, de modo a não exceder a cércea da envolvente e respeitar o perfil regulamentar da rua conforme Art. 59.º do RGEU.",
+      "enabled": true,
+      "tags": ["penthouse", "recuo", "último piso", "cércea", "RGEU"]
+    },
+    {
+      "id": "ARQ-PENTHOUSE-02",
+      "regulationId": "dl-555-99-rjue-arq",
+      "article": "Art. 60.º — Altura da Penthouse face à Cércea do PDM",
+      "description": "A altura total do edifício incluindo a penthouse ({architecture.buildingHeightWithPenthouse} m) excede a cércea máxima permitida pelo PDM.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasPenthouse", "operator": "==", "value": true },
+        { "field": "architecture.buildingHeightWithPenthouse", "operator": ">", "value": 0 },
+        { "field": "architecture.maxAllowedHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.buildingHeightWithPenthouse", "operator": ">", "value": null }
+      ],
+      "currentValueTemplate": "Altura total c/ penthouse: {architecture.buildingHeightWithPenthouse} m / Cércea PDM: {architecture.maxAllowedHeight} m",
+      "requiredValue": "Altura total incluindo penthouse ≤ cércea máxima do PDM",
+      "remediation": "Reduzir a altura da penthouse ou aumentar o recuo para que o volume recuado não seja contabilizado na cércea, conforme critérios do PDM e Art. 60.º do RJUE.",
+      "enabled": true,
+      "tags": ["penthouse", "cércea", "PDM", "altura", "RJUE"]
+    },
+    {
+      "id": "ARQ-PENTHOUSE-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 59.º — Penthouse: Recuo Lateral e Posterior",
+      "description": "O recuo lateral ou posterior da penthouse ({architecture.penthouseLateralSetback} m) é inferior ao mínimo de 2.00 m, podendo comprometer a privacidade dos vizinhos e a integração volumétrica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasPenthouse", "operator": "==", "value": true },
+        { "field": "architecture.penthouseLateralSetback", "operator": "<", "value": 2.00 }
+      ],
+      "currentValueTemplate": "Recuo lateral/posterior penthouse: {architecture.penthouseLateralSetback} m",
+      "requiredValue": "≥ 2.00 m de recuo lateral e posterior",
+      "remediation": "Garantir recuo mínimo de 2.00 m nas empenas laterais e posteriores da penthouse para minimizar impacto visual e respeitar privacidade dos edifícios adjacentes conforme Art. 59.º do RGEU.",
+      "enabled": true,
+      "tags": ["penthouse", "recuo lateral", "privacidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERRAPRIV-01",
+      "regulationId": "dl-38382-1951-rgeu-cob-gar",
+      "article": "Art. 50.º — Tela de Privacidade em Terraço de Cobertura",
+      "description": "O terraço de cobertura acessível não dispõe de tela/ecrã de privacidade com altura mínima de 1.60 m nas zonas com vista direta sobre prédios vizinhos a menos de 5.00 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasRooftopTerrace", "operator": "==", "value": true },
+        { "field": "architecture.rooftopPrivacyScreenHeight", "operator": "<", "value": 1.60 },
+        { "field": "architecture.distanceToNeighborFromTerrace", "operator": "<", "value": 5.00 }
+      ],
+      "currentValueTemplate": "Altura tela de privacidade: {architecture.rooftopPrivacyScreenHeight} m",
+      "requiredValue": "≥ 1.60 m de tela de privacidade quando distância ao vizinho < 5.00 m",
+      "remediation": "Instalar tela, ecrã ou elemento vegetal de privacidade com altura mínima de 1.60 m nas zonas do terraço com vista direta sobre propriedades vizinhas a menos de 5 m, conforme Art. 50.º do RGEU e Art. 1360.º do Código Civil.",
+      "enabled": true,
+      "tags": ["terraço", "privacidade", "tela", "cobertura", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERRAPRIV-02",
+      "regulationId": "codigo-civil-edificacao",
+      "article": "Art. 1360.º — Privacidade: Recuo de Zonas de Estar em Terraço",
+      "description": "A zona de estar do terraço de cobertura não respeita o afastamento mínimo de 1.50 m ao limite da propriedade vizinha, nos termos do Código Civil.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasRooftopTerrace", "operator": "==", "value": true },
+        { "field": "architecture.terraceSeatingDistanceToBoundary", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "Distância zona de estar ao limite: {architecture.terraceSeatingDistanceToBoundary} m",
+      "requiredValue": "≥ 1.50 m ao limite da propriedade vizinha",
+      "remediation": "Recuar a zona de estar do terraço ou instalar ecrã opaco fixo de modo a respeitar a distância mínima de 1.50 m ao limite do prédio vizinho conforme Art. 1360.º do Código Civil.",
+      "enabled": true,
+      "tags": ["terraço", "privacidade", "vizinhança", "Código Civil"]
+    },
+    {
+      "id": "ARQ-PROFNAT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Profundidade Máxima do Corpo do Edifício para Iluminação Natural",
+      "description": "A profundidade do corpo do edifício ({architecture.buildingBodyDepth} m) excede 15.00 m, comprometendo a iluminação natural dos compartimentos interiores.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.buildingBodyDepth", "operator": ">", "value": 15.00 }
+      ],
+      "currentValueTemplate": "Profundidade do corpo: {architecture.buildingBodyDepth} m",
+      "requiredValue": "≤ 15.00 m (profundidade máxima do corpo para iluminação natural bilateral)",
+      "remediation": "Reduzir a profundidade do corpo do edifício para no máximo 15.00 m, ou introduzir saguões, pátios interiores ou clarabóias que garantam iluminação natural a todos os compartimentos habitáveis conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["profundidade", "iluminação natural", "corpo do edifício", "RGEU"]
+    },
+    {
+      "id": "ARQ-PROFNAT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Profundidade do Compartimento: Regra dos 2× Pé-Direito",
+      "description": "A profundidade do compartimento habitável ({architecture.habitableRoomDepth} m) excede o dobro do pé-direito, limitando a penetração de luz natural.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.habitableRoomDepth", "operator": ">", "value": 0 },
+        { "field": "architecture.ceilingHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.habitableRoomDepth", "operator": "formula_gt", "value": "architecture.ceilingHeight * 2.0" }
+      ],
+      "currentValueTemplate": "Profundidade: {architecture.habitableRoomDepth} m (limite: {architecture.ceilingHeight} × 2)",
+      "requiredValue": "Profundidade ≤ 2 × pé-direito do compartimento",
+      "remediation": "Redimensionar o compartimento para que a profundidade não exceda o dobro do pé-direito livre, garantindo iluminação natural adequada conforme Art. 66.º do RGEU. Considerar segundas aberturas ou luz zenital.",
+      "enabled": true,
+      "tags": ["profundidade", "pé-direito", "iluminação natural", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-PROFNAT-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Iluminação Natural Unilateral: Profundidade Máxima",
+      "description": "Em compartimentos com iluminação natural unilateral, a profundidade ({architecture.unilateralLitRoomDepth} m) excede 2.5 vezes a altura do lintel da janela.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasUnilateralLighting", "operator": "==", "value": true },
+        { "field": "architecture.unilateralLitRoomDepth", "operator": ">", "value": 0 },
+        { "field": "architecture.windowLintelHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.unilateralLitRoomDepth", "operator": "formula_gt", "value": "architecture.windowLintelHeight * 2.5" }
+      ],
+      "currentValueTemplate": "Profundidade: {architecture.unilateralLitRoomDepth} m / Lintel: {architecture.windowLintelHeight} m × 2.5 = limite",
+      "requiredValue": "Profundidade ≤ 2.5 × altura do lintel da janela",
+      "remediation": "Reduzir a profundidade do compartimento ou aumentar a altura do vão envidraçado para garantir que a relação profundidade/lintel ≤ 2.5, assegurando distribuição adequada de luz natural conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["iluminação unilateral", "profundidade", "lintel", "janela", "RGEU"]
+    },
+    {
+      "id": "ARQ-PATIOINT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Pátio Interior: Dimensão Mínima em Planta",
+      "description": "A menor dimensão do pátio interior ({architecture.courtyardMinDimension} m) é inferior ao mínimo de 3.00 m exigido para saguões ou pátios interiores de ventilação e iluminação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasInternalCourtyard", "operator": "==", "value": true },
+        { "field": "architecture.courtyardMinDimension", "operator": "<", "value": 3.00 }
+      ],
+      "currentValueTemplate": "Menor dimensão do pátio: {architecture.courtyardMinDimension} m",
+      "requiredValue": "≥ 3.00 m (menor dimensão em planta)",
+      "remediation": "Aumentar as dimensões do pátio interior para que a menor dimensão em planta seja pelo menos 3.00 m, garantindo ventilação cruzada e iluminação natural conforme Art. 67.º do RGEU.",
+      "enabled": true,
+      "tags": ["pátio interior", "saguão", "dimensão mínima", "iluminação", "RGEU"]
+    },
+    {
+      "id": "ARQ-PATIOINT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Pátio Interior: Área Mínima",
+      "description": "A área do pátio interior ({architecture.courtyardArea} m²) é inferior ao mínimo de 12.00 m² exigido para edifícios com mais de 3 pisos.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasInternalCourtyard", "operator": "==", "value": true },
+        { "field": "architecture.numberOfFloors", "operator": ">", "value": 3 },
+        { "field": "architecture.courtyardArea", "operator": "<", "value": 12.00 }
+      ],
+      "currentValueTemplate": "Área do pátio interior: {architecture.courtyardArea} m²",
+      "requiredValue": "≥ 12.00 m² para edifícios > 3 pisos",
+      "remediation": "Aumentar a área do pátio interior para o mínimo de 12.00 m², garantindo ventilação e iluminação natural adequadas aos compartimentos envolventes conforme Art. 67.º do RGEU.",
+      "enabled": true,
+      "tags": ["pátio interior", "área mínima", "ventilação", "RGEU"]
+    },
+    {
+      "id": "ARQ-PATIOINT-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 67.º — Pátio Interior: Relação Altura/Largura",
+      "description": "A relação entre a altura das paredes do pátio e a sua menor dimensão excede 2:1, comprometendo a ventilação e iluminação dos pisos inferiores.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasInternalCourtyard", "operator": "==", "value": true },
+        { "field": "architecture.courtyardWallHeight", "operator": ">", "value": 0 },
+        { "field": "architecture.courtyardMinDimension", "operator": ">", "value": 0 },
+        { "field": "architecture.courtyardWallHeight", "operator": "formula_gt", "value": "architecture.courtyardMinDimension * 2.0" }
+      ],
+      "currentValueTemplate": "Altura paredes: {architecture.courtyardWallHeight} m / Menor dimensão: {architecture.courtyardMinDimension} m",
+      "requiredValue": "Relação altura/largura ≤ 2:1",
+      "remediation": "Aumentar a dimensão em planta do pátio interior ou reduzir a altura das paredes envolventes para que a relação altura/largura não exceda 2:1 conforme Art. 67.º do RGEU.",
+      "enabled": true,
+      "tags": ["pátio interior", "relação altura/largura", "ventilação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ENTPROT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Proteção contra Intempéries na Entrada do Edifício",
+      "description": "A entrada principal do edifício não possui pala, alpendre ou marquise de proteção contra intempéries com profundidade mínima de 1.20 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasEntranceWeatherProtection", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem proteção contra intempéries na entrada",
+      "requiredValue": "Pala/alpendre com profundidade ≥ 1.20 m",
+      "remediation": "Instalar pala, alpendre ou marquise sobre a entrada principal do edifício com profundidade mínima de 1.20 m e largura cobrindo toda a largura da porta de entrada, garantindo proteção contra chuva e sol conforme Art. 55.º do RGEU.",
+      "enabled": true,
+      "tags": ["entrada", "proteção", "intempéries", "pala", "RGEU"]
+    },
+    {
+      "id": "ARQ-ENTPROT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Profundidade da Pala de Proteção na Entrada",
+      "description": "A profundidade da pala de proteção na entrada ({architecture.entranceCanopyDepth} m) é inferior ao mínimo de 1.20 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasEntranceWeatherProtection", "operator": "==", "value": true },
+        { "field": "architecture.entranceCanopyDepth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "Profundidade da pala: {architecture.entranceCanopyDepth} m",
+      "requiredValue": "≥ 1.20 m de profundidade",
+      "remediation": "Aumentar a profundidade da pala ou alpendre de entrada para pelo menos 1.20 m, de forma a proteger adequadamente os utilizadores das intempéries conforme Art. 55.º do RGEU.",
+      "enabled": true,
+      "tags": ["entrada", "pala", "profundidade", "proteção", "RGEU"]
+    },
+    {
+      "id": "ARQ-ARRUMRES-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Arrumo Privativo por Fogo: Área Mínima",
+      "description": "A área de arrumo privativo por fogo ({architecture.dwellingStorageArea} m²) é inferior ao mínimo de 2.50 m² exigido para habitações T1 ou superior.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.numberOfBedrooms", "operator": ">=", "value": 1 },
+        { "field": "architecture.dwellingStorageArea", "operator": "<", "value": 2.50 }
+      ],
+      "currentValueTemplate": "Área arrumo: {architecture.dwellingStorageArea} m²",
+      "requiredValue": "≥ 2.50 m² por fogo (T1 ou superior)",
+      "remediation": "Prever espaço de arrumo privativo com área mínima de 2.50 m² por fogo, podendo ser na cave, sótão ou arrecadação no interior da habitação conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["arrumo", "arrecadação", "habitação", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-ARRUMRES-02",
+      "regulationId": "dl-177-2001",
+      "article": "Art. 3.º — Arrumo/Arrecadação: Dimensão Mínima Livre",
+      "description": "A menor dimensão livre do arrumo ({architecture.storageMinDimension} m) é inferior a 1.10 m, comprometendo a utilização do espaço.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.dwellingStorageArea", "operator": ">", "value": 0 },
+        { "field": "architecture.storageMinDimension", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "Menor dimensão arrumo: {architecture.storageMinDimension} m",
+      "requiredValue": "≥ 1.10 m (menor dimensão livre)",
+      "remediation": "Redimensionar o espaço de arrumo para que a menor dimensão livre seja pelo menos 1.10 m, permitindo acesso e utilização adequados conforme DL 177/2001.",
+      "enabled": true,
+      "tags": ["arrumo", "dimensão mínima", "arrecadação", "DL 177/2001"]
+    },
+    {
+      "id": "ARQ-ARRUMRES-03",
+      "regulationId": "portaria-62-2003",
+      "article": "Quadro I — Arrumo em Habitação a Custos Controlados",
+      "description": "Em habitação a custos controlados, a área de arrumo ({architecture.socialHousingStorageArea} m²) é inferior ao mínimo regulamentar de 2.00 m² por fogo.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.isSocialHousing", "operator": "==", "value": true },
+        { "field": "architecture.socialHousingStorageArea", "operator": "<", "value": 2.00 }
+      ],
+      "currentValueTemplate": "Área arrumo custos controlados: {architecture.socialHousingStorageArea} m²",
+      "requiredValue": "≥ 2.00 m² por fogo (custos controlados)",
+      "remediation": "Prever arrumo com área mínima de 2.00 m² por fogo em habitação a custos controlados conforme Quadro I da Portaria 62/2003.",
+      "enabled": true,
+      "tags": ["arrumo", "custos controlados", "habitação social", "Portaria 62/2003"]
+    },
+    {
+      "id": "ARQ-UTILROOM-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Compartimento Técnico/Lavandaria: Área Mínima",
+      "description": "A área do compartimento técnico/lavandaria ({architecture.utilityRoomArea} m²) é inferior ao mínimo de 3.00 m² exigido para alojar equipamentos de lavagem e secagem.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasUtilityRoom", "operator": "==", "value": true },
+        { "field": "architecture.utilityRoomArea", "operator": "<", "value": 3.00 }
+      ],
+      "currentValueTemplate": "Área lavandaria/técnico: {architecture.utilityRoomArea} m²",
+      "requiredValue": "≥ 3.00 m²",
+      "remediation": "Aumentar a área do compartimento técnico/lavandaria para o mínimo de 3.00 m², com espaço para máquina de lavar, secador, tanque e ventilação adequada conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["lavandaria", "compartimento técnico", "área mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-UTILROOM-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 68.º — Lavandaria: Ventilação Obrigatória",
+      "description": "O compartimento de lavandaria/tratamento de roupa não possui ventilação natural ou mecânica adequada.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasUtilityRoom", "operator": "==", "value": true },
+        { "field": "architecture.utilityRoomHasVentilation", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sem ventilação no compartimento de lavandaria",
+      "requiredValue": "Ventilação natural ou mecânica obrigatória",
+      "remediation": "Garantir ventilação natural (janela ou grelha para o exterior) ou mecânica (extração forçada) no compartimento de lavandaria para evitar humidade e condensações conforme Art. 68.º do RGEU.",
+      "enabled": true,
+      "tags": ["lavandaria", "ventilação", "humidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-TECHSHAFT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 70.º — Courettes Técnicas: Porta de Acesso",
+      "description": "As courettes/ductos técnicos verticais não possuem porta de acesso em cada piso com dimensões mínimas de 0.60 m × 0.60 m para manutenção.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasTechnicalShafts", "operator": "==", "value": true },
+        { "field": "architecture.techShaftHasAccessDoors", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Courettes sem portas de acesso em cada piso",
+      "requiredValue": "Porta de acesso ≥ 0.60 m × 0.60 m em cada piso",
+      "remediation": "Prever porta ou alçapão de acesso às courettes técnicas em cada piso, com dimensões mínimas de 0.60 m × 0.60 m, permitindo manutenção e inspeção das infraestruturas conforme Art. 70.º do RGEU.",
+      "enabled": true,
+      "tags": ["courette", "ducto técnico", "porta de acesso", "manutenção", "RGEU"]
+    },
+    {
+      "id": "ARQ-TECHSHAFT-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 70.º — Courettes Técnicas: Dimensão Mínima Interior",
+      "description": "A menor dimensão interior da courette técnica ({architecture.techShaftMinDimension} m) é inferior a 0.50 m, impossibilitando a passagem e manutenção das infraestruturas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasTechnicalShafts", "operator": "==", "value": true },
+        { "field": "architecture.techShaftMinDimension", "operator": "<", "value": 0.50 }
+      ],
+      "currentValueTemplate": "Menor dimensão courette: {architecture.techShaftMinDimension} m",
+      "requiredValue": "≥ 0.50 m (menor dimensão interior)",
+      "remediation": "Aumentar a secção interior da courette técnica para que a menor dimensão seja pelo menos 0.50 m, garantindo passagem adequada de tubagens, cabos e acesso para manutenção conforme Art. 70.º do RGEU.",
+      "enabled": true,
+      "tags": ["courette", "ducto técnico", "dimensão mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-RAISEDFLR-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Pavimento Sobrelevado: Altura Livre Residual",
+      "description": "A altura livre entre o pavimento sobrelevado e o teto ({architecture.raisedFloorClearance} m) é inferior a 2.40 m, comprometendo o pé-direito útil.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasRaisedFloor", "operator": "==", "value": true },
+        { "field": "architecture.raisedFloorClearance", "operator": "<", "value": 2.40 }
+      ],
+      "currentValueTemplate": "Pé-direito útil com pavimento sobrelevado: {architecture.raisedFloorClearance} m",
+      "requiredValue": "≥ 2.40 m de altura livre acima do pavimento sobrelevado",
+      "remediation": "Reduzir a altura do pavimento sobrelevado ou aumentar o pé-direito bruto para garantir pelo menos 2.40 m de altura livre utilizável acima da superfície do pavimento elevado conforme Art. 65.º do RGEU.",
+      "enabled": true,
+      "tags": ["pavimento sobrelevado", "pé-direito", "altura livre", "RGEU"]
+    },
+    {
+      "id": "ARQ-RAISEDFLR-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Pavimento Sobrelevado: Altura do Plenum",
+      "description": "A altura do plenum do pavimento sobrelevado ({architecture.raisedFloorPlenumHeight} m) é inferior a 0.10 m, insuficiente para passagem de infraestruturas.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasRaisedFloor", "operator": "==", "value": true },
+        { "field": "architecture.raisedFloorPlenumHeight", "operator": "<", "value": 0.10 }
+      ],
+      "currentValueTemplate": "Altura plenum: {architecture.raisedFloorPlenumHeight} m",
+      "requiredValue": "≥ 0.10 m (mínimo para passagem de infraestruturas)",
+      "remediation": "Aumentar a altura do plenum do pavimento sobrelevado para pelo menos 0.10 m (recomendado 0.15 m para escritórios) de modo a acomodar cabos elétricos, dados e outras infraestruturas.",
+      "enabled": true,
+      "tags": ["pavimento sobrelevado", "plenum", "infraestruturas", "RGEU"]
+    },
+    {
+      "id": "ARQ-SUSPCEILING-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Teto Falso: Altura Livre ao Pavimento",
+      "description": "A altura livre entre o pavimento acabado e o teto falso ({architecture.suspendedCeilingHeight} m) é inferior a 2.40 m em compartimentos habitáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasSuspendedCeiling", "operator": "==", "value": true },
+        { "field": "architecture.suspendedCeilingHeight", "operator": "<", "value": 2.40 }
+      ],
+      "currentValueTemplate": "Altura livre sob teto falso: {architecture.suspendedCeilingHeight} m",
+      "requiredValue": "≥ 2.40 m em compartimentos habitáveis",
+      "remediation": "Aumentar a altura do teto falso ou reduzir o espaço plenum para garantir pelo menos 2.40 m de pé-direito útil entre o pavimento acabado e a face inferior do teto falso conforme Art. 65.º do RGEU.",
+      "enabled": true,
+      "tags": ["teto falso", "pé-direito", "altura livre", "RGEU"]
+    },
+    {
+      "id": "ARQ-SUSPCEILING-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 65.º — Teto Falso em Instalações Sanitárias: Altura Mínima",
+      "description": "A altura livre sob o teto falso nas instalações sanitárias ({architecture.suspendedCeilingHeightWC} m) é inferior a 2.20 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasSuspendedCeiling", "operator": "==", "value": true },
+        { "field": "architecture.suspendedCeilingHeightWC", "operator": "<", "value": 2.20 }
+      ],
+      "currentValueTemplate": "Altura livre sob teto falso (IS): {architecture.suspendedCeilingHeightWC} m",
+      "requiredValue": "≥ 2.20 m em instalações sanitárias",
+      "remediation": "Garantir pelo menos 2.20 m de altura livre entre o pavimento e o teto falso nas instalações sanitárias conforme Art. 65.º do RGEU.",
+      "enabled": true,
+      "tags": ["teto falso", "instalações sanitárias", "altura mínima", "RGEU"]
+    },
+    {
+      "id": "ARQ-PEITORIL-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Altura do Peitoril para Segurança Infantil",
+      "description": "A altura do peitoril das janelas ({architecture.windowSillHeight} m) é inferior a 0.90 m, representando risco de queda, especialmente para crianças.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.windowSillHeight", "operator": "<", "value": 0.90 }
+      ],
+      "currentValueTemplate": "Altura do peitoril: {architecture.windowSillHeight} m",
+      "requiredValue": "≥ 0.90 m (segurança contra quedas)",
+      "remediation": "Elevar o peitoril das janelas para pelo menos 0.90 m ou instalar guarda-corpo/barra de segurança complementar até perfazer 0.90 m de proteção contra quedas conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["peitoril", "segurança", "crianças", "queda", "RGEU"]
+    },
+    {
+      "id": "ARQ-PEITORIL-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Peitoril: Elementos Escaláveis",
+      "description": "O vão da janela possui elementos horizontais entre 0.20 m e 0.70 m de altura que podem ser escalados por crianças, comprometendo a segurança.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.windowHasClimbableElements", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Elementos escaláveis detetados no peitoril/guarda",
+      "requiredValue": "Sem elementos horizontais escaláveis entre 0.20 m e 0.70 m",
+      "remediation": "Eliminar ou redesenhar elementos horizontais (travessas, barras intermédias) entre 0.20 m e 0.70 m de altura no peitoril ou guarda da janela que possam ser usados como apoio para escalada por crianças conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["peitoril", "segurança infantil", "elementos escaláveis", "RGEU"]
+    },
+    {
+      "id": "ARQ-JULIET-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Varanda Francesa (Juliet): Altura da Guarda",
+      "description": "A altura da guarda da varanda francesa/Juliet ({architecture.julietBalconyGuardHeight} m) é inferior ao mínimo de 1.10 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasJulietBalcony", "operator": "==", "value": true },
+        { "field": "architecture.julietBalconyGuardHeight", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "Altura da guarda Juliet: {architecture.julietBalconyGuardHeight} m",
+      "requiredValue": "≥ 1.10 m",
+      "remediation": "Aumentar a altura da guarda da varanda francesa para pelo menos 1.10 m, medida desde o pavimento acabado interior até ao topo da guarda conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["varanda francesa", "Juliet", "guarda", "segurança", "RGEU"]
+    },
+    {
+      "id": "ARQ-JULIET-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 56.º — Varanda Francesa: Espaçamento de Prumos",
+      "description": "O espaçamento entre prumos/balaústres da varanda francesa ({architecture.julietBalustradeSpacing} m) excede 0.11 m, permitindo passagem de crianças.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasJulietBalcony", "operator": "==", "value": true },
+        { "field": "architecture.julietBalustradeSpacing", "operator": ">", "value": 0.11 }
+      ],
+      "currentValueTemplate": "Espaçamento entre prumos: {architecture.julietBalustradeSpacing} m",
+      "requiredValue": "≤ 0.11 m entre prumos/balaústres",
+      "remediation": "Reduzir o espaçamento entre prumos verticais da guarda da varanda francesa para no máximo 0.11 m, impedindo a passagem da cabeça de uma criança conforme Art. 56.º do RGEU.",
+      "enabled": true,
+      "tags": ["varanda francesa", "Juliet", "balaústres", "segurança infantil", "RGEU"]
+    },
+    {
+      "id": "ARQ-FRENCH-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 64.º — Porta de Sacada: Largura Mínima",
+      "description": "A largura livre da porta de sacada/francesa ({architecture.frenchDoorWidth} m) é inferior ao mínimo de 0.80 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasFrenchDoors", "operator": "==", "value": true },
+        { "field": "architecture.frenchDoorWidth", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "Largura porta de sacada: {architecture.frenchDoorWidth} m",
+      "requiredValue": "≥ 0.80 m de largura livre",
+      "remediation": "Aumentar a largura livre da porta de sacada para pelo menos 0.80 m, permitindo passagem confortável e acessibilidade conforme Art. 64.º do RGEU.",
+      "enabled": true,
+      "tags": ["porta de sacada", "porta francesa", "largura", "RGEU"]
+    },
+    {
+      "id": "ARQ-FRENCH-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 64.º — Porta de Sacada: Altura Mínima",
+      "description": "A altura livre da porta de sacada/francesa ({architecture.frenchDoorHeight} m) é inferior ao mínimo de 2.10 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasFrenchDoors", "operator": "==", "value": true },
+        { "field": "architecture.frenchDoorHeight", "operator": "<", "value": 2.10 }
+      ],
+      "currentValueTemplate": "Altura porta de sacada: {architecture.frenchDoorHeight} m",
+      "requiredValue": "≥ 2.10 m de altura livre",
+      "remediation": "Aumentar a altura livre da porta de sacada para pelo menos 2.10 m conforme Art. 64.º do RGEU.",
+      "enabled": true,
+      "tags": ["porta de sacada", "porta francesa", "altura", "RGEU"]
+    },
+    {
+      "id": "ARQ-SLIDEDOOR-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 64.º — Porta de Correr: Largura Livre para Acessibilidade",
+      "description": "A largura livre de passagem da porta de correr ({architecture.slidingDoorClearWidth} m) é inferior a 0.80 m, comprometendo a acessibilidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasSlidingDoors", "operator": "==", "value": true },
+        { "field": "architecture.slidingDoorClearWidth", "operator": "<", "value": 0.80 }
+      ],
+      "currentValueTemplate": "Largura livre porta de correr: {architecture.slidingDoorClearWidth} m",
+      "requiredValue": "≥ 0.80 m de largura livre de passagem",
+      "remediation": "Garantir que a porta de correr oferece pelo menos 0.80 m de largura livre de passagem na posição totalmente aberta, permitindo a circulação de cadeira de rodas conforme Art. 64.º do RGEU e DL 163/2006.",
+      "enabled": true,
+      "tags": ["porta de correr", "acessibilidade", "largura", "RGEU"]
+    },
+    {
+      "id": "ARQ-SLIDEDOOR-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 64.º — Porta de Correr: Espaço Lateral de Manobra",
+      "description": "O espaço lateral livre junto à porta de correr ({architecture.slidingDoorSideClearance} m) é inferior a 0.50 m, dificultando o acionamento por pessoas com mobilidade reduzida.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasSlidingDoors", "operator": "==", "value": true },
+        { "field": "architecture.slidingDoorSideClearance", "operator": "<", "value": 0.50 }
+      ],
+      "currentValueTemplate": "Espaço lateral porta de correr: {architecture.slidingDoorSideClearance} m",
+      "requiredValue": "≥ 0.50 m de espaço lateral para manobra",
+      "remediation": "Garantir espaço livre lateral mínimo de 0.50 m junto ao puxador da porta de correr para permitir manobra por utilizadores de cadeira de rodas conforme Art. 64.º do RGEU.",
+      "enabled": true,
+      "tags": ["porta de correr", "acessibilidade", "mobilidade reduzida", "RGEU"]
+    },
+    {
+      "id": "ARQ-REVOLV-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Porta Giratória: Átrio Corta-Vento",
+      "description": "A entrada com porta giratória não possui átrio corta-vento alternativo com porta batente acessível adjacente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasRevolvingDoor", "operator": "==", "value": true },
+        { "field": "architecture.hasAdjacentAccessibleDoor", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Porta giratória sem alternativa acessível adjacente",
+      "requiredValue": "Porta batente acessível adjacente obrigatória",
+      "remediation": "Instalar porta batente ou de correr acessível adjacente à porta giratória, com largura livre mínima de 0.90 m, garantindo acesso a pessoas com mobilidade reduzida, carrinhos e volumes grandes conforme Art. 55.º do RGEU e DL 163/2006.",
+      "enabled": true,
+      "tags": ["porta giratória", "corta-vento", "acessibilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-REVOLV-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Porta Giratória: Diâmetro do Tambor",
+      "description": "O diâmetro do tambor da porta giratória ({architecture.revolvingDoorDiameter} m) é inferior ao mínimo de 2.40 m, dificultando a circulação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasRevolvingDoor", "operator": "==", "value": true },
+        { "field": "architecture.revolvingDoorDiameter", "operator": "<", "value": 2.40 }
+      ],
+      "currentValueTemplate": "Diâmetro do tambor: {architecture.revolvingDoorDiameter} m",
+      "requiredValue": "≥ 2.40 m de diâmetro",
+      "remediation": "Aumentar o diâmetro do tambor da porta giratória para pelo menos 2.40 m, garantindo passagem confortável de pessoas com bagagem ou volumes conforme Art. 55.º do RGEU.",
+      "enabled": true,
+      "tags": ["porta giratória", "diâmetro", "átrio", "RGEU"]
+    },
+    {
+      "id": "ARQ-AIRLOCK-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Átrio de Entrada (Airlock): Profundidade Mínima",
+      "description": "A profundidade do átrio de entrada/airlock ({architecture.airlockDepth} m) é inferior a 2.00 m, não permitindo que a porta interior feche antes de abrir a exterior.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasAirlockEntrance", "operator": "==", "value": true },
+        { "field": "architecture.airlockDepth", "operator": "<", "value": 2.00 }
+      ],
+      "currentValueTemplate": "Profundidade do átrio: {architecture.airlockDepth} m",
+      "requiredValue": "≥ 2.00 m de profundidade",
+      "remediation": "Aumentar a profundidade do átrio de entrada para pelo menos 2.00 m (recomendado 2.50 m), permitindo que uma porta feche completamente antes de a seguinte ser aberta, garantindo eficácia do corta-vento conforme Art. 55.º do RGEU.",
+      "enabled": true,
+      "tags": ["átrio", "airlock", "corta-vento", "entrada", "RGEU"]
+    },
+    {
+      "id": "ARQ-AIRLOCK-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Átrio de Entrada (Airlock): Largura Mínima",
+      "description": "A largura do átrio de entrada/airlock ({architecture.airlockWidth} m) é inferior a 1.50 m, não respeitando a largura mínima para acessibilidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasAirlockEntrance", "operator": "==", "value": true },
+        { "field": "architecture.airlockWidth", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "Largura do átrio: {architecture.airlockWidth} m",
+      "requiredValue": "≥ 1.50 m de largura",
+      "remediation": "Aumentar a largura do átrio de entrada para pelo menos 1.50 m, garantindo passagem acessível e manobra de cadeira de rodas conforme Art. 55.º do RGEU e DL 163/2006.",
+      "enabled": true,
+      "tags": ["átrio", "airlock", "largura", "acessibilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-SERVCORR-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Corredor de Serviço: Largura Mínima",
+      "description": "A largura do corredor de serviço ({architecture.serviceCorridorWidth} m) é inferior ao mínimo de 1.20 m exigido para circulação de equipamentos e pessoal de manutenção.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasServiceCorridor", "operator": "==", "value": true },
+        { "field": "architecture.serviceCorridorWidth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "Largura corredor de serviço: {architecture.serviceCorridorWidth} m",
+      "requiredValue": "≥ 1.20 m",
+      "remediation": "Aumentar a largura do corredor de serviço para pelo menos 1.20 m, permitindo circulação de equipamentos de manutenção, carrinhos e passagem de dois trabalhadores em simultâneo conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["corredor de serviço", "largura", "manutenção", "RGEU"]
+    },
+    {
+      "id": "ARQ-SERVCORR-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Corredor de Serviço: Pé-Direito Mínimo",
+      "description": "O pé-direito do corredor de serviço ({architecture.serviceCorridorHeight} m) é inferior a 2.20 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasServiceCorridor", "operator": "==", "value": true },
+        { "field": "architecture.serviceCorridorHeight", "operator": "<", "value": 2.20 }
+      ],
+      "currentValueTemplate": "Pé-direito corredor de serviço: {architecture.serviceCorridorHeight} m",
+      "requiredValue": "≥ 2.20 m",
+      "remediation": "Garantir pé-direito mínimo de 2.20 m no corredor de serviço, mesmo com presença de instalações técnicas suspensas (condutas, esteiras de cabos) conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["corredor de serviço", "pé-direito", "RGEU"]
+    },
+    {
+      "id": "ARQ-SERVCORR-03",
+      "regulationId": "dl-177-2001",
+      "article": "Art. 4.º — Corredor de Serviço: Iluminação de Emergência",
+      "description": "O corredor de serviço com comprimento superior a 10 m não dispõe de iluminação de emergência.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasServiceCorridor", "operator": "==", "value": true },
+        { "field": "architecture.serviceCorridorLength", "operator": ">", "value": 10.00 },
+        { "field": "architecture.serviceCorridorHasEmergencyLighting", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Comprimento: {architecture.serviceCorridorLength} m / Sem iluminação de emergência",
+      "requiredValue": "Iluminação de emergência obrigatória se comprimento > 10 m",
+      "remediation": "Instalar iluminação de emergência autónoma no corredor de serviço com espaçamento máximo de 15 m, assegurando nível mínimo de 1 lux ao nível do pavimento conforme DL 177/2001.",
+      "enabled": true,
+      "tags": ["corredor de serviço", "iluminação de emergência", "segurança", "DL 177/2001"]
+    },
+    {
+      "id": "ARQ-CLEANERS-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Compartimento de Limpeza: Existência",
+      "description": "O edifício com área bruta de construção superior a 500 m² não possui compartimento de limpeza (arrumo de produtos e equipamentos de limpeza).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.grossConstructionArea", "operator": ">", "value": 500 },
+        { "field": "architecture.hasCleanersCupboard", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "ABC: {architecture.grossConstructionArea} m² / Sem compartimento de limpeza",
+      "requiredValue": "Compartimento de limpeza obrigatório (ABC > 500 m²)",
+      "remediation": "Prever pelo menos um compartimento de limpeza por piso ou bloco funcional, com área mínima de 1.50 m², ponto de água, ralo de pavimento e ventilação, para armazenamento de produtos e equipamentos de limpeza conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["limpeza", "arrumo", "compartimento", "RGEU"]
+    },
+    {
+      "id": "ARQ-CLEANERS-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 69.º — Compartimento de Limpeza: Área e Equipamento Mínimo",
+      "description": "A área do compartimento de limpeza ({architecture.cleanersCupboardArea} m²) é inferior a 1.50 m² ou não dispõe de ponto de água e ralo.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasCleanersCupboard", "operator": "==", "value": true },
+        { "field": "architecture.cleanersCupboardArea", "operator": "<", "value": 1.50 }
+      ],
+      "currentValueTemplate": "Área compartimento de limpeza: {architecture.cleanersCupboardArea} m²",
+      "requiredValue": "≥ 1.50 m² com ponto de água e ralo de pavimento",
+      "remediation": "Aumentar a área do compartimento de limpeza para pelo menos 1.50 m² e garantir ponto de água fria, ralo sifonado de pavimento e ventilação (natural ou mecânica) conforme Art. 69.º do RGEU.",
+      "enabled": true,
+      "tags": ["limpeza", "área mínima", "ponto de água", "RGEU"]
+    },
+    {
+      "id": "ARQ-ITROOM-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 70.º — Sala Técnica de TI/Telecomunicações: Área Mínima",
+      "description": "A área da sala técnica de TI/telecomunicações ({architecture.itRoomArea} m²) é inferior ao mínimo de 6.00 m² para edifícios com mais de 10 frações.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasITRoom", "operator": "==", "value": true },
+        { "field": "architecture.numberOfUnits", "operator": ">", "value": 10 },
+        { "field": "architecture.itRoomArea", "operator": "<", "value": 6.00 }
+      ],
+      "currentValueTemplate": "Área sala TI: {architecture.itRoomArea} m²",
+      "requiredValue": "≥ 6.00 m² para edifícios > 10 frações",
+      "remediation": "Aumentar a área da sala técnica de TI para pelo menos 6.00 m², com ventilação forçada, controlo de temperatura, pavimento antiestático e instalação elétrica dedicada conforme Art. 70.º do RGEU e ITED3.",
+      "enabled": true,
+      "tags": ["sala técnica", "TI", "telecomunicações", "ITED", "RGEU"]
+    },
+    {
+      "id": "ARQ-ITROOM-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 70.º — Sala Técnica de TI: Ventilação e Climatização",
+      "description": "A sala técnica de TI/servidor não possui ventilação forçada ou climatização dedicada para controlo de temperatura.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasITRoom", "operator": "==", "value": true },
+        { "field": "architecture.itRoomHasClimateControl", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sala TI sem climatização dedicada",
+      "requiredValue": "Ventilação forçada e climatização obrigatórias",
+      "remediation": "Instalar sistema de climatização dedicado na sala técnica de TI, mantendo temperatura entre 18°C e 27°C e humidade relativa entre 40% e 60%, com ventilação forçada independente conforme Art. 70.º do RGEU.",
+      "enabled": true,
+      "tags": ["sala técnica", "TI", "climatização", "ventilação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ITROOM-03",
+      "regulationId": "portaria-216b-2008",
+      "article": "Art. 5.º — Sala Técnica: Registo na Ficha Técnica",
+      "description": "A ficha técnica da habitação não regista as características da sala técnica de telecomunicações do edifício.",
+      "severity": "info",
+      "conditions": [
+        { "field": "architecture.hasITRoom", "operator": "==", "value": true },
+        { "field": "architecture.fthIncludesITRoom", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Sala técnica não registada na FTH",
+      "requiredValue": "Características da sala técnica registadas na FTH",
+      "remediation": "Incluir na ficha técnica da habitação (FTH) a descrição, localização e características técnicas da sala de telecomunicações/TI do edifício conforme Portaria 216-B/2008.",
+      "enabled": true,
+      "tags": ["ficha técnica", "sala técnica", "FTH", "Portaria 216-B/2008"]
+    },
+    {
+      "id": "ARQ-ENTRAMP-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Rampa de Entrada: Inclinação Máxima",
+      "description": "A inclinação da rampa de acesso à entrada do edifício ({architecture.entranceRampGradient}%) excede o máximo de 6% para rampas até 10 m de desenvolvimento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasEntranceRamp", "operator": "==", "value": true },
+        { "field": "architecture.entranceRampGradient", "operator": ">", "value": 6.0 },
+        { "field": "architecture.entranceRampLength", "operator": "<=", "value": 10.00 }
+      ],
+      "currentValueTemplate": "Inclinação da rampa: {architecture.entranceRampGradient}% / Comprimento: {architecture.entranceRampLength} m",
+      "requiredValue": "≤ 6% para rampas até 10 m",
+      "remediation": "Reduzir a inclinação da rampa de entrada para no máximo 6% (ou 8% se comprimento ≤ 5 m), com piso antiderrapante, corrimão bilateral e patamar de descanso conforme Art. 55.º do RGEU e DL 163/2006.",
+      "enabled": true,
+      "tags": ["rampa", "entrada", "acessibilidade", "inclinação", "RGEU"]
+    },
+    {
+      "id": "ARQ-ENTRAMP-02",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Rampa de Entrada: Largura Mínima",
+      "description": "A largura da rampa de acesso à entrada ({architecture.entranceRampWidth} m) é inferior ao mínimo de 1.20 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasEntranceRamp", "operator": "==", "value": true },
+        { "field": "architecture.entranceRampWidth", "operator": "<", "value": 1.20 }
+      ],
+      "currentValueTemplate": "Largura da rampa: {architecture.entranceRampWidth} m",
+      "requiredValue": "≥ 1.20 m de largura",
+      "remediation": "Aumentar a largura da rampa de entrada para pelo menos 1.20 m (recomendado 1.50 m), com rebordos laterais de proteção de 0.05 m e corrimão bilateral a 0.90 m de altura conforme Art. 55.º do RGEU e DL 163/2006.",
+      "enabled": true,
+      "tags": ["rampa", "entrada", "largura", "acessibilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-ENTRAMP-03",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 55.º — Rampa de Entrada: Patamar de Descanso",
+      "description": "A rampa de entrada com desenvolvimento superior a 6.00 m não possui patamar de descanso intermédio com comprimento mínimo de 1.50 m.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "architecture.hasEntranceRamp", "operator": "==", "value": true },
+        { "field": "architecture.entranceRampLength", "operator": ">", "value": 6.00 },
+        { "field": "architecture.rampHasRestingPlatform", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Rampa: {architecture.entranceRampLength} m sem patamar de descanso",
+      "requiredValue": "Patamar de descanso ≥ 1.50 m a cada 6.00 m de desenvolvimento",
+      "remediation": "Introduzir patamar de descanso horizontal com comprimento mínimo de 1.50 m a cada 6.00 m de desenvolvimento da rampa, permitindo pausa segura para utilizadores de cadeira de rodas conforme Art. 55.º do RGEU.",
+      "enabled": true,
+      "tags": ["rampa", "patamar", "descanso", "acessibilidade", "RGEU"]
+    },
+    {
+      "id": "ARQ-DEPTHLIGHT-01",
+      "regulationId": "dl-38382-1951-rgeu",
+      "article": "Art. 66.º — Limite de Profundidade: Compartimentos Sem Segunda Fachada",
+      "description": "A profundidade dos compartimentos interiores em corpo de edifício sem segunda fachada ({architecture.singleFacadeDepth} m) excede 8.00 m, zona máxima de penetração efetiva de luz natural.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasSingleFacade", "operator": "==", "value": true },
+        { "field": "architecture.singleFacadeDepth", "operator": ">", "value": 8.00 }
+      ],
+      "currentValueTemplate": "Profundidade fachada única: {architecture.singleFacadeDepth} m",
+      "requiredValue": "≤ 8.00 m de profundidade útil (fachada única)",
+      "remediation": "Limitar a profundidade dos compartimentos a 8.00 m quando servidos por uma única fachada. Considerar saguões, átrios, clarabóias ou fachadas opostas para iluminação natural complementar conforme Art. 66.º do RGEU.",
+      "enabled": true,
+      "tags": ["profundidade", "fachada única", "iluminação natural", "RGEU"]
+    },
+    {
+      "id": "ARQ-DEPTHLIGHT-02",
+      "regulationId": "dl-38382-1951-rgeu-salubridade",
+      "article": "Art. 35.º — Compartimentos Interiores Sem Luz Natural",
+      "description": "Existem compartimentos habitáveis no interior do corpo do edifício sem qualquer fonte de iluminação natural (janela, clarabóia ou saguão).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasHabitableRoomsWithoutNaturalLight", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Compartimentos habitáveis sem iluminação natural detetados",
+      "requiredValue": "Todos os compartimentos habitáveis devem ter iluminação natural",
+      "remediation": "Garantir iluminação natural a todos os compartimentos habitáveis (salas, quartos, cozinhas) através de janelas para o exterior, saguões, clarabóias ou pátios interiores conforme Art. 35.º do RGEU (Salubridade).",
+      "enabled": true,
+      "tags": ["iluminação natural", "salubridade", "compartimento habitável", "RGEU"]
+    },
+    {
+      "id": "ARQ-TERRAPRIV-03",
+      "regulationId": "dl-38382-1951-rgeu-cob-gar",
+      "article": "Art. 50.º — Terraço de Cobertura: Guarda-Corpo",
+      "description": "A altura do guarda-corpo do terraço de cobertura acessível ({architecture.rooftopTerraceGuardHeight} m) é inferior ao mínimo de 1.10 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "architecture.hasRooftopTerrace", "operator": "==", "value": true },
+        { "field": "architecture.rooftopTerraceGuardHeight", "operator": "<", "value": 1.10 }
+      ],
+      "currentValueTemplate": "Altura guarda-corpo terraço: {architecture.rooftopTerraceGuardHeight} m",
+      "requiredValue": "≥ 1.10 m de altura do guarda-corpo",
+      "remediation": "Elevar o guarda-corpo do terraço de cobertura para pelo menos 1.10 m de altura, medida desde o pavimento acabado do terraço, com espaçamento entre elementos verticais ≤ 0.11 m conforme Art. 50.º do RGEU.",
+      "enabled": true,
+      "tags": ["terraço", "guarda-corpo", "cobertura", "segurança", "RGEU"]
     }
   ]
 }

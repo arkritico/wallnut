@@ -1801,6 +1801,148 @@
       "remediation": "Garantir integração do sistema AVAC com o controlo de fumos: (1) Encravamento: deteção de incêndio (SADI) deve comandar paragem automática de todas as UTAs e ventiladores de conforto da zona afetada em ≤ 60 s. (2) Registos corta-fogo motorizados: fecho automático em caso de alarme, alimentação de segurança (UPS ou bateria). (3) Ativação da desenfumagem: ventiladores de desenfumagem devem arrancar automaticamente, com alimentação elétrica independente (circuito de segurança). (4) Condutas: as condutas de desenfumagem não podem ser partilhadas com o sistema AVAC de conforto. (5) GTC: integrar sinais de estado (ventilador ON/OFF, posição de registos) na gestão técnica centralizada. (6) Ensaio semestral: teste funcional completo do cenário incêndio com verificação de tempos de resposta.",
       "enabled": true,
       "tags": ["controlo de fumos", "desenfumagem", "SCIE", "AVAC", "encravamento", "EN 12101"]
+    },
+    {
+      "id": "HVAC-ICE-STORAGE-GLYCOL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / Boas Práticas — Circuito de Glicol para Armazenamento Térmico por Gelo",
+      "description": "O sistema de armazenamento térmico por gelo não possui concentração adequada de glicol no circuito primário, correndo risco de congelação nas serpentinas e falha do sistema de armazenamento.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.iceStorageGlycolPercent", "operator": "<", "value": 25 },
+        { "field": "hvac.hasIceThermalStorage", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.iceStorageGlycolPercent}% de glicol no circuito primário",
+      "requiredValue": "25-30% etilenoglicol (ponto de congelação ≤ -12°C) para sistemas ice storage",
+      "remediation": "Ajustar concentração de glicol no circuito primário do sistema ice storage: (1) Concentração: 25-30% etilenoglicol (ponto de congelação -12°C a -15°C) para operação a -5°C a -7°C do fluido. (2) Verificação: medir com refractómetro ou densidade a cada 6 meses. (3) Impacto na eficiência: glicol aumenta a viscosidade e reduz a transferência de calor — penalização de 5-10% no COP do chiller. (4) Bomba: sobredimensionar em 10-15% para compensar viscosidade adicional. (5) Inibidores: verificar anualmente que os inibidores de corrosão estão ativos (análise laboratorial). (6) Proibido: nunca utilizar glicol automóvel (contém silicatos que obstruem permutadores) — utilizar apenas glicol de grau industrial/AVAC.",
+      "enabled": true,
+      "tags": ["ice storage", "glicol", "armazenamento térmico", "RECS"]
+    },
+    {
+      "id": "HVAC-GSHP-COP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 14511 — COP Mínimo de Bombas de Calor Geotérmicas",
+      "description": "A bomba de calor geotérmica (ground source) apresenta COP ({hvac.gshpCOP}) inferior ao valor mínimo esperado para esta tecnologia, indicando possível subdimensionamento do campo geotérmico, degradação do solo ou falha do equipamento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.gshpCOP", "operator": "<", "value": 4.0 },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "ground-source" }
+      ],
+      "currentValueTemplate": "COP = {hvac.gshpCOP}",
+      "requiredValue": "COP ≥ 4.0 para bombas de calor geotérmicas (EN 14511, condições B0/W35)",
+      "remediation": "Diagnosticar causa de COP baixo na bomba de calor geotérmica: (1) Temperatura de retorno do furo: deve ser ≥ 0°C em aquecimento e ≤ 30°C em arrefecimento — degradação indica subdimensionamento. (2) Caudal geotérmico: verificar bomba circuladora e caudal por furo (obstrução ou ar no circuito). (3) Glicol: concentração excessiva (> 35%) reduz transferência de calor e COP. (4) Compressor: verificar sobreaquecimento e subarrefecimento — valores fora de gama indicam subcarga ou sobrecarga de refrigerante. (5) Campo geotérmico: se COP degrada ao longo dos anos, o solo pode estar a saturar termicamente — considerar furos adicionais ou recarga térmica solar.",
+      "enabled": true,
+      "tags": ["geotérmico", "COP", "bomba de calor", "EN 14511", "RECS"]
+    },
+    {
+      "id": "HVAC-STEAM-INJECTION-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Injeção de Vapor para Humidificação em UTAs",
+      "description": "O sistema de humidificação por injeção de vapor não possui controlo adequado para evitar condensação na conduta (distance de absorção insuficiente), resultando em gotículas de água na corrente de ar que podem causar corrosão, proliferação microbiológica e danos nos filtros a jusante.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.steamAbsorptionDistance", "operator": "<", "value": 1.5 },
+        { "field": "hvac.humidifierType", "operator": "==", "value": "steam-injection" }
+      ],
+      "currentValueTemplate": "Distância de absorção: {hvac.steamAbsorptionDistance} m",
+      "requiredValue": "Distância de absorção ≥ 1.5-2.0 m após o ponto de injeção de vapor",
+      "remediation": "Otimizar o sistema de injeção de vapor: (1) Distância de absorção: mínimo 1.5 m (preferível 2.0 m) entre o distribuidor de vapor e o próximo componente (bateria, filtro, curva). (2) Distribuidor: tipo multi-tubo com orifícios distribuídos uniformemente pela secção da conduta. (3) Velocidade do ar: 2.5-4.0 m/s na zona de absorção — velocidade muito baixa causa condensação, muito alta arrasta gotículas. (4) Separador de gotas: instalar a jusante da zona de absorção como segurança. (5) Drenagem: tabuleiro com sifão sob a zona de absorção para recolha de condensados. (6) Controlo: sonda de humidade na conduta de insuflação, a > 3 m do ponto de injeção.",
+      "enabled": true,
+      "tags": ["vapor", "humidificação", "injeção", "absorção", "UTA", "RECS"]
+    },
+    {
+      "id": "HVAC-RADIANT-PANEL-SIZING-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS + EN 14240 — Dimensionamento de Painéis Radiantes de Teto",
+      "description": "Os painéis radiantes de teto para arrefecimento foram dimensionados com potência específica ({hvac.radiantPanelPower} W/m²) insuficiente para a carga térmica da zona, resultando em temperatura interior acima do setpoint.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.radiantPanelPower", "operator": "<", "value": 40 },
+        { "field": "hvac.hasRadiantCeilingPanels", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.radiantPanelPower} W/m² de potência radiante",
+      "requiredValue": "40-80 W/m² em arrefecimento, 30-50 W/m² em aquecimento (EN 14240)",
+      "remediation": "Redimensionar ou complementar os painéis radiantes de teto: (1) Potência típica: 40-80 W/m² em arrefecimento (depende de ΔT e coeficiente de emissividade). (2) Cobertura: painéis devem cobrir 60-80% da área do teto para potência máxima. (3) Temperatura da água: 15-18°C para arrefecimento — temperaturas mais baixas aumentam potência mas risco de condensação. (4) Complemento: ventilação por ar novo (DOAS) deve cobrir a carga latente — o painel radiante trata apenas carga sensível. (5) Alternativa: se potência insuficiente, complementar com vigas frias ativas (150-300 W/m) nas zonas perimetrais. (6) Isolamento superior: isolar o dorso do painel para minimizar perdas para o plenum do teto.",
+      "enabled": true,
+      "tags": ["painel radiante", "teto", "EN 14240", "dimensionamento", "RECS"]
+    },
+    {
+      "id": "HVAC-CT-LEGIONELLA-PREV-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / DGS — Prevenção de Legionella em Torres de Arrefecimento AVAC",
+      "description": "A torre de arrefecimento do sistema AVAC não cumpre as medidas mínimas de prevenção de Legionella conforme orientações da DGS e RECS, constituindo risco de saúde pública.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCoolingTowerLegionellaPrevention", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Programa completo de prevenção de Legionella para torres de arrefecimento",
+      "remediation": "Implementar programa de prevenção de Legionella na torre: (1) Tratamento biocida contínuo: cloro 0.5-1.0 mg/L residual ou bromo 1.0-2.0 mg/L. (2) Eliminadores de gotas: eficiência ≥ 99.9%, substituir se danificados. (3) Purga: automática por condutividade (ciclos 5-8). (4) Análise Legionella: trimestral em laboratório acreditado. (5) Limpeza semestral: bacia, enchimento, eliminadores. (6) Registo: manter por 5 anos. (7) Em caso de Legionella > 1000 UFC/L: desinfeção de choque imediata + notificação DGS. (8) Distância mínima de entradas de ar novo: 15-20 m (evitar recaptação de aerossóis).",
+      "enabled": true,
+      "tags": ["Legionella", "torre de arrefecimento", "prevenção", "DGS", "RECS"]
+    },
+    {
+      "id": "HVAC-ASHP-DEFROST-DRAIN-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / Boas Práticas — Drenagem de Descongelação de Bombas de Calor Aerotérmicas",
+      "description": "A bomba de calor aerotérmica exterior não possui sistema adequado de drenagem para a água de descongelação, resultando em acumulação de gelo na base, risco de escorregamento e danos no equipamento.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasDefrostDrain", "operator": "not_exists", "value": null },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "air-source" }
+      ],
+      "requiredValue": "Drenagem de descongelação obrigatória com proteção contra gelo",
+      "remediation": "Instalar sistema de drenagem de descongelação: (1) Tabuleiro de recolha sob a unidade exterior com inclinação ≥ 3%. (2) Tubo de drenagem: DN32 mínimo, isolado termicamente e com cabo de aquecimento (heat trace) para evitar congelação no inverno. (3) Descarga: para ponto de drenagem adequado (nunca sobre passeio público ou zona de passagem). (4) Volume de descongelação: 2-5 litros por ciclo para unidades de 10-20 kW — pode ser significativo em dias frios e húmidos (10-20 ciclos/dia). (5) Base elevada: apoiar unidade em base ≥ 100 mm acima do solo para evitar acumulação de gelo na base. (6) Proteção: grelha de drenagem ou caleira para conduzir água de descongelação para longe da base.",
+      "enabled": true,
+      "tags": ["bomba de calor", "descongelação", "drenagem", "RECS", "aerotérmica"]
+    },
+    {
+      "id": "HVAC-VRF-OIL-TRAP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 378-2 — Sifões de Retorno de Óleo em Tubagem VRF Vertical",
+      "description": "A tubagem frigorífica do sistema VRF com desnível vertical significativo ({hvac.vrfVerticalPipeRise} m) não possui sifões de retorno de óleo (oil traps) conforme instruções do fabricante, comprometendo a lubrificação do compressor.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.vrfVerticalPipeRise", "operator": ">", "value": 10 },
+        { "field": "hvac.hasVRFOilTraps", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVRFSystem", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Desnível vertical: {hvac.vrfVerticalPipeRise} m sem sifões de óleo",
+      "requiredValue": "Sifões de óleo a cada 6-10 m de subida vertical conforme fabricante VRF",
+      "remediation": "Instalar sifões de retorno de óleo na tubagem VRF: (1) Frequência: a cada 6-10 m de subida vertical na linha de aspiração (conforme manual do fabricante — varia entre marcas). (2) Forma: U invertido com profundidade de 100-150 mm, diâmetro igual ao da linha principal. (3) Topo: no topo de cada subida, instalar U invertido para separação de óleo/gás antes do troço horizontal. (4) Dupla subida: para sistemas com grande variação de capacidade (0-100%), instalar tubo secundário de menor diâmetro em paralelo. (5) Retorno de óleo: verificar que o controlador VRF executa ciclos periódicos de equalização de óleo entre compressores. (6) Visor de óleo: instalar no compressor para verificação visual do nível.",
+      "enabled": true,
+      "tags": ["VRF", "retorno de óleo", "sifão", "tubagem", "compressor", "RECS"]
+    },
+    {
+      "id": "HVAC-CONDENSATE-PUMP-ALARM-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Alarme de Transbordo em Bombas de Condensados",
+      "description": "As bombas de condensados das unidades de arrefecimento não possuem sensor de nível alto com alarme e corte automático da unidade, permitindo transbordo em caso de falha da bomba.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasCondensateAlarm", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCondensatePump", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Sensor de nível alto com corte automático em todas as bombas de condensados",
+      "remediation": "Instalar alarme e proteção contra transbordo: (1) Sensor de nível alto: tipo boia magnética ou sensor condutivo no tabuleiro — ativa quando nível atinge 80% da capacidade. (2) Ação: corte automático da unidade de arrefecimento (contacto seco NO para circuito de segurança). (3) Sinalização: LED indicador na unidade + alarme na GTC/BMS. (4) Sensor de água no pavimento: como segunda barreira, instalar sensor de fuga de água sob o tabuleiro de cada FCU/UTA em espaços sensíveis (data centers, museus, salas elétricas). (5) Manutenção: testar o funcionamento do sensor trimestralmente (simular nível alto). (6) Custo-benefício: o custo de um sensor de nível (~20€) é insignificante vs. danos por inundação (milhares de euros).",
+      "enabled": true,
+      "tags": ["condensados", "alarme", "bomba", "transbordo", "RECS"]
+    },
+    {
+      "id": "HVAC-DISP-VENT-SUPPLY-TEMP-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / REHVA Guidebook 23 — Temperatura de Insuflação em Ventilação por Deslocamento",
+      "description": "O sistema de ventilação por deslocamento (displacement ventilation) insufla ar a temperatura excessivamente baixa ({hvac.displacementSupplyTemp}°C), criando desconforto por correntes de ar frio ao nível do pavimento e risco de condensação nos difusores.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.displacementSupplyTemp", "operator": "<", "value": 18 },
+        { "field": "hvac.ventilationStrategy", "operator": "==", "value": "displacement" }
+      ],
+      "currentValueTemplate": "Temperatura de insuflação: {hvac.displacementSupplyTemp}°C",
+      "requiredValue": "Temperatura de insuflação 18-20°C (ΔT máximo de 5-8°C abaixo da temperatura ambiente)",
+      "remediation": "Ajustar temperatura de insuflação do sistema de ventilação por deslocamento: (1) Temperatura de insuflação recomendada: 18-20°C para temperatura ambiente de 24-26°C (ΔT = 4-6°C). (2) Nunca insuflar abaixo de 17°C: risco de condensação no difusor e desconforto nos pés dos ocupantes. (3) Velocidade de insuflação: ≤ 0.3 m/s na zona de ocupação (0.1 m acima do pavimento). (4) Difusores de pavimento/parede: com grande área de descarga para manter velocidade baixa. (5) Controlo de condensação: sonda de ponto de orvalho no difusor com aumento automático da temperatura de água. (6) Para cargas elevadas (> 40 W/m²): complementar com teto radiante em vez de baixar temperatura de insuflação.",
+      "enabled": true,
+      "tags": ["ventilação deslocamento", "temperatura", "insuflação", "conforto", "RECS"]
     }
   ]
 }
