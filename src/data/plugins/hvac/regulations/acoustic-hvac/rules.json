@@ -97,6 +97,102 @@
       "remediation": "Reduzir ruído AVAC em escritórios para NC-40 ou inferior: (1) Silenciadores nas condutas: silenciador dissipativo retangular com 1.2 m de comprimento — atenuação de 15-25 dB(A). (2) Difusores de baixo ruído: velocidade no pescoço ≤ 2.5 m/s. (3) Plenum acústico: caixa de distribuição com revestimento absorvente. (4) Para escritórios privados/salas de reunião: NC-35 ou inferior — considerar difusores lineares de baixa velocidade. (5) Verificar ruído regenerado: curvas, derivações, registos de regulação geram ruído que pode anular a atenuação dos silenciadores.",
       "enabled": true,
       "tags": ["ruído", "NC", "escritório", "conforto", "silenciador"]
+    },
+    {
+      "id": "HVAC-NOISE-SPLIT-EXT-01",
+      "regulationId": "acoustic-hvac",
+      "article": "DL 9/2007 (RGR) / EN 12102 — Ruído de Unidades Exteriores Split/VRF",
+      "description": "O nível de potência sonora da unidade exterior split/VRF ({hvac.splitOutdoorNoiseLw} dB(A) Lw) excede o valor que garante conformidade com os limites de exposição do RGR na fachada do recetor mais próximo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.splitOutdoorNoiseLw", "operator": ">", "value": 65 },
+        { "field": "hvac.hasOutdoorUnit", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.splitOutdoorNoiseLw} dB(A) Lw",
+      "requiredValue": "Lw ≤ 65 dB(A) para conformidade típica em zona mista (distância > 3 m)",
+      "remediation": "Reduzir o ruído da unidade exterior: (1) Selecionar unidade com modo silencioso (night mode) — redução de 3-6 dB. (2) Instalar clausura acústica com material absorvente interior (lã mineral 50 mm). (3) Orientar a descarga do condensador para longe das janelas dos vizinhos. (4) Base anti-vibrátil para eliminar transmissão estrutural. (5) Para múltiplas unidades: agrupar e tratar acusticamente. (6) Verificar conformidade com RGR: calcular Lp na fachada do recetor = Lw - 10×log(4πr²) + correcções de reflexão, e comparar com limites de zona (55 dB(A) diurno zona mista, 45 dB(A) noturno).",
+      "enabled": true,
+      "tags": ["ruído", "split", "unidade exterior", "RGR", "VRF"]
+    },
+    {
+      "id": "HVAC-NOISE-ASHP-01",
+      "regulationId": "acoustic-hvac",
+      "article": "DL 9/2007 (RGR) / EN 12102 — Ruído de Bombas de Calor Aerotérmicas",
+      "description": "A bomba de calor aerotérmica (air source heat pump) emite um nível de potência sonora ({hvac.ashpNoiseLw} dB(A) Lw) que excede o valor compatível com os limites de exposição do RGR para recetores sensíveis vizinhos, especialmente no modo de aquecimento noturno.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ashpNoiseLw", "operator": ">", "value": 62 },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "air-source" }
+      ],
+      "currentValueTemplate": "{hvac.ashpNoiseLw} dB(A) Lw",
+      "requiredValue": "Lw ≤ 62 dB(A) para conformidade em zona mista (distância > 3 m ao recetor)",
+      "remediation": "Reduzir ruído da bomba de calor aerotérmica: (1) Selecionar modelo com modo silencioso noturno: redução de 3-8 dB(A) por limitação de velocidade do ventilador e compressor. (2) Clausura acústica: barreira em 3 lados com material absorvente interior — atenuação de 8-12 dB(A). (3) Posicionamento: distância máxima ao vizinho mais próximo, descarga de ar para longe de fachadas residenciais. (4) Base anti-vibrátil: amortecedores de borracha ou mola para eliminar transmissão estrutural. (5) Compressor inverter: funcionamento a velocidade reduzida durante a noite (reduz emissão em 4-6 dB vs. arranque/paragem). (6) Verificação conforme EN 12102: medir Lw em condições de ensaio normalizadas.",
+      "enabled": true,
+      "tags": ["ruído", "bomba de calor", "aerotérmica", "RGR", "EN 12102"]
+    },
+    {
+      "id": "HVAC-NOISE-FCU-01",
+      "regulationId": "acoustic-hvac",
+      "article": "EN 16032 / BS 8233 — Ruído de Ventiloconvectores (Fan Coil Units)",
+      "description": "O nível de ruído do ventiloconvector ({hvac.fcuNoiseLevel} dB(A)) excede o critério de conforto acústico para o tipo de espaço onde está instalado. Ventiloconvectores são uma das principais fontes de ruído AVAC em escritórios e quartos de hotel.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.fcuNoiseLevel", "operator": ">", "value": 35 },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "hotel-room", "hospital"] }
+      ],
+      "currentValueTemplate": "{hvac.fcuNoiseLevel} dB(A) @ velocidade média",
+      "requiredValue": "≤ 35 dB(A) escritórios, ≤ 30 dB(A) quartos hotel, ≤ 25 dB(A) quartos hospital",
+      "remediation": "Reduzir ruído de ventiloconvectores: (1) Sobredimensionar: selecionar FCU com potência nominal 20-30% superior à carga — permite funcionamento na velocidade baixa (redução de 6-10 dB(A)). (2) Ventilador EC (Electronically Commutated): 3-5 dB(A) mais silencioso que motores AC convencionais. (3) Isolamento acústico: invólucro com espuma acústica interior (mínimo 25 mm). (4) Ligações flexíveis: condutas flexíveis com atenuação acústica entre o FCU e os difusores. (5) Posicionamento: evitar instalação sobre ou adjacente a zonas de trabalho concentrado. (6) Catálogo: exigir dados de ruído em NC/NR para as 3 velocidades conforme EN 16430.",
+      "enabled": true,
+      "tags": ["ruído", "ventiloconvector", "fan coil", "EN 16032", "conforto"]
+    },
+    {
+      "id": "HVAC-NOISE-ATTENUATOR-01",
+      "regulationId": "acoustic-hvac",
+      "article": "EN 12599 / ASHRAE — Atenuadores Acústicos em Condutas AVAC",
+      "description": "O sistema de condutas AVAC não possui atenuadores acústicos (silenciadores) adequados, resultando em transmissão de ruído do ventilador através das condutas para os espaços ocupados.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasDuctAttenuators", "operator": "not_exists", "value": null },
+        { "field": "hvac.mainDuctVelocity", "operator": ">", "value": 6 },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "classroom", "hospital", "hotel-room"] }
+      ],
+      "requiredValue": "Atenuadores acústicos obrigatórios em condutas que servem espaços sensíveis",
+      "remediation": "Instalar atenuadores acústicos nas condutas AVAC: (1) Tipo dissipativo (splitter): para frequências médias-altas (250-4000 Hz), comprimento 0.6-1.5 m, atenuação 10-25 dB(A). (2) Tipo cilíndrico: para condutas circulares, inserção no interior da conduta. (3) Posicionamento: a jusante do ventilador (insuflação) e a montante do ventilador (retorno/extração). (4) Dimensionamento: velocidade no atenuador ≤ 8 m/s para evitar ruído auto-gerado, perda de carga ≤ 50 Pa. (5) Material absorvente: lã mineral revestida com véu anti-erosão. (6) Para baixa frequência (< 250 Hz): considerar câmara plenum revestida ou atenuador reativo.",
+      "enabled": true,
+      "tags": ["ruído", "atenuador acústico", "silenciador", "conduta", "EN 12599"]
+    },
+    {
+      "id": "HVAC-NOISE-ASHP-NIGHT-01",
+      "regulationId": "acoustic-hvac",
+      "article": "DL 9/2007 (RGR) Art. 13.º — Ruído Noturno de Bombas de Calor Aerotérmicas",
+      "description": "A bomba de calor aerotérmica não possui modo silencioso noturno ativado, excedendo o limite noturno de exposição de 45 dB(A) LAeq em zona mista conforme DL 9/2007.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.ashpNoiseNightDb", "operator": ">", "value": 45 },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "air-source" }
+      ],
+      "currentValueTemplate": "{hvac.ashpNoiseNightDb} dB(A) LAeq noturno",
+      "requiredValue": "≤ 45 dB(A) LAeq noturno em zona mista, ≤ 35 dB(A) em zona sensível",
+      "remediation": "Configurar modo silencioso noturno na bomba de calor: (1) Programação horária: ativar modo silencioso das 23h às 07h — limita rotação do compressor e ventilador (redução típica de 3-8 dB). (2) Aceitar penalização de potência: no modo silencioso, a potência disponível reduz-se em 20-40% — compensar com acumulação térmica (depósito de inércia carregado durante o dia). (3) Buffer térmico: depósito de 50-100 L por kW permite funcionamento intermitente reduzido durante a noite. (4) Se insuficiente: instalar clausura acústica ou barreira anti-ruído. (5) Verificar componente tonal: tons puros do compressor penalizados em +3 dB conforme RGR.",
+      "enabled": true,
+      "tags": ["ruído", "bomba de calor", "noturno", "RGR", "modo silencioso"]
+    },
+    {
+      "id": "HVAC-NOISE-ATTENUATOR-REGEN-01",
+      "regulationId": "acoustic-hvac",
+      "article": "ASHRAE / CIBSE — Ruído Regenerado em Acessórios de Condutas",
+      "description": "O ruído regenerado em acessórios de condutas (curvas, derivações, registos) excede o ruído atenuado pelos silenciadores, anulando a eficácia dos atenuadores acústicos instalados a montante.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasDuctAttenuators", "operator": "exists", "value": null },
+        { "field": "hvac.mainDuctVelocity", "operator": ">", "value": 10 }
+      ],
+      "currentValueTemplate": "Velocidade na conduta: {hvac.mainDuctVelocity} m/s",
+      "requiredValue": "Velocidade ≤ 6 m/s em ramais junto a espaços sensíveis para minimizar ruído regenerado",
+      "remediation": "Controlar ruído regenerado nos acessórios de condutas: (1) Velocidade do ar: ≤ 5 m/s em condutas junto a espaços sensíveis, ≤ 8 m/s em condutas principais. (2) Curvas: instalar deflectores (turning vanes) — reduzem ruído e perda de carga. (3) Registos de regulação: posicionar a > 3 m de distância dos difusores. (4) Derivações: evitar derivações em T com mudança brusca de secção. (5) Difusores: selecionar para velocidade no pescoço ≤ 2.5 m/s. (6) Posicionar atenuadores acústicos a jusante de todos os acessórios ruidosos, não apenas junto ao ventilador.",
+      "enabled": true,
+      "tags": ["ruído", "regenerado", "acessórios", "conduta", "velocidade"]
     }
   ]
 }

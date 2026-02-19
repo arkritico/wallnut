@@ -1943,6 +1943,290 @@
       "remediation": "Ajustar temperatura de insuflação do sistema de ventilação por deslocamento: (1) Temperatura de insuflação recomendada: 18-20°C para temperatura ambiente de 24-26°C (ΔT = 4-6°C). (2) Nunca insuflar abaixo de 17°C: risco de condensação no difusor e desconforto nos pés dos ocupantes. (3) Velocidade de insuflação: ≤ 0.3 m/s na zona de ocupação (0.1 m acima do pavimento). (4) Difusores de pavimento/parede: com grande área de descarga para manter velocidade baixa. (5) Controlo de condensação: sonda de ponto de orvalho no difusor com aumento automático da temperatura de água. (6) Para cargas elevadas (> 40 W/m²): complementar com teto radiante em vez de baixar temperatura de insuflação.",
       "enabled": true,
       "tags": ["ventilação deslocamento", "temperatura", "insuflação", "conforto", "RECS"]
+    },
+    {
+      "id": "HVAC-THERMAL-COMFORT-MON-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 16798-1 — Sistema de Monitorização de Conforto Térmico",
+      "description": "O edifício de comércio e serviços não dispõe de sistema de monitorização contínua de conforto térmico (temperatura operativa, humidade relativa) integrado com o BMS, impedindo a verificação em tempo real do cumprimento dos critérios da EN 16798-1.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasThermalComfortMonitoring", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "requiredValue": "Monitorização contínua de temperatura e humidade em zonas representativas integrada no BMS",
+      "remediation": "Instalar sistema de monitorização de conforto térmico: (1) Sondas combinadas temperatura + humidade em cada zona térmica (mínimo 1 por 100 m²). (2) Posicionamento: a 1.1 m de altura (posição sentada), afastadas de fontes de calor, janelas e difusores (≥ 1 m). (3) Precisão: ±0.3°C para temperatura, ±2% para HR. (4) Integração BMS: registo a cada 15 minutos com cálculo de PMV/PPD ou percentagem de horas fora da gama de conforto. (5) Dashboard: visualização em tempo real e histórico com alertas quando T fora de 20-26°C ou HR fora de 30-70%. (6) Relatórios mensais para o gestor de edifício com análise de conformidade EN 16798-1.",
+      "enabled": true,
+      "tags": ["conforto térmico", "monitorização", "BMS", "EN 16798", "RECS"]
+    },
+    {
+      "id": "HVAC-THERMAL-COMFORT-PMV-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / ISO 7730 — Cálculo de Índice PMV/PPD para Conforto Térmico",
+      "description": "O sistema de gestão técnica do edifício não calcula os índices de conforto térmico PMV (Predicted Mean Vote) e PPD (Predicted Percentage Dissatisfied) conforme ISO 7730, limitando-se ao controlo de temperatura seca sem considerar temperatura radiante, velocidade do ar e metabolismo dos ocupantes.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasPMVCalculation", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasBACS", "operator": "exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "PMV entre -0.5 e +0.5 (PPD < 10%) para Categoria II (EN 16798-1)",
+      "remediation": "Implementar cálculo de PMV/PPD no sistema BMS: (1) Variáveis necessárias: temperatura do ar (sonda existente), temperatura radiante média (sonda de globo negro ou cálculo a partir de temperaturas de superfícies), velocidade do ar (medição pontual ou valor padrão 0.1-0.15 m/s), humidade relativa. (2) Parâmetros estimados: metabolismo (1.2 met para escritório), resistência do vestuário (0.5 clo verão, 1.0 clo inverno). (3) Cálculo: algoritmo ISO 7730 programado no controlador BMS. (4) Critérios: PMV entre -0.5 e +0.5 (Categoria II), PPD < 10%. (5) Ajuste automático de setpoints: o BMS modifica setpoints de temperatura e velocidade do ar para otimizar PMV.",
+      "enabled": true,
+      "tags": ["conforto térmico", "PMV", "PPD", "ISO 7730", "BMS", "RECS"]
+    },
+    {
+      "id": "HVAC-IAQ-SENSOR-PLACEMENT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / Portaria 353-A/2013 — Posicionamento de Sensores de Qualidade do Ar Interior",
+      "description": "Os sensores de qualidade do ar interior (CO₂, PM2.5, TVOC) não estão posicionados conforme as recomendações técnicas, resultando em leituras não representativas da zona de respiração dos ocupantes e controlo de ventilação inadequado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasIAQSensorPlacementVerified", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasAirQualityControl", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Sensores QAI posicionados na zona de respiração (1.1-1.7 m), afastados de fontes e fluxos de ar",
+      "remediation": "Verificar e corrigir posicionamento dos sensores de QAI: (1) Altura: 1.1-1.7 m (zona de respiração — sentado a de pé). (2) Afastamento: ≥ 1.5 m de janelas, portas e difusores de ar (evitar leitura diluída pelo ar novo). (3) Afastamento de fontes: ≥ 2 m de fotocopiadoras, impressoras, cozinhas (evitar leitura contaminada). (4) Localização: zona de retorno de ar da sala (representativa da mistura de ar do espaço). (5) Quantidade: mínimo 1 sonda de CO₂ por zona de ventilação (cada registo de ar novo). (6) Para DCV: sonda no canal de retorno da UTA + sonda de referência no espaço para validação cruzada. (7) Calibração: anual para CO₂ (NDIR), semestral para TVOC e PM.",
+      "enabled": true,
+      "tags": ["QAI", "sensores", "posicionamento", "CO₂", "PM2.5", "TVOC", "RECS"]
+    },
+    {
+      "id": "HVAC-IAQ-MULTI-SENSOR-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / Portaria 353-A/2013 — Estação Multi-sensor de QAI",
+      "description": "O edifício de comércio e serviços com área > 1000 m² não dispõe de estações multi-sensor de qualidade do ar interior que monitorizem simultaneamente CO₂, PM2.5, TVOC, temperatura e humidade, conforme recomendado para verificação contínua dos parâmetros da Portaria 353-A/2013.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasMultiSensorIAQ", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "requiredValue": "Estações multi-sensor (CO₂, PM2.5, TVOC, T, HR) em zonas representativas para áreas > 1000 m²",
+      "remediation": "Instalar estações multi-sensor de QAI: (1) Parâmetros monitorizados: CO₂ (NDIR, ±50 ppm), PM2.5 (laser scatter, ±10 µg/m³), TVOC (PID ou MOX, indicativo), temperatura (±0.3°C), humidade relativa (±2%). (2) Quantidade: 1 estação por 200-500 m² ou por zona de ventilação. (3) Comunicação: BACnet/IP, Modbus TCP ou LoRaWAN para integração no BMS. (4) Display local: ecrã com indicação colorida do nível de qualidade do ar (verde/amarelo/vermelho) para sensibilização dos ocupantes. (5) Limites de alarme conforme Portaria 353-A: CO₂ > 1250 ppm, PM2.5 > 25 µg/m³, TVOC > 600 µg/m³. (6) Dados para relatório QAI nas auditorias periódicas SCE.",
+      "enabled": true,
+      "tags": ["QAI", "multi-sensor", "monitorização", "Portaria 353-A", "BMS", "RECS"]
+    },
+    {
+      "id": "HVAC-PRESSURIZATION-CTRL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / ASHRAE 62.1 — Controlo de Pressurização do Edifício",
+      "description": "O edifício de comércio e serviços não possui controlo ativo de pressurização, resultando em infiltrações descontroladas de ar exterior não tratado que comprometem a qualidade do ar interior e a eficiência energética do sistema AVAC.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasBuildingPressurizationControl", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "requiredValue": "Pressão diferencial positiva de 5-25 Pa em relação ao exterior durante ocupação",
+      "remediation": "Implementar controlo de pressurização do edifício: (1) Objetivo: manter pressão interior 5-25 Pa acima do exterior para evitar infiltrações de ar não tratado, humidade e poluentes. (2) Medição: instalar sensor de pressão diferencial entre interior e exterior (resolução ±1 Pa). (3) Controlo: modular o caudal de ar novo vs. extração para manter diferencial positivo. Em sistemas com ventiladores de insuflação e extração independentes, ajustar a velocidade relativa. (4) Registo de ar novo: posição mínima para garantir pressão positiva. (5) Limites: não exceder 25 Pa (dificuldade de abertura de portas). (6) Exceções: laboratórios, cozinhas e WC em depressão relativa ao edifício (mas edifício em sobrepressão ao exterior).",
+      "enabled": true,
+      "tags": ["pressurização", "infiltrações", "QAI", "eficiência energética", "RECS"]
+    },
+    {
+      "id": "HVAC-THERMAL-COMFORT-DRAUGHT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 16798-1 — Monitorização de Risco de Corrente de Ar (Draught Rate)",
+      "description": "O sistema AVAC não monitoriza a velocidade do ar na zona de ocupação, impossibilitando a verificação do risco de corrente de ar frio (draught rate > 15%) que causa desconforto localizado.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasDraughtRateMonitoring", "operator": "not_exists", "value": null },
+        { "field": "hvac.ventilationStrategy", "operator": "in", "value": ["mixing", "displacement", "underfloor"] },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["office", "hospital", "classroom"] }
+      ],
+      "requiredValue": "Draught rate < 15% (Cat. II) — velocidade do ar < 0.2 m/s na zona de ocupação a 20°C",
+      "remediation": "Monitorizar e controlar o risco de corrente de ar: (1) Medição: anemómetro omnidirecional a 0.1 m, 0.6 m e 1.1 m de altura — campanha de medição trimestral. (2) Cálculo de Draught Rate (DR): DR = (34 - T) × (v - 0.05)^0.62 × (0.37 × v × Tu + 3.14) [%], onde T = temp ar local, v = velocidade média, Tu = intensidade turbulenta. (3) Critério: DR < 15% para Categoria II (EN 16798-1). (4) Correção: reduzir velocidade nos difusores, aumentar temperatura de insuflação, redirecionar jato de ar para o teto (efeito Coanda). (5) Para ventilação por deslocamento: monitorizar velocidade ao nível dos tornozelos (0.1 m) — ≤ 0.15 m/s.",
+      "enabled": true,
+      "tags": ["conforto térmico", "draught", "velocidade do ar", "EN 16798", "RECS"]
+    },
+    {
+      "id": "HVAC-ABSORPTION-CHILLER-SPEC-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 14511 — Especificações de Chillers de Absorção",
+      "description": "O projeto de AVAC com chiller de absorção não especifica o COP mínimo de 0.7 (simples efeito) ou 1.2 (duplo efeito), nem verifica a compatibilidade com a fonte de calor disponível (água quente, vapor ou gás direto), comprometendo a eficiência energética global do sistema.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.absorptionChillerCOP", "operator": "<", "value": 0.7 },
+        { "field": "hvac.chillerType", "operator": "==", "value": "absorption" }
+      ],
+      "currentValueTemplate": "COP do chiller de absorção: {hvac.absorptionChillerCOP}",
+      "requiredValue": "COP ≥ 0.7 (simples efeito LiBr/H₂O) ou COP ≥ 1.2 (duplo efeito)",
+      "remediation": "Verificar e especificar corretamente o chiller de absorção: (1) Simples efeito (LiBr/H₂O): COP 0.7-0.8, fonte de calor 80-95°C (ideal para solar térmico ou recuperação de calor). (2) Duplo efeito: COP 1.2-1.4, fonte de calor 140-180°C (vapor ou queima direta). (3) Triplo efeito: COP 1.6-1.8, fonte de calor > 200°C. (4) Dimensionar torre de arrefecimento: rejeição de calor = Qfrio × (1 + 1/COP). (5) Verificar cristalização: manter temperatura de entrada da água de arrefecimento > 24°C. (6) Compatibilidade com RECS: preferencial quando associado a fontes de calor renováveis ou recuperação de calor residual.",
+      "enabled": true,
+      "tags": ["absorção", "chiller", "COP", "LiBr", "eficiência", "RECS"]
+    },
+    {
+      "id": "HVAC-HEAT-PIPE-HX-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 308 — Permutadores de Calor de Heat Pipes",
+      "description": "O sistema de recuperação de calor não considera permutadores de heat pipes como alternativa para recuperação ar-ar em situações onde a contaminação cruzada é proibida (laboratórios, hospitais, cozinhas), apesar de oferecerem eficácia de 50-65% sem partes móveis.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasHeatPipeHXAssessment", "operator": "not_exists", "value": null },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["hospital", "laboratory", "commercial-kitchen", "cleanroom"] },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "requiredValue": "Avaliação de heat pipe HX recomendada para espaços com requisito de zero contaminação cruzada",
+      "remediation": "Avaliar permutadores de heat pipes para recuperação de calor: (1) Princípio: tubos selados com fluido bifásico (R134a, água) — evaporação no lado quente, condensação no lado frio. (2) Eficácia: 50-65% (sensível apenas, sem transferência de humidade). (3) Vantagem: zero contaminação cruzada entre correntes de ar (sem partes móveis, sem fugas). (4) Aplicações ideais: hospitais (blocos operatórios, isolamento), laboratórios (fugas químicas), cozinhas (gorduras). (5) Manutenção: reduzida — sem motores, correias ou rolamentos. (6) Limitação: eficácia inferior a rodas térmicas, não recupera calor latente. (7) Inclinação: 2-5° para facilitar o retorno do condensado por gravidade.",
+      "enabled": true,
+      "tags": ["heat pipe", "recuperação", "permutador", "contaminação cruzada", "RECS"]
+    },
+    {
+      "id": "HVAC-THERMAL-WHEEL-EFF-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 308 — Eficiência de Rodas Térmicas (Rotary Heat Exchangers)",
+      "description": "A roda térmica do sistema de recuperação de calor apresenta eficiência total ({hvac.thermalWheelEfficiency}%) inferior ao mínimo de 73% exigido pelo Regulamento Ecodesign EU 1253/2014 para unidades de ventilação, indicando desgaste ou ajuste inadequado.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.thermalWheelEfficiency", "operator": "<", "value": 73 },
+        { "field": "hvac.heatRecoveryType", "operator": "==", "value": "thermal-wheel" }
+      ],
+      "currentValueTemplate": "Eficiência da roda térmica: {hvac.thermalWheelEfficiency}%",
+      "requiredValue": "≥ 73% eficiência total (Ecodesign EU 1253/2014) — rodas higroscópicas: ≥ 80% total",
+      "remediation": "Verificar e melhorar a eficiência da roda térmica: (1) Velocidade de rotação: ajustar entre 10-20 rpm para maximizar eficiência (demasiado lenta: baixa transferência; demasiado rápida: arrasto excessivo). (2) Vedações: verificar vedações radiais e axiais — substituir se desgastadas (fuga de ar > 5% reduz eficiência significativamente). (3) Limpeza: aspirar e lavar o rotor semestralmente — acumulação de poeira reduz eficiência em 5-15%. (4) Sector de purga: ajustar para 5-10° — demasiado grande reduz eficiência, demasiado pequeno permite contaminação cruzada. (5) Tipo de rotor: sensível (alumínio) 65-75%, entálpico/higroscópico (silica gel, zeólito) 75-85% eficiência total. (6) Bypass: prever damper de bypass para free-cooling quando Text < Tint.",
+      "enabled": true,
+      "tags": ["roda térmica", "recuperação", "eficiência", "Ecodesign", "RECS"]
+    },
+    {
+      "id": "HVAC-EVAP-COOLING-SYS-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / REHVA — Sistemas de Arrefecimento Evaporativo",
+      "description": "O projeto AVAC em zona climática quente e seca não avaliou a integração de arrefecimento evaporativo direto ou indireto como estratégia de redução de consumo energético, apesar do potencial significativo de poupança (30-60% vs. arrefecimento mecânico) quando a depressão de bolbo húmido supera 8°C.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasEvaporativeCoolingAssessment", "operator": "not_exists", "value": null },
+        { "field": "hvac.climateZone", "operator": "in", "value": ["I2", "I3", "V2", "V3"] },
+        { "field": "hvac.installedCoolingPower", "operator": ">=", "value": 30 }
+      ],
+      "requiredValue": "Avaliação de arrefecimento evaporativo obrigatória em zonas climáticas quentes secas",
+      "remediation": "Avaliar arrefecimento evaporativo: (1) Direto (DEC): painéis húmidos ou spray no fluxo de ar — reduz temperatura em 70-90% da depressão de bolbo húmido. Adequado para espaços industriais e armazéns. (2) Indireto (IEC): permutador ar-ar com pulverização no lado secundário — sem adição de humidade ao ar de insuflação. (3) Regenerativo (Maisotsenko): combina IEC com pré-arrefecimento do ar de trabalho — pode atingir temperaturas abaixo do bolbo húmido. (4) Condensador adiabático: spray na bateria do condensador de VRF/chiller — reduz Tcondensação em 5-10°C, melhora COP 15-25%. (5) Controlo de Legionella: obrigatório em sistemas com recirculação de água — tratamento UV-C ou biocida. (6) Consumo de água: 2-4 L/kWh frio evitado.",
+      "enabled": true,
+      "tags": ["arrefecimento evaporativo", "clima seco", "eficiência", "RECS", "poupança"]
+    },
+    {
+      "id": "HVAC-MIXED-MODE-CTRL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 16798-1 — Controlo de Ventilação em Modo Misto",
+      "description": "O edifício com estratégia de ventilação mista (natural + mecânica) não possui sistema de controlo integrado que coordene a abertura de janelas com o funcionamento do sistema AVAC, resultando em desperdício energético quando ambos funcionam simultaneamente.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasMixedModeControl", "operator": "not_exists", "value": null },
+        { "field": "hvac.ventilationStrategy", "operator": "==", "value": "mixed-mode" }
+      ],
+      "requiredValue": "Controlo integrado janelas/AVAC obrigatório em edifícios de modo misto",
+      "remediation": "Implementar controlo de ventilação em modo misto: (1) Sensores de abertura de janela: contactos magnéticos em todas as janelas operáveis. (2) Lógica de controlo: desligar AVAC da zona quando ≥ 1 janela aberta E Text entre 18-26°C E HR < 70%. (3) Estação meteorológica: medir Text, HR, velocidade do vento, chuva. (4) Changeover automático: natural → mecânico quando Text > 26°C ou < 18°C ou CO₂ > 800 ppm. (5) Interface com GTC: registo de horas em cada modo para análise energética. (6) Indicação ao ocupante: semáforo verde (abrir janelas) / vermelho (fechar janelas, AVAC ativo). (7) Override: possibilidade de forçar modo mecânico para eventos especiais.",
+      "enabled": true,
+      "tags": ["modo misto", "ventilação", "janelas", "controlo", "RECS"]
+    },
+    {
+      "id": "HVAC-HYDRONIC-BAL-VALVE-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / CIBSE Guide B1 — Válvulas de Equilíbrio Hidráulico",
+      "description": "O sistema hidráulico AVAC não possui válvulas de equilíbrio independentes da pressão (PICV) ou válvulas de equilíbrio estáticas nos ramais, resultando em desequilíbrio de caudais superior a ±10% entre terminais, comprometendo o conforto e a eficiência.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasHydronicBalancingValves", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasPipework", "operator": "exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 25 }
+      ],
+      "requiredValue": "Válvulas de equilíbrio em todos os ramais — desvio máximo ±10% do caudal de projeto",
+      "remediation": "Instalar válvulas de equilíbrio hidráulico: (1) PICV (Pressure Independent Control Valves): recomendadas para sistemas de caudal variável — combinam válvula de equilíbrio, regulador de pressão diferencial e válvula de controlo num só corpo. (2) Estáticas (manuais): adequadas para circuitos de caudal constante — tipo Venturi com tomadas de pressão para medição. (3) Dinâmicas (automáticas): mantêm ΔP constante independentemente da variação de pressão na rede. (4) Localização: em cada ramal de distribuição, antes de cada bateria de UTA e em cada anel de distribuição. (5) Procedimento de equilíbrio: método proporcional (CIBSE) — ajustar todas as válvulas para o mesmo % de abertura relativa ao caudal de projeto. (6) Verificação: caudal medido dentro de ±10% do caudal de projeto.",
+      "enabled": true,
+      "tags": ["equilíbrio hidráulico", "PICV", "válvulas", "caudal", "RECS"]
+    },
+    {
+      "id": "HVAC-EXPANSION-VESSEL-SIZING-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 13831 — Dimensionamento de Vasos de Expansão",
+      "description": "O vaso de expansão do circuito hidráulico AVAC está subdimensionado — o volume útil ({hvac.expansionVesselVolume} L) é inferior ao necessário para absorver a dilatação térmica do volume total de água no circuito, arriscando abertura frequente da válvula de segurança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.expansionVesselVolume", "operator": "computed_lt", "value": "hvac.requiredExpansionVolume" },
+        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Volume do vaso: {hvac.expansionVesselVolume} L (necessário: {hvac.requiredExpansionVolume} L)",
+      "requiredValue": "Volume útil ≥ volume de expansão + reserva de 20%",
+      "remediation": "Dimensionar corretamente o vaso de expansão: (1) Volume de expansão: Ve = Vtotal × β × ΔT, onde Vtotal = volume total de água no circuito (tubagem + equipamentos), β = coeficiente de dilatação volumétrica da água (0.00021/°C a 50°C), ΔT = diferença entre temperatura de enchimento e temperatura máxima de operação. (2) Pressão de pré-carga (azoto): P0 = pressão estática no ponto mais alto + 0.3 bar. (3) Volume do vaso: Vvaso = Ve × (Pfinal + 1) / (Pfinal - P0), onde Pfinal = pressão de disparo da válvula de segurança - 0.5 bar. (4) Reserva: adicionar 20% ao volume calculado. (5) Verificação anual: medir pré-carga com o circuito despressurizado. (6) EN 13831: vasos > 0.5 bar·L sujeitos a marcação CE (PED).",
+      "enabled": true,
+      "tags": ["vaso de expansão", "dimensionamento", "pressão", "EN 13831", "RECS"]
+    },
+    {
+      "id": "HVAC-AIR-CURTAIN-SPEC-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 16798-1 — Especificações de Cortinas de Ar",
+      "description": "O edifício comercial com portas de entrada de utilização frequente (> 20 aberturas/hora) não possui cortina de ar ou vestíbulo, permitindo infiltrações significativas que aumentam as cargas térmicas e comprometem o conforto na zona de entrada.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasAirCurtain", "operator": "not_exists", "value": null },
+        { "field": "hvac.entranceDoorOpeningsPerHour", "operator": ">", "value": 20 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "requiredValue": "Cortina de ar ou vestíbulo obrigatório para portas com > 20 aberturas/hora em edifícios climatizados",
+      "remediation": "Instalar cortina de ar na entrada principal: (1) Velocidade de descarga: 6-10 m/s para portas até 2.5 m de altura, 10-14 m/s para portas até 3.5 m. (2) Largura do jato: cobrir 100% da largura da porta + 100 mm de cada lado. (3) Tipo: não aquecida (climas amenos), aquecida a água quente (preferencial) ou elétrica (último recurso). (4) Montagem: horizontal sobre a porta (descendente) — preferencial para alturas ≤ 3 m. Vertical lateral para portas maiores. (5) Controlo: interruptor de porta (contacto magnético) — a cortina liga quando a porta abre e desliga 30 s após fecho. (6) Eficiência: cortina de ar bem instalada reduz infiltrações em 60-80%. (7) EN 16798-1: as infiltrações devem ser incluídas no cálculo de cargas térmicas.",
+      "enabled": true,
+      "tags": ["cortina de ar", "entrada", "infiltração", "comercial", "RECS"]
+    },
+    {
+      "id": "HVAC-DESTRATIFICATION-FAN-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS — Ventiladores de Destratificação em Espaços de Pé-Direito Elevado",
+      "description": "O espaço de pé-direito elevado (> 4 m) com aquecimento ativo não possui ventiladores de destratificação, resultando em estratificação de temperatura com diferenças superiores a 1°C/m de altura e desperdício energético por sobreaquecimento da zona superior não ocupada.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasDestratificationFans", "operator": "not_exists", "value": null },
+        { "field": "hvac.ceilingHeight", "operator": ">", "value": 4 },
+        { "field": "hvac.hasHeating", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Ventiladores de destratificação obrigatórios em espaços com pé-direito > 4 m e aquecimento",
+      "remediation": "Instalar ventiladores de destratificação: (1) Tipo HVLS (High Volume Low Speed): diâmetro 2.4-7.3 m, para espaços > 6 m de pé-direito. Velocidade 1-3 m/s, caudal 50.000-350.000 m³/h por ventilador. (2) Tipo jato axial (destratificadores): para pé-direito 4-8 m, montados no teto, jato descendente a 45°. Espaçamento: 1 por cada 150-250 m² dependendo do pé-direito. (3) Controlo: sonda de temperatura diferencial (teto vs. 1.5 m) — ligar quando ΔT > 2°C. (4) Poupança: redução de 20-30% no consumo de aquecimento por eliminação da estratificação. (5) Modo verão: rotação inversa (ascendente) para efeito de brisa sem arrefecimento real. (6) Ruído: ≤ 40 dB(A) na zona de ocupação.",
+      "enabled": true,
+      "tags": ["destratificação", "HVLS", "pé-direito", "aquecimento", "RECS"]
+    },
+    {
+      "id": "HVAC-REFRIG-LEAK-DETECT-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 378-3 / F-Gas — Deteção de Fugas de Refrigerante",
+      "description": "O sistema de refrigeração com carga de refrigerante superior a 3 kg (ou 5 tCO₂eq) não possui sistema de deteção de fugas automático com alarme e corte, conforme exigido pelo Regulamento F-Gas (EU 517/2014) e EN 378-3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasRefrigerantLeakDetection", "operator": "not_exists", "value": null },
+        { "field": "hvac.refrigerantCharge", "operator": ">", "value": 3 }
+      ],
+      "requiredValue": "Deteção de fugas automática obrigatória para cargas > 3 kg (ou > 5 tCO₂eq F-Gas)",
+      "remediation": "Instalar sistema de deteção de fugas de refrigerante: (1) Sensores: infravermelho (NDIR) ou semicondutor, calibrados para o refrigerante específico (R410A, R32, R290, etc.). (2) Localização: junto ao solo para refrigerantes mais pesados que o ar (R410A, R134a), ao nível do teto para R32 (ligeiramente inflamável, mais leve). (3) Limiar de alarme: 25% do LFL para refrigerantes inflamáveis (A2L, A3), ou TLV-TWA para refrigerantes tóxicos (B1). (4) Ações automáticas: alarme sonoro + visual, ventilação de emergência, corte de fontes de ignição (A2L/A3). (5) Frequência de verificação F-Gas: anual (5-50 tCO₂eq), semestral (50-500 tCO₂eq), trimestral (> 500 tCO₂eq). (6) Registo: todas as inspeções e fugas detetadas devem ser registadas no registo F-Gas do equipamento.",
+      "enabled": true,
+      "tags": ["deteção fugas", "refrigerante", "F-Gas", "EN 378", "RECS"]
+    },
+    {
+      "id": "HVAC-DUCT-PRESSURE-CLASS-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EN 1507 + EN 12237 — Classe de Pressão de Condutas",
+      "description": "As condutas AVAC não estão especificadas com a classe de pressão adequada conforme EN 1507 (condutas retangulares) ou EN 12237 (condutas circulares), podendo resultar em deformação, fugas excessivas e ruído de vibração das paredes da conduta.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasDuctPressureClassSpec", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Classe de pressão das condutas especificada conforme EN 1507/EN 12237 e classe de estanquidade conforme EN 16798-3",
+      "remediation": "Especificar classe de pressão das condutas: (1) EN 1507 (retangulares): Classe 1 (≤ 500 Pa), Classe 2 (500-1000 Pa), Classe 3 (1000-2000 Pa), Classe 4 (> 2000 Pa). (2) EN 12237 (circulares): diâmetro e espessura conforme classe de pressão. (3) Classe de estanquidade (EN 16798-3): Classe A (fmax = 0.027 × p^0.65 L/s·m²), Classe B (3× melhor que A), Classe C (3× melhor que B), Classe D (3× melhor que C). (4) Para sistemas de caudal variável: classe de pressão = 1.5× a pressão estática máxima do ventilador. (5) Juntas: vedante silicone ou EPDM para classe B+. (6) Teste: ensaio de estanquidade por amostragem a 10% da rede — fuga medida ≤ limite da classe especificada.",
+      "enabled": true,
+      "tags": ["condutas", "pressão", "estanquidade", "EN 1507", "EN 12237", "RECS"]
+    },
+    {
+      "id": "HVAC-VSD-PUMP-CTRL-01",
+      "regulationId": "dl-118-2013-recs",
+      "article": "RECS / EU 622/2012 — Controlo de Bombas com Variador de Velocidade",
+      "description": "As bombas circuladoras do sistema hidráulico AVAC com potência superior a 0.75 kW não possuem variador de velocidade (VSD), funcionando a caudal constante e consumindo energia excessiva em condições de carga parcial.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVSDPumps", "operator": "not_exists", "value": null },
+        { "field": "hvac.pumpPower", "operator": ">", "value": 0.75 },
+        { "field": "hvac.hasPipework", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "VSD obrigatório em bombas > 0.75 kW em sistemas de caudal variável",
+      "remediation": "Instalar variadores de velocidade nas bombas circuladoras: (1) Controlo por pressão diferencial: sensor de ΔP no ponto mais desfavorável da rede — reduzir velocidade quando a pressão aumenta (válvulas fecham). (2) Setpoint variável: ΔP setpoint = ΔP nominal × (Q/Qnom)² — maximiza poupança em carga parcial. (3) Alternativa: bombas com motor de ímanes permanentes (ECM) com regulação integrada (EEI ≤ 0.23 conforme EU 622/2012). (4) Poupança: P ∝ n³ (lei da afinidade) — reduzir 20% a velocidade poupa 49% de energia. (5) Proteção: caudal mínimo de 25% do nominal para evitar sobreaquecimento da bomba. (6) Filtro EMC: classe C2 para ambientes industriais, classe C1 para residencial/escritórios.",
+      "enabled": true,
+      "tags": ["VSD", "bombas", "caudal variável", "eficiência", "EU 622/2012", "RECS"]
     }
   ]
 }

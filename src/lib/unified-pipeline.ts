@@ -489,8 +489,34 @@ export async function runUnifiedPipeline(
       const { aggregateProjectResources } = await import("./resource-aggregator");
 
       const maxWorkers = laborConstraint?.maxWorkers ?? 10;
-      schedule = generateSchedule(wbsProject, matchReport.matches, maxWorkers);
+      const scheduleOpts = {
+        maxWorkers,
+        useCriticalChain: true,
+        safetyReduction: 0.5,
+        projectBufferRatio: 0.5,
+        feedingBufferRatio: 0.5,
+      };
+      schedule = generateSchedule(wbsProject, matchReport.matches, scheduleOpts);
       resources = aggregateProjectResources(wbsProject, matchReport.matches, schedule);
+
+      // Post-optimization: resource leveling + equipment conflict resolution
+      try {
+        const { optimizeSchedule } = await import("./site-capacity-optimizer");
+        const optimized = optimizeSchedule(schedule, resources);
+        // Apply optimized tasks back to schedule
+        const optimizedFinish = optimized.optimizedTasks
+          .filter(t => !t.isSummary)
+          .reduce((latest, t) => t.finishDate > latest ? t.finishDate : latest, schedule.startDate);
+        schedule = {
+          ...schedule,
+          tasks: optimized.optimizedTasks,
+          finishDate: optimizedFinish,
+        };
+      } catch (optErr) {
+        warnings.push(
+          `Otimização de recursos falhou (cronograma base mantido): ${optErr instanceof Error ? optErr.message : String(optErr)}`,
+        );
+      }
     } catch (err) {
       warnings.push(
         `Geração de cronograma falhou: ${err instanceof Error ? err.message : String(err)}`,

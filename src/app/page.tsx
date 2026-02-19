@@ -866,6 +866,7 @@ export default function Home() {
               projectId={currentProjectId ?? undefined}
               userRole={currentUserRole}
               ifcAnalyses={unifiedResult?.ifcAnalyses}
+              cashFlow={unifiedResult?.cashFlow}
             />
           </div>
           {currentProjectId && (

@@ -81,6 +81,36 @@
       "remediation": "Para cargas ≥ 500 tCO₂eq: verificação trimestral por técnico certificado E deteção automática de fugas são ambas obrigatórias. Com deteção automática, a frequência de verificação reduz-se para semestral. O sistema de deteção deve ser verificado anualmente para correto funcionamento.",
       "enabled": true,
       "tags": ["F-Gas", "fugas", "verificação", "≥500 tCO₂eq", "deteção automática"]
+    },
+    {
+      "id": "HVAC-FGAS-RECOVERY-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 Art. 8.º — Recuperação de Refrigerante no Desmantelamento",
+      "description": "O procedimento de desmantelamento de equipamentos AVAC não inclui recuperação obrigatória do refrigerante por técnico certificado, conforme exigido pelo Regulamento F-Gas para evitar emissão para a atmosfera.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasRefrigerantRecoveryProcedure", "operator": "not_exists", "value": null },
+        { "field": "hvac.refrigerantChargeKg", "operator": ">", "value": 0 }
+      ],
+      "requiredValue": "Recuperação obrigatória de 100% do refrigerante antes de desmantelamento",
+      "remediation": "Garantir recuperação de refrigerante no desmantelamento: (1) Técnico certificado F-Gas obrigatório para recuperação. (2) Equipamento: máquina de recuperação certificada EN 13313, cilindro de recuperação com válvula dupla. (3) Recuperar 100% do refrigerante (líquido + vapor) antes de abrir o circuito. (4) Registar: quantidade recuperada, tipo de refrigerante, destino (reciclagem/regeneração/destruição). (5) Refrigerante recuperado: enviar para centro de regeneração licenciado ou destruição conforme EU 517/2014. (6) Proibição absoluta de ventilar refrigerante para a atmosfera — coima até 50.000€.",
+      "enabled": true,
+      "tags": ["F-Gas", "recuperação", "desmantelamento", "refrigerante", "ambiente"]
+    },
+    {
+      "id": "HVAC-FGAS-VRF-OIL-01",
+      "regulationId": "eu-517-2014-fgas",
+      "article": "EU 517/2014 + EN 378-2 — Compatibilidade Óleo-Refrigerante em Sistemas VRF",
+      "description": "O sistema VRF utiliza refrigerante substituído (retrofill) sem verificação da compatibilidade com o óleo lubrificante original do compressor, podendo resultar em miscibilidade inadequada, falha de lubrificação e avaria catastrófica do compressor.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.vrfRefrigerantChanged", "operator": "==", "value": true },
+        { "field": "hvac.hasOilCompatibilityCheck", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Verificação de compatibilidade óleo-refrigerante obrigatória após substituição de refrigerante",
+      "remediation": "Garantir compatibilidade óleo-refrigerante no sistema VRF: (1) R-410A (original): óleo POE (poliolester) — miscível e estável. (2) R-32: compatível com óleo POE existente (mesma família). (3) R-454B: verificar com fabricante — pode exigir troca parcial de óleo. (4) NUNCA misturar refrigerantes sem purga total do circuito. (5) Após substituição: verificar retorno de óleo ao compressor (visor de nível), analisar acidez do óleo após 500 h de funcionamento. (6) A conversão de R-410A para R-32 em sistemas VRF existentes requer avaliação pelo fabricante — não é uma simples troca de refrigerante (diferentes pressões de operação). (7) Registar no livro F-Gas: tipo de refrigerante anterior e novo, quantidade, data, técnico.",
+      "enabled": true,
+      "tags": ["F-Gas", "VRF", "óleo", "compatibilidade", "refrigerante", "POE"]
     }
   ]
 }

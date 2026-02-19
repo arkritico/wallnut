@@ -298,20 +298,37 @@ export class CypeUnifiedScraper {
           this.results.set(dedupeKey, item);
           this.stats.itemsScraped++;
 
-          if (this.stats.itemsScraped % 25 === 0) {
+          if (this.stats.itemsScraped % 50 === 0) {
             this.logger.info(
-              `Progress: ${this.stats.itemsScraped} items scraped`,
+              `Progress: ${this.stats.itemsScraped} items | ${this.stats.categoriesVisited} pages visited | ${this.stats.errors} errors`,
             );
           }
         } else {
           this.stats.skippedDuplicates++;
         }
+      } else {
+        this.logger.warn(`Failed to parse item page: ${url}`);
       }
       return;
     }
 
     // Navigation page — find child links
     const childLinks = this.extractChildLinks($, url);
+
+    if (childLinks.length === 0 && depth > 0) {
+      // Page detected as navigation but has no child links.
+      // It might actually be an item page with unusual structure.
+      // Try parsing it as an item anyway.
+      const fallbackItem = this.parseItemPage($, url, categoryPath);
+      if (fallbackItem && fallbackItem.unitCost > 0) {
+        const dedupeKey = `${fallbackItem.code}:${fallbackItem.typology}`;
+        if (!this.results.has(dedupeKey)) {
+          this.results.set(dedupeKey, fallbackItem);
+          this.stats.itemsScraped++;
+        }
+      }
+      return;
+    }
 
     for (const link of childLinks) {
       if (this.aborted) break;
@@ -326,27 +343,59 @@ export class CypeUnifiedScraper {
 
   /**
    * Detect whether the current page is an item detail page.
-   * Item pages have price information (€ symbol near a number).
+   *
+   * The CYPE site uses a global sidebar navigation on ALL pages (item AND
+   * navigation), so counting raw nav links is unreliable.
+   *
+   * Instead we use structural signals unique to item pages:
+   * 1. The #decomposedPrice accordion section (breakdown table)
+   * 2. Price in an h4/h6 heading (item pages show the unit price prominently)
+   * 3. The meta description starts with a price pattern "N,NN€ …"
+   * 4. calculaprecio.asp links (price configurator buttons, only on items)
    */
   private detectItemPage($: cheerio.CheerioAPI, _html: string): boolean {
-    // Item pages contain a price display and typically a breakdown table
-    // Check for price patterns: "XX,XX€" or "XX,XX €"
-    const pricePattern = /\d+[.,]\d{2}\s*€/;
+    // Signal 1: #decomposedPrice section — strongest indicator of an item page
+    const hasDecomposedPrice = $("#decomposedPrice").length > 0
+      || $("#decomposedPriceHeader").length > 0;
 
-    // Check in h6 elements (common price location)
-    let hasPrice = false;
-    $("h6").each((_, el) => {
-      if (pricePattern.test($(el).text())) hasPrice = true;
+    // Signal 2: Price in h4 or h6 (the actual unit price display)
+    const pricePattern = /\d+[.,]\d{2}\s*€/;
+    let hasPriceHeading = false;
+    $("h4, h6").each((_, el) => {
+      if (pricePattern.test($(el).text())) hasPriceHeading = true;
     });
 
-    // Also check for breakdown table patterns
-    if (!hasPrice) {
-      const text = $("body").text();
-      // Item pages have the unit-price-total pattern for breakdowns
-      hasPrice = (text.match(/\d+[.,]\d{2}\s*€/g) || []).length >= 3;
-    }
+    // Signal 3: Meta description starts with a price (e.g., "6,23€ Calha protectora...")
+    const metaDesc = $('meta[name="description"]').attr("content") ?? "";
+    const metaStartsWithPrice = pricePattern.test(metaDesc.substring(0, 20));
 
-    return hasPrice;
+    // Signal 4: calculaprecio.asp links (item configurator, never on navigation pages)
+    let hasCalcLinks = false;
+    $("a[href*='calculaprecio'], input[onclick*='calculaprecio']").each(() => {
+      hasCalcLinks = true;
+    });
+
+    // Signal 5: Breakdown table with rows having ≥4 cells
+    let breakdownRowCount = 0;
+    $("table tr").each((_, row) => {
+      const cells = $(row).find("td");
+      if (cells.length >= 4) breakdownRowCount++;
+    });
+    const hasBreakdownTable = breakdownRowCount >= 2;
+
+    // Combine signals:
+    // - decomposedPrice alone = definite item page
+    // - calculaprecio links alone = definite item page
+    // - price heading + breakdown table = item page
+    // - meta starts with price + breakdown table = item page
+    // - breakdown table with many rows + any price signal = item page
+    if (hasDecomposedPrice) return true;
+    if (hasCalcLinks) return true;
+    if (hasPriceHeading && hasBreakdownTable) return true;
+    if (metaStartsWithPrice && hasBreakdownTable) return true;
+    if (hasBreakdownTable && breakdownRowCount >= 3 && (hasPriceHeading || metaStartsWithPrice)) return true;
+
+    return false;
   }
 
   /**
@@ -359,8 +408,9 @@ export class CypeUnifiedScraper {
   ): CypeItem | null {
     try {
       // Extract code from URL (e.g., EHS010 from EHS010_Pilar...)
-      const code = this.extractCodeFromUrl(url) ?? this.extractCodeFromPage($);
-      if (!code) return null;
+      const code = this.extractCodeFromUrl(url)
+        ?? this.extractCodeFromPage($)
+        ?? this.generateSyntheticCode(url);
 
       // Extract description from page title / h1 / meta
       const description = this.extractDescription($);
@@ -399,6 +449,11 @@ export class CypeUnifiedScraper {
 
   /**
    * Extract child navigation links from a category page.
+   *
+   * The CYPE site has a global sidebar (.navbar-vertical-content) that contains
+   * the tree navigation. Every page (navigation AND item) has ~60+ sidebar links.
+   * We extract child links specifically from the sidebar, filtering to only links
+   * that go DEEPER into the current path.
    */
   private extractChildLinks(
     $: cheerio.CheerioAPI,
@@ -406,23 +461,30 @@ export class CypeUnifiedScraper {
   ): Array<{ url: string; text: string }> {
     const links: Array<{ url: string; text: string }> = [];
     const currentPath = new URL(currentUrl).pathname;
-    const baseDir = currentPath.replace(/\/[^/]*\.html$/, "");
+    // The directory part of the current page (e.g., /obra_nova/Instalacoes/Electricas)
+    const currentDir = currentPath.replace(/\/[^/]*\.html$/, "");
+    // The filename stem (e.g., "Canalizacoes" from "Canalizacoes.html")
+    const currentStem = currentPath.split("/").pop()?.replace(/\.html$/, "") ?? "";
 
     const baseHost = new URL(this.config.baseUrl).hostname;
 
-    $("a[href]").each((_, el) => {
+    // Primary: extract from sidebar navigation which has the tree structure
+    // Fallback: extract from all links (for pages that don't use the sidebar)
+    const sidebarLinks = $(".navbar-vertical-content a.nav-link[href]");
+    const linkElements = sidebarLinks.length > 0 ? sidebarLinks : $("a[href]");
+
+    linkElements.each((_, el) => {
       const href = $(el).attr("href");
       const text = $(el).text().trim();
       if (!href || !text || text.length < 2) return;
 
-      // Only follow .html links within the current typology
+      // Only follow .html links
       if (!href.endsWith(".html")) return;
       if (href.includes("index.html")) return;
 
       // Build absolute URL
       let fullUrl: string;
       if (href.startsWith("http")) {
-        // Reject links to other domains/subdomains (e.g. angola.geradordeprecos.info)
         try {
           const linkHost = new URL(href).hostname;
           if (linkHost !== baseHost) return;
@@ -431,8 +493,7 @@ export class CypeUnifiedScraper {
       } else if (href.startsWith("/")) {
         fullUrl = `${this.config.baseUrl}${href}`;
       } else {
-        // Relative link — resolve against current page directory
-        fullUrl = `${this.config.baseUrl}${baseDir}/${href}`;
+        fullUrl = `${this.config.baseUrl}${currentDir}/${href}`;
       }
 
       // Must be within our typology
@@ -441,15 +502,34 @@ export class CypeUnifiedScraper {
       // Skip already visited
       if (this.visitedUrls.has(fullUrl)) return;
 
-      // Skip navigation back to parent categories
-      const linkPath = new URL(fullUrl).pathname;
-      if (linkPath.length <= currentPath.length && !linkPath.includes(baseDir.split("/").pop() || "")) return;
-
       // Skip links that go to other typologies
       if (
-        fullUrl.includes("/reabilitacao/") && this.config.typology !== "reabilitacao" ||
-        fullUrl.includes("/espacos_urbanos/") && this.config.typology !== "espacos_urbanos"
+        (fullUrl.includes("/reabilitacao/") && this.config.typology !== "reabilitacao") ||
+        (fullUrl.includes("/espacos_urbanos/") && this.config.typology !== "espacos_urbanos")
       ) return;
+
+      // Only follow links that are CHILDREN of the current page.
+      //
+      // For a page at /obra_nova/Instalacoes/Electricas/Canalizacoes.html:
+      //   currentDir  = /obra_nova/Instalacoes/Electricas
+      //   currentStem = Canalizacoes
+      //   Children live in /obra_nova/Instalacoes/Electricas/Canalizacoes/
+      //
+      // For a chapter page at /obra_nova/Trabalhos_previos.html:
+      //   currentDir  = /obra_nova
+      //   currentStem = Trabalhos_previos
+      //   Children live in /obra_nova/Trabalhos_previos/
+      //
+      // A child link's path must start with currentDir + "/" + currentStem + "/".
+      // This prevents jumping to sibling chapters.
+      const linkPath = new URL(fullUrl).pathname;
+
+      // Don't follow link back to self
+      if (linkPath === currentPath) return;
+
+      // The child subtree prefix for this page
+      const childPrefix = `${currentDir}/${currentStem}/`;
+      if (!linkPath.startsWith(childPrefix)) return;
 
       links.push({ url: fullUrl, text });
     });
@@ -486,7 +566,32 @@ export class CypeUnifiedScraper {
       if (match) return match[1];
     }
 
+    // Try breakdown table headers or any text near price elements
+    let foundCode: string | null = null;
+    $("h3, h4, h5, h6, strong, b").each((_, el) => {
+      if (foundCode) return;
+      const match = $(el).text().match(codePattern);
+      if (match) foundCode = match[1];
+    });
+    if (foundCode) return foundCode;
+
     return null;
+  }
+
+  /**
+   * Generate a synthetic code from the URL when no CYPE code exists.
+   * e.g., /Detector_convencional.html → "GEN_Detector_convencional"
+   */
+  private generateSyntheticCode(url: string): string {
+    const filename = url.split("/").pop()?.replace(/\.html$/, "") ?? "unknown";
+    // Use first 3 chars of parent dir + filename hash for uniqueness
+    const parentDir = url.split("/").slice(-2, -1)[0] ?? "GEN";
+    const prefix = parentDir.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, "X");
+    // Create a short hash from the filename
+    let hash = 0;
+    for (const ch of filename) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0;
+    const num = String(Math.abs(hash) % 1000).padStart(3, "0");
+    return `${prefix}${num}`;
   }
 
   private extractDescription($: cheerio.CheerioAPI): string | null {
@@ -543,14 +648,26 @@ export class CypeUnifiedScraper {
   }
 
   private extractPrice($: cheerio.CheerioAPI): number | null {
-    // Primary: h6 element with price
+    // Primary: h4 element with price (current CYPE site uses h4 for the unit price)
+    const h4Price = $("h4")
+      .map((_, el) => this.parseEurPrice($(el).text()))
+      .get()
+      .find((p: number | null) => p !== null && p > 0);
+    if (h4Price) return h4Price;
+
+    // Secondary: h6 element with price (older CYPE layout)
     const h6Price = $("h6")
       .map((_, el) => this.parseEurPrice($(el).text()))
       .get()
       .find((p: number | null) => p !== null && p > 0);
     if (h6Price) return h6Price;
 
-    // Fallback: any element with price pattern
+    // Tertiary: meta description (starts with "6,23€ ...")
+    const metaDesc = $('meta[name="description"]').attr("content") ?? "";
+    const metaPrice = this.parseEurPrice(metaDesc);
+    if (metaPrice && metaPrice > 0) return metaPrice;
+
+    // Last resort: any element with price pattern
     const allText = $("body").text();
     const match = allText.match(/(\d{1,6}[.,]\d{2})\s*€/);
     return match ? this.parseEurPrice(match[0]) : null;
@@ -727,8 +844,9 @@ export class CypeUnifiedScraper {
     try {
       const response = await fetch(url, {
         headers: {
-          "User-Agent": "Wallnut-CypeScraper/1.0 (construction-price-research)",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
           "Accept-Language": "pt-PT,pt;q=0.9",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         },
       });
 

@@ -109,6 +109,66 @@
       "remediation": "Implementar monitorização de eficiência operacional: (1) COP/EER real: calcular a partir de medições de potência elétrica e energia térmica produzida (contadores de energia térmica). (2) Comparar com COP/EER nominal: degradação > 15% indica necessidade de manutenção corretiva. (3) Causas comuns de degradação: permutadores sujos (-10-20% COP), falta de refrigerante (-15% por cada 10% de subcarga), filtros colmatados (aumento de SFP). (4) Frequência: trimestral para equipamentos > 25 kW, mensal para > 100 kW. (5) Registar tendências: gráfico de COP vs. temperatura exterior para deteção precoce de anomalias.",
       "enabled": true,
       "tags": ["manutenção", "eficiência", "COP", "EER", "monitorização"]
+    },
+    {
+      "id": "HVAC-MAINT-CT-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Anexo I — Manutenção de Torres de Arrefecimento",
+      "description": "A torre de arrefecimento não possui plano de manutenção específico incluindo limpeza semestral, análise microbiológica trimestral e verificação do sistema de tratamento de água conforme Portaria 349-D.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCoolingTowerMaintenancePlan", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Plano de manutenção específico para torre de arrefecimento (semestral mínimo)",
+      "remediation": "Elaborar plano de manutenção da torre de arrefecimento conforme Portaria 349-D e DGS: (1) Mensal: verificar doseamento de biocida, condutividade, pH, inibidor de corrosão. (2) Trimestral: análise microbiológica (Legionella pneumophila) em laboratório acreditado. (3) Semestral: limpeza e desinfeção completa (bacia, enchimento, eliminadores de gotas). (4) Anual: inspeção mecânica (motor, rolamentos, correias, ventilador). (5) Registar: datas, resultados, técnico, produtos utilizados. (6) Em caso de Legionella > 1000 UFC/L: desinfeção de choque imediata e recolha 48h após.",
+      "enabled": true,
+      "tags": ["manutenção", "torre de arrefecimento", "Legionella", "Portaria 349-D"]
+    },
+    {
+      "id": "HVAC-MAINT-AHU-COIL-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Anexo I — Limpeza de Baterias de UTAs",
+      "description": "As baterias de aquecimento e arrefecimento das UTAs não são limpas com a periodicidade exigida, resultando em perda de eficiência térmica e risco de contaminação microbiológica.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasCoilCleaningRecord", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "Limpeza de baterias UTA semestral (anual mínimo)",
+      "remediation": "Incluir no plano de manutenção a limpeza das baterias das UTAs: (1) Frequência: semestral (antes de cada estação — aquecimento e arrefecimento). (2) Método: limpeza com água sob pressão moderada (< 3 bar para não danificar alhetas) e detergente alcalino. (3) Alhetas danificadas: endireitar com pente de alhetas. (4) Bateria de arrefecimento: verificar drenagem do tabuleiro de condensados (sifão limpo, inclinação ≥ 1%). (5) Impacto da sujidade: redução de 10-25% na potência térmica e aumento de 15-30% na perda de carga do lado do ar. (6) Desinfetar o tabuleiro de condensados com biocida após cada limpeza.",
+      "enabled": true,
+      "tags": ["manutenção", "UTA", "bateria", "limpeza", "Portaria 349-D"]
+    },
+    {
+      "id": "HVAC-MAINT-STEAM-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Anexo I — Manutenção de Sistemas de Injeção de Vapor",
+      "description": "O sistema de humidificação por injeção de vapor não possui plano de manutenção específico incluindo descalcificação periódica do cilindro gerador, verificação de elétrodos e controlo de qualidade da água de alimentação.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasSteamHumidifierMaintenance", "operator": "not_exists", "value": null },
+        { "field": "hvac.humidifierType", "operator": "==", "value": "steam-electric" }
+      ],
+      "requiredValue": "Manutenção de humidificadores de vapor conforme Portaria 349-D (trimestral mínimo)",
+      "remediation": "Implementar plano de manutenção para humidificadores de injeção de vapor: (1) Trimestral: verificar nível de desgaste dos elétrodos/cilindro (substituir quando corrente nominal atinge 80% do novo). (2) Semestral: limpeza/substituição do cilindro de ebulição, verificar acumulação de calcário. (3) Água de alimentação: condutividade entre 125-1250 μS/cm (água demasiado pura ou demasiado dura degrada o cilindro). (4) Verificar válvula de drenagem automática: ciclo de purga deve funcionar corretamente para reduzir acumulação mineral. (5) Controlo: verificar sonda de humidade e calibrar anualmente. (6) Registar: horas de funcionamento, substituições, medições de condutividade.",
+      "enabled": true,
+      "tags": ["manutenção", "humidificador", "vapor", "Portaria 349-D", "descalcificação"]
+    },
+    {
+      "id": "HVAC-MAINT-CX-REBALANCE-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 Art. 3.º — Recomissionamento Periódico do Sistema AVAC",
+      "description": "O sistema AVAC com mais de 5 anos de operação não foi submetido a recomissionamento (re-Cx) para verificar que os caudais, temperaturas e setpoints correspondem às condições de projeto e ocupação atuais.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.lastRecommissioningDate", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">", "value": 50 }
+      ],
+      "requiredValue": "Recomissionamento recomendado a cada 5 anos para sistemas > 50 kW",
+      "remediation": "Realizar recomissionamento (re-Cx) do sistema AVAC: (1) Verificar caudais de ar: medir caudais em todos os difusores e comparar com projeto original (desvio ≤ ±10%). (2) Verificar equilíbrio hidráulico: medir caudais de água nos ramais principais. (3) Calibrar sondas: temperatura, humidade, CO₂, pressão diferencial — desvio máximo ±0.5°C, ±3% HR. (4) Testar sequências de controlo: arranque, paragem, free-cooling, alarmes, modos de economia. (5) Verificar setpoints: ajustar conforme ocupação atual (pode ter mudado desde o projeto). (6) Documentar: relatório de re-Cx com medições antes/depois e lista de anomalias corrigidas. (7) O re-Cx contribui para manter a eficiência ao longo da vida útil do edifício.",
+      "enabled": true,
+      "tags": ["recomissionamento", "re-Cx", "manutenção", "Portaria 349-D", "eficiência"]
     }
   ]
 }

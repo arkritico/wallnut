@@ -7,8 +7,8 @@ import {
 } from "@/lib/phase-constraints";
 
 describe("PHASE_OVERLAP_RULES", () => {
-  it("has 20 rules", () => {
-    expect(PHASE_OVERLAP_RULES.length).toBe(20);
+  it("has 30 rules", () => {
+    expect(PHASE_OVERLAP_RULES.length).toBe(30);
   });
 
   it("includes structure→waterproofing non-overlap with 7-day gap", () => {
@@ -38,8 +38,8 @@ describe("PHASE_OVERLAP_RULES", () => {
 });
 
 describe("PHASE_EQUIPMENT", () => {
-  it("has 8 entries", () => {
-    expect(PHASE_EQUIPMENT.length).toBe(8);
+  it("has 11 entries", () => {
+    expect(PHASE_EQUIPMENT.length).toBe(11);
   });
 
   it("maps structure to crane, concrete_pump, scaffolding", () => {

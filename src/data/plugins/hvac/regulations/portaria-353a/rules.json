@@ -96,6 +96,116 @@
       "remediation": "Aumentar o caudal de ventilação para garantir no mínimo 6 renovações por hora. Para laboratórios com hottes, o caudal de extração deve ser predominante (pressão negativa). Garantir 100% ar novo (sem recirculação) em laboratórios com agentes químicos ou biológicos. Dimensionar sistema de compensação de ar para equilibrar a extração das hottes.",
       "enabled": true,
       "tags": ["laboratório", "renovações de ar", "hotte", "QAI"]
+    },
+    {
+      "id": "HVAC-POOL-AIR-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Qualidade do Ar em Piscinas Cobertas",
+      "description": "A concentração de trihalometanos (THM) e cloraminas no ar da piscina coberta excede os limites de qualidade do ar interior, indicando ventilação insuficiente ou tratamento de água inadequado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.poolChloramineLevel", "operator": ">", "value": 0.5 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "swimming-pool" }
+      ],
+      "currentValueTemplate": "{hvac.poolChloramineLevel} mg/m³ de cloraminas",
+      "requiredValue": "Cloraminas ≤ 0.5 mg/m³ no ar da piscina (OMS / DGS)",
+      "remediation": "Reduzir cloraminas e subprodutos de cloração no ar da piscina: (1) Aumentar a taxa de ventilação: mínimo 4 renovações/hora com ar novo (não recirculado). (2) Extração na superfície da água: 50% do ar de extração deve ser aspirado ao nível do plano de água (camada de 30 cm onde se concentram os subprodutos). (3) Otimizar o tratamento da água: pH 7.0-7.4, cloro livre 0.5-1.0 mg/L, UV ou ozono como tratamento complementar. (4) Controlar a carga de banhistas (principal fonte de compostos azotados precursores). (5) Monitorizar cloraminas no ar com equipamento específico (trimestral mínimo).",
+      "enabled": true,
+      "tags": ["piscina", "QAI", "cloraminas", "ventilação", "tratamento água"]
+    },
+    {
+      "id": "HVAC-HUMID-SPEC-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Especificações de Humidificadores para QAI",
+      "description": "O sistema de humidificação do edifício de comércio/serviços não cumpre os requisitos de higiene para qualidade do ar interior, utilizando tecnologia de pulverização de água fria sem tratamento, que pode introduzir contaminantes microbiológicos na corrente de ar.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.humidifierType", "operator": "in", "value": ["spray", "ultrasonic"] },
+        { "field": "hvac.hasHumidifierHygieneControl", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Humidificador tipo {hvac.humidifierType} sem controlo de higiene",
+      "requiredValue": "Humidificadores conformes com higiene QAI: vapor ou evaporativo com desinfeção UV",
+      "remediation": "Garantir conformidade higiénica dos humidificadores conforme Portaria 353-A: (1) Tipo preferencial: injeção de vapor (estéril por natureza — sem risco microbiológico). (2) Se evaporativo: alimentação com água tratada (osmose inversa ou UV-C), purga automática contínua, limpeza mensal do meio evaporativo. (3) Proibido: humidificadores ultrassónicos em sistemas centrais (dispersam aerossóis com minerais e potenciais bactérias). (4) Controlo: sonda de humidade com ±3% HR de precisão, setpoint 40-60% HR. (5) Posicionamento na UTA: após o filtro final, com distância de absorção ≥ 2 m até ao próximo componente para evitar gotículas residuais. (6) Tabuleiro de drenagem: obrigatório a jusante do humidificador.",
+      "enabled": true,
+      "tags": ["humidificador", "QAI", "Portaria 353-A", "higiene", "vapor"]
+    },
+    {
+      "id": "HVAC-DESICCANT-QAI-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Desumidificação para Controlo de Humidade e QAI",
+      "description": "A humidade relativa interior ({hvac.indoorRelativeHumidity}%) excede o limite superior de 70%, favorecendo a proliferação de fungos e ácaros conforme parâmetros de QAI da Portaria 353-A/2013.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.indoorRelativeHumidity", "operator": ">", "value": 70 },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed"] }
+      ],
+      "currentValueTemplate": "{hvac.indoorRelativeHumidity}% HR",
+      "requiredValue": "HR interior 40-60% (recomendado), máximo 70% (Portaria 353-A)",
+      "remediation": "Controlar a humidade relativa interior: (1) Aumentar caudal de ventilação: o ar novo (mais seco no inverno, mais húmido no verão) dilui a humidade interior. (2) Arrefecimento com desumidificação: a bateria de arrefecimento da UTA deve operar abaixo do ponto de orvalho para condensar humidade. (3) Desumidificação dedicada: roda dessecante para espaços com carga latente elevada (piscinas, cozinhas). (4) Para museus e arquivos: HR 50% ±5% — considerar UTA com controlo de humidade de precisão. (5) Eliminar fontes de humidade: infiltrações, água estagnada, vegetação interior excessiva. (6) Monitorizar: sonda de HR em cada zona com registo contínuo (datalogger) para verificar conformidade.",
+      "enabled": true,
+      "tags": ["desumidificação", "humidade", "QAI", "Portaria 353-A", "fungos"]
+    },
+    {
+      "id": "HVAC-PM-FILTRATION-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Filtração de Partículas em Suspensão (PM2.5/PM10)",
+      "description": "O sistema de filtração da UTA não é adequado para cumprir os limites de partículas em suspensão da Portaria 353-A/2013 (PM2.5 ≤ 25 µg/m³, PM10 ≤ 50 µg/m³), especialmente em zonas urbanas com elevada poluição exterior.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.indoorPM25", "operator": ">", "value": 25 },
+        { "field": "hvac.hasVentilationSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.indoorPM25} µg/m³ PM2.5 interior",
+      "requiredValue": "PM2.5 ≤ 25 µg/m³ e PM10 ≤ 50 µg/m³ conforme Portaria 353-A/2013",
+      "remediation": "Reforçar filtração de partículas: (1) Filtro final mínimo F7 (ePM2.5 ≥ 50%) — insuficiente em zonas urbanas poluídas. (2) Para PM2.5 exterior > 20 µg/m³: instalar filtro F9 (ePM2.5 ≥ 80%) ou HEPA E10 (ePM2.5 ≥ 95%). (3) Em zonas de tráfego intenso: considerar filtro molecular (carvão ativado) adicionalmente para NO₂. (4) Monitorizar PM2.5 interior e exterior com sensores laser para ajuste dinâmico da ventilação. (5) Reduzir fontes interiores: aspiração centralizada com filtro HEPA, tapetes de entrada anti-poeira. (6) Manutenção: substituir filtros quando ΔP > 2× inicial ou PM2.5 interior > 15 µg/m³.",
+      "enabled": true,
+      "tags": ["PM2.5", "PM10", "filtração", "QAI", "Portaria 353-A", "partículas"]
+    },
+    {
+      "id": "HVAC-ACTIVATED-CARBON-VOC-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Filtração por Carvão Ativado para COV",
+      "description": "O sistema de ventilação em edifício com fontes interiores significativas de compostos orgânicos voláteis (COV) não dispõe de filtração por carvão ativado, excedendo o limite de TVOC de 600 µg/m³ da Portaria 353-A/2013.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.indoorTVOC", "operator": ">", "value": 600 },
+        { "field": "hvac.hasActivatedCarbonFilter", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "{hvac.indoorTVOC} µg/m³ TVOC interior",
+      "requiredValue": "TVOC ≤ 600 µg/m³ (Portaria 353-A/2013), formaldeído ≤ 100 µg/m³",
+      "remediation": "Instalar filtração por carvão ativado para remoção de COV: (1) Tipo: filtro de carvão ativado granular (GAC) ou em painel impregnado, instalado a jusante do filtro de partículas na UTA. (2) Capacidade de adsorção: 10-25% do peso do carvão para COV comuns (benzeno, tolueno, formaldeído). (3) Dimensionamento: tempo de contacto (EBCT) ≥ 0.05-0.1 s para remoção eficaz de TVOC. (4) Espessura do leito: 25-50 mm para filtros em painel, 100-300 mm para leitos granulares. (5) Substituição: quando eficiência de remoção < 50% do valor inicial (tipicamente a cada 6-12 meses). (6) Monitorizar: sensor TVOC (PID) a jusante do filtro para verificar eficácia. (7) Fontes interiores a controlar: mobiliário novo, tintas, produtos de limpeza, fotocopiadoras.",
+      "enabled": true,
+      "tags": ["carvão ativado", "COV", "TVOC", "formaldeído", "filtração", "QAI", "Portaria 353-A"]
+    },
+    {
+      "id": "HVAC-ACTIVATED-CARBON-REGEN-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 — Manutenção de Filtros de Carvão Ativado para COV",
+      "description": "Os filtros de carvão ativado instalados na UTA para remoção de COV não possuem programa de substituição periódica documentado, podendo estar saturados e ineficazes na remoção de compostos orgânicos voláteis.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasActivatedCarbonFilter", "operator": "exists", "value": null },
+        { "field": "hvac.hasActivatedCarbonMaintenancePlan", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Programa de substituição de carvão ativado documentado (6-12 meses típico)",
+      "remediation": "Implementar programa de manutenção dos filtros de carvão ativado: (1) Monitorização: instalar sensor TVOC a jusante do filtro com alarme quando eficiência de remoção < 50%. (2) Substituição: trimestral em ambientes com carga elevada de COV (tipografias, laboratórios), semestral para escritórios standard, anual para ambientes com baixa carga. (3) Teste de breakthrough: medição periódica de TVOC a montante e jusante para calcular eficiência residual. (4) Não regenerar em campo: o carvão ativado impregnado não é regenerável — substituir módulos completos. (5) Registo: data de instalação, tipo de carvão (granular, impregnado, virgem de coco), medições de eficiência. (6) Eliminar carvão saturado conforme regulamentação de resíduos (potencialmente perigoso se carregado com solventes).",
+      "enabled": true,
+      "tags": ["carvão ativado", "manutenção", "COV", "substituição", "QAI", "Portaria 353-A"]
+    },
+    {
+      "id": "HVAC-PM-HEPA-HOSPITAL-01",
+      "regulationId": "portaria-353a-2013",
+      "article": "Portaria 353-A/2013 / EN 1822 — Filtração HEPA para Espaços Hospitalares e Salas Limpas",
+      "description": "Os espaços com requisitos de qualidade do ar elevados (blocos operatórios, salas limpas, unidades de imunodeprimidos) não possuem filtração HEPA terminal (H13/H14) conforme EN 1822, excedendo os limites de partículas para classificação ISO 5-7.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasTerminalHEPA", "operator": "not_exists", "value": null },
+        { "field": "hvac.spaceType", "operator": "in", "value": ["operating-theatre", "cleanroom", "laboratory"] }
+      ],
+      "requiredValue": "Filtro HEPA H13 (99.95%) ou H14 (99.995%) terminal para espaços ISO 5-7",
+      "remediation": "Instalar filtração HEPA terminal: (1) Classe H13 (ePM0.3 ≥ 99.95%): blocos operatórios classe I, salas limpas ISO 7. (2) Classe H14 (ePM0.3 ≥ 99.995%): blocos operatórios classe IA, salas limpas ISO 5-6. (3) Instalação: em caixa terminal selada junto ao difusor (flow/plenum terminal HEPA box). (4) Teste de integridade: DOP/PAO in-situ conforme EN ISO 14644-3 anualmente (fugas < 0.01% da concentração upstream). (5) Substituição: quando ΔP > 2× ΔP inicial (tipicamente 600-800 Pa para H13). (6) Pré-filtração: F7 + F9 obrigatório a montante para proteger o HEPA e prolongar a sua vida útil (3-5 anos vs. < 1 ano sem pré-filtro).",
+      "enabled": true,
+      "tags": ["HEPA", "filtração", "hospital", "sala limpa", "EN 1822", "partículas", "Portaria 353-A"]
     }
   ]
 }

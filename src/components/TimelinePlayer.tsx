@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Play, Pause, SkipForward, SkipBack, Calendar } from "lucide-react";
 import type { ProjectSchedule, ScheduleTask } from "@/lib/wbs-types";
 import type { ConstructionPhase } from "@/lib/wbs-types";
+import type { TaskProgress } from "@/lib/earned-value";
 import { phaseColor, phaseLabel } from "@/lib/phase-colors";
 import GanttTimeline from "./GanttTimeline";
 
@@ -28,6 +29,8 @@ export interface TimelineState {
   accumulatedCost: number;
   /** Workers on site at current date */
   activeWorkers: number;
+  /** Workers by trade name at current date */
+  activeWorkersByTrade: Record<string, number>;
 }
 
 export interface TimelinePlayerProps {
@@ -39,6 +42,12 @@ export interface TimelinePlayerProps {
   selectedTaskUids?: Set<number>;
   /** Critical path task UIDs (red accent on Gantt bars) */
   criticalPathUids?: Set<number>;
+  /** Actual progress entries — when provided, shows actual markers on Gantt */
+  progressEntries?: TaskProgress[];
+  /** External seek override (ms) — used by video export to control timeline */
+  externalSeekMs?: number | null;
+  /** Callback exposing toggle play/pause to parent (for keyboard shortcuts) */
+  onTogglePlayRef?: React.MutableRefObject<(() => void) | null>;
   className?: string;
 }
 
@@ -48,7 +57,6 @@ export interface TimelinePlayerProps {
 
 const SPEEDS = [1, 2, 5, 10];
 const MS_PER_DAY = 86_400_000;
-const TICK_MS = 100; // 10 fps animation
 
 function toMs(iso: string): number {
   return new Date(iso).getTime();
@@ -76,6 +84,9 @@ export default function TimelinePlayer({
   onBarSelect,
   selectedTaskUids,
   criticalPathUids,
+  progressEntries,
+  externalSeekMs,
+  onTogglePlayRef,
   className = "",
 }: TimelinePlayerProps) {
   const startMs = useMemo(() => toMs(schedule.startDate), [schedule.startDate]);
@@ -85,12 +96,25 @@ export default function TimelinePlayer({
   const [currentMs, setCurrentMs] = useState(startMs);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number>(0);
 
   // Detail (non-summary) tasks only
   const detailTasks = useMemo(
     () => schedule.tasks.filter((t) => !t.isSummary),
     [schedule.tasks],
+  );
+
+  // Extract milestone tasks
+  const milestoneTasks = useMemo(
+    () => schedule.tasks.filter((t) => t.isMilestone),
+    [schedule.tasks],
+  );
+
+  // Extract CCPM buffers (if available)
+  const ccpmBuffers = useMemo(
+    () => schedule.criticalChain?.buffers ?? [],
+    [schedule.criticalChain],
   );
 
   // ── Compute timeline state ─────────────────────────────────
@@ -101,6 +125,7 @@ export default function TimelinePlayer({
     let completedTasks = 0;
     let accumulatedCost = 0;
     let activeWorkers = 0;
+    const workersByTrade: Record<string, number> = {};
 
     for (const task of detailTasks) {
       const tStart = toMs(task.startDate);
@@ -118,7 +143,10 @@ export default function TimelinePlayer({
         const duration = tFinish - tStart || 1;
         accumulatedCost += task.cost * (elapsed / duration);
         for (const r of task.resources) {
-          if (r.type === "labor") activeWorkers += r.units;
+          if (r.type === "labor") {
+            activeWorkers += r.units;
+            workersByTrade[r.name] = (workersByTrade[r.name] ?? 0) + r.units;
+          }
         }
       }
     }
@@ -133,6 +161,7 @@ export default function TimelinePlayer({
       totalTasks: detailTasks.length,
       accumulatedCost: Math.round(accumulatedCost),
       activeWorkers,
+      activeWorkersByTrade: workersByTrade,
     };
   }, [currentMs, isPlaying, speed, detailTasks]);
 
@@ -141,24 +170,54 @@ export default function TimelinePlayer({
     onStateChange(timelineState);
   }, [timelineState, onStateChange]);
 
-  // ── Animation loop ─────────────────────────────────────────
+  // ── External seek (for video export) ──────────────────────
   useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setCurrentMs((prev) => {
-          const next = prev + (MS_PER_DAY * speed * TICK_MS) / 1000;
-          if (next >= finishMs) {
-            setIsPlaying(false);
-            return finishMs;
-          }
-          return next;
-        });
-      }, TICK_MS);
+    if (externalSeekMs != null && externalSeekMs >= startMs && externalSeekMs <= finishMs) {
+      setCurrentMs(externalSeekMs);
+    }
+  }, [externalSeekMs, startMs, finishMs]);
+
+  // ── Expose toggle play/pause to parent (for keyboard shortcuts) ──
+  useEffect(() => {
+    if (onTogglePlayRef) {
+      onTogglePlayRef.current = () => setIsPlaying((prev) => !prev);
     }
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+      if (onTogglePlayRef) onTogglePlayRef.current = null;
+    };
+  }, [onTogglePlayRef]);
+
+  // ── Animation loop (60fps via requestAnimationFrame) ───────
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    lastTimeRef.current = 0;
+
+    function tick(timestamp: number) {
+      if (lastTimeRef.current === 0) {
+        lastTimeRef.current = timestamp;
+      }
+      const delta = timestamp - lastTimeRef.current;
+      lastTimeRef.current = timestamp;
+
+      setCurrentMs((prev) => {
+        const next = prev + (delta / 1000) * MS_PER_DAY * speed;
+        if (next >= finishMs) {
+          setIsPlaying(false);
+          return finishMs;
+        }
+        return next;
+      });
+
+      rafRef.current = requestAnimationFrame(tick);
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
       }
     };
   }, [isPlaying, speed, finishMs]);
@@ -201,6 +260,9 @@ export default function TimelinePlayer({
           onBarSelect={onBarSelect}
           selectedTaskUids={selectedTaskUids}
           criticalPathUids={criticalPathUids}
+          progressEntries={progressEntries}
+          buffers={ccpmBuffers.length > 0 ? ccpmBuffers : undefined}
+          milestones={milestoneTasks.length > 0 ? milestoneTasks : undefined}
         />
         <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
           <span>{formatPT(startMs)}</span>

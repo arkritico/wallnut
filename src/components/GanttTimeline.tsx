@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useCallback, useRef, useState } from "react";
-import type { ScheduleTask, ConstructionPhase } from "@/lib/wbs-types";
+import type { ScheduleTask, ConstructionPhase, CriticalChainBuffer } from "@/lib/wbs-types";
+import type { TaskProgress } from "@/lib/earned-value";
 import { PHASE_ORDER } from "@/lib/construction-sequencer";
 import { phaseColor, phaseLabel } from "@/lib/phase-colors";
 
@@ -21,6 +22,12 @@ export interface GanttTimelineProps {
   selectedTaskUids?: Set<number>;
   /** Critical path task UIDs (shown with red accent) */
   criticalPathUids?: Set<number>;
+  /** Actual progress entries — when provided, shows actual start/finish markers */
+  progressEntries?: TaskProgress[];
+  /** CCPM buffers — rendered as dashed bars below phase rows */
+  buffers?: CriticalChainBuffer[];
+  /** Milestone tasks — rendered as diamond markers on the timeline */
+  milestones?: ScheduleTask[];
 }
 
 interface PhaseBar {
@@ -105,12 +112,21 @@ export default function GanttTimeline({
   onBarSelect,
   selectedTaskUids,
   criticalPathUids,
+  progressEntries,
+  buffers,
+  milestones,
 }: GanttTimelineProps) {
   const ganttRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
 
   const totalMs = finishMs - startMs || 1;
   const playheadPct = ((currentMs - startMs) / totalMs) * 100;
+
+  // Build progress lookup map
+  const progressMap = useMemo(() => {
+    if (!progressEntries || progressEntries.length === 0) return null;
+    return new Map(progressEntries.map((p) => [p.taskUid, p]));
+  }, [progressEntries]);
 
   // Group tasks by phase, sorted by PHASE_ORDER
   const phaseRows = useMemo(() => {
@@ -222,15 +238,17 @@ export default function GanttTimeline({
     [],
   );
 
-  const ganttHeight = Math.min(phaseRows.length * ROW_H, 8 * ROW_H);
+  const bufferRowCount = buffers && buffers.length > 0 ? 1 : 0; // single row for all buffers
+  const ganttHeight = Math.min(phaseRows.length * ROW_H, 8 * ROW_H) + bufferRowCount * ROW_H;
   const visibleRows = phaseRows.slice(0, 8);
   const hiddenCount = phaseRows.length - visibleRows.length;
+  const hasActualDates = progressEntries && progressEntries.length > 0;
 
   return (
     <div
       ref={ganttRef}
       className="relative select-none cursor-pointer"
-      style={{ height: ganttHeight + (hiddenCount > 0 ? 14 : 0) }}
+      style={{ height: ganttHeight + (hiddenCount > 0 ? 14 : 0) + (hasActualDates ? 14 : 0) }}
       onClick={handleClick}
       onMouseLeave={() => setHover(null)}
     >
@@ -261,38 +279,182 @@ export default function GanttTimeline({
             {row.bars.map((bar, j) => {
               const selected = isBarSelected(bar);
               const critical = isBarCritical(bar);
+
+              // Compute actual progress markers for this bar
+              const actualMarkers: { pct: number; isFinish: boolean; isLate: boolean }[] = [];
+              if (progressMap) {
+                for (const t of bar.tasks) {
+                  const prog = progressMap.get(t.uid);
+                  if (!prog) continue;
+
+                  const plannedFinishMs = new Date(t.finishDate).getTime();
+
+                  // Actual finish marker
+                  if (prog.actualFinish) {
+                    const actualFinishMs = new Date(prog.actualFinish).getTime();
+                    const pct = ((actualFinishMs - startMs) / totalMs) * 100;
+                    if (pct >= 0 && pct <= 100) {
+                      actualMarkers.push({
+                        pct,
+                        isFinish: true,
+                        isLate: actualFinishMs > plannedFinishMs,
+                      });
+                    }
+                  }
+
+                  // Actual start marker
+                  if (prog.actualStart) {
+                    const actualStartMs = new Date(prog.actualStart).getTime();
+                    const plannedStartMs = new Date(t.startDate).getTime();
+                    const pct = ((actualStartMs - startMs) / totalMs) * 100;
+                    if (pct >= 0 && pct <= 100) {
+                      actualMarkers.push({
+                        pct,
+                        isFinish: false,
+                        isLate: actualStartMs > plannedStartMs,
+                      });
+                    }
+                  }
+                }
+              }
+
               return (
-                <div
-                  key={j}
-                  className="absolute top-0.5 rounded-sm transition-opacity"
-                  style={{
-                    left: `${bar.startPct}%`,
-                    width: `${bar.widthPct}%`,
-                    height: ROW_H - 4,
-                    backgroundColor: phaseColor(bar.phase),
-                    opacity: selected ? 1 : barOpacity(bar),
-                    minWidth: 2,
-                    outline: selected ? "2px solid white" : "none",
-                    outlineOffset: 1,
-                    boxShadow: selected ? "0 0 4px rgba(255,255,255,0.8)" : "none",
-                    zIndex: selected ? 10 : undefined,
-                    borderBottom: critical ? "2px solid #ef4444" : "none",
-                  }}
-                  onClick={(e) => handleBarClick(e, bar)}
-                  onMouseEnter={(e) => handleBarHover(e, bar)}
-                  onMouseMove={(e) => handleBarHover(e, bar)}
-                  onMouseLeave={() => setHover(null)}
-                />
+                <div key={j} className="contents">
+                  <div
+                    className="absolute top-0.5 rounded-sm transition-opacity"
+                    style={{
+                      left: `${bar.startPct}%`,
+                      width: `${bar.widthPct}%`,
+                      height: ROW_H - 4,
+                      backgroundColor: phaseColor(bar.phase),
+                      opacity: selected ? 1 : barOpacity(bar),
+                      minWidth: 2,
+                      outline: selected ? "2px solid white" : "none",
+                      outlineOffset: 1,
+                      boxShadow: selected ? "0 0 4px rgba(255,255,255,0.8)" : "none",
+                      zIndex: selected ? 10 : undefined,
+                      borderBottom: critical ? "2px solid #ef4444" : "none",
+                    }}
+                    onClick={(e) => handleBarClick(e, bar)}
+                    onMouseEnter={(e) => handleBarHover(e, bar)}
+                    onMouseMove={(e) => handleBarHover(e, bar)}
+                    onMouseLeave={() => setHover(null)}
+                  />
+
+                  {/* Actual date diamond markers */}
+                  {actualMarkers.map((marker, mi) => (
+                    <div
+                      key={`m-${j}-${mi}`}
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${marker.pct}%`,
+                        top: (ROW_H - 6) / 2,
+                        width: 6,
+                        height: 6,
+                        marginLeft: -3,
+                        backgroundColor: marker.isLate ? "#DC2626" : "#10B981",
+                        transform: "rotate(45deg)",
+                        zIndex: 15,
+                      }}
+                      title={`${marker.isFinish ? "Conclusão" : "Início"} real${marker.isLate ? " (atrasado)" : " (adiantado)"}`}
+                    />
+                  ))}
+                </div>
               );
             })}
           </div>
         </div>
       ))}
 
+      {/* CCPM Buffer bars */}
+      {buffers && buffers.length > 0 && (
+        <div className="flex items-center" style={{ height: ROW_H }}>
+          <div
+            className="flex-shrink-0 text-[9px] text-gray-400 truncate pr-1"
+            style={{ width: LABEL_W }}
+          >
+            Buffers
+          </div>
+          <div className="flex-1 relative h-full">
+            {buffers.map((buf, bi) => {
+              const bufStartMs = new Date(buf.startDate).getTime();
+              const bufEndMs = new Date(buf.finishDate).getTime();
+              const bufStartPct = ((bufStartMs - startMs) / totalMs) * 100;
+              const bufWidthPct = Math.max(0.5, ((bufEndMs - bufStartMs) / totalMs) * 100);
+              const zoneColor =
+                buf.zone === "green" ? "#10B981" :
+                buf.zone === "yellow" ? "#D97706" : "#DC2626";
+
+              return (
+                <div
+                  key={`buf-${bi}`}
+                  className="absolute top-0.5 rounded-sm"
+                  style={{
+                    left: `${bufStartPct}%`,
+                    width: `${bufWidthPct}%`,
+                    height: ROW_H - 4,
+                    background: zoneColor,
+                    opacity: 0.55,
+                    border: "1px dashed rgba(255,255,255,0.5)",
+                    minWidth: 2,
+                  }}
+                  title={`${buf.name} — ${buf.durationDays}d (${Math.round(100 - buf.consumedPercent)}% restante)`}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Milestone diamonds */}
+      {milestones && milestones.length > 0 && (
+        <div className="absolute pointer-events-none" style={{ top: 0, left: LABEL_W, right: 0, height: ganttHeight }}>
+          {milestones.map((ms, mi) => {
+            const msPct = ((new Date(ms.startDate).getTime() - startMs) / totalMs) * 100;
+            if (msPct < 0 || msPct > 100) return null;
+            return (
+              <div
+                key={`ms-${mi}`}
+                className="absolute"
+                style={{
+                  left: `${msPct}%`,
+                  top: -1,
+                  zIndex: 20,
+                }}
+                title={ms.name}
+              >
+                <div
+                  className="w-2 h-2 rotate-45 border"
+                  style={{
+                    backgroundColor: "#F59E0B",
+                    borderColor: "#D97706",
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Hidden phases indicator */}
       {hiddenCount > 0 && (
         <div className="text-[9px] text-gray-400 text-center" style={{ height: 14, lineHeight: "14px" }}>
           +{hiddenCount} fases
+        </div>
+      )}
+
+      {/* Actual date diamond markers legend */}
+      {progressEntries && progressEntries.length > 0 && (
+        <div className="flex items-center gap-3 px-2 text-[8px] text-gray-400" style={{ height: 14, lineHeight: "14px" }}>
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-[6px] h-[6px] rotate-45" style={{ backgroundColor: "#10B981" }} />
+            Adiantado
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block w-[6px] h-[6px] rotate-45" style={{ backgroundColor: "#DC2626" }} />
+            Atrasado
+          </span>
+          <span className="text-gray-300">◆ Datas reais</span>
         </div>
       )}
 
@@ -309,7 +471,10 @@ export default function GanttTimeline({
       {hover && (
         <div
           className="fixed z-50 px-2 py-1 bg-gray-900 text-white text-[10px] rounded shadow-lg pointer-events-none"
-          style={{ left: hover.x + 8, top: hover.y - 32 }}
+          style={{
+            left: Math.min(hover.x + 8, (typeof window !== "undefined" ? window.innerWidth : 9999) - 200),
+            top: Math.max(hover.y - 32, 8),
+          }}
         >
           <p className="font-medium">{hover.taskName}</p>
           <p className="text-gray-300">{hover.dates}</p>

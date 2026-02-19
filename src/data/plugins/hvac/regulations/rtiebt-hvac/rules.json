@@ -244,6 +244,162 @@
       "remediation": "Implementar encravamentos elétricos (interlocks) para sequências seguras de operação: (1) Compressor: encravamento com ventilador de condensador (não arrancar sem ventilador), pressostato de alta/baixa pressão, caudal de água no evaporador (flow switch). (2) Caldeira: encravamento com bomba de circulação, termostato de segurança (rearme manual), pressostato de água. (3) UTA: encravamento ventilador com registo de ar (não arrancar com registo fechado), proteção contra congelamento (termostato anti-frost). (4) Bomba de circulação: encravamento com válvula de seccionamento, pressostato diferencial. (5) Torre de arrefecimento: encravamento ventilador com bomba de condensados. Todos os encravamentos devem ser cablados (hardwired), não apenas por software.",
       "enabled": true,
       "tags": ["RTIEBT", "encravamento", "interlock", "segurança", "sequência"]
+    },
+    {
+      "id": "HVAC-VFD-MOTOR-BEARING-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / IEC 60034-25 — Correntes de Rolamento em Motores com VFD",
+      "description": "Os motores AVAC alimentados por VFD não possuem proteção contra correntes de rolamento (bearing currents), que causam erosão por arco elétrico (fluting) e falha prematura dos rolamentos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVFD", "operator": "==", "value": true },
+        { "field": "hvac.hasBearingProtection", "operator": "not_exists", "value": null },
+        { "field": "hvac.largestMotorPower", "operator": ">=", "value": 30 }
+      ],
+      "requiredValue": "Proteção contra correntes de rolamento para motores ≥ 30 kW com VFD",
+      "remediation": "Proteger motores ≥ 30 kW alimentados por VFD contra correntes de rolamento: (1) Instalar escova de ligação à terra no veio do motor (shaft grounding brush). (2) Utilizar rolamentos isolados no lado NDE (Non-Drive End). (3) Instalar filtro dU/dt ou filtro sinusoidal na saída do VFD para reduzir tensão no veio (shaft voltage). (4) Para motores > 100 kW: considerar rolamentos cerâmicos (isolados) em ambos os lados. (5) Verificar: tensão no veio < 1 V pico (medição com osciloscópio). A falha prematura de rolamentos em motores com VFD é a avaria mais frequente e dispendiosa em instalações AVAC.",
+      "enabled": true,
+      "tags": ["VFD", "rolamentos", "motor", "corrente de rolamento", "proteção"]
+    },
+    {
+      "id": "HVAC-MOTOR-IE-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "EU 2019/1781 / RTIEBT — Classe de Eficiência IE de Motores AVAC",
+      "description": "Os motores AVAC instalados não cumprem a classe de eficiência mínima IE3 (ou IE2 com VFD) exigida pelo Regulamento EU 2019/1781 para motores de 0.75-375 kW.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.motorEfficiencyClass", "operator": "in", "value": ["IE1", "IE0"] },
+        { "field": "hvac.largestMotorPower", "operator": ">=", "value": 0.75 }
+      ],
+      "currentValueTemplate": "Classe {hvac.motorEfficiencyClass}",
+      "requiredValue": "IE3 mínimo (ou IE2 com VFD) para motores 0.75-375 kW (EU 2019/1781)",
+      "remediation": "Substituir motores AVAC para cumprir Ecodesign EU 2019/1781: (1) Desde 01/07/2021: IE3 obrigatório para motores 0.75-1000 kW. (2) IE2 com VFD é aceite como alternativa (eficiência equivalente). (3) Desde 01/07/2023: IE4 obrigatório para motores 75-200 kW. (4) Ao substituir, dimensionar corretamente: motor sobredimensionado opera com fator de potência e eficiência reduzidos. (5) Considerar motores de ímanes permanentes (IE5) para ventiladores e bombas com operação contínua — payback < 3 anos.",
+      "enabled": true,
+      "tags": ["motor", "IE3", "eficiência", "Ecodesign", "EU 2019/1781"]
+    },
+    {
+      "id": "HVAC-VFD-REGEN-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / IEC 61800-3 — VFD Regenerativo para Ventiladores AVAC",
+      "description": "Os VFDs de ventiladores AVAC de grande porte (≥ 55 kW) utilizam resistências de travagem que dissipam energia em calor, em vez de VFDs regenerativos que devolvem energia à rede durante desaceleração.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasVFD", "operator": "==", "value": true },
+        { "field": "hvac.hasRegenerativeVFD", "operator": "not_exists", "value": null },
+        { "field": "hvac.largestMotorPower", "operator": ">=", "value": 55 }
+      ],
+      "requiredValue": "VFD regenerativo (AFE) recomendado para motores ≥ 55 kW com ciclos frequentes",
+      "remediation": "Considerar VFD regenerativo (Active Front End) para ventiladores e bombas AVAC ≥ 55 kW: (1) Recupera energia de travagem para a rede (em vez de dissipar em resistência). (2) THDi < 5% nativamente (sem filtro de harmónicas adicional). (3) Fator de potência unitário (cos φ = 1.0). (4) Economia: 5-10% adicional em aplicações com variação frequente de velocidade. (5) Payback: 3-5 anos vs. VFD convencional com resistência de travagem. (6) Particularmente vantajoso para sistemas de ventilação com variação horária de caudal (DCV).",
+      "enabled": true,
+      "tags": ["VFD", "regenerativo", "AFE", "eficiência", "ventilador"]
+    },
+    {
+      "id": "HVAC-ELEC-SUBMETER-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / EN 15232 — Subcontagem Elétrica por Subsistema AVAC",
+      "description": "A instalação AVAC não possui subcontagem elétrica separada para os principais subsistemas (chillers, caldeiras, ventilação, bombas, iluminação técnica), impedindo a análise detalhada de consumos e a identificação de ineficiências.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasElectricalSubMetering", "operator": "not_exists", "value": null },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 100 }
+      ],
+      "requiredValue": "Subcontagem elétrica por subsistema AVAC para potência ≥ 100 kW",
+      "remediation": "Instalar contadores de energia elétrica dedicados nos quadros AVAC: (1) Contador para chillers/bombas de calor. (2) Contador para caldeiras e circuito de aquecimento. (3) Contador para ventiladores (UTAs, UTAN, extração). (4) Contador para bombas circuladoras. (5) Contador para torres de arrefecimento. (6) Contadores com interface de comunicação (Modbus, M-Bus ou BACnet) para integração no BMS. (7) Resolução: medição de potência ativa, reativa, tensão, corrente, fator de potência e energia acumulada (kWh). (8) Dados para benchmarking: kWh/m²/ano por subsistema.",
+      "enabled": true,
+      "tags": ["subcontagem", "energia", "RTIEBT", "monitorização", "BMS"]
+    },
+    {
+      "id": "HVAC-ELEC-HP-SUPPLY-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 553 — Alimentação Elétrica de Bombas de Calor Geotérmicas",
+      "description": "A bomba de calor geotérmica (ground source heat pump) não possui circuito elétrico dedicado com proteção adequada conforme RTIEBT, partilhando o circuito com outros equipamentos e comprometendo a seletividade das proteções.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasHeatPumpDedicatedCircuit", "operator": "not_exists", "value": null },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "ground-source" }
+      ],
+      "requiredValue": "Circuito elétrico dedicado para bomba de calor geotérmica com proteção individual",
+      "remediation": "Instalar circuito elétrico dedicado para a bomba de calor: (1) Disjuntor: curva D para corrente de arranque do compressor (6-10× In). (2) RCD: Tipo B obrigatório se alimentada por inverter (correntes de fuga DC). (3) Secção do cabo: dimensionar para 125% da corrente nominal (arranques frequentes). (4) Contactor + relé térmico: para comando e proteção do compressor. (5) Proteção contra sobretensão: SPD Tipo 2 no quadro da bomba de calor. (6) Quadro dedicado: com seccionador geral, proteção diferencial e disjuntor individual para compressor, bombas circuladoras geotérmicas e resistência de apoio.",
+      "enabled": true,
+      "tags": ["RTIEBT", "bomba de calor", "geotérmico", "alimentação elétrica", "proteção"]
+    },
+    {
+      "id": "HVAC-ELEC-VRF-COMM-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / EN 50174 — Cablagem de Comunicação VRF/BMS",
+      "description": "A cablagem de comunicação entre as unidades VRF e o controlador central não está separada da cablagem de potência conforme RTIEBT, resultando em interferências eletromagnéticas que causam erros de comunicação e alarmes intempestivos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVRFCommSeparation", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVRFSystem", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Separação ≥ 300 mm entre cabos de comunicação VRF e cabos de potência",
+      "remediation": "Garantir separação entre cabos de comunicação e potência no sistema VRF: (1) Distância mínima: 300 mm entre cabos de comunicação RS-485/H-Link e cabos de potência (230V/400V). (2) Cruzamentos: sempre a 90° quando inevitáveis. (3) Esteiras separadas: utilizar esteiras de cabos dedicadas para comunicação e potência. (4) Cabo blindado: utilizar cabo de comunicação blindado (STP) com blindagem ligada à terra num único ponto. (5) Terminação: resistências de terminação (120 Ω) nos extremos do bus RS-485 para evitar reflexões. (6) Comprimento máximo: respeitar limites do fabricante VRF (tipicamente 500-1000 m para RS-485).",
+      "enabled": true,
+      "tags": ["RTIEBT", "VRF", "comunicação", "EMC", "cablagem"]
+    },
+    {
+      "id": "HVAC-ELEC-CONDENSATE-PUMP-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT Secção 701 — Proteção Elétrica de Bombas de Condensados AVAC",
+      "description": "As bombas de condensados dos ventiloconvectores e UTAs não possuem proteção elétrica adequada (RCD 30 mA), apresentando risco de contacto indireto em ambiente húmido.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCondensatePumpRCD", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCondensatePump", "operator": "exists", "value": null }
+      ],
+      "requiredValue": "RCD 30 mA para bombas de condensados em ambientes húmidos (RTIEBT Secção 701)",
+      "remediation": "Proteger eletricamente as bombas de condensados: (1) RCD 30 mA: obrigatório para equipamentos em contacto com água. (2) IP: grau de proteção mínimo IP44 para o motor e ligações elétricas da bomba. (3) Alimentação: circuito separado do FCU/UTA com proteção individual ou alimentação de baixa tensão (SELV 24V). (4) Encravamento: bomba de condensados deve arrancar antes ou simultaneamente com a unidade de arrefecimento. (5) Alarme: contacto de nível alto no tabuleiro — corte da unidade de arrefecimento e sinalização na GTC. (6) Cabo: tipo H07RN-F (flexível resistente à humidade) para ligação à bomba.",
+      "enabled": true,
+      "tags": ["RTIEBT", "bomba condensados", "RCD", "proteção", "IP44"]
+    },
+    {
+      "id": "HVAC-ELEC-HP-BACKUP-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT / EN 50160 — Alimentação de Reserva para Bombas de Calor em Edifícios de Saúde",
+      "description": "A bomba de calor que serve como fonte principal de aquecimento/arrefecimento em edifício de saúde não possui alimentação elétrica de reserva (gerador ou UPS), comprometendo a continuidade de climatização em caso de falha da rede.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasBackupPowerHP", "operator": "not_exists", "value": null },
+        { "field": "hvac.heatPumpType", "operator": "in", "value": ["air-source", "ground-source"] },
+        { "field": "hvac.spaceType", "operator": "==", "value": "hospital" }
+      ],
+      "requiredValue": "Alimentação de reserva obrigatória para bombas de calor em edifícios de saúde",
+      "remediation": "Garantir alimentação de reserva para a bomba de calor em edifícios de saúde: (1) Gerador de emergência: dimensionar para 100% da potência elétrica da bomba de calor + bombas circuladoras. (2) Tempo de comutação: ≤ 15 s via ATS (Automatic Transfer Switch). (3) Alternativa: UPS online para equipamentos críticos (UTAs de salas limpas, blocos operatórios). (4) Verificar que o compressor da bomba de calor suporta o transitório de comutação gerador/rede sem alarme. (5) Teste: ensaio mensal do gerador com carga AVAC (mínimo 30% da potência nominal). (6) Conforme RT-SCIE e EN 50172: edifícios de saúde classificados como locais de risco D exigem alimentação de segurança.",
+      "enabled": true,
+      "tags": ["RTIEBT", "bomba de calor", "alimentação reserva", "hospital", "gerador"]
+    },
+    {
+      "id": "HVAC-ELEC-VSD-PUMP-INSTALL-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT §559 + EN 61800-3 — Instalação Elétrica de Variadores de Velocidade em Bombas AVAC",
+      "description": "O variador de velocidade (VSD) da bomba circuladora AVAC não possui filtro EMC adequado, cabo blindado (screened) entre o VSD e o motor, ou reactância de saída, podendo causar interferência eletromagnética em sistemas de controlo BMS, sensores e equipamentos próximos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasVSDEMCCompliance", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasVSDPumps", "operator": "==", "value": true },
+        { "field": "hvac.pumpPower", "operator": ">", "value": 0.75 }
+      ],
+      "requiredValue": "VSD com filtro EMC (EN 61800-3 Cat. C1/C2), cabo blindado e ligação à terra 360° conforme RTIEBT",
+      "remediation": "Instalar corretamente o VSD da bomba conforme RTIEBT e EN 61800-3: (1) Filtro EMC: classe C1 para ambiente residencial/escritório (1.º ambiente), classe C2 para ambiente industrial (2.º ambiente). Filtro integrado ou externo montado junto ao VSD. (2) Cabo motor: blindado (screened) com malha de cobre ≥ 85% cobertura. Comprimento máximo conforme fabricante (tipicamente 50-100 m sem reactância). (3) Ligação da blindagem: 360° (braçadeira ou prensa-cabos EMC) em ambas as extremidades — VSD e motor. (4) Reactância de saída (dU/dt): obrigatória para cabos > 20 m ou motores antigos (classe de isolamento < F) — limita picos de tensão nos terminais do motor. (5) Separação de cabos: mínimo 300 mm entre cabo motor VSD e cabos de sinal/controlo. (6) Terra: terra funcional (PE) + terra de alta frequência (blindagem) — ambos necessários.",
+      "enabled": true,
+      "tags": ["RTIEBT", "VSD", "bomba", "EMC", "blindagem", "EN 61800-3"]
+    },
+    {
+      "id": "HVAC-ELEC-REFRIG-LEAK-POWER-01",
+      "regulationId": "rtiebt-hvac",
+      "article": "RTIEBT §422 + EN 378-3 — Alimentação Elétrica de Sistemas de Deteção de Fugas de Refrigerante",
+      "description": "O sistema de deteção de fugas de refrigerante na sala de máquinas não possui alimentação elétrica de segurança (UPS ou circuito prioritário do gerador), podendo ficar inoperativo durante um corte de energia quando a fuga de refrigerante é mais provável (paragem descontrolada de compressores).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasLeakDetectionBackupPower", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasFixedLeakDetection", "operator": "==", "value": true },
+        { "field": "hvac.refrigerantCharge", "operator": ">", "value": 10 }
+      ],
+      "requiredValue": "Alimentação de segurança (UPS ou gerador) para deteção de fugas e ventilação de emergência",
+      "remediation": "Garantir alimentação elétrica de segurança para o sistema de deteção de fugas: (1) UPS dedicado: autonomia mínima de 72 horas para sensores e central de deteção (consumo típico < 50 W). (2) Ventilação de emergência: alimentada por circuito prioritário do gerador de emergência — comutação automática em ≤ 15 s. (3) Circuito independente: proteção dedicada no quadro de segurança — disjuntor com etiqueta 'NÃO DESLIGAR — Deteção de refrigerante'. (4) Sinalização de falha: relé de vigilância de alimentação com contacto para alarme no BMS — qualquer perda de alimentação gera alarme imediato. (5) Teste: ensaio mensal de comutação para alimentação de segurança com verificação funcional dos sensores. (6) RTIEBT §422: classificação como serviço de segurança — circuito resistente ao fogo (E30) se na rota de evacuação.",
+      "enabled": true,
+      "tags": ["RTIEBT", "deteção fugas", "alimentação segurança", "UPS", "refrigerante"]
     }
   ]
 }

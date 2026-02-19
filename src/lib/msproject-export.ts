@@ -10,6 +10,7 @@
  */
 
 import type { ProjectSchedule, ScheduleTask, ProjectResource, TaskResource } from "./wbs-types";
+import { isPortugueseHoliday } from "./construction-sequencer";
 
 // ============================================================
 // XML Escaping
@@ -155,13 +156,18 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
     lines.push(`          <DayWorking>0</DayWorking>`);
     lines.push(`        </WeekDay>`);
   }
-  // Portuguese public holidays (typical year)
-  const holidays = [
-    "01-01", "04-18", "04-25", "05-01", "06-10",
-    "06-19", "08-15", "10-05", "11-01", "12-01",
-    "12-08", "12-25",
-  ];
-  const year = schedule.startDate.substring(0, 4);
+  // Portuguese public holidays (computed dynamically including Easter-dependent)
+  const year = parseInt(schedule.startDate.substring(0, 4));
+  const holidays: string[] = [];
+  for (let m = 0; m < 12; m++) {
+    for (let d = 1; d <= 31; d++) {
+      const date = new Date(year, m, d);
+      if (date.getMonth() !== m) break; // month overflow
+      if (isPortugueseHoliday(date)) {
+        holidays.push(`${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+      }
+    }
+  }
   for (const h of holidays) {
     lines.push(`        <WeekDay>`);
     lines.push(`          <DayType>0</DayType>`);
@@ -209,6 +215,7 @@ export function generateMSProjectXML(schedule: ProjectSchedule): string {
     lines.push(`      <WBS>${escapeXml(task.wbs)}</WBS>`);
     lines.push(`      <OutlineLevel>${task.outlineLevel}</OutlineLevel>`);
     lines.push(`      <Summary>${task.isSummary ? 1 : 0}</Summary>`);
+    lines.push(`      <Milestone>${task.isMilestone ? 1 : 0}</Milestone>`);
     lines.push(`      <Critical>${schedule.criticalPath.includes(task.uid) ? 1 : 0}</Critical>`);
     lines.push(`      <Start>${formatDateTime(task.startDate)}</Start>`);
     lines.push(`      <Finish>${formatDateTime(task.finishDate, "17:00:00")}</Finish>`);

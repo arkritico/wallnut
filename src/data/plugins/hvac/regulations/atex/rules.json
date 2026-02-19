@@ -63,6 +63,22 @@
       "remediation": "Instalar sistema de deteção de gás combustível: (1) Sensor: tipo catalítico ou infravermelho, certificado EN 60079-29-1, calibrado para gás natural (metano) ou GPL (propano/butano). (2) Localização: junto ao teto para gás natural (mais leve que ar), junto ao solo para GPL (mais pesado). Mínimo 1 detetor por 50 m². (3) Níveis de alarme: pré-alarme a 10% do LIE (sinalização visual/sonora), alarme a 25% do LIE (corte automático da electroválvula de gás + arranque de ventilação de emergência). (4) Central: painel de deteção de gás com saída para GTC e SADI. (5) Manutenção: calibração semestral com gás padrão, teste funcional mensal.",
       "enabled": true,
       "tags": ["ATEX", "deteção gás", "LIE", "caldeira", "electroválvula"]
+    },
+    {
+      "id": "HVAC-ATEX-VRF-LEAK-01",
+      "regulationId": "atex-2014-34",
+      "article": "ATEX / EN 60079-10-1 + EN 378-1 — Classificação de Zona para Fugas de Refrigerante A2L/A3 em Sistemas VRF",
+      "description": "O sistema VRF/multi-split utiliza refrigerante inflamável (classe A2L: R-32, R-454B, ou classe A3: R-290) e não foi realizada classificação de zonas ATEX para os pontos de potencial fuga de refrigerante (unidades interiores, junções de tubagem, válvulas de serviço).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasATEXClassificationRefrigerant", "operator": "not_exists", "value": null },
+        { "field": "hvac.refrigerantFlammabilityClass", "operator": "in", "value": ["A2L", "A3"] }
+      ],
+      "currentValueTemplate": "Refrigerante classe {hvac.refrigerantFlammabilityClass}",
+      "requiredValue": "Classificação de zona ATEX para todos os pontos de potencial fuga de refrigerante inflamável",
+      "remediation": "Realizar classificação de zonas ATEX para refrigerantes inflamáveis em sistemas VRF: (1) Identificar pontes de fuga: cada unidade interior (juntas flare, válvulas de expansão), derivações de tubagem, válvulas de serviço da unidade exterior. (2) Para R-32 (A2L, LII = 14.4% vol): a extensão da zona é tipicamente Zona 2, com raio de 1-2 m do ponto de fuga, dependendo da ventilação. (3) Para R-290 propano (A3, LII = 2.1% vol): zonas mais extensas — considerar Zona 1 junto à unidade e Zona 2 alargada. (4) Ventilação: calcular o caudal mínimo de ventilação conforme EN 378-1 para manter concentração < 25% do LII em caso de fuga total da carga. (5) Equipamentos: em Zona 2, todas as fontes de ignição devem ser Ex Cat. 3G (tomadas, interruptores, termóstatos). (6) Documentar no DPCE (Documento de Proteção Contra Explosões).",
+      "enabled": true,
+      "tags": ["ATEX", "VRF", "refrigerante inflamável", "A2L", "R-32", "zona", "fuga"]
     }
   ]
 }

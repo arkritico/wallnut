@@ -234,16 +234,17 @@ describe("getTaskWorkerCount", () => {
 
 describe("buildDailyHistogram", () => {
   it("sums workers per day across overlapping tasks", () => {
+    // Use weekday dates (Mon-Thu) to avoid weekend/holiday filtering
     const tasks = [
-      makeTask({ uid: 1, startDate: "2026-03-01", finishDate: "2026-03-03", resources: [makeResource(4)] }),
-      makeTask({ uid: 2, startDate: "2026-03-02", finishDate: "2026-03-04", resources: [makeResource(3)] }),
+      makeTask({ uid: 1, startDate: "2026-03-02", finishDate: "2026-03-04", resources: [makeResource(4)] }),
+      makeTask({ uid: 2, startDate: "2026-03-03", finishDate: "2026-03-05", resources: [makeResource(3)] }),
     ];
     const histogram = buildDailyHistogram(tasks);
 
-    expect(histogram.get("2026-03-01")).toBe(4);
-    expect(histogram.get("2026-03-02")).toBe(7);
-    expect(histogram.get("2026-03-03")).toBe(7);
-    expect(histogram.get("2026-03-04")).toBe(3);
+    expect(histogram.get("2026-03-02")).toBe(4);  // Mon: only task 1
+    expect(histogram.get("2026-03-03")).toBe(7);  // Tue: both tasks overlap
+    expect(histogram.get("2026-03-04")).toBe(7);  // Wed: both tasks overlap
+    expect(histogram.get("2026-03-05")).toBe(3);  // Thu: only task 2
   });
 
   it("skips summary tasks", () => {
@@ -583,7 +584,7 @@ describe("backward compatibility", () => {
     const constraints = getDefaultConstraints();
     expect(constraints.maxWorkersPerFloor).toBe(20);
     expect(constraints.equipmentConflicts.length).toBe(3);
-    expect(constraints.phaseOverlapRules.length).toBe(20);
+    expect(constraints.phaseOverlapRules.length).toBe(30);
   });
 
   it("handles empty schedule", () => {

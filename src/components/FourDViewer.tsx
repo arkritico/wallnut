@@ -1,18 +1,33 @@
 "use client";
 
-import { useState, useCallback, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
+import {
+  ClipboardList,
+  GitCompareArrows,
+  BarChart3,
+  Film,
+} from "lucide-react";
 import type { FragmentsModel } from "@thatopen/fragments";
 import type { ProjectSchedule, ScheduleTask, ConstructionPhase } from "@/lib/wbs-types";
 import type { ElementTaskMappingResult, ElementTaskLink } from "@/lib/element-task-mapper";
 import { normalizeStorey } from "@/lib/element-task-mapper";
 import { phaseColor } from "@/lib/phase-colors";
+import {
+  captureBaseline,
+  computeEvmSnapshot,
+  type EvmBaseline,
+  type TaskProgress,
+} from "@/lib/earned-value";
 import type { PhaseHighlight } from "./IfcViewer";
 import type { LegendPhase } from "./FourDLegend";
 import TimelinePlayer, { type TimelineState } from "./TimelinePlayer";
 import StoreyFilter from "./StoreyFilter";
 import ElementInfoPanel from "./ElementInfoPanel";
 import FourDLegend from "./FourDLegend";
+import ProgressPanel from "./ProgressPanel";
+import ResourceHistogramChart from "./ResourceHistogramChart";
+import VideoExportDialog from "./VideoExportDialog";
 
 const IfcViewer = dynamic(() => import("./IfcViewer"), { ssr: false });
 
@@ -30,6 +45,45 @@ export interface FourDViewerProps {
 
 /** Map from schedule task UID → set of fragment localIds */
 type TaskLocalIdMap = Map<number, Set<number>>;
+
+/** Comparison mode for planned vs actual overlay */
+export type ComparisonMode = "off" | "overlay" | "heatmap";
+
+// ============================================================
+// Comparison color helpers
+// ============================================================
+
+/** Color codes for planned vs actual comparison overlay */
+const COMPARISON_COLORS = {
+  ahead: "#10B981",     // emerald-500 — ahead of schedule
+  onTrack: "#6b7280",   // gray-500 — on track (use phase color)
+  behind: "#D97706",    // amber-600 — behind schedule
+  delayed: "#DC2626",   // red-600 — significantly delayed
+} as const;
+
+/**
+ * Get comparison color for a task based on actual vs planned progress.
+ * Returns null if the task should use its normal phase color.
+ */
+function getComparisonColor(
+  actualPct: number,
+  plannedPct: number,
+): string | null {
+  const delta = actualPct - plannedPct;
+  if (delta > 5) return COMPARISON_COLORS.ahead;
+  if (delta >= -10) return null; // on track → use normal phase color
+  if (delta >= -25) return COMPARISON_COLORS.behind;
+  return COMPARISON_COLORS.delayed;
+}
+
+/**
+ * Get heatmap color from SPI value.
+ */
+function getSpiColor(spi: number): string {
+  if (spi >= 1.0) return COMPARISON_COLORS.ahead;
+  if (spi >= 0.75) return COMPARISON_COLORS.behind;
+  return COMPARISON_COLORS.delayed;
+}
 
 // ============================================================
 // Visual state computation
@@ -119,6 +173,22 @@ function computeVisualState(
 }
 
 // ============================================================
+// Comparison mode label helper
+// ============================================================
+
+const COMPARISON_LABELS: Record<ComparisonMode, string> = {
+  off: "Desligado",
+  overlay: "Sobreposição",
+  heatmap: "Mapa calor",
+};
+
+function nextComparisonMode(current: ComparisonMode): ComparisonMode {
+  if (current === "off") return "overlay";
+  if (current === "overlay") return "heatmap";
+  return "off";
+}
+
+// ============================================================
 // Component
 // ============================================================
 
@@ -140,6 +210,23 @@ export default function FourDViewer({
   const [isolatedPhase, setIsolatedPhase] = useState<ConstructionPhase | null>(null);
   const modelRef = useRef<FragmentsModel | null>(null);
   const localIdToLinksRef = useRef<Map<number, ElementTaskLink[]>>(new Map());
+
+  // ── Progress tracking state ──────────────────────────────
+  const [progressEntries, setProgressEntries] = useState<TaskProgress[]>([]);
+  const [baseline, setBaseline] = useState<EvmBaseline | null>(null);
+  const [showProgress, setShowProgress] = useState(false);
+  const [comparisonMode, setComparisonMode] = useState<ComparisonMode>("off");
+  const [showHistogram, setShowHistogram] = useState(false);
+  const [showVideoExport, setShowVideoExport] = useState(false);
+  const [videoSeekMs, setVideoSeekMs] = useState<number | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const togglePlayRef = useRef<(() => void) | null>(null);
+
+  // ── Progress map for quick lookup ────────────────────────
+  const progressMap = useMemo(
+    () => new Map(progressEntries.map((p) => [p.taskUid, p])),
+    [progressEntries],
+  );
 
   // ── Build GUID→task mapping index ──────────────────────────
   const guidToLinks = useMemo(() => {
@@ -287,10 +374,72 @@ export default function FourDViewer({
     return { [modelId]: isolatedIds };
   }, [visualState, modelId, isolatedPhase]);
 
+  // ── Compute planned % per task at current date ──────────────
+  const plannedPctByTask = useMemo(() => {
+    if (!timelineState) return new Map<number, number>();
+    const currentMs = new Date(timelineState.currentDate).getTime();
+    const map = new Map<number, number>();
+    for (const [uid, task] of taskByUid) {
+      if (task.isSummary) continue;
+      const startMs = new Date(task.startDate).getTime();
+      const finishMs = new Date(task.finishDate).getTime();
+      const duration = finishMs - startMs;
+      if (duration <= 0) {
+        map.set(uid, currentMs >= startMs ? 100 : 0);
+      } else if (currentMs >= finishMs) {
+        map.set(uid, 100);
+      } else if (currentMs <= startMs) {
+        map.set(uid, 0);
+      } else {
+        map.set(uid, Math.round(((currentMs - startMs) / duration) * 100));
+      }
+    }
+    return map;
+  }, [timelineState, taskByUid]);
+
+  // ── EVM snapshot for heatmap SPI per task ───────────────────
+  const taskSpiMap = useMemo(() => {
+    if (comparisonMode !== "heatmap" || !baseline) return new Map<number, number>();
+    const snapshot = computeEvmSnapshot(
+      baseline,
+      schedule,
+      progressEntries,
+      timelineState?.currentDate,
+    );
+    const map = new Map<number, number>();
+    for (const tm of snapshot.taskMetrics) {
+      map.set(tm.taskUid, tm.spiRaw);
+    }
+    return map;
+  }, [comparisonMode, baseline, schedule, progressEntries, timelineState?.currentDate]);
+
+  // ── Pre-compute comparison color per task (avoids per-element duplication) ──
+  const taskComparisonColors = useMemo((): Map<number, string> => {
+    if (comparisonMode === "off" || progressEntries.length === 0) return new Map();
+    const colors = new Map<number, string>();
+    for (const [uid, task] of taskByUid) {
+      if (task.isSummary) continue;
+      if (comparisonMode === "heatmap") {
+        const spi = taskSpiMap.get(uid) ?? (progressMap.has(uid) ? 1 : 0);
+        colors.set(uid, getSpiColor(spi));
+      } else {
+        // overlay mode
+        const actualPct = progressMap.get(uid)?.percentComplete ?? 0;
+        const plannedPct = plannedPctByTask.get(uid) ?? 0;
+        const c = getComparisonColor(actualPct, plannedPct);
+        if (c) colors.set(uid, c);
+        // null → use phase color (no entry in map)
+      }
+    }
+    return colors;
+  }, [comparisonMode, progressEntries, taskByUid, taskSpiMap, progressMap, plannedPctByTask]);
+
   // ── Phase highlights: ghost → in-progress → completed (layered) ──
+  // Modified to support comparison overlay/heatmap modes
   const phaseHighlights = useMemo((): PhaseHighlight[] | undefined => {
     if (!modelId || !visualState) return undefined;
     const highlights: PhaseHighlight[] = [];
+    const hasComparison = comparisonMode !== "off" && progressEntries.length > 0;
 
     // Ghost future elements first (very faint, underneath everything)
     // Skip ghosts when a phase is isolated
@@ -302,28 +451,79 @@ export default function FourDViewer({
       });
     }
 
-    // In-progress second (lower opacity)
-    for (const [phase, ids] of visualState.inProgressIds) {
-      if (isolatedPhase && phase !== isolatedPhase) continue;
-      highlights.push({
-        color: phaseColor(phase),
-        opacity: 0.25,
-        elements: { [modelId]: ids },
-      });
-    }
+    if (hasComparison) {
+      // ── Comparison mode: batch localIds by (color, opacity) ──
+      // Uses pre-computed taskComparisonColors for O(1) lookup per element.
+      // Groups all localIds sharing the same color+opacity into one highlight.
+      const colorGroups = new Map<string, Set<number>>();
 
-    // Completed last (higher opacity, rendered on top)
-    for (const [phase, ids] of visualState.completedIds) {
-      if (isolatedPhase && phase !== isolatedPhase) continue;
-      highlights.push({
-        color: phaseColor(phase),
-        opacity: 0.8,
-        elements: { [modelId]: ids },
-      });
+      const addToGroup = (color: string, opacity: number, id: number) => {
+        const key = `${color}:${opacity}`;
+        const existing = colorGroups.get(key);
+        if (existing) {
+          existing.add(id);
+        } else {
+          colorGroups.set(key, new Set([id]));
+        }
+      };
+
+      // Process in-progress elements
+      for (const [phase, ids] of visualState.inProgressIds) {
+        if (isolatedPhase && phase !== isolatedPhase) continue;
+        for (const id of ids) {
+          const links = localIdToLinksRef.current.get(id);
+          if (!links || links.length === 0) continue;
+          const color = taskComparisonColors.get(links[0].taskUid) ?? phaseColor(phase);
+          addToGroup(color, 0.35, id);
+        }
+      }
+
+      // Process completed elements
+      for (const [phase, ids] of visualState.completedIds) {
+        if (isolatedPhase && phase !== isolatedPhase) continue;
+        for (const id of ids) {
+          const links = localIdToLinksRef.current.get(id);
+          if (!links || links.length === 0) continue;
+          const color = taskComparisonColors.get(links[0].taskUid) ?? phaseColor(phase);
+          addToGroup(color, 0.85, id);
+        }
+      }
+
+      // Convert grouped colors into highlights
+      for (const [key, ids] of colorGroups) {
+        const color = key.split(":")[0];
+        const opacity = parseFloat(key.split(":")[1]);
+        highlights.push({
+          color,
+          opacity,
+          elements: { [modelId]: ids },
+        });
+      }
+    } else {
+      // ── Normal mode: phase colors ──
+      // In-progress second (lower opacity)
+      for (const [phase, ids] of visualState.inProgressIds) {
+        if (isolatedPhase && phase !== isolatedPhase) continue;
+        highlights.push({
+          color: phaseColor(phase),
+          opacity: 0.25,
+          elements: { [modelId]: ids },
+        });
+      }
+
+      // Completed last (higher opacity, rendered on top)
+      for (const [phase, ids] of visualState.completedIds) {
+        if (isolatedPhase && phase !== isolatedPhase) continue;
+        highlights.push({
+          color: phaseColor(phase),
+          opacity: 0.8,
+          elements: { [modelId]: ids },
+        });
+      }
     }
 
     return highlights.length > 0 ? highlights : undefined;
-  }, [modelId, visualState, isolatedPhase]);
+  }, [modelId, visualState, isolatedPhase, comparisonMode, progressEntries, taskComparisonColors]);
 
   // ── Selection highlights (white glow on selected task elements) ──
   const selectedLocalIds = useMemo((): Set<number> => {
@@ -409,6 +609,59 @@ export default function FourDViewer({
     return timelineState.activeTasks.some(task => taskLocalIds.has(task.uid));
   }, [timelineState, taskLocalIds]);
 
+  // ── Progress toolbar handlers ──────────────────────────────
+  const handleToggleProgress = useCallback(() => {
+    setShowProgress((prev) => !prev);
+  }, []);
+
+  const handleCycleComparison = useCallback(() => {
+    setComparisonMode((prev) => nextComparisonMode(prev));
+  }, []);
+
+  const handleBaselineCapture = useCallback((bl: EvmBaseline) => {
+    setBaseline(bl);
+  }, []);
+
+  const handleToggleHistogram = useCallback(() => {
+    setShowHistogram((prev) => !prev);
+  }, []);
+
+  const handleToggleVideoExport = useCallback(() => {
+    setShowVideoExport((prev) => !prev);
+  }, []);
+
+  /** Video export seeks timeline by updating currentMs in TimelinePlayer via state */
+  const handleVideoSeek = useCallback((dateMs: number) => {
+    setVideoSeekMs(dateMs);
+  }, []);
+
+  // ── Keyboard shortcuts (Space/P/C/R) ──────────────────────
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      // Skip when typing in an input/textarea/select
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+      switch (e.code) {
+        case "Space":
+          e.preventDefault();
+          togglePlayRef.current?.();
+          break;
+        case "KeyP":
+          handleToggleProgress();
+          break;
+        case "KeyC":
+          if (progressEntries.length > 0) handleCycleComparison();
+          break;
+        case "KeyR":
+          handleToggleHistogram();
+          break;
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleToggleProgress, handleCycleComparison, handleToggleHistogram, progressEntries.length]);
+
   // ── Render ─────────────────────────────────────────────────
   return (
     <div className={`flex flex-col ${className}`}>
@@ -423,6 +676,8 @@ export default function FourDViewer({
           phaseHighlights={phaseHighlights}
           selectionHighlights={selectionHighlights}
           flyToTarget={flyToTarget}
+          externalVisibilityControl
+          canvasRef={canvasRef}
           className="h-full"
         />
 
@@ -450,6 +705,120 @@ export default function FourDViewer({
           isolatedPhase={isolatedPhase}
           onPhaseClick={setIsolatedPhase}
         />
+
+        {/* Progress panel (left side) */}
+        {showProgress && (
+          <ProgressPanel
+            schedule={schedule}
+            progress={progressEntries}
+            baseline={baseline}
+            onProgressChange={setProgressEntries}
+            onBaselineCapture={handleBaselineCapture}
+            onClose={() => setShowProgress(false)}
+          />
+        )}
+
+        {/* Synchro 4D toolbar (top-center) */}
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-1.5 py-1">
+          {/* Progress panel toggle */}
+          <button
+            onClick={handleToggleProgress}
+            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+              showProgress
+                ? "bg-accent text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            title="Painel de progresso"
+          >
+            <ClipboardList className="w-3.5 h-3.5" />
+            Progresso
+          </button>
+
+          <span className="w-px h-4 bg-gray-200" />
+
+          {/* Comparison mode toggle */}
+          <button
+            onClick={handleCycleComparison}
+            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+              comparisonMode !== "off"
+                ? "bg-accent text-white"
+                : progressEntries.length === 0
+                  ? "text-gray-300 cursor-not-allowed"
+                  : "text-gray-600 hover:bg-gray-100"
+            }`}
+            disabled={progressEntries.length === 0}
+            title={`Plano vs Real: ${COMPARISON_LABELS[comparisonMode]}`}
+          >
+            <GitCompareArrows className="w-3.5 h-3.5" />
+            <span>
+              Plano vs Real
+              {comparisonMode !== "off" && (
+                <span className="ml-1 opacity-75">({COMPARISON_LABELS[comparisonMode]})</span>
+              )}
+            </span>
+          </button>
+
+          <span className="w-px h-4 bg-gray-200" />
+
+          {/* Resource histogram toggle */}
+          <button
+            onClick={handleToggleHistogram}
+            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+              showHistogram
+                ? "bg-accent text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            title="Histograma de recursos"
+          >
+            <BarChart3 className="w-3.5 h-3.5" />
+            Recursos
+          </button>
+
+          <span className="w-px h-4 bg-gray-200" />
+
+          {/* Video export */}
+          <button
+            onClick={handleToggleVideoExport}
+            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+              showVideoExport
+                ? "bg-accent text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            title="Exportar vídeo 4D"
+          >
+            <Film className="w-3.5 h-3.5" />
+            Vídeo
+          </button>
+        </div>
+
+        {/* Comparison legend (top-right, shown in overlay/heatmap modes) */}
+        {comparisonMode !== "off" && progressEntries.length > 0 && (
+          <div className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-sm rounded-lg shadow border border-gray-200 px-3 py-2">
+            <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+              {comparisonMode === "overlay" ? "Progresso vs Plano" : "SPI por Tarefa"}
+            </p>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: COMPARISON_COLORS.ahead }} />
+                <span className="text-[9px] text-gray-600">
+                  {comparisonMode === "overlay" ? "Adiantado" : "SPI \u2265 1.0"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: COMPARISON_COLORS.behind }} />
+                <span className="text-[9px] text-gray-600">
+                  {comparisonMode === "overlay" ? "Atrasado" : "SPI 0.75\u20131.0"}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-2 rounded-sm" style={{ backgroundColor: COMPARISON_COLORS.delayed }} />
+                <span className="text-[9px] text-gray-600">
+                  {comparisonMode === "overlay" ? "Muito atrasado" : "SPI < 0.75"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* No-geometry overlay for phases without 3D */}
         {!currentPhasesHave3D && timelineState && timelineState.activeTasks.length > 0 && (
@@ -492,7 +861,41 @@ export default function FourDViewer({
             <span>{coverageStats.mapped}/{coverageStats.total} fases com 3D</span>
           </>
         )}
+        {progressEntries.length > 0 && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span className="text-accent font-medium">
+              {progressEntries.filter((p) => p.percentComplete >= 100).length}/{progressEntries.length} concluídas (real)
+            </span>
+          </>
+        )}
+        {schedule.criticalChain && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span className="flex items-center gap-1">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  schedule.criticalChain.projectBuffer.zone === "green" ? "bg-green-500" :
+                  schedule.criticalChain.projectBuffer.zone === "yellow" ? "bg-amber-500" : "bg-red-500"
+                }`}
+              />
+              Buffer: {Math.round(100 - schedule.criticalChain.projectBuffer.consumedPercent)}%
+            </span>
+          </>
+        )}
       </div>
+
+      {/* Resource histogram (collapsible) */}
+      {showHistogram && timelineState && (
+        <ResourceHistogramChart
+          schedule={schedule}
+          progress={progressEntries.length > 0 ? progressEntries : undefined}
+          baseline={baseline}
+          currentMs={new Date(timelineState.currentDate).getTime()}
+          onSeekToWeek={handleVideoSeek}
+          height={160}
+        />
+      )}
 
       {/* Timeline controls */}
       <TimelinePlayer
@@ -501,7 +904,21 @@ export default function FourDViewer({
         onBarSelect={handleBarSelect}
         selectedTaskUids={selectedTaskUids}
         criticalPathUids={criticalPathUids}
+        progressEntries={progressEntries.length > 0 ? progressEntries : undefined}
+        externalSeekMs={videoSeekMs}
+        onTogglePlayRef={togglePlayRef}
       />
+
+      {/* Video export dialog (modal) */}
+      {showVideoExport && (
+        <VideoExportDialog
+          canvas={canvasRef.current}
+          startDate={schedule.startDate}
+          finishDate={schedule.finishDate}
+          onSeekToDate={handleVideoSeek}
+          onClose={() => setShowVideoExport(false)}
+        />
+      )}
     </div>
   );
 }

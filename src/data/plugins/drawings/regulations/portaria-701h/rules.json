@@ -7281,7 +7281,11 @@
         {
           "field": "drawings.foundationType",
           "operator": "in",
-          "value": ["estacas", "microestacas", "estacas_helicoidais"]
+          "value": [
+            "estacas",
+            "microestacas",
+            "estacas_helicoidais"
+          ]
         },
         {
           "field": "drawings.hasPileLayoutPlan",
@@ -7311,7 +7315,10 @@
         {
           "field": "drawings.foundationType",
           "operator": "in",
-          "value": ["estacas", "microestacas"]
+          "value": [
+            "estacas",
+            "microestacas"
+          ]
         },
         {
           "field": "drawings.hasPileCapDetails",
@@ -7401,7 +7408,11 @@
         {
           "field": "drawings.retainingWallType",
           "operator": "in",
-          "value": ["cortina_ancorada", "berlim_ancorado", "parede_moldada_ancorada"]
+          "value": [
+            "cortina_ancorada",
+            "berlim_ancorado",
+            "parede_moldada_ancorada"
+          ]
         },
         {
           "field": "drawings.hasAnchorageDetails",
@@ -8546,7 +8557,10 @@
         {
           "field": "drawings.foundationType",
           "operator": "in",
-          "value": ["estacas", "microestacas"]
+          "value": [
+            "estacas",
+            "microestacas"
+          ]
         },
         {
           "field": "drawings.pileDetailScale",
@@ -8864,6 +8878,1535 @@
         "NP EN ISO 7518",
         "solos",
         "representação"
+      ]
+    },
+    {
+      "id": "DRW-DEMOLPLAN-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de demolições com faseamento",
+      "description": "O projeto de demolições deve incluir planta com indicação clara das fases de demolição, numeradas sequencialmente e com código de cores para cada fase.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasDemolitionScope",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasDemolitionPhasingPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de faseamento de demolição: {drawings.hasDemolitionPhasingPlan}",
+      "requiredValue": "Planta de demolições com faseamento obrigatória",
+      "remediation": "Incluir planta de demolições (escala 1:50 ou 1:100) com: identificação de cada fase de demolição numerada sequencialmente, código de cores (ex: Fase 1 — amarelo, Fase 2 — laranja, Fase 3 — vermelho), indicação dos elementos estruturais a demolir em cada fase, sequência de demolição de cima para baixo (últimos pisos primeiro), zonas de exclusão e proteção de elementos a manter, posição de equipamentos de demolição (escavadora, tesoura, bola), e caminhos de evacuação de entulho.",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "faseamento",
+        "planta",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-DEMOLPLAN-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Inventário de materiais perigosos em planta de demolição",
+      "description": "A planta de demolições deve identificar e localizar todos os materiais perigosos (amianto, tintas com chumbo, PCBs), com simbologia específica e referência ao plano de remoção.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasDemolitionScope",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasHazardousMaterialsInventoryOnPlan",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Inventário de materiais perigosos na planta: {drawings.hasHazardousMaterialsInventoryOnPlan}",
+      "requiredValue": "Localização de materiais perigosos obrigatória na planta de demolição",
+      "remediation": "Identificar na planta de demolições todos os materiais perigosos conforme levantamento prévio: amianto (fibrocimento em coberturas, isolamentos, pavimentos vinílicos), tintas com chumbo (caixilharias antigas, superfícies metálicas), PCBs (condensadores em equipamentos elétricos antigos), fibras minerais (isolamentos de AVAC). Usar simbologia distinta para cada tipo (triângulo com código de cor: vermelho — amianto, laranja — chumbo, roxo — PCB). Referenciar o plano de remoção aprovado e a entidade licenciada para remoção.",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "materiais perigosos",
+        "amianto",
+        "segurança",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-DEMOLPLAN-03",
+      "regulationId": "np-en-iso-7518",
+      "article": "NP EN ISO 7518 — Simbologia de demolição nos desenhos",
+      "description": "Os elementos a demolir devem ser representados com a simbologia normalizada de demolição conforme NP EN ISO 7518, diferenciando claramente elementos a manter e a remover.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasDemolitionScope",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.demolitionSymbologyNormalized",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Simbologia de demolição normalizada: {drawings.demolitionSymbologyNormalized}",
+      "requiredValue": "Simbologia de demolição conforme NP EN ISO 7518",
+      "remediation": "Aplicar simbologia normalizada NP EN ISO 7518 nos desenhos de demolição: elementos a demolir representados com hachura cruzada (X) em linhas finas a 45°, elementos existentes a manter em linha contínua normal, elementos novos a construir em linha grossa ou preenchimento sólido. Incluir legenda clara em cada folha com a correspondência entre grafismo e estado do elemento (a demolir / a manter / novo).",
+      "enabled": true,
+      "tags": [
+        "demolição",
+        "simbologia",
+        "NP EN ISO 7518",
+        "representação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-TRABPROV-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de obras provisórias com cálculo de dimensionamento",
+      "description": "Os desenhos de obras provisórias devem incluir memória de cálculo resumida ou referência ao documento de dimensionamento, com indicação das cargas de projeto.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasTemporaryWorksDrawings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.temporaryWorksDesignReference",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Referência a cálculo de obras provisórias: {drawings.temporaryWorksDesignReference}",
+      "requiredValue": "Referência a memória de cálculo obrigatória nos desenhos de obras provisórias",
+      "remediation": "Incluir em cada desenho de obras provisórias: referência ao documento de cálculo (número e data da memória de cálculo), cargas de projeto consideradas (peso próprio, sobrecargas de construção, vento, empuxos de terras), coeficientes de segurança aplicados, classe de consequência (CC1, CC2, CC3 conforme EN 1990), validade temporal do projeto (data limite de utilização), e nota indicando que qualquer alteração requer revisão pelo projetista de obras provisórias.",
+      "enabled": true,
+      "tags": [
+        "obras provisórias",
+        "cálculo",
+        "dimensionamento",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-TRABPROV-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de caminhos de circulação e acessos em obras provisórias",
+      "description": "Os desenhos de obras provisórias devem indicar os caminhos de circulação de peões e veículos, acessos de emergência e zonas de exclusão durante a construção.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasTemporaryWorksDrawings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasTemporaryCirculationPaths",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Caminhos de circulação em obras provisórias: {drawings.hasTemporaryCirculationPaths}",
+      "requiredValue": "Caminhos de circulação e acessos obrigatórios nos desenhos de obras provisórias",
+      "remediation": "Indicar na planta de obras provisórias: caminhos de circulação pedonal (largura mínima 0,60 m, protegidos com guarda-corpos), caminhos de veículos e maquinaria (largura conforme equipamento, com raios de curvatura), acessos de emergência (mantidos desobstruídos, sinalizados), zonas de exclusão sob cargas suspensas e trabalhos em altura, pontos de reunião de emergência, e localização de equipamentos de combate a incêndio e primeiros socorros.",
+      "enabled": true,
+      "tags": [
+        "obras provisórias",
+        "circulação",
+        "acessos",
+        "segurança",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESCOR-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Pormenor de escoramento com indicação de cargas",
+      "description": "Os pormenores de escoramento devem indicar as cargas de projeto transmitidas, tipo de escoramento, espaçamento entre prumos e travamento lateral.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasShoringDrawings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.shoringLoadIndicationsPresent",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Indicação de cargas no escoramento: {drawings.shoringLoadIndicationsPresent}",
+      "requiredValue": "Cargas de projeto obrigatórias nos pormenores de escoramento",
+      "remediation": "Indicar nos pormenores de escoramento (escala 1:20 ou 1:50): carga por prumo (kN), carga total por área (kN/m²), tipo de escoramento (torres, prumos telescópicos, escoras metálicas), espaçamento entre prumos nas duas direções, travamento lateral (cruzetas, diagonais, contraventamento horizontal), tipo e dimensões das bases (pés reguláveis, pranchas de repartição), altura máxima de escoramento sem travamento intermédio, e referência à ficha técnica do sistema utilizado.",
+      "enabled": true,
+      "tags": [
+        "escoramento",
+        "cargas",
+        "prumos",
+        "pormenor",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESCOR-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de escoramento com sequência de descofragem",
+      "description": "Os desenhos de escoramento devem incluir a sequência e os prazos mínimos de descofragem/descimbramento, compatíveis com a resistência do betão.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasShoringDrawings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasStrikingSequence",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Sequência de descimbramento: {drawings.hasStrikingSequence}",
+      "requiredValue": "Sequência e prazos de descimbramento obrigatórios nos desenhos de escoramento",
+      "remediation": "Indicar na planta e/ou notas de escoramento: prazos mínimos de descimbramento conforme EN 13670 e NP EN 1992-1-1 (lajes: 7-28 dias dependendo do vão; vigas: 14-28 dias; consolas: mínimo 28 dias), sequência de remoção de escoras (do centro para os apoios), requisito de resistência mínima do betão à data de descimbramento (geralmente ≥ 70% de fck), reescoramentos necessários nos pisos inferiores, e condições de verificação antes do descimbramento (ensaios de maturidade ou esclerómetro).",
+      "enabled": true,
+      "tags": [
+        "escoramento",
+        "descimbramento",
+        "prazos",
+        "betão",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESCOR-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Pormenor de escoramento em zonas de grande altura",
+      "description": "Em zonas com altura de escoramento superior a 3,5 m, os pormenores devem incluir detalhes de contraventamento intermédio e verificação de estabilidade.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.shoringMaxHeightM",
+          "operator": ">",
+          "value": 3.5
+        },
+        {
+          "field": "drawings.hasHighShoringBracingDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Altura máxima de escoramento: {drawings.shoringMaxHeightM} m — pormenor de contraventamento: {drawings.hasHighShoringBracingDetail}",
+      "requiredValue": "Pormenor de contraventamento obrigatório para escoramento com h > 3,5 m",
+      "remediation": "Elaborar pormenor específico de escoramento para alturas superiores a 3,5 m (escala 1:20): incluir contraventamento horizontal intermédio a cada 2,0 m de altura, diagonais de contraventamento vertical em ambas as direções (intervalos ≤ 5 m), ligação das diagonais aos prumos (braçadeiras ou encaixes do sistema), verificação de estabilidade global (carga crítica de Euler), bases em sapatas ou plataformas niveladas, e nota indicando obrigatoriedade de verificação por engenheiro de estruturas.",
+      "enabled": true,
+      "tags": [
+        "escoramento",
+        "altura",
+        "contraventamento",
+        "estabilidade",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-REBAIXAMENTO-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta do sistema de rebaixamento do nível freático",
+      "description": "Quando necessário rebaixamento do nível freático, o projeto deve incluir planta com localização de poços de bombagem, wellpoints ou drenos, e caudais de extração.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.requiresDewatering",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasDewateringLayoutPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de rebaixamento: {drawings.hasDewateringLayoutPlan}",
+      "requiredValue": "Planta do sistema de rebaixamento do nível freático obrigatória",
+      "remediation": "Incluir planta de rebaixamento (escala 1:100 ou 1:200) com: localização e espaçamento dos poços/wellpoints (tipicamente 1,0 a 3,0 m entre wellpoints), profundidade de cada poço, nível freático existente e nível objetivo de rebaixamento, caudal estimado de bombagem (l/min por poço e total), traçado do coletor de aspiração/descarga, localização das bombas (submersíveis ou de vácuo), ponto de descarga das águas (rede pluvial ou linha de água com autorização), e perímetro de influência do rebaixamento com efeito nas construções vizinhas.",
+      "enabled": true,
+      "tags": [
+        "rebaixamento",
+        "nível freático",
+        "bombagem",
+        "wellpoints",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-REBAIXAMENTO-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Corte do sistema de rebaixamento com níveis",
+      "description": "O projeto de rebaixamento deve incluir corte com indicação dos níveis freáticos, profundidade dos poços, camadas de solo e raio de influência.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.requiresDewatering",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasDewateringSectionDrawing",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Corte de rebaixamento: {drawings.hasDewateringSectionDrawing}",
+      "requiredValue": "Corte do sistema de rebaixamento com níveis obrigatório",
+      "remediation": "Elaborar corte do sistema de rebaixamento (escala 1:50 ou 1:100) com: perfil geotécnico simplificado (camadas de solo com permeabilidade), nível freático natural (linha a tracejado azul), nível freático rebaixado (linha contínua azul), profundidade dos poços/wellpoints em relação à cota da escavação, cone de depressão estimado (raio de influência), cota do fundo de escavação, folga de segurança entre nível rebaixado e fundo de escavação (mínimo 0,5 m), e indicação do caudal por poço.",
+      "enabled": true,
+      "tags": [
+        "rebaixamento",
+        "corte",
+        "níveis",
+        "geotecnia",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SONDAGENS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de localização de sondagens geotécnicas",
+      "description": "O projeto deve incluir planta com localização exata de todas as sondagens geotécnicas realizadas, com coordenadas e cota do terreno.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasGeotechnicalInvestigation",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasBoreholeLocationPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de localização de sondagens: {drawings.hasBoreholeLocationPlan}",
+      "requiredValue": "Planta de localização de sondagens geotécnicas obrigatória",
+      "remediation": "Incluir planta de localização de sondagens (escala 1:200 ou 1:500) com: posição de cada sondagem (S1, S2, ...) com coordenadas (sistema PT-TM06/ETRS89), cota do terreno em cada ponto (m), tipo de sondagem (mecânica rotativa, percussão, SPT, CPTU, poço de prospeção), profundidade atingida, sobreposição com a implantação do edifício (para verificar representatividade), distância entre sondagens (geralmente ≤ 30 m para edifícios correntes), e identificação de sondagens com ensaios especiais (Lefranc, Lugeon, pressiométro).",
+      "enabled": true,
+      "tags": [
+        "sondagens",
+        "geotecnia",
+        "localização",
+        "prospeção",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SONDAGENS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Perfis de sondagem nos desenhos geotécnicos",
+      "description": "Os perfis de sondagem devem ser representados nos desenhos com indicação das camadas de solo, valores de SPT, nível freático e amostras recolhidas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasBoreholeLocationPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasBoreholeLogDrawings",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Perfis de sondagem nos desenhos: {drawings.hasBoreholeLogDrawings}",
+      "requiredValue": "Perfis de sondagem geotécnica incluídos nos desenhos",
+      "remediation": "Incluir perfis de sondagem (escala vertical 1:50 ou 1:100) com: coluna litológica com simbologia normalizada (conforme NP EN ISO 7518), profundidade de cada camada, classificação do solo (USCS ou EN ISO 14688), valores de N(SPT) a cada 1,5 m de profundidade, profundidade do nível freático (data de medição), amostras recolhidas (tipo: remexida, indeformada, carote), ensaios in situ realizados (SPT, vane test, pressiómetro), e observações relevantes (perdas de água, blocos, cavidades).",
+      "enabled": true,
+      "tags": [
+        "sondagens",
+        "perfis",
+        "SPT",
+        "geotecnia",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SONDAGENS-03",
+      "regulationId": "np-en-iso-7518",
+      "article": "NP EN ISO 7518 — Representação de perfis geológicos interpolados",
+      "description": "Os cortes geológicos interpolados entre sondagens devem usar simbologia normalizada e indicar claramente a natureza interpretativa da interpolação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasGeologicalProfiles",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.geologicalProfilesShowInterpolationNote",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Nota de interpolação nos perfis geológicos: {drawings.geologicalProfilesShowInterpolationNote}",
+      "requiredValue": "Perfis geológicos interpolados com nota de interpretação",
+      "remediation": "Nos cortes geológicos entre sondagens: representar a coluna de cada sondagem real em linha contínua grossa, a interpolação entre sondagens em linha tracejada ou tom mais claro, incluir nota 'Perfil interpretativo — as transições reais entre camadas podem diferir', usar simbologia NP EN ISO 7518 para representação dos solos, indicar a distância horizontal entre sondagens, e referenciar os ensaios laboratoriais que sustentam a classificação (granulometria, limites de Atterberg, teor de humidade).",
+      "enabled": true,
+      "tags": [
+        "geotecnia",
+        "perfis geológicos",
+        "interpolação",
+        "NP EN ISO 7518",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTACAS-04",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Planta de implantação de estacas com tabela de cargas",
+      "description": "A planta de fundações por estacas deve incluir implantação de todas as estacas com numeração e tabela de cargas por estaca ou grupo de estacas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.foundationType",
+          "operator": "in",
+          "value": [
+            "estacas",
+            "microestacas"
+          ]
+        },
+        {
+          "field": "drawings.hasPileLayoutWithLoadTable",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de estacas com tabela de cargas: {drawings.hasPileLayoutWithLoadTable}",
+      "requiredValue": "Planta de implantação de estacas com tabela de cargas obrigatória",
+      "remediation": "Incluir planta de implantação de estacas (escala 1:50 ou 1:100) com: numeração sequencial de cada estaca (E1, E2, ...), coordenadas de implantação (referidas a eixos do edifício), tipo e diâmetro de cada estaca, tabela de cargas (N.º da estaca, carga vertical permanente, carga vertical variável, carga horizontal, momento fletor), comprimento previsto de cada estaca, cota de cabeça e cota de ponta, e tolerâncias de implantação (tipicamente ±75 mm para estacas moldadas e ±25 mm para microestacas).",
+      "enabled": true,
+      "tags": [
+        "fundações",
+        "estacas",
+        "tabela de cargas",
+        "implantação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTACAS-05",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Pormenor de maciço de encabeçamento de estacas",
+      "description": "O projeto deve incluir pormenor do maciço de encabeçamento com armaduras, dimensões, embebimento da estaca e ligação ao pilar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.foundationType",
+          "operator": "in",
+          "value": [
+            "estacas",
+            "microestacas"
+          ]
+        },
+        {
+          "field": "drawings.hasPileCapDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de maciço de encabeçamento: {drawings.hasPileCapDetail}",
+      "requiredValue": "Pormenor de maciço de encabeçamento obrigatório",
+      "remediation": "Elaborar pormenor de maciço de encabeçamento (escala 1:20) com: dimensões em planta e altura do maciço, armadura inferior (tirantes entre estacas), armadura superior, estribos verticais, comprimento de embebimento da estaca no maciço (mínimo 50 mm ou 1 diâmetro de varão longitudinal), arranques do pilar (comprimento de amarração conforme EC2), betão de limpeza (mínimo 50 mm), recobrimento das armaduras (mínimo 50 mm em contacto com solo), e classe de betão e aço especificados.",
+      "enabled": true,
+      "tags": [
+        "fundações",
+        "estacas",
+        "maciço",
+        "encabeçamento",
+        "pormenor",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ESTACAS-06",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Critérios de aceitação de estacas nos desenhos",
+      "description": "Os desenhos de fundações por estacas devem incluir nota com os critérios de aceitação: nega, resistência mínima e tolerâncias de desvio.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.foundationType",
+          "operator": "in",
+          "value": [
+            "estacas",
+            "microestacas"
+          ]
+        },
+        {
+          "field": "drawings.pileAcceptanceCriteriaOnDrawings",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Critérios de aceitação nos desenhos: {drawings.pileAcceptanceCriteriaOnDrawings}",
+      "requiredValue": "Critérios de aceitação de estacas indicados nos desenhos",
+      "remediation": "Incluir nos desenhos de estacas nota com critérios de aceitação: nega de cravação (para estacas cravadas), resistência mínima no ensaio de carga estático (≥ 1,5 × carga de serviço), critério de integridade (ensaio sónico — amplitude máxima de reflexão), tolerância de posição em planta (±75 mm para Ø ≥ 600, ±50 mm para microestacas), desvio de verticalidade (≤ 2% do comprimento ou 1:50), e procedimento em caso de não-conformidade (estaca de substituição ou reforço de maciço).",
+      "enabled": true,
+      "tags": [
+        "fundações",
+        "estacas",
+        "critérios de aceitação",
+        "ensaios",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPERCAVE-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de impermeabilização de cave com sistema de drenagem",
+      "description": "O projeto de caves deve incluir planta de impermeabilização com indicação do sistema de drenagem periférica, pendentes da laje de fundo e localização de bombas.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasBasementOrRetainingWalls",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasBasementWaterproofingPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de impermeabilização de cave: {drawings.hasBasementWaterproofingPlan}",
+      "requiredValue": "Planta de impermeabilização de cave obrigatória",
+      "remediation": "Incluir planta de impermeabilização de cave (escala 1:50 ou 1:100) com: tipo de sistema impermeabilizante (membrana betuminosa, bentonite, membrana líquida), traçado do dreno periférico (DN110 mínimo, pendente ≥ 0,5%), pendentes da laje de fundo (mínimo 1% para caleiras de recolha), localização da(s) caixa(s) de bombagem com bomba submersível (caudal e pressão), pontos de descarga, juntas de betonagem impermeabilizadas (waterstop ou juntas injectáveis), e cota do nível freático de projeto comparada com a cota da laje de fundo.",
+      "enabled": true,
+      "tags": [
+        "impermeabilização",
+        "cave",
+        "drenagem",
+        "bombagem",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-IMPERCAVE-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pormenor de junta de betonagem estanque em caves",
+      "description": "As juntas de betonagem em caves enterradas devem ter pormenor com indicação do tipo de junta estanque (waterstop, junta injectável ou perfil hidro-expansivo).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasBasementOrRetainingWalls",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasWatertightJointDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de junta estanque: {drawings.hasWatertightJointDetail}",
+      "requiredValue": "Pormenor de junta de betonagem estanque obrigatório em caves",
+      "remediation": "Elaborar pormenor de junta de betonagem estanque (escala 1:5 ou 1:2) com: tipo de junta (waterstop PVC — largura mínima 200 mm, perfil hidro-expansivo de bentonite, ou tubo de injeção), posição da junta na secção do elemento (centrada na espessura), método de fixação (amarração às armaduras), tratamento da superfície de junta (picagem e limpeza do betão antes da retoma), distância máxima entre juntas de betonagem (recomendado 6-8 m em paredes), e sequência de betonagem (referência ao plano de betonagem).",
+      "enabled": true,
+      "tags": [
+        "impermeabilização",
+        "junta de betonagem",
+        "waterstop",
+        "cave",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-JUNTADIL-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Planta de juntas de dilatação do edifício",
+      "description": "O projeto deve incluir planta com indicação de todas as juntas de dilatação, com espaçamento e largura da junta em cada localização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.buildingLengthM",
+          "operator": ">",
+          "value": 30
+        },
+        {
+          "field": "drawings.hasExpansionJointPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de juntas de dilatação: {drawings.hasExpansionJointPlan}",
+      "requiredValue": "Planta de juntas de dilatação obrigatória para edifícios com comprimento > 30 m",
+      "remediation": "Incluir planta de juntas de dilatação (escala 1:100 ou 1:200) com: localização de cada junta (tipicamente a cada 30-40 m em betão armado), largura da junta (calculada em função do comprimento do bloco, variação térmica ΔT e coeficiente de dilatação — tipicamente 20-40 mm), continuidade da junta em toda a altura do edifício (desde fundações até cobertura), numeração das juntas (JD1, JD2, ...), e referência aos pormenores tipo para cada localização (junta em laje, parede, cobertura, fachada).",
+      "enabled": true,
+      "tags": [
+        "juntas de dilatação",
+        "planta",
+        "estrutura",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-JUNTADIL-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Pormenor de junta de dilatação em laje",
+      "description": "O projeto deve incluir pormenor da junta de dilatação na laje com indicação do perfil de selagem, apoio duplo e acabamento de piso.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasExpansionJointPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasExpansionJointSlabDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de junta de dilatação em laje: {drawings.hasExpansionJointSlabDetail}",
+      "requiredValue": "Pormenor de junta de dilatação em laje obrigatório",
+      "remediation": "Elaborar pormenor de junta de dilatação em laje (escala 1:5 ou 1:10) com: largura da folga (conforme cálculo), perfil de selagem (neoprene ou poliuretano, com referência ao fabricante), fundo de junta (cordão de polietileno expansido), apoio duplo da laje em cada lado (consola curta ou dente), recobrimento e armaduras junto à junta, acabamento de piso em ambos os lados (interrupção coordenada com acabamento), e proteção mecânica do perfil (mata-juntas metálico se em zona de tráfego).",
+      "enabled": true,
+      "tags": [
+        "juntas de dilatação",
+        "laje",
+        "pormenor",
+        "selagem",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-JUNTADIL-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 6.º — Pormenor de junta de dilatação em fachada",
+      "description": "O projeto deve incluir pormenor da junta de dilatação na fachada com indicação da solução de estanquidade e acabamento exterior.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasExpansionJointPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasExpansionJointFacadeDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de junta de dilatação em fachada: {drawings.hasExpansionJointFacadeDetail}",
+      "requiredValue": "Pormenor de junta de dilatação em fachada obrigatório",
+      "remediation": "Elaborar pormenor de junta de dilatação em fachada (escala 1:5) com: solução de estanquidade exterior (perfil de silicone ou EPDM com compressão), cordão de fundo de junta, proteção contra infiltração (dupla barreira: exterior selada + interior drenante), acabamento exterior (cobre-juntas em alumínio ou perfil de dilatação pré-fabricado), compatibilidade com o sistema ETICS ou revestimento cerâmico (interrupção coordenada), e detalhe de ligação à junta da cobertura e da laje inferior.",
+      "enabled": true,
+      "tags": [
+        "juntas de dilatação",
+        "fachada",
+        "estanquidade",
+        "pormenor",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-JUNTAMOV-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de juntas de movimento em revestimentos",
+      "description": "Os desenhos de revestimentos devem incluir a localização das juntas de movimento (retração, contorno, intermediárias) em pavimentos e paredes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasFloorFinishDrawings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasMovementJointLayout",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Planta de juntas de movimento: {drawings.hasMovementJointLayout}",
+      "requiredValue": "Planta de juntas de movimento em revestimentos obrigatória",
+      "remediation": "Incluir planta de juntas de movimento (escala 1:50) com: juntas de contorno perimetrais (junto a paredes, pilares, soleiras — largura 5-10 mm), juntas intermédias em pavimentos (a cada 4-6 m em cerâmico, 3-4 m em pedra natural), juntas de retração em betonilhas (a cada 4-5 m, espessura 1/3 da betonilha), juntas sobre as juntas estruturais (coincidentes em posição e largura), e material de preenchimento (silicone, poliuretano ou perfil pré-fabricado). Indicar tipo de perfil de junta conforme o tráfego previsto.",
+      "enabled": true,
+      "tags": [
+        "juntas de movimento",
+        "revestimentos",
+        "pavimentos",
+        "cerâmico",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-JUNTAMOV-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pormenor de junta de movimento em revestimento cerâmico de fachada",
+      "description": "As fachadas com revestimento cerâmico ou pedra colada devem incluir pormenor das juntas de movimento horizontais e verticais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.facadeType",
+          "operator": "in",
+          "value": [
+            "cerâmico colado",
+            "pedra colada",
+            "porcelânico ventilado"
+          ]
+        },
+        {
+          "field": "drawings.hasFacadeMovementJointDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de junta de movimento em fachada: {drawings.hasFacadeMovementJointDetail}",
+      "requiredValue": "Pormenor de juntas de movimento em revestimento de fachada obrigatório",
+      "remediation": "Elaborar pormenor de juntas de movimento em fachada (escala 1:2 ou 1:5) com: juntas horizontais a cada piso (coincidentes com a laje), juntas verticais a cada 3-6 m (conforme exposição solar e cor do revestimento), largura mínima de 6 mm (ou conforme EN 13888), fundo de junta em cordão de polietileno, selante de silicone neutro (compatível com pedra natural se aplicável), e reforço da impermeabilização na zona da junta (rede de fibra de vidro + argamassa flexível).",
+      "enabled": true,
+      "tags": [
+        "juntas de movimento",
+        "fachada",
+        "cerâmico",
+        "pedra",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-COORDSERV-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Cortes de coordenação de instalações em tetos falsos",
+      "description": "O projeto deve incluir cortes de coordenação mostrando todas as instalações na zona de teto falso (AVAC, sprinklers, elétrico, dados) com cotas de passagem.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSuspendedCeilings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasServicesCoordinationSections",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Cortes de coordenação de instalações: {drawings.hasServicesCoordinationSections}",
+      "requiredValue": "Cortes de coordenação de instalações no teto falso obrigatórios",
+      "remediation": "Elaborar cortes de coordenação (escala 1:20 ou 1:25) nas zonas críticas (corredores, zonas técnicas, cruzamentos principais): indicar cota inferior da laje estrutural, cota superior do teto falso, todas as redes na zona de plenum (condutas AVAC — com isolamento, tubagem de sprinklers, esteiras de cabos elétricos e dados, tubagens de águas e esgotos), cotas de eixo e fundo de cada rede, folgas mínimas entre redes (50 mm) e entre rede mais baixa e teto falso (50 mm para manutenção). Atribuir código de cores por especialidade.",
+      "enabled": true,
+      "tags": [
+        "coordenação",
+        "instalações",
+        "teto falso",
+        "cortes",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-COORDSERV-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Cortes de coordenação em courettes e ductos técnicos",
+      "description": "O projeto deve incluir cortes de coordenação em cada courette ou ducto técnico, demonstrando que todas as redes cabem no espaço disponível.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasServiceShafts",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasShaftCoordinationSections",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cortes de coordenação em courettes: {drawings.hasShaftCoordinationSections}",
+      "requiredValue": "Cortes de coordenação em courettes/ductos técnicos obrigatórios",
+      "remediation": "Elaborar corte horizontal de cada courette (escala 1:10 ou 1:20) com: dimensões interiores da courette, todas as tubagens e condutas que a atravessam (identificadas por especialidade e diâmetro), folga mínima entre tubagens (25 mm) e entre tubagens e paredes (50 mm para manutenção), acessos de manutenção (portas ou painéis amovíveis — largura mínima 0,40 m), isolamento acústico (lã mineral 40 mm na face interior), resistência ao fogo das paredes da courette (EI 60 ou EI 120), e selagem corta-fogo nas passagens entre pisos.",
+      "enabled": true,
+      "tags": [
+        "coordenação",
+        "courettes",
+        "ductos técnicos",
+        "instalações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-COORDSERV-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de reservas e atravessamentos em elementos estruturais",
+      "description": "O projeto deve incluir planta de reservas (negativos) em lajes, vigas e paredes para passagem de instalações, com coordenação entre especialidades.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasStructuralProject",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasSleeveAndPenetrationPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de reservas e atravessamentos: {drawings.hasSleeveAndPenetrationPlan}",
+      "requiredValue": "Planta de reservas para instalações em elementos estruturais obrigatória",
+      "remediation": "Incluir planta de reservas (escala 1:50) para cada piso com: localização de cada negativo (coordenadas e cota), dimensão do negativo (diâmetro ou largura × altura), especialidade que o utiliza (AVAC, elétrico, águas, esgotos, gás), reforço estrutural necessário (armaduras adicionais conforme cálculo do estruturista), manga passante (aço ou PVC, com folga de 25 mm), selagem corta-fogo (tipo e resistência), e nota proibindo furação de elementos estruturais em obra sem autorização do projetista.",
+      "enabled": true,
+      "tags": [
+        "coordenação",
+        "reservas",
+        "atravessamentos",
+        "estrutura",
+        "instalações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-TECTOFALSO-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de tetos (planta refletida)",
+      "description": "O projeto de arquitetura deve incluir planta refletida de tetos com indicação de materiais, cotas de nível, sancas, equipamentos embutidos e grelhas de ventilação.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasSuspendedCeilings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasReflectedCeilingPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta refletida de tetos: {drawings.hasReflectedCeilingPlan}",
+      "requiredValue": "Planta refletida de tetos obrigatória",
+      "remediation": "Incluir planta refletida de tetos (escala 1:50) para cada piso com: tipo de teto (gesso cartonado, metálico, mineral, madeira), cotas de nível do teto em cada zona (com referência ao ±0.00), sancas e rebaixos (com dimensões e iluminação indireta se aplicável), posição de luminárias (coordenada com projeto de iluminação), grelhas e difusores de AVAC (coordenados com projeto mecânico), sprinklers (coordenados com projeto de incêndio), detetores de incêndio e intrusão, altifalantes (se aplicável), e alçapões de acesso a válvulas e equipamentos no plenum.",
+      "enabled": true,
+      "tags": [
+        "teto falso",
+        "planta refletida",
+        "arquitetura",
+        "coordenação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-TECTOFALSO-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pormenor de suspensão e estrutura de teto falso",
+      "description": "O projeto deve incluir pormenor da estrutura de suspensão do teto falso, com indicação de perfis, espaçamento de pendurais e reforços para equipamentos pesados.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasSuspendedCeilings",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasCeilingSuspensionDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de suspensão de teto falso: {drawings.hasCeilingSuspensionDetail}",
+      "requiredValue": "Pormenor de suspensão de teto falso recomendado",
+      "remediation": "Elaborar pormenor de suspensão (escala 1:10) com: tipo de perfil (T visível, T oculto, omega), espaçamento dos pendurais (máximo 1,2 m para gesso cartonado, conforme fabricante), tipo de fixação à laje (bucha metálica, varão roscado M6/M8), reforços para equipamentos pesados (luminárias > 5 kg, projetores, grelhas motorizadas — suspensão independente), junta de dilatação do teto (a cada 10-15 m ou sobre juntas estruturais), e remate perimetral (cantoneira L ou perfil U, fixado à parede a cada 0,60 m).",
+      "enabled": true,
+      "tags": [
+        "teto falso",
+        "suspensão",
+        "pormenor",
+        "estrutura",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPAPORTAS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Mapa de portas com especificações completas",
+      "description": "O projeto deve incluir mapa de portas (door schedule) com identificação de cada porta, dimensões, tipo, material, resistência ao fogo e acessórios.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": [
+            "execução",
+            "licenciamento"
+          ]
+        },
+        {
+          "field": "drawings.hasDoorSchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de portas: {drawings.hasDoorSchedule}",
+      "requiredValue": "Mapa de portas obrigatório no projeto de execução",
+      "remediation": "Incluir mapa de portas (tabela) com colunas: referência (P01, P02, ...), localização (piso/compartimento), dimensão do vão (largura × altura), tipo (batente, correr, pivotante, vai-vém), material da folha (madeira, metálica, vidro, mista), material do aro (madeira, metálico, alumínio), acabamento (lacado, folheado, pintado — cor RAL), resistência ao fogo (EI 30, EI 60, EI 120 — onde aplicável), isolamento acústico (Rw em dB — onde exigido), ferragens (dobradiças, fechadura, mola, barra antipânico), e observações (vidro de inspeção, grelha de ventilação, soleira).",
+      "enabled": true,
+      "tags": [
+        "mapa de portas",
+        "door schedule",
+        "especificações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPAPORTAS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pormenor tipo de portas corta-fogo",
+      "description": "O projeto deve incluir pormenor tipo de instalação de portas corta-fogo, com indicação do aro, selagem, mola e sinalização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasFireRatedDoors",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasFireDoorInstallationDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de porta corta-fogo: {drawings.hasFireDoorInstallationDetail}",
+      "requiredValue": "Pormenor tipo de porta corta-fogo obrigatório",
+      "remediation": "Elaborar pormenor tipo de porta corta-fogo (escala 1:5 ou 1:10) com: aro metálico (aço galvanizado 1,5 mm mínimo), selagem intumescente perimetral (tira intumescente no aro ou na folha), mola aérea (EN 1154 — força de fecho regulável), fecho automático (eletroíman com ligação à central de incêndio para portas normalmente abertas), barra antipânico (EN 1125 — se em via de evacuação), vedante acústico e de fumo (EN 1634-3), sinalização 'Porta corta-fogo — manter fechada', e nota com classe de resistência (EI₂ 30-C, EI₂ 60-C conforme RT-SCIE).",
+      "enabled": true,
+      "tags": [
+        "portas corta-fogo",
+        "pormenor",
+        "incêndio",
+        "segurança",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPAPORTAS-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Correspondência entre mapa de portas e plantas",
+      "description": "Todas as portas indicadas nas plantas devem ter referência ao mapa de portas, e vice-versa, garantindo correspondência biunívoca.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasDoorSchedule",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.doorScheduleMatchesPlans",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Correspondência mapa de portas / plantas: {drawings.doorScheduleMatchesPlans}",
+      "requiredValue": "Correspondência biunívoca entre mapa de portas e plantas",
+      "remediation": "Verificar e garantir correspondência completa entre o mapa de portas e as plantas: cada porta na planta deve ter etiqueta com a referência do mapa (P01, P02, ...), cada entrada no mapa deve corresponder a uma porta localizada na planta, o sentido de abertura nas plantas deve ser consistente com o tipo indicado no mapa, e as dimensões de vão nas plantas devem coincidir com as do mapa. Incluir nota de cross-reference entre os documentos.",
+      "enabled": true,
+      "tags": [
+        "mapa de portas",
+        "correspondência",
+        "plantas",
+        "verificação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPAJANELAS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Mapa de vãos envidraçados com especificações",
+      "description": "O projeto deve incluir mapa de vãos envidraçados (window schedule) com dimensões, tipo de caixilharia, vidro, desempenho térmico e acústico.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": [
+            "execução",
+            "licenciamento"
+          ]
+        },
+        {
+          "field": "drawings.hasWindowSchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de vãos envidraçados: {drawings.hasWindowSchedule}",
+      "requiredValue": "Mapa de vãos envidraçados obrigatório no projeto de execução",
+      "remediation": "Incluir mapa de vãos envidraçados com colunas: referência (J01, J02, ...), localização (piso/fachada/compartimento), dimensão do vão (largura × altura), tipo de abertura (batente, oscilobatente, correr, fixo, projetante), material da caixilharia (alumínio com corte térmico, PVC, madeira), cor/acabamento (RAL), tipo de vidro (duplo 6+16+6, triplo, laminado, temperado), coeficiente térmico Uw (W/m².K — conforme REH), fator solar g⊥ (com proteção solar), isolamento acústico Rw (dB), classe de permeabilidade ao ar (EN 12207), e estanquidade à água (EN 12208).",
+      "enabled": true,
+      "tags": [
+        "mapa de janelas",
+        "window schedule",
+        "caixilharia",
+        "vidro",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MAPAJANELAS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pormenor tipo de instalação de caixilharia",
+      "description": "O projeto deve incluir pormenores tipo de instalação de caixilharia, com corte vertical e horizontal mostrando ligação ao vão, isolamento e remate.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasWindowSchedule",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasWindowInstallationDetails",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de instalação de caixilharia: {drawings.hasWindowInstallationDetails}",
+      "requiredValue": "Pormenor tipo de instalação de caixilharia obrigatório",
+      "remediation": "Elaborar pormenores tipo de instalação de caixilharia (escala 1:2 ou 1:5): corte vertical (peitoril, travessa superior, ligação ao capoto/ETICS) e corte horizontal (montante lateral, ligação à ombreira). Indicar: posição do caixilho no vão (alinhado com o isolamento para minimizar ponte térmica), fixação mecânica (parafusos com bucha ou garras), espuma de poliuretano (preenchimento da folga), banda de estanquidade interior (barreira de vapor) e exterior (impermeável ao ar e água mas permeável ao vapor), isolamento térmico na ombreira (mínimo 20 mm de XPS/EPS), e peitoril exterior com pingadeira (pendente 5%).",
+      "enabled": true,
+      "tags": [
+        "caixilharia",
+        "instalação",
+        "pormenor",
+        "isolamento",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-FERRAGENS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Mapa de ferragens (ironmongery schedule)",
+      "description": "O projeto deve incluir mapa de ferragens para todas as portas, com especificação de dobradiças, fechaduras, puxadores, molas e acessórios.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasDoorSchedule",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasIronmongerySchedule",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Mapa de ferragens: {drawings.hasIronmongerySchedule}",
+      "requiredValue": "Mapa de ferragens obrigatório quando existe mapa de portas",
+      "remediation": "Incluir mapa de ferragens (tabela) com: referência da porta (P01, P02, ...), dobradiças (tipo, quantidade, acabamento — inox, latão, cromado), fechadura (tipo — cilindro europeu, magnética, antipânico; sistema de chave mestra se aplicável), puxador (modelo, altura de montagem — 1000-1100 mm), mola aérea (EN 1154, força de fecho, com/sem braço de retenção), batente de porta (tipo e posição), vedante acústico e de fumo, barra antipânico (EN 1125/EN 179 — se em via de evacuação), e acessórios especiais (visor, grelha de ventilação, sinalética táctil).",
+      "enabled": true,
+      "tags": [
+        "ferragens",
+        "ironmongery",
+        "portas",
+        "especificações",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-FERRAGENS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Especificação de sistema de chave mestra",
+      "description": "Em edifícios com controlo de acessos por chave, o projeto deve incluir diagrama do sistema de chave mestra (master key) com hierarquia de acessos.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasMasterKeySystem",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasMasterKeyDiagram",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Diagrama de chave mestra: {drawings.hasMasterKeyDiagram}",
+      "requiredValue": "Diagrama de sistema de chave mestra incluído no projeto",
+      "remediation": "Incluir diagrama de sistema de chave mestra com: hierarquia de chaves (grande mestre, mestre de piso, mestre de zona, chaves individuais), identificação de cada cilindro e sua posição no diagrama, grupos de acesso (ex: manutenção acede a todas as áreas técnicas, limpeza acede a todos os pisos), número total de cilindros e chaves, referência ao fabricante do sistema (compatível com as fechaduras especificadas no mapa de ferragens), e nota sobre fornecimento de cartão de segurança para reprodução de chaves.",
+      "enabled": true,
+      "tags": [
+        "ferragens",
+        "chave mestra",
+        "master key",
+        "acessos",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MOBILIARIO-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de disposição de mobiliário",
+      "description": "O projeto deve incluir planta de disposição de mobiliário para validar a funcionalidade dos espaços, circulações e cumprimento de áreas mínimas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.projectPhase",
+          "operator": "in",
+          "value": [
+            "execução",
+            "licenciamento"
+          ]
+        },
+        {
+          "field": "drawings.hasFurnitureLayoutPlan",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Planta de mobiliário: {drawings.hasFurnitureLayoutPlan}",
+      "requiredValue": "Planta de disposição de mobiliário recomendada no projeto de execução",
+      "remediation": "Incluir planta de disposição de mobiliário (escala 1:50) com: representação à escala de todo o mobiliário fixo e móvel (mesas, cadeiras, armários, camas, sofás), largura de circulação entre peças de mobiliário (mínimo 0,90 m em habitação, 1,20 m em escritórios — conforme DL 163/2006 para acessibilidade), zona de abertura de portas e gavetas (sem conflito), posição de tomadas e interruptores coordenada com o mobiliário, e verificação de áreas úteis mínimas por compartimento conforme RGEU.",
+      "enabled": true,
+      "tags": [
+        "mobiliário",
+        "layout",
+        "funcionalidade",
+        "circulação",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-MOBILIARIO-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de mobiliário fixo com pormenores",
+      "description": "O mobiliário fixo (cozinhas, armários embutidos, bancadas) deve ter planta com cotas e referência a pormenores de execução.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasBuiltInFurniture",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasBuiltInFurnitureDetails",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenores de mobiliário fixo: {drawings.hasBuiltInFurnitureDetails}",
+      "requiredValue": "Pormenores de mobiliário fixo obrigatórios",
+      "remediation": "Elaborar planta e alçados de mobiliário fixo (escala 1:20 ou 1:50) com: cotas gerais e parciais, materiais (MDF, melamina, pedra, aço inox), acabamento (cor, textura, brilho), ferragens de fixação (tipo e espaçamento), equipamentos embutidos (eletrodomésticos, lavatórios, torneiras — com marca e modelo), pontos de alimentação (água, gás, eletricidade — coordenados com instalações), e referência a pormenores de remate (ligação a paredes, rodapé, sanca de iluminação).",
+      "enabled": true,
+      "tags": [
+        "mobiliário fixo",
+        "cozinha",
+        "armários",
+        "pormenor",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SINALIZ-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de sinalização de segurança e emergência",
+      "description": "O projeto deve incluir planta de sinalização de segurança e emergência com localização de todos os sinais, conforme RT-SCIE e EN ISO 7010.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.buildingUsageType",
+          "operator": "not_in",
+          "value": [
+            "habitação unifamiliar"
+          ]
+        },
+        {
+          "field": "drawings.hasEmergencySignagePlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de sinalização de emergência: {drawings.hasEmergencySignagePlan}",
+      "requiredValue": "Planta de sinalização de segurança e emergência obrigatória",
+      "remediation": "Incluir planta de sinalização (escala 1:100 ou 1:50) com: sinais de saída de emergência (EN ISO 7010 E001/E002 — luminosos, altura ≥ 2,10 m), sinais de percurso de evacuação (setas direcionais a cada mudança de direção), sinais de extintores e bocas de incêndio (a 1,20-1,50 m do pavimento), sinais de proibição (proibido fumar, etc.), sinais de obrigação (EPI em zonas técnicas), plantas de emergência (junto a entradas e em cada piso, conforme NP 4386), e dimensionamento dos sinais conforme distância de leitura (d = Z × s, com Z conforme EN ISO 7010).",
+      "enabled": true,
+      "tags": [
+        "sinalização",
+        "segurança",
+        "emergência",
+        "EN ISO 7010",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-SINALIZ-02",
+      "regulationId": "iso-7001",
+      "article": "ISO 7001 — Sinalização de orientação e informação pública",
+      "description": "Os desenhos de sinalização devem incluir planta de sinais de orientação e informação pública conforme ISO 7001 para edifícios de acesso público.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.buildingUsageType",
+          "operator": "in",
+          "value": [
+            "comércio",
+            "serviços",
+            "equipamento",
+            "hotelaria",
+            "saúde",
+            "ensino"
+          ]
+        },
+        {
+          "field": "drawings.hasWayfindingSignagePlan",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Planta de sinalização de orientação: {drawings.hasWayfindingSignagePlan}",
+      "requiredValue": "Planta de sinalização de orientação recomendada para edifícios públicos",
+      "remediation": "Incluir planta de sinalização de orientação (escala 1:100) com: sinais diretórios nos acessos (listagem de pisos e funções), sinais direcionais nos corredores (setas com pictogramas ISO 7001), sinais de identificação em cada porta/sala (nome, número, pictograma), sinais de acessibilidade (WC adaptado, elevador, rampa), sinais de serviços (telefone, informação, primeiros socorros), tipo de suporte (bandeira, topo, parede, suspensa), e material e dimensões (conforme manual de imagem do edifício, se existente).",
+      "enabled": true,
+      "tags": [
+        "sinalização",
+        "orientação",
+        "wayfinding",
+        "ISO 7001",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-REGA-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de rega automática com traçado e setores",
+      "description": "O projeto de espaços exteriores deve incluir planta de rega automática com traçado de tubagens, setores, aspersores/gotejadores e programador.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasLandscapeIrrigationRequired",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasIrrigationLayoutPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de rega automática: {drawings.hasIrrigationLayoutPlan}",
+      "requiredValue": "Planta de rega automática obrigatória quando especificada",
+      "remediation": "Incluir planta de rega automática (escala 1:100 ou 1:200) com: traçado de tubagens principais e secundárias (material PE ou PEAD, diâmetros), setores de rega numerados (S1, S2, ...), tipo de emissores por setor (aspersores — raio e ângulo, pulverizadores, gotejadores — espaçamento e caudal), electroválvulas (localização e diâmetro), programador (localização, número de estações), ponto de ligação à rede de abastecimento (com contador dedicado se exigido), pressão e caudal necessários, e pluviometria de cada setor (mm/h — conforme necessidade hídrica das espécies).",
+      "enabled": true,
+      "tags": [
+        "rega",
+        "irrigação",
+        "paisagismo",
+        "aspersores",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-REGA-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Pormenor de ligação de rega ao abastecimento de água",
+      "description": "O projeto de rega deve incluir pormenor da ligação à rede de abastecimento, com válvula de retenção, contador e filtro.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasIrrigationLayoutPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasIrrigationConnectionDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Pormenor de ligação de rega: {drawings.hasIrrigationConnectionDetail}",
+      "requiredValue": "Pormenor de ligação de rega ao abastecimento recomendado",
+      "remediation": "Elaborar pormenor de ligação (escala 1:10 ou 1:20) com: válvula de corte geral, válvula de retenção (anti-retorno — obrigatória para evitar contaminação da rede pública), contador dedicado (se exigido pela entidade gestora), filtro (malha ou discos — 120 mesh para gotejadores, 80 mesh para aspersores), redutor de pressão (se pressão de rede > 4 bar), purga e ponto de drenagem, e electroválvula mestre (master valve — para segurança em caso de fuga). Indicar diâmetros e materiais de todos os componentes.",
+      "enabled": true,
+      "tags": [
+        "rega",
+        "ligação",
+        "abastecimento",
+        "pormenor",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-REGA-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Cálculo hidráulico do sistema de rega nos desenhos",
+      "description": "Os desenhos de rega devem incluir tabela com o cálculo hidráulico simplificado de cada setor (caudal, pressão, perda de carga).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasIrrigationLayoutPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasIrrigationHydraulicCalculation",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Cálculo hidráulico de rega: {drawings.hasIrrigationHydraulicCalculation}",
+      "requiredValue": "Cálculo hidráulico do sistema de rega incluído nos desenhos",
+      "remediation": "Incluir tabela de cálculo hidráulico com: setor (S1, S2, ...), número de emissores, caudal total do setor (l/min), pressão de operação (bar), perda de carga na tubagem (calculada — fórmula de Hazen-Williams ou equivalente), perda de carga na electroválvula e filtro, pressão requerida no ponto de ligação, e verificação de que o caudal e pressão disponíveis na rede são suficientes. A perda de velocidade na tubagem não deve exceder 1,5 m/s.",
+      "enabled": true,
+      "tags": [
+        "rega",
+        "cálculo hidráulico",
+        "caudal",
+        "pressão",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ILUMEXT-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de iluminação exterior",
+      "description": "O projeto deve incluir planta de iluminação exterior com localização de luminárias, postes, projetores e circuitos de alimentação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasExteriorSpaces",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasExteriorLightingPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de iluminação exterior: {drawings.hasExteriorLightingPlan}",
+      "requiredValue": "Planta de iluminação exterior obrigatória",
+      "remediation": "Incluir planta de iluminação exterior (escala 1:200 ou 1:500) com: localização de cada ponto de luz (postes, apliques de fachada, balizas, projetores, encastrados de piso), tipo e potência de cada luminária (LED — potência em W e fluxo em lm), altura de montagem (postes: tipicamente 3-6 m), circuito de alimentação (traçado, secção, proteção), quadro de alimentação (localização), sistema de controlo (relógio astronómico, crepuscular, programador), e níveis de iluminância previstos (lux — conforme EN 12464-2 para zonas de circulação: 5-20 lux, parques: 10-50 lux).",
+      "enabled": true,
+      "tags": [
+        "iluminação exterior",
+        "luminárias",
+        "postes",
+        "LED",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-ILUMEXT-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Minimização de poluição luminosa em iluminação exterior",
+      "description": "A planta de iluminação exterior deve demonstrar medidas de minimização de poluição luminosa, com luminárias de emissão descendente (full cut-off).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "drawings.hasExteriorLightingPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.exteriorLightingPollutionMitigation",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Mitigação de poluição luminosa: {drawings.exteriorLightingPollutionMitigation}",
+      "requiredValue": "Medidas de minimização de poluição luminosa nos desenhos de iluminação exterior",
+      "remediation": "Indicar nos desenhos de iluminação exterior: tipo de distribuição luminosa (full cut-off ou cut-off — ULOR = 0%), temperatura de cor (≤ 3000K em zonas residenciais para reduzir impacto ecológico), horário de redução de intensidade (dimming noturno após 23h — redução ≥ 50%), inclinação das luminárias (0° — horizontais, nunca apontadas para cima), e nota com classificação da zona de poluição luminosa (E1 a E4 conforme CIE 150). Em zonas sensíveis (junto a áreas naturais protegidas), usar filtros âmbar (≤ 2200K).",
+      "enabled": true,
+      "tags": [
+        "iluminação exterior",
+        "poluição luminosa",
+        "full cut-off",
+        "sustentabilidade",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VENTPARK-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de ventilação de parque de estacionamento subterrâneo",
+      "description": "O projeto de parque subterrâneo deve incluir planta de ventilação com condutas, ventiladores, grelhas de admissão/extração e caudais.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasUndergroundParking",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasParkingVentilationPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta de ventilação do parque: {drawings.hasParkingVentilationPlan}",
+      "requiredValue": "Planta de ventilação de parque subterrâneo obrigatória",
+      "remediation": "Incluir planta de ventilação (escala 1:100 ou 1:200) com: condutas de admissão de ar novo e extração de ar viciado (dimensões e material), ventiladores (tipo: axial ou centrífugo, caudal, pressão estática, potência), grelhas de admissão (localização, área livre, velocidade do ar ≤ 3 m/s), pontos de extração (distribuídos para evitar zonas mortas), caudal mínimo de ventilação (300 l/s por lugar segundo RT-SCIE, ou 6 renovações/hora), ventiladores jet fans (se sistema por impulso — localização, espaçamento, direção de impulso), e detetores de CO (localização — 1 por cada 400 m²).",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "parque",
+        "estacionamento",
+        "subterrâneo",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VENTPARK-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Modo de desenfumagem do parque de estacionamento",
+      "description": "A planta de ventilação do parque deve incluir o modo de desenfumagem (smoke exhaust), com indicação de caudais majorados e comando pela central de incêndio.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasUndergroundParking",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasParkingSmokeExhaustMode",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Modo de desenfumagem do parque: {drawings.hasParkingSmokeExhaustMode}",
+      "requiredValue": "Modo de desenfumagem obrigatório na planta de ventilação do parque",
+      "remediation": "Indicar na planta de ventilação o modo de desenfumagem: caudal de extração majorado (mínimo 10 renovações/hora ou conforme simulação CFD), admissão forçada de ar novo (pelo menos 60% do caudal de extração), registos corta-fogo em condutas que atravessam compartimentos (EI 120), comando automático pela central de incêndio (ativação por detetores de fumo ou sprinklers), comando manual junto ao acesso dos bombeiros, velocidade mínima do ar nos percursos de evacuação (≥ 1 m/s), e nota referindo conformidade com RT-SCIE (artigos relevantes para parques).",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "desenfumagem",
+        "parque",
+        "incêndio",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-VENTPARK-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Corte de ventilação do parque com alturas livres",
+      "description": "O projeto deve incluir corte mostrando o sistema de ventilação do parque com condutas, jet fans e a verificação de alturas livres mínimas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasParkingVentilationPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasParkingVentilationSection",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Corte de ventilação do parque: {drawings.hasParkingVentilationSection}",
+      "requiredValue": "Corte de ventilação do parque com alturas livres obrigatório",
+      "remediation": "Elaborar corte de ventilação do parque (escala 1:50) com: cota inferior da laje de teto, condutas de ventilação (com isolamento se aplicável), jet fans (cota de instalação, folga mínima ao teto: 200 mm), tubagem de sprinklers, iluminação, e verificação da altura livre mínima sob equipamentos (≥ 2,20 m em vias de circulação e ≥ 2,10 m em lugares de estacionamento conforme RGEU). Indicar as zonas críticas onde a acumulação de redes reduz a altura livre.",
+      "enabled": true,
+      "tags": [
+        "ventilação",
+        "parque",
+        "corte",
+        "alturas livres",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CAISCARGAS-01",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta do cais de cargas e descarga",
+      "description": "O projeto deve incluir planta do cais de cargas com dimensionamento dos docas, zonas de manobra de veículos pesados e acessos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "drawings.hasLoadingBayRequirement",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasLoadingBayPlan",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "currentValueTemplate": "Planta do cais de cargas: {drawings.hasLoadingBayPlan}",
+      "requiredValue": "Planta do cais de cargas obrigatória",
+      "remediation": "Incluir planta do cais de cargas (escala 1:100 ou 1:200) com: número e dimensão dos docas (largura mínima 3,50 m, profundidade conforme veículo — articulado: 16,50 m, rígido 2 eixos: 10 m), zona de manobra (raio de viragem do veículo de projeto), cota da plataforma de carga (1,20 m para veículos pesados), rampas de acesso (pendente máxima 12%), portões de doca (tipo e dimensões), niveladores de doca (tipo: hidráulico, mecânico), sentido de circulação de veículos, e separação entre zona de peões e veículos pesados.",
+      "enabled": true,
+      "tags": [
+        "cais de cargas",
+        "loading bay",
+        "docas",
+        "logística",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CAISCARGAS-02",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Corte do cais de cargas com nivelador de doca",
+      "description": "O projeto deve incluir corte do cais de cargas com indicação da plataforma, nivelador de doca, abrigo de doca e drenagem.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasLoadingBayPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasLoadingBaySectionDetail",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Corte do cais de cargas: {drawings.hasLoadingBaySectionDetail}",
+      "requiredValue": "Corte do cais de cargas com nivelador de doca obrigatório",
+      "remediation": "Elaborar corte do cais de cargas (escala 1:20 ou 1:50) com: cota da plataforma de carga (1,20 m — ajustável com nivelador), nivelador de doca (tipo hidráulico — comprimento mínimo 2,50 m, capacidade de carga conforme utilização), abrigo de doca (shelter — tipo almofada ou cortina, proteção contra intempéries), para-choques de borracha (proteção da estrutura), portão seccional (com visor e segurança fotocélula), caleira de drenagem (na soleira exterior), pendente do pavimento exterior (2% para drenagem), e iluminação da doca (mínimo 150 lux na zona de carga).",
+      "enabled": true,
+      "tags": [
+        "cais de cargas",
+        "nivelador",
+        "corte",
+        "doca",
+        "portaria-701h"
+      ]
+    },
+    {
+      "id": "DRW-CAISCARGAS-03",
+      "regulationId": "portaria-701h-2008",
+      "article": "Art. 11.º — Planta de circulação de veículos pesados no cais de cargas",
+      "description": "O projeto deve incluir verificação de circulação de veículos pesados com raios de curvatura e simulação de varredura.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "drawings.hasLoadingBayPlan",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "drawings.hasVehicleSweptPathAnalysis",
+          "operator": "!=",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Simulação de varredura de veículos: {drawings.hasVehicleSweptPathAnalysis}",
+      "requiredValue": "Verificação de circulação de veículos pesados obrigatória",
+      "remediation": "Incluir na planta do cais de cargas a verificação de circulação de veículos pesados: veículo de projeto (articulado 16,50 m ou rígido conforme utilização), raio de curvatura interior mínimo (articulado: 6,00 m interior, 12,50 m exterior), simulação de varredura (swept path analysis) nos pontos críticos (entrada, curvas, inversão de marcha, acostagem ao doca), largura mínima de via (3,50 m para sentido único, 6,50 m para duplo sentido), altura livre mínima (4,50 m), e sinalização horizontal (marcação de vias, setas, zona de proibição de estacionamento).",
+      "enabled": true,
+      "tags": [
+        "cais de cargas",
+        "circulação",
+        "veículos pesados",
+        "varredura",
+        "portaria-701h"
       ]
     }
   ]

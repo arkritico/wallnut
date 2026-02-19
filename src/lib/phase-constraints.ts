@@ -29,7 +29,7 @@ export interface PhaseEquipmentEntry {
 }
 
 // ============================================================
-// Phase Overlap Rules (26 Portuguese construction rules)
+// Phase Overlap Rules (30 Portuguese construction rules)
 // ============================================================
 
 export const PHASE_OVERLAP_RULES: PhaseOverlapRule[] = [
@@ -123,16 +123,18 @@ export const PHASE_OVERLAP_RULES: PhaseOverlapRule[] = [
   {
     phase1: "flooring",
     phase2: "plumbing_fixtures",
-    canOverlap: true,
-    reason: "Loiças sanitárias podem ser instaladas durante pavimentação",
+    canOverlap: false,
+    minimumGap: 1,
+    reason: "Pavimentos devem estar assentes antes de fixar loiças sanitárias",
   },
 
-  // External works
+  // External works (must wait for scaffolding removal)
   {
     phase1: "external_finishes",
     phase2: "external_works",
-    canOverlap: true,
-    reason: "Arranjos exteriores podem começar durante acabamentos de fachada",
+    canOverlap: false,
+    minimumGap: 0,
+    reason: "Fachadas terminadas e andaimes removidos antes de arranjos exteriores",
   },
 
   // Rough-in phases (can overlap with each other)
@@ -166,8 +168,9 @@ export const PHASE_OVERLAP_RULES: PhaseOverlapRule[] = [
   {
     phase1: "ceilings",
     phase2: "electrical_fixtures",
-    canOverlap: true,
-    reason: "Luminárias podem ser instaladas após tetos falsos",
+    canOverlap: false,
+    minimumGap: 0,
+    reason: "Tetos falsos completos antes de instalar aparelhagem definitiva",
   },
 
   // Fire safety
@@ -175,7 +178,97 @@ export const PHASE_OVERLAP_RULES: PhaseOverlapRule[] = [
     phase1: "fire_safety",
     phase2: "testing",
     canOverlap: false,
-    reason: "Sistema de incêndio deve estar instalado antes de testar",
+    minimumGap: 2,
+    reason: "Sistema de incêndio deve estar instalado e verificado antes de ensaios",
+  },
+
+  // ── Additional constraints (rules 21-30) ──
+
+  // Insulation must cure before external finishes
+  {
+    phase1: "insulation",
+    phase2: "external_finishes",
+    canOverlap: false,
+    minimumGap: 3,
+    reason: "Isolamento necessita cura antes de acabamentos exteriores",
+  },
+
+  // Metalwork and painting cannot overlap (shared scaffolding)
+  {
+    phase1: "metalwork",
+    phase2: "painting",
+    canOverlap: false,
+    minimumGap: 0,
+    reason: "Andaimes partilhados entre serralharia e pintura",
+  },
+
+  // Gas rough-in must finish before testing
+  {
+    phase1: "rough_in_gas",
+    phase2: "testing",
+    canOverlap: false,
+    minimumGap: 3,
+    reason: "Instalação de gás deve estar completa e estanque antes de ensaios",
+  },
+
+  // External walls before insulation
+  {
+    phase1: "external_walls",
+    phase2: "insulation",
+    canOverlap: false,
+    minimumGap: 2,
+    reason: "Alvenaria exterior deve secar antes de aplicar isolamento",
+  },
+
+  // Roof before external frames (waterproofing sequence)
+  {
+    phase1: "roof",
+    phase2: "external_frames",
+    canOverlap: false,
+    minimumGap: 1,
+    reason: "Cobertura deve estar estanque antes de instalar caixilharias",
+  },
+
+  // HVAC rough-in can overlap with telecom
+  {
+    phase1: "rough_in_hvac",
+    phase2: "rough_in_telecom",
+    canOverlap: true,
+    reason: "AVAC e telecomunicações podem trabalhar em paralelo",
+  },
+
+  // Gas rough-in can overlap with electrical
+  {
+    phase1: "rough_in_gas",
+    phase2: "rough_in_electrical",
+    canOverlap: true,
+    reason: "Gás e elétrica em zonas distintas — podem trabalhar em paralelo",
+  },
+
+  // Telecom rough-in can overlap with plumbing
+  {
+    phase1: "rough_in_telecom",
+    phase2: "rough_in_plumbing",
+    canOverlap: true,
+    reason: "Telecomunicações e canalizações em zonas distintas",
+  },
+
+  // Elevators need structure complete and shaft clear
+  {
+    phase1: "structure",
+    phase2: "elevators",
+    canOverlap: false,
+    minimumGap: 5,
+    reason: "Caixa de elevador deve estar completa e curada antes de instalação",
+  },
+
+  // Cleanup cannot overlap with testing
+  {
+    phase1: "testing",
+    phase2: "cleanup",
+    canOverlap: false,
+    minimumGap: 0,
+    reason: "Ensaios devem estar concluídos antes de limpeza final",
   },
 ];
 
@@ -189,9 +282,12 @@ export const PHASE_EQUIPMENT: PhaseEquipmentEntry[] = [
   { phase: "structure", equipment: ["crane", "concrete_pump", "scaffolding"] },
   { phase: "external_walls", equipment: ["scaffolding"] },
   { phase: "roof", equipment: ["crane", "scaffolding"] },
+  { phase: "waterproofing", equipment: ["scaffolding"] },
   { phase: "external_finishes", equipment: ["scaffolding"] },
+  { phase: "metalwork", equipment: ["scaffolding"] },
   { phase: "painting", equipment: ["scaffolding"] },
   { phase: "elevators", equipment: ["crane"] },
+  { phase: "external_works", equipment: ["crane"] },
 ];
 
 // ============================================================

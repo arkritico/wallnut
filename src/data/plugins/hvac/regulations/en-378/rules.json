@@ -113,6 +113,117 @@
       "remediation": "Planear transição para refrigerantes de baixo GWP conforme calendário F-Gas: (1) R-410A (GWP 2088) → R-32 (GWP 675) ou R-454B (GWP 466) para split/VRF. (2) R-404A (GWP 3922) → R-449A (GWP 1397) como retrofit, ou R-744 (CO₂, GWP 1) para novo equipamento. (3) R-134a (GWP 1430) → R-1234ze (GWP 7) ou R-513A (GWP 631) para chillers. (4) Proibições já em vigor: R-404A/R-507A em novo equipamento frigorífico comercial desde 2020. (5) A partir de 2025: proibição de manutenção com R-404A virgem em equipamentos > 40 tCO₂eq.",
       "enabled": true,
       "tags": ["F-Gas", "GWP", "phase-down", "refrigerante", "transição"]
+    },
+    {
+      "id": "HVAC-REF-CHARGE-LIMIT-VRF-01",
+      "regulationId": "en-378",
+      "article": "EN 378-1 §5.4.3 — Limite de Carga de Refrigerante em Sistemas VRF",
+      "description": "A carga total de refrigerante do sistema VRF ({hvac.vrfTotalCharge} kg) excede o limite prático para o menor espaço servido, exigindo medidas adicionais de segurança conforme EN 378-1.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.vrfTotalCharge", "operator": ">", "value": 0 },
+        { "field": "hvac.hasVRFSystem", "operator": "==", "value": true },
+        { "field": "hvac.vrfChargeExceedsSmallestRoom", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.vrfTotalCharge} kg (menor espaço: {hvac.smallestRoomVolume} m³)",
+      "requiredValue": "Carga ≤ PL × volume do menor espaço, ou deteção + ventilação de emergência",
+      "remediation": "Em sistemas VRF, a carga total pode ser significativa (20-80 kg): (1) Calcular PL × volume do menor espaço servido — se carga total > este valor, instalar deteção de refrigerante em cada espaço com volume inferior ao limite. (2) Para R-410A: PL = 0.44 kg/m³ — sala de 15 m³ admite máximo 6.6 kg. (3) Para R-32 (A2L): PL = 0.061 kg/m³ — sala de 15 m³ admite apenas 0.9 kg. (4) Com R-32: considerar sistema VRF água (circuito de refrigerante apenas na unidade exterior) para eliminar o risco. (5) Detetor + ventilação de emergência: caudal ≥ 4 renovações/hora, alarme a 25% LFL.",
+      "enabled": true,
+      "tags": ["EN 378", "VRF", "refrigerante", "carga", "R-32", "segurança"]
+    },
+    {
+      "id": "HVAC-REF-A2L-IGNITION-01",
+      "regulationId": "en-378",
+      "article": "EN 378-1 §6.5 — Fontes de Ignição para Refrigerantes A2L",
+      "description": "O espaço com equipamento contendo refrigerante A2L (R-32, R-454B) possui fontes de ignição potenciais não protegidas na zona de acumulação do refrigerante em caso de fuga.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.refrigerantSafetyClass", "operator": "==", "value": "A2L" },
+        { "field": "hvac.hasIgnitionSourceControl", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Eliminação de fontes de ignição na zona de acumulação de refrigerante A2L",
+      "remediation": "Para refrigerantes A2L (ligeiramente inflamáveis): (1) Identificar fontes de ignição na zona baixa do espaço (< 0.6 m do solo para refrigerantes mais pesados que o ar). (2) Eliminar ou proteger: tomadas elétricas desprotegidas, interruptores não estanques, aquecedores com resistência exposta, equipamentos com arco elétrico. (3) Instalar detetor de refrigerante com corte automático do equipamento AVAC e ativação de ventilação de emergência. (4) Para unidades interiores split/VRF com R-32: verificar que as ligações elétricas internas são estanques ou spark-free. (5) A EN 378 não proíbe A2L em espaços ocupados, mas exige avaliação de risco documentada.",
+      "enabled": true,
+      "tags": ["EN 378", "A2L", "ignição", "R-32", "segurança", "inflamável"]
+    },
+    {
+      "id": "HVAC-REF-VRF-OIL-RETURN-01",
+      "regulationId": "en-378",
+      "article": "EN 378-2 §6.3 + EN 14511 — Retorno de Óleo em Sistemas VRF",
+      "description": "O sistema VRF com tubagem vertical extensa ({hvac.vrfVerticalRise} m) não possui sistema adequado de retorno de óleo (oil traps, oil separators), correndo risco de deficiência de lubrificação no compressor e falha catastrófica.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.vrfVerticalRise", "operator": ">", "value": 30 },
+        { "field": "hvac.hasVRFSystem", "operator": "==", "value": true },
+        { "field": "hvac.hasOilReturnSystem", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Desnível vertical: {hvac.vrfVerticalRise} m",
+      "requiredValue": "Sistema de retorno de óleo obrigatório para desníveis > 30 m conforme instruções do fabricante VRF",
+      "remediation": "Garantir retorno de óleo adequado no sistema VRF: (1) Oil traps (sifões de óleo): instalar a cada 6-10 m de subida vertical na linha de aspiração e na linha de líquido. (2) Separador de óleo: instalar na descarga do compressor para sistemas com tubagem total > 100 m equivalentes. (3) Ciclo de retorno de óleo: verificar que o controlador VRF executa ciclos periódicos de retorno de óleo (oil recovery cycle) — tipicamente a cada 4-8 h. (4) Velocidade do gás: manter velocidade mínima na linha de aspiração de 4-6 m/s em troços verticais ascendentes para arrastar o óleo. (5) Dupla subida (double riser): para sistemas com grande variação de caudal — tubo pequeno para baixa carga + tubo grande para plena carga.",
+      "enabled": true,
+      "tags": ["EN 378", "VRF", "óleo", "retorno", "lubrificação", "compressor"]
+    },
+    {
+      "id": "HVAC-REF-CHILLED-BEAM-01",
+      "regulationId": "en-378",
+      "article": "EN 378-1 + EN 15116 — Especificações de Vigas Frias (Chilled Beams)",
+      "description": "As vigas frias ativas (active chilled beams) não foram dimensionadas conforme EN 15116, apresentando potência de arrefecimento insuficiente ({hvac.chilledBeamCoolingCapacity} W/m) para a carga térmica da zona.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.chilledBeamCoolingCapacity", "operator": "<", "value": 150 },
+        { "field": "hvac.hasChilledBeams", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "{hvac.chilledBeamCoolingCapacity} W/m de potência de arrefecimento",
+      "requiredValue": "≥ 150-300 W/m por viga fria ativa conforme EN 15116 e carga térmica da zona",
+      "remediation": "Verificar dimensionamento das vigas frias conforme EN 15116: (1) Potência típica: vigas frias ativas 150-300 W/m em arrefecimento, 80-150 W/m em aquecimento. (2) Temperatura da água: 14-16°C (arrefecimento), 35-45°C (aquecimento) — compatível com bombas de calor de alta eficiência. (3) Caudal de ar primário: 10-15 L/s por metro linear de viga — o ar primário induz ar ambiente sobre a bateria (efeito venturi). (4) Controlo de condensação: sensor de ponto de orvalho + válvula de corte de água fria. (5) Posicionamento: junto a fachadas para compensar carga solar, espaçamento entre vigas de 2-3 m para cobertura uniforme. (6) Conforto acústico: NC < 30 para vigas frias (principal vantagem vs. ventiloconvectores).",
+      "enabled": true,
+      "tags": ["viga fria", "chilled beam", "EN 15116", "arrefecimento", "conforto"]
+    },
+    {
+      "id": "HVAC-REF-CONDENSATE-CHILLER-01",
+      "regulationId": "en-378",
+      "article": "EN 378-2 §6.2.5 — Drenagem de Condensados em Chillers e Evaporadores",
+      "description": "O evaporador do chiller ou da bomba de calor não possui sistema adequado de drenagem de condensados no lado do ar, podendo resultar em acumulação de gelo no evaporador e perda progressiva de eficiência.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasChillerCondensateDrain", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasChiller", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Sistema de drenagem de condensados funcional no evaporador do chiller",
+      "remediation": "Garantir drenagem adequada de condensados no evaporador: (1) Tabuleiro de condensados: inox 304 ou alumínio, inclinação ≥ 2% para o ponto de drenagem. (2) Sifão: altura = 2× a pressão estática do ventilador para evitar aspiração de ar pela drenagem. (3) Aquecimento do tabuleiro: resistência de 30-50 W/m para evitar congelação dos condensados em evaporadores a temperatura negativa (armazenamento de gelo). (4) Tubo de drenagem: DN32 mínimo, isolado termicamente para evitar condensação exterior. (5) Ponto de descarga: ligação ao esgoto com corta-odores (sifão com guarda de água). (6) Manutenção: limpeza trimestral do tabuleiro e verificação do sifão.",
+      "enabled": true,
+      "tags": ["EN 378", "condensados", "chiller", "evaporador", "drenagem"]
+    },
+    {
+      "id": "HVAC-REF-LEAK-DETECT-SYS-01",
+      "regulationId": "en-378",
+      "article": "EN 378-3 §7 — Sistema de Deteção de Fugas de Refrigerante em Salas de Máquinas",
+      "description": "A sala de máquinas de refrigeração com carga total de refrigerante superior ao limite prático ({hvac.refrigerantPracticalLimit} kg/m³ × volume da sala) não possui sistema de deteção de fugas fixo com alarme em dois patamares e ativação automática de ventilação de emergência conforme EN 378-3.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasFixedLeakDetection", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasMachineRoom", "operator": "==", "value": true },
+        { "field": "hvac.refrigerantCharge", "operator": ">", "value": 10 }
+      ],
+      "requiredValue": "Deteção de fugas fixa com 2 patamares de alarme e ventilação de emergência automática (EN 378-3 §7)",
+      "remediation": "Instalar sistema de deteção de fugas conforme EN 378-3: (1) Sensores: tipo NDIR (infravermelho) ou semicondutor, calibrados para o refrigerante específico. Localização: a 150 mm do solo para refrigerantes mais pesados que o ar, a 150 mm do teto para os mais leves. (2) Alarme nível 1 (pré-alarme): 50% do limite prático — alarme sonoro + visual na sala e no BMS. (3) Alarme nível 2 (alarme principal): 100% do limite prático — ativação automática de ventilação de emergência, corte de ignição (se refrigerante A2L/A3), notificação à segurança. (4) Ventilação de emergência: caudal para diluir a fuga total abaixo do limite prático em < 15 min. (5) Calibração: semestral com gás padrão. (6) Redundância: mínimo 2 sensores por sala para evitar falsos alarmes.",
+      "enabled": true,
+      "tags": ["EN 378", "deteção fugas", "sala de máquinas", "refrigerante", "segurança"]
+    },
+    {
+      "id": "HVAC-REF-ABSORPTION-SAFETY-01",
+      "regulationId": "en-378",
+      "article": "EN 378-2 §5.4 — Segurança de Chillers de Absorção (LiBr/H₂O e NH₃/H₂O)",
+      "description": "O chiller de absorção instalado não cumpre os requisitos de segurança da EN 378-2 relativos à classificação do par refrigerante/absorvente, ventilação da sala de máquinas e dispositivos de alívio de pressão, especialmente para sistemas com amoníaco (NH₃/H₂O, grupo B2L).",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasAbsorptionChillerSafetyCompliance", "operator": "not_exists", "value": null },
+        { "field": "hvac.chillerType", "operator": "==", "value": "absorption" }
+      ],
+      "requiredValue": "Conformidade EN 378-2 para chillers de absorção — sala de máquinas ventilada, dispositivos de alívio, deteção",
+      "remediation": "Garantir segurança do chiller de absorção conforme EN 378: (1) LiBr/H₂O: refrigerante é água (grupo A1) — sem requisitos especiais de toxicidade/inflamabilidade. Atenção à cristalização de LiBr: manter temperatura de condensação dentro dos limites do fabricante. (2) NH₃/H₂O: amoníaco é tóxico e ligeiramente inflamável (grupo B2L) — sala de máquinas obrigatória com ventilação mecânica de emergência (caudal ≥ 14 × m_ref^(2/3) m³/s), deteção de NH₃ a 25 ppm (alarme) e 300 ppm (evacuação). (3) Dispositivos de alívio: válvula de segurança no gerador e no evaporador, dimensionada para a potência máxima da fonte de calor. (4) Purga de incondensáveis: sistema automático de purga para manter eficiência (presença de ar reduz COP). (5) Teste de estanquidade: He ou N₂ a 1.1× pressão de projeto.",
+      "enabled": true,
+      "tags": ["EN 378", "absorção", "amoníaco", "LiBr", "segurança", "sala de máquinas"]
     }
   ]
 }

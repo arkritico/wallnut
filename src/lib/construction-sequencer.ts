@@ -280,16 +280,114 @@ function getPrimaryRole(phase: ConstructionPhase): { name: string; rate: number 
 }
 
 // ============================================================
+// Portuguese Holiday Calendar
+// ============================================================
+
+/** Fixed Portuguese public holidays [month, day] (1-indexed). */
+const FIXED_HOLIDAYS: [number, number][] = [
+  [1, 1],   // Ano Novo
+  [4, 25],  // Dia da Liberdade
+  [5, 1],   // Dia do Trabalhador
+  [6, 10],  // Dia de Portugal
+  [6, 13],  // Santo António (Lisboa/Porto) — common construction halt
+  [8, 15],  // Assunção de Nossa Senhora
+  [10, 5],  // Implantação da República
+  [11, 1],  // Todos os Santos
+  [12, 1],  // Restauração da Independência
+  [12, 8],  // Imaculada Conceição
+  [12, 25], // Natal
+];
+
+/**
+ * Compute Easter Sunday for a given year using the Anonymous Gregorian algorithm.
+ * Source: Meeus/Jones/Butcher algorithm (accurate for all Gregorian years).
+ */
+function getEasterDate(year: number): Date {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31); // 3=March, 4=April
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+/** Format a Date as YYYY-MM-DD using local time (avoids UTC shift issues). */
+function toLocalDateKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** Cache of holiday sets per year for fast lookup. */
+const holidayCache = new Map<number, Set<string>>();
+
+function getHolidaysForYear(year: number): Set<string> {
+  const cached = holidayCache.get(year);
+  if (cached) return cached;
+
+  const holidays = new Set<string>();
+
+  // Fixed holidays
+  for (const [month, day] of FIXED_HOLIDAYS) {
+    holidays.add(`${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`);
+  }
+
+  // Easter-dependent holidays
+  const easter = getEasterDate(year);
+  // Sexta-feira Santa (Good Friday) = Easter - 2 days
+  const goodFriday = new Date(easter);
+  goodFriday.setDate(goodFriday.getDate() - 2);
+  holidays.add(toLocalDateKey(goodFriday));
+
+  // Corpo de Deus (Corpus Christi) = Easter + 60 days
+  const corpusChristi = new Date(easter);
+  corpusChristi.setDate(corpusChristi.getDate() + 60);
+  holidays.add(toLocalDateKey(corpusChristi));
+
+  holidayCache.set(year, holidays);
+  return holidays;
+}
+
+/**
+ * Check if a date is a Portuguese public holiday.
+ */
+export function isPortugueseHoliday(date: Date): boolean {
+  const key = toLocalDateKey(date);
+  return getHolidaysForYear(date.getFullYear()).has(key);
+}
+
+/**
+ * Check if a date is a working day (not weekend, not holiday).
+ */
+export function isWorkingDay(date: Date): boolean {
+  const dow = date.getDay();
+  if (dow === 0 || dow === 6) return false;
+  return !isPortugueseHoliday(date);
+}
+
+// ============================================================
 // Date Utilities
 // ============================================================
 
-function addWorkingDays(startDate: Date, days: number): Date {
+/**
+ * Add working days to a start date, skipping weekends and Portuguese public holidays.
+ */
+export function addWorkingDays(startDate: Date, days: number): Date {
   const result = new Date(startDate);
   let added = 0;
   while (added < days) {
     result.setDate(result.getDate() + 1);
-    const dow = result.getDay();
-    if (dow !== 0 && dow !== 6) added++;
+    if (isWorkingDay(result)) added++;
   }
   return result;
 }
@@ -314,6 +412,39 @@ interface ArticleWithMeta {
   manhours: number;
 }
 
+/** Phases where work is repeated floor-by-floor with overlapping starts */
+const FLOOR_STAGGER_PHASES: ConstructionPhase[] = [
+  "structure", "external_walls", "internal_walls", "flooring", "ceilings",
+];
+/** Working days between consecutive floors starting (concrete curing + safety) */
+const FLOOR_STAGGER_LAG = 5;
+
+/** Long-lead procurement items — zero-labor tasks starting at project start */
+const PROCUREMENT_LEAD_TIMES: Partial<Record<ConstructionPhase, { name: string; days: number }>> = {
+  structure:       { name: "Encomenda: Aço estrutural", days: 20 },
+  external_frames: { name: "Encomenda: Caixilharias", days: 35 },
+  elevators:       { name: "Encomenda: Elevadores", days: 75 },
+  roof:            { name: "Encomenda: Cobertura", days: 15 },
+  fire_safety:     { name: "Encomenda: Sistema incêndio", days: 25 },
+  rough_in_hvac:   { name: "Encomenda: Equipamento AVAC", days: 30 },
+};
+
+/** Portuguese seasonal productivity multipliers (1.0 = normal). Index 0 = Jan. */
+const PT_SEASONAL: number[] = [
+  0.85, // Jan — rain/cold
+  0.85, // Feb — rain/cold
+  0.95, // Mar — improving
+  1.0,  // Apr — normal
+  1.0,  // May — normal
+  1.0,  // Jun — normal
+  1.0,  // Jul — normal
+  0.7,  // Aug — férias coletivas
+  1.0,  // Sep — normal
+  1.0,  // Oct — normal
+  0.9,  // Nov — rain starts
+  0.85, // Dec — rain + holidays
+];
+
 export interface ScheduleOptions {
   maxWorkers?: number;
   /** Enable Goldratt Critical Chain Project Management */
@@ -333,6 +464,13 @@ export interface ScheduleOptions {
    * Standard CCPM uses 50%. Default: 0.5
    */
   feedingBufferRatio?: number;
+  /**
+   * Monthly productivity multipliers (index 0 = Jan, 11 = Dec).
+   * Applied to man-hour calculations to account for weather/holidays.
+   * Default: PT_SEASONAL (Portuguese climate adjustments).
+   * Set to array of 12 × 1.0 to disable.
+   */
+  seasonalFactors?: number[];
 }
 
 /**
@@ -412,6 +550,22 @@ export function generateSchedule(
     phaseDurations.set(phase, { totalManhours, workers, days });
   }
 
+  // Seasonal factor helper: adjusts working days by monthly productivity
+  const seasonal = opts.seasonalFactors ?? PT_SEASONAL;
+  function applySeasonalFactor(baseDays: number, taskStartDate: Date): number {
+    if (baseDays <= 0) return baseDays;
+    // Use the average seasonal factor for the months the task spans
+    const monthFactors: number[] = [];
+    let d = new Date(taskStartDate);
+    for (let i = 0; i < baseDays; i++) {
+      monthFactors.push(seasonal[d.getMonth()] ?? 1.0);
+      d = addWorkingDays(d, 1);
+    }
+    const avgFactor = monthFactors.reduce((s, f) => s + f, 0) / monthFactors.length;
+    // Lower productivity → more days needed
+    return Math.max(1, Math.ceil(baseDays / avgFactor));
+  }
+
   // Second pass: schedule phases respecting dependencies
   const phaseSchedule = new Map<ConstructionPhase, { start: Date; finish: Date }>();
 
@@ -441,8 +595,38 @@ export function generateSchedule(
       if (requiredStart > phaseStart) phaseStart = requiredStart;
     }
 
-    const phaseFinish = addWorkingDays(phaseStart, duration.days);
+    // Apply seasonal productivity to phase-level duration
+    const seasonalDays = applySeasonalFactor(duration.days, phaseStart);
+    const phaseFinish = addWorkingDays(phaseStart, seasonalDays);
     phaseSchedule.set(phase, { start: phaseStart, finish: phaseFinish });
+  }
+
+  // Insert procurement lead-time tasks (zero-labor predecessors)
+  const procurementUids = new Map<ConstructionPhase, number>();
+  for (const phase of activePhases) {
+    const procurement = PROCUREMENT_LEAD_TIMES[phase];
+    if (!procurement) continue;
+
+    taskUid++;
+    const procFinish = addWorkingDays(startDate, procurement.days);
+    allTasks.push({
+      uid: taskUid,
+      wbs: "",
+      name: procurement.name,
+      durationDays: procurement.days,
+      durationHours: 0,
+      startDate: toISODate(startDate),
+      finishDate: toISODate(procFinish),
+      predecessors: [],
+      isSummary: false,
+      phase,
+      resources: [],
+      cost: 0,
+      materialCost: 0,
+      outlineLevel: 2,
+      percentComplete: 0,
+    });
+    procurementUids.set(phase, taskUid);
   }
 
   // Third pass: create tasks
@@ -484,91 +668,185 @@ export function generateSchedule(
       });
     }
 
+    // Link procurement lead-time task as FS predecessor
+    const procUid = procurementUids.get(phase);
+    if (procUid) {
+      summaryTask.predecessors.push({ uid: procUid, type: "FS" });
+    }
+
     allTasks.push(summaryTask);
     phaseTaskMap.set(phase, { summaryUid, startDate: schedule.start, finishDate: schedule.finish });
 
     // Child tasks for each article within the phase
-    const sortedArts = [...arts].sort((a, b) => {
-      // Sort by sub-chapter code, then article code
-      return a.article.code.localeCompare(b.article.code);
-    });
+    // Sort by manhours descending — schedule biggest articles first for better packing
+    const sortedArts = [...arts].sort((a, b) => b.manhours - a.manhours);
 
-    let articleStart = new Date(schedule.start);
+    const floors = project.numberOfFloors ?? 1;
+    const useFloorStagger = FLOOR_STAGGER_PHASES.includes(phase) && floors > 1;
+
+    // Worker-budget parallel scheduling: articles run in parallel when
+    // adding them doesn't exceed the phase's allocated worker count.
+    // When the budget is full, a new batch starts after the previous batch finishes.
+    let batchStart = new Date(schedule.start);
+    let batchWorkers = 0;
+    let batchLatestFinish = new Date(schedule.start);
+
     for (const art of sortedArts) {
-      taskUid++;
-      const artWorkers = Math.max(1, Math.min(duration.workers, Math.ceil(art.manhours / HOURS_PER_DAY)));
-      const artDays = Math.max(1, Math.ceil(art.manhours / (artWorkers * HOURS_PER_DAY)));
-      const artFinish = addWorkingDays(articleStart, artDays);
+      // Floor-stagger: split article into per-floor sub-tasks with SS+lag
+      const floorCount = useFloorStagger ? floors : 1;
 
-      const role = getPrimaryRole(phase);
-      const resources: TaskResource[] = [];
+      let prevFloorUid: number | null = null;
+      for (let floor = 0; floor < floorCount; floor++) {
+        taskUid++;
+        const floorManhours = art.manhours / floorCount;
+        const floorQty = art.article.quantity / floorCount;
+        const artWorkers = Math.max(1, Math.min(duration.workers, Math.ceil(floorManhours / HOURS_PER_DAY)));
+        const baseDays = Math.max(1, Math.ceil(floorManhours / (artWorkers * HOURS_PER_DAY)));
 
-      // Labor
-      resources.push({
-        name: role.name,
-        type: "labor",
-        units: artWorkers,
-        rate: role.rate,
-        hours: art.manhours,
-      });
-
-      // Material & machinery from CYPE breakdown
-      if (art.cypeMatch) {
-        const qty = art.article.quantity;
-        if (art.cypeMatch.breakdown.materials > 0) {
-          resources.push({
-            name: `Materiais - ${art.cypeMatch.cypeCode}`,
-            type: "material",
-            units: qty,
-            rate: art.cypeMatch.breakdown.materials,
-            hours: 0,
-          });
+        // For floor 0, use worker-budget parallel scheduling
+        // For floor N>0, start = previous floor start + lag
+        let taskStart: Date;
+        if (floor === 0) {
+          // If adding this article exceeds the worker budget, start a new batch
+          if (batchWorkers + artWorkers > duration.workers && batchWorkers > 0) {
+            batchStart = new Date(batchLatestFinish);
+            batchWorkers = 0;
+            batchLatestFinish = new Date(batchStart);
+          }
+          taskStart = new Date(batchStart);
+          batchWorkers += artWorkers;
+        } else {
+          // SS+lag from the previous floor of the same article
+          const prevFloorTask = allTasks.find(t => t.uid === prevFloorUid)!;
+          taskStart = addWorkingDays(parseDate(prevFloorTask.startDate), FLOOR_STAGGER_LAG);
         }
-        if (art.cypeMatch.breakdown.machinery > 0) {
-          resources.push({
-            name: `Equipamento - ${art.cypeMatch.cypeCode}`,
-            type: "machinery",
-            units: 1,
-            rate: art.cypeMatch.breakdown.machinery * qty,
-            hours: art.manhours,
-          });
+
+        // Apply seasonal productivity factor (rain, holidays, August vacation)
+        const artDays = applySeasonalFactor(baseDays, taskStart);
+        const artFinish = addWorkingDays(taskStart, artDays);
+        if (artFinish > batchLatestFinish) batchLatestFinish = artFinish;
+
+        const role = getPrimaryRole(phase);
+        const resources: TaskResource[] = [];
+
+        // Labor
+        resources.push({
+          name: role.name,
+          type: "labor",
+          units: artWorkers,
+          rate: role.rate,
+          hours: floorManhours,
+        });
+
+        // Material & machinery from CYPE breakdown
+        if (art.cypeMatch) {
+          if (art.cypeMatch.breakdown.materials > 0) {
+            resources.push({
+              name: `Materiais - ${art.cypeMatch.cypeCode}`,
+              type: "material",
+              units: floorQty,
+              rate: art.cypeMatch.breakdown.materials,
+              hours: 0,
+            });
+          }
+          if (art.cypeMatch.breakdown.machinery > 0) {
+            resources.push({
+              name: `Equipamento - ${art.cypeMatch.cypeCode}`,
+              type: "machinery",
+              units: 1,
+              rate: art.cypeMatch.breakdown.machinery * floorQty,
+              hours: floorManhours,
+            });
+          }
         }
+
+        const unitPrice = art.cypeMatch?.unitCost ?? art.article.unitPrice ?? 0;
+        const totalCost = unitPrice * floorQty;
+        const materialCost = (art.cypeMatch?.breakdown.materials ?? 0) * floorQty;
+
+        const floorLabel = floorCount > 1 ? ` — Piso ${floor}` : "";
+        const predecessors: ScheduleTask["predecessors"] = floor === 0
+          ? [{ uid: summaryUid, type: "SS" as const }]
+          : [{ uid: prevFloorUid!, type: "SS" as const, lag: FLOOR_STAGGER_LAG }];
+
+        allTasks.push({
+          uid: taskUid,
+          wbs: art.article.code,
+          name: `${art.article.description}${floorLabel}`,
+          durationDays: artDays,
+          durationHours: floorManhours,
+          startDate: toISODate(taskStart),
+          finishDate: toISODate(artFinish),
+          predecessors,
+          isSummary: false,
+          phase,
+          resources,
+          cost: totalCost,
+          materialCost,
+          outlineLevel: floorCount > 1 ? 3 : 2,
+          percentComplete: 0,
+          notes: art.cypeMatch ? `CYPE: ${art.cypeMatch.cypeCode} (${art.cypeMatch.confidence}% conf.)` : undefined,
+        });
+
+        prevFloorUid = taskUid;
       }
-
-      const unitPrice = art.cypeMatch?.unitCost ?? art.article.unitPrice ?? 0;
-      const totalCost = unitPrice * art.article.quantity;
-      const materialCost = (art.cypeMatch?.breakdown.materials ?? 0) * art.article.quantity;
-
-      allTasks.push({
-        uid: taskUid,
-        wbs: art.article.code,
-        name: art.article.description,
-        durationDays: artDays,
-        durationHours: art.manhours,
-        startDate: toISODate(articleStart),
-        finishDate: toISODate(artFinish),
-        predecessors: [{ uid: summaryUid, type: "SS" }],
-        isSummary: false,
-        phase,
-        resources,
-        cost: totalCost,
-        materialCost,
-        outlineLevel: 2,
-        percentComplete: 0,
-        notes: art.cypeMatch ? `CYPE: ${art.cypeMatch.cypeCode} (${art.cypeMatch.confidence}% conf.)` : undefined,
-      });
-
-      // Stagger articles within phase (sequential within phase)
-      articleStart = artFinish;
     }
 
-    // Update summary task cost
-    summaryTask.cost = allTasks
-      .filter(t => t.phase === phase && !t.isSummary)
-      .reduce((sum, t) => sum + t.cost, 0);
-    summaryTask.materialCost = allTasks
-      .filter(t => t.phase === phase && !t.isSummary)
-      .reduce((sum, t) => sum + t.materialCost, 0);
+    // Update summary task cost and finishDate from actual child tasks
+    const childTasks = allTasks.filter(t => t.phase === phase && !t.isSummary);
+    summaryTask.cost = childTasks.reduce((sum, t) => sum + t.cost, 0);
+    summaryTask.materialCost = childTasks.reduce((sum, t) => sum + t.materialCost, 0);
+
+    // Recompute summary finishDate from actual child task dates
+    // (seasonal factors and parallel scheduling may shift children beyond the original estimate)
+    if (childTasks.length > 0) {
+      const latestFinish = childTasks.reduce((latest, t) => {
+        const f = parseDate(t.finishDate);
+        return f > latest ? f : latest;
+      }, parseDate(childTasks[0].finishDate));
+      summaryTask.finishDate = toISODate(latestFinish);
+      summaryTask.durationDays = Math.ceil(
+        (latestFinish.getTime() - parseDate(summaryTask.startDate).getTime()) / (1000 * 60 * 60 * 24),
+      );
+      // Update phaseTaskMap so milestones and downstream phases reference correct dates
+      const entry = phaseTaskMap.get(phase);
+      if (entry) entry.finishDate = latestFinish;
+    }
+  }
+
+  // ── Insert Portuguese Construction Milestones ──
+  const MILESTONES: { name: string; afterPhase: ConstructionPhase }[] = [
+    { name: "Marco: Consignação de Obra", afterPhase: "site_setup" },
+    { name: "Marco: Vistoria Estrutural", afterPhase: "structure" },
+    { name: "Marco: Fecho de Envolvente", afterPhase: "external_frames" },
+    { name: "Marco: Vistoria Final", afterPhase: "testing" },
+    { name: "Marco: Receção Provisória", afterPhase: "cleanup" },
+  ];
+
+  for (const ms of MILESTONES) {
+    const predPhase = phaseTaskMap.get(ms.afterPhase);
+    if (!predPhase) continue; // Phase not present in this project
+
+    taskUid++;
+    const msDate = toISODate(predPhase.finishDate);
+    allTasks.push({
+      uid: taskUid,
+      wbs: "",
+      name: ms.name,
+      durationDays: 0,
+      durationHours: 0,
+      startDate: msDate,
+      finishDate: msDate,
+      predecessors: [{ uid: predPhase.summaryUid, type: "FS" }],
+      isSummary: false,
+      isMilestone: true,
+      phase: ms.afterPhase,
+      resources: [],
+      cost: 0,
+      materialCost: 0,
+      outlineLevel: 1,
+      percentComplete: 0,
+    });
   }
 
   // Build resource list
@@ -665,12 +943,13 @@ export function generateSchedule(
  */
 function findCriticalPath(tasks: ScheduleTask[]): number[] {
   const summaryTasks = tasks.filter(t => t.isSummary);
+  const detailTasks = tasks.filter(t => !t.isSummary && !t.isMilestone);
   const finishMap = new Map<number, Date>();
   for (const t of summaryTasks) {
     finishMap.set(t.uid, parseDate(t.finishDate));
   }
 
-  // Find the task with the latest finish date
+  // Find the summary task with the latest finish date
   let latestTask: ScheduleTask | null = null;
   let latestDate = new Date(0);
   for (const t of summaryTasks) {
@@ -683,11 +962,10 @@ function findCriticalPath(tasks: ScheduleTask[]): number[] {
 
   if (!latestTask) return [];
 
-  // Trace back through predecessors
-  const path: number[] = [latestTask.uid];
+  // Trace back through predecessors (summary level)
+  const summaryPath: number[] = [latestTask.uid];
   let current = latestTask;
   while (current.predecessors.length > 0) {
-    // Find the predecessor with the latest finish date (critical predecessor)
     let critPred: ScheduleTask | null = null;
     let critDate = new Date(0);
     for (const pred of current.predecessors) {
@@ -701,11 +979,27 @@ function findCriticalPath(tasks: ScheduleTask[]): number[] {
       }
     }
     if (!critPred) break;
-    path.unshift(critPred.uid);
+    summaryPath.unshift(critPred.uid);
     current = critPred;
   }
 
-  return path;
+  // Drill into detail tasks: for each critical summary, find the bottleneck child
+  // (the child with the latest finish date — the one that actually drives the phase duration)
+  const fullPath: number[] = [];
+  for (const summaryUid of summaryPath) {
+    fullPath.push(summaryUid);
+    const children = detailTasks.filter(t =>
+      t.predecessors.some(p => p.uid === summaryUid),
+    );
+    if (children.length > 0) {
+      const bottleneck = children.reduce((a, b) =>
+        parseDate(a.finishDate) >= parseDate(b.finishDate) ? a : b,
+      );
+      fullPath.push(bottleneck.uid);
+    }
+  }
+
+  return fullPath;
 }
 
 // ============================================================

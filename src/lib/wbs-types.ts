@@ -170,6 +170,8 @@ export interface ScheduleTask {
   percentComplete: number;
   /** Physical percent complete (0-100); distinct from schedule % complete */
   physicalPercentComplete?: number;
+  /** Is this a milestone (zero-duration marker)? */
+  isMilestone?: boolean;
   /** Notes/remarks */
   notes?: string;
 }

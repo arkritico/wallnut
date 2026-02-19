@@ -528,7 +528,10 @@ describe("runUnifiedPipeline", () => {
     expect(mockGenerateSchedule).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
-      20,
+      expect.objectContaining({
+        maxWorkers: 20,
+        useCriticalChain: true,
+      }),
     );
   });
 

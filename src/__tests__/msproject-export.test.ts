@@ -141,12 +141,13 @@ describe("MS Project XML Export", () => {
       }
     });
 
-    it("includes all 12 Portuguese public holidays", () => {
+    it("includes all 13 Portuguese public holidays", () => {
       const xml = generateMSProjectXML(makeSchedule());
       // Count holiday WeekDays (DayType=0 with DayWorking=0)
+      // 11 fixed holidays + Good Friday + Corpus Christi = 13
       const holidayMatches = xml.match(/<DayType>0<\/DayType>\s*<DayWorking>0<\/DayWorking>/g);
       expect(holidayMatches).not.toBeNull();
-      expect(holidayMatches!.length).toBe(12);
+      expect(holidayMatches!.length).toBe(13);
 
       // Verify key holiday dates (year from schedule.startDate = 2026)
       expect(xml).toContain("2026-01-01T00:00:00"); // New Year

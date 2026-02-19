@@ -49,6 +49,53 @@
       "remediation": "Substituir o aquecimento por resistência elétrica por bomba de calor: ar-ar (split/multi-split) com COP ≥ 3.5, ar-água (para sistemas hidráulicos) com COP ≥ 3.0, ou geotérmica com COP ≥ 4.0. A bomba de calor consome 3-4× menos energia que a resistência para a mesma potência de aquecimento. O retorno do investimento é tipicamente de 2-5 anos. Para potências < 12 kW, a substituição é recomendada mas não obrigatória.",
       "enabled": true,
       "tags": ["resistência elétrica", "bomba de calor", "eficiência", "DL 68-A"]
+    },
+    {
+      "id": "HVAC-AUDIT-DATACENTER-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 + EN 50600-2-3 — Auditoria Energética de Data Centers",
+      "description": "O data center com consumo energético AVAC significativo (PUE > 1.6) não possui auditoria energética específica ao sistema de arrefecimento, conforme recomendado pelo DL 68-A/2015 para consumidores intensivos e pela EN 50600-2-3 para infraestruturas de TI.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.datacenterPUE", "operator": ">", "value": 1.6 },
+        { "field": "hvac.hasDatacenterCoolingAudit", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "PUE = {hvac.datacenterPUE}",
+      "requiredValue": "PUE ≤ 1.4 (objetivo) com auditoria energética específica ao arrefecimento",
+      "remediation": "Realizar auditoria energética específica ao arrefecimento do data center: (1) Medição do PUE real (não estimado): PUE = Energia Total / Energia TI. PUE > 1.6 indica ineficiência significativa no arrefecimento. (2) Análise CFD (Computational Fluid Dynamics) para identificar hotspots e recirculação de ar quente. (3) Verificar contenção de corredor quente/frio: a contenção reduz o PUE em 0.1-0.3. (4) Avaliar free-cooling: em Portugal, free-cooling direto ou indireto é viável > 4000 h/ano (setpoint > 27°C conforme ASHRAE TC 9.9 classe A1). (5) Otimizar setpoints: ASHRAE permite temperaturas de insuflação até 27°C para equipamento classe A1 (vs. 18-20°C tradicionais). (6) Metas: PUE ≤ 1.4 para instalações existentes, PUE ≤ 1.2 para novas.",
+      "enabled": true,
+      "tags": ["data center", "PUE", "auditoria", "free-cooling", "DL 68-A", "EN 50600"]
+    },
+    {
+      "id": "HVAC-AUDIT-GSHP-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Auditoria de Eficiência de Bombas de Calor Geotérmicas",
+      "description": "A bomba de calor geotérmica com consumo significativo não foi sujeita a auditoria específica para verificar a eficiência real (SPF — Seasonal Performance Factor) e o estado do campo geotérmico (degradação térmica do solo).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasGSHPAudit", "operator": "not_exists", "value": null },
+        { "field": "hvac.heatPumpType", "operator": "==", "value": "ground-source" },
+        { "field": "hvac.installedHVACPower", "operator": ">=", "value": 50 }
+      ],
+      "requiredValue": "Auditoria de SPF e estado do campo geotérmico recomendada para GSHP ≥ 50 kW",
+      "remediation": "Realizar auditoria específica da bomba de calor geotérmica: (1) SPF real: medir energia elétrica consumida (compressor + bombas geotérmicas) e energia térmica produzida (contadores de energia térmica). SPF alvo ≥ 4.0. (2) Temperatura do campo: instalar termómetros no retorno de cada furo geotérmico — degradação > 2°C/ano indica subdimensionamento ou desequilíbrio térmico. (3) Equilibrar cargas: se arrefecimento >> aquecimento, considerar geocooling passivo ou recarga solar do campo. (4) Análise de glicol: verificar concentração (25-35%), pH e inibidores de corrosão anualmente. (5) Caudal geotérmico: verificar caudal por furo vs. projeto — perda de caudal indica obstrução ou fuga.",
+      "enabled": true,
+      "tags": ["auditoria", "geotérmico", "SPF", "DL 68-A", "bomba de calor"]
+    },
+    {
+      "id": "HVAC-AUDIT-COOLING-TOWER-01",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Auditoria Energética de Torres de Arrefecimento",
+      "description": "A torre de arrefecimento com consumo de água e energia significativo não foi sujeita a auditoria energética específica para otimizar a eficiência e reduzir o consumo de água de reposição.",
+      "severity": "info",
+      "conditions": [
+        { "field": "hvac.hasCoolingTowerAudit", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Auditoria energética de torres de arrefecimento recomendada para otimização",
+      "remediation": "Realizar auditoria energética da torre de arrefecimento: (1) Eficiência: medir approach (diferença entre temperatura de saída da água e temperatura de bolbo húmido) — approach alvo: 3-5°C. (2) Consumo de água: medir e comparar com benchmark (2-4 L/kWh de arrefecimento). (3) Ciclos de concentração: otimizar para 5-8 ciclos (reduz consumo de água em 30-50% vs. 3 ciclos). (4) Ventiladores: instalar variadores de frequência para modulação do caudal de ar em função da carga e condições exteriores. (5) Enchimento: verificar estado do enchimento (degradação UV reduz eficiência) — substituir se approach > 7°C. (6) Eliminadores de gotas: verificar drift rate < 0.001% — substituir se danificados.",
+      "enabled": true,
+      "tags": ["auditoria", "torre de arrefecimento", "eficiência", "água", "DL 68-A"]
     }
   ]
 }

@@ -80,6 +80,102 @@
       "remediation": "Aumentar o setpoint de arrefecimento para 24-26°C. Setpoints abaixo de 23°C resultam em consumo energético excessivo e risco de desconforto por correntes de ar frio. Cada grau abaixo de 26°C representa ≈ 8% de aumento no consumo de arrefecimento. Implementar dead band de 2°C entre setpoints de aquecimento e arrefecimento.",
       "enabled": true,
       "tags": ["temperatura", "sobrearrefecimento", "eficiência", "EN 16798"]
+    },
+    {
+      "id": "HVAC-DISP-VENT-GRADIENT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 — Gradiente de Temperatura em Ventilação por Deslocamento",
+      "description": "O sistema de ventilação por deslocamento gera um gradiente vertical de temperatura ({hvac.displacementTempGradient}°C/m) excessivo, excedendo o limite de 2°C/m para a Categoria I conforme EN 16798-1, causando desconforto térmico nos pés dos ocupantes.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.displacementTempGradient", "operator": ">", "value": 2 },
+        { "field": "hvac.ventilationStrategy", "operator": "==", "value": "displacement" }
+      ],
+      "currentValueTemplate": "{hvac.displacementTempGradient}°C/m",
+      "requiredValue": "≤ 2°C/m (Cat. I) ou ≤ 3°C/m (Cat. II) entre 0.1 m e 1.1 m",
+      "remediation": "Reduzir o gradiente de temperatura na ventilação por deslocamento: (1) Aumentar a temperatura de insuflação: Δt entre ar insuflado e ambiente de apenas 3-5°C (não mais). (2) Reduzir a velocidade de insuflação para melhorar a mistura na zona inferior. (3) Utilizar difusores semicirculares de parede com grande área de descarga. (4) Para cargas internas elevadas: complementar com teto radiante para arrefecimento (elimina a necessidade de Δt elevado no ar). (5) Gradiente aceitável: Cat. I ≤ 2°C/m, Cat. II ≤ 3°C/m entre tornozelos (0.1 m) e cabeça sentada (1.1 m).",
+      "enabled": true,
+      "tags": ["ventilação deslocamento", "gradiente", "conforto", "EN 16798"]
+    },
+    {
+      "id": "HVAC-RADIANT-PANEL-DEWPOINT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 + EN 14240 — Controlo de Ponto de Orvalho em Painéis Radiantes de Teto",
+      "description": "O sistema de painéis radiantes de teto para arrefecimento não possui controlo adequado do ponto de orvalho, correndo risco de condensação superficial ({hvac.radiantPanelMinTemp}°C < ponto de orvalho) que causa danos nos materiais e compromete a qualidade do ar interior.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.radiantPanelMinTemp", "operator": "<", "value": 16 },
+        { "field": "hvac.hasRadiantCeilingPanels", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Temperatura mínima do painel: {hvac.radiantPanelMinTemp}°C",
+      "requiredValue": "Temperatura do painel ≥ ponto de orvalho + 2°C (tipicamente ≥ 16°C)",
+      "remediation": "Implementar controlo de ponto de orvalho para painéis radiantes: (1) Sensor de humidade: instalar sonda de HR combinada (temperatura + humidade) na zona de retorno de ar para cálculo do ponto de orvalho em tempo real. (2) Controlo: válvula de 2 vias no circuito de água fria, cortada quando a temperatura da água de ida se aproxima do ponto de orvalho + 2°C (margem de segurança). (3) Temperatura típica de água: 15-18°C para arrefecimento (vs. 7°C em sistemas convencionais). (4) Desumidificação: o sistema de ventilação (DOAS — Dedicated Outdoor Air System) deve tratar a carga latente para manter o ponto de orvalho < 14°C. (5) Potência radiante típica: 40-80 W/m² em arrefecimento sem condensação.",
+      "enabled": true,
+      "tags": ["painel radiante", "teto", "ponto de orvalho", "condensação", "EN 14240", "EN 16798"]
+    },
+    {
+      "id": "HVAC-DISP-VENT-TERMINAL-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 + REHVA Guidebook 23 — Dispositivos Terminais de Ventilação por Deslocamento",
+      "description": "Os dispositivos terminais do sistema de ventilação por deslocamento não cumprem os critérios de velocidade e temperatura de insuflação conforme EN 16798-1, gerando correntes de ar frio ao nível dos tornozelos dos ocupantes (draft risk > 15%).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.displacementSupplyVelocity", "operator": ">", "value": 0.3 },
+        { "field": "hvac.ventilationStrategy", "operator": "==", "value": "displacement" }
+      ],
+      "currentValueTemplate": "Velocidade de insuflação: {hvac.displacementSupplyVelocity} m/s",
+      "requiredValue": "Velocidade ≤ 0.2-0.3 m/s na zona de ocupação, ΔT ≤ 5°C (EN 16798-1)",
+      "remediation": "Ajustar os dispositivos terminais de ventilação por deslocamento: (1) Difusores de pé de parede (semicirculares): velocidade de descarga ≤ 0.5 m/s na face, velocidade na zona de ocupação (0.1 m) ≤ 0.2 m/s. (2) ΔT ar insuflado: 3-5°C abaixo da temperatura ambiente (ex: 20-22°C para T ambiente de 25°C). Nunca > 8°C. (3) Área de difusor: dimensionar para velocidade facial ≤ 0.3 m/s — difusores com área típica de 0.3-0.6 m² por 200 L/s. (4) Afastamento do posto de trabalho: ≥ 1.0 m entre o difusor e o ocupante mais próximo. (5) Carga térmica máxima: ventilação por deslocamento eficaz até 40-50 W/m² — acima, complementar com teto radiante.",
+      "enabled": true,
+      "tags": ["ventilação deslocamento", "terminal", "corrente de ar", "EN 16798", "draft"]
+    },
+    {
+      "id": "HVAC-UFAD-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 + ASHRAE — Distribuição de Ar pelo Pavimento (UFAD)",
+      "description": "O sistema de distribuição de ar pelo pavimento (Underfloor Air Distribution — UFAD) gera estratificação de temperatura excessiva ({hvac.ufadStratification}°C) entre o nível do pavimento e 1.8 m, excedendo os limites de conforto da EN 16798-1.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.ufadStratification", "operator": ">", "value": 4 },
+        { "field": "hvac.ventilationStrategy", "operator": "==", "value": "underfloor" }
+      ],
+      "currentValueTemplate": "Estratificação: {hvac.ufadStratification}°C entre pavimento e 1.8 m",
+      "requiredValue": "≤ 3°C (Categoria I) ou ≤ 4°C (Categoria II) entre 0.1 m e 1.8 m",
+      "remediation": "Controlar a estratificação em sistemas UFAD: (1) Temperatura de insuflação: 17-19°C (superior à de sistemas convencionais de teto, 13-14°C). (2) Difusores swirl ajustáveis: permitem ao ocupante regular o caudal e a direção do ar. (3) Pressão no plenum: manter 12-25 Pa (insuficiente: má distribuição; excessiva: correntes de ar). (4) Plenum compartimentado: divisões no plenum para controlo por zona térmica. (5) Retorno pelo teto: o ar quente estratificado é extraído ao nível do teto, maximizando a eficiência de ventilação. (6) Cargas internas: UFAD é mais eficaz com cargas distribuídas (escritórios) — menos adequado para cargas pontuais elevadas.",
+      "enabled": true,
+      "tags": ["UFAD", "pavimento", "estratificação", "EN 16798", "underfloor"]
+    },
+    {
+      "id": "HVAC-EVAP-COOLING-COMFORT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 §6.4 — Limites de Conforto para Arrefecimento Evaporativo",
+      "description": "O sistema de arrefecimento evaporativo direto eleva a humidade relativa interior acima de 70% ({hvac.indoorRH}%), excedendo o limite de conforto da Categoria II da EN 16798-1 e criando condições propícias ao desenvolvimento de fungos e bactérias.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.indoorRH", "operator": ">", "value": 70 },
+        { "field": "hvac.coolingType", "operator": "in", "value": ["direct-evaporative", "evaporative"] }
+      ],
+      "currentValueTemplate": "HR interior com arrefecimento evaporativo: {hvac.indoorRH}%",
+      "requiredValue": "HR interior ≤ 70% (recomendado ≤ 60% para conforto ótimo, EN 16798-1 Cat. II)",
+      "remediation": "Controlar a humidade com arrefecimento evaporativo: (1) Preferir arrefecimento evaporativo indireto (IEC): não adiciona humidade ao ar de insuflação — permutador ar-ar com spray no lado secundário. (2) Evaporativo direto: limitar o bypass ratio para manter HR < 70% — damper de bypass modulante controlado por sensor de HR na zona. (3) Sistema híbrido: evaporativo + DX — o DX atua apenas quando o evaporativo não consegue manter HR ≤ 70%. (4) Monitorização: sensor de HR em cada zona servida — registo contínuo no BMS. (5) EN 16798-1: HR > 70% durante > 3% das horas de ocupação = não conformidade com Cat. II. (6) Manutenção: painéis evaporativos — substituir anualmente para evitar acumulação de calcário e biofilme.",
+      "enabled": true,
+      "tags": ["arrefecimento evaporativo", "humidade", "conforto", "EN 16798", "HR"]
+    },
+    {
+      "id": "HVAC-DESTRAT-TEMP-GRADIENT-01",
+      "regulationId": "en-16798-1",
+      "article": "EN 16798-1 §6.3.2 — Gradiente Vertical de Temperatura e Destratificação",
+      "description": "O gradiente vertical de temperatura no espaço ({hvac.verticalTempGradient}°C/m) excede o limite de 2°C/m (Categoria II) ou 3°C/m (Categoria III) da EN 16798-1 entre 0.1 m e 1.8 m de altura, indicando necessidade de destratificação ou ajuste do sistema de difusão de ar.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.verticalTempGradient", "operator": ">", "value": 2 },
+        { "field": "hvac.ceilingHeight", "operator": ">", "value": 3 }
+      ],
+      "currentValueTemplate": "Gradiente vertical: {hvac.verticalTempGradient}°C/m (0.1 m a 1.8 m)",
+      "requiredValue": "≤ 2°C/m (Categoria II) ou ≤ 3°C/m (Categoria III) entre 0.1 m e 1.8 m",
+      "remediation": "Reduzir o gradiente vertical de temperatura: (1) Ventiladores de destratificação: HVLS para pé-direito > 5 m, ventiladores de jato para 3-5 m. Controlo por sensor de ΔT (teto vs. 1.5 m). (2) Difusores ajustáveis: direcionar o jato de ar quente para baixo em modo aquecimento. (3) Piso radiante: elimina estratificação — aquecimento uniforme a baixa temperatura (35-40°C). (4) Ventilação por deslocamento: aceitar gradiente controlado (1.5-2°C/m) — normal neste tipo de distribuição. (5) Medição: campanha com 3 sensores a 0.1 m, 0.6 m e 1.8 m (posição sentada) ou 1.1 m e 1.8 m (em pé). (6) EN 16798-1 Tabela B.2: gradiente máximo de 2°C (Cat. I), 3°C (Cat. II) entre cabeça e tornozelos.",
+      "enabled": true,
+      "tags": ["gradiente temperatura", "estratificação", "destratificação", "EN 16798", "conforto"]
     }
   ]
 }

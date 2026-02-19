@@ -108,6 +108,82 @@
       "remediation": "Identificar e eliminar troços mortos na rede de água: (1) Levantamento: identificar todos os ramais sem utilização regular (equipamentos desativados, pontos de consumo encerrados, ligações futuras não utilizadas). (2) Eliminação: cortar e tamponar os troços mortos junto à tubagem principal. (3) Minimização: quando impossível eliminar, reduzir comprimento para ≤ 3× DN da tubagem. (4) Purga periódica: para troços que não podem ser eliminados, purgar semanalmente durante 5 minutos. (5) Fontes comuns: ligações de reserva em coletores, ramais de equipamentos removidos, derivações para futuras ampliações.",
       "enabled": true,
       "tags": ["Legionella", "troços mortos", "dead legs", "estagnação", "EN 806"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-CT-DRIFT-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / EN 13741 — Eliminadores de Gotas em Torres de Arrefecimento",
+      "description": "A torre de arrefecimento não possui eliminadores de gotas (drift eliminators) com eficiência ≥ 99.9%, permitindo a dispersão de aerossóis contaminados com Legionella para a vizinhança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true },
+        { "field": "hvac.hasDriftEliminators", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Eliminadores de gotas com eficiência ≥ 99.9% (drift rate ≤ 0.001%)",
+      "remediation": "Instalar ou substituir eliminadores de gotas na torre de arrefecimento: (1) Eficiência mínima: 99.9% (drift rate ≤ 0.001% do caudal de recirculação). (2) Tipo: lamelas em PVC de alta eficiência com perfil sinusoidal ou em chicana. (3) Verificar integridade: sem danos, deformações ou folgas que permitam bypass de ar. (4) Substituir a cada 5-7 anos (degradação UV e química). (5) A dispersão de gotículas é o principal mecanismo de transmissão de Legionella ao exterior — em Portugal, casos epidémicos foram associados a torres de arrefecimento com eliminadores deficientes ou ausentes.",
+      "enabled": true,
+      "tags": ["Legionella", "torre de arrefecimento", "eliminadores gotas", "drift", "DGS"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-TRAINING-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS Orientação 023/2014 — Formação em Prevenção de Legionella",
+      "description": "Os técnicos de manutenção AVAC não possuem formação específica em prevenção e controlo de Legionella, conforme recomendado pela DGS para edifícios de risco.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "hvac.hasLegionellaTraining", "operator": "not_exists", "value": null },
+        { "field": "buildingType", "operator": "in", "value": ["commercial", "mixed", "hospital"] }
+      ],
+      "requiredValue": "Formação em Legionella para técnicos AVAC de edifícios de risco (anual)",
+      "remediation": "Proporcionar formação em prevenção de Legionella: (1) Conteúdo: biologia da Legionella, fatores de risco (20-50°C, estagnação, biofilme), sistemas de risco (torres, AQS, humidificadores), medidas de controlo (temperatura, tratamento, eliminação de dead legs), procedimentos de amostragem e interpretação de resultados. (2) Frequência: formação inicial + atualização anual. (3) Público: TIM, técnicos de manutenção, gestores de edifícios. (4) Certificação: registo de formação no dossier de manutenção. (5) Em edifícios de saúde: formação obrigatória para toda a equipa de manutenção conforme DGS Orientação 023/2014.",
+      "enabled": true,
+      "tags": ["Legionella", "formação", "DGS", "prevenção", "técnicos"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-CT-BIOCIDE-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / EN 13741 — Programa de Biocida para Torres de Arrefecimento",
+      "description": "A torre de arrefecimento não possui programa de tratamento biocida contínuo e de choque para prevenção de Legionella, confiando apenas no tratamento térmico que é insuficiente em sistemas de circuito aberto.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCoolingTowerBiocide", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Programa de biocida contínuo + choque periódico obrigatório para torres de arrefecimento",
+      "remediation": "Implementar programa de biocida para a torre de arrefecimento: (1) Biocida contínuo: doseamento automático de biocida oxidante (cloro: 0.5-1.0 mg/L residual, ou bromo: 1.0-2.0 mg/L residual, ou dióxido de cloro: 0.1-0.3 mg/L). (2) Biocida de choque: aplicação semanal de biocida não-oxidante (isotiazolona ou glutaraldeído) para controlo de biofilme. (3) Monitorização: medir residual de biocida diariamente (kit de teste rápido), registar resultados. (4) Análise microbiológica: Legionella pneumophila trimestral em laboratório acreditado. (5) Ação corretiva: se Legionella > 1000 UFC/L, hipercloração de choque (50 mg/L × 1h) e nova amostragem 48h após. (6) Regulamentação: DGS exige plano documentado com responsável identificado.",
+      "enabled": true,
+      "tags": ["Legionella", "biocida", "torre de arrefecimento", "DGS", "tratamento"]
+    },
+    {
+      "id": "HVAC-HUMIDIFIER-LEGIONELLA-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / ASHRAE 188 — Especificações de Humidificadores para Prevenção de Legionella",
+      "description": "O sistema de humidificação do tipo evaporativo ou spray utiliza água em estado líquido a temperaturas favoráveis à proliferação de Legionella (20-45°C), sem programa de desinfeção adequado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.humidifierType", "operator": "in", "value": ["evaporative", "spray", "ultrasonic"] },
+        { "field": "hvac.hasHumidifierDisinfection", "operator": "not_exists", "value": null }
+      ],
+      "currentValueTemplate": "Humidificador tipo {hvac.humidifierType} sem programa de desinfeção",
+      "requiredValue": "Programa de desinfeção obrigatório para humidificadores de água líquida, ou substituição por vapor",
+      "remediation": "Controlar risco de Legionella em humidificadores: (1) Solução preferencial: substituir por humidificador de vapor (injeção de vapor estéril) — elimina risco de Legionella. (2) Se humidificador evaporativo: desinfeção UV-C na bacia de água, purga contínua (bleed-off), limpeza mensal, análise microbiológica trimestral. (3) Humidificadores ultrassónicos: evitar em sistemas AVAC — geram aerossóis que podem transportar Legionella e minerais dissolvidos. (4) Água de alimentação: utilizar água tratada (desmineralizada ou osmose inversa) para reduzir nutrientes. (5) Temperatura da água: manter < 20°C ou > 60°C (fora da zona de proliferação). (6) Tabuleiro de drenagem: inclinação mínima de 2%, sem pontos de estagnação.",
+      "enabled": true,
+      "tags": ["Legionella", "humidificador", "DGS", "vapor", "evaporativo"]
+    },
+    {
+      "id": "HVAC-LEGIONELLA-CT-REGISTER-01",
+      "regulationId": "dgs-legionella",
+      "article": "DGS / DL 306/2007 — Registo Obrigatório de Torres de Arrefecimento",
+      "description": "A torre de arrefecimento não está registada junto das autoridades de saúde conforme exigido pela regulamentação portuguesa de prevenção de Legionella.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasCoolingTowerRegistration", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasCoolingTower", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Registo obrigatório de torres de arrefecimento junto da autoridade de saúde local (DGS)",
+      "remediation": "Registar a torre de arrefecimento junto da autoridade de saúde: (1) Contactar a Unidade de Saúde Pública (USP) da Administração Regional de Saúde (ARS) da área. (2) Fornecer: localização GPS, tipo e potência da torre, volume de água, programa de manutenção e tratamento, resultados de análises microbiológicas recentes. (3) Atualizar o registo anualmente ou quando houver alterações significativas no equipamento. (4) Em caso de surto epidémico de legionellose: as autoridades de saúde podem ordenar paragem imediata de torres não registadas ou sem programa de controlo documentado. (5) Manter cópia do registo no dossier técnico da instalação.",
+      "enabled": true,
+      "tags": ["Legionella", "torre de arrefecimento", "registo", "DGS", "autoridade saúde"]
     }
   ]
 }

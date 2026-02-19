@@ -21,7 +21,7 @@ import type {
   ConstructionPhase,
 } from "./wbs-types";
 import type { ProjectResources } from "./resource-aggregator";
-import { PHASE_ORDER } from "./construction-sequencer";
+import { PHASE_ORDER, addWorkingDays, isWorkingDay } from "./construction-sequencer";
 import {
   PHASE_OVERLAP_RULES,
   getPhaseEquipment,
@@ -157,10 +157,10 @@ function toDateKey(d: Date): string {
   return d.toISOString().split("T")[0];
 }
 
-function addOneDay(isoDate: string): string {
-  const d = new Date(isoDate);
-  d.setDate(d.getDate() + 1);
-  return toDateKey(d);
+/** Advance an ISO date string by 1 working day (skips weekends + Portuguese holidays). */
+function addOneWorkingDay(isoDate: string): string {
+  const d = new Date(isoDate + "T08:00:00");
+  return toDateKey(addWorkingDays(d, 1));
 }
 
 // ============================================================
@@ -193,8 +193,10 @@ function buildDailyHistogram(tasks: ScheduleTask[]): Map<string, number> {
     const taskEnd = new Date(task.finishDate);
 
     while (currentDate <= taskEnd) {
-      const key = toDateKey(currentDate);
-      histogram.set(key, (histogram.get(key) ?? 0) + workers);
+      if (isWorkingDay(currentDate)) {
+        const key = toDateKey(currentDate);
+        histogram.set(key, (histogram.get(key) ?? 0) + workers);
+      }
       currentDate.setDate(currentDate.getDate() + 1);
     }
   }
@@ -360,24 +362,27 @@ function buildCapacityTimeline(
     const taskEnd = new Date(task.finishDate);
 
     while (currentDate <= taskEnd) {
-      const dateKey = toDateKey(currentDate);
+      // Only count working days (skip weekends + Portuguese holidays)
+      if (isWorkingDay(currentDate)) {
+        const dateKey = toDateKey(currentDate);
 
-      // Track workers per phase per day
-      if (!dailyWorkers.has(dateKey)) {
-        dailyWorkers.set(dateKey, new Map());
-      }
-      const dayData = dailyWorkers.get(dateKey)!;
-      const phase = task.phase || "cleanup";
-      dayData.set(phase, (dayData.get(phase) ?? 0) + workers);
-
-      // Track equipment per day
-      if (phaseEquip.length > 0) {
-        if (!dailyEquipment.has(dateKey)) {
-          dailyEquipment.set(dateKey, new Map());
+        // Track workers per phase per day
+        if (!dailyWorkers.has(dateKey)) {
+          dailyWorkers.set(dateKey, new Map());
         }
-        const dayEquip = dailyEquipment.get(dateKey)!;
-        for (const eq of phaseEquip) {
-          dayEquip.set(eq, (dayEquip.get(eq) ?? 0) + 1);
+        const dayData = dailyWorkers.get(dateKey)!;
+        const phase = task.phase || "cleanup";
+        dayData.set(phase, (dayData.get(phase) ?? 0) + workers);
+
+        // Track equipment per day
+        if (phaseEquip.length > 0) {
+          if (!dailyEquipment.has(dateKey)) {
+            dailyEquipment.set(dateKey, new Map());
+          }
+          const dayEquip = dailyEquipment.get(dateKey)!;
+          for (const eq of phaseEquip) {
+            dayEquip.set(eq, (dayEquip.get(eq) ?? 0) + 1);
+          }
         }
       }
 
@@ -485,8 +490,9 @@ function detectViolations(
     for (const t1 of phase1Tasks) {
       for (const t2 of phase2Tasks) {
         const gap = rule.minimumGap || 0;
-        const t1End = new Date(t1.finishDate);
-        t1End.setDate(t1End.getDate() + gap);
+        const t1End = gap > 0
+          ? addWorkingDays(new Date(t1.finishDate), gap)
+          : new Date(t1.finishDate);
 
         const t2Start = new Date(t2.startDate);
         const t2End = new Date(t2.finishDate);
@@ -636,8 +642,8 @@ function levelResources(
     const idx = current.findIndex((t) => t.uid === bestTask!.uid);
     if (idx === -1) break;
 
-    const newStart = addOneDay(current[idx].startDate);
-    const newEnd = addOneDay(current[idx].finishDate);
+    const newStart = addOneWorkingDay(current[idx].startDate);
+    const newEnd = addOneWorkingDay(current[idx].finishDate);
 
     // Verify predecessor constraints before applying
     if (violatesPredecessors(current[idx], newStart, current)) continue;
@@ -826,26 +832,20 @@ function sequenceConflicts(
     const latestPhase1End = new Date(Math.max(...phase1EndDates));
 
     const minimumGap = rule.minimumGap || 0;
-    const requiredPhase2Start = new Date(latestPhase1End);
-    requiredPhase2Start.setDate(
-      requiredPhase2Start.getDate() + minimumGap,
-    );
+    // Use working-day offset for the minimum gap
+    const requiredPhase2Start = minimumGap > 0
+      ? addWorkingDays(latestPhase1End, minimumGap)
+      : latestPhase1End;
 
     for (let i = 0; i < adjustedTasks.length; i++) {
       const task = adjustedTasks[i];
       if (task.phase === rule.phase2 && !task.isSummary) {
         const taskStartDate = new Date(task.startDate);
         if (taskStartDate < requiredPhase2Start) {
-          const shiftDays = Math.ceil(
-            (requiredPhase2Start.getTime() - taskStartDate.getTime()) /
-              (1000 * 60 * 60 * 24),
-          );
-
-          const newStart = new Date(task.startDate);
-          newStart.setDate(newStart.getDate() + shiftDays);
-
-          const newEnd = new Date(task.finishDate);
-          newEnd.setDate(newEnd.getDate() + shiftDays);
+          // Shift by working days to respect holidays/weekends
+          const taskDuration = task.durationDays;
+          const newStart = addWorkingDays(requiredPhase2Start, 0);
+          const newEnd = addWorkingDays(newStart, taskDuration);
 
           adjustedTasks[i] = {
             ...task,

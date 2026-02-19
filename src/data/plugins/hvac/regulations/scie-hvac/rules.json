@@ -188,6 +188,133 @@
       "remediation": "Garantir alimentação elétrica de emergência para todos os sistemas AVAC de segurança: (1) Ventiladores de desenfumagem: alimentação pelo grupo gerador de emergência com arranque automático em < 15 s. (2) Sistemas de pressurização: alimentação redundante (rede + gerador). (3) Registos corta-fogo motorizados: posição de segurança (fechado) por mola, alimentação apenas para manter aberto (fail-safe). (4) Cabos elétricos de alimentação: resistentes ao fogo (E 30 mínimo, E 90 recomendado), percurso protegido. (5) Quadro elétrico AVAC de segurança: dedicado, sinalizado, com comutação automática rede/gerador.",
       "enabled": true,
       "tags": ["SCIE", "alimentação emergência", "gerador", "desenfumagem", "cabos"]
+    },
+    {
+      "id": "HVAC-SMOKE-MECH-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 155.º / EN 12101-3 — Ventiladores de Desenfumagem Mecânica",
+      "description": "Os ventiladores de desenfumagem mecânica não possuem classificação de resistência a temperatura elevada F400-120 (400°C durante 120 minutos), conforme exigido pela EN 12101-3 para ventiladores de extração de fumo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.smokeExhaustFanRating", "operator": "!=", "value": "F400-120" },
+        { "field": "hvac.hasSmokeExtractionSystem", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Classificação: {hvac.smokeExhaustFanRating}",
+      "requiredValue": "F400-120 (400°C / 2h) para ventiladores de desenfumagem (EN 12101-3)",
+      "remediation": "Substituir ventiladores de desenfumagem por modelos certificados: (1) Classificação: F400-120 para utilização geral (400°C durante 120 minutos). (2) Para estacionamentos: F300-120 é aceitável (300°C / 2h). (3) Certificação conforme EN 12101-3 com ensaio por laboratório notificado. (4) Motor e acoplamento devem também resistir à mesma temperatura. (5) Alimentação por cabo resistente ao fogo (FE 180 / E90). (6) Ensaio funcional semestral obrigatório (arranque de emergência). (7) Comando: automático pela central SADI e manual por botoneira junto ao quadro.",
+      "enabled": true,
+      "tags": ["SCIE", "desenfumagem", "ventilador", "F400", "EN 12101-3"]
+    },
+    {
+      "id": "HVAC-SMOKE-STAIRWELL-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 161.º — Ventilação de Escadas Não Pressurizadas",
+      "description": "As escadas de evacuação não pressurizadas de edifícios com 9-28 m de altura não possuem abertura de desenfumagem no topo (exutor ou janela de socorro), conforme RT-SCIE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasStairPressurization", "operator": "not_exists", "value": null },
+        { "field": "building.height", "operator": ">=", "value": 9 },
+        { "field": "building.height", "operator": "<=", "value": 28 },
+        { "field": "hvac.hasStairSmokeVent", "operator": "not_exists", "value": null }
+      ],
+      "requiredValue": "Exutor ou abertura ≥ 1 m² no topo da escada (edifícios 9-28 m sem pressurização)",
+      "remediation": "Para escadas de edifícios com 9-28 m de altura sem pressurização mecânica: (1) Instalar exutor de desenfumagem no topo da caixa de escada com área útil ≥ 1 m². (2) Acionamento: automático pela central SADI + comando manual junto à porta de acesso ao piso de saída. (3) Posição de segurança: aberto (spring-return ou contrabalanço). (4) Em alternativa: janela de socorro operável pelo corpo de bombeiros com área ≥ 1 m². (5) Prever admissão de ar na base (porta de saída ao exterior ou grelha permanente ≥ 1 m²).",
+      "enabled": true,
+      "tags": ["SCIE", "escada", "desenfumagem", "exutor", "evacuação"]
+    },
+    {
+      "id": "HVAC-SMOKE-PARKING-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 148.º — Ventilação e Desenfumagem de Estacionamentos",
+      "description": "O estacionamento subterrâneo não possui sistema de desenfumagem dimensionado para o caudal mínimo de 600 m³/(h·veículo) conforme RT-SCIE, com deteção de CO integrada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.parkingSmokeExtractionRate", "operator": "<", "value": 600 },
+        { "field": "hvac.spaceType", "operator": "==", "value": "parking" }
+      ],
+      "currentValueTemplate": "{hvac.parkingSmokeExtractionRate} m³/(h·veículo)",
+      "requiredValue": "≥ 600 m³/(h·veículo) para desenfumagem de estacionamentos (RT-SCIE)",
+      "remediation": "Dimensionar desenfumagem de estacionamento conforme RT-SCIE: (1) Caudal de extração: 600 m³/(h·veículo) em modo de incêndio. (2) Ventilação normal: 300 m³/(h·veículo) com controlo por CO (50 ppm arranque, 100 ppm reforço). (3) Jet fans (ventilação por impulso): para estacionamentos > 3 pisos subterrâneos, com velocidade de impulso ≥ 3 m/s. (4) Pontos de extração nos cantos opostos do piso (cruzamento de fluxo). (5) Admissão de ar: pelas rampas ou condutas dedicadas. (6) Ventiladores F300-120 com alimentação de emergência. (7) Comando: SADI para modo de incêndio, sensor CO para modo normal.",
+      "enabled": true,
+      "tags": ["SCIE", "estacionamento", "desenfumagem", "jet fans", "CO"]
+    },
+    {
+      "id": "HVAC-SMOKE-AHU-DAMPER-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 92.º — Registos Corta-fogo Motorizados em UTAs",
+      "description": "A UTA não possui registos corta-fogo motorizados (fire dampers) nas travessias de compartimentação corta-fogo, ou os registos existentes não são motorizados com retorno por mola (spring-return) para posição de segurança.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasMotorizedFireDampers", "operator": "not_exists", "value": null },
+        { "field": "hvac.ductsPassFireWalls", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Registos corta-fogo motorizados (spring-return) em todas as travessias de compartimentação",
+      "remediation": "Instalar registos corta-fogo motorizados em todas as travessias de compartimentação: (1) Classificação: EI 60S ou EI 90S conforme a resistência ao fogo da parede/laje atravessada. (2) Atuador: com retorno por mola (spring-return) — fecha automaticamente por falha de alimentação (posição de segurança = fechado). (3) Comando: fecho por sinal da central SADI (contacto seco) e/ou por fusível térmico local (72°C como redundância). (4) Sinalização: microswitch de posição (aberto/fechado) para monitorização pela GTC. (5) Ensaio: teste semestral de abertura/fecho com verificação do tempo de resposta (< 60 s). (6) Manutenção: lubrificação anual dos mecanismos e verificação do fusível térmico.",
+      "enabled": true,
+      "tags": ["SCIE", "registo corta-fogo", "motorizado", "UTA", "fire damper"]
+    },
+    {
+      "id": "HVAC-SMOKE-PRESSURIZATION-STAIR-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE Art. 161.º + EN 12101-6 — Pressurização de Caixas de Escada",
+      "description": "A caixa de escada protegida do edifício alto (> 28 m) não possui sistema de pressurização conforme EN 12101-6, ou a diferença de pressão ({hvac.stairPressureDiff} Pa) é inferior ao mínimo de 50 Pa com todas as portas fechadas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.stairPressureDiff", "operator": "<", "value": 50 },
+        { "field": "building.height", "operator": ">", "value": 28 }
+      ],
+      "currentValueTemplate": "{hvac.stairPressureDiff} Pa com portas fechadas",
+      "requiredValue": "50 Pa (portas fechadas), ≥ 0.75 m/s velocidade do ar (porta aberta) conforme EN 12101-6",
+      "remediation": "Dimensionar sistema de pressurização conforme EN 12101-6: (1) Diferença de pressão: 50 Pa (±10%) com todas as portas fechadas, sem exceder 100 Pa (para permitir abertura manual das portas). (2) Velocidade do ar: ≥ 0.75 m/s através de cada porta aberta simultaneamente (tipicamente 1-2 portas). (3) Ventilador: dedicado, classificação F300-120 (ou F400-120), alimentação de emergência. (4) Regulação de pressão: registo motorizado de alívio de pressão (barometric damper) para evitar sobrepressão. (5) Admissão de ar: na base da escada ou a cada 3 pisos para distribuição uniforme. (6) Ensaio: teste funcional semestral com medição de pressão e velocidade.",
+      "enabled": true,
+      "tags": ["SCIE", "pressurização", "escada", "EN 12101-6", "edifício alto"]
+    },
+    {
+      "id": "HVAC-SMOKE-KITCHEN-SUPPRESSION-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE + NFPA 96 — Proteção de Condutas de Extração de Cozinha",
+      "description": "A conduta de extração da cozinha profissional/industrial não possui registo corta-fogo na travessia de compartimentação e sistema de supressão automática na hotte (nozzle system), conforme exigido pelo RT-SCIE para cozinhas de risco elevado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasKitchenSuppressionSystem", "operator": "not_exists", "value": null },
+        { "field": "hvac.spaceType", "operator": "==", "value": "commercial-kitchen" }
+      ],
+      "requiredValue": "Sistema de supressão na hotte + registo corta-fogo na conduta para cozinhas profissionais",
+      "remediation": "Proteger a conduta de extração de cozinha profissional: (1) Sistema de supressão automática: agente químico húmido (wet chemical) com nozzles dirigidos à zona de cocção e entrada da conduta. (2) Acionamento: fusível térmico (182°C) + comando manual acessível na rota de fuga. (3) Registo corta-fogo: classe EI 120S na travessia de cada compartimentação. (4) Conduta: material incombustível (aço inox 1.5 mm mínimo), sem isolamento combustível, acesso para limpeza a cada 3 m. (5) Limpeza: trimestral para cozinhas de alto débito (gorduras) — empresa certificada com relatório fotográfico. (6) Ventilador: F400-120, instalado na cobertura (extremidade da conduta) para manter a conduta em depressão.",
+      "enabled": true,
+      "tags": ["SCIE", "cozinha", "extração", "supressão", "conduta", "NFPA 96"]
+    },
+    {
+      "id": "HVAC-SMOKE-AIR-CURTAIN-FIRE-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE / EN 12101-6 — Cortinas de Ar para Controlo de Fumo",
+      "description": "A cortina de ar instalada na entrada de espaço comercial de grande dimensão (> 1000 m²) não está integrada com o sistema de controlo de fumo, podendo criar caminhos de propagação de fumo entre compartimentos em caso de incêndio quando a cortina permanece ligada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasAirCurtainFireIntegration", "operator": "not_exists", "value": null },
+        { "field": "hvac.hasAirCurtain", "operator": "==", "value": true },
+        { "field": "hvac.grossFloorArea", "operator": ">", "value": 1000 }
+      ],
+      "requiredValue": "Cortina de ar com desligamento automático por alarme de incêndio e integração com sistema de controlo de fumo",
+      "remediation": "Integrar cortina de ar com o sistema SCIE: (1) Desligamento automático: contacto seco da central de deteção de incêndio (CDI) desliga a cortina de ar em caso de alarme confirmado. (2) Motivo: a cortina de ar cria um jato descendente que pode empurrar a camada de fumo para baixo, reduzindo a visibilidade na rota de evacuação. (3) Alternativa: cortina de ar do tipo fire-rated (EN 16282-8) com certificação de barreira ao fumo — pode permanecer ligada em modo de barreira de fumo. (4) Registo corta-fogo: se a cortina de ar está embutida na parede de compartimentação, prever registo corta-fogo EI 60 no invólucro. (5) Alimentação: circuito elétrico normal (não de segurança) — deve desligar em emergência. (6) Sinalização: painel junto à cortina indicando 'Desligamento automático por alarme de incêndio'.",
+      "enabled": true,
+      "tags": ["SCIE", "cortina de ar", "fumo", "incêndio", "desligamento"]
+    },
+    {
+      "id": "HVAC-SMOKE-PRESSURIZATION-LOBBY-01",
+      "regulationId": "scie-hvac",
+      "article": "RT-SCIE / EN 12101-6 — Pressurização de Lobbies e Câmaras Corta-Fogo",
+      "description": "O lobby protegido ou câmara corta-fogo que serve como via de evacuação não possui sistema de pressurização que garanta sobrepressão de 50 Pa (±10%) relativamente aos espaços adjacentes em caso de incêndio, conforme exigido pelo RT-SCIE para edifícios de altura > 28 m.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "hvac.hasLobbyPressurization", "operator": "not_exists", "value": null },
+        { "field": "hvac.buildingHeight", "operator": ">", "value": 28 },
+        { "field": "hvac.hasFireLobby", "operator": "==", "value": true }
+      ],
+      "requiredValue": "Pressurização de lobby protegido: 50 Pa (±10%) relativamente a espaços adjacentes (RT-SCIE/EN 12101-6)",
+      "remediation": "Implementar sistema de pressurização do lobby protegido: (1) Pressão diferencial: 50 Pa ±10% entre o lobby e os espaços adjacentes (corredor, piso do incêndio). (2) Ventilador: dedicado, com alimentação de emergência (gerador + UPS para 2 horas mínimo). (3) Conduta: classe de resistência ao fogo EI 120, percurso direto ao exterior. (4) Alívio de pressão: damper de alívio calibrado para manter 50 Pa — impede sobrepressão que dificulte abertura de portas (força máxima na porta ≤ 100 N conforme EN 12101-6). (5) Ativação: automática por alarme da CDI para o piso em incêndio. (6) Teste: ensaio funcional com todas as portas fechadas e com 1 porta aberta (simular evacuação) — pressão medida dentro dos limites. (7) Monitorização: sensor de pressão diferencial com transmissão ao BMS.",
+      "enabled": true,
+      "tags": ["SCIE", "pressurização", "lobby", "câmara corta-fogo", "EN 12101-6"]
     }
   ]
 }

@@ -7816,6 +7816,1609 @@
         "eficiência",
         "processo"
       ]
+    },
+    {
+      "id": "ENE-STOR-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Capacidade Mínima de Armazenamento de Energia para Edifícios NZEB",
+      "description": "O edifício NZEB com produção fotovoltaica não dispõe de sistema de armazenamento de energia (bateria) com capacidade mínima de 1 kWh por cada 3 kWp de potência instalada.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.storage.batteryCapacityKwh",
+          "operator": "<",
+          "value": 0.33
+        },
+        {
+          "field": "energy.pv.installedKwp",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "energy.isNzeb",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Capacidade de bateria: {energy.storage.batteryCapacityKwh} kWh para {energy.pv.installedKwp} kWp PV",
+      "requiredValue": "Armazenamento ≥ 1 kWh por cada 3 kWp instalados para edifícios NZEB com PV",
+      "remediation": "Instalar sistema de armazenamento de energia: (1) dimensionar bateria para ≥ 33% da potência PV em kWh (ex.: 5 kWp → ≥ 1.67 kWh); (2) preferir baterias LFP (LiFePO₄) para maior durabilidade e segurança; (3) integrar com inversor híbrido para autoconsumo noturno; (4) considerar bateria de segunda vida EV para reduzir custo; (5) prever espaço ventilado e protegido para instalação.",
+      "enabled": true,
+      "tags": [
+        "armazenamento",
+        "bateria",
+        "NZEB",
+        "PV",
+        "autoconsumo"
+      ]
+    },
+    {
+      "id": "ENE-STOR-02",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Armazenamento Integrado em Unidades de Autoconsumo (UPAC)",
+      "description": "A unidade de autoconsumo (UPAC) com potência superior a 4 kWp não incorpora sistema de armazenamento para maximização do autoconsumo e redução da injeção na rede.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.storage.hasStorage",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.pv.installedKwp",
+          "operator": ">",
+          "value": 4
+        },
+        {
+          "field": "energy.upac.registered",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "UPAC {energy.pv.installedKwp} kWp sem armazenamento integrado",
+      "requiredValue": "Recomendação de armazenamento para UPAC > 4 kWp (autoconsumo ≥ 70%)",
+      "remediation": "Integrar armazenamento na UPAC: (1) dimensionar para cobrir consumo noturno (tipicamente 50-70% da produção diária); (2) taxa de autoconsumo alvo ≥ 70%; (3) instalar sistema de gestão de energia (EMS) para otimizar ciclos de carga/descarga; (4) calcular payback com tarifa bi-horária; (5) verificar compatibilidade com inversor existente; (6) atualizar registo DGEG se necessário.",
+      "enabled": true,
+      "tags": [
+        "armazenamento",
+        "UPAC",
+        "autoconsumo",
+        "DGEG",
+        "bateria"
+      ]
+    },
+    {
+      "id": "ENE-STOR-03",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Gestão Inteligente de Armazenamento de Energia e Resposta à Rede",
+      "description": "O sistema de armazenamento de energia do edifício não possui gestão inteligente com capacidade de resposta à rede (demand response) e otimização de perfil de carga.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.storage.smartManagement",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.storage.hasStorage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.storage.batteryCapacityKwh",
+          "operator": ">",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "Bateria {energy.storage.batteryCapacityKwh} kWh sem gestão inteligente",
+      "requiredValue": "Gestão inteligente de armazenamento com demand response para baterias > 5 kWh",
+      "remediation": "Implementar gestão inteligente de bateria: (1) algoritmo de otimização baseado em previsão de consumo e produção PV; (2) resposta a sinais tarifários (carga em horas de vazio); (3) capacidade de demand response com operador de rede; (4) peak shaving automático; (5) modo de backup para resiliência; (6) integração com protocolo OCPP ou EEBus para comunicação com rede.",
+      "enabled": true,
+      "tags": [
+        "armazenamento",
+        "smart grid",
+        "demand response",
+        "EMS",
+        "bateria"
+      ]
+    },
+    {
+      "id": "ENE-DISTH-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Avaliação de Ligação a Rede de Aquecimento Urbano",
+      "description": "O edifício de serviços localizado em zona com rede de aquecimento/arrefecimento urbano disponível não avaliou a ligação à rede distrital como alternativa a sistemas individuais.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.districtHeating.networkAvailable",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.districtHeating.connectionEvaluated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rede distrital disponível mas ligação não avaliada",
+      "requiredValue": "Avaliação obrigatória de ligação a rede distrital quando disponível para GES",
+      "remediation": "Avaliar ligação à rede distrital: (1) solicitar condições de ligação ao operador da rede; (2) comparar custo de energia com alternativas individuais; (3) calcular fator de energia primária da rede (tipicamente inferior a caldeiras individuais); (4) dimensionar subestação de interface; (5) prever circuito hidráulico de interligação; (6) considerar benefício ambiental (redução de emissões locais).",
+      "enabled": true,
+      "tags": [
+        "aquecimento urbano",
+        "district heating",
+        "rede distrital",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-DISTH-02",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Fator de Conversão para Energia Distrital",
+      "description": "O cálculo de energia primária do edifício ligado a rede distrital não utiliza o fator de conversão específico da rede, aplicando incorretamente o fator genérico de gás natural.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.districtHeating.connected",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.districtHeating.specificFpuUsed",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Ligado a rede distrital sem Fpu específico (usando Fpu genérico gás natural)",
+      "requiredValue": "Fpu específico da rede distrital conforme declaração do operador e Despacho 15793-E/2013",
+      "remediation": "Corrigir cálculo de energia primária: (1) solicitar ao operador da rede a declaração do Fpu específico; (2) se rede com cogeração: Fpu tipicamente 0.8-1.0 kWhep/kWh; (3) se rede com renováveis (biomassa, geotérmica): Fpu pode ser < 0.5; (4) aplicar no cálculo do Ntc/IEE; (5) documentar fonte do Fpu no certificado energético.",
+      "enabled": true,
+      "tags": [
+        "Fpu",
+        "energia primária",
+        "district heating",
+        "conversão"
+      ]
+    },
+    {
+      "id": "ENE-CHP-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Eficiência Global Mínima de Cogeração (CHP)",
+      "description": "O sistema de cogeração (CHP) instalado no edifício não atinge a eficiência global mínima de 75%, necessária para ser considerado cogeração de alto rendimento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.chp.globalEfficiency",
+          "operator": "<",
+          "value": 0.75
+        },
+        {
+          "field": "energy.chp.installed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Eficiência global CHP: {energy.chp.globalEfficiency} ({energy.chp.globalEfficiency|percent})",
+      "requiredValue": "Eficiência global CHP ≥ 75% (cogeração de alto rendimento, Diretiva 2012/27/UE)",
+      "remediation": "Melhorar eficiência do CHP: (1) verificar carga térmica efetiva vs. dimensionamento; (2) otimizar horas de funcionamento (mínimo 4500 h/ano para viabilidade); (3) recuperar calor dos gases de escape (permutador secundário); (4) aproveitar calor do circuito de arrefecimento do motor; (5) reduzir perdas na distribuição térmica (isolamento tubagens); (6) considerar substituição por unidade mais eficiente se PES < 10%.",
+      "enabled": true,
+      "tags": [
+        "CHP",
+        "cogeração",
+        "eficiência",
+        "alto rendimento"
+      ]
+    },
+    {
+      "id": "ENE-CHP-02",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Contabilização de Energia Renovável de Cogeração a Biomassa",
+      "description": "A cogeração a biomassa certificada não tem a parcela renovável corretamente contabilizada no cálculo de Eren, subestimando o contributo renovável do edifício.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.chp.fuel",
+          "operator": "==",
+          "value": "biomass"
+        },
+        {
+          "field": "energy.chp.renewableShareAccounted",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "CHP biomassa sem contabilização Eren da parcela renovável",
+      "requiredValue": "Eren CHP biomassa = produção térmica + elétrica × fator renovável certificado",
+      "remediation": "Contabilizar Eren corretamente: (1) identificar fração renovável do combustível (biomassa certificada = 100%); (2) calcular Eren_térmica = Q_útil × fração_renovável; (3) calcular Eren_elétrica = E_produzida × fração_renovável; (4) somar ao Eren total do edifício; (5) documentar certificação da biomassa (sustentabilidade RED II); (6) aplicar Fpu = 1.0 para biomassa sólida conforme Despacho.",
+      "enabled": true,
+      "tags": [
+        "CHP",
+        "biomassa",
+        "Eren",
+        "renovável",
+        "contabilização"
+      ]
+    },
+    {
+      "id": "ENE-LABEL-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 18.º — Afixação da Etiqueta Energética em Edifícios Públicos",
+      "description": "O edifício público ou frequentado pelo público (> 250 m²) não tem a etiqueta energética afixada em local visível e acessível junto à entrada principal.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.label.displayed",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.isPublic",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 250
+        }
+      ],
+      "currentValueTemplate": "Etiqueta energética não afixada (edifício público > 250 m²)",
+      "requiredValue": "Etiqueta energética afixada em local visível junto à entrada principal (DL 118/2013 Art. 18.º)",
+      "remediation": "Afixar etiqueta energética: (1) obter etiqueta junto da ADENE com base no certificado em vigor; (2) afixar em local visível e acessível junto à entrada principal; (3) dimensões mínimas A3 para edifícios públicos; (4) incluir classe energética, valor IEE e data de validade; (5) renovar etiqueta quando certificado for atualizado; (6) multa por incumprimento: 250 € a 3.740 € (pessoa singular) ou 2.500 € a 44.890 € (pessoa coletiva).",
+      "enabled": true,
+      "tags": [
+        "etiqueta",
+        "afixação",
+        "edifício público",
+        "certificação"
+      ]
+    },
+    {
+      "id": "ENE-LABEL-02",
+      "regulationId": "dl-68a-2015",
+      "article": "DL 68-A/2015 — Inclusão da Classe Energética em Anúncios Imobiliários",
+      "description": "O anúncio de venda ou arrendamento do imóvel não inclui a classe energética do certificado SCE, conforme obrigatório desde 2015.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.label.inAdvertising",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.transaction.advertised",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Anúncio imobiliário sem indicação da classe energética",
+      "requiredValue": "Classe energética obrigatória em todos os anúncios de venda/arrendamento (DL 68-A/2015)",
+      "remediation": "Incluir classe energética no anúncio: (1) indicar a letra da classe (A+ a F); (2) obrigatório em todos os meios: portais imobiliários, jornais, montras, panfletos; (3) se certificado em renovação, indicar 'classe em atualização'; (4) contraordenação por omissão: 250 € a 3.740 € (particular) ou 2.500 € a 44.890 € (empresa).",
+      "enabled": true,
+      "tags": [
+        "etiqueta",
+        "anúncio",
+        "transação",
+        "classe energética"
+      ]
+    },
+    {
+      "id": "ENE-LABEL-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Classe Energética Mínima para Edifícios Novos de Habitação",
+      "description": "O edifício novo de habitação não atinge a classe energética mínima B⁻, obrigatória para obtenção de licença de utilização.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.label.class",
+          "operator": "ordinal_lt",
+          "value": "B-",
+          "scale": [
+            "A+",
+            "A",
+            "B",
+            "B-",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.type",
+          "operator": "==",
+          "value": "residential"
+        }
+      ],
+      "currentValueTemplate": "Classe energética: {energy.label.class} (mínimo B⁻ para edifícios novos)",
+      "requiredValue": "Classe energética ≥ B⁻ para edifícios novos de habitação (REH)",
+      "remediation": "Melhorar classe energética: (1) reforçar isolamento da envolvente (U paredes ≤ 0.35 W/m²·K); (2) instalar envidraçados de elevado desempenho (Uw ≤ 1.4 W/m²·K); (3) corrigir pontes térmicas (ETICS contínuo); (4) instalar sistema solar térmico ou bomba de calor AQS; (5) considerar PV para reduzir Ntc; (6) garantir ventilação adequada (Rph ≥ 0.4 h⁻¹).",
+      "enabled": true,
+      "tags": [
+        "classe energética",
+        "mínimo",
+        "habitação",
+        "REH",
+        "B-"
+      ]
+    },
+    {
+      "id": "ENE-GAP-01",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Análise de Desvio entre Desempenho Previsto e Real (Performance Gap)",
+      "description": "O edifício novo em operação apresenta consumo energético real superior a 130% do previsto no certificado energético, indicando performance gap significativo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.gap.realVsPredictedRatio",
+          "operator": ">",
+          "value": 1.3
+        },
+        {
+          "field": "energy.gap.dataAvailable",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Consumo real/previsto: {energy.gap.realVsPredictedRatio} ({energy.gap.realVsPredictedRatio|percent})",
+      "requiredValue": "Rácio consumo real/previsto ≤ 130% (performance gap aceitável)",
+      "remediation": "Investigar performance gap: (1) verificar condições de ocupação reais vs. pressupostos (horários, densidade, equipamentos); (2) auditar desempenho real da envolvente (termografia, blower door); (3) verificar set-points e horários AVAC; (4) analisar consumos desagregados por uso final; (5) verificar comissionamento dos sistemas; (6) ajustar modelo energético com dados reais; (7) implementar plano de correção com metas trimestrais.",
+      "enabled": true,
+      "tags": [
+        "performance gap",
+        "desvio",
+        "consumo real",
+        "pós-ocupação"
+      ]
+    },
+    {
+      "id": "ENE-GAP-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Monitorização Contínua para Identificação de Performance Gap em GES",
+      "description": "O grande edifício de serviços (GES) não implementa monitorização contínua de consumo para deteção precoce de desvios de desempenho energético.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.gap.continuousMonitoring",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 1000
+        }
+      ],
+      "currentValueTemplate": "GES > 1000 m² sem monitorização contínua de performance gap",
+      "requiredValue": "Monitorização contínua com alerta automático para desvios > 15% em GES > 1000 m²",
+      "remediation": "Implementar monitorização de performance gap: (1) instalar contadores inteligentes por uso final (AVAC, iluminação, equipamentos, AQS); (2) definir baseline normalizada (graus-dia, ocupação); (3) configurar alertas automáticos para desvios > 15%; (4) dashboard mensal com comparação real vs. previsto; (5) relatório trimestral de análise de desvios; (6) integrar com sistema GTC/BMS existente.",
+      "enabled": true,
+      "tags": [
+        "performance gap",
+        "monitorização",
+        "GES",
+        "desvio",
+        "contínuo"
+      ]
+    },
+    {
+      "id": "ENE-PASSIVH-01",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Requisitos Passive House para Edifícios de Consumo Quase Nulo",
+      "description": "O edifício que pretende certificação Passive House não cumpre o limite de necessidades de aquecimento de 15 kWh/m²·ano.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.passiveHouse.heatingDemand",
+          "operator": ">",
+          "value": 15
+        },
+        {
+          "field": "energy.passiveHouse.targetCertification",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Necessidades de aquecimento: {energy.passiveHouse.heatingDemand} kWh/m²·ano",
+      "requiredValue": "Necessidades de aquecimento ≤ 15 kWh/m²·ano (critério Passive House)",
+      "remediation": "Reduzir necessidades de aquecimento: (1) U paredes ≤ 0.15 W/m²·K (espessura ETICS ≥ 20 cm); (2) U cobertura ≤ 0.10 W/m²·K; (3) envidraçados triplos (Uw ≤ 0.80 W/m²·K); (4) eliminar pontes térmicas (ψ ≤ 0.01 W/m·K); (5) estanquidade n50 ≤ 0.6 h⁻¹; (6) ventilação mecânica com recuperação de calor ≥ 85%; (7) orientação solar otimizada.",
+      "enabled": true,
+      "tags": [
+        "passive house",
+        "aquecimento",
+        "NZEB",
+        "15 kWh",
+        "certificação"
+      ]
+    },
+    {
+      "id": "ENE-PASSIVH-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Necessidades de Energia Primária Passive House (PER)",
+      "description": "O edifício candidato a Passive House excede o limite de energia primária renovável (PER) de 60 kWh/m²·ano, comprometendo a certificação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.passiveHouse.primaryEnergyRenewable",
+          "operator": ">",
+          "value": 60
+        },
+        {
+          "field": "energy.passiveHouse.targetCertification",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Energia primária renovável (PER): {energy.passiveHouse.primaryEnergyRenewable} kWh/m²·ano",
+      "requiredValue": "PER ≤ 60 kWh/m²·ano (Passive House Classic) ou ≤ 45 kWh/m²·ano (Plus)",
+      "remediation": "Reduzir energia primária: (1) maximizar eficiência de todos os sistemas (aquecimento, AQS, ventilação, iluminação); (2) instalar PV para compensar consumo elétrico; (3) bomba de calor com COP ≥ 4.0; (4) iluminação LED exclusiva (≤ 2.5 W/m²); (5) equipamentos classe A; (6) para Passive House Plus: produção renovável ≥ 60 kWh/m²·ano.",
+      "enabled": true,
+      "tags": [
+        "passive house",
+        "PER",
+        "energia primária",
+        "certificação"
+      ]
+    },
+    {
+      "id": "ENE-PASSIVH-03",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Reconhecimento de Certificação Passive House no SCE",
+      "description": "O edifício com certificação Passive House válida não está a beneficiar da equivalência para efeitos de classificação SCE, podendo obter classe A+ automaticamente.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.passiveHouse.certified",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.label.class",
+          "operator": "!=",
+          "value": "A+"
+        }
+      ],
+      "currentValueTemplate": "Certificação Passive House válida mas classe SCE: {energy.label.class}",
+      "requiredValue": "Edifício Passive House certificado elegível para classe A+ no SCE",
+      "remediation": "Obter reconhecimento SCE: (1) apresentar certificado PHI (Passive House Institute) válido ao perito qualificado; (2) verificar que valores PHI são compatíveis com metodologia REH/RECS; (3) solicitar emissão de certificado SCE classe A+ com base na certificação PHI; (4) documentar equivalência no relatório do perito.",
+      "enabled": true,
+      "tags": [
+        "passive house",
+        "SCE",
+        "A+",
+        "equivalência",
+        "PHI"
+      ]
+    },
+    {
+      "id": "ENE-AIRTIGHT-01",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Teste de Estanquidade ao Ar para Edifícios NZEB",
+      "description": "O edifício NZEB não realizou teste de estanquidade ao ar (blower door test) conforme requerido para edifícios de consumo quase nulo.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.airtightness.blowerDoorTestDone",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isNzeb",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Teste blower door não realizado (edifício NZEB)",
+      "requiredValue": "Teste de estanquidade ao ar obrigatório para edifícios NZEB (n50 medido)",
+      "remediation": "Realizar teste de estanquidade: (1) contratar técnico certificado EN 13829/ISO 9972; (2) teste de pressurização (50 Pa) e despressurização; (3) resultado n50 ≤ 3.0 h⁻¹ (mínimo NZEB) ou n50 ≤ 0.6 h⁻¹ (Passive House); (4) identificar e selar infiltrações detetadas (câmara termográfica + smoke test); (5) documentar resultado no certificado energético.",
+      "enabled": true,
+      "tags": [
+        "estanquidade",
+        "blower door",
+        "n50",
+        "NZEB",
+        "infiltrações"
+      ]
+    },
+    {
+      "id": "ENE-AIRTIGHT-02",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-I/2013 — Valor n50 e Caudal de Ventilação Rph Corrigido",
+      "description": "O valor de renovações por hora (Rph) utilizado no cálculo REH não está corrigido com base no resultado do teste de estanquidade ao ar (n50), quando disponível.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.airtightness.n50CorrectionApplied",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.airtightness.blowerDoorTestDone",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "n50 = {energy.airtightness.n50Value} h⁻¹ medido, mas Rph não corrigido",
+      "requiredValue": "Rph calculado com base no n50 medido conforme metodologia Despacho 15793-I/2013",
+      "remediation": "Corrigir Rph com n50 medido: (1) aplicar fórmula Rph = n50 × e × f (fatores de exposição e tipo de ventilação); (2) para edifícios estanques (n50 < 1.0): verificar suficiência de ventilação mecânica; (3) atualizar cálculo Nic e Nvc com Rph corrigido; (4) documentar teste n50 e correção no certificado.",
+      "enabled": true,
+      "tags": [
+        "n50",
+        "Rph",
+        "ventilação",
+        "estanquidade",
+        "REH"
+      ]
+    },
+    {
+      "id": "ENE-AIRTIGHT-03",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Estanquidade ao Ar da Envolvente e Qualidade Construtiva",
+      "description": "O edifício apresenta resultado de teste de estanquidade n50 superior a 6.0 h⁻¹, indicando deficiências graves na qualidade construtiva da envolvente.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.airtightness.n50Value",
+          "operator": ">",
+          "value": 6
+        },
+        {
+          "field": "energy.airtightness.blowerDoorTestDone",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "n50 = {energy.airtightness.n50Value} h⁻¹ (muito elevado)",
+      "requiredValue": "n50 ≤ 6.0 h⁻¹ (máximo aceitável); recomendado ≤ 3.0 h⁻¹ (NZEB) ou ≤ 0.6 h⁻¹ (Passive House)",
+      "remediation": "Corrigir infiltrações excessivas: (1) localizar fugas com termografia infravermelha e smoke test; (2) selar juntas caixilharia-parede (fita de estanquidade + espuma PU); (3) selar passagens de tubagens e cablagem; (4) verificar/substituir vedantes de portas e janelas; (5) selar caixas de estore (causa frequente de infiltrações em Portugal); (6) aplicar membrana de estanquidade contínua interior; (7) repetir teste após correções.",
+      "enabled": true,
+      "tags": [
+        "n50",
+        "infiltrações",
+        "qualidade construtiva",
+        "envolvente",
+        "blower door"
+      ]
+    },
+    {
+      "id": "ENE-HVACEFF-01",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14511 — SCOP Mínimo para Bombas de Calor em Edifícios Novos",
+      "description": "A bomba de calor para aquecimento não atinge o SCOP mínimo de 3.5 (clima temperado, média temperatura), comprometendo a eficiência sazonal do sistema.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.hvac.heatPump.scop",
+          "operator": "<",
+          "value": 3.5
+        },
+        {
+          "field": "energy.hvac.heatPump.installed",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "SCOP bomba de calor: {energy.hvac.heatPump.scop}",
+      "requiredValue": "SCOP ≥ 3.5 para bombas de calor em edifícios novos (clima temperado PT)",
+      "remediation": "Substituir ou melhorar bomba de calor: (1) selecionar modelo com SCOP ≥ 3.5 (preferível ≥ 4.0); (2) preferir tecnologia inverter (modulação contínua); (3) dimensionar corretamente (evitar sobredimensionamento que reduz SCOP); (4) verificar certificação Eurovent/EHPA; (5) otimizar temperatura de distribuição (baixa temperatura: 35-45°C para piso radiante); (6) garantir descongelação eficiente.",
+      "enabled": true,
+      "tags": [
+        "SCOP",
+        "bomba de calor",
+        "eficiência sazonal",
+        "aquecimento"
+      ]
+    },
+    {
+      "id": "ENE-HVACEFF-02",
+      "regulationId": "en-14511-16147",
+      "article": "EN 14511 — SEER Mínimo para Sistemas de Arrefecimento",
+      "description": "O sistema de arrefecimento não atinge o SEER mínimo de 4.0, resultando em consumo excessivo de eletricidade na estação de arrefecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hvac.cooling.seer",
+          "operator": "<",
+          "value": 4
+        },
+        {
+          "field": "energy.hvac.cooling.installed",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "SEER sistema de arrefecimento: {energy.hvac.cooling.seer}",
+      "requiredValue": "SEER ≥ 4.0 para sistemas de arrefecimento (regulamento Ecodesign)",
+      "remediation": "Melhorar eficiência de arrefecimento: (1) substituir por equipamento com SEER ≥ 5.0 (classe A++); (2) implementar free-cooling quando temperatura exterior < set-point; (3) sombreamento solar eficaz (reduz carga de arrefecimento); (4) ventilação noturna para arrefecimento passivo; (5) verificar limpeza de filtros e condensadores (manutenção); (6) otimizar set-points (25°C vs. 22°C reduz consumo ~30%).",
+      "enabled": true,
+      "tags": [
+        "SEER",
+        "arrefecimento",
+        "eficiência",
+        "Ecodesign"
+      ]
+    },
+    {
+      "id": "ENE-HVACEFF-03",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — SFP de Ventiladores em Unidades de Tratamento de Ar",
+      "description": "A potência específica dos ventiladores (SFP) da unidade de tratamento de ar excede o limite máximo de 2.0 kW/(m³/s) para sistemas com recuperação de calor.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hvac.ahu.sfp",
+          "operator": ">",
+          "value": 2
+        },
+        {
+          "field": "energy.hvac.ahu.hasHeatRecovery",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "SFP da UTA: {energy.hvac.ahu.sfp} kW/(m³/s)",
+      "requiredValue": "SFP ≤ 2.0 kW/(m³/s) para UTAs com recuperação de calor (Portaria 349-D/2013)",
+      "remediation": "Reduzir SFP: (1) verificar dimensionamento de condutas (velocidade ≤ 6 m/s); (2) selecionar ventiladores EC (electronically commutated) de alta eficiência; (3) reduzir perda de carga de filtros (manutenção regular); (4) otimizar geometria de condutas (evitar curvas apertadas); (5) instalar VSD (variador de velocidade) para modulação em carga parcial; (6) verificar perda de carga do recuperador de calor.",
+      "enabled": true,
+      "tags": [
+        "SFP",
+        "ventiladores",
+        "UTA",
+        "eficiência",
+        "RECS"
+      ]
+    },
+    {
+      "id": "ENE-HW-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 — Sistema Solar Térmico Obrigatório para AQS em Edifícios de Habitação",
+      "description": "O edifício de habitação novo não dispõe de sistema solar térmico ou alternativa renovável equivalente para preparação de águas quentes sanitárias (AQS).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.hotWater.solarThermalInstalled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.hotWater.renewableAlternative",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.type",
+          "operator": "==",
+          "value": "residential"
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Sem sistema solar térmico ou alternativa renovável para AQS",
+      "requiredValue": "Sistema solar térmico obrigatório para AQS em edifícios novos de habitação (REH), ou alternativa renovável equivalente",
+      "remediation": "Instalar sistema solar térmico: (1) dimensionar conforme Despacho 15793-I (1 m²/ocupante, mínimo); (2) orientação Sul (±45°), inclinação = latitude - 5°; (3) depósito AQS ≥ 50 L/m² de coletor; (4) alternativas: bomba de calor AQS (COP ≥ 2.8), PV com resistência elétrica (Esolar equivalente); (5) garantir cobertura solar ≥ 50% das necessidades AQS; (6) documentar no certificado energético.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "solar térmico",
+        "obrigatório",
+        "habitação",
+        "renovável"
+      ]
+    },
+    {
+      "id": "ENE-HW-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Isolamento de Redes de Distribuição de AQS Centralizada",
+      "description": "A rede de distribuição de AQS centralizada não possui isolamento térmico adequado, resultando em perdas térmicas excessivas nas tubagens.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hotWater.pipeworkInsulationMm",
+          "operator": "<",
+          "value": 20
+        },
+        {
+          "field": "energy.hotWater.centralSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Isolamento de tubagens AQS: {energy.hotWater.pipeworkInsulationMm} mm",
+      "requiredValue": "Isolamento tubagens AQS ≥ 20 mm (DN ≤ 40) ou ≥ 30 mm (DN > 40), conforme Portaria 349-D/2013",
+      "remediation": "Isolar tubagens de AQS: (1) espessura mínima 20 mm para DN ≤ 40 mm, 30 mm para DN > 40 mm; (2) material: espuma elastomérica (λ ≤ 0.040 W/m·K) ou lã mineral; (3) isolar válvulas, flanges e acessórios; (4) proteger isolamento exterior com revestimento UV; (5) prever temperatura de retorno de recirculação ≥ 50°C (Legionella); (6) redução estimada de perdas: 50-70%.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "isolamento",
+        "tubagens",
+        "perdas térmicas",
+        "RECS"
+      ]
+    },
+    {
+      "id": "ENE-HW-03",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-I/2013 — Eficiência do Sistema de Preparação de AQS",
+      "description": "A eficiência do sistema de preparação de AQS é inferior ao valor de referência para o tipo de sistema instalado, aumentando as necessidades de energia para águas quentes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hotWater.systemEfficiency",
+          "operator": "<",
+          "value": 0.8
+        },
+        {
+          "field": "energy.hotWater.systemType",
+          "operator": "!=",
+          "value": "heat_pump"
+        }
+      ],
+      "currentValueTemplate": "Eficiência sistema AQS: {energy.hotWater.systemEfficiency} ({energy.hotWater.systemEfficiency|percent})",
+      "requiredValue": "Eficiência sistema AQS ≥ 80% para caldeiras, ≥ 85% para caldeiras condensação (referência REH)",
+      "remediation": "Melhorar eficiência AQS: (1) para caldeira convencional: verificar queimador e permutador (limpeza anual); (2) considerar caldeira de condensação (η ≥ 95%); (3) instalar bomba de calor AQS (COP 2.8-4.0, equivale a η 280-400%); (4) reduzir temperatura de armazenamento para 55-60°C (mínimo Legionella); (5) minimizar comprimento de tubagens; (6) instalar válvula misturadora termostática.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "eficiência",
+        "caldeira",
+        "bomba calor",
+        "referência"
+      ]
+    },
+    {
+      "id": "ENE-LITCTRL-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Controlo Automático de Iluminação em Edifícios de Serviços",
+      "description": "O edifício de serviços não possui controlo automático de iluminação (deteção de presença e/ou regulação de luz natural) nas zonas de circulação e espaços comuns.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.lighting.autoControlCirculation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Sem controlo automático de iluminação em zonas de circulação",
+      "requiredValue": "Controlo automático de iluminação obrigatório em circulações e espaços comuns de GES",
+      "remediation": "Instalar controlo de iluminação: (1) detetores de presença/movimento em corredores, WC, escadas, armazéns; (2) temporização adequada (2-10 min conforme uso); (3) sensores de luz natural (daylight harvesting) em zonas com iluminação lateral; (4) regulação DALI para dimming proporcional; (5) poupança estimada: 30-60% no consumo de iluminação; (6) ROI tipicamente < 3 anos.",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "controlo",
+        "presença",
+        "luz natural",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-LITCTRL-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Classe BAC para Controlo de Iluminação",
+      "description": "O sistema de controlo de iluminação do edifício não atinge a classe BAC C mínima, operando apenas com interruptores manuais sem qualquer automação.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.lighting.bacClass",
+          "operator": "ordinal_lt",
+          "value": "C",
+          "scale": [
+            "A+",
+            "A",
+            "B",
+            "B-",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Classe BAC iluminação: {energy.lighting.bacClass}",
+      "requiredValue": "Classe BAC iluminação mínima C (controlo automático por zona) para edifícios novos",
+      "remediation": "Elevar classe BAC de iluminação: (1) Classe D→C: instalar deteção de presença e horários automáticos; (2) Classe C→B: adicionar regulação por luz natural (daylight linking); (3) Classe B→A: integrar com GTC, cenas programáveis e otimização energética; (4) protocolo DALI-2 para máxima flexibilidade; (5) considerar human centric lighting (ajuste de temperatura de cor).",
+      "enabled": true,
+      "tags": [
+        "iluminação",
+        "BAC",
+        "automação",
+        "DALI",
+        "controlo"
+      ]
+    },
+    {
+      "id": "ENE-LITCTRL-03",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Densidade de Potência de Iluminação (DPIE) em Edifícios de Serviços",
+      "description": "A densidade de potência de iluminação (DPIE) excede o valor máximo regulamentar para o tipo de espaço, indicando iluminação ineficiente ou sobredimensionada.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.lighting.dpie",
+          "operator": ">",
+          "value": 10
+        },
+        {
+          "field": "building.type",
+          "operator": "==",
+          "value": "commercial"
+        }
+      ],
+      "currentValueTemplate": "DPIE: {energy.lighting.dpie} W/m²",
+      "requiredValue": "DPIE ≤ 10 W/m² para escritórios (Portaria 349-D/2013, Tabela I.28)",
+      "remediation": "Reduzir DPIE: (1) substituir toda a iluminação por LED (eficácia ≥ 130 lm/W); (2) otimizar níveis de iluminância por zona (EN 12464-1: 500 lux escritórios, 300 lux circulações); (3) utilizar luminárias com ótica eficiente (UGR < 19); (4) maximizar aproveitamento de luz natural; (5) eliminar iluminação decorativa excessiva; (6) objetivo: DPIE ≤ 6 W/m² com LED de última geração.",
+      "enabled": true,
+      "tags": [
+        "DPIE",
+        "iluminação",
+        "LED",
+        "W/m²",
+        "RECS"
+      ]
+    },
+    {
+      "id": "ENE-REC-01",
+      "regulationId": "dl-162-2019",
+      "article": "DL 162/2019 — Certificados de Origem Renovável para Autoconsumo Coletivo",
+      "description": "A comunidade de autoconsumo coletivo não possui garantias de origem (GO) que certifiquem a proveniência renovável da energia partilhada entre os membros.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.renewableCerts.guaranteeOfOrigin",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.community.collectiveSelfConsumption",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Autoconsumo coletivo sem garantias de origem renovável",
+      "requiredValue": "Garantias de origem (GO) recomendadas para certificação da proveniência renovável em autoconsumo coletivo",
+      "remediation": "Obter garantias de origem: (1) registar instalação no registo de garantias de origem da DGEG; (2) solicitar emissão de GOs para produção mensal; (3) as GOs certificam que cada MWh foi produzido de fonte renovável; (4) necessárias para reporte ESG/CSRD; (5) permitem valorização de excedentes no mercado voluntário; (6) custo marginal vs. benefício reputacional significativo.",
+      "enabled": true,
+      "tags": [
+        "garantia de origem",
+        "renovável",
+        "certificado",
+        "autoconsumo",
+        "DGEG"
+      ]
+    },
+    {
+      "id": "ENE-REC-02",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Documentação de Origem Renovável para Contabilização Eren",
+      "description": "A energia renovável declarada no cálculo Eren do certificado energético não está suportada por documentação comprovativa (garantias de origem, contrato PPA renovável, ou certificação de biomassa).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.renewableCerts.erenDocumented",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.eren.totalKwh",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Eren = {energy.eren.totalKwh} kWh/ano declarado sem documentação comprovativa",
+      "requiredValue": "Documentação comprovativa de origem renovável para toda a energia declarada em Eren",
+      "remediation": "Documentar origem renovável: (1) para PV/solar térmico próprio: declaração de instalação e potência; (2) para biomassa: certificado de sustentabilidade (RED II); (3) para eletricidade verde adquirida: contrato PPA renovável ou GOs; (4) para CHP renovável: declaração de combustível e rendimento; (5) manter documentação atualizada para auditorias SCE.",
+      "enabled": true,
+      "tags": [
+        "Eren",
+        "documentação",
+        "garantia de origem",
+        "PPA",
+        "renovável"
+      ]
+    },
+    {
+      "id": "ENE-EVCHG-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Pré-instalação de Carregamento de Veículos Elétricos em Edifícios Novos",
+      "description": "O edifício novo com mais de 10 lugares de estacionamento não possui pré-instalação de infraestrutura para carregamento de veículos elétricos (VE) em pelo menos 20% dos lugares.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.ev.preInstallationPercent",
+          "operator": "<",
+          "value": 20
+        },
+        {
+          "field": "building.parkingSpaces",
+          "operator": ">",
+          "value": 10
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Pré-instalação VE: {energy.ev.preInstallationPercent}% dos lugares",
+      "requiredValue": "Pré-instalação VE ≥ 20% dos lugares de estacionamento para edifícios novos > 10 lugares (EPBD recast)",
+      "remediation": "Instalar infraestrutura VE: (1) condutas e caminhos de cabos até ≥ 20% dos lugares; (2) quadro elétrico com reserva de potência para VE; (3) pelo menos 1 ponto de carregamento operacional por cada 10 lugares; (4) dimensionar transformador com margem para 100% VE futuro; (5) prever sistema de gestão de carga (load management) para evitar picos; (6) conformidade com Decreto-Lei n.º 39/2010.",
+      "enabled": true,
+      "tags": [
+        "VE",
+        "carregamento",
+        "pré-instalação",
+        "estacionamento",
+        "EPBD"
+      ]
+    },
+    {
+      "id": "ENE-EVCHG-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Gestão Inteligente de Carga VE e Integração com Edifício",
+      "description": "Os pontos de carregamento de VE não possuem gestão inteligente de carga (smart charging), carregando a potência máxima sem considerar o perfil de consumo do edifício.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.ev.smartChargingEnabled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.ev.chargingPointsCount",
+          "operator": ">",
+          "value": 3
+        }
+      ],
+      "currentValueTemplate": "Carregamento VE sem gestão inteligente ({energy.ev.chargingPointsCount} pontos)",
+      "requiredValue": "Gestão inteligente de carga (smart charging) para > 3 pontos de carregamento VE",
+      "remediation": "Implementar smart charging: (1) instalar sistema de gestão de carga com protocolo OCPP 2.0; (2) balanceamento dinâmico de potência entre pontos (load balancing); (3) programação de carga em horas de vazio (23h-07h); (4) integração com produção PV (solar charging); (5) vehicle-to-building (V2B) se suportado; (6) dashboard de monitorização de consumo VE.",
+      "enabled": true,
+      "tags": [
+        "VE",
+        "smart charging",
+        "OCPP",
+        "gestão de carga",
+        "V2B"
+      ]
+    },
+    {
+      "id": "ENE-EVCHG-03",
+      "regulationId": "despacho-15793e-2013",
+      "article": "Despacho 15793-E/2013 — Contabilização Energética de Carregamento VE no Edifício",
+      "description": "O consumo energético do carregamento de veículos elétricos não está desagregado e contabilizado separadamente no cálculo do IEE do edifício.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.ev.separateMetering",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.ev.chargingPointsCount",
+          "operator": ">",
+          "value": 0
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Consumo VE não desagregado do IEE do edifício",
+      "requiredValue": "Sub-contagem separada de consumo VE para exclusão do cálculo IEE do edifício (GES)",
+      "remediation": "Desagregar consumo VE: (1) instalar contador dedicado para circuito de carregamento VE; (2) excluir consumo VE do cálculo IEE conforme metodologia RECS; (3) reportar separadamente no certificado energético; (4) permite avaliação justa do desempenho do edifício sem distorção pelo consumo de mobilidade; (5) registar consumo VE para reporte de emissões Scope 1/2.",
+      "enabled": true,
+      "tags": [
+        "VE",
+        "IEE",
+        "sub-contagem",
+        "desagregação",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-SMARTBMS-01",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Sistema de Gestão Técnica Centralizada (GTC/BMS) para GES",
+      "description": "O grande edifício de serviços (GES) não dispõe de sistema de gestão técnica centralizada (GTC/BMS) para monitorização e controlo integrado de energia.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.smart.hasBMS",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 1000
+        }
+      ],
+      "currentValueTemplate": "GES > 1000 m² sem sistema GTC/BMS centralizado",
+      "requiredValue": "GTC/BMS obrigatório para GES > 1000 m² (DL 118/2013 + EN 15232 classe C mínima)",
+      "remediation": "Instalar GTC/BMS: (1) sistema centralizado com protocolo aberto (BACnet/IP ou Modbus TCP); (2) monitorização de AVAC, iluminação, contadores de energia; (3) registo histórico de dados (mínimo 2 anos); (4) alarmes automáticos para desvios e avarias; (5) interface web para gestão remota; (6) integrar com contadores inteligentes; (7) poupança estimada: 15-30% no consumo energético.",
+      "enabled": true,
+      "tags": [
+        "GTC",
+        "BMS",
+        "gestão técnica",
+        "GES",
+        "EN 15232"
+      ]
+    },
+    {
+      "id": "ENE-SMARTBMS-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Analítica Energética e Deteção de Anomalias por IA",
+      "description": "O sistema de gestão do edifício não incorpora analítica energética avançada com deteção automática de anomalias e oportunidades de otimização.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.smart.analyticsEnabled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.smart.hasBMS",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 2000
+        }
+      ],
+      "currentValueTemplate": "BMS sem analítica energética avançada (edifício > 2000 m²)",
+      "requiredValue": "Analítica energética com deteção de anomalias recomendada para edifícios > 2000 m² com BMS",
+      "remediation": "Implementar analítica energética: (1) plataforma de analytics sobre dados BMS (AFDD — Automated Fault Detection and Diagnostics); (2) algoritmos de deteção de anomalias (consumo fora do padrão, set-points incorretos, funcionamento simultâneo aquecimento/arrefecimento); (3) benchmarking interno por zona; (4) relatórios automáticos semanais; (5) estimativa de poupança por ação; (6) integração com plataforma de gestão de manutenção (CMMS).",
+      "enabled": true,
+      "tags": [
+        "analítica",
+        "IA",
+        "AFDD",
+        "anomalias",
+        "BMS"
+      ]
+    },
+    {
+      "id": "ENE-OCCUP-01",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Controlo AVAC Baseado em Ocupação Real",
+      "description": "O sistema AVAC do edifício não ajusta a climatização com base na ocupação real dos espaços, operando com horários fixos independentemente da presença de ocupantes.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.occupancy.hvacDemandControlled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "currentValueTemplate": "AVAC sem controlo por ocupação (horários fixos apenas)",
+      "requiredValue": "Controlo AVAC baseado em ocupação (DCV — Demand Controlled Ventilation) para GES > 500 m²",
+      "remediation": "Implementar controlo por ocupação: (1) instalar sensores de CO₂ por zona para DCV (Demand Controlled Ventilation); (2) sensores de presença/contagem para ajuste de set-points; (3) registos motorizados por zona para modulação de caudal; (4) reduzir ventilação para mínimo higiénico em zonas desocupadas; (5) ajustar set-points: desocupado → aquecimento 16°C, arrefecimento 30°C; (6) poupança estimada: 20-40% no consumo AVAC.",
+      "enabled": true,
+      "tags": [
+        "ocupação",
+        "DCV",
+        "CO₂",
+        "AVAC",
+        "controlo"
+      ]
+    },
+    {
+      "id": "ENE-OCCUP-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Controlo de Iluminação Baseado em Ocupação em Espaços Intermitentes",
+      "description": "Os espaços de ocupação intermitente (WC, arrumos, salas de reunião) não possuem controlo de iluminação por deteção de presença com desligamento automático.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.occupancy.lightingPresenceControl",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.lighting.intermittentSpacesCount",
+          "operator": ">",
+          "value": 0
+        }
+      ],
+      "currentValueTemplate": "Espaços intermitentes sem deteção de presença para iluminação ({energy.lighting.intermittentSpacesCount} espaços)",
+      "requiredValue": "Deteção de presença para iluminação em todos os espaços de ocupação intermitente",
+      "remediation": "Instalar deteção de presença: (1) sensores PIR ou ultrassónicos em WC, arrumos, copas, salas de reunião; (2) temporização: 5-10 min após último movimento; (3) para corredores: deteção de presença com dimming (50% quando desocupado); (4) custo por ponto: 30-80 €; (5) payback típico: 1-2 anos; (6) integrar com sistema DALI se existente.",
+      "enabled": true,
+      "tags": [
+        "ocupação",
+        "presença",
+        "iluminação",
+        "intermitente",
+        "PIR"
+      ]
+    },
+    {
+      "id": "ENE-OCCUP-03",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Gestão de Energia de Quartos de Hotel Baseada em Ocupação",
+      "description": "O hotel não possui sistema de gestão de energia por quarto (key card switch ou sensor de janela) que reduza o consumo quando o quarto está desocupado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.occupancy.hotelRoomEMS",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.subType",
+          "operator": "==",
+          "value": "hotel"
+        }
+      ],
+      "currentValueTemplate": "Hotel sem sistema de gestão de energia por quarto",
+      "requiredValue": "Sistema de gestão de energia por quarto (key card + set-back) para hotéis",
+      "remediation": "Instalar gestão de energia por quarto: (1) interruptor de cartão-chave (key card switch) para corte de circuitos não essenciais; (2) set-back de AVAC quando desocupado (aquecimento 16°C, arrefecimento 30°C); (3) sensor de janela para corte de AVAC com janela aberta; (4) deteção de presença para iluminação de cortesia; (5) gestão centralizada com dashboard de ocupação; (6) poupança estimada: 25-40% por quarto.",
+      "enabled": true,
+      "tags": [
+        "hotel",
+        "ocupação",
+        "key card",
+        "quarto",
+        "EMS"
+      ]
+    },
+    {
+      "id": "ENE-BENCH-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Benchmarking IEE por Tipologia de Edifício de Serviços",
+      "description": "O edifício de serviços apresenta IEE (Indicador de Eficiência Energética) superior ao percentil 75 da sua tipologia, indicando desempenho energético significativamente abaixo da média.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.benchmark.ieePercentile",
+          "operator": ">",
+          "value": 75
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "IEE no percentil {energy.benchmark.ieePercentile} da tipologia (acima da mediana)",
+      "requiredValue": "IEE ≤ percentil 50 (mediana) da tipologia; objetivo: percentil 25 (melhor quartil)",
+      "remediation": "Melhorar posição no benchmarking: (1) identificar usos finais com maior desvio vs. referência (ADENE benchmarks); (2) implementar medidas prioritárias de redução de consumo; (3) comparar com edifícios similares na plataforma ADENE; (4) definir meta anual de melhoria (mínimo 3%); (5) participar em programa de benchmarking voluntário (ex.: LNEG); (6) objetivo: atingir percentil 25 em 5 anos.",
+      "enabled": true,
+      "tags": [
+        "benchmarking",
+        "IEE",
+        "tipologia",
+        "percentil",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-BENCH-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Comparação de Desempenho Energético entre Edifícios de Escritórios",
+      "description": "O edifício de escritórios não participa em programa de benchmarking energético, impossibilitando a comparação do seu desempenho com edifícios similares.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.benchmark.enrolled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.subType",
+          "operator": "in",
+          "value": [
+            "office",
+            "mixed_use"
+          ]
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 1000
+        }
+      ],
+      "currentValueTemplate": "Edifício de escritórios > 1000 m² sem benchmarking energético",
+      "requiredValue": "Participação em programa de benchmarking energético para edifícios de escritórios > 1000 m²",
+      "remediation": "Aderir a benchmarking: (1) registar na plataforma ADENE de benchmarking voluntário; (2) submeter dados anuais: consumo total, por uso final, área, ocupação, graus-dia; (3) normalizar IEE por graus-dia e horas de operação; (4) comparar com medianas sectoriais; (5) identificar áreas de melhoria prioritárias; (6) usar resultados para justificar investimentos em eficiência.",
+      "enabled": true,
+      "tags": [
+        "benchmarking",
+        "escritórios",
+        "ADENE",
+        "comparação",
+        "voluntário"
+      ]
+    },
+    {
+      "id": "ENE-PEAK-01",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Gestão de Ponta de Consumo e Peak Shaving",
+      "description": "O edifício não implementa gestão de ponta de consumo (peak shaving), resultando em potência de ponta contratada excessiva e custos de potência elevados.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.peak.managementEnabled",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.peak.contractedPowerKva",
+          "operator": ">",
+          "value": 100
+        }
+      ],
+      "currentValueTemplate": "Potência contratada: {energy.peak.contractedPowerKva} kVA sem gestão de ponta",
+      "requiredValue": "Gestão de ponta ativa para edifícios com potência contratada > 100 kVA",
+      "remediation": "Implementar gestão de ponta: (1) instalar analisador de rede com registo de potência de ponta em intervalos de 15 min; (2) identificar cargas deslocáveis (VE, AQS, armazenamento de frio/calor); (3) programar deslastre rotativo de cargas não críticas; (4) utilizar bateria para peak shaving (se disponível); (5) otimizar arranque de equipamentos (soft start, sequenciação); (6) redução potencial de potência contratada: 15-30%.",
+      "enabled": true,
+      "tags": [
+        "peak shaving",
+        "ponta",
+        "potência",
+        "gestão de carga",
+        "deslastre"
+      ]
+    },
+    {
+      "id": "ENE-PEAK-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Arranque Sequenciado de Sistemas AVAC para Limitação de Ponta",
+      "description": "Os sistemas AVAC do edifício arrancam simultaneamente, criando picos de potência desnecessários que aumentam a potência de ponta e os custos de energia.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.peak.hvacSequentialStart",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.hvac.totalPowerKw",
+          "operator": ">",
+          "value": 50
+        }
+      ],
+      "currentValueTemplate": "Arranque simultâneo de AVAC (potência total: {energy.hvac.totalPowerKw} kW)",
+      "requiredValue": "Arranque sequenciado de sistemas AVAC com desfasamento ≥ 5 min entre unidades",
+      "remediation": "Implementar arranque sequenciado: (1) programar desfasamento de 5-10 min entre arranque de cada unidade; (2) ordem de prioridade: áreas críticas primeiro; (3) pré-aquecimento/arrefecimento progressivo (início 30 min antes da ocupação); (4) soft start em motores > 7.5 kW; (5) limitar corrente de arranque com VSD; (6) redução de pico estimada: 30-50% vs. arranque simultâneo.",
+      "enabled": true,
+      "tags": [
+        "arranque",
+        "sequenciado",
+        "AVAC",
+        "ponta",
+        "soft start"
+      ]
+    },
+    {
+      "id": "ENE-PF-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "Portaria 349-D/2013 — Correção do Fator de Potência em Edifícios de Serviços",
+      "description": "O fator de potência do edifício é inferior a 0.93, resultando em penalização tarifária por energia reativa e perdas adicionais na instalação elétrica.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.powerFactor.value",
+          "operator": "<",
+          "value": 0.93
+        },
+        {
+          "field": "energy.powerFactor.measured",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Fator de potência: {energy.powerFactor.value} (penalização por reativa)",
+      "requiredValue": "Fator de potência ≥ 0.93 (isento de penalização por energia reativa)",
+      "remediation": "Corrigir fator de potência: (1) instalar bateria de condensadores automática dimensionada para cos φ ≥ 0.96; (2) para cargas não lineares (VSD, LED drivers): filtros de harmónicas; (3) condensadores com reator de bloqueio anti-harmónicas; (4) regulador automático com medição em tempo real; (5) manutenção: verificar condensadores anualmente (degradação); (6) ROI tipicamente < 1 ano pela eliminação da penalização.",
+      "enabled": true,
+      "tags": [
+        "fator de potência",
+        "reativa",
+        "condensadores",
+        "penalização",
+        "cos phi"
+      ]
+    },
+    {
+      "id": "ENE-PF-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Monitorização de Qualidade de Energia e Harmónicas",
+      "description": "O edifício de serviços com cargas não lineares significativas não monitoriza a qualidade de energia (THD, harmónicas), que afeta a eficiência da instalação elétrica.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.powerFactor.thdMonitored",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.powerFactor.nonLinearLoadPercent",
+          "operator": ">",
+          "value": 30
+        }
+      ],
+      "currentValueTemplate": "Cargas não lineares: {energy.powerFactor.nonLinearLoadPercent}% sem monitorização THD",
+      "requiredValue": "Monitorização de THD para edifícios com cargas não lineares > 30% (VSD, LED, UPS)",
+      "remediation": "Monitorizar qualidade de energia: (1) instalar analisador de rede com medição de THD (Total Harmonic Distortion); (2) THD de tensão ≤ 8% e THD de corrente ≤ 20% (EN 50160); (3) identificar fontes de harmónicas (VSD, retificadores, LED drivers); (4) instalar filtros activos ou passivos se THD > limites; (5) verificar sobreaquecimento de cabos e transformador (perdas adicionais por harmónicas); (6) risco de falha prematura de condensadores sem proteção anti-harmónicas.",
+      "enabled": true,
+      "tags": [
+        "THD",
+        "harmónicas",
+        "qualidade de energia",
+        "cargas não lineares"
+      ]
+    },
+    {
+      "id": "ENE-WASTE-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Identificação de Aquecimento e Arrefecimento Simultâneos",
+      "description": "O edifício opera com aquecimento e arrefecimento simultâneos em zonas adjacentes ou no mesmo espaço, desperdiçando energia significativa.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.waste.simultaneousHeatingCooling",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.hvac.centralSystem",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Detetado aquecimento e arrefecimento simultâneos",
+      "requiredValue": "Eliminação de aquecimento/arrefecimento simultâneo (zona morta mínima 2°C entre set-points)",
+      "remediation": "Eliminar desperdício: (1) implementar zona morta (dead band) mínima de 2°C entre set-points de aquecimento e arrefecimento; (2) verificar controladores de zona (recalibrar sensores); (3) auditar válvulas de zona (possível passagem por avaria); (4) separar circuitos de aquecimento e arrefecimento; (5) programar GTC para alerta automático quando detetado; (6) poupança estimada: 15-25% do consumo AVAC.",
+      "enabled": true,
+      "tags": [
+        "desperdício",
+        "simultâneo",
+        "aquecimento",
+        "arrefecimento",
+        "zona morta"
+      ]
+    },
+    {
+      "id": "ENE-WASTE-02",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 — Consumo em Período de Não-Ocupação (Base Load Excessivo)",
+      "description": "O consumo energético do edifício em período de não-ocupação (noites e fins de semana) excede 40% do consumo em período de ocupação, indicando cargas permanentes excessivas.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.waste.offHoursRatio",
+          "operator": ">",
+          "value": 0.4
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Rácio consumo não-ocupação/ocupação: {energy.waste.offHoursRatio} ({energy.waste.offHoursRatio|percent})",
+      "requiredValue": "Consumo em não-ocupação ≤ 40% do consumo em ocupação (base load controlado)",
+      "remediation": "Reduzir consumo fora de horas: (1) auditar cargas permanentes (servidores, UPS, iluminação exterior, AVAC de zonas não ocupadas); (2) programar desligamento automático de iluminação e AVAC fora de horas; (3) instalar contactores para corte de circuitos não essenciais; (4) verificar temporizadores e relógios programáveis; (5) deteção de presença para iluminação de segurança; (6) standby power: desligar equipamentos de escritório centralmente.",
+      "enabled": true,
+      "tags": [
+        "base load",
+        "não-ocupação",
+        "desperdício",
+        "fora de horas",
+        "GES"
+      ]
+    },
+    {
+      "id": "ENE-WASTE-03",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Deteção Automática de Fugas e Desperdícios Energéticos",
+      "description": "O sistema de gestão do edifício não possui regras automáticas de deteção de desperdícios energéticos comuns (AVAC ligado com janelas abertas, iluminação acesa em espaços desocupados).",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.waste.autoDetectionRules",
+          "operator": "<",
+          "value": 5
+        },
+        {
+          "field": "energy.smart.hasBMS",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Regras de deteção automática de desperdício: {energy.waste.autoDetectionRules}",
+      "requiredValue": "Mínimo 5 regras de deteção automática de desperdício energético no BMS",
+      "remediation": "Configurar regras de deteção: (1) AVAC ligado com janela aberta (sensor de contacto); (2) iluminação acesa em espaço desocupado > 30 min; (3) temperatura de set-point fora de gama (< 18°C ou > 26°C); (4) consumo anormal vs. perfil histórico (desvio > 20%); (5) equipamento em funcionamento fora de horário sem justificação; (6) alarmes por email/SMS ao gestor de energia; (7) dashboard de desperdícios evitados (kWh e €).",
+      "enabled": true,
+      "tags": [
+        "desperdício",
+        "deteção automática",
+        "BMS",
+        "regras",
+        "alarmes"
+      ]
+    },
+    {
+      "id": "ENE-CARBON-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Cálculo e Reporte de Emissões de CO₂ do Edifício",
+      "description": "O edifício não calcula e reporta as emissões anuais de CO₂ associadas ao consumo energético, conforme necessário para alinhamento com metas de neutralidade carbónica 2050.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.carbon.annualEmissionsCalculated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.isGES",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Emissões de CO₂ não calculadas/reportadas para GES",
+      "requiredValue": "Cálculo anual de emissões CO₂ (kgCO₂/m²·ano) para GES, com plano de redução",
+      "remediation": "Calcular e reportar emissões: (1) converter consumos energéticos com fatores de emissão: eletricidade (mix PT ~0.20 kgCO₂/kWh), gás natural (0.202 kgCO₂/kWh); (2) calcular total anual em kgCO₂ e intensidade (kgCO₂/m²); (3) definir meta de redução alinhada com RNC2050 (neutralidade 2050); (4) identificar medidas: eletrificação, renováveis, eficiência; (5) reportar no relatório anual de energia; (6) preparar para futuro reporte CSRD/SFDR.",
+      "enabled": true,
+      "tags": [
+        "CO₂",
+        "emissões",
+        "carbono",
+        "neutralidade",
+        "RNC2050"
+      ]
+    },
+    {
+      "id": "ENE-CARBON-02",
+      "regulationId": "portaria-42-2019",
+      "article": "Portaria 42/2019 — Carbono Incorporado nos Materiais de Construção (Embodied Carbon)",
+      "description": "O edifício novo não calcula o carbono incorporado nos materiais de construção (embodied carbon), componente crescente das emissões de ciclo de vida.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.carbon.embodiedCarbonCalculated",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "isRehabilitation",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.area",
+          "operator": ">",
+          "value": 1000
+        }
+      ],
+      "currentValueTemplate": "Carbono incorporado não calculado para edifício novo > 1000 m²",
+      "requiredValue": "Cálculo de carbono incorporado (kgCO₂e/m²) para edifícios novos > 1000 m² (EN 15978)",
+      "remediation": "Calcular embodied carbon: (1) análise de ciclo de vida (ACV) conforme EN 15978; (2) incluir módulos A1-A3 (produção), A4-A5 (transporte e construção), B4 (substituição), C1-C4 (fim de vida); (3) ferramentas: One Click LCA, OpenLCA, BEES; (4) benchmark: < 500 kgCO₂e/m² para edifício residencial; (5) estratégias de redução: madeira estrutural, betão baixo carbono, materiais reciclados; (6) relevante para Taxonomia Verde da UE e financiamento ESG.",
+      "enabled": true,
+      "tags": [
+        "embodied carbon",
+        "ACV",
+        "LCA",
+        "materiais",
+        "EN 15978"
+      ]
+    },
+    {
+      "id": "ENE-RESIL-01",
+      "regulationId": "dl-101d-2020-sce",
+      "article": "DL 101-D/2020 — Plano de Resiliência Energética para Edifícios Críticos",
+      "description": "O edifício com função crítica (hospital, centro de dados, edifício público essencial) não possui plano de resiliência energética que garanta continuidade de serviço durante interrupções de rede.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.resilience.planExists",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "building.criticalFunction",
+          "operator": "==",
+          "value": true
+        }
+      ],
+      "currentValueTemplate": "Edifício crítico sem plano de resiliência energética",
+      "requiredValue": "Plano de resiliência energética obrigatório para edifícios com função crítica",
+      "remediation": "Elaborar plano de resiliência energética: (1) identificar cargas críticas e sua potência (iluminação de emergência, sistemas de segurança, TI, refrigeração); (2) dimensionar gerador de emergência para ≥ 72 h de autonomia; (3) UPS para cargas sensíveis (TI, equipamento médico); (4) integrar PV + bateria como backup renovável; (5) testar sistema de emergência trimestralmente; (6) plano de comunicação em caso de falha energética; (7) redundância N+1 para sistemas críticos.",
+      "enabled": true,
+      "tags": [
+        "resiliência",
+        "continuidade",
+        "emergência",
+        "edifício crítico",
+        "backup"
+      ]
+    },
+    {
+      "id": "ENE-RESIL-02",
+      "regulationId": "en-15232",
+      "article": "EN 15232 — Micro-rede e Operação em Ilha para Resiliência Energética",
+      "description": "O edifício com produção renovável e armazenamento não está configurado para operação em ilha (islanding), desperdiçando o potencial de resiliência durante falhas da rede.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.resilience.islandingCapable",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "energy.storage.hasStorage",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.pv.installedKwp",
+          "operator": ">",
+          "value": 5
+        }
+      ],
+      "currentValueTemplate": "PV ({energy.pv.installedKwp} kWp) + bateria sem capacidade de islanding",
+      "requiredValue": "Capacidade de operação em ilha (islanding) para edifícios com PV + bateria",
+      "remediation": "Configurar operação em ilha: (1) inversor híbrido com função de islanding certificada (EN 50549); (2) proteção anti-ilhamento automática com reconexão; (3) gestão de cargas prioritárias durante operação em ilha; (4) dimensionar bateria para mínimo 4 h de autonomia das cargas essenciais; (5) circuito de emergência dedicado (cargas críticas); (6) teste semestral do modo ilha; (7) considerar integração com gerador para backup estendido.",
+      "enabled": true,
+      "tags": [
+        "islanding",
+        "micro-rede",
+        "resiliência",
+        "backup",
+        "operação em ilha"
+      ]
     }
   ]
 }

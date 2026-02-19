@@ -10,10 +10,29 @@ import {
   SimpleCamera,
   SimpleRenderer,
   Hider,
+  Clipper,
+  Classifier,
   FragmentsManager,
 } from "@thatopen/components";
 import type { FragmentsModel, RaycastResult, RenderedFaces } from "@thatopen/fragments";
-import { Upload, Eye, Maximize2, Layers, Camera } from "lucide-react";
+import {
+  Upload,
+  Eye,
+  Maximize2,
+  Camera,
+  Scissors,
+  Info,
+  Filter,
+  Layers,
+} from "lucide-react";
+import ModelManagerPanel from "./ifc-viewer/ModelManagerPanel";
+import type { LoadedModelInfo } from "./ifc-viewer/ModelManagerPanel";
+import ClipperPanel from "./ifc-viewer/ClipperPanel";
+import PropertiesPanel from "./ifc-viewer/PropertiesPanel";
+import type { ElementProperties } from "./ifc-viewer/PropertiesPanel";
+import CategoryFilterPanel from "./ifc-viewer/CategoryFilterPanel";
+import type { CategoryNode } from "./ifc-viewer/CategoryFilterPanel";
+import { translateCategoryName } from "./ifc-viewer/CategoryFilterPanel";
 
 // ============================================================
 // Types
@@ -43,15 +62,15 @@ export interface IfcViewerProps {
   selectionHighlights?: PhaseHighlight[];
   /** Elements to fly the camera to (modelId → localIds). Camera animates when this changes. */
   flyToTarget?: Record<string, Set<number>>;
+  /** When true, category filters and model manager are disabled (external control mode) */
+  externalVisibilityControl?: boolean;
+  /** Ref to expose the underlying WebGL canvas element (for video capture) */
+  canvasRef?: React.MutableRefObject<HTMLCanvasElement | null>;
   /** CSS class for the container */
   className?: string;
 }
 
-interface LoadedModelInfo {
-  model: FragmentsModel;
-  name: string;
-  categories: string[];
-}
+type PanelType = "models" | "clipper" | "properties" | "categories" | null;
 
 // ============================================================
 // Component
@@ -66,6 +85,8 @@ export default function IfcViewer({
   phaseHighlights,
   selectionHighlights,
   flyToTarget,
+  externalVisibilityControl = false,
+  canvasRef,
   className = "",
 }: IfcViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,12 +95,63 @@ export default function IfcViewer({
   const worldRef = useRef<any>(null);
   const hiderRef = useRef<Hider | null>(null);
   const ifcLoaderRef = useRef<IfcLoader | null>(null);
+  const clipperRef = useRef<Clipper | null>(null);
+  const classifierRef = useRef<Classifier | null>(null);
 
   const [loadedModels, setLoadedModels] = useState<LoadedModelInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
-  const [showStoreys, setShowStoreys] = useState(false);
+
+  // New panel state
+  const [activePanel, setActivePanel] = useState<PanelType>(null);
+  const [selectedElementData, setSelectedElementData] = useState<ElementProperties | null>(null);
+  const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
+  const [modelVisibility, setModelVisibility] = useState<Record<string, boolean>>({});
+
+  // Stable ref for loadedModels to use in event handlers
+  const loadedModelsRef = useRef<LoadedModelInfo[]>([]);
+  loadedModelsRef.current = loadedModels;
+
+  // ── Toggle panel (only one open at a time) ──────────────────
+  function togglePanel(panel: PanelType) {
+    setActivePanel((prev) => (prev === panel ? null : panel));
+  }
+
+  // ── Rebuild category tree from Classifier ─────────────────────
+  const rebuildCategoryTree = useCallback(async () => {
+    const classifier = classifierRef.current;
+    if (!classifier) return;
+
+    try {
+      await classifier.byCategory();
+      const categoryMap = classifier.list.get("category");
+      if (!categoryMap) return;
+
+      const nodes: CategoryNode[] = [];
+      for (const [name, groupData] of categoryMap) {
+        const modelIdMap = await groupData.get();
+        let count = 0;
+        const localIds: Record<string, number[]> = {};
+        for (const [mid, idSet] of Object.entries(modelIdMap)) {
+          count += idSet.size;
+          localIds[mid] = Array.from(idSet);
+        }
+        if (count === 0) continue;
+        nodes.push({
+          name,
+          displayName: translateCategoryName(name),
+          count,
+          localIds,
+          visible: true,
+        });
+      }
+      nodes.sort((a, b) => b.count - a.count);
+      setCategoryTree(nodes);
+    } catch (err) {
+      console.warn("Failed to build category tree:", err);
+    }
+  }, []);
 
   // ── Initialize 3D scene ─────────────────────────────────────
   useEffect(() => {
@@ -123,15 +195,26 @@ export default function IfcViewer({
         });
         world.renderer = renderer;
 
+        // Expose the canvas element for video capture
+        if (canvasRef) {
+          canvasRef.current = renderer.three.domElement;
+        }
+
+        // Prevent right-click context menu on 3D viewport
+        renderer.three.domElement.addEventListener("contextmenu", (e) => e.preventDefault());
+
+        // Handle WebGL context loss gracefully
+        renderer.three.domElement.addEventListener("webglcontextlost", (e) => {
+          e.preventDefault();
+          setError("Contexto WebGL perdido. Recarregue a página para restaurar o visualizador 3D.");
+        });
+
         // 5. Setup camera — assigned to world AFTER renderer so
         //    newCameraControls() can find the renderer's DOM element.
-        //    Wrapped in retry: on first mount the renderer may not yet
-        //    be visible to the camera's event handler synchronously.
         const camera = new SimpleCamera(components);
         try {
           world.camera = camera;
         } catch {
-          // Fallback: force renderer reference, then retry
           camera.currentWorld = null;
           await new Promise(r => setTimeout(r, 0));
           world.camera = camera;
@@ -159,9 +242,28 @@ export default function IfcViewer({
         const hider = components.get(Hider);
         hiderRef.current = hider;
 
-        // 10. Setup click picking
+        // 10. Setup Clipper
+        const clipper = components.get(Clipper);
+        clipper.setup();
+        clipper.material = new THREE.MeshBasicMaterial({
+          color: 0x4D65FF,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.2,
+        });
+        clipperRef.current = clipper;
+
+        // 11. Setup Classifier
+        const classifier = components.get(Classifier);
+        classifierRef.current = classifier;
+
+        // 12. Setup click picking with property fetching
         renderer.three.domElement.addEventListener("pointerdown", async (e) => {
           if (e.button !== 0) return; // left click only
+
+          // Don't pick if Clipper is in interactive creation mode
+          if (clipper.enabled) return;
+
           const rect = container.getBoundingClientRect();
           const mouse = new THREE.Vector2(
             ((e.clientX - rect.left) / rect.width) * 2 - 1,
@@ -192,15 +294,41 @@ export default function IfcViewer({
                 },
                 { [modelId]: new Set([cast.localId]) },
               );
+
+              // Fetch element properties
+              const modelInfo = loadedModelsRef.current.find(
+                (m) => m.model.modelId === modelId,
+              );
+              if (modelInfo) {
+                try {
+                  const items = await modelInfo.model.getItemsData([cast.localId]);
+                  const item = items[0] as Record<string, unknown> | undefined;
+                  const guidArr = await modelInfo.model.getGuidsByLocalIds([cast.localId]);
+
+                  setSelectedElementData({
+                    localId: cast.localId,
+                    modelId,
+                    modelName: modelInfo.name,
+                    name: extractStringValue(item, "Name") ?? `Elemento #${cast.localId}`,
+                    category: (item?.type as string) ?? "Desconhecido",
+                    guid: guidArr?.[0] ?? "",
+                    attributes: item ?? {},
+                  });
+                  setActivePanel("properties");
+                } catch (err) {
+                  console.warn("Failed to fetch element properties:", err);
+                }
+              }
             }
           } else {
             setSelectedElement(null);
+            setSelectedElementData(null);
             onElementSelect?.(null, "");
             await fragmentsManager.resetHighlight();
           }
         });
 
-        // 10. Handle resize
+        // 13. Handle resize
         const observer = new ResizeObserver(() => {
           if (!disposed && renderer) {
             renderer.resize();
@@ -209,7 +337,7 @@ export default function IfcViewer({
         });
         observer.observe(container);
 
-        // 11. If IFC data was provided, load it
+        // 14. If IFC data was provided, load it
         if (ifcData) {
           await loadIfcFile(ifcData, ifcName ?? "model.ifc");
         }
@@ -255,15 +383,20 @@ export default function IfcViewer({
 
       const categories = await model.getCategories();
 
-      setLoadedModels((prev) => [...prev, { model, name, categories }]);
+      const newModel: LoadedModelInfo = { model, name, categories };
+      setLoadedModels((prev) => [...prev, newModel]);
+      setModelVisibility((prev) => ({ ...prev, [model.modelId]: true }));
       onModelLoaded?.(model);
+
+      // Rebuild category tree with new model data
+      await rebuildCategoryTree();
     } catch (err) {
       console.error("Failed to load IFC:", err);
       setError(err instanceof Error ? err.message : "Failed to load IFC file");
     } finally {
       setIsLoading(false);
     }
-  }, [onModelLoaded]);
+  }, [onModelLoaded, rebuildCategoryTree]);
 
   // ── Load new IFC data when prop changes ─────────────────────
   useEffect(() => {
@@ -279,9 +412,7 @@ export default function IfcViewer({
 
     async function applyVisibility() {
       if (!hider) return;
-      // First hide everything
       await hider.set(false);
-      // Then show only the specified elements
       if (visibilityMap && Object.keys(visibilityMap).length > 0) {
         await hider.set(true, visibilityMap);
       }
@@ -301,7 +432,6 @@ export default function IfcViewer({
 
     async function applyHighlights() {
       await fragmentsManager.resetHighlight();
-      // Phase highlights first (underneath)
       if (phaseHighlights) {
         for (const group of phaseHighlights) {
           await fragmentsManager.highlight(
@@ -315,7 +445,6 @@ export default function IfcViewer({
           );
         }
       }
-      // Selection highlights on top
       if (selectionHighlights) {
         for (const group of selectionHighlights) {
           await fragmentsManager.highlight(
@@ -392,6 +521,8 @@ export default function IfcViewer({
     const hider = hiderRef.current;
     if (!hider) return;
     await hider.set(true);
+    // Reset category visibility state
+    setCategoryTree((prev) => prev.map((c) => ({ ...c, visible: true })));
   }
 
   function handleScreenshot() {
@@ -399,24 +530,122 @@ export default function IfcViewer({
     if (!world) return;
     const renderer = world.renderer as SimpleRenderer;
     const gl = renderer.three as THREE.WebGLRenderer;
-    // Force a render to ensure current frame is captured
     const scene = world.scene.three as THREE.Scene;
     const cam = (world.camera as SimpleCamera).three as THREE.Camera;
     gl.render(scene, cam);
     const dataUrl = gl.domElement.toDataURL("image/png");
     const a = document.createElement("a");
     a.href = dataUrl;
-    a.download = `4d-screenshot-${new Date().toISOString().split("T")[0]}.png`;
+    a.download = `wallnut-screenshot-${new Date().toISOString().split("T")[0]}.png`;
     a.click();
+  }
+
+  // ── Model manager handlers ──────────────────────────────────
+  function handleToggleModelVisibility(modelId: string) {
+    const model = loadedModels.find((m) => m.model.modelId === modelId);
+    if (!model) return;
+
+    const currentVisible = modelVisibility[modelId] !== false;
+    const newVisible = !currentVisible;
+
+    setModelVisibility((prev) => ({ ...prev, [modelId]: newVisible }));
+    model.model.setVisible(undefined, newVisible);
+  }
+
+  function handleRemoveModel(modelId: string) {
+    const world = worldRef.current;
+    const modelInfo = loadedModels.find((m) => m.model.modelId === modelId);
+    if (!modelInfo || !world) return;
+
+    world.scene.three.remove(modelInfo.model.object);
+    modelInfo.model.dispose();
+
+    setLoadedModels((prev) => prev.filter((m) => m.model.modelId !== modelId));
+    setModelVisibility((prev) => {
+      const next = { ...prev };
+      delete next[modelId];
+      return next;
+    });
+
+    // Rebuild category tree without this model
+    rebuildCategoryTree();
+  }
+
+  // ── Category filter handlers ────────────────────────────────
+  async function handleToggleCategory(categoryName: string) {
+    const hider = hiderRef.current;
+    if (!hider) return;
+
+    const cat = categoryTree.find((c) => c.name === categoryName);
+    if (!cat) return;
+
+    const newVisible = !cat.visible;
+
+    // Build modelIdMap with Set<number>
+    const modelIdMap: Record<string, Set<number>> = {};
+    for (const [mid, ids] of Object.entries(cat.localIds)) {
+      modelIdMap[mid] = new Set(ids);
+    }
+
+    await hider.set(newVisible, modelIdMap);
+
+    setCategoryTree((prev) =>
+      prev.map((c) => (c.name === categoryName ? { ...c, visible: newVisible } : c)),
+    );
+  }
+
+  async function handleIsolateCategory(categoryName: string) {
+    const hider = hiderRef.current;
+    if (!hider) return;
+
+    const cat = categoryTree.find((c) => c.name === categoryName);
+    if (!cat) return;
+
+    // Build modelIdMap for the isolated category
+    const modelIdMap: Record<string, Set<number>> = {};
+    for (const [mid, ids] of Object.entries(cat.localIds)) {
+      modelIdMap[mid] = new Set(ids);
+    }
+
+    await hider.isolate(modelIdMap);
+
+    // Update category tree — only isolated category is visible
+    setCategoryTree((prev) =>
+      prev.map((c) => ({ ...c, visible: c.name === categoryName })),
+    );
+  }
+
+  // ── Fly to element from properties panel ────────────────────
+  async function handleFlyToElement(modelId: string, localId: number) {
+    const world = worldRef.current;
+    const model = loadedModels.find((m) => m.model.modelId === modelId)?.model;
+    if (!world || !model) return;
+
+    try {
+      const box = await model.getMergedBox([localId]);
+      if (box.isEmpty()) return;
+      const camera = world.camera as SimpleCamera;
+      await camera.controls.fitToBox(box, true, {
+        cover: false,
+        paddingLeft: 40,
+        paddingRight: 40,
+        paddingTop: 40,
+        paddingBottom: 40,
+      });
+    } catch {
+      // Element may not have geometry
+    }
   }
 
   // ── Render ──────────────────────────────────────────────────
   const hasModel = loadedModels.length > 0;
+  const isExternalControl = externalVisibilityControl || !!visibilityMap;
 
   return (
     <div className={`relative flex flex-col bg-gray-100 rounded-lg overflow-hidden ${className}`}>
       {/* Toolbar */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-white border-b border-gray-200 text-sm">
+      <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200 text-sm">
+        {/* Upload IFC button */}
         <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium">
           <Upload className="w-3.5 h-3.5" />
           IFC
@@ -430,42 +659,76 @@ export default function IfcViewer({
 
         {hasModel && (
           <>
-            <div className="w-px h-5 bg-gray-200" />
+            <div className="w-px h-5 bg-gray-200 mx-1" />
+
+            {/* Panel toggle buttons */}
+            {!isExternalControl && (
+              <ToolbarButton
+                icon={<Layers className="w-4 h-4" />}
+                label="Modelos"
+                badge={loadedModels.length > 1 ? String(loadedModels.length) : undefined}
+                active={activePanel === "models"}
+                onClick={() => togglePanel("models")}
+              />
+            )}
+
+            <ToolbarButton
+              icon={<Scissors className="w-4 h-4" />}
+              label="Cortes"
+              active={activePanel === "clipper"}
+              onClick={() => togglePanel("clipper")}
+            />
+
+            <ToolbarButton
+              icon={<Info className="w-4 h-4" />}
+              label="Propriedades"
+              active={activePanel === "properties"}
+              onClick={() => togglePanel("properties")}
+            />
+
+            {!isExternalControl && (
+              <ToolbarButton
+                icon={<Filter className="w-4 h-4" />}
+                label="Categorias"
+                active={activePanel === "categories"}
+                onClick={() => togglePanel("categories")}
+              />
+            )}
+
+            <div className="w-px h-5 bg-gray-200 mx-1" />
+
+            {/* Utility buttons */}
             <button
               onClick={handleFitToModel}
               className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-              title="Fit to model"
+              title="Encaixar modelo"
             >
               <Maximize2 className="w-4 h-4" />
             </button>
             <button
               onClick={handleShowAll}
               className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-              title="Show all"
+              title="Mostrar tudo"
             >
               <Eye className="w-4 h-4" />
             </button>
             <button
-              onClick={() => setShowStoreys(!showStoreys)}
-              className={`p-1.5 rounded transition-colors ${showStoreys ? "text-accent bg-accent-light" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
-              title="Storeys"
-            >
-              <Layers className="w-4 h-4" />
-            </button>
-            <button
               onClick={handleScreenshot}
               className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-              title="Screenshot (PNG)"
+              title="Captura de ecrã (PNG)"
             >
               <Camera className="w-4 h-4" />
             </button>
-            <div className="w-px h-5 bg-gray-200" />
-            <span className="text-xs text-gray-400">
+
+            {/* Model names */}
+            <div className="w-px h-5 bg-gray-200 mx-1" />
+            <span className="text-xs text-gray-400 truncate max-w-[200px]">
               {loadedModels.map((m) => m.name).join(", ")}
             </span>
           </>
         )}
 
+        {/* Selected element indicator */}
         {selectedElement != null && (
           <span className="ml-auto text-xs text-accent font-mono">
             #{selectedElement}
@@ -479,6 +742,49 @@ export default function IfcViewer({
         className="flex-1 min-h-[400px]"
         style={{ touchAction: "none" }}
       />
+
+      {/* ── Panels ─────────────────────────────────────────────── */}
+
+      {/* Model Manager Panel */}
+      {activePanel === "models" && !isExternalControl && (
+        <ModelManagerPanel
+          models={loadedModels}
+          visibility={modelVisibility}
+          onToggleVisibility={handleToggleModelVisibility}
+          onRemoveModel={handleRemoveModel}
+          onFitAll={handleFitToModel}
+        />
+      )}
+
+      {/* Clipper Panel */}
+      {activePanel === "clipper" && clipperRef.current && worldRef.current && (
+        <ClipperPanel
+          clipper={clipperRef.current}
+          world={worldRef.current}
+          models={loadedModels}
+        />
+      )}
+
+      {/* Properties Panel */}
+      {activePanel === "properties" && (
+        <PropertiesPanel
+          element={selectedElementData}
+          onFlyTo={handleFlyToElement}
+          onClose={() => setActivePanel(null)}
+        />
+      )}
+
+      {/* Category Filter Panel */}
+      {activePanel === "categories" && !isExternalControl && (
+        <CategoryFilterPanel
+          categories={categoryTree}
+          onToggleCategory={handleToggleCategory}
+          onIsolateCategory={handleIsolateCategory}
+          onShowAll={handleShowAll}
+        />
+      )}
+
+      {/* ── Overlays ───────────────────────────────────────────── */}
 
       {/* Empty state */}
       {!hasModel && !isLoading && !error && (
@@ -513,29 +819,57 @@ export default function IfcViewer({
           </button>
         </div>
       )}
-
-      {/* Storey panel */}
-      {showStoreys && hasModel && (
-        <div className="absolute top-12 right-3 bg-white rounded-lg shadow-lg border border-gray-200 p-3 w-48 max-h-60 overflow-y-auto">
-          <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Pisos</p>
-          {loadedModels.flatMap((m) =>
-            m.categories
-              .filter((c) => c.includes("STOREY") || c.includes("BUILDING"))
-              .map((c) => (
-                <button
-                  key={`${m.name}-${c}`}
-                  onClick={() => setShowStoreys(false)}
-                  className="block w-full text-left px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                >
-                  {c.replace("IFC", "").replace("BUILDING", "")}
-                </button>
-              )),
-          )}
-          {loadedModels.every((m) => m.categories.filter((c) => c.includes("STOREY")).length === 0) && (
-            <p className="text-xs text-gray-400 italic">Sem pisos no modelo</p>
-          )}
-        </div>
-      )}
     </div>
   );
+}
+
+// ============================================================
+// Sub-components
+// ============================================================
+
+interface ToolbarButtonProps {
+  icon: React.ReactNode;
+  label: string;
+  badge?: string;
+  active: boolean;
+  onClick: () => void;
+}
+
+function ToolbarButton({ icon, label, badge, active, onClick }: ToolbarButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs transition-colors ${
+        active
+          ? "bg-accent text-white"
+          : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+      }`}
+      title={label}
+    >
+      {icon}
+      <span className="hidden sm:inline">{label}</span>
+      {badge && (
+        <span className={`text-[9px] font-medium px-1 rounded-full ${
+          active ? "bg-white/20 text-white" : "bg-gray-200 text-gray-500"
+        }`}>
+          {badge}
+        </span>
+      )}
+    </button>
+  );
+}
+
+// ============================================================
+// Helpers
+// ============================================================
+
+/** Extract a string value from an IFC item data object */
+function extractStringValue(item: Record<string, unknown> | undefined, key: string): string | null {
+  if (!item) return null;
+  const val = item[key];
+  if (typeof val === "string") return val;
+  if (typeof val === "object" && val !== null && "value" in (val as Record<string, unknown>)) {
+    return String((val as Record<string, unknown>).value);
+  }
+  return null;
 }
