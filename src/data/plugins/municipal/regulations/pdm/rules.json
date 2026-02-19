@@ -1029,6 +1029,492 @@
       "remediation": "Incluir no projeto de estruturas a classificação da zona sísmica do local conforme o Eurocódigo 8 (NP EN 1998-1) e o Anexo Nacional. Portugal continental está dividido em zonas sísmicas de 1.1 a 2.5 (ação sísmica tipo 1 — interplaca e tipo 2 — intraplaca). Garantir que a aceleração de referência (agR) utilizada no cálculo é a correspondente à zona sísmica correta.",
       "enabled": true,
       "tags": ["sismicidade", "zona-sísmica", "EC8", "estruturas", "condicionantes", "PDM"]
+    },
+
+    {
+      "id": "PDM-PATRIM-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 107/2001, Art. 43.º — Zona Tampão de Património Classificado",
+      "description": "Na envolvente de imóveis classificados deve ser respeitada uma zona tampão (buffer zone) com raio mínimo de 50 m, onde qualquer intervenção urbanística está sujeita a parecer prévio vinculativo da DGPC ou DRC competente.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToClassifiedBuilding", "operator": "exists", "value": null },
+        { "field": "municipal.heritageBufferMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToClassifiedBuilding} m ao imóvel classificado",
+      "requiredValue": "Distância ao imóvel classificado ≥ {municipal.heritageBufferMin} m ou parecer favorável da DGPC",
+      "remediation": "O edifício proposto situa-se dentro da zona tampão de um imóvel classificado. Obter parecer favorável da DGPC (Direção-Geral do Património Cultural) ou da DRC competente antes de submeter o pedido de licenciamento. O parecer pode impor condicionantes volumétricas, de materiais e de cromatismo.",
+      "enabled": true,
+      "tags": ["património", "zona-tampão", "imóvel-classificado", "DGPC", "PDM"]
+    },
+    {
+      "id": "PDM-PATRIM-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 107/2001, Art. 79.º — Levantamento Arqueológico Prévio Obrigatório",
+      "description": "Em zonas de sensibilidade arqueológica identificadas no PDM, é obrigatória a realização de levantamento e/ou escavação arqueológica prévia antes do início de quaisquer trabalhos de escavação ou fundação.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInArchaeologicalZone", "operator": "==", "value": true },
+        { "field": "municipal.archaeologicalSurveyCompleted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Zona arqueológica: {municipal.isInArchaeologicalZone} | Levantamento realizado: {municipal.archaeologicalSurveyCompleted}",
+      "requiredValue": "Levantamento arqueológico concluído com parecer favorável (archaeologicalSurveyCompleted = true)",
+      "remediation": "Contratar arqueólogo habilitado pela DGPC para realizar levantamento arqueológico prévio na área de intervenção. O relatório deve ser submetido à DGPC para apreciação. Em caso de achados significativos, podem ser impostas medidas de salvaguarda (conservação in situ, escavação integral, acompanhamento arqueológico permanente) que condicionam o projeto.",
+      "enabled": true,
+      "tags": ["património", "arqueologia", "escavação", "DGPC", "PDM"]
+    },
+    {
+      "id": "PDM-PATRIM-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 140/2009 — Conservação Obrigatória de Fachadas em Zona Histórica",
+      "description": "Em zonas históricas ou centros antigos delimitados no PDM, as fachadas dos edifícios existentes devem ser conservadas e mantidas, podendo ser exigida a manutenção dos materiais originais, caixilharias tradicionais e elementos decorativos.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInHistoricCenter", "operator": "==", "value": true },
+        { "field": "municipal.facadeConservationPlanSubmitted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Zona histórica: {municipal.isInHistoricCenter} | Plano de conservação de fachada: {municipal.facadeConservationPlanSubmitted}",
+      "requiredValue": "Plano de conservação de fachada submetido e aprovado (facadeConservationPlanSubmitted = true)",
+      "remediation": "Elaborar plano de conservação de fachada que respeite os materiais, cromatismo e elementos decorativos originais do edifício. Submeter à câmara municipal e, quando aplicável, à DGPC/DRC. Em centros históricos, pode ser exigida a manutenção de cantarias, azulejos, caixilharias de madeira e gradeamentos originais em ferro forjado.",
+      "enabled": true,
+      "tags": ["património", "fachada", "conservação", "centro-histórico", "PDM"]
+    },
+    {
+      "id": "PDM-PATRIM-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei 107/2001, Art. 17.º — Restrições a Edifícios Classificados ou em Vias de Classificação",
+      "description": "As intervenções em edifícios classificados ou em vias de classificação estão sujeitas a restrições severas e requerem autorização prévia da DGPC. Qualquer alteração ao interior, exterior ou envolvente está condicionada.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isClassifiedBuilding", "operator": "==", "value": true },
+        { "field": "municipal.dgpcAuthorizationObtained", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Edifício classificado: {municipal.isClassifiedBuilding} | Autorização DGPC: {municipal.dgpcAuthorizationObtained}",
+      "requiredValue": "Autorização da DGPC obtida para intervenção em edifício classificado (dgpcAuthorizationObtained = true)",
+      "remediation": "Submeter o projeto de intervenção à DGPC (Direção-Geral do Património Cultural) para obtenção de autorização prévia, nos termos da Lei 107/2001. A autorização é condição prévia ao licenciamento municipal. A intervenção deve respeitar os valores patrimoniais do edifício e pode exigir acompanhamento técnico especializado.",
+      "enabled": true,
+      "tags": ["património", "edifício-classificado", "DGPC", "autorização", "PDM"]
+    },
+    {
+      "id": "PDM-PATRIM-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Proteção de Paisagem Cultural Classificada",
+      "description": "Em áreas de paisagem cultural classificada ou identificada no PDM como de valor paisagístico relevante, as intervenções urbanísticas devem garantir a preservação das características essenciais da paisagem, incluindo volumetria, materiais e relação com o território.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInCulturalLandscape", "operator": "==", "value": true },
+        { "field": "municipal.landscapeImpactAssessmentDone", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Paisagem cultural: {municipal.isInCulturalLandscape} | Avaliação de impacto: {municipal.landscapeImpactAssessmentDone}",
+      "requiredValue": "Avaliação de impacto paisagístico realizada e aprovada (landscapeImpactAssessmentDone = true)",
+      "remediation": "Elaborar estudo de impacto sobre a paisagem cultural que demonstre que a intervenção proposta preserva os valores essenciais da paisagem classificada. O estudo deve analisar: visibilidade do novo edifício a partir de pontos de vista relevantes, relação volumétrica com a envolvente, materiais e cores propostos, e impacto sobre elementos naturais e culturais da paisagem.",
+      "enabled": true,
+      "tags": ["património", "paisagem-cultural", "proteção", "impacto-paisagístico", "PDM"]
+    },
+
+    {
+      "id": "PDM-INFRA-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 123/2009 (ITED) — Condutas de Telecomunicações em Loteamentos",
+      "description": "Nas operações de loteamento e urbanização, devem ser instaladas condutas subterrâneas para telecomunicações (ITUR) conforme o DL 123/2009, garantindo a ligação de todos os lotes à rede pública de telecomunicações.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isLoteamento", "operator": "==", "value": true },
+        { "field": "municipal.telecomDuctsInstalled", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Condutas telecomunicações instaladas: {municipal.telecomDuctsInstalled}",
+      "requiredValue": "Condutas ITUR instaladas conforme DL 123/2009 (telecomDuctsInstalled = true)",
+      "remediation": "Projetar e instalar infraestruturas de telecomunicações em urbanizações e loteamentos (ITUR) conforme o DL 123/2009 e o Manual ITUR da ANACOM. As condutas devem ser dimensionadas para servir todos os lotes e permitir a passagem de cabos de múltiplos operadores. Incluir projeto ITUR elaborado por projetista habilitado pela ANACOM.",
+      "enabled": true,
+      "tags": ["infraestruturas", "telecomunicações", "ITUR", "condutas", "PDM"]
+    },
+    {
+      "id": "PDM-INFRA-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 521/99 — Ligação à Rede de Gás Natural",
+      "description": "Em zonas servidas por rede de gás natural, os novos edifícios devem prever a infraestrutura de ligação à rede, conforme o DL 521/99 e regulamentação municipal. A ligação efetiva depende da disponibilidade da rede na zona.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.gasNetworkAvailable", "operator": "==", "value": true },
+        { "field": "municipal.gasConnectionProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Rede de gás disponível: {municipal.gasNetworkAvailable} | Ligação prevista: {municipal.gasConnectionProvided}",
+      "requiredValue": "Infraestrutura de ligação à rede de gás natural prevista no projeto (gasConnectionProvided = true)",
+      "remediation": "Incluir no projeto as infraestruturas de ligação à rede de gás natural, conforme o Regulamento Técnico de Gás (DL 521/99) e normas da entidade distribuidora (ex.: Galp Gás Natural Distribuição). O projeto de gás deve ser elaborado por técnico habilitado e incluir ramal de ligação, contagem e rede interior.",
+      "enabled": true,
+      "tags": ["infraestruturas", "gás-natural", "rede-gás", "ligação", "PDM"]
+    },
+    {
+      "id": "PDM-INFRA-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Iluminação Pública em Novos Arruamentos",
+      "description": "Os novos arruamentos resultantes de operações de loteamento ou urbanização devem ser dotados de sistema de iluminação pública conforme as normas técnicas municipais e a EN 13201 (iluminação de estradas).",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isLoteamento", "operator": "==", "value": true },
+        { "field": "municipal.publicLightingDesigned", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Iluminação pública projetada: {municipal.publicLightingDesigned}",
+      "requiredValue": "Projeto de iluminação pública dos novos arruamentos elaborado e aprovado (publicLightingDesigned = true)",
+      "remediation": "Elaborar projeto de iluminação pública para todos os arruamentos do loteamento, conforme a EN 13201 e as especificações técnicas do município. O projeto deve prever: luminárias LED de eficiência energética elevada, níveis de iluminância adequados à classificação da via, iluminação de travessias pedonais e espaços públicos, e infraestrutura de alimentação elétrica. Submeter à entidade gestora da iluminação pública para aprovação.",
+      "enabled": true,
+      "tags": ["infraestruturas", "iluminação-pública", "arruamentos", "EN-13201", "PDM"]
+    },
+    {
+      "id": "PDM-INFRA-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DR 23/95 — Capacidade da Rede de Abastecimento de Água",
+      "description": "A rede pública de abastecimento de água deve ter capacidade suficiente para servir o acréscimo de consumo resultante da nova operação urbanística. A verificação de capacidade deve ser confirmada pela entidade gestora.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.waterSupplyCapacityVerified", "operator": "==", "value": false },
+        { "field": "municipal.publicWaterNetworkAvailable", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Capacidade de abastecimento de água verificada: {municipal.waterSupplyCapacityVerified}",
+      "requiredValue": "Confirmação da capacidade de abastecimento pela entidade gestora (waterSupplyCapacityVerified = true)",
+      "remediation": "Solicitar à entidade gestora do abastecimento de água (ex.: EPAL, Águas de Portugal, SMAS) a confirmação de que a rede existente tem capacidade para servir o acréscimo de consumo resultante do empreendimento. Caso a capacidade seja insuficiente, o promotor pode ser obrigado a financiar o reforço da rede. Incluir estudo de caudais e pressões no projeto de águas.",
+      "enabled": true,
+      "tags": ["infraestruturas", "abastecimento-água", "capacidade", "rede-pública", "PDM"]
+    },
+    {
+      "id": "PDM-INFRA-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DR 23/95 — Capacidade da Rede de Drenagem de Águas Residuais",
+      "description": "A rede pública de drenagem de águas residuais deve ter capacidade suficiente para receber o acréscimo de caudal resultante da nova operação urbanística. A verificação de capacidade deve ser confirmada pela entidade gestora.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.sewerCapacityVerified", "operator": "==", "value": false },
+        { "field": "municipal.publicSewerNetworkAvailable", "operator": "==", "value": true }
+      ],
+      "currentValueTemplate": "Capacidade de drenagem de águas residuais verificada: {municipal.sewerCapacityVerified}",
+      "requiredValue": "Confirmação da capacidade de drenagem pela entidade gestora (sewerCapacityVerified = true)",
+      "remediation": "Solicitar à entidade gestora do saneamento (ex.: Águas de Portugal, SMAS) a confirmação de que a rede de drenagem de águas residuais tem capacidade para receber o caudal adicional do empreendimento. Se a capacidade for insuficiente, pode ser necessário reforçar coletores ou ligação a nova ETAR. Incluir estudo de caudais residuais no projeto de saneamento.",
+      "enabled": true,
+      "tags": ["infraestruturas", "saneamento", "capacidade", "águas-residuais", "PDM"]
+    },
+
+    {
+      "id": "PDM-CIRC-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Perfil Mínimo de Via Distribuidora Local",
+      "description": "As vias distribuidoras locais resultantes de operações de loteamento devem ter um perfil transversal mínimo, incluindo faixa de rodagem, passeios, estacionamento e faixa de arborização, conforme definido no regulamento municipal.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.roadProfileWidth", "operator": "exists", "value": null },
+        { "field": "municipal.roadProfileWidthMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Perfil de via: {municipal.roadProfileWidth} m",
+      "requiredValue": "Perfil de via ≥ {municipal.roadProfileWidthMin} m (conforme regulamento municipal)",
+      "remediation": "Redimensionar o perfil transversal da via para cumprir o mínimo regulamentar. O perfil típico de via distribuidora local inclui: faixa de rodagem (≥ 6,00 m para dois sentidos), passeios (≥ 1,50 m cada lado), estacionamento lateral (≥ 2,00 m) e faixa de arborização. Ajustar conforme as especificações do regulamento municipal aplicável.",
+      "enabled": true,
+      "tags": ["circulação", "perfil-via", "arruamentos", "loteamento", "PDM"]
+    },
+    {
+      "id": "PDM-CIRC-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 163/2006 — Dimensão Mínima de Passeios",
+      "description": "Os passeios adjacentes às vias públicas devem ter largura mínima livre de 1,50 m (conforme DL 163/2006 — acessibilidades), podendo o regulamento municipal exigir larguras superiores em zonas centrais ou comerciais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.sidewalkWidth", "operator": "exists", "value": null },
+        { "field": "municipal.sidewalkWidthMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Largura do passeio: {municipal.sidewalkWidth} m",
+      "requiredValue": "Largura livre do passeio ≥ {municipal.sidewalkWidthMin} m",
+      "remediation": "Aumentar a largura dos passeios para garantir o mínimo regulamentar (1,50 m livres conforme DL 163/2006). Em zonas centrais ou comerciais, o regulamento municipal pode exigir larguras superiores (2,00 m ou mais). A largura livre é medida excluindo mobiliário urbano, caldeiras de árvores e postes de iluminação.",
+      "enabled": true,
+      "tags": ["circulação", "passeios", "acessibilidade", "DL-163-2006", "PDM"]
+    },
+    {
+      "id": "PDM-CIRC-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / SCIE (DL 220/2008) — Raio de Curvatura para Veículos de Emergência",
+      "description": "As vias de acesso ao edifício devem permitir a circulação de veículos de emergência (bombeiros e ambulâncias), com raio de curvatura interior mínimo de 11,00 m nos cruzamentos e curvas.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.turningRadiusEmergency", "operator": "exists", "value": null },
+        { "field": "municipal.turningRadiusEmergency", "operator": "<", "value": 11.0 }
+      ],
+      "currentValueTemplate": "Raio de curvatura interior: {municipal.turningRadiusEmergency} m",
+      "requiredValue": "Raio de curvatura interior ≥ 11,00 m para veículos de emergência",
+      "remediation": "Redimensionar os cruzamentos e curvas dos arruamentos para garantir o raio de curvatura interior mínimo de 11,00 m, permitindo a passagem de veículos pesados de emergência (autoescadas e autotanques dos bombeiros). Em espaços confinados, considerar soluções de ampliação das curvas ou rotundas.",
+      "enabled": true,
+      "tags": ["circulação", "emergência", "raio-curvatura", "bombeiros", "PDM"]
+    },
+    {
+      "id": "PDM-CIRC-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Inclinação Máxima de Rampas de Acesso a Estacionamento",
+      "description": "As rampas de acesso a garagens e estacionamentos subterrâneos ou elevados devem respeitar a inclinação máxima definida no regulamento municipal, tipicamente 15% em rampa reta e 12% em rampa curva.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.parkingRampGradient", "operator": "exists", "value": null },
+        { "field": "municipal.parkingRampGradientMax", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Inclinação da rampa: {municipal.parkingRampGradient} %",
+      "requiredValue": "Inclinação da rampa ≤ {municipal.parkingRampGradientMax} % (conforme regulamento municipal)",
+      "remediation": "Reduzir a inclinação da rampa de acesso ao estacionamento para cumprir o máximo regulamentar. As rampas retas não devem exceder 15% e as rampas curvas 12%. Prever troços de concordância com inclinação reduzida (≤ 5%) nos extremos da rampa, com comprimento mínimo de 3,00 m, para evitar o raspamento dos veículos.",
+      "enabled": true,
+      "tags": ["circulação", "rampas", "estacionamento", "inclinação", "PDM"]
+    },
+    {
+      "id": "PDM-CIRC-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / ENMAC 2030 — Infraestrutura Ciclável Obrigatória",
+      "description": "Em operações de loteamento de dimensão relevante, o regulamento municipal pode exigir a previsão de infraestrutura ciclável (ciclovias ou faixas cicláveis) integrada nos novos arruamentos, em consonância com a Estratégia Nacional de Mobilidade Ativa Ciclável (ENMAC 2030).",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.cycleLaneRequired", "operator": "==", "value": true },
+        { "field": "municipal.cycleLaneProvided", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Infraestrutura ciclável exigida: {municipal.cycleLaneRequired} | Prevista: {municipal.cycleLaneProvided}",
+      "requiredValue": "Infraestrutura ciclável prevista nos novos arruamentos (cycleLaneProvided = true)",
+      "remediation": "Incluir no projeto de arruamentos infraestrutura ciclável conforme as normas técnicas do município e a ENMAC 2030. A ciclovia segregada deve ter largura mínima de 1,50 m (sentido único) ou 2,50 m (bidirecional). As faixas cicláveis podem ter largura de 1,20 m. Prever estacionamento para bicicletas junto aos edifícios (mín. 1 lugar por cada 200 m² de ABC).",
+      "enabled": true,
+      "tags": ["circulação", "ciclovia", "mobilidade-ativa", "ENMAC", "PDM"]
+    },
+
+    {
+      "id": "PDM-VERDE-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Plantação Mínima de Árvores por Lote",
+      "description": "O regulamento municipal pode exigir a plantação de um número mínimo de árvores por lote ou por fração, como medida de contribuição para a estrutura ecológica urbana e o conforto ambiental.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.treesProposed", "operator": "exists", "value": null },
+        { "field": "municipal.treesRequiredMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.treesProposed} árvores propostas",
+      "requiredValue": "Árvores plantadas ≥ {municipal.treesRequiredMin} (conforme regulamento municipal)",
+      "remediation": "Incluir no projeto de arranjos exteriores a plantação do número mínimo de árvores exigido pelo regulamento municipal. Utilizar espécies autóctones ou adaptadas ao clima local, evitando espécies invasoras (conforme DL 92/2019). Prever caldeiras de dimensão adequada (mín. 1,00 × 1,00 m) e sistema de rega nas áreas ajardinadas.",
+      "enabled": true,
+      "tags": ["espaços-verdes", "árvores", "plantação", "ecologia", "PDM"]
+    },
+    {
+      "id": "PDM-VERDE-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Percentagem Mínima de Superfície Permeável em Operações de Loteamento",
+      "description": "Nas operações de loteamento, a percentagem mínima de superfície permeável do conjunto (incluindo espaços públicos e privados) deve respeitar o valor definido no PDM, contribuindo para a infiltração natural das águas pluviais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.overallPermeableSurface", "operator": "exists", "value": null },
+        { "field": "municipal.overallPermeableSurfaceMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.overallPermeableSurface} % de superfície permeável",
+      "requiredValue": "Superfície permeável ≥ {municipal.overallPermeableSurfaceMin} % da área total do loteamento",
+      "remediation": "Aumentar a percentagem de superfície permeável do loteamento. Utilizar pavimentos permeáveis nos arruamentos e estacionamentos, aumentar as áreas ajardinadas e verdes, prever trincheiras de infiltração e bacias de retenção. A percentagem é calculada sobre a área total da operação de loteamento, incluindo cedências.",
+      "enabled": true,
+      "tags": ["espaços-verdes", "permeabilidade", "loteamento", "infiltração", "PDM"]
+    },
+    {
+      "id": "PDM-VERDE-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Portaria 216-B/2008 — Espaço Verde por Fogo em Operações de Loteamento",
+      "description": "Nas operações de loteamento, deve ser garantida uma área mínima de espaço verde de utilização coletiva por fogo habitacional, conforme os parâmetros de dimensionamento do PDM e da Portaria 216-B/2008.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.greenSpacePerDwelling", "operator": "exists", "value": null },
+        { "field": "municipal.greenSpacePerDwellingMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.greenSpacePerDwelling} m²/fogo de espaço verde",
+      "requiredValue": "Espaço verde ≥ {municipal.greenSpacePerDwellingMin} m²/fogo",
+      "remediation": "Aumentar a área de espaço verde de utilização coletiva no loteamento para cumprir o rácio mínimo por fogo. A Portaria 216-B/2008 prevê 28 m²/fogo como referência para espaços verdes e de utilização coletiva. Distribuir os espaços verdes de forma equilibrada na operação de loteamento, garantindo proximidade a todas as habitações.",
+      "enabled": true,
+      "tags": ["espaços-verdes", "utilização-coletiva", "fogos", "dimensionamento", "PDM"]
+    },
+    {
+      "id": "PDM-VERDE-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Zonas de Proteção à Vegetação Existente",
+      "description": "O PDM pode delimitar zonas de proteção à vegetação existente (maciços arbóreos, sebes, alinhamentos de árvores) onde qualquer intervenção que implique o abate ou a poda severa está condicionada a autorização prévia.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.isInVegetationProtectionZone", "operator": "==", "value": true },
+        { "field": "municipal.vegetationProtectionCompliance", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Zona de proteção à vegetação: {municipal.isInVegetationProtectionZone} | Conformidade: {municipal.vegetationProtectionCompliance}",
+      "requiredValue": "Projeto em conformidade com a zona de proteção à vegetação (vegetationProtectionCompliance = true)",
+      "remediation": "Adaptar o projeto para preservar a vegetação existente na zona de proteção identificada no PDM. Caso o abate de exemplares seja inevitável, obter autorização prévia da câmara municipal e/ou do ICNF (para espécies protegidas) e propor medidas compensatórias (plantação de exemplares de substituição na proporção definida pelo regulamento).",
+      "enabled": true,
+      "tags": ["espaços-verdes", "vegetação", "proteção", "abate", "PDM"]
+    },
+    {
+      "id": "PDM-VERDE-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Regulamento Municipal — Plano de Paisagismo Obrigatório",
+      "description": "Para operações de loteamento e edifícios de dimensão relevante, o regulamento municipal pode exigir a apresentação de um plano de paisagismo (projeto de arranjos exteriores) como parte integrante do pedido de licenciamento.",
+      "severity": "info",
+      "conditions": [
+        { "field": "municipal.landscapingPlanRequired", "operator": "==", "value": true },
+        { "field": "municipal.landscapingPlanSubmitted", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Plano de paisagismo exigido: {municipal.landscapingPlanRequired} | Submetido: {municipal.landscapingPlanSubmitted}",
+      "requiredValue": "Plano de paisagismo submetido e aprovado (landscapingPlanSubmitted = true)",
+      "remediation": "Elaborar e submeter plano de paisagismo (projeto de arranjos exteriores) da autoria de arquiteto paisagista habilitado. O plano deve incluir: plano geral de plantação, lista de espécies (privilegiando autóctones), sistema de rega, mobiliário urbano, pavimentos exteriores e modelação do terreno. A câmara municipal pode rejeitar o pedido de licenciamento se o plano de paisagismo não for apresentado.",
+      "enabled": true,
+      "tags": ["espaços-verdes", "paisagismo", "arranjos-exteriores", "loteamento", "PDM"]
+    },
+
+    {
+      "id": "PDM-AFAST-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Afastamento ao Eixo da Via Pública",
+      "description": "O edifício deve respeitar o afastamento mínimo ao eixo da via pública confrontante, conforme definido no PDM. Este afastamento é medido desde o eixo da via até à fachada mais próxima e garante a reserva de espaço para futuros alargamentos viários.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToRoadAxis", "operator": "exists", "value": null },
+        { "field": "municipal.distanceToRoadAxisMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToRoadAxis} m ao eixo da via",
+      "requiredValue": "Afastamento ao eixo da via ≥ {municipal.distanceToRoadAxisMin} m",
+      "remediation": "Recuar a implantação do edifício para garantir o afastamento mínimo ao eixo da via pública definido no PDM. Este afastamento é diferente do afastamento frontal ao limite do lote e visa garantir a reserva de espaço para alargamento e reperfilamento da via. Consultar a planta de alinhamentos e as plantas de condicionantes do PDM.",
+      "enabled": true,
+      "tags": ["afastamento", "eixo-via", "alinhamento", "reserva-viária", "PDM"]
+    },
+    {
+      "id": "PDM-AFAST-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RJIGT — Afastamento Lateral em Função da Altura do Edifício",
+      "description": "O afastamento lateral do edifício ao limite do lote vizinho deve ser, no mínimo, igual a metade da altura da fachada lateral (H/2), com um mínimo absoluto definido no regulamento municipal, garantindo condições de salubridade e privacidade.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.lateralSetbackProposed", "operator": "exists", "value": null },
+        { "field": "municipal.lateralSetbackRequired", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Afastamento lateral proposto: {municipal.lateralSetbackProposed} m",
+      "requiredValue": "Afastamento lateral ≥ {municipal.lateralSetbackRequired} m (H/2 com mínimo absoluto)",
+      "remediation": "Aumentar o afastamento lateral do edifício ao limite do lote para cumprir a regra de H/2 (metade da altura da fachada lateral) com o mínimo absoluto definido no PDM. Se a altura do edifício for de 12 m, o afastamento lateral mínimo será de 6 m (ou o mínimo absoluto do regulamento, se superior). Considerar reduzir a altura ou recuar a implantação.",
+      "enabled": true,
+      "tags": ["afastamento", "lateral", "altura", "H/2", "salubridade", "PDM"]
+    },
+    {
+      "id": "PDM-AFAST-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / RGEU, Art. 73.º — Afastamento Posterior Mínimo ao Logradouro",
+      "description": "O afastamento posterior do edifício ao limite tardoz do lote deve garantir condições mínimas de iluminação e ventilação natural para os compartimentos posteriores, com valor mínimo definido no PDM ou, supletivamente, no RGEU.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.rearSetbackProposed", "operator": "exists", "value": null },
+        { "field": "municipal.rearSetbackMinimum", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Afastamento posterior proposto: {municipal.rearSetbackProposed} m",
+      "requiredValue": "Afastamento posterior ≥ {municipal.rearSetbackMinimum} m",
+      "remediation": "Aumentar o afastamento posterior ao limite tardoz do lote para cumprir o mínimo regulamentar. O afastamento deve garantir iluminação e ventilação natural adequadas para todos os compartimentos da fachada posterior. Considerar a regra do ângulo de 45° medido a partir do limite tardoz do lote vizinho, ou o valor absoluto definido no PDM.",
+      "enabled": true,
+      "tags": ["afastamento", "posterior", "logradouro", "iluminação", "PDM"]
+    },
+    {
+      "id": "PDM-AFAST-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / Lei da Água (Lei 58/2005) — Afastamento a Cursos de Água e Linhas de Água",
+      "description": "O edifício deve respeitar o afastamento mínimo a cursos de água e linhas de água definido no PDM e na Lei da Água, tipicamente 10 m para margens de cursos de água não navegáveis e 50 m para cursos de água navegáveis.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToWatercourse", "operator": "exists", "value": null },
+        { "field": "municipal.watercourseSetbackMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToWatercourse} m ao curso de água",
+      "requiredValue": "Afastamento ao curso de água ≥ {municipal.watercourseSetbackMin} m",
+      "remediation": "Recuar a implantação do edifício para fora da faixa de proteção ao curso de água. A Lei da Água (Lei 58/2005) e o DL 226-A/2007 definem faixas de servidão administrativa de 10 m para cursos de água não navegáveis e 50 m para navegáveis. O PDM pode definir faixas mais restritivas. Obter parecer da APA/ARH se a implantação se situar na faixa de proteção.",
+      "enabled": true,
+      "tags": ["afastamento", "cursos-de-água", "lei-da-água", "servidão", "PDM"]
+    },
+    {
+      "id": "PDM-AFAST-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 276/2003 — Afastamento a Linhas Ferroviárias",
+      "description": "O edifício deve respeitar o afastamento mínimo à via ferroviária, conforme o DL 276/2003 e a servidão ferroviária delimitada na planta de condicionantes do PDM. A faixa non-aedificandi é tipicamente de 10 m ao carril mais próximo.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToRailway", "operator": "exists", "value": null },
+        { "field": "municipal.railwaySetbackMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToRailway} m à linha ferroviária",
+      "requiredValue": "Afastamento à linha ferroviária ≥ {municipal.railwaySetbackMin} m",
+      "remediation": "Recuar a implantação do edifício para fora da faixa de servidão ferroviária. O DL 276/2003 estabelece uma zona non-aedificandi de 10 m medidos desde o carril exterior da via. Para linhas de alta velocidade ou com tráfego de mercadorias perigosas, podem aplicar-se faixas mais restritivas. Obter parecer da IP — Infraestruturas de Portugal.",
+      "enabled": true,
+      "tags": ["afastamento", "ferroviária", "servidão", "DL-276-2003", "PDM"]
+    },
+
+    {
+      "id": "PDM-FOGO-01",
+      "regulationId": "pdm-generic",
+      "article": "PDM / SCIE (DL 220/2008), RT-SCIE — Distância Máxima a Hidrante",
+      "description": "O edifício deve estar servido por hidrante de incêndio exterior a uma distância máxima definida no regulamento técnico de SCIE e no PDM. A distância típica é de 100 m ao hidrante mais próximo para edifícios habitacionais.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.distanceToFireHydrant", "operator": "exists", "value": null },
+        { "field": "municipal.fireHydrantMaxDistance", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "{municipal.distanceToFireHydrant} m ao hidrante mais próximo",
+      "requiredValue": "Distância ao hidrante ≤ {municipal.fireHydrantMaxDistance} m",
+      "remediation": "Instalar hidrante de incêndio exterior na proximidade do edifício para cumprir a distância máxima regulamentar. Em novos loteamentos, os hidrantes devem ser incluídos no projeto de redes de águas. A instalação deve ser articulada com a entidade gestora do abastecimento de água e com o município. O hidrante deve garantir caudal e pressão mínimos para combate a incêndio.",
+      "enabled": true,
+      "tags": ["incêndio", "hidrante", "SCIE", "distância", "PDM"]
+    },
+    {
+      "id": "PDM-FOGO-02",
+      "regulationId": "pdm-generic",
+      "article": "PDM / SCIE (DL 220/2008), RT-SCIE — Largura Mínima de Via de Acesso para Viaturas de Bombeiros",
+      "description": "As vias de acesso ao edifício devem permitir a circulação de viaturas de combate a incêndio, com largura mínima de faixa de rodagem de 3,50 m e altura livre de 4,00 m, conforme o regulamento técnico de SCIE.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.fireAccessRoadWidth", "operator": "exists", "value": null },
+        { "field": "municipal.fireAccessRoadWidth", "operator": "<", "value": 3.5 }
+      ],
+      "currentValueTemplate": "Largura da via de acesso: {municipal.fireAccessRoadWidth} m",
+      "requiredValue": "Largura da via de acesso ≥ 3,50 m e altura livre ≥ 4,00 m para viaturas de bombeiros",
+      "remediation": "Alargar a via de acesso ao edifício para garantir a largura mínima de 3,50 m de faixa de rodagem e 4,00 m de altura livre, conforme o RT-SCIE. Para edifícios com altura superior a 9 m, a via deve permitir o estacionamento de autoescada com largura de 7,00 m. Remover quaisquer obstáculos que impeçam o acesso de viaturas de bombeiros.",
+      "enabled": true,
+      "tags": ["incêndio", "via-acesso", "bombeiros", "largura", "SCIE", "PDM"]
+    },
+    {
+      "id": "PDM-FOGO-03",
+      "regulationId": "pdm-generic",
+      "article": "PDM / SCIE (DL 220/2008), RT-SCIE — Distância Mínima entre Fachadas de Edifícios Opostos",
+      "description": "A distância entre fachadas de edifícios opostos com vãos deve garantir que a propagação do fogo entre edifícios seja minimizada. O RT-SCIE estabelece distâncias mínimas em função da utilização-tipo e da resistência ao fogo das fachadas.",
+      "severity": "warning",
+      "conditions": [
+        { "field": "municipal.facadeSeparationDistance", "operator": "exists", "value": null },
+        { "field": "municipal.facadeSeparationDistanceMin", "operator": "exists", "value": null }
+      ],
+      "currentValueTemplate": "Distância entre fachadas: {municipal.facadeSeparationDistance} m",
+      "requiredValue": "Distância entre fachadas ≥ {municipal.facadeSeparationDistanceMin} m (conforme RT-SCIE)",
+      "remediation": "Aumentar a distância entre fachadas opostas com vãos para cumprir o mínimo regulamentar de separação contra incêndio. Em alternativa, prever fachadas sem vãos ou com resistência ao fogo reforçada (EI 60 ou EI 90) na zona de proximidade. Consultar o projetista de SCIE para análise da propagação do fogo entre edifícios.",
+      "enabled": true,
+      "tags": ["incêndio", "fachadas", "separação", "propagação", "SCIE", "PDM"]
+    },
+    {
+      "id": "PDM-FOGO-04",
+      "regulationId": "pdm-generic",
+      "article": "PDM / DL 124/2006 (PMDFCI) — Faixa de Gestão de Combustível em Interface Urbano-Florestal",
+      "description": "Os edifícios localizados em interface urbano-florestal devem respeitar as faixas de gestão de combustível definidas no Plano Municipal de Defesa da Floresta contra Incêndios (PMDFCI), com uma faixa mínima de 50 m em torno do perímetro edificado.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.isInUrbanForestInterface", "operator": "==", "value": true },
+        { "field": "municipal.fuelManagementStripCompliant", "operator": "==", "value": false }
+      ],
+      "currentValueTemplate": "Interface urbano-florestal: {municipal.isInUrbanForestInterface} | Faixa de combustível conforme: {municipal.fuelManagementStripCompliant}",
+      "requiredValue": "Faixa de gestão de combustível conforme o PMDFCI (fuelManagementStripCompliant = true)",
+      "remediation": "Assegurar a faixa de gestão de combustível com mínimo de 50 m em torno do edifício, conforme o DL 124/2006 e o PMDFCI. A faixa deve ser limpa de vegetação arbustiva densa e árvores com copas próximas, mantendo apenas vegetação rasteira e árvores espaçadas (distância entre copas ≥ 4 m). A manutenção da faixa é responsabilidade do proprietário e a sua não realização constitui contraordenação.",
+      "enabled": true,
+      "tags": ["incêndio", "florestal", "interface-urbano-florestal", "PMDFCI", "PDM"]
+    },
+    {
+      "id": "PDM-FOGO-05",
+      "regulationId": "pdm-generic",
+      "article": "PDM / SCIE (DL 220/2008), RT-SCIE — Área de Manobra para Viaturas de Emergência",
+      "description": "Deve ser prevista junto ao edifício uma área de manobra para estacionamento e operação de viaturas de emergência (autoescadas e autotanques), com dimensões mínimas definidas no RT-SCIE em função da altura do edifício.",
+      "severity": "critical",
+      "conditions": [
+        { "field": "municipal.emergencyVehicleTurningArea", "operator": "exists", "value": null },
+        { "field": "municipal.emergencyVehicleTurningArea", "operator": "<", "value": 1 }
+      ],
+      "currentValueTemplate": "Área de manobra para emergência: {municipal.emergencyVehicleTurningArea}",
+      "requiredValue": "Área de manobra para viaturas de emergência prevista conforme RT-SCIE",
+      "remediation": "Prever junto ao edifício uma área de manobra para viaturas de emergência conforme o RT-SCIE. Para edifícios com altura > 9 m, a via de acesso deve ter uma faixa operacional com largura ≥ 7,00 m junto à fachada acessível, para estacionamento de autoescada. Incluir rotunda ou placa de inversão de marcha em vias sem saída (raio interior ≥ 11 m). A área deve suportar veículos de 26 toneladas.",
+      "enabled": true,
+      "tags": ["incêndio", "área-manobra", "emergência", "autoescada", "SCIE", "PDM"]
     }
   ]
 }
