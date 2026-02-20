@@ -118,7 +118,10 @@ export default function UnifiedUpload({
   const [includeSchedule, setIncludeSchedule] = useState(true);
   const [includeCompliance, setIncludeCompliance] = useState(true);
 
-  // New: dedup warning
+  // File validation warnings (IFC size, PDF pages)
+  const [fileWarnings, setFileWarnings] = useState<Map<string, { type: "warn" | "block"; message: string }>>(new Map());
+
+  // Dedup warning
   const [dedupWarning, setDedupWarning] = useState<string | null>(null);
 
   // New: cached result indicator
@@ -197,6 +200,86 @@ export default function UnifiedUpload({
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // ── File size / page limits ─────────────────────────────
+
+  const IFC_WARN_MB = 200;
+  const IFC_BLOCK_MB = 500;
+  const PDF_WARN_PAGES = 50;
+  const PDF_BLOCK_PAGES = 200;
+
+  // Validate files when the list changes (async for PDF page count)
+  useEffect(() => {
+    let cancelled = false;
+
+    async function validate() {
+      const warnings = new Map<string, { type: "warn" | "block"; message: string }>();
+
+      for (const f of files) {
+        const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
+        const key = `${f.name}:${f.size}`;
+        const sizeMB = f.size / (1024 * 1024);
+
+        if (ext === "ifc") {
+          if (sizeMB > IFC_BLOCK_MB) {
+            warnings.set(key, {
+              type: "block",
+              message: lang === "pt"
+                ? `IFC demasiado grande (${sizeMB.toFixed(0)} MB). Máximo: ${IFC_BLOCK_MB} MB.`
+                : `IFC too large (${sizeMB.toFixed(0)} MB). Maximum: ${IFC_BLOCK_MB} MB.`,
+            });
+          } else if (sizeMB > IFC_WARN_MB) {
+            warnings.set(key, {
+              type: "warn",
+              message: lang === "pt"
+                ? `IFC grande (${sizeMB.toFixed(0)} MB) — processamento pode ser lento.`
+                : `Large IFC (${sizeMB.toFixed(0)} MB) — processing may be slow.`,
+            });
+          }
+        }
+
+        if (ext === "pdf") {
+          try {
+            const { getPageCount } = await import("@/lib/pdf-splitter");
+            const buffer = await f.arrayBuffer();
+            if (cancelled) return;
+            const pages = await getPageCount(buffer);
+            if (cancelled) return;
+
+            if (pages > PDF_BLOCK_PAGES) {
+              warnings.set(key, {
+                type: "block",
+                message: lang === "pt"
+                  ? `PDF demasiado longo (${pages} páginas). Máximo: ${PDF_BLOCK_PAGES} páginas.`
+                  : `PDF too long (${pages} pages). Maximum: ${PDF_BLOCK_PAGES} pages.`,
+              });
+            } else if (pages > PDF_WARN_PAGES) {
+              warnings.set(key, {
+                type: "warn",
+                message: lang === "pt"
+                  ? `PDF longo (${pages} páginas) — processamento pode ser lento.`
+                  : `Long PDF (${pages} pages) — processing may be slow.`,
+              });
+            }
+          } catch {
+            // Page count detection failed — skip warning
+          }
+        }
+      }
+
+      if (!cancelled) setFileWarnings(warnings);
+    }
+
+    if (files.length > 0) {
+      validate();
+    } else {
+      setFileWarnings(new Map());
+    }
+
+    return () => { cancelled = true; };
+  }, [files, lang]);
+
+  const hasBlockedFiles = [...fileWarnings.values()].some((w) => w.type === "block");
 
   // ── File handling ─────────────────────────────────────────
 
@@ -391,6 +474,7 @@ export default function UnifiedUpload({
     setIsCachedResult(false);
     setElapsedMs(0);
     setDedupWarning(null);
+    setFileWarnings(new Map());
     ifcBytesRef.current = null;
     stopTimer();
   }
@@ -446,31 +530,51 @@ export default function UnifiedUpload({
           <div className="space-y-2">
             {files.map((file, idx) => {
               const badge = fileBadge(file.name);
+              const warningKey = `${file.name}:${file.size}`;
+              const warning = fileWarnings.get(warningKey);
+
               return (
-                <div
-                  key={`${file.name}-${idx}`}
-                  className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
-                      {badge.label}
-                    </span>
-                    <span className="text-sm text-gray-700 truncate">{file.name}</span>
-                    <span className="text-xs text-gray-400">
-                      {file.size > 1024 * 1024
-                        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
-                        : `${(file.size / 1024).toFixed(0)} KB`}
-                    </span>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFile(idx);
-                    }}
-                    className="p-1 hover:bg-gray-200 rounded"
+                <div key={`${file.name}-${idx}`}>
+                  <div
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 ${
+                      warning?.type === "block"
+                        ? "bg-red-50 border border-red-200"
+                        : warning?.type === "warn"
+                          ? "bg-amber-50 border border-amber-200"
+                          : "bg-gray-50"
+                    }`}
                   >
-                    <X className="w-3.5 h-3.5 text-gray-400" />
-                  </button>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`text-xs font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                        {badge.label}
+                      </span>
+                      <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                      <span className="text-xs text-gray-400">
+                        {file.size > 1024 * 1024
+                          ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+                          : `${(file.size / 1024).toFixed(0)} KB`}
+                      </span>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFile(idx);
+                      }}
+                      className="p-1 hover:bg-gray-200 rounded"
+                    >
+                      <X className="w-3.5 h-3.5 text-gray-400" />
+                    </button>
+                  </div>
+                  {warning && (
+                    <p className={`text-xs mt-0.5 ml-2 flex items-center gap-1 ${
+                      warning.type === "block" ? "text-red-600" : "text-amber-600"
+                    }`}>
+                      {warning.type === "block"
+                        ? <XCircle className="w-3 h-3 flex-shrink-0" />
+                        : <AlertTriangle className="w-3 h-3 flex-shrink-0" />}
+                      {warning.message}
+                    </p>
+                  )}
                 </div>
               );
             })}
@@ -538,7 +642,7 @@ export default function UnifiedUpload({
         <div className="flex gap-3">
           <button
             onClick={handleProcess}
-            disabled={files.length === 0}
+            disabled={files.length === 0 || hasBlockedFiles}
             className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent text-white font-semibold rounded-xl hover:bg-accent-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {txt.process}
