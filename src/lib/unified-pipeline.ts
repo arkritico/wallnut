@@ -178,33 +178,36 @@ function createProgressReporter(onProgress?: (progress: UnifiedProgress) => void
 
 /**
  * Resolve a relative API path to an absolute URL.
- * In Node.js/browser main thread, relative URLs work fine.
- * In Web Workers, self.location.origin may be unavailable,
- * so we need to construct the full URL.
+ * In Web Workers, relative fetch URLs fail because the Worker's base URL
+ * is the script URL, not the page URL. We derive the origin from
+ * import.meta.url (most reliable in bundled Workers), self.location, or env vars.
  */
 function resolveApiUrl(path: string): string {
   // Already absolute
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
 
-  // Try self.location (Web Worker or browser)
+  // Best: derive origin from the current module URL (works in Workers + browser)
+  try {
+    const origin = new URL(import.meta.url).origin;
+    if (origin && origin !== "null" && !origin.startsWith("file:")) {
+      return `${origin}${path}`;
+    }
+  } catch { /* import.meta.url unavailable */ }
+
+  // Fallback: self.location (Web Worker or browser)
   try {
     if (typeof self !== "undefined" && self.location?.origin && self.location.origin !== "null") {
       return `${self.location.origin}${path}`;
     }
   } catch { /* not in a Worker with a valid origin */ }
 
-  // Try globalThis.location (browser main thread)
-  try {
-    if (typeof globalThis !== "undefined" && (globalThis as { location?: { origin?: string } }).location?.origin) {
-      return `${(globalThis as { location?: { origin?: string } }).location!.origin}${path}`;
-    }
-  } catch { /* not in browser */ }
+  // Server-side (Node.js) or test — use env or default
+  if (typeof process !== "undefined") {
+    const base = process.env?.NEXTAUTH_URL || process.env?.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+    return `${base}${path}`;
+  }
 
-  // Server-side (Node.js) — use localhost with NEXTAUTH_URL or default
-  const baseUrl = typeof process !== "undefined"
-    ? (process.env?.NEXTAUTH_URL || process.env?.NEXT_PUBLIC_SITE_URL || "http://localhost:3000")
-    : "http://localhost:3000";
-  return `${baseUrl}${path}`;
+  return `http://localhost:3000${path}`;
 }
 
 // ============================================================
@@ -616,7 +619,10 @@ export async function runUnifiedPipeline(
         // Non-critical: no historical patterns available yet
       }
 
-      const response = await fetch(resolveApiUrl("/api/ai-estimate"), {
+      const apiUrl = resolveApiUrl("/api/ai-estimate");
+      console.log(`[wallnut] AI estimate → ${apiUrl} (summary: ${summary.length} chars)`);
+
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectSummary: summary }),
@@ -626,18 +632,27 @@ export async function runUnifiedPipeline(
         const data = await response.json();
         if (data.available !== false) {
           aiEstimate = data as AIEstimateResult;
+          console.log(`[wallnut] AI estimate complete: ${aiEstimate.workPackages?.length ?? 0} work packages, €${aiEstimate.totalEstimate?.min}-${aiEstimate.totalEstimate?.max}`);
 
           // If no BOQ was uploaded, use AI work packages as the WBS
           if (!wbsProject && aiEstimate) {
             const { aiEstimateToWbs } = await import("./ai-estimate-converter");
             wbsProject = aiEstimateToWbs(aiEstimate);
           }
+        } else {
+          // API returned available: false (likely missing ANTHROPIC_API_KEY)
+          const reason = data.fallbackReason || "API indisponível";
+          console.warn(`[wallnut] AI estimate skipped: ${reason}`);
+          warnings.push(`Estimativa AI não disponível: ${reason}`);
         }
+      } else {
+        console.warn(`[wallnut] AI estimate HTTP ${response.status}`);
+        warnings.push(`Estimativa AI falhou (HTTP ${response.status}). A continuar com estimativa algorítmica.`);
       }
     } catch (err) {
-      warnings.push(
-        `Estimativa AI indisponível: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[wallnut] AI estimate error:`, msg);
+      warnings.push(`Estimativa AI indisponível: ${msg}`);
     }
   }
 
