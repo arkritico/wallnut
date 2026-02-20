@@ -371,19 +371,21 @@ export function buildConditionDisplay(
 // Rule browsing metadata extraction
 // ============================================================
 
-/** Extract applicable building types from a rule's conditions */
+/** Extract applicable building types from a rule's conditions (normalized to canonical keys) */
 export function extractApplicableTypes(rule: DeclarativeRule): string[] {
-  const types: string[] = [];
+  const types = new Set<string>();
   for (const cond of rule.conditions) {
     if (cond.field === "buildingType") {
       if (cond.operator === "==" && typeof cond.value === "string") {
-        types.push(cond.value);
+        types.add(normalizeBuildingType(cond.value));
       } else if (cond.operator === "in" && Array.isArray(cond.value)) {
-        types.push(...cond.value.filter((v): v is string => typeof v === "string"));
+        for (const v of cond.value) {
+          if (typeof v === "string") types.add(normalizeBuildingType(v));
+        }
       }
     }
   }
-  return types;
+  return [...types];
 }
 
 /** Extract project scope (new build / rehabilitation / all) from a rule's conditions */
@@ -419,37 +421,159 @@ function extractSubTopic(rule: DeclarativeRule): string | undefined {
   return rule.tags[0];
 }
 
+/**
+ * Normalize raw buildingType values from rules to canonical keys.
+ * Maps Portuguese variants, English synonyms, and special codes
+ * to a consistent canonical form.
+ */
+const BUILDING_TYPE_NORMALIZE: Record<string, string> = {
+  // ── Habitação ──
+  residential: "residential",
+  housing: "residential",
+  habitacional: "habitacional",
+  residential_single: "residential",
+  residential_multi: "habitacional",
+  multifamily: "habitacional",
+  alojamento: "alojamento",
+  senior_residence: "alojamento",
+  // ── Comércio e Serviços ──
+  commercial: "commercial",
+  comercial: "commercial",
+  office: "office",
+  escritório: "office",
+  retail: "retail",
+  supermarket: "retail",
+  restaurant: "restaurant",
+  hotel: "hotel",
+  hoteleiro: "hotel",
+  hospitality: "hotel",
+  tourism: "hotel",
+  turismo: "hotel",
+  services: "commercial",
+  "serviços": "commercial",
+  "comércio": "commercial",
+  bank: "commercial",
+  postal: "commercial",
+  pharmacy: "commercial",
+  spa: "hotel",
+  // ── Equipamentos — Saúde ──
+  hospital: "hospital",
+  hospitalar: "hospital",
+  healthcare: "hospital",
+  health: "hospital",
+  clinic: "clinic",
+  "clínica": "clinic",
+  dental_clinic: "clinic",
+  "health-center": "clinic",
+  "centro-saúde": "clinic",
+  // ── Equipamentos — Ensino ──
+  school: "school",
+  escolar: "school",
+  escola: "school",
+  education: "school",
+  educational: "school",
+  "educação": "school",
+  university: "university",
+  "universitário": "university",
+  research: "university",
+  laboratory: "university",
+  // ── Equipamentos — Cultura/Desporto ──
+  cultural: "cultural",
+  museum: "cultural",
+  gallery: "cultural",
+  library: "cultural",
+  cinema: "cultural",
+  entertainment: "cultural",
+  leisure: "cultural",
+  sports: "cultural",
+  theater: "cultural",
+  theatre: "cultural",
+  "sala-de-espetáculos": "cultural",
+  "auditório": "cultural",
+  auditorium: "cultural",
+  assembly: "assembly",
+  assembly_C1: "assembly",
+  assembly_C5: "assembly",
+  "UT I": "assembly",
+  XII: "assembly",
+  electoral: "public",
+  // ── Equipamentos — Público/Institucional ──
+  public: "public",
+  institutional: "public",
+  religious: "public",
+  municipal: "public",
+  // ── Industrial/Armazéns ──
+  industrial: "industrial",
+  "fábrica": "industrial",
+  factory: "industrial",
+  warehouse: "warehouse",
+  "armazém": "warehouse",
+  "armazém-industrial": "warehouse",
+  parking: "parking",
+  "monta-cargas": "parking",
+  construction_site: "industrial",
+  // ── Misto ──
+  mixed: "mixed",
+  misto: "mixed",
+  "mixed-use": "mixed",
+  mixed_with_parking: "mixed",
+  "comércio-habitação": "mixed",
+  "habitacional-comercial": "mixed",
+  // ── Temporário/Especial ──
+  temporary: "temporary",
+  historic: "historic",
+  transport: "public",
+  agricultural: "industrial",
+};
+
 /** Portuguese building type taxonomy — grouped by category */
 export const BUILDING_TYPE_TAXONOMY: Record<string, { label: string; types: Record<string, string> }> = {
   habitacao: {
     label: "Habitação",
     types: {
-      residential: "Habitação Unifamiliar",
-      housing: "Habitação Unifamiliar",
-      habitacional: "Habitação Multifamiliar",
+      residential: "Unifamiliar",
+      habitacional: "Multifamiliar",
+      alojamento: "Alojamento/Residências",
     },
   },
-  servicos: {
+  comercio: {
     label: "Comércio e Serviços",
     types: {
       commercial: "Comércio",
       office: "Escritórios",
-      retail: "Comércio a Retalho",
+      retail: "Retalho/Supermercado",
       restaurant: "Restauração",
-      hotel: "Hotelaria",
+      hotel: "Hotelaria/Turismo",
     },
   },
-  equipamentos: {
-    label: "Equipamentos",
+  saude: {
+    label: "Saúde",
+    types: {
+      hospital: "Hospital",
+      clinic: "Clínica/Centro de Saúde",
+    },
+  },
+  ensino: {
+    label: "Ensino",
     types: {
       school: "Escolar",
-      hospital: "Hospitalar",
+      university: "Universitário/Investigação",
+    },
+  },
+  cultura: {
+    label: "Cultura e Reunião",
+    types: {
+      cultural: "Cultural/Desporto",
+      assembly: "Reunião/Espetáculos",
+      public: "Público/Institucional",
     },
   },
   industrial: {
-    label: "Industrial",
+    label: "Industrial e Armazéns",
     types: {
       industrial: "Industrial",
+      warehouse: "Armazém",
+      parking: "Estacionamento",
     },
   },
   misto: {
@@ -458,21 +582,33 @@ export const BUILDING_TYPE_TAXONOMY: Record<string, { label: string; types: Reco
       mixed: "Misto",
     },
   },
+  especial: {
+    label: "Especial",
+    types: {
+      temporary: "Temporário",
+      historic: "Histórico/Patrimonial",
+    },
+  },
 };
 
-/** Flat lookup for backward compat — derived from taxonomy */
+/** Flat lookup: canonical type → Portuguese label */
 export const BUILDING_TYPE_LABELS: Record<string, string> = Object.fromEntries(
   Object.values(BUILDING_TYPE_TAXONOMY).flatMap(cat =>
     Object.entries(cat.types)
   )
 );
 
-/** Reverse lookup: building type value → category key */
+/** Reverse lookup: canonical type → category key */
 export function getBuildingTypeCategory(typeValue: string): string | undefined {
   for (const [catKey, cat] of Object.entries(BUILDING_TYPE_TAXONOMY)) {
     if (typeValue in cat.types) return catKey;
   }
   return undefined;
+}
+
+/** Normalize a raw building type value to its canonical form */
+export function normalizeBuildingType(raw: string): string {
+  return BUILDING_TYPE_NORMALIZE[raw] ?? raw;
 }
 
 // ============================================================
