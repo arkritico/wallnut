@@ -31,6 +31,7 @@ import type { ParsedBoq } from "./xlsx-parser";
 import type { ScheduleDiagnostic } from "./msproject-import";
 import type { AIEstimateResult, ReconciliationReport } from "./ai-estimate-types";
 import type { AIReviewResult } from "./ai-feedback-types";
+import { resolveUrl } from "./resolve-url";
 
 // ============================================================
 // Types
@@ -170,44 +171,6 @@ function createProgressReporter(onProgress?: (progress: UnifiedProgress) => void
       });
     },
   };
-}
-
-// ============================================================
-// API URL resolution (works in both Node.js and Web Workers)
-// ============================================================
-
-/**
- * Resolve a relative API path to an absolute URL.
- * In Web Workers, relative fetch URLs fail because the Worker's base URL
- * is the script URL, not the page URL. We derive the origin from
- * import.meta.url (most reliable in bundled Workers), self.location, or env vars.
- */
-function resolveApiUrl(path: string): string {
-  // Already absolute
-  if (path.startsWith("http://") || path.startsWith("https://")) return path;
-
-  // Best: derive origin from the current module URL (works in Workers + browser)
-  try {
-    const origin = new URL(import.meta.url).origin;
-    if (origin && origin !== "null" && !origin.startsWith("file:")) {
-      return `${origin}${path}`;
-    }
-  } catch { /* import.meta.url unavailable */ }
-
-  // Fallback: self.location (Web Worker or browser)
-  try {
-    if (typeof self !== "undefined" && self.location?.origin && self.location.origin !== "null") {
-      return `${self.location.origin}${path}`;
-    }
-  } catch { /* not in a Worker with a valid origin */ }
-
-  // Server-side (Node.js) or test — use env or default
-  if (typeof process !== "undefined") {
-    const base = process.env?.NEXTAUTH_URL || process.env?.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-    return `${base}${path}`;
-  }
-
-  return `http://localhost:3000${path}`;
 }
 
 // ============================================================
@@ -522,7 +485,7 @@ export async function runUnifiedPipeline(
               formData.append("pages", JSON.stringify(scannedPages.map((p) => p.page)));
               formData.append("language", "por");
 
-              const ocrResponse = await fetch(resolveApiUrl("/api/ocr"), { method: "POST", body: formData });
+              const ocrResponse = await fetch(resolveUrl("/api/ocr"), { method: "POST", body: formData });
               if (!ocrResponse.ok) throw new Error(`OCR API ${ocrResponse.status}`);
 
               const ocrData = await ocrResponse.json() as { texts: string[]; confidences: number[] };
@@ -619,7 +582,7 @@ export async function runUnifiedPipeline(
         // Non-critical: no historical patterns available yet
       }
 
-      const apiUrl = resolveApiUrl("/api/ai-estimate");
+      const apiUrl = resolveUrl("/api/ai-estimate");
       console.log(`[wallnut] AI estimate → ${apiUrl} (summary: ${summary.length} chars)`);
 
       const response = await fetch(apiUrl, {
@@ -715,7 +678,7 @@ export async function runUnifiedPipeline(
   if (aiEstimate && matchReport && reconciliation && opts.includeAIEstimate !== false) {
     aiReviewPromise = (async () => {
       try {
-        const response = await fetch(resolveApiUrl("/api/ai-review"), {
+        const response = await fetch(resolveUrl("/api/ai-review"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aiEstimate, matchReport, reconciliation }),

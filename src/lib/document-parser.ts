@@ -6,6 +6,7 @@
 
 import type { BuildingProject } from "./types";
 import { splitAndExtract, needsSplitting, type ProgressCallback } from "./pdf-splitter";
+import { resolveUrl } from "./resolve-url";
 
 export interface ParsedProjectData {
   fields: Partial<BuildingProject>;
@@ -62,7 +63,7 @@ export async function parseDocumentWithAI(
 ): Promise<ParsedProjectData> {
   const prompt = buildExtractionPrompt(text);
 
-  const response = await fetch("/api/parse-document", {
+  const response = await fetch(resolveUrl("/api/parse-document"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

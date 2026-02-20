@@ -9,6 +9,7 @@
 
 import type { PriceWorkItem } from './cost-estimation';
 import type { RegulationArea } from './types';
+import { resolveUrl } from './resolve-url';
 
 // ============================================================================
 // TYPES
@@ -225,7 +226,7 @@ async function loadScrapedData(): Promise<ScrapedDataFile | null> {
       return JSON.parse(jsonData);
     } else {
       // Browser/Worker: fetch from public directory
-      const res = await fetch('/data/price-db.json');
+      const res = await fetch(resolveUrl('/data/price-db.json'));
       if (!res.ok) {
         console.warn(`[price-db-loader] fetch /data/price-db.json failed: ${res.status}`);
         return null;
