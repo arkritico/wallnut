@@ -194,6 +194,20 @@ export default function RegulationGraph({ className = "", evaluationResults, emb
       });
   }, []);
 
+  // ── Auto-expand all regulations on first load ─────────────
+  useEffect(() => {
+    if (!graphData) return;
+    setExpandedRegulations(prev => {
+      if (prev.size > 0) return prev; // already expanded by user
+      const allRegIds = new Set(
+        graphData.nodes
+          .filter(n => n.type === "regulation" && n.regulationId)
+          .map(n => n.regulationId!),
+      );
+      return allRegIds;
+    });
+  }, [graphData]);
+
   // ── Resize observer ───────────────────────────────────────
   useEffect(() => {
     const el = containerRef.current;
