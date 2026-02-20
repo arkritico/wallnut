@@ -425,7 +425,7 @@ export class PriceScraper {
         code,
         description,
         fullDescription: this.extractFullDescription($),
-        category: categoryPath.split(" > ").slice(-1)[0] || categoryPath,
+        category: this.cleanCategoryPath(categoryPath),
         unit: unit || "Ud",
         unitCost: price,
         totalCost: price,
@@ -594,55 +594,76 @@ export class PriceScraper {
     return `${prefix}${num}`;
   }
 
+  /**
+   * Strip leading price pattern from text.
+   * e.g., "11,23€ Isolamento térmico..." → "Isolamento térmico..."
+   *        "1.234,56 € Pilar..."         → "Pilar..."
+   */
+  private stripPricePrefix(text: string): string {
+    return text.replace(/^[\d.,]+\s*€\s*/, "").trim();
+  }
+
   private extractDescription($: cheerio.CheerioAPI): string | null {
     // Try meta description first (most complete)
     const metaDesc = $('meta[name="description"]').attr("content")?.trim();
-    if (metaDesc && metaDesc.length > 10) return metaDesc;
+    if (metaDesc && metaDesc.length > 10) {
+      return this.stripPricePrefix(metaDesc);
+    }
 
     // Try h1
     const h1 = $("h1").first().text().trim();
-    if (h1 && h1.length > 10) return h1;
+    if (h1 && h1.length > 10) return this.stripPricePrefix(h1);
 
     // Try title (minus site name)
     const title = $("title").text().split("|")[0]?.trim();
-    if (title && title.length > 10) return title;
+    if (title && title.length > 10) return this.stripPricePrefix(title);
 
     return null;
   }
 
   private extractFullDescription($: cheerio.CheerioAPI): string {
-    return $('meta[name="description"]').attr("content")?.trim() || "";
+    const raw = $('meta[name="description"]').attr("content")?.trim() || "";
+    return this.stripPricePrefix(raw);
   }
 
   private extractUnit($: cheerio.CheerioAPI): string {
-    // Look for unit text near price — common patterns:
-    // <p>m²</p>, <span class="unit">m</span>, text before €
     const unitPattern = /^(m[²³23]?|Ud|un|kg|t|h|l|conjunto|vg|sistema|projeto)$/i;
 
-    // Check p elements adjacent to h6 (price heading)
-    let unit = "";
-    $("h6")
-      .next("p")
-      .each((_, el) => {
-        const text = $(el).text().trim();
-        if (unitPattern.test(text)) unit = text;
-      });
-    if (unit) return this.normalizeUnit(unit);
+    // Priority 1: element immediately after price heading (h4 or h6)
+    for (const tag of ["h4", "h6"]) {
+      const priceEl = $(tag).filter((_, el) => /\d+[.,]\d{2}\s*€/.test($(el).text()));
+      if (priceEl.length > 0) {
+        const next = priceEl.first().next();
+        if (next.length) {
+          const text = next.text().trim();
+          if (unitPattern.test(text)) return this.normalizeUnit(text);
+        }
+      }
+    }
 
-    // Check any small text blocks near prices
+    // Priority 2: collect ALL matching units from p/span and prefer area/volume
+    // The old approach took the FIRST match which often was "l" (litre) from a
+    // stray DOM element, even when the real unit "m²" appeared later.
+    const candidates: string[] = [];
     $("p, span").each((_, el) => {
       const text = $(el).text().trim();
-      if (unitPattern.test(text) && !unit) unit = text;
+      if (unitPattern.test(text)) candidates.push(this.normalizeUnit(text));
     });
-    if (unit) return this.normalizeUnit(unit);
 
-    // Infer from description
-    const desc = $("h1").text().toLowerCase();
-    if (desc.startsWith("m²") || desc.startsWith("m2 ")) return "m2";
-    if (desc.startsWith("m³") || desc.startsWith("m3 ")) return "m3";
-    if (desc.startsWith("m ") || desc.match(/^m\b/)) return "m";
-    if (desc.startsWith("ud ") || desc.startsWith("Ud ")) return "Ud";
-    if (desc.startsWith("kg ")) return "kg";
+    if (candidates.length > 0) {
+      // Prefer construction-relevant units: area > volume > length > mass > generic
+      const preference = ["m2", "m3", "m", "kg", "t", "Ud", "conjunto", "vg", "sistema", "projeto", "h", "l"];
+      for (const pref of preference) {
+        if (candidates.includes(pref)) return pref;
+      }
+      return candidates[0];
+    }
+
+    // Priority 3: infer from description or meta
+    const desc = ($("h1").text() + " " + ($('meta[name="description"]').attr("content") ?? "")).toLowerCase();
+    if (desc.includes("m²") || desc.includes("m2")) return "m2";
+    if (desc.includes("m³") || desc.includes("m3")) return "m3";
+    if (/\bkg\b/.test(desc)) return "kg";
 
     return "Ud";
   }
@@ -688,6 +709,16 @@ export class PriceScraper {
 
       // Skip header rows
       if (code === "Unitário" || code === "Código" || !code) return;
+
+      // Skip non-breakdown rows that the table parser picks up by mistake:
+      // - EN/NP standard references (e.g., "EN 13162:2012+A1:2015")
+      // - Waste classification codes (e.g., "17 09 04")
+      // - Maintenance cost summaries
+      // - "Total:" summary rows
+      if (/^(EN|NP)\s/i.test(code)) return;
+      if (/^\d{2}\s+\d{2}\s+\d{2}$/.test(code)) return;
+      if (/^Custo de /i.test(code)) return;
+      if (cellTexts.some((t) => /^Total:/i.test(t))) return;
 
       // Parse the row — structure varies, try common patterns
       const desc = cellTexts[2] || cellTexts[1] || "";
@@ -765,6 +796,32 @@ export class PriceScraper {
     const cleaned = text.replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
     const num = parseFloat(cleaned);
     return isNaN(num) ? null : num;
+  }
+
+  /**
+   * Clean the accumulated category path by removing leaf segments that are
+   * actually item descriptions (the CYPE sidebar link text contains unit + full
+   * description, e.g., "m²\nIsolamento térmico ...").
+   *
+   * Also collapses newlines within segments and trims.
+   */
+  private cleanCategoryPath(categoryPath: string): string {
+    const segments = categoryPath.split(" > ").map((s) => s.replace(/\n/g, " ").trim());
+
+    // Drop trailing segments that look like item descriptions:
+    // - start with a unit prefix (m², m³, m, Ud, kg, etc.)
+    // - are very long (>80 chars)
+    const unitPrefixRe = /^(m[²³23]?\s|Ud\s|un\s|kg\s|t\s|h\s|l\s|conjunto\s)/i;
+    while (segments.length > 1) {
+      const last = segments[segments.length - 1];
+      if (unitPrefixRe.test(last) || last.length > 80) {
+        segments.pop();
+      } else {
+        break;
+      }
+    }
+
+    return segments.join(" > ");
   }
 
   private normalizeUnit(unit: string): string {

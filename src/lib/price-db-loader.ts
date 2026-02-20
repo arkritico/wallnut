@@ -265,21 +265,30 @@ function convertToWorkItems(item: ScrapedPriceItem): PriceWorkItem[] {
     }
   }
 
-  // Infer areas from category and description
-  const areas = inferRegulationAreas(item.category, item.description);
+  // Clean description: remove embedded prices, URLs, site names, excess whitespace
+  const cleanDesc = item.description
+    .replace(/€\s*[\d.,]+/g, '')           // €83.99 format
+    .replace(/[\d.,]+\s*€/g, '')           // 83,99€ European format
+    .replace(/\bhttp\S+/g, '')             // URLs
+    .replace(/Gerador de Preços\.?\s*Portugal\.?/gi, '') // Site name noise
+    .replace(/\s{2,}/g, ' ')              // Collapse spaces
+    .trim() || item.description;
 
-  // Generate search patterns
-  const patterns = generatePatterns(item.description, item.category, item.code);
+  // Infer areas from category and description
+  const areas = inferRegulationAreas(item.category, cleanDesc);
+
+  // Generate search patterns from cleaned description
+  const patterns = generatePatterns(cleanDesc, item.category, item.code);
 
   // Determine if it's a rehab item — typology-based (primary) or string-based (fallback)
   const isRehab = item.typology === 'reabilitacao' ||
                   item.category.toLowerCase().includes('reabilita') ||
-                  item.description.toLowerCase().includes('reabilita') ||
+                  cleanDesc.toLowerCase().includes('reabilita') ||
                   item.category.toLowerCase().includes('demoliç');
 
   const base: PriceWorkItem = {
     code: item.code,
-    description: item.description,
+    description: cleanDesc,
     chapter: item.category,
     unit: item.unit,
     unitCost: item.totalCost,

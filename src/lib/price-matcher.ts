@@ -706,14 +706,64 @@ function stemPT(word: string): string {
   return s.length >= 2 ? s : word.toLowerCase();
 }
 
-/** Tokenize and stem a Portuguese text, removing stopwords */
+/**
+ * Portuguese construction synonym groups.
+ * All words in a group are considered equivalent during matching.
+ * Stored as stemmed forms for efficient lookup.
+ */
+const PT_CONSTRUCTION_SYNONYMS: string[][] = [
+  ["betao", "concret"],
+  ["pilar", "colun", "pilaret"],
+  ["viga", "lintel"],
+  ["laj", "slab"],
+  ["alvenari", "tijol", "parede"],
+  ["escav", "terraplen"],
+  ["cobertur", "telhad", "tect", "tet"],
+  ["impermeabiliz", "tel"],
+  ["caixilhari", "janel", "envidrac"],
+  ["reboc", "estuqu", "argamass"],
+  ["ceramic", "mosaic", "azulej"],
+  ["flutuant", "soalh", "parquet"],
+  ["pintur", "tint"],
+  ["tubag", "tub", "canaliz"],
+  ["quadr", "distribu"],
+  ["elevad", "ascens"],
+  ["guard", "corrim", "balaustrad"],
+  ["vedac", "tapum"],
+  ["sapat", "fundac"],
+  ["betonilh", "regulariz", "screed"],
+  ["armad", "reforc"],
+  ["isolament", "capot", "ETICS"],
+];
+
+/** Pre-build reverse lookup: stemmed token → index of synonym group */
+const _synonymIndex = new Map<string, number>();
+for (let i = 0; i < PT_CONSTRUCTION_SYNONYMS.length; i++) {
+  for (const stem of PT_CONSTRUCTION_SYNONYMS[i]) {
+    _synonymIndex.set(stem, i);
+  }
+}
+
+/** Tokenize and stem a Portuguese text, removing stopwords, with synonym expansion */
 function tokenize(text: string): string[] {
-  return text
+  const baseTokens = text
     .toLowerCase()
     .replace(/[^a-záàâãéêíóôõúüç0-9\s]/gi, " ")
     .split(/\s+/)
     .filter(w => w.length >= 2 && !STOPWORDS.has(w))
     .map(stemPT);
+
+  // Expand synonyms: if a token matches any synonym stem, add all stems from that group
+  const expanded = new Set(baseTokens);
+  for (const token of baseTokens) {
+    const groupIdx = _synonymIndex.get(token);
+    if (groupIdx !== undefined) {
+      for (const syn of PT_CONSTRUCTION_SYNONYMS[groupIdx]) {
+        expanded.add(syn);
+      }
+    }
+  }
+  return Array.from(expanded);
 }
 
 /** Generate character n-grams from a string */
@@ -819,6 +869,56 @@ const KEYNOTE_MAP: Record<string, string[]> = {
 // Matching Engine
 // ============================================================
 
+// ============================================================
+// Specification Extraction
+// ============================================================
+
+/** Extract thickness from description (returns meters) */
+function extractThickness(desc: string): number | null {
+  // Match patterns: "esp 0.20m", "e=15cm", "esp.20cm", "(e=0.20)"
+  const match = desc.match(/(?:esp\.?\s*|e\s*=\s*|espessura\s*)(\d+(?:[.,]\d+)?)\s*(mm|cm|m)/i)
+    || desc.match(/(\d+(?:[.,]\d+)?)\s*(mm|cm|m)\b/i);
+  if (!match) return null;
+  const val = parseFloat(match[1].replace(",", "."));
+  const unit = match[2].toLowerCase();
+  if (unit === "mm") return val / 1000;
+  if (unit === "cm") return val / 100;
+  return val;
+}
+
+/** Score specification matches between article and price item descriptions */
+function scoreSpecifications(articleDesc: string, priceDesc: string): number {
+  let bonus = 0;
+
+  // Concrete grade match (C25/30, C30/37, etc.)
+  const articleGrade = articleDesc.match(/C\d+\/\d+/);
+  const priceGrade = priceDesc.match(/C\d+\/\d+/);
+  if (articleGrade && priceGrade) {
+    if (articleGrade[0] === priceGrade[0]) bonus += 8;
+  }
+
+  // Steel grade match (A500NR, A500, S275, S355)
+  const articleSteel = articleDesc.match(/[AS]\d{3,4}(?:NR)?/);
+  const priceSteel = priceDesc.match(/[AS]\d{3,4}(?:NR)?/);
+  if (articleSteel && priceSteel) {
+    if (articleSteel[0] === priceSteel[0]) bonus += 5;
+  }
+
+  // Thickness match
+  const articleThick = extractThickness(articleDesc);
+  const priceThick = extractThickness(priceDesc);
+  if (articleThick !== null && priceThick !== null) {
+    if (Math.abs(articleThick - priceThick) < 0.01) bonus += 7;
+    else if (Math.abs(articleThick - priceThick) < 0.05) bonus += 3;
+  }
+
+  return Math.min(15, bonus);
+}
+
+// ============================================================
+// Matching Engine
+// ============================================================
+
 interface ScoredMatch {
   item: PriceWorkItem;
   score: number;
@@ -870,12 +970,15 @@ function scoreMatch(article: WbsArticle, item: PriceWorkItem): ScoredMatch {
   const ngramSim = jaccard(articleNgrams, priceNgrams);
   score += Math.round(ngramSim * 15);
 
-  // 6. Unit compatibility bonus/penalty
+  // 5b. Specification matching (concrete grade, thickness, steel)
+  score += scoreSpecifications(article.description, item.description);
+
+  // 6. Unit compatibility bonus/penalty (strengthened)
   if (article.unit) {
     if (unitsCompatible(article.unit, item.unit)) {
-      score += 10;
+      score += 15;
     } else {
-      score -= 10;
+      score -= 20;
       warnings.push(`Unidade diferente: artigo=${article.unit}, PRICE=${item.unit}`);
     }
   }
@@ -898,12 +1001,30 @@ function scoreMatch(article: WbsArticle, item: PriceWorkItem): ScoredMatch {
 
 /**
  * Match a single WBS article against the PRICE database.
- * Returns the best match or null.
+ * Uses chapter-based pre-filtering for category proximity bonus.
  */
 async function matchArticle(article: WbsArticle): Promise<ScoredMatch | null> {
   let best: ScoredMatch | null = null;
   const database = await getDatabase();
 
+  // Pre-filter: if article has a chapter code, prioritize DB items in same category
+  const chapterPrefix = article.code?.split(".")[0];
+  const priorityCodes = chapterPrefix ? (KEYNOTE_MAP[chapterPrefix] ?? []) : [];
+
+  // Score priority items first (same category) with bonus
+  if (priorityCodes.length > 0) {
+    for (const item of database) {
+      if (priorityCodes.some(c => item.code.startsWith(c))) {
+        const scored = scoreMatch(article, item);
+        scored.score = Math.min(99, scored.score + 5); // category proximity bonus
+        if (scored.score > (best?.score ?? 0)) {
+          best = scored;
+        }
+      }
+    }
+  }
+
+  // Score full DB (in case category mapping is wrong or best match is elsewhere)
   for (const item of database) {
     const scored = scoreMatch(article, item);
     if (scored.score > (best?.score ?? 0)) {

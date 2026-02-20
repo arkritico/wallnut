@@ -591,7 +591,8 @@ export class PriceVariantScraper {
 
         var h1 = document.querySelector("h1");
         var meta = document.querySelector('meta[name="description"]');
-        var desc = (h1 ? h1.textContent.trim() : null) || (meta ? (meta.getAttribute("content") || "").trim() : null);
+        var rawDesc = (h1 ? h1.textContent.trim() : null) || (meta ? (meta.getAttribute("content") || "").trim() : null);
+        var desc = rawDesc ? rawDesc.replace(/^[\\d.,]+\\s*€\\s*/, "").trim() : null;
 
         var materials = [], labor = [], machinery = [];
         var rows = document.querySelectorAll("table tr");
@@ -600,6 +601,12 @@ export class PriceVariantScraper {
           if (cells.length < 4) continue;
           var code = (cells[0].textContent || "").trim();
           if (!code || code === "Unitário" || code === "Código") continue;
+          if (/^(EN|NP)\s/i.test(code)) continue;
+          if (/^\d{2}\s+\d{2}\s+\d{2}$/.test(code)) continue;
+          if (/^Custo de /i.test(code)) continue;
+          var hasTotal = false;
+          for (var ct2 = 0; ct2 < cells.length; ct2++) { if (/^Total:/i.test((cells[ct2].textContent||"").trim())) hasTotal = true; }
+          if (hasTotal) continue;
           var ct = [];
           for (var c = 0; c < cells.length; c++) ct.push((cells[c].textContent || "").trim());
           var total = parseNum(ct[5] || ct[ct.length - 1]);
