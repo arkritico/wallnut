@@ -47,7 +47,6 @@ import {
   Sun,
   Hammer,
   GitCompareArrows,
-  BookOpen,
   Play,
   Users,
   Menu,
@@ -577,12 +576,6 @@ export default function Home() {
                 <FolderOpen className="w-4 h-4" /> {t.myProjects}
               </MobileNavLink>
             )}
-            <MobileNavLink onClick={() => { setView("viewer"); setMobileMenuOpen(false); }}>
-              <BookOpen className="w-4 h-4" /> {lang === "pt" ? "Visualizador 3D" : "3D Viewer"}
-            </MobileNavLink>
-            <MobileNavLink onClick={() => { setView("wbs"); setMobileMenuOpen(false); }}>
-              <Clock className="w-4 h-4" /> WBS
-            </MobileNavLink>
             <Link href="/regulamentos" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors text-sm">
               <Hammer className="w-4 h-4" /> {lang === "pt" ? "Regulamentos" : "Regulations"}
             </Link>
@@ -597,82 +590,65 @@ export default function Home() {
           </MobileNav>
 
           {/* Hero */}
-          <section className="max-w-4xl mx-auto px-6 pt-24 pb-12 text-center">
+          <section className="max-w-4xl mx-auto px-6 pt-24 pb-16 text-center">
             <h1 className="text-5xl md:text-[4.5rem] leading-[1.1] font-semibold tracking-tight text-gray-900 mb-8">
               {t.heroHeadline}
             </h1>
-            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed mb-12">
               {t.heroSubline}
             </p>
-          </section>
-
-          {/* Input formats */}
-          <section className="max-w-4xl mx-auto px-6 py-10">
-            <div className="border-t border-b border-gray-200 py-10 text-center">
-              <p className="text-2xl md:text-3xl font-semibold tracking-wide text-gray-900 mb-2">{t.inputFormats}</p>
-              <p className="text-sm text-gray-300 uppercase tracking-[0.15em]">{t.inputFormatsDesc}</p>
+            <button
+              onClick={() => setView("unified")}
+              className="inline-flex items-center gap-3 px-10 py-4 bg-accent text-white font-semibold rounded-lg hover:bg-accent-hover transition-colors text-lg"
+            >
+              {lang === "pt" ? "Carregar Ficheiros" : "Upload Files"}
+              <ChevronRight className="w-5 h-5" />
+            </button>
+            <p className="mt-4 text-sm text-gray-300">{t.inputFormats}</p>
+            <div className="mt-3 flex items-center justify-center gap-4 text-sm">
+              <Link href="/regulamentos" className="text-gray-400 hover:text-accent transition-colors">
+                {lang === "pt" ? "Explorar regulamentos" : "Explore regulations"}
+              </Link>
+              {savedProjects.length > 0 && (
+                <>
+                  <span className="text-gray-200">&middot;</span>
+                  <button
+                    onClick={() => { refreshProjects(); setView("dashboard"); }}
+                    className="text-gray-400 hover:text-accent transition-colors"
+                  >
+                    {lang === "pt" ? "Abrir projeto" : "Open project"}
+                  </button>
+                </>
+              )}
             </div>
           </section>
 
-          {/* Three capabilities */}
-          <section className="max-w-5xl mx-auto px-6 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
-              <div>
-                <h3 className="text-base font-semibold text-gray-900 mb-3">{t.capCostTitle}</h3>
+          {/* Capabilities */}
+          <section className="max-w-5xl mx-auto px-6 pb-20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="border border-gray-100 rounded-xl p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{t.capCostTitle}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">{t.capCostDesc}</p>
               </div>
-              <div>
-                <h3 className="text-base font-semibold text-gray-900 mb-3">{t.capScheduleTitle}</h3>
+              <div className="border border-gray-100 rounded-xl p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{t.capScheduleTitle}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">{t.capScheduleDesc}</p>
               </div>
-              <div>
-                <h3 className="text-base font-semibold text-gray-900 mb-3">{t.capComplianceTitle}</h3>
+              <div className="border border-gray-100 rounded-xl p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{t.cap4DTitle}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{t.cap4DDesc}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-8 max-w-3xl mx-auto">
+              <div className="border border-gray-100 rounded-xl p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{t.capComplianceTitle}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">{t.capComplianceDesc}</p>
               </div>
-            </div>
-          </section>
-
-          {/* Primary CTA */}
-          <section className="max-w-4xl mx-auto px-6 py-16 text-center">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={() => setView("unified")}
-                className="inline-flex items-center gap-3 px-10 py-4 bg-accent text-white font-semibold rounded-lg hover:bg-accent-hover transition-colors text-lg"
-              >
-                {lang === "pt" ? "Carregar Ficheiros" : "Upload Files"}
-                <ChevronRight className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleNewProject}
-                className="inline-flex items-center gap-3 px-10 py-4 bg-white text-gray-700 font-semibold rounded-lg border border-gray-300 hover:border-accent hover:text-accent transition-colors text-lg"
-              >
-                {t.startAnalysis}
-                <ChevronRight className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-300">
-              <button onClick={() => setView("viewer")} className="hover:text-gray-500 transition-colors">
-                {lang === "pt" ? "Visualizador 3D" : "3D Viewer"}
-              </button>
-              <span className="text-gray-200">|</span>
-              <button onClick={() => setView("wbs")} className="hover:text-gray-500 transition-colors">
-                WBS
-              </button>
-              <span className="text-gray-200">|</span>
-              <Link href="/regulamentos" className="hover:text-gray-500 transition-colors">
-                {lang === "pt" ? "Regulamentos" : "Regulations"}
-              </Link>
-            </div>
-            {savedProjects.length > 0 && (
-              <div className="mt-4">
-                <button
-                  onClick={() => { refreshProjects(); setView("dashboard"); }}
-                  className="text-sm text-gray-300 hover:text-accent transition-colors"
-                >
-                  {lang === "pt" ? "ou abrir um projeto existente" : "or open an existing project"}
-                </button>
+              <div className="border border-gray-100 rounded-xl p-6">
+                <h3 className="text-base font-semibold text-gray-900 mb-2">{t.capRegAITitle}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{t.capRegAIDesc}</p>
               </div>
-            )}
+            </div>
           </section>
 
           {/* Specialty badges */}

@@ -165,10 +165,24 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
   }
 
   // Pre-pass: build relationship maps for O(1) lookup during entity extraction
-  // These resolve the window→opening→wall chain and building→storey→space hierarchy
+  // This single pass over all entities replaces 4 inner O(n) loops per target entity,
+  // reducing overall complexity from O(targets × entities) to O(entities).
   const fillsOpening = new Map<string, string>();        // fillingElementId → openingId
   const voidsHost = new Map<string, string>();            // openingId → hostElementId
   const aggregateChildren = new Map<string, string[]>();  // parentId → [childId, ...]
+  const propDefByEntity = new Map<string, string[]>();    // entityId → [psetRef, ...]
+  const materialByEntity = new Map<string, string[]>();   // entityId → [materialRef, ...]
+  const classificationByEntity = new Map<string, string[]>(); // entityId → [classRef, ...]
+  const containmentByEntity = new Map<string, string>();  // entityId → storeyRef
+
+  // Helper: extract element list and target ref from IFCREL* entities
+  // Pattern: IFCRELXXX('guid',#owner,$,$,(#el1,#el2,...),#targetRef)
+  function extractRelElements(val: string): { elements: string[]; targetRef: string } | null {
+    const match = val.match(/\(([^()]+)\)\s*,\s*(#\d+)\s*\)$/);
+    if (!match) return null;
+    const elements = match[1].match(/#\d+/g) || [];
+    return { elements, targetRef: match[2] };
+  }
 
   for (const [, val] of entities) {
     if (val.startsWith("IFCRELFILLSELEMENT(")) {
@@ -192,6 +206,40 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
         const children = childPart.match(/#\d+/g) || [];
         if (children.length > 0) {
           aggregateChildren.set(parentId, children);
+        }
+      }
+    } else if (val.startsWith("IFCRELDEFINESBYPROPERTIES(")) {
+      const rel = extractRelElements(val);
+      if (rel) {
+        for (const elId of rel.elements) {
+          const existing = propDefByEntity.get(elId);
+          if (existing) existing.push(rel.targetRef);
+          else propDefByEntity.set(elId, [rel.targetRef]);
+        }
+      }
+    } else if (val.startsWith("IFCRELASSOCIATESMATERIAL(")) {
+      const rel = extractRelElements(val);
+      if (rel) {
+        for (const elId of rel.elements) {
+          const existing = materialByEntity.get(elId);
+          if (existing) existing.push(rel.targetRef);
+          else materialByEntity.set(elId, [rel.targetRef]);
+        }
+      }
+    } else if (val.startsWith("IFCRELASSOCIATESCLASSIFICATION(")) {
+      const rel = extractRelElements(val);
+      if (rel) {
+        for (const elId of rel.elements) {
+          const existing = classificationByEntity.get(elId);
+          if (existing) existing.push(rel.targetRef);
+          else classificationByEntity.set(elId, [rel.targetRef]);
+        }
+      }
+    } else if (val.startsWith("IFCRELCONTAINEDINSPATIALSTRUCTURE(")) {
+      const rel = extractRelElements(val);
+      if (rel) {
+        for (const elId of rel.elements) {
+          containmentByEntity.set(elId, rel.targetRef);
         }
       }
     }
@@ -224,8 +272,11 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
     const entityType = typeMatch[1];
 
     if (!TARGET_ENTITIES.some(t => entityType.startsWith(t))) continue;
-    // Skip TYPE definitions (IFCCOLUMNTYPE, IFCBEAMTYPE, etc.) — they are type templates, not actual elements
-    if (entityType.endsWith("TYPE")) continue;
+    // Skip non-element entity types: TYPE definitions (IFCCOLUMNTYPE), STYLE definitions
+    // (IFCWINDOWSTYLE, IFCDOORSTYLE), and property definitions (IFCWINDOWLININGPROPERTIES,
+    // IFCDOORLININGPROPERTIES, IFCDOORPANELPROPERTIES) — these are templates, not actual elements
+    if (entityType.endsWith("TYPE") || entityType.endsWith("STYLE") ||
+        entityType.includes("LININGPROPERTIES") || entityType.includes("PANELPROPERTIES")) continue;
 
     const nameMatch = val.match(/'([^']*)'/g);
     // IFC entity order: (GlobalId, #OwnerHistory, Name, Description, ...)
@@ -296,159 +347,152 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
       item.aggregatedChildren = aggChildren;
     }
 
-    // Find associated property sets via IFCRELDEFINESBYPROPERTIES
-    for (const [, relVal] of entities) {
-      if (!relVal.startsWith("IFCRELDEFINESBYPROPERTIES(")) continue;
-      if (!new RegExp(`${id}[,)\\]]`).test(relVal)) continue;
+    // Find associated property sets via pre-indexed IFCRELDEFINESBYPROPERTIES map
+    const psetRefs = propDefByEntity.get(id);
+    if (psetRefs) {
+      for (const psetRefId of psetRefs) {
+        const psetVal = entities.get(psetRefId);
+        if (!psetVal) continue;
 
-      // Find the property set reference (last #ref before closing paren)
-      const psetRef = relVal.match(/(#\d+)\)$/);
-      if (!psetRef) continue;
+        // Extract from IFCELEMENTQUANTITY
+        if (psetVal.startsWith("IFCELEMENTQUANTITY(")) {
+          const qRefs = psetVal.match(/#\d+/g) || [];
+          for (const qRef of qRefs) {
+            const qVal = entities.get(qRef);
+            if (!qVal) continue;
 
-      const psetVal = entities.get(psetRef[1]);
-      if (!psetVal) continue;
-
-      // Extract from IFCELEMENTQUANTITY
-      if (psetVal.startsWith("IFCELEMENTQUANTITY(")) {
-        const qRefs = psetVal.match(/#\d+/g) || [];
-        for (const qRef of qRefs) {
-          const qVal = entities.get(qRef);
-          if (!qVal) continue;
-
-          if (qVal.startsWith("IFCQUANTITYAREA(")) {
-            const areaMatch = qVal.match(/'([^']*)'/);
-            const numMatch = qVal.match(/([\d.]+)/g);
-            const area = numMatch?.map(Number).find(n => n > 0 && n < 100000);
-            if (area) {
-              const label = areaMatch?.[1] ?? "";
-              if (label.toLowerCase().includes("net")) item.quantities.area = area;
-              else if (!item.quantities.area) item.quantities.area = area;
+            if (qVal.startsWith("IFCQUANTITYAREA(")) {
+              const areaMatch = qVal.match(/'([^']*)'/);
+              const numMatch = qVal.match(/([\d.]+)/g);
+              const area = numMatch?.map(Number).find(n => n > 0 && n < 100000);
+              if (area) {
+                const label = areaMatch?.[1] ?? "";
+                if (label.toLowerCase().includes("net")) item.quantities.area = area;
+                else if (!item.quantities.area) item.quantities.area = area;
+              }
+            }
+            if (qVal.startsWith("IFCQUANTITYVOLUME(")) {
+              const numMatch = qVal.match(/([\d.]+)/g);
+              const vol = numMatch?.map(Number).find(n => n > 0 && n < 100000);
+              if (vol) item.quantities.volume = vol;
+            }
+            if (qVal.startsWith("IFCQUANTITYLENGTH(")) {
+              const numMatch = qVal.match(/([\d.]+)/g);
+              const len = numMatch?.map(Number).find(n => n > 0 && n < 100000);
+              if (len) item.quantities.length = len;
+            }
+            if (qVal.startsWith("IFCQUANTITYWEIGHT(")) {
+              const numMatch = qVal.match(/([\d.]+)/g);
+              const wt = numMatch?.map(Number).find(n => n > 0 && n < 1000000);
+              if (wt) item.quantities.weight = wt;
             }
           }
-          if (qVal.startsWith("IFCQUANTITYVOLUME(")) {
-            const numMatch = qVal.match(/([\d.]+)/g);
-            const vol = numMatch?.map(Number).find(n => n > 0 && n < 100000);
-            if (vol) item.quantities.volume = vol;
+        }
+
+        // Extract from IFCPROPERTYSET
+        if (psetVal.startsWith("IFCPROPERTYSET(")) {
+          const psetNameMatch = psetVal.match(/'([^']*)'/);
+          const psetName = psetNameMatch?.[1] ?? "";
+
+          const propRefs = psetVal.match(/#\d+/g) || [];
+          const psetProperties: Record<string, string | number | boolean> = {};
+
+          for (const pRef of propRefs) {
+            const propVal = entities.get(pRef);
+            if (!propVal?.startsWith("IFCPROPERTYSINGLEVALUE(")) continue;
+            const propParts = propVal.match(/'([^']*)'/g);
+            const propName = propParts?.[0]?.replace(/'/g, "");
+            if (!propName) continue;
+
+            const valMatch = propVal.match(/IFCREAL\(([\d.]+)\)|IFCBOOLEAN\(\.([A-Z]+)\.\)|IFCLABEL\('([^']*)'\)|IFCTEXT\('([^']*)'\)|IFCINTEGER\((\d+)\)|IFCTHERMALTRANSMITTANCEMEASURE\(([\d.]+)\)|IFCPOSITIVELENGTHMEASURE\(([\d.]+)\)|IFCAREAMEASURE\(([\d.]+)\)/);
+            if (valMatch) {
+              let value: string | number | boolean;
+              if (valMatch[1]) value = parseFloat(valMatch[1]);
+              else if (valMatch[2]) value = valMatch[2] === "TRUE";
+              else if (valMatch[3]) value = valMatch[3];
+              else if (valMatch[4]) value = valMatch[4];
+              else if (valMatch[5]) value = parseInt(valMatch[5]);
+              else if (valMatch[6]) value = parseFloat(valMatch[6]); // ThermalTransmittanceMeasure
+              else if (valMatch[7]) value = parseFloat(valMatch[7]); // PositiveLengthMeasure
+              else if (valMatch[8]) value = parseFloat(valMatch[8]); // AreaMeasure
+              else continue;
+
+              item.properties[propName] = value;
+              psetProperties[propName] = value;
+            }
           }
-          if (qVal.startsWith("IFCQUANTITYLENGTH(")) {
-            const numMatch = qVal.match(/([\d.]+)/g);
-            const len = numMatch?.map(Number).find(n => n > 0 && n < 100000);
-            if (len) item.quantities.length = len;
+
+          // Store properties keyed by property set name
+          if (psetName && Object.keys(psetProperties).length > 0) {
+            item.propertySetData[psetName] = psetProperties;
           }
-          if (qVal.startsWith("IFCQUANTITYWEIGHT(")) {
-            const numMatch = qVal.match(/([\d.]+)/g);
-            const wt = numMatch?.map(Number).find(n => n > 0 && n < 1000000);
-            if (wt) item.quantities.weight = wt;
+
+          // Check for thickness in wall properties
+          const thickness = item.properties["Width"] ?? item.properties["Thickness"] ?? item.properties["NominalThickness"];
+          if (typeof thickness === "number") item.quantities.thickness = thickness;
+
+          // Check for IsExternal
+          if (item.properties["IsExternal"] !== undefined) {
+            item.properties._isExternal = item.properties["IsExternal"];
           }
-        }
-      }
 
-      // Extract from IFCPROPERTYSET
-      if (psetVal.startsWith("IFCPROPERTYSET(")) {
-        // Get the property set name
-        const psetNameMatch = psetVal.match(/'([^']*)'/);
-        const psetName = psetNameMatch?.[1] ?? "";
-
-        const propRefs = psetVal.match(/#\d+/g) || [];
-        const psetProperties: Record<string, string | number | boolean> = {};
-
-        for (const pRef of propRefs) {
-          const propVal = entities.get(pRef);
-          if (!propVal?.startsWith("IFCPROPERTYSINGLEVALUE(")) continue;
-          const propParts = propVal.match(/'([^']*)'/g);
-          const propName = propParts?.[0]?.replace(/'/g, "");
-          if (!propName) continue;
-
-          const valMatch = propVal.match(/IFCREAL\(([\d.]+)\)|IFCBOOLEAN\(\.([A-Z]+)\.\)|IFCLABEL\('([^']*)'\)|IFCTEXT\('([^']*)'\)|IFCINTEGER\((\d+)\)|IFCTHERMALTRANSMITTANCEMEASURE\(([\d.]+)\)|IFCPOSITIVELENGTHMEASURE\(([\d.]+)\)|IFCAREAMEASURE\(([\d.]+)\)/);
-          if (valMatch) {
-            let value: string | number | boolean;
-            if (valMatch[1]) value = parseFloat(valMatch[1]);
-            else if (valMatch[2]) value = valMatch[2] === "TRUE";
-            else if (valMatch[3]) value = valMatch[3];
-            else if (valMatch[4]) value = valMatch[4];
-            else if (valMatch[5]) value = parseInt(valMatch[5]);
-            else if (valMatch[6]) value = parseFloat(valMatch[6]); // ThermalTransmittanceMeasure
-            else if (valMatch[7]) value = parseFloat(valMatch[7]); // PositiveLengthMeasure
-            else if (valMatch[8]) value = parseFloat(valMatch[8]); // AreaMeasure
-            else continue;
-
-            item.properties[propName] = value;
-            psetProperties[propName] = value;
+          // Extract thermal transmittance for walls/windows/doors
+          const thermalU = item.properties["ThermalTransmittance"] as number | undefined;
+          if (thermalU !== undefined && thermalU > 0) {
+            item.properties._thermalTransmittance = thermalU;
           }
-        }
 
-        // Store properties keyed by property set name
-        if (psetName && Object.keys(psetProperties).length > 0) {
-          item.propertySetData[psetName] = psetProperties;
-        }
+          // Extract fire rating
+          const fireRating = item.properties["FireRating"] as string | undefined;
+          if (fireRating) {
+            item.properties._fireRating = fireRating;
+          }
 
-        // Check for thickness in wall properties
-        const thickness = item.properties["Width"] ?? item.properties["Thickness"] ?? item.properties["NominalThickness"];
-        if (typeof thickness === "number") item.quantities.thickness = thickness;
+          // Extract acoustic rating
+          const acousticRating = item.properties["AcousticRating"] as string | number | undefined;
+          if (acousticRating !== undefined) {
+            item.properties._acousticRating = acousticRating;
+          }
 
-        // Check for IsExternal
-        if (item.properties["IsExternal"] !== undefined) {
-          item.properties._isExternal = item.properties["IsExternal"];
-        }
+          // Extract handicap accessible flag (doors)
+          const handicapAccessible = item.properties["HandicapAccessible"] as boolean | undefined;
+          if (handicapAccessible !== undefined) {
+            item.properties._handicapAccessible = handicapAccessible;
+          }
 
-        // Extract thermal transmittance for walls/windows/doors
-        const thermalU = item.properties["ThermalTransmittance"] as number | undefined;
-        if (thermalU !== undefined && thermalU > 0) {
-          item.properties._thermalTransmittance = thermalU;
-        }
-
-        // Extract fire rating
-        const fireRating = item.properties["FireRating"] as string | undefined;
-        if (fireRating) {
-          item.properties._fireRating = fireRating;
-        }
-
-        // Extract acoustic rating
-        const acousticRating = item.properties["AcousticRating"] as string | number | undefined;
-        if (acousticRating !== undefined) {
-          item.properties._acousticRating = acousticRating;
-        }
-
-        // Extract handicap accessible flag (doors)
-        const handicapAccessible = item.properties["HandicapAccessible"] as boolean | undefined;
-        if (handicapAccessible !== undefined) {
-          item.properties._handicapAccessible = handicapAccessible;
-        }
-
-        // Extract solar heat gain coefficient (windows)
-        const solarGain = item.properties["SolarHeatGainCoefficient"] as number | undefined
-          ?? item.properties["GValue"] as number | undefined;
-        if (solarGain !== undefined && solarGain > 0) {
-          item.properties._solarFactor = solarGain;
+          // Extract solar heat gain coefficient (windows)
+          const solarGain = item.properties["SolarHeatGainCoefficient"] as number | undefined
+            ?? item.properties["GValue"] as number | undefined;
+          if (solarGain !== undefined && solarGain > 0) {
+            item.properties._solarFactor = solarGain;
+          }
         }
       }
     }
 
-    // Find material associations
-    for (const [, relVal] of entities) {
-      if (!relVal.startsWith("IFCRELASSOCIATESMATERIAL(")) continue;
-      if (!new RegExp(`${id}[,)\\]]`).test(relVal)) continue;
+    // Find material associations via pre-indexed map
+    const matRefs = materialByEntity.get(id);
+    if (matRefs) {
+      for (const matRefId of matRefs) {
+        const matVal = entities.get(matRefId);
+        if (!matVal) continue;
 
-      const matRef = relVal.match(/(#\d+)\)$/);
-      if (!matRef) continue;
-      const matVal = entities.get(matRef[1]);
-      if (!matVal) continue;
-
-      if (matVal.startsWith("IFCMATERIAL(")) {
-        const mName = matVal.match(/'([^']*)'/);
-        if (mName) item.materials.push(mName[1]);
-      }
-      if (matVal.startsWith("IFCMATERIALLAYERSET(") || matVal.startsWith("IFCMATERIALLAYERSETUSAGE(")) {
-        const layerRefs = matVal.match(/#\d+/g) || [];
-        for (const lRef of layerRefs) {
-          const layerVal = entities.get(lRef);
-          if (layerVal?.startsWith("IFCMATERIALLAYER(")) {
-            const innerRef = layerVal.match(/#\d+/);
-            if (innerRef) {
-              const innerMat = entities.get(innerRef[0]);
-              if (innerMat?.startsWith("IFCMATERIAL(")) {
-                const mName = innerMat.match(/'([^']*)'/);
-                if (mName) item.materials.push(mName[1]);
+        if (matVal.startsWith("IFCMATERIAL(")) {
+          const mName = matVal.match(/'([^']*)'/);
+          if (mName) item.materials.push(mName[1]);
+        }
+        if (matVal.startsWith("IFCMATERIALLAYERSET(") || matVal.startsWith("IFCMATERIALLAYERSETUSAGE(")) {
+          const layerRefs = matVal.match(/#\d+/g) || [];
+          for (const lRef of layerRefs) {
+            const layerVal = entities.get(lRef);
+            if (layerVal?.startsWith("IFCMATERIALLAYER(")) {
+              const innerRef = layerVal.match(/#\d+/);
+              if (innerRef) {
+                const innerMat = entities.get(innerRef[0]);
+                if (innerMat?.startsWith("IFCMATERIAL(")) {
+                  const mName = innerMat.match(/'([^']*)'/);
+                  if (mName) item.materials.push(mName[1]);
+                }
               }
             }
           }
@@ -456,37 +500,25 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
       }
     }
 
-    // Find classification references (keynotes)
-    for (const [, relVal] of entities) {
-      if (!relVal.startsWith("IFCRELASSOCIATESCLASSIFICATION(")) continue;
-      if (!new RegExp(`${id}[,)\\]]`).test(relVal)) continue;
-
-      const classRef = relVal.match(/(#\d+)\)$/);
-      if (!classRef) continue;
-      const classVal = entities.get(classRef[1]);
-      if (classVal?.startsWith("IFCCLASSIFICATIONREFERENCE(")) {
-        const parts = classVal.match(/'([^']*)'/g);
-        item.classification = parts?.[1]?.replace(/'/g, "") ?? parts?.[0]?.replace(/'/g, "");
+    // Find classification references via pre-indexed map
+    const classRefs = classificationByEntity.get(id);
+    if (classRefs) {
+      for (const classRefId of classRefs) {
+        const classVal = entities.get(classRefId);
+        if (classVal?.startsWith("IFCCLASSIFICATIONREFERENCE(")) {
+          const parts = classVal.match(/'([^']*)'/g);
+          item.classification = parts?.[1]?.replace(/'/g, "") ?? parts?.[0]?.replace(/'/g, "");
+        }
       }
     }
 
-    // Find storey containment via IFCRELCONTAINEDINSPATIALSTRUCTURE
-    // Format: IFCRELCONTAINEDINSPATIALSTRUCTURE('guid',#owner,$,$,(#el1,#el2,...),#storey)
-    for (const [, relVal] of entities) {
-      if (!relVal.startsWith("IFCRELCONTAINEDINSPATIALSTRUCTURE(")) continue;
-      // Use word-boundary-safe check: id must be followed by , or ) not another digit
-      if (!new RegExp(`${id}[,)\\]]`).test(relVal)) continue;
-
-      // Last #ref before closing ) is the spatial structure element (storey)
-      const storeyRef = relVal.match(/(#\d+)\)$/);
-      if (!storeyRef) continue;
-      const storeyVal = entities.get(storeyRef[1]);
+    // Find storey containment via pre-indexed IFCRELCONTAINEDINSPATIALSTRUCTURE map
+    const storeyRefId = containmentByEntity.get(id);
+    if (storeyRefId) {
+      const storeyVal = entities.get(storeyRefId);
       if (storeyVal?.startsWith("IFCBUILDINGSTOREY(")) {
-        // IFCBUILDINGSTOREY('GlobalId', #OwnerHistory, 'Name', 'Description', ...)
-        // parts[0] = GlobalId, parts[1] = Name
         const parts = storeyVal.match(/'([^']*)'/g);
         const rawStorey = parts?.[1]?.replace(/'/g, "") || parts?.[0]?.replace(/'/g, "");
-        // Decode IFC encoded text (\X\HH for non-ASCII, e.g. \X\E3 = ã)
         item.storey = rawStorey?.replace(/\\X\\([0-9A-Fa-f]{2})/g,
           (_, hex) => String.fromCharCode(parseInt(hex, 16)));
       }

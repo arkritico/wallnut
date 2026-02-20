@@ -12,6 +12,7 @@
  *   - IFC only → auto-generate BOQ from IFC, then cost/schedule/compliance
  *   - BOQ only → skip IFC enrichment, cost/schedule/compliance
  *   - IFC + BOQ → use uploaded BOQ, enrich with IFC data
+ *   - XML → import MS Project schedule, apply optimizations
  *   - PDF only → extract text, AI parse, compliance
  *   - Any combination → combine all available data
  */
@@ -27,6 +28,7 @@ import type { ElementTaskMappingResult } from "./element-task-mapper";
 import type { CashFlowResult } from "./cashflow";
 import type { ReconciledBoq } from "./boq-reconciliation";
 import type { ParsedBoq } from "./xlsx-parser";
+import type { ScheduleDiagnostic } from "./msproject-import";
 
 // ============================================================
 // Types
@@ -80,6 +82,10 @@ export interface UnifiedPipelineResult {
   reconciledBoq?: ReconciledBoq;
   parsedBoq?: ParsedBoq;
   complianceExcel?: ArrayBuffer;
+  /** Imported schedule from MS Project XML (before optimization) */
+  importedSchedule?: ProjectSchedule;
+  /** Import diagnostics/suggestions from XML schedule */
+  scheduleDiagnostics?: ScheduleDiagnostic[];
   /** Raw IFC file bytes for 4D viewer (client-side only, not serialized to server) */
   ifcFileData?: Uint8Array;
   /** Original IFC file name */
@@ -96,6 +102,7 @@ interface ClassifiedFiles {
   ifc: File[];
   boq: File[];  // xls, xlsx, csv
   pdf: File[];
+  schedule: File[];  // xml (MS Project)
   other: File[];
 }
 
@@ -156,7 +163,7 @@ function createProgressReporter(onProgress?: (progress: UnifiedProgress) => void
 // ============================================================
 
 function classifyFiles(files: File[]): ClassifiedFiles {
-  const result: ClassifiedFiles = { ifc: [], boq: [], pdf: [], other: [] };
+  const result: ClassifiedFiles = { ifc: [], boq: [], pdf: [], schedule: [], other: [] };
 
   for (const file of files) {
     const ext = file.name.split(".").pop()?.toLowerCase() ?? "";
@@ -167,6 +174,8 @@ function classifyFiles(files: File[]): ClassifiedFiles {
       result.boq.push(file);
     } else if (ext === "pdf") {
       result.pdf.push(file);
+    } else if (ext === "xml") {
+      result.schedule.push(file);
     } else {
       result.other.push(file);
     }
@@ -183,13 +192,14 @@ function classifyFiles(files: File[]): ClassifiedFiles {
  * Run the unified multi-file pipeline.
  *
  * Stages:
- *   1. Classify — sort files by type (IFC/BOQ/PDF)
+ *   1. Classify — sort files by type (IFC/BOQ/PDF/XML)
  *   2. Parse IFC — analyze IFC files, extract quantities, enrich project
  *   3. Parse BOQ — parse uploaded spreadsheet OR generate from IFC
+ *   3b. Parse XML — import MS Project schedule (if provided)
  *   4. Parse PDF — split large PDFs, extract text, AI parse
  *   5. Analyze — regulatory compliance analysis
  *   6. Estimate — CYPE match + cost + labor constraints
- *   7. Schedule — construction sequencing with CCPM
+ *   7. Schedule — use imported schedule OR generate with CCPM
  *   8. Export — generate downloadable outputs
  */
 export async function runUnifiedPipeline(
@@ -204,8 +214,8 @@ export async function runUnifiedPipeline(
   progress.report("classify", "A classificar ficheiros...");
   const classified = classifyFiles(input.files);
 
-  if (classified.ifc.length === 0 && classified.boq.length === 0 && classified.pdf.length === 0) {
-    warnings.push("Nenhum ficheiro reconhecido (IFC, XLS/XLSX, PDF).");
+  if (classified.ifc.length === 0 && classified.boq.length === 0 && classified.pdf.length === 0 && classified.schedule.length === 0) {
+    warnings.push("Nenhum ficheiro reconhecido (IFC, XLS/XLSX, PDF, XML).");
   }
 
   progress.completeStage("classify");
@@ -231,6 +241,8 @@ export async function runUnifiedPipeline(
   let ccpmGanttExcel: ArrayBuffer | undefined;
   let parsedBoq: ParsedBoq | undefined;
   let reconciledBoq: ReconciledBoq | undefined;
+  let importedSchedule: ProjectSchedule | undefined;
+  let scheduleDiagnostics: ScheduleDiagnostic[] | undefined;
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -369,6 +381,56 @@ export async function runUnifiedPipeline(
   }
 
   progress.completeStage("parse_boq");
+
+  // ─── Stage 3b: Parse Schedule XML ──────────────────────────
+  if (classified.schedule.length > 0) {
+    progress.reportPartial("parse_boq", 0.9, "A importar cronograma MS Project...");
+
+    try {
+      const { parseMSProjectXML, isMSProjectXML } = await import("./msproject-import");
+
+      for (const file of classified.schedule) {
+        const text = await file.text();
+        if (!isMSProjectXML(text)) {
+          warnings.push(`${file.name} não é um ficheiro MS Project XML válido.`);
+          continue;
+        }
+
+        const importResult = parseMSProjectXML(text);
+        importedSchedule = importResult.schedule;
+        scheduleDiagnostics = importResult.diagnostics;
+
+        // If no WBS from BOQ, use the schedule's extracted WBS
+        if (!wbsProject) {
+          wbsProject = importResult.wbsProject;
+          warnings.push(
+            `WBS extraído do cronograma ${file.name} (${importResult.wbsProject.chapters.length} capítulos).`,
+          );
+        }
+
+        // Set project name from imported schedule if not already set
+        if (importedSchedule.projectName && !project.name) {
+          project.name = importedSchedule.projectName;
+        }
+
+        // Collect warning-level diagnostics
+        for (const d of importResult.diagnostics.filter((d) => d.type === "warning")) {
+          warnings.push(d.message);
+        }
+
+        if (classified.schedule.length > 1) {
+          warnings.push(
+            `Múltiplos ficheiros XML enviados. Apenas o primeiro (${file.name}) foi utilizado.`,
+          );
+        }
+        break; // Use first valid XML only
+      }
+    } catch (err) {
+      warnings.push(
+        `Erro ao importar cronograma XML: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
 
   // ─── Stage 4: Parse PDF ────────────────────────────────────
   progress.report("parse_pdf", "A extrair texto de documentos PDF...");
@@ -548,46 +610,84 @@ export async function runUnifiedPipeline(
   }
 
   // ─── Stage 7: Schedule ─────────────────────────────────────
-  if (opts.includeSchedule !== false && wbsProject && matchReport) {
+  if (opts.includeSchedule !== false) {
     progress.report("schedule", "A gerar cronograma de obra...");
 
-    try {
-      const { generateSchedule } = await import("./construction-sequencer");
-      const { aggregateProjectResources } = await import("./resource-aggregator");
+    if (importedSchedule) {
+      // User provided a MS Project XML schedule — use it as base
+      schedule = importedSchedule;
+      warnings.push(
+        `Cronograma importado: ${schedule.tasks.length} tarefas, duração ${schedule.totalDurationDays} dias.`,
+      );
 
-      const maxWorkers = laborConstraint?.maxWorkers ?? 10;
-      const scheduleOpts = {
-        maxWorkers,
-        useCriticalChain: true,
-        safetyReduction: 0.5,
-        projectBufferRatio: 0.5,
-        feedingBufferRatio: 0.5,
-      };
-      schedule = generateSchedule(wbsProject, matchReport.matches, scheduleOpts);
-      resources = aggregateProjectResources(wbsProject, matchReport.matches, schedule);
+      // Aggregate resources from the imported schedule if we have WBS + match data
+      if (wbsProject && matchReport) {
+        try {
+          const { aggregateProjectResources } = await import("./resource-aggregator");
+          resources = aggregateProjectResources(wbsProject, matchReport.matches, schedule);
+        } catch {
+          // Non-critical: resource aggregation from imported schedule
+        }
+      }
 
-      // Post-optimization: resource leveling + equipment conflict resolution
+      // Apply resource optimization on imported schedule
+      if (resources) {
+        try {
+          const { optimizeSchedule } = await import("./site-capacity-optimizer");
+          const optimized = optimizeSchedule(schedule, resources);
+          const optimizedFinish = optimized.optimizedTasks
+            .filter(t => !t.isSummary)
+            .reduce((latest, t) => t.finishDate > latest ? t.finishDate : latest, schedule.startDate);
+          schedule = {
+            ...schedule,
+            tasks: optimized.optimizedTasks,
+            finishDate: optimizedFinish,
+          };
+        } catch (optErr) {
+          warnings.push(
+            `Otimização de recursos falhou (cronograma importado mantido): ${optErr instanceof Error ? optErr.message : String(optErr)}`,
+          );
+        }
+      }
+    } else if (wbsProject && matchReport) {
+      // No imported schedule — generate from scratch
       try {
-        const { optimizeSchedule } = await import("./site-capacity-optimizer");
-        const optimized = optimizeSchedule(schedule, resources);
-        // Apply optimized tasks back to schedule
-        const optimizedFinish = optimized.optimizedTasks
-          .filter(t => !t.isSummary)
-          .reduce((latest, t) => t.finishDate > latest ? t.finishDate : latest, schedule.startDate);
-        schedule = {
-          ...schedule,
-          tasks: optimized.optimizedTasks,
-          finishDate: optimizedFinish,
+        const { generateSchedule } = await import("./construction-sequencer");
+        const { aggregateProjectResources } = await import("./resource-aggregator");
+
+        const maxWorkers = laborConstraint?.maxWorkers ?? 10;
+        const scheduleOpts = {
+          maxWorkers,
+          useCriticalChain: true,
+          safetyReduction: 0.5,
+          projectBufferRatio: 0.5,
+          feedingBufferRatio: 0.5,
         };
-      } catch (optErr) {
+        schedule = generateSchedule(wbsProject, matchReport.matches, scheduleOpts);
+        resources = aggregateProjectResources(wbsProject, matchReport.matches, schedule);
+
+        // Post-optimization: resource leveling + equipment conflict resolution
+        try {
+          const { optimizeSchedule } = await import("./site-capacity-optimizer");
+          const optimized = optimizeSchedule(schedule, resources);
+          const optimizedFinish = optimized.optimizedTasks
+            .filter(t => !t.isSummary)
+            .reduce((latest, t) => t.finishDate > latest ? t.finishDate : latest, schedule.startDate);
+          schedule = {
+            ...schedule,
+            tasks: optimized.optimizedTasks,
+            finishDate: optimizedFinish,
+          };
+        } catch (optErr) {
+          warnings.push(
+            `Otimização de recursos falhou (cronograma base mantido): ${optErr instanceof Error ? optErr.message : String(optErr)}`,
+          );
+        }
+      } catch (err) {
         warnings.push(
-          `Otimização de recursos falhou (cronograma base mantido): ${optErr instanceof Error ? optErr.message : String(optErr)}`,
+          `Geração de cronograma falhou: ${err instanceof Error ? err.message : String(err)}`,
         );
       }
-    } catch (err) {
-      warnings.push(
-        `Geração de cronograma falhou: ${err instanceof Error ? err.message : String(err)}`,
-      );
     }
   }
 
@@ -707,6 +807,8 @@ export async function runUnifiedPipeline(
     msProjectXml,
     ccpmGanttExcel,
     complianceExcel,
+    importedSchedule,
+    scheduleDiagnostics,
     warnings,
     processingTimeMs,
   };

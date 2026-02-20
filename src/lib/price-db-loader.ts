@@ -151,6 +151,11 @@ function inferRegulationAreas(category: string, description: string): Regulation
 // PATTERN GENERATION
 // ============================================================================
 
+/** Escape regex metacharacters in a string */
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
  * Generate search patterns from Price description
  */
@@ -171,8 +176,8 @@ function generatePatterns(description: string, category: string, code: string): 
     .slice(0, 5);
 
   if (words.length >= 2) {
-    // Create pattern from first 2-3 words
-    const keyPhrase = words.slice(0, 3).join('.*');
+    // Create pattern from first 2-3 words (escape metacharacters)
+    const keyPhrase = words.slice(0, 3).map(escapeRegex).join('.*');
     patterns.push(new RegExp(keyPhrase, 'i'));
   }
 
@@ -190,10 +195,10 @@ function generatePatterns(description: string, category: string, code: string): 
     .slice(-2); // Last 2 words from category
 
   if (catWords.length > 0) {
-    patterns.push(new RegExp(catWords.join('.*'), 'i'));
+    patterns.push(new RegExp(catWords.map(escapeRegex).join('.*'), 'i'));
   }
 
-  return patterns.length > 0 ? patterns : [new RegExp(cleanDesc.substring(0, 20), 'i')];
+  return patterns.length > 0 ? patterns : [new RegExp(escapeRegex(cleanDesc.substring(0, 20)), 'i')];
 }
 
 // ============================================================================

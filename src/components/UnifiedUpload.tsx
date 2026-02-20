@@ -85,6 +85,7 @@ function fileBadge(name: string): { label: string; className: string } {
   if (ext === "pdf") return { label: "PDF", className: "bg-blue-100 text-blue-700" };
   if (["xls", "xlsx", "csv"].includes(ext))
     return { label: ext.toUpperCase(), className: "bg-green-100 text-green-700" };
+  if (ext === "xml") return { label: "XML", className: "bg-orange-100 text-orange-700" };
   return { label: ext.toUpperCase() || "?", className: "bg-gray-100 text-gray-500" };
 }
 
@@ -145,7 +146,7 @@ export default function UnifiedUpload({
     dropHere: lang === "pt"
       ? "Arraste ficheiros ou clique para selecionar"
       : "Drop files or click to select",
-    acceptedTypes: ".ifc, .pdf, .xls, .xlsx, .csv",
+    acceptedTypes: ".ifc, .pdf, .xls, .xlsx, .csv, .xml",
     processing: lang === "pt" ? "A processar..." : "Processing...",
     process: lang === "pt" ? "Processar Projeto" : "Process Project",
     budget: lang === "pt" ? "Orçamento (Budget Excel)" : "Budget Excel",
@@ -283,7 +284,7 @@ export default function UnifiedUpload({
 
   // ── File handling ─────────────────────────────────────────
 
-  const ACCEPTED_EXTENSIONS = new Set(["ifc", "pdf", "xls", "xlsx", "csv"]);
+  const ACCEPTED_EXTENSIONS = new Set(["ifc", "pdf", "xls", "xlsx", "csv", "xml"]);
 
   const addFiles = useCallback((newFiles: FileList | File[]) => {
     const accepted: File[] = [];
@@ -519,7 +520,7 @@ export default function UnifiedUpload({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".ifc,.pdf,.xls,.xlsx,.csv"
+          accept=".ifc,.pdf,.xls,.xlsx,.csv,.xml"
           multiple
           onChange={handleInputChange}
           className="hidden"
@@ -807,6 +808,12 @@ export default function UnifiedUpload({
               {txt.cachedResult}
             </span>
           )}
+          {result.importedSchedule && (
+            <span className="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 rounded-full px-2.5 py-1 border border-orange-200">
+              <Clock className="w-3 h-3" />
+              {lang === "pt" ? "Cronograma importado" : "Imported schedule"}
+            </span>
+          )}
         </div>
 
         {/* Key metrics */}
@@ -928,6 +935,19 @@ export default function UnifiedUpload({
                 +{result.warnings.length - 5} {lang === "pt" ? "mais" : "more"}
               </p>
             )}
+          </div>
+        )}
+
+        {/* Schedule diagnostics (suggestions from imported XML) */}
+        {result.scheduleDiagnostics && result.scheduleDiagnostics.filter((d) => d.type === "suggestion").length > 0 && (
+          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 space-y-1">
+            <p className="font-medium flex items-center gap-1">
+              <AlertTriangle className="w-4 h-4" />
+              {lang === "pt" ? "Sugestões de melhoria" : "Improvement suggestions"}
+            </p>
+            {result.scheduleDiagnostics.filter((d) => d.type === "suggestion").map((d, i) => (
+              <p key={i} className="text-xs">{d.message}</p>
+            ))}
           </div>
         )}
 

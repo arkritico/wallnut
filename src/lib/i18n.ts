@@ -255,8 +255,12 @@ export interface Translations {
   capCostDesc: string;
   capScheduleTitle: string;
   capScheduleDesc: string;
+  cap4DTitle: string;
+  cap4DDesc: string;
   capComplianceTitle: string;
   capComplianceDesc: string;
+  capRegAITitle: string;
+  capRegAIDesc: string;
 
   // Earned Value Management
   evmTitle: string;
@@ -521,15 +525,19 @@ const pt: Translations = {
   twoFactorRequired: "Autenticação de 2 fatores obrigatória.",
 
   heroHeadline: "Do projeto à obra.",
-  heroSubline: "Submeta os ficheiros do seu projeto e receba uma estimativa de custos rigorosa, um planeamento de obra realista e a verificação de conformidade regulamentar completa.",
-  inputFormats: "IFC · PDF · XLS · DWFx",
+  heroSubline: "Modelo BIM e documentos de projeto entram. Orçamento, planeamento, simulação 4D e conformidade regulamentar saem — automaticamente.",
+  inputFormats: "IFC · PDF · XLS",
   inputFormatsDesc: "Qualquer nível de desenvolvimento",
-  capCostTitle: "Estimativa de Custos",
-  capCostDesc: "Base de preços com mão de obra, materiais e equipamentos. Ligação automática entre modelo IFC e Mapa de Quantidades por keynotes — ou MQT extrapolado com máximo rigor quando ausente.",
-  capScheduleTitle: "Planeamento de Obra",
-  capScheduleDesc: "Ficheiro MS Project com feriados portugueses, custos por recurso e mão de obra dimensionada à realidade da obra. Simulação 4D sobre o modelo BIM e gestão de valor ganho (EVM).",
+  capCostTitle: "Orçamentação",
+  capCostDesc: "Base de preços CYPE com mão de obra, materiais e equipamentos. Ligação automática entre modelo IFC e Mapa de Quantidades por keynotes.",
+  capScheduleTitle: "Planeamento CCPM",
+  capScheduleDesc: "30 fases de construção, feriados portugueses, recursos dimensionados à realidade da obra. Exportação direta para MS Project.",
+  cap4DTitle: "Simulação 4D",
+  cap4DDesc: "Reproduza a sequência construtiva sobre o modelo BIM. Acompanhe o progresso com gestão de valor ganho (EVM) integrada.",
   capComplianceTitle: "Conformidade Regulamentar",
-  capComplianceDesc: "Mais de 7.000 regras em 18 especialidades. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocódigos, DL 163/2006 e regulamentação municipal — verificação automática.",
+  capComplianceDesc: "Mais de 7.000 regras declarativas em 18 especialidades — SCIE, REH, RTIEBT, Eurocódigos, ITED/ITUR e mais — verificadas automaticamente.",
+  capRegAITitle: "Assistente Regulamentar",
+  capRegAIDesc: "Pergunte sobre qualquer regra em linguagem natural. Análise cruzada entre especialidades e navegação interativa por grafo 3D.",
 
   evmTitle: "Valor Ganho (EVM)",
   evmBaseline: "Linha de Base",
@@ -792,15 +800,19 @@ const en: Translations = {
   twoFactorRequired: "Two-factor authentication required.",
 
   heroHeadline: "From project to site.",
-  heroSubline: "Submit your project files and receive a rigorous cost estimate, a realistic construction schedule, and complete regulatory compliance verification.",
-  inputFormats: "IFC · PDF · XLS · DWFx",
+  heroSubline: "BIM model and project documents go in. Budget, schedule, 4D simulation, and regulatory compliance come out — automatically.",
+  inputFormats: "IFC · PDF · XLS",
   inputFormatsDesc: "Any level of development",
   capCostTitle: "Cost Estimation",
-  capCostDesc: "Price database with labor, materials, and equipment. Automatic linking between IFC model and Bill of Quantities via keynotes — or BOQ extrapolated with maximum rigor when absent.",
-  capScheduleTitle: "Construction Scheduling",
-  capScheduleDesc: "MS Project file with Portuguese holidays, resource costs, and workforce sized to the project's reality. 4D simulation over BIM model and Earned Value Management (EVM).",
+  capCostDesc: "CYPE price database with labor, materials, and equipment. Automatic IFC-to-BOQ linking via keynotes.",
+  capScheduleTitle: "CCPM Scheduling",
+  capScheduleDesc: "30 construction phases, Portuguese holidays, workforce sized to project reality. Direct MS Project export.",
+  cap4DTitle: "4D Simulation",
+  cap4DDesc: "Play the construction sequence over the BIM model. Track progress with integrated Earned Value Management (EVM).",
   capComplianceTitle: "Regulatory Compliance",
-  capComplianceDesc: "Over 7,000 rules across 18 specialties. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocodes, DL 163/2006, and municipal regulations — automatically verified.",
+  capComplianceDesc: "Over 7,000 declarative rules across 18 specialties — SCIE, REH, RTIEBT, Eurocodes, ITED/ITUR and more — automatically verified.",
+  capRegAITitle: "Regulation Assistant",
+  capRegAIDesc: "Ask about any rule in natural language. Cross-specialty analysis and interactive 3D graph navigation.",
 
   evmTitle: "Earned Value (EVM)",
   evmBaseline: "Baseline",
