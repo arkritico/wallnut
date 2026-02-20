@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildProjectContext, analyzeRuleCoverage } from "@/lib/context-builder";
+import { buildProjectContext, analyzeRuleCoverage, analyzeValidationAutomation } from "@/lib/context-builder";
 import type { BuildContextOptions, FieldMapping, ContextBuildReport } from "@/lib/context-builder";
 import { DEFAULT_PROJECT } from "@/lib/defaults";
 import type { BuildingProject } from "@/lib/types";
@@ -754,5 +754,98 @@ describe("buildProjectContext — field mapping defaults", () => {
 
     expect(section).toBeDefined();
     expect(section.mappedField).toBe(42);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// analyzeValidationAutomation
+// ---------------------------------------------------------------------------
+
+describe("analyzeValidationAutomation", () => {
+  it("categorizes rules by automation level", () => {
+    const project = createProject({ buildingType: "residential" });
+    const { enriched, report } = buildProjectContext(project, { applySmartDefaults: true });
+
+    // Rules that check fields from IFC (via defaults for this test)
+    const rules = [
+      {
+        id: "rule-1",
+        conditions: [{ field: "fireSafety.riskCategory", operator: "equals" }],
+      },
+      {
+        id: "rule-2",
+        conditions: [{ field: "general.bedroomArea", operator: "gte" }],
+      },
+      {
+        id: "rule-3",
+        conditions: [
+          { field: "nonexistent.field1", operator: "gte" },
+          { field: "nonexistent.field2", operator: "lte" },
+        ],
+      },
+    ];
+
+    const result = analyzeValidationAutomation(report, rules, enriched);
+
+    expect(result.totalRules).toBe(3);
+    // Rules 1 and 2 should be evaluable (from defaults)
+    expect(result.fullyAutomated + result.evaluableWithDefaults).toBeGreaterThanOrEqual(2);
+    // Rule 3 should need input
+    expect(result.needsManualInput).toBeGreaterThanOrEqual(1);
+  });
+
+  it("identifies high-impact missing fields", () => {
+    const project = createProject({ buildingType: "residential" });
+    const { enriched, report } = buildProjectContext(project, { applySmartDefaults: false });
+
+    const rules = [
+      { id: "r1", conditions: [{ field: "missing.field", operator: "gt" }] },
+      { id: "r2", conditions: [{ field: "missing.field", operator: "lt" }] },
+      { id: "r3", conditions: [{ field: "missing.field", operator: "eq" }] },
+      { id: "r4", conditions: [{ field: "other.missing", operator: "gt" }] },
+    ];
+
+    const result = analyzeValidationAutomation(report, rules, enriched);
+
+    expect(result.highImpactFields.length).toBeGreaterThan(0);
+    // "missing.field" blocks 3 rules, should be top
+    expect(result.highImpactFields[0].field).toBe("missing.field");
+    expect(result.highImpactFields[0].rulesBlocked).toBe(3);
+  });
+
+  it("returns per-namespace breakdown", () => {
+    const project = createProject({ buildingType: "residential" });
+    const { enriched, report } = buildProjectContext(project, { applySmartDefaults: true });
+
+    const rules = [
+      { id: "r1", conditions: [{ field: "fireSafety.riskCategory", operator: "equals" }] },
+      { id: "r2", conditions: [{ field: "fireSafety.buildingHeight", operator: "gte" }] },
+      { id: "r3", conditions: [{ field: "general.bedroomArea", operator: "gte" }] },
+    ];
+
+    const result = analyzeValidationAutomation(report, rules, enriched);
+
+    expect(result.byNamespace.fireSafety).toBeDefined();
+    expect(result.byNamespace.fireSafety.total).toBe(2);
+    expect(result.byNamespace.general).toBeDefined();
+    expect(result.byNamespace.general.total).toBe(1);
+  });
+
+  it("reports 100% automation when all fields available from IFC", () => {
+    const project = createProject({ buildingType: "residential" });
+    const { enriched, report } = buildProjectContext(project, { applySmartDefaults: true });
+
+    // Simulate IFC-resolved fields
+    report.fromIfc.push("fireSafety.riskCategory", "general.bedroomArea");
+
+    const rules = [
+      { id: "r1", conditions: [{ field: "fireSafety.riskCategory", operator: "equals" }] },
+      { id: "r2", conditions: [{ field: "general.bedroomArea", operator: "gte" }] },
+    ];
+
+    const result = analyzeValidationAutomation(report, rules, enriched);
+
+    expect(result.fullyAutomated).toBe(2);
+    expect(result.automationPercentage).toBe(100);
   });
 });

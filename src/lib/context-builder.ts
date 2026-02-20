@@ -1249,3 +1249,132 @@ export function analyzeRuleCoverage(
     byNamespace,
   };
 }
+
+// ----------------------------------------------------------
+// Validation Automation Report
+// ----------------------------------------------------------
+
+export type FieldDataSource = "ifc-resolved" | "ifc-computed" | "location-derived" | "smart-default" | "form-input" | "missing";
+
+export interface ValidationAutomationReport {
+  /** Total rules analyzed */
+  totalRules: number;
+  /** Rules fully auto-evaluable (all fields from IFC/computed/location) */
+  fullyAutomated: number;
+  /** Rules evaluable with defaults filling gaps */
+  evaluableWithDefaults: number;
+  /** Rules that need at least one manual input field */
+  needsManualInput: number;
+  /** Percentage of rules fully automatable */
+  automationPercentage: number;
+  /** Per-rule breakdown */
+  ruleBreakdown: Array<{
+    ruleId: string;
+    status: "automated" | "defaults-assisted" | "needs-input";
+    fieldsFromIfc: string[];
+    fieldsFromDefaults: string[];
+    fieldsMissing: string[];
+  }>;
+  /** Per-namespace summary */
+  byNamespace: Record<string, {
+    total: number;
+    automated: number;
+    defaultsAssisted: number;
+    needsInput: number;
+  }>;
+  /** Fields that would unlock the most rules if provided */
+  highImpactFields: Array<{ field: string; rulesBlocked: number }>;
+}
+
+/**
+ * Analyze which rules can be fully auto-validated from IFC + computed data,
+ * which need defaults, and which still require manual input.
+ *
+ * This gives users a clear picture of the automation pipeline:
+ * IFC upload → spatial resolver → computed fields → defaults → what's left?
+ */
+export function analyzeValidationAutomation(
+  report: ContextBuildReport,
+  rules: Array<{ id: string; conditions: Array<{ field: string; operator: string }> }>,
+  enriched: BuildingProject
+): ValidationAutomationReport {
+  const data = enriched as unknown as Record<string, unknown>;
+  const ifcFields = new Set(report.fromIfc);
+  const defaultFields = new Set(report.fromDefaults);
+  const locationFields = new Set(report.fromLocation);
+
+  let fullyAutomated = 0;
+  let evaluableWithDefaults = 0;
+  let needsManualInput = 0;
+  const ruleBreakdown: ValidationAutomationReport["ruleBreakdown"] = [];
+  const byNamespace: ValidationAutomationReport["byNamespace"] = {};
+  const fieldBlockCount = new Map<string, number>();
+
+  for (const rule of rules) {
+    const ns = rule.conditions[0]?.field.split(".")[0] ?? "unknown";
+    if (!byNamespace[ns]) byNamespace[ns] = { total: 0, automated: 0, defaultsAssisted: 0, needsInput: 0 };
+    byNamespace[ns].total++;
+
+    const fieldsFromIfc: string[] = [];
+    const fieldsFromDefaults: string[] = [];
+    const fieldsMissing: string[] = [];
+    let hasDefaultFill = false;
+    let hasMissing = false;
+
+    for (const cond of rule.conditions) {
+      if (cond.operator === "not_exists" || cond.operator.startsWith("lookup_")) continue;
+
+      const field = cond.field;
+      const value = getFieldValue(data, field);
+
+      if (ifcFields.has(field) || locationFields.has(field)) {
+        fieldsFromIfc.push(field);
+      } else if (defaultFields.has(field)) {
+        fieldsFromDefaults.push(field);
+        hasDefaultFill = true;
+      } else if (value !== undefined) {
+        // From form input or cross-population
+        fieldsFromIfc.push(field);
+      } else {
+        fieldsMissing.push(field);
+        hasMissing = true;
+        fieldBlockCount.set(field, (fieldBlockCount.get(field) ?? 0) + 1);
+      }
+    }
+
+    let status: "automated" | "defaults-assisted" | "needs-input";
+    if (hasMissing) {
+      status = "needs-input";
+      needsManualInput++;
+      byNamespace[ns].needsInput++;
+    } else if (hasDefaultFill) {
+      status = "defaults-assisted";
+      evaluableWithDefaults++;
+      byNamespace[ns].defaultsAssisted++;
+    } else {
+      status = "automated";
+      fullyAutomated++;
+      byNamespace[ns].automated++;
+    }
+
+    ruleBreakdown.push({ ruleId: rule.id, status, fieldsFromIfc, fieldsFromDefaults, fieldsMissing });
+  }
+
+  // Sort high-impact fields by rules blocked (descending)
+  const highImpactFields = Array.from(fieldBlockCount.entries())
+    .map(([field, rulesBlocked]) => ({ field, rulesBlocked }))
+    .sort((a, b) => b.rulesBlocked - a.rulesBlocked)
+    .slice(0, 20);
+
+  const totalRules = rules.length;
+  return {
+    totalRules,
+    fullyAutomated,
+    evaluableWithDefaults,
+    needsManualInput,
+    automationPercentage: totalRules > 0 ? Math.round((fullyAutomated / totalRules) * 100) : 0,
+    ruleBreakdown,
+    byNamespace,
+    highImpactFields,
+  };
+}

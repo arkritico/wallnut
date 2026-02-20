@@ -412,6 +412,7 @@ const SPACE_PATTERNS: Record<string, string[]> = {
   garage:    ["garagem", "garage", "parking", "estacion"],
   storage:   ["arrumo", "storage", "despensa", "pantry"],
   laundry:   ["lavandaria", "laundry"],
+  lobby:     ["hall", "lobby", "entrada", "vestíbulo", "átrio", "entry"],
 };
 
 function spaceMatchesType(space: IfcQuantityData, type: string): boolean {
@@ -445,26 +446,45 @@ function getSpaceArea(space: IfcQuantityData): number | undefined {
 const COMPUTED_TO_RULE_FIELDS: [string, string[]][] = [
   // Room areas (RGEU compliance)
   ["computed.minBedroomArea",     ["general.bedroomArea"]],
-  ["computed.maxBedroomArea",     ["general.mainBedroomArea"]],
-  ["computed.minBathroomArea",    ["general.wcArea"]],
-  ["computed.minKitchenArea",     ["general.kitchenArea"]],
-  ["computed.minLivingArea",      ["general.livingRoomArea"]],
+  ["computed.maxBedroomArea",     ["general.mainBedroomArea", "architecture.mainBedroomArea"]],
+  ["computed.minBathroomArea",    ["general.wcArea", "architecture.bathroomArea"]],
+  ["computed.minKitchenArea",     ["general.kitchenArea", "architecture.kitchenArea"]],
+  ["computed.minLivingArea",      ["general.livingRoomArea", "architecture.livingRoomArea"]],
   ["computed.minStorageArea",     ["general.storageArea", "general.pantryArea"]],
+  // Room widths
+  ["computed.minBedroomWidth",    ["general.bedroomWidth", "general.mainBedroomWidth"]],
+  ["computed.minKitchenWidth",    ["general.kitchenWidth"]],
+  ["computed.minBathroomWidth",   ["general.wcWidth"]],
+  ["computed.minLivingWidth",     ["general.livingRoomWidth"]],
   // Room counts
   ["computed.bedroomCount",       ["general.numBedrooms", "architecture.numberOfBedrooms"]],
-  ["computed.bathroomCount",      ["general.numBathrooms"]],
+  ["computed.bathroomCount",      ["general.numBathrooms", "architecture.numberOfBathrooms"]],
   // Widths — corridors, doors
   ["computed.minCorridorWidth",   ["general.corridorWidth", "general.commonCorridorWidth", "accessibility.corridorWidths"]],
   ["computed.minDoorWidth",       ["general.interiorDoorWidth", "accessibility.doorWidths"]],
   // Heights
-  ["computed.minCeilingHeight",   ["architecture.ceilingHeight", "general.nonHabitableHeight"]],
+  ["computed.minCeilingHeight",   ["architecture.ceilingHeight", "general.nonHabitableHeight", "acoustic.ceilingHeight"]],
+  // Building-level derived
+  ["computed.numberOfFloors",     ["general.floorsAboveGround", "architecture.numberOfFloors"]],
+  ["computed.buildingHeight",     ["fireSafety.buildingHeight", "architecture.buildingHeight"]],
+  ["computed.grossFloorArea",     ["architecture.grossFloorArea"]],
   // Areas — building level
-  ["computed.totalUsableArea",    ["architecture.totalUsableArea"]],
+  ["computed.totalUsableArea",    ["architecture.totalUsableArea", "general.totalDwellingArea"]],
   ["computed.maxCompartmentArea", ["fireSafety.compartmentArea"]],
+  // Typology inference
+  ["computed.typology",           ["general.typology", "architecture.typology"]],
+  ["computed.isMultifamily",      ["general.isMultifamily", "architecture.isMultifamily"]],
+  // Fire safety derived
+  ["computed.occupantLoad",       ["fireSafety.occupantLoad"]],
+  ["computed.riskCategory",       ["fireSafety.riskCategory"]],
   // Envelope
   ["computed.windowToWallRatio",  ["envelope.windowToWallRatio"]],
+  ["computed.windowToFloorRatio", ["envelope.windowToFloorRatio"]],
   ["computed.totalWindowArea",    ["envelope.windowArea"]],
   ["computed.totalExtWallArea",   ["envelope.externalWallArea"]],
+  // Garage
+  ["computed.minGarageArea",      ["architecture.garageArea"]],
+  ["computed.minGarageHeight",    ["general.garageHeight", "architecture.garageCeilingHeight"]],
   // Stair dimensions
   ["computed.minStairWidth",      ["general.stairWidth", "general.commonStairWidth", "accessibility.stairWidth", "architecture.commonStairWidth"]],
   ["computed.stairRiserHeight",   ["general.stairRiserHeight", "accessibility.stairRiserHeight"]],
@@ -472,6 +492,14 @@ const COMPUTED_TO_RULE_FIELDS: [string, string[]][] = [
   // Ramp dimensions
   ["computed.rampSlope",          ["general.accessRampSlope", "general.accessibleRampSlope", "accessibility.rampGradient"]],
   ["computed.minRampWidth",       ["accessibility.rampWidth"]],
+  // Acoustic from spaces
+  ["computed.minRoomVolume",      ["acoustic.roomVolume"]],
+  // Lobby / entry
+  ["computed.minLobbyArea",       ["architecture.entranceLobbyArea", "architecture.entryHallArea"]],
+  // Guard rails
+  ["computed.guardRailHeight",    ["general.guardRailHeight", "architecture.balconyGuardHeight"]],
+  // Floor counts
+  ["computed.floorsBelowGround",  ["general.floorsBelowGround"]],
 ];
 
 function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
@@ -483,6 +511,9 @@ function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
   const stairs = index.getByType("IFCSTAIRFLIGHT");
   const ramps = index.getByType("IFCRAMP");
   const rampFlights = index.getByType("IFCRAMPFLIGHT");
+  const storeys = index.getByType("IFCBUILDINGSTOREY");
+  const buildings = index.getByType("IFCBUILDING");
+  const railings = index.getByType("IFCRAILING");
 
   // Helper to add a computed field
   function add(field: string, value: unknown, detail: string) {
@@ -525,7 +556,7 @@ function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
   }
 
   // --- Min/max areas AND widths by space type ---
-  for (const type of ["bedroom", "bathroom", "kitchen", "living", "corridor", "storage"]) {
+  for (const type of ["bedroom", "bathroom", "kitchen", "living", "corridor", "storage", "lobby"]) {
     const matching = spaces.filter(s => spaceMatchesType(s, type));
     const areas = matching.map(s => getSpaceArea(s)).filter((a): a is number => a !== undefined);
     if (areas.length > 0) {
@@ -670,7 +701,178 @@ function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
       `min(window area / floor area) across ${lightRatios.length} habitable rooms`);
   }
 
+  // --- Number of floors (from IFCBUILDINGSTOREY) ---
+  if (storeys.length > 0) {
+    // Count floors above ground (elevation >= 0 or no elevation data)
+    const aboveGround = storeys.filter(s => {
+      const elev = s.properties.Elevation ?? s.properties.elevation;
+      if (elev === undefined) return true; // assume above ground
+      return Number(elev) >= 0;
+    });
+    const belowGround = storeys.length - aboveGround.length;
+    add("computed.numberOfFloors", aboveGround.length,
+      `${aboveGround.length} storeys above ground from ${storeys.length} total`);
+    if (belowGround > 0) {
+      add("computed.floorsBelowGround", belowGround,
+        `${belowGround} storeys below ground`);
+    }
+  }
+
+  // --- Building height (from storey elevations) ---
+  if (storeys.length > 1) {
+    const elevations = storeys
+      .map(s => Number(s.properties.Elevation ?? s.properties.elevation ?? 0))
+      .filter(e => !isNaN(e));
+    if (elevations.length > 1) {
+      const maxElev = Math.max(...elevations);
+      const minElev = Math.min(...elevations);
+      // Approximate: highest storey + typical floor height (3m)
+      const height = maxElev - minElev + 3.0;
+      add("computed.buildingHeight", height,
+        `derived from storey elevations: ${minElev.toFixed(1)}m to ${maxElev.toFixed(1)}m + 3m`);
+    }
+  }
+  // Also check IFCBUILDING for direct height
+  if (buildings.length > 0) {
+    for (const building of buildings) {
+      const qtoHeight = building.propertySetData?.["Qto_BuildingBaseQuantities"]?.Height as number;
+      if (qtoHeight && qtoHeight > 0) {
+        add("computed.buildingHeight", qtoHeight, `from Qto_BuildingBaseQuantities.Height`);
+        break;
+      }
+    }
+  }
+
+  // --- Gross floor area (from IFCBUILDING base quantities) ---
+  if (buildings.length > 0) {
+    for (const building of buildings) {
+      const gfa = building.propertySetData?.["Qto_BuildingBaseQuantities"]?.GrossFloorArea as number;
+      if (gfa && gfa > 0) {
+        add("computed.grossFloorArea", gfa, `from Qto_BuildingBaseQuantities.GrossFloorArea`);
+        break;
+      }
+    }
+  }
+  // Fallback: sum storey gross areas
+  if (!computed.find(c => c.field === "computed.grossFloorArea") && storeys.length > 0) {
+    const storeyAreas = storeys
+      .map(s => {
+        const qto = s.propertySetData?.["Qto_BuildingStoreyBaseQuantities"]?.GrossFloorArea as number;
+        return qto ?? s.quantities.area ?? 0;
+      })
+      .filter(a => a > 0);
+    if (storeyAreas.length > 0) {
+      const total = storeyAreas.reduce((a, b) => a + b, 0);
+      add("computed.grossFloorArea", total,
+        `sum of ${storeyAreas.length} storey gross floor areas`);
+    }
+  }
+
+  // --- Window-to-floor ratio ---
+  const totalUsable = spaceAreas.length > 0 ? spaceAreas.reduce((a, b) => a + b, 0) : 0;
+  if (totalWindowArea > 0 && totalUsable > 0) {
+    add("computed.windowToFloorRatio", (totalWindowArea / totalUsable) * 100,
+      `${totalWindowArea.toFixed(1)}m² windows / ${totalUsable.toFixed(1)}m² usable area`);
+  }
+
+  // --- Typology inference (T0-T5 from bedroom count) ---
+  const bedroomEntry = computed.find(c => c.field === "computed.bedroomCount");
+  if (bedroomEntry && typeof bedroomEntry.value === "number") {
+    const count = bedroomEntry.value;
+    const typology = `T${Math.min(count, 9)}`;
+    add("computed.typology", typology, `inferred from ${count} bedroom(s)`);
+    // Multi-family: more than 1 dwelling = multi-family, but we can't detect
+    // dwelling count from IFC reliably, so leave to manual or zone detection
+  }
+
+  // --- Occupant load (gross area × occupancy index) ---
+  const gfaEntry = computed.find(c => c.field === "computed.grossFloorArea");
+  if (gfaEntry && typeof gfaEntry.value === "number") {
+    // Default occupancy index for residential UT-I: 0.02 persons/m²
+    const occupancyIndex = 0.02;
+    const occupantLoad = Math.ceil(gfaEntry.value as number * occupancyIndex);
+    if (occupantLoad > 0) {
+      add("computed.occupantLoad", occupantLoad,
+        `${gfaEntry.value}m² × ${occupancyIndex} persons/m²`);
+    }
+  }
+
+  // --- Fire safety risk category (DL 220/2008 simplified matrix) ---
+  const heightEntry = computed.find(c => c.field === "computed.buildingHeight");
+  const floorsEntry = computed.find(c => c.field === "computed.numberOfFloors");
+  if (heightEntry && typeof heightEntry.value === "number") {
+    const riskCat = classifyFireRiskCategory(
+      heightEntry.value as number,
+      floorsEntry ? (floorsEntry.value as number) : undefined
+    );
+    add("computed.riskCategory", riskCat,
+      `DL 220/2008 UT-I: height=${heightEntry.value}m, floors=${floorsEntry?.value ?? "?"}`);
+  }
+
+  // --- Garage spaces ---
+  const garages = spaces.filter(s => spaceMatchesType(s, "garage"));
+  if (garages.length > 0) {
+    const garageAreas = garages.map(s => getSpaceArea(s)).filter((a): a is number => a !== undefined);
+    if (garageAreas.length > 0) {
+      add("computed.minGarageArea", Math.min(...garageAreas),
+        `min area across ${garageAreas.length} garage/parking spaces`);
+    }
+    const garageHeights = garages
+      .map(s => s.quantities.height || (s.propertySetData?.["Pset_SpaceCommon"]?.Height as number))
+      .filter((h): h is number => h !== undefined && h > 0);
+    if (garageHeights.length > 0) {
+      add("computed.minGarageHeight", Math.min(...garageHeights),
+        `min height across ${garageHeights.length} garage spaces`);
+    }
+  }
+
+  // --- Room volumes (for acoustic) ---
+  const roomVolumes = spaces
+    .map(s => {
+      const vol = s.properties.Volume ?? s.propertySetData?.["Qto_SpaceBaseQuantities"]?.GrossVolume;
+      return typeof vol === "number" ? vol : undefined;
+    })
+    .filter((v): v is number => v !== undefined && v > 0);
+  if (roomVolumes.length > 0) {
+    add("computed.minRoomVolume", Math.min(...roomVolumes),
+      `min volume across ${roomVolumes.length} spaces`);
+  }
+
+  // --- Guard rail height ---
+  if (railings.length > 0) {
+    const railHeights = railings
+      .map(r => r.quantities.height)
+      .filter((h): h is number => h !== undefined && h > 0 && h < 3);
+    if (railHeights.length > 0) {
+      add("computed.guardRailHeight", Math.min(...railHeights),
+        `min height across ${railHeights.length} railings`);
+    }
+  }
+
   return computed;
+}
+
+// ============================================================
+// Fire Safety Risk Category — DL 220/2008 UT-I (Residential)
+// ============================================================
+
+/**
+ * Classify fire risk category per DL 220/2008 for UT-I (residential).
+ * Simplified matrix based on building height:
+ *   1ª categoria: height ≤ 9m
+ *   2ª categoria: 9m < height ≤ 28m
+ *   3ª categoria: 28m < height ≤ 50m
+ *   4ª categoria: height > 50m
+ */
+export function classifyFireRiskCategory(
+  buildingHeight: number,
+  numberOfFloors?: number
+): string {
+  // Use height-based classification (primary)
+  if (buildingHeight <= 9) return "1";
+  if (buildingHeight <= 28) return "2";
+  if (buildingHeight <= 50) return "3";
+  return "4";
 }
 
 /**

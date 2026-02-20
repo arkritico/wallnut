@@ -6,6 +6,7 @@ import {
   resolveEntityProperty,
   aggregate,
   EntityIndex,
+  classifyFireRiskCategory,
   type SpatialFieldMapping,
 } from "../lib/spatial-context-resolver";
 
@@ -685,5 +686,288 @@ describe("resolveSpatialContext integration", () => {
     expect(result.stats.durationMs).toBeLessThan(100);
     expect(result.resolved.length).toBeGreaterThan(0);
     expect(result.computed.length).toBeGreaterThan(0);
+  });
+});
+
+// ============================================================
+// Derived Classification Fields
+// ============================================================
+
+describe("derived classification fields", () => {
+  it("derives numberOfFloors from IFCBUILDINGSTOREY count", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Cave", properties: { Elevation: -3.0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 0", properties: { Elevation: 0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 1", properties: { Elevation: 3.0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 2", properties: { Elevation: 6.0 } }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.numberOfFloors).toBe(3); // 3 above ground
+    expect(computed?.floorsBelowGround).toBe(1); // 1 below ground
+
+    // Bridge to rule fields
+    const general = result.fields.general as Record<string, unknown>;
+    expect(general?.floorsAboveGround).toBe(3);
+    expect(general?.floorsBelowGround).toBe(1);
+  });
+
+  it("derives buildingHeight from storey elevations", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 0", properties: { Elevation: 0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 1", properties: { Elevation: 3.0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 2", properties: { Elevation: 6.0 } }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    // Height = maxElev(6) - minElev(0) + 3m typical floor = 9m
+    expect(computed?.buildingHeight).toBe(9);
+
+    // Bridge to fire safety
+    const fs = result.fields.fireSafety as Record<string, unknown>;
+    expect(fs?.buildingHeight).toBe(9);
+  });
+
+  it("derives buildingHeight from Qto_BuildingBaseQuantities (preferred)", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCBUILDING", name: "Building",
+        propertySetData: { "Qto_BuildingBaseQuantities": { Height: 12.5, GrossFloorArea: 450 } },
+      }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 0", properties: { Elevation: 0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 1", properties: { Elevation: 3.0 } }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    // Qto value should be present (may appear alongside storey-derived value)
+    expect(computed?.buildingHeight).toBeDefined();
+    expect(computed?.grossFloorArea).toBe(450);
+  });
+
+  it("derives grossFloorArea from building base quantities", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCBUILDING", name: "Building",
+        propertySetData: { "Qto_BuildingBaseQuantities": { GrossFloorArea: 1200 } },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.grossFloorArea).toBe(1200);
+
+    // Bridge
+    const arch = result.fields.architecture as Record<string, unknown>;
+    expect(arch?.grossFloorArea).toBe(1200);
+  });
+
+  it("falls back to sum of storey areas for grossFloorArea", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCBUILDINGSTOREY", name: "Piso 0",
+        properties: { Elevation: 0 },
+        propertySetData: { "Qto_BuildingStoreyBaseQuantities": { GrossFloorArea: 200 } },
+      }),
+      makeEntity({
+        entityType: "IFCBUILDINGSTOREY", name: "Piso 1",
+        properties: { Elevation: 3 },
+        propertySetData: { "Qto_BuildingStoreyBaseQuantities": { GrossFloorArea: 200 } },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.grossFloorArea).toBe(400);
+  });
+
+  it("derives typology from bedroom count", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({ entityType: "IFCSPACE", name: "Quarto 1", quantities: { area: 12 } }),
+      makeEntity({ entityType: "IFCSPACE", name: "Quarto 2", quantities: { area: 10 } }),
+      makeEntity({ entityType: "IFCSPACE", name: "Quarto 3", quantities: { area: 9 } }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.typology).toBe("T3");
+
+    // Bridge to rule fields
+    const general = result.fields.general as Record<string, unknown>;
+    expect(general?.typology).toBe("T3");
+    const arch = result.fields.architecture as Record<string, unknown>;
+    expect(arch?.typology).toBe("T3");
+  });
+
+  it("derives windowToFloorRatio from computed values", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCWINDOW", name: "Window 1",
+        quantities: { area: 5 },
+      }),
+      makeEntity({
+        entityType: "IFCWINDOW", name: "Window 2",
+        quantities: { area: 5 },
+      }),
+      makeEntity({ entityType: "IFCSPACE", name: "Sala", quantities: { area: 50 } }),
+      makeEntity({ entityType: "IFCSPACE", name: "Quarto", quantities: { area: 30 } }),
+      // Need external walls for window-to-wall ratio to trigger window area computation
+      makeEntity({
+        entityType: "IFCWALL", name: "Ext Wall",
+        properties: { IsExternal: true },
+        quantities: { area: 100 },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    // 10m² windows / 80m² usable = 12.5%
+    expect(computed?.windowToFloorRatio).toBe(12.5);
+    // Bridge
+    const envelope = result.fields.envelope as Record<string, unknown>;
+    expect(envelope?.windowToFloorRatio).toBe(12.5);
+  });
+
+  it("derives occupantLoad from gross floor area", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCBUILDING", name: "Building",
+        propertySetData: { "Qto_BuildingBaseQuantities": { GrossFloorArea: 500 } },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    // 500m² × 0.02 = 10 occupants
+    expect(computed?.occupantLoad).toBe(10);
+
+    // Bridge to fire safety
+    const fs = result.fields.fireSafety as Record<string, unknown>;
+    expect(fs?.occupantLoad).toBe(10);
+  });
+});
+
+// ============================================================
+// Fire Safety Risk Category Classification
+// ============================================================
+
+describe("classifyFireRiskCategory", () => {
+  it("classifies low buildings as category 1", () => {
+    expect(classifyFireRiskCategory(6)).toBe("1");
+    expect(classifyFireRiskCategory(9)).toBe("1");
+  });
+
+  it("classifies medium buildings as category 2", () => {
+    expect(classifyFireRiskCategory(9.1)).toBe("2");
+    expect(classifyFireRiskCategory(15)).toBe("2");
+    expect(classifyFireRiskCategory(28)).toBe("2");
+  });
+
+  it("classifies tall buildings as category 3", () => {
+    expect(classifyFireRiskCategory(28.1)).toBe("3");
+    expect(classifyFireRiskCategory(50)).toBe("3");
+  });
+
+  it("classifies very tall buildings as category 4", () => {
+    expect(classifyFireRiskCategory(50.1)).toBe("4");
+    expect(classifyFireRiskCategory(100)).toBe("4");
+  });
+
+  it("integrates with spatial resolver", () => {
+    // 4-storey building: 0,3,6,9 → height = 9-0+3 = 12m → category 2
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 0", properties: { Elevation: 0 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 1", properties: { Elevation: 3 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 2", properties: { Elevation: 6 } }),
+      makeEntity({ entityType: "IFCBUILDINGSTOREY", name: "Piso 3", properties: { Elevation: 9 } }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.riskCategory).toBe("2");
+
+    // Bridge to fire safety
+    const fs = result.fields.fireSafety as Record<string, unknown>;
+    expect(fs?.riskCategory).toBe("2");
+  });
+});
+
+// ============================================================
+// Garage & Lobby Extraction
+// ============================================================
+
+describe("garage and lobby extraction", () => {
+  it("extracts garage area and height", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCSPACE", name: "Garagem",
+        quantities: { area: 30, height: 2.5 },
+      }),
+      makeEntity({
+        entityType: "IFCSPACE", name: "Estacionamento 2",
+        quantities: { area: 45, height: 2.3 },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.minGarageArea).toBe(30);
+    expect(computed?.minGarageHeight).toBe(2.3);
+    expect(computed?.garageCount).toBe(2);
+
+    // Bridge
+    const general = result.fields.general as Record<string, unknown>;
+    expect(general?.garageHeight).toBe(2.3);
+  });
+
+  it("extracts lobby area", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCSPACE", name: "Hall de Entrada",
+        quantities: { area: 8, width: 2.5 },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.minLobbyArea).toBe(8);
+    expect(computed?.lobbyCount).toBe(1);
+
+    // Bridge
+    const arch = result.fields.architecture as Record<string, unknown>;
+    expect(arch?.entranceLobbyArea).toBe(8);
+  });
+});
+
+// ============================================================
+// Guard Rail & Room Volume
+// ============================================================
+
+describe("guard rail and room volume", () => {
+  it("extracts guard rail height from IFCRAILING", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({ entityType: "IFCRAILING", name: "Railing 1", quantities: { height: 1.10 } }),
+      makeEntity({ entityType: "IFCRAILING", name: "Railing 2", quantities: { height: 0.90 } }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.guardRailHeight).toBe(0.9);
+
+    // Bridge
+    const general = result.fields.general as Record<string, unknown>;
+    expect(general?.guardRailHeight).toBe(0.9);
+  });
+
+  it("extracts room volume for acoustic analysis", () => {
+    const result = resolveSpatialContext([makeAnalysis([
+      makeEntity({
+        entityType: "IFCSPACE", name: "Quarto",
+        quantities: { area: 12 },
+        properties: { Volume: 30 },
+      }),
+      makeEntity({
+        entityType: "IFCSPACE", name: "Sala",
+        quantities: { area: 20 },
+        properties: { Volume: 50 },
+      }),
+    ])], []);
+
+    const computed = result.fields.computed as Record<string, unknown>;
+    expect(computed?.minRoomVolume).toBe(30);
+
+    // Bridge to acoustic
+    const acoustic = result.fields.acoustic as Record<string, unknown>;
+    expect(acoustic?.roomVolume).toBe(30);
   });
 });
