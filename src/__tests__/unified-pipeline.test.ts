@@ -195,8 +195,9 @@ function setupFullMocks() {
   mockGenerateMSProjectXML.mockReturnValue("<Project/>");
   mockOcrPdfPages.mockResolvedValue([]);
   // Default fetch mock: handle both /api/ocr and /api/ai-estimate
+  // URLs may be absolute (http://localhost:3000/api/...) in Web Worker context
   mockFetch.mockImplementation((url: string) => {
-    if (url === "/api/ai-estimate") {
+    if (url.endsWith("/api/ai-estimate")) {
       return Promise.resolve(new Response(JSON.stringify({ available: false, fallbackReason: "test" }), { status: 200 }));
     }
     // Default: OCR response
@@ -560,7 +561,7 @@ describe("runUnifiedPipeline", () => {
       chunks: 1,
     });
     mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/ai-estimate") {
+      if (url.endsWith("/api/ai-estimate")) {
         return Promise.resolve(new Response(JSON.stringify({ available: false }), { status: 200 }));
       }
       // OCR response
@@ -589,7 +590,7 @@ describe("runUnifiedPipeline", () => {
 
     // OCR was called via fetch to /api/ocr for pages 1 and 3 (both < 50 chars)
     expect(mockFetch).toHaveBeenCalledWith(
-      "/api/ocr",
+      expect.stringContaining("/api/ocr"),
       expect.objectContaining({ method: "POST" }),
     );
     // OCR text should be used for AI parsing
@@ -607,7 +608,7 @@ describe("runUnifiedPipeline", () => {
     });
     // Simulate OCR API returning error, AI estimate returns unavailable
     mockFetch.mockImplementation((url: string) => {
-      if (url === "/api/ai-estimate") {
+      if (url.endsWith("/api/ai-estimate")) {
         return Promise.resolve(new Response(JSON.stringify({ available: false }), { status: 200 }));
       }
       return Promise.resolve(new Response("Internal Server Error", { status: 500 }));

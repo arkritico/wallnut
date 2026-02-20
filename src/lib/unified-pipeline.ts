@@ -173,6 +173,41 @@ function createProgressReporter(onProgress?: (progress: UnifiedProgress) => void
 }
 
 // ============================================================
+// API URL resolution (works in both Node.js and Web Workers)
+// ============================================================
+
+/**
+ * Resolve a relative API path to an absolute URL.
+ * In Node.js/browser main thread, relative URLs work fine.
+ * In Web Workers, self.location.origin may be unavailable,
+ * so we need to construct the full URL.
+ */
+function resolveApiUrl(path: string): string {
+  // Already absolute
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+
+  // Try self.location (Web Worker or browser)
+  try {
+    if (typeof self !== "undefined" && self.location?.origin && self.location.origin !== "null") {
+      return `${self.location.origin}${path}`;
+    }
+  } catch { /* not in a Worker with a valid origin */ }
+
+  // Try globalThis.location (browser main thread)
+  try {
+    if (typeof globalThis !== "undefined" && (globalThis as { location?: { origin?: string } }).location?.origin) {
+      return `${(globalThis as { location?: { origin?: string } }).location!.origin}${path}`;
+    }
+  } catch { /* not in browser */ }
+
+  // Server-side (Node.js) — use localhost with NEXTAUTH_URL or default
+  const baseUrl = typeof process !== "undefined"
+    ? (process.env?.NEXTAUTH_URL || process.env?.NEXT_PUBLIC_SITE_URL || "http://localhost:3000")
+    : "http://localhost:3000";
+  return `${baseUrl}${path}`;
+}
+
+// ============================================================
 // File classification
 // ============================================================
 
@@ -484,7 +519,7 @@ export async function runUnifiedPipeline(
               formData.append("pages", JSON.stringify(scannedPages.map((p) => p.page)));
               formData.append("language", "por");
 
-              const ocrResponse = await fetch("/api/ocr", { method: "POST", body: formData });
+              const ocrResponse = await fetch(resolveApiUrl("/api/ocr"), { method: "POST", body: formData });
               if (!ocrResponse.ok) throw new Error(`OCR API ${ocrResponse.status}`);
 
               const ocrData = await ocrResponse.json() as { texts: string[]; confidences: number[] };
@@ -581,7 +616,7 @@ export async function runUnifiedPipeline(
         // Non-critical: no historical patterns available yet
       }
 
-      const response = await fetch("/api/ai-estimate", {
+      const response = await fetch(resolveApiUrl("/api/ai-estimate"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projectSummary: summary }),
@@ -665,7 +700,7 @@ export async function runUnifiedPipeline(
   if (aiEstimate && matchReport && reconciliation && opts.includeAIEstimate !== false) {
     aiReviewPromise = (async () => {
       try {
-        const response = await fetch("/api/ai-review", {
+        const response = await fetch(resolveApiUrl("/api/ai-review"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ aiEstimate, matchReport, reconciliation }),
