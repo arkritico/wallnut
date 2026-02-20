@@ -1,16 +1,16 @@
 /**
- * Parametric CYPE Pricing Engine
+ * Parametric Pricing Engine
  *
- * The real CYPE Gerador de Preços (geradordeprecos.info) requires
+ * The Gerador de Preços (geradordeprecos.info) requires
  * clicking into each item and configuring parameters to see the
  * "Preço Composto" breakdown. This module models those parametric
  * variations so we can estimate prices for any configuration without
  * needing API access.
  *
- * For items where we have real CYPE exports (via import), those
+ * For items where we have real exports (via import), those
  * override our parametric estimates.
  *
- * Sources: Portuguese market data 2024-2025, CYPE reference ranges.
+ * Sources: Portuguese market data 2024-2025, reference ranges.
  */
 
 // ============================================================
@@ -18,7 +18,7 @@
 // ============================================================
 
 export interface ParametricItem {
-  /** CYPE-style code prefix */
+  /** Price code prefix */
   code: string;
   /** Base description */
   description: string;
@@ -45,17 +45,17 @@ export interface PriceResult {
   unitCost: number;
   unit: string;
   breakdown: { materials: number; labor: number; machinery: number };
-  /** Generated CYPE-style code with variation suffix */
+  /** Generated price code with variation suffix */
   variantCode: string;
   /** Full description with parameters */
   fullDescription: string;
-  /** Confidence: "parametric" means modeled, "imported" means from real CYPE data */
+  /** Confidence: "parametric" means modeled, "imported" means from real data */
   source: "parametric" | "imported";
   /** Notes on how the price was calculated */
   notes: string[];
 }
 
-export interface CypeImportRow {
+export interface PriceImportRow {
   code: string;
   description: string;
   unit: string;
@@ -70,10 +70,10 @@ export interface CypeImportRow {
 // User Override Store
 // ============================================================
 
-/** Imported CYPE prices override parametric estimates */
-const importedPrices = new Map<string, CypeImportRow>();
+/** Imported prices override parametric estimates */
+const importedPrices = new Map<string, PriceImportRow>();
 
-export function importCypePrices(rows: CypeImportRow[]): number {
+export function importPrices(rows: PriceImportRow[]): number {
   let count = 0;
   for (const row of rows) {
     if (row.code && row.unitCost > 0) {
@@ -84,7 +84,7 @@ export function importCypePrices(rows: CypeImportRow[]): number {
   return count;
 }
 
-export function getImportedPrice(code: string): CypeImportRow | undefined {
+export function getImportedPrice(code: string): PriceImportRow | undefined {
   return importedPrices.get(code);
 }
 
@@ -107,8 +107,8 @@ export function getImportedCount(): number {
  *
  * Some exports use semicolons, others tabs. We detect automatically.
  */
-export function parseCypeExport(text: string): CypeImportRow[] {
-  const rows: CypeImportRow[] = [];
+export function parsePriceExport(text: string): PriceImportRow[] {
+  const rows: PriceImportRow[] = [];
   const lines = text.split("\n").filter(l => l.trim());
   if (lines.length < 2) return rows;
 
@@ -134,7 +134,7 @@ export function parseCypeExport(text: string): CypeImportRow[] {
       materials: cols.length > 4 ? parseNum(cols[4]) : 0,
       labor: cols.length > 5 ? parseNum(cols[5]) : 0,
       machinery: cols.length > 6 ? parseNum(cols[6]) : 0,
-      source: "cype-import",
+      source: "price-import",
     });
   }
 

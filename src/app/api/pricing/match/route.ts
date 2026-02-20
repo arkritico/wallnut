@@ -1,12 +1,12 @@
 /**
- * CYPE Matching API Route
+ * Price Matching API Route
  *
- * Server-side endpoint for WBS to CYPE matching.
+ * Server-side endpoint for WBS to price database matching.
  * Handles database loading (fs access) on the server only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { matchWbsToCype } from '@/lib/cype-matcher';
+import { matchWbsToPrice } from '@/lib/price-matcher';
 import type { WbsProject, MatchReport } from '@/lib/wbs-types';
 
 export async function POST(request: NextRequest) {
@@ -22,14 +22,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Perform matching on server side (has access to fs)
-    const matchReport: MatchReport = matchWbsToCype(wbsProject);
+    const matchReport: MatchReport = matchWbsToPrice(wbsProject);
 
     return NextResponse.json(matchReport);
   } catch (error) {
-    console.error('CYPE matching error:', error);
+    console.error('Price matching error:', error);
     return NextResponse.json(
       {
-        error: 'Failed to match WBS to CYPE',
+        error: 'Failed to match WBS to price database',
         details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }

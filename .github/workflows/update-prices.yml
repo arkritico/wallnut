@@ -1,4 +1,4 @@
-name: Update CYPE Prices Monthly
+name: Update Prices Monthly
 
 on:
   schedule:
@@ -45,7 +45,7 @@ jobs:
         if: github.event.inputs.with_variants == 'true'
         run: npx playwright install --with-deps chromium
 
-      - name: Run CYPE Scraper
+      - name: Run Price Scraper
         run: |
           ARGS="--merge"
 
@@ -65,8 +65,8 @@ jobs:
             ARGS="$ARGS --with-variants"
           fi
 
-          echo "Running: npx tsx scripts/scrape-cype.ts $ARGS"
-          npx tsx scripts/scrape-cype.ts $ARGS
+          echo "Running: npx tsx scripts/scrape-prices.ts $ARGS"
+          npx tsx scripts/scrape-prices.ts $ARGS
 
       - name: Commit updated prices
         run: |
@@ -75,14 +75,14 @@ jobs:
 
           DATE=$(date +%Y-%m-%d)
 
-          git add data/cype-full.json data/backups/ data/cype-categories.config.json
-          git diff --quiet --staged || git commit -m "chore: update CYPE prices — $DATE"
+          git add data/price-db.json data/backups/ data/price-categories.config.json
+          git diff --quiet --staged || git commit -m "chore: update prices — $DATE"
           git push
         continue-on-error: true
 
       - name: Upload price database artifact
         uses: actions/upload-artifact@v4
         with:
-          name: cype-prices-${{ github.run_number }}
-          path: data/cype-full.json
+          name: price-db-${{ github.run_number }}
+          path: data/price-db.json
           retention-days: 90

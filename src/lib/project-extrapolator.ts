@@ -112,7 +112,7 @@ export interface ExtrapolationResult {
 
 /**
  * Base construction costs per m² by building type.
- * Source: CYPE Gerador de Preços Portugal + LNEC data + IMPIC statistics
+ * Source: Price Database Portugal + LNEC data + IMPIC statistics
  */
 const BASE_COST_PER_M2: Record<BuildingType, { min: number; max: number; typical: number }> = {
   residential: { min: 800, max: 1500, typical: 1100 },

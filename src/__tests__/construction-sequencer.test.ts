@@ -6,7 +6,7 @@ import {
   isWorkingDay,
   PHASE_ORDER,
 } from "@/lib/construction-sequencer";
-import type { WbsProject, CypeMatch } from "@/lib/wbs-types";
+import type { WbsProject, PriceMatch } from "@/lib/wbs-types";
 
 // ─── Helpers ────────────────────────────────────────────────
 
@@ -73,18 +73,18 @@ function makeProject(overrides: Partial<WbsProject> = {}): WbsProject {
   };
 }
 
-function makeMatch(overrides: Partial<CypeMatch> = {}): CypeMatch {
+function makeMatch(overrides: Partial<PriceMatch> = {}): PriceMatch {
   return {
     articleCode: "06.01.001",
     articleDescription: "Pilar de betão armado",
-    cypeCode: "EHS010",
-    cypeDescription: "Pilar de betão armado",
-    cypeChapter: "06",
+    priceCode: "EHS010",
+    priceDescription: "Pilar de betão armado",
+    priceChapter: "06",
     confidence: 80,
     matchMethod: "description",
     unitCost: 673.53,
     breakdown: { materials: 400, labor: 200, machinery: 73.53 },
-    cypeUnit: "m",
+    priceUnit: "m",
     unitConversion: 1,
     warnings: [],
     articleQuantity: 50,
@@ -94,12 +94,12 @@ function makeMatch(overrides: Partial<CypeMatch> = {}): CypeMatch {
   };
 }
 
-function makeMatches(): CypeMatch[] {
+function makeMatches(): PriceMatch[] {
   return [
     makeMatch({
       articleCode: "06.01.001",
-      cypeCode: "EHS010",
-      cypeDescription: "Pilar de betão armado",
+      priceCode: "EHS010",
+      priceDescription: "Pilar de betão armado",
       unitCost: 673.53,
       breakdown: { materials: 400, labor: 200, machinery: 73.53 },
       articleQuantity: 50,
@@ -107,8 +107,8 @@ function makeMatches(): CypeMatch[] {
     }),
     makeMatch({
       articleCode: "06.02.001",
-      cypeCode: "EHB070",
-      cypeDescription: "Viga de betão armado",
+      priceCode: "EHB070",
+      priceDescription: "Viga de betão armado",
       confidence: 75,
       unitCost: 96.93,
       breakdown: { materials: 50, labor: 35, machinery: 11.93 },
@@ -117,13 +117,13 @@ function makeMatches(): CypeMatch[] {
     }),
     makeMatch({
       articleCode: "09.01.001",
-      cypeCode: "ERR020",
-      cypeDescription: "Reboco exterior",
-      cypeChapter: "09",
+      priceCode: "ERR020",
+      priceDescription: "Reboco exterior",
+      priceChapter: "09",
       confidence: 60,
       unitCost: 25,
       breakdown: { materials: 12, labor: 10, machinery: 3 },
-      cypeUnit: "m2",
+      priceUnit: "m2",
       articleUnit: "m2",
       articleQuantity: 200,
       estimatedCost: 5000,

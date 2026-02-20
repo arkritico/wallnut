@@ -86,10 +86,10 @@ describe("analyzeProject — regulation summary", () => {
 
     const areas = result.regulationSummary.map(s => s.area);
     const expectedAreas = [
-      "architecture", "structural", "fire_safety", "avac",
-      "water_drainage", "gas", "electrical", "ited_itur",
+      "architecture", "structural", "fire_safety", "hvac",
+      "water_drainage", "gas", "electrical", "telecommunications",
       "thermal", "acoustic", "accessibility", "energy",
-      "elevators", "licensing", "waste", "local",
+      "elevators", "licensing", "waste", "municipal",
       "drawings", "general",
     ];
     for (const area of expectedAreas) {

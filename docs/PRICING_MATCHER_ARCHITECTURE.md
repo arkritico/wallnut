@@ -1,16 +1,16 @@
-# 🔗 CYPE Matcher - Arquitetura Dinâmica
+# Price Matcher - Arquitetura Dinâmica
 
 ## Overview
 
-O CYPE Matcher agora carrega dados **dinamicamente** do scraper, substituindo os 652 items hardcoded.
+O Price Matcher agora carrega dados **dinamicamente** do scraper, substituindo os 652 items hardcoded.
 
 ## Arquitetura Antes vs Depois
 
 ### ❌ ANTES (Hardcoded)
 
 ```typescript
-// cype-matcher.ts
-const CYPE_CONSTRUCTION_DB: CypeWorkItem[] = [
+// price-matcher.ts
+const PRICE_CONSTRUCTION_DB: PriceWorkItem[] = [
   { code: "EES010", description: "...", ... }, // 652 items
   { code: "EES020", description: "...", ... },
   // ... 650 more items manually maintained
@@ -19,27 +19,27 @@ const CYPE_CONSTRUCTION_DB: CypeWorkItem[] = [
 
 **Problemas:**
 - Dados estáticos (nunca atualizados)
-- Apenas 652 items (vs 2000+ disponíveis no CYPE)
+- Apenas 652 items (vs 2000+ disponíveis no Gerador de Precos)
 - Manutenção manual (erro-prone)
 - Desconectado do scraper
 
 ### ✅ DEPOIS (Dinâmico)
 
 ```typescript
-// cype-matcher-db-loader.ts
-export function getCypeMatcherDatabase(): CypeWorkItem[] {
-  const scrapedData = loadScrapedData('data/cype-full.json');
+// price-matcher-db-loader.ts
+export function getPriceMatcherDatabase(): PriceWorkItem[] {
+  const scrapedData = loadScrapedData('data/price-db.json');
   return scrapedData.items.map(convertToWorkItem);
 }
 
-// cype-matcher.ts
-let CYPE_CONSTRUCTION_DB: CypeWorkItem[] | null = null;
+// price-matcher.ts
+let PRICE_CONSTRUCTION_DB: PriceWorkItem[] | null = null;
 
-function getDatabase(): CypeWorkItem[] {
-  if (!CYPE_CONSTRUCTION_DB) {
-    CYPE_CONSTRUCTION_DB = getCypeMatcherDatabase(); // Auto-load
+function getDatabase(): PriceWorkItem[] {
+  if (!PRICE_CONSTRUCTION_DB) {
+    PRICE_CONSTRUCTION_DB = getPriceMatcherDatabase(); // Auto-load
   }
-  return CYPE_CONSTRUCTION_DB;
+  return PRICE_CONSTRUCTION_DB;
 }
 ```
 
@@ -55,16 +55,16 @@ function getDatabase(): CypeWorkItem[] {
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  1. SCRAPER RUNS                                         │
-│     CypeUnifiedScraper.scrapeAll()                       │
+│     PriceScraper.scrapeAll()                       │
 │     ↓                                                    │
-│     data/cype-full.json (2049 items)                     │
+│     data/price-db.json (2049 items)                     │
 └──────────────────────────────────────────────────────────┘
                           ↓
 ┌──────────────────────────────────────────────────────────┐
 │  2. LOADER CONVERTS                                      │
-│     getCypeMatcherDatabase()                             │
+│     getPriceMatcherDatabase()                             │
 │     ↓                                                    │
-│     ScrapedCypeItem → CypeWorkItem                       │
+│     ScrapedPriceItem → PriceWorkItem                       │
 │     - Infer regulation areas                             │
 │     - Generate search patterns                           │
 │     - Calculate breakdowns                               │
@@ -72,7 +72,7 @@ function getDatabase(): CypeWorkItem[] {
                           ↓
 ┌──────────────────────────────────────────────────────────┐
 │  3. MATCHER USES                                         │
-│     matchWbsToCype(project)                              │
+│     matchWbsToPrice(project)                              │
 │     ↓                                                    │
 │     Searches 2049 items (not 652)                        │
 │     Returns best matches with confidence scores          │
@@ -81,10 +81,10 @@ function getDatabase(): CypeWorkItem[] {
 
 ## Componentes
 
-### 1. `cype-matcher-db-loader.ts` (NEW)
+### 1. `price-matcher-db-loader.ts` (NEW)
 
 **Responsabilidades:**
-- Carregar `data/cype-full.json`
+- Carregar `data/price-db.json`
 - Converter formato scraper → matcher
 - Inferir regulation areas automaticamente
 - Gerar patterns de pesquisa
@@ -92,12 +92,12 @@ function getDatabase(): CypeWorkItem[] {
 
 **Funções principais:**
 ```typescript
-getCypeMatcherDatabase(): CypeWorkItem[]
-refreshMatcherDatabase(): CypeWorkItem[]
+getPriceMatcherDatabase(): PriceWorkItem[]
+refreshMatcherDatabase(): PriceWorkItem[]
 getDatabaseStats(): { totalItems, withBreakdown, byArea, ... }
 ```
 
-### 2. `cype-matcher.ts` (UPDATED)
+### 2. `price-matcher.ts` (UPDATED)
 
 **Mudanças:**
 - ~~Hardcoded array~~ → Dynamic loading
@@ -106,13 +106,13 @@ getDatabaseStats(): { totalItems, withBreakdown, byArea, ... }
 
 **API pública (sem breaking changes):**
 ```typescript
-matchWbsToCype(project): MatchReport     // ← Funciona igual
-getCypeDatabase(): CypeWorkItem[]         // ← Agora retorna 2049 items
-searchCype(query): Match[]                // ← Pesquisa 2049 items
-refreshCypeDatabase(): void               // ← NEW: força reload
+matchWbsToPrice(project): MatchReport     // ← Funciona igual
+getPriceDatabase(): PriceWorkItem[]         // ← Agora retorna 2049 items
+searchPriceDB(query): Match[]                // ← Pesquisa 2049 items
+refreshPriceDatabase(): void               // ← NEW: força reload
 ```
 
-### 3. `cype-unified-scraper.ts`
+### 3. `price-scraper.ts` (Scraper)
 
 **Output:**
 ```json
@@ -193,30 +193,30 @@ function generatePatterns(description, category, code): RegExp[] {
 ### Uso Normal (auto-load)
 
 ```typescript
-import { matchWbsToCype } from './cype-matcher';
+import { matchWbsToPrice } from './price-matcher';
 
-const report = matchWbsToCype(project);
+const report = matchWbsToPrice(project);
 // ✅ Automaticamente carrega 2049 items do scraper
 ```
 
 ### Refresh Manual (após scraping)
 
 ```typescript
-import { refreshCypeDatabase } from './cype-matcher';
+import { refreshPriceDatabase } from './price-matcher';
 
 // 1. Run scraper
-const scraper = new CypeUnifiedScraper();
+const scraper = new PriceScraper();
 await scraper.scrapeAll();
 
 // 2. Refresh matcher database
-refreshCypeDatabase();
+refreshPriceDatabase();
 // ✅ Matcher agora usa dados frescos
 ```
 
 ### Estatísticas
 
 ```typescript
-import { getDatabaseStats } from './cype-matcher-db-loader';
+import { getDatabaseStats } from './price-matcher-db-loader';
 
 const stats = getDatabaseStats();
 console.log(stats);
@@ -237,7 +237,7 @@ console.log(stats);
 
 ### Cache Strategy
 
-1. **First load:** Read `data/cype-full.json` (~2 MB) → ~200ms
+1. **First load:** Read `data/price-db.json` (~2 MB) → ~200ms
 2. **Subsequent calls:** Return cached array → <1ms
 3. **Refresh:** Clear cache + reload → ~200ms
 
@@ -255,18 +255,18 @@ console.log(stats);
 
 ```typescript
 // ✅ Código existente funciona sem alterações
-const report = matchWbsToCype(project);
-const items = getCypeDatabase();
-const results = searchCype("isolamento");
+const report = matchWbsToPrice(project);
+const items = getPriceDatabase();
+const results = searchPriceDB("isolamento");
 ```
 
 **Novo comportamento:**
 - Antes: 652 items hardcoded
-- Depois: 2049 items do scraper (ou 0 se `data/cype-full.json` não existir)
+- Depois: 2049 items do scraper (ou 0 se `data/price-db.json` não existir)
 
 ### Fallback Behavior
 
-Se `data/cype-full.json` não existir:
+Se `data/price-db.json` não existir:
 ```typescript
 logger.warn('No scraped data available, returning empty database');
 return []; // Ou pode retornar os 652 hardcoded como fallback
@@ -278,7 +278,7 @@ return []; // Ou pode retornar os 652 hardcoded como fallback
 - [ ] Task 7: Cache inteligente (Redis opcional)
 - [ ] Task 8: API com background jobs
 - [ ] Adicionar fallback aos 652 items hardcoded se scraper falhar
-- [ ] Hot-reload quando `data/cype-full.json` muda (file watcher)
+- [ ] Hot-reload quando `data/price-db.json` muda (file watcher)
 
 ## Benefícios Finais
 

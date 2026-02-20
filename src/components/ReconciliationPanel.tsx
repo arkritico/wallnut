@@ -350,8 +350,8 @@ function ExecutionRow({ article }: { article: ReconciledArticle }) {
         <div className="truncate" title={article.originalDescription}>
           {article.originalDescription}
         </div>
-        {article.cypeCode && (
-          <span className="text-[9px] text-gray-400 font-mono">{article.cypeCode}</span>
+        {article.priceCode && (
+          <span className="text-[9px] text-gray-400 font-mono">{article.priceCode}</span>
         )}
       </td>
       <td className="px-3 py-2 text-right text-gray-700 whitespace-nowrap">
@@ -408,8 +408,8 @@ function AdditionRow({ article }: { article: AdditionArticle }) {
         <div className="truncate" title={article.description}>
           {article.description}
         </div>
-        {article.cypeCode && (
-          <span className="text-[9px] text-gray-400 font-mono">{article.cypeCode}</span>
+        {article.priceCode && (
+          <span className="text-[9px] text-gray-400 font-mono">{article.priceCode}</span>
         )}
       </td>
       <td className="px-3 py-2 text-right text-blue-700 whitespace-nowrap">

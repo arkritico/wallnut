@@ -1,5 +1,5 @@
 /**
- * Tests for CYPE variant scraper utilities and DB loader variant expansion.
+ * Tests for price variant scraper utilities and DB loader variant expansion.
  *
  * Note: Actual Playwright browser tests are not included here as they require
  * a running browser and network access. These tests cover the pure-logic
@@ -13,7 +13,7 @@ import {
   generateCombinations,
   type VariantPreset,
   type VariantPresetsFile,
-} from "../lib/cype-variant-scraper";
+} from "../lib/price-variant-scraper";
 
 // ============================================================================
 // generateVariantId

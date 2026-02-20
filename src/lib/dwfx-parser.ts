@@ -464,7 +464,7 @@ export function generateComplianceAnnotations(
     fire_safety: /scie|incend|fire|evac/i,
     electrical: /elec|elet|rtiebt/i,
     water_drainage: /agua|water|drain|esgo/i,
-    avac: /avac|hvac|vent|clim/i,
+    hvac: /avac|hvac|vent|clim/i,
     accessibility: /acess|access/i,
   };
 

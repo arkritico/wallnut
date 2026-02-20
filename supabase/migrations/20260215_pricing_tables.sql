@@ -1,8 +1,8 @@
--- CYPE Prices Database Schema
+-- Pricing Database Schema
 -- Stores construction prices from geradordeprecos.info
 
 -- Main prices table
-CREATE TABLE IF NOT EXISTS cype_prices (
+CREATE TABLE IF NOT EXISTS pricing_items (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code VARCHAR(20) NOT NULL UNIQUE, -- NAF010, EEI015, etc.
   description TEXT NOT NULL,
@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS cype_prices (
 );
 
 -- Breakdown components table
-CREATE TABLE IF NOT EXISTS cype_price_components (
+CREATE TABLE IF NOT EXISTS pricing_components (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  price_id UUID REFERENCES cype_prices(id) ON DELETE CASCADE,
+  price_id UUID REFERENCES pricing_items(id) ON DELETE CASCADE,
 
   component_code VARCHAR(50) NOT NULL, -- mt16aaa040b, mo054
   component_type VARCHAR(20) NOT NULL, -- material, labor, equipment
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS cype_price_components (
 );
 
 -- Price history (track changes over time)
-CREATE TABLE IF NOT EXISTS cype_price_history (
+CREATE TABLE IF NOT EXISTS pricing_history (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   price_code VARCHAR(20) NOT NULL,
 
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS cype_price_history (
 );
 
 -- Scraping jobs log
-CREATE TABLE IF NOT EXISTS cype_scraping_jobs (
+CREATE TABLE IF NOT EXISTS pricing_scraping_jobs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
 
   status VARCHAR(20) NOT NULL, -- running, completed, failed
@@ -73,30 +73,30 @@ CREATE TABLE IF NOT EXISTS cype_scraping_jobs (
 );
 
 -- Indexes for performance
-CREATE INDEX idx_cype_prices_code ON cype_prices(code);
-CREATE INDEX idx_cype_prices_category ON cype_prices(category);
-CREATE INDEX idx_cype_prices_region ON cype_prices(region);
-CREATE INDEX idx_cype_price_components_price_id ON cype_price_components(price_id);
-CREATE INDEX idx_cype_price_components_type ON cype_price_components(component_type);
-CREATE INDEX idx_cype_price_history_code ON cype_price_history(price_code);
+CREATE INDEX idx_pricing_items_code ON pricing_items(code);
+CREATE INDEX idx_pricing_items_category ON pricing_items(category);
+CREATE INDEX idx_pricing_items_region ON pricing_items(region);
+CREATE INDEX idx_pricing_components_price_id ON pricing_components(price_id);
+CREATE INDEX idx_pricing_components_type ON pricing_components(component_type);
+CREATE INDEX idx_pricing_history_code ON pricing_history(price_code);
 
 -- RLS Policies (Read: public, Write: authenticated only)
-ALTER TABLE cype_prices ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cype_price_components ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cype_price_history ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cype_scraping_jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pricing_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pricing_components ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pricing_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pricing_scraping_jobs ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access
-CREATE POLICY "Allow public read access" ON cype_prices FOR SELECT USING (true);
-CREATE POLICY "Allow public read components" ON cype_price_components FOR SELECT USING (true);
-CREATE POLICY "Allow public read history" ON cype_price_history FOR SELECT USING (true);
+CREATE POLICY "Allow public read access" ON pricing_items FOR SELECT USING (true);
+CREATE POLICY "Allow public read components" ON pricing_components FOR SELECT USING (true);
+CREATE POLICY "Allow public read history" ON pricing_history FOR SELECT USING (true);
 
 -- Only authenticated users can insert/update
-CREATE POLICY "Allow authenticated insert" ON cype_prices FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Allow authenticated update" ON cype_prices FOR UPDATE USING (auth.role() = 'authenticated');
+CREATE POLICY "Allow authenticated insert" ON pricing_items FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY "Allow authenticated update" ON pricing_items FOR UPDATE USING (auth.role() = 'authenticated');
 
 -- View for easy querying with components
-CREATE OR REPLACE VIEW cype_prices_with_breakdown AS
+CREATE OR REPLACE VIEW pricing_items_with_breakdown AS
 SELECT
   p.id,
   p.code,
@@ -118,12 +118,12 @@ SELECT
       'total', c.total
     )
   ) FILTER (WHERE c.id IS NOT NULL) as components
-FROM cype_prices p
-LEFT JOIN cype_price_components c ON p.id = c.price_id
+FROM pricing_items p
+LEFT JOIN pricing_components c ON p.id = c.price_id
 GROUP BY p.id, p.code, p.description, p.category, p.unit, p.total_cost, p.region, p.scraped_at, p.version;
 
 -- Function to update price and track history
-CREATE OR REPLACE FUNCTION update_cype_price_with_history(
+CREATE OR REPLACE FUNCTION update_price_with_history(
   p_code VARCHAR(20),
   p_new_cost DECIMAL(10,2),
   p_version INTEGER
@@ -133,19 +133,19 @@ DECLARE
   v_change_percent DECIMAL(5,2);
 BEGIN
   -- Get old cost
-  SELECT total_cost INTO v_old_cost FROM cype_prices WHERE code = p_code;
+  SELECT total_cost INTO v_old_cost FROM pricing_items WHERE code = p_code;
 
   -- Calculate change
   IF v_old_cost IS NOT NULL AND v_old_cost > 0 THEN
     v_change_percent := ((p_new_cost - v_old_cost) / v_old_cost) * 100;
 
     -- Insert into history
-    INSERT INTO cype_price_history (price_code, old_total_cost, new_total_cost, change_percent, version)
+    INSERT INTO pricing_history (price_code, old_total_cost, new_total_cost, change_percent, version)
     VALUES (p_code, v_old_cost, p_new_cost, v_change_percent, p_version);
   END IF;
 
   -- Update price
-  UPDATE cype_prices
+  UPDATE pricing_items
   SET total_cost = p_new_cost,
       version = p_version,
       updated_at = NOW()
@@ -153,7 +153,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-COMMENT ON TABLE cype_prices IS 'CYPE construction prices from geradordeprecos.info';
-COMMENT ON TABLE cype_price_components IS 'Detailed breakdown of each price (materials, labor, equipment)';
-COMMENT ON TABLE cype_price_history IS 'Historical price changes for tracking inflation/trends';
-COMMENT ON TABLE cype_scraping_jobs IS 'Log of all scraping operations';
+COMMENT ON TABLE pricing_items IS 'Construction prices from geradordeprecos.info';
+COMMENT ON TABLE pricing_components IS 'Detailed breakdown of each price (materials, labor, equipment)';
+COMMENT ON TABLE pricing_history IS 'Historical price changes for tracking inflation/trends';
+COMMENT ON TABLE pricing_scraping_jobs IS 'Log of all scraping operations';

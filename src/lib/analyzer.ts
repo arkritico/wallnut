@@ -26,17 +26,17 @@ const NAMESPACE_TO_AREAS: Record<string, string[]> = {
   waterDrainage: ["water_drainage"],
   water: ["water_drainage"],
   plumbing: ["water_drainage"],
-  avac: ["avac"],
-  hvac: ["avac"],
+  avac: ["hvac"],
+  hvac: ["hvac"],
   acoustic: ["acoustic"],
   elevators: ["elevators"],
   elevator: ["elevators"],
   thermal: ["thermal"],
   envelope: ["thermal", "energy"],
   energy: ["energy"],
-  ited: ["ited_itur"],
-  itur: ["ited_itur"],
-  telecommunications: ["ited_itur"],
+  ited: ["telecommunications"],
+  itur: ["telecommunications"],
+  telecommunications: ["telecommunications"],
   accessibility: ["accessibility"],
   licensing: ["licensing"],
   waste: ["waste"],
@@ -55,8 +55,8 @@ function getAnalyzedAreas(report: ContextBuildReport): Set<string> {
     if (dotIdx > 0) namespaces.add(field.substring(0, dotIdx));
   }
 
-  // Architecture, general, and local use generic building data — always analyzable
-  const areas = new Set<string>(["architecture", "general", "local"]);
+  // Architecture, general, and municipal use generic building data — always analyzable
+  const areas = new Set<string>(["architecture", "general", "municipal"]);
 
   for (const ns of namespaces) {
     const mapped = NAMESPACE_TO_AREAS[ns];
@@ -392,11 +392,11 @@ function generatePassFindings(findings: Finding[], analyzedAreas: Set<string>): 
     architecture: "Arquitetura (RGEU + Código Civil)",
     structural: "Estruturas (Eurocódigos)",
     fire_safety: "Segurança Contra Incêndio (SCIE)",
-    avac: "AVAC (Ventilação e Ar Condicionado)",
+    hvac: "AVAC (Ventilação e Ar Condicionado)",
     water_drainage: "Águas e Drenagem (RGSPPDADAR)",
     gas: "Instalações de Gás",
     electrical: "Instalações Elétricas (RTIEBT)",
-    ited_itur: "Telecomunicações (ITED/ITUR)",
+    telecommunications: "Telecomunicações (ITED/ITUR)",
     thermal: "Desempenho Térmico (REH/RECS)",
     acoustic: "Acústica (RRAE)",
     accessibility: "Acessibilidade (DL 163/2006)",
@@ -406,7 +406,7 @@ function generatePassFindings(findings: Finding[], analyzedAreas: Set<string>): 
     waste: "Resíduos de Construção (DL 46/2008)",
     drawings: "Peças Desenhadas (Portaria 701-H)",
     general: "Regulamento Geral (RGEU)",
-    local: "Regulamentos Municipais",
+    municipal: "Regulamentos Municipais",
   };
 
   const plugins = getAvailablePlugins();
@@ -451,11 +451,11 @@ function buildRegulationSummary(findings: Finding[]): RegulationSummary[] {
     { area: "architecture", name: "1. Arquitetura (RGEU + Código Civil)" },
     { area: "structural", name: "2. Estruturas / Sísmica (Eurocódigos)" },
     { area: "fire_safety", name: "3. Segurança Contra Incêndio (SCIE + NTs)" },
-    { area: "avac", name: "4. AVAC (Ventilação e Ar Condicionado)" },
+    { area: "hvac", name: "4. AVAC (Ventilação e Ar Condicionado)" },
     { area: "water_drainage", name: "5. Águas e Drenagem (RGSPPDADAR)" },
     { area: "gas", name: "6. Instalações de Gás (DL 521/99)" },
     { area: "electrical", name: "7. Instalações Elétricas (RTIEBT + ISQ/EREDES)" },
-    { area: "ited_itur", name: "8. Telecomunicações (ITED/ITUR + ANACOM)" },
+    { area: "telecommunications", name: "8. Telecomunicações (ITED/ITUR + ANACOM)" },
     { area: "thermal", name: "9. Desempenho Térmico (REH/RECS)" },
     { area: "acoustic", name: "10. Acústica (RRAE)" },
     { area: "accessibility", name: "11. Acessibilidade (DL 163/2006)" },
@@ -463,7 +463,7 @@ function buildRegulationSummary(findings: Finding[]): RegulationSummary[] {
     { area: "elevators", name: "13. Ascensores (DL 320/2002)" },
     { area: "licensing", name: "14. Licenciamento (RJUE)" },
     { area: "waste", name: "15. Resíduos de Construção (DL 46/2008)" },
-    { area: "local", name: "16. Regulamentos Municipais" },
+    { area: "municipal", name: "16. Regulamentos Municipais" },
     { area: "drawings", name: "17. Qualidade das Peças Desenhadas" },
     { area: "general", name: "18. Regulamento Geral (RGEU)" },
   ];

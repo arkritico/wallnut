@@ -3,7 +3,7 @@
  * Portuguese ProNIC chapter structure.
  *
  * Each article carries a keynote that maps to BIM model elements,
- * enabling automated quantity takeoff and CYPE cost matching.
+ * enabling automated quantity takeoff and price cost matching.
  */
 
 // ============================================================
@@ -65,34 +65,34 @@ export interface WbsArticle {
   keynote?: string;
   /** Revit/IFC element IDs this article corresponds to */
   elementIds?: string[];
-  /** Manual CYPE code override (if user already knows the match) */
-  cypeCodeOverride?: string;
+  /** Manual price code override (if user already knows the match) */
+  priceCodeOverride?: string;
   /** Additional search terms for matching */
   tags?: string[];
 }
 
 // ============================================================
-// CYPE Match Results
+// Price Match Results
 // ============================================================
 
-export interface CypeMatch {
+export interface PriceMatch {
   /** The WBS article that was matched */
   articleCode: string;
   articleDescription: string;
-  /** CYPE work item code */
-  cypeCode: string;
-  cypeDescription: string;
-  cypeChapter: string;
+  /** Price work item code */
+  priceCode: string;
+  priceDescription: string;
+  priceChapter: string;
   /** Match confidence 0-100 */
   confidence: number;
   /** How the match was determined */
   matchMethod: "exact_code" | "keynote" | "description" | "category" | "fallback";
-  /** Matched CYPE unit cost */
+  /** Matched price unit cost */
   unitCost: number;
   /** Cost breakdown */
   breakdown: { materials: number; labor: number; machinery: number };
-  /** CYPE unit */
-  cypeUnit: string;
+  /** Price unit */
+  priceUnit: string;
   /** Unit conversion factor if units differ */
   unitConversion: number;
   /** Issues with the match */
@@ -103,7 +103,7 @@ export interface CypeMatch {
   articleUnit?: string;
   /** Total estimated cost (unitCost × articleQuantity × unitConversion) */
   estimatedCost?: number;
-  /** Full breakdown array from CYPE database (for resource aggregation) */
+  /** Full breakdown array from price database (for resource aggregation) */
   fullBreakdown?: Array<{
     code: string;
     unit: string;
@@ -117,7 +117,7 @@ export interface CypeMatch {
 
 export interface MatchReport {
   /** All matches found */
-  matches: CypeMatch[];
+  matches: PriceMatch[];
   /** Articles with no match (need manual review) */
   unmatched: { articleCode: string; description: string; suggestedSearch: string }[];
   /** Overall statistics */
@@ -160,7 +160,7 @@ export interface ScheduleTask {
   phase: ConstructionPhase;
   /** Resources assigned */
   resources: TaskResource[];
-  /** Cost from CYPE match */
+  /** Cost from price match */
   cost: number;
   /** Material cost */
   materialCost: number;

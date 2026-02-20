@@ -26,7 +26,7 @@ import type {
   CriticalChainBuffer,
 } from "./wbs-types";
 import { chapterToPhase, PRONIC_CHAPTERS } from "./wbs-types";
-import type { CypeMatch } from "./wbs-types";
+import type { PriceMatch } from "./wbs-types";
 import { PHASE_OVERLAP_RULES } from "./phase-constraints";
 
 // ============================================================
@@ -408,7 +408,7 @@ interface ArticleWithMeta {
   article: WbsArticle;
   chapter: WbsChapter;
   phase: ConstructionPhase;
-  cypeMatch?: CypeMatch;
+  priceMatch?: PriceMatch;
   manhours: number;
 }
 
@@ -482,7 +482,7 @@ export interface ScheduleOptions {
  */
 export function generateSchedule(
   project: WbsProject,
-  matches: CypeMatch[],
+  matches: PriceMatch[],
   maxWorkersOrOpts: number | ScheduleOptions = 10,
 ): ProjectSchedule {
   const opts: ScheduleOptions = typeof maxWorkersOrOpts === "number"
@@ -490,7 +490,7 @@ export function generateSchedule(
     : maxWorkersOrOpts;
   const maxWorkers = opts.maxWorkers ?? 10;
   // Index matches by article code
-  const matchMap = new Map<string, CypeMatch>();
+  const matchMap = new Map<string, PriceMatch>();
   for (const m of matches) {
     matchMap.set(m.articleCode, m);
   }
@@ -502,15 +502,15 @@ export function generateSchedule(
     for (const sub of chapter.subChapters) {
       for (const article of sub.articles) {
         const match = matchMap.get(article.code);
-        const cypeCode = match?.cypeCode ?? "";
-        const productivity = PRODUCTIVITY[cypeCode] ?? DEFAULT_PRODUCTIVITY;
+        const priceCode = match?.priceCode ?? "";
+        const productivity = PRODUCTIVITY[priceCode] ?? DEFAULT_PRODUCTIVITY;
         const manhours = article.quantity * productivity;
 
         articles.push({
           article,
           chapter,
           phase,
-          cypeMatch: match,
+          priceMatch: match,
           manhours,
         });
       }
@@ -738,31 +738,31 @@ export function generateSchedule(
           hours: floorManhours,
         });
 
-        // Material & machinery from CYPE breakdown
-        if (art.cypeMatch) {
-          if (art.cypeMatch.breakdown.materials > 0) {
+        // Material & machinery from price breakdown
+        if (art.priceMatch) {
+          if (art.priceMatch.breakdown.materials > 0) {
             resources.push({
-              name: `Materiais - ${art.cypeMatch.cypeCode}`,
+              name: `Materiais - ${art.priceMatch.priceCode}`,
               type: "material",
               units: floorQty,
-              rate: art.cypeMatch.breakdown.materials,
+              rate: art.priceMatch.breakdown.materials,
               hours: 0,
             });
           }
-          if (art.cypeMatch.breakdown.machinery > 0) {
+          if (art.priceMatch.breakdown.machinery > 0) {
             resources.push({
-              name: `Equipamento - ${art.cypeMatch.cypeCode}`,
+              name: `Equipamento - ${art.priceMatch.priceCode}`,
               type: "machinery",
               units: 1,
-              rate: art.cypeMatch.breakdown.machinery * floorQty,
+              rate: art.priceMatch.breakdown.machinery * floorQty,
               hours: floorManhours,
             });
           }
         }
 
-        const unitPrice = art.cypeMatch?.unitCost ?? art.article.unitPrice ?? 0;
+        const unitPrice = art.priceMatch?.unitCost ?? art.article.unitPrice ?? 0;
         const totalCost = unitPrice * floorQty;
-        const materialCost = (art.cypeMatch?.breakdown.materials ?? 0) * floorQty;
+        const materialCost = (art.priceMatch?.breakdown.materials ?? 0) * floorQty;
 
         const floorLabel = floorCount > 1 ? ` — Piso ${floor}` : "";
         const predecessors: ScheduleTask["predecessors"] = floor === 0
@@ -785,7 +785,7 @@ export function generateSchedule(
           materialCost,
           outlineLevel: floorCount > 1 ? 3 : 2,
           percentComplete: 0,
-          notes: art.cypeMatch ? `CYPE: ${art.cypeMatch.cypeCode} (${art.cypeMatch.confidence}% conf.)` : undefined,
+          notes: art.priceMatch ? `Preço: ${art.priceMatch.priceCode} (${art.priceMatch.confidence}% conf.)` : undefined,
         });
 
         prevFloorUid = taskUid;

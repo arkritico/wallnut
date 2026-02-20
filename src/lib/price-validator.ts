@@ -1,5 +1,5 @@
 /**
- * CYPE Price Validator
+ * Price Validator
  *
  * Validates scraped prices against parametric estimates and business rules.
  * - Outlier detection (scraped vs parametric)
@@ -10,7 +10,7 @@
 
 import { createLogger } from "./logger";
 
-const logger = createLogger("cype-price-validator");
+const logger = createLogger("price-validator");
 
 // ============================================================================
 // TYPES
@@ -40,7 +40,7 @@ export interface UnitValidationResult {
   warnings: string[];
 }
 
-export interface CypePriceInput {
+export interface PricePriceInput {
   code: string;
   description: string;
   category: string;
@@ -202,7 +202,7 @@ export function detectPriceOutlier(
 // FULL VALIDATION
 // ============================================================================
 
-export function validateCypePrice(item: CypePriceInput): PriceValidationResult {
+export function validatePrice(item: PricePriceInput): PriceValidationResult {
   const warnings: string[] = [];
   const errors: string[] = [];
   let confidence = 100;
@@ -270,8 +270,8 @@ export function validateCypePrice(item: CypePriceInput): PriceValidationResult {
 /**
  * Batch validate and return statistics.
  */
-export function validateBatch(items: CypePriceInput[]): {
-  results: Array<CypePriceInput & { validation: PriceValidationResult }>;
+export function validateBatch(items: PricePriceInput[]): {
+  results: Array<PricePriceInput & { validation: PriceValidationResult }>;
   stats: {
     total: number;
     valid: number;
@@ -282,7 +282,7 @@ export function validateBatch(items: CypePriceInput[]): {
 } {
   const results = items.map((item) => ({
     ...item,
-    validation: validateCypePrice(item),
+    validation: validatePrice(item),
   }));
 
   const valid = results.filter((r) => r.validation.isValid).length;

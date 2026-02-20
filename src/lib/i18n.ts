@@ -483,7 +483,7 @@ const pt: Translations = {
   complete: "completo",
   mandatoryMissing: "documento(s) obrigatório(s) em falta",
 
-  costEstimation: "Estimativa de Custos (CYPE)",
+  costEstimation: "Estimativa de Custos",
   projectPlanning: "Planeamento MS Project",
   additionalModules: "Módulos adicionais",
 
@@ -525,9 +525,9 @@ const pt: Translations = {
   inputFormats: "IFC · PDF · XLS · DWFx",
   inputFormatsDesc: "Qualquer nível de desenvolvimento",
   capCostTitle: "Estimativa de Custos",
-  capCostDesc: "Base de preços CYPE com mão de obra, materiais e equipamentos. Ligação automática entre modelo IFC e Mapa de Quantidades por keynotes — ou MQT extrapolado com máximo rigor quando ausente.",
+  capCostDesc: "Base de preços com mão de obra, materiais e equipamentos. Ligação automática entre modelo IFC e Mapa de Quantidades por keynotes — ou MQT extrapolado com máximo rigor quando ausente.",
   capScheduleTitle: "Planeamento de Obra",
-  capScheduleDesc: "Ficheiro MS Project com feriados portugueses, custos por recurso CYPE e mão de obra dimensionada à realidade da obra. Pronto para execução.",
+  capScheduleDesc: "Ficheiro MS Project com feriados portugueses, custos por recurso e mão de obra dimensionada à realidade da obra. Pronto para execução.",
   capComplianceTitle: "Conformidade Regulamentar",
   capComplianceDesc: "1.964 regras em 18 especialidades. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocódigos, DL 163/2006 e regulamentação municipal — verificação automática.",
 
@@ -754,7 +754,7 @@ const en: Translations = {
   complete: "complete",
   mandatoryMissing: "mandatory document(s) missing",
 
-  costEstimation: "Cost Estimate (CYPE)",
+  costEstimation: "Cost Estimate",
   projectPlanning: "MS Project Planning",
   additionalModules: "Additional modules",
 
@@ -796,9 +796,9 @@ const en: Translations = {
   inputFormats: "IFC · PDF · XLS · DWFx",
   inputFormatsDesc: "Any level of development",
   capCostTitle: "Cost Estimation",
-  capCostDesc: "CYPE price database with labor, materials, and equipment. Automatic linking between IFC model and Bill of Quantities via keynotes — or BOQ extrapolated with maximum rigor when absent.",
+  capCostDesc: "Price database with labor, materials, and equipment. Automatic linking between IFC model and Bill of Quantities via keynotes — or BOQ extrapolated with maximum rigor when absent.",
   capScheduleTitle: "Construction Scheduling",
-  capScheduleDesc: "MS Project file with Portuguese holidays, CYPE resource costs, and workforce sized to the project's reality. Ready for execution.",
+  capScheduleDesc: "MS Project file with Portuguese holidays, resource costs, and workforce sized to the project's reality. Ready for execution.",
   capComplianceTitle: "Regulatory Compliance",
   capComplianceDesc: "1,964 rules across 18 specialties. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocodes, DL 163/2006, and municipal regulations — automatically verified.",
 

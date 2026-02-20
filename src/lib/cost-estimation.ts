@@ -1,7 +1,7 @@
 /**
- * Cost estimation module based on Gerador de Preços (CYPE) reference data.
+ * Cost estimation module based on Gerador de Preços reference data.
  *
- * Uses the CYPE item code structure (3 letters + 3 digits) and unit pricing
+ * Uses the price item code structure (3 letters + 3 digits) and unit pricing
  * from geradordeprecos.info to estimate remediation costs for non-compliance
  * findings. Includes 3-component breakdown (materials, labor, machinery),
  * parametric adjustments by district and building type, and automatic
@@ -13,7 +13,7 @@
 
 import type { BuildingProject, Finding, RegulationArea } from "./types";
 import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
-// NOTE: cype-matcher-db-loader uses fs/winston — imported lazily to avoid
+// NOTE: price-db-loader uses fs/winston — imported lazily to avoid
 // pulling Node.js modules into the client bundle (WbsSchedule.tsx imports formatCost).
 import { aggregateIfcQuantities, lookupIfcQuantity, type IfcQuantitySummary } from "./ifc-quantity-takeoff";
 
@@ -27,12 +27,12 @@ export interface CostComponent {
   machinery: number;
 }
 
-export interface CypeWorkItem {
-  /** CYPE item code (e.g., IOD010, ZFF120, IEI015) */
+export interface PriceWorkItem {
+  /** Price item code (e.g., IOD010, ZFF120, IEI015) */
   code: string;
   /** Portuguese description */
   description: string;
-  /** CYPE chapter path */
+  /** Price chapter path */
   chapter: string;
   /** Measurement unit */
   unit: string;  // Common: "m2" | "m" | "Ud" | "m3" | "kg" | "sistema" | "projeto" | "ensaio" | "vg" and others
@@ -64,8 +64,8 @@ export interface CostLineItem {
   /** Finding that triggered this cost */
   findingId: string;
   findingDescription: string;
-  /** CYPE work item reference */
-  workItem: CypeWorkItem;
+  /** Price work item reference */
+  workItem: PriceWorkItem;
   /** Estimated quantity */
   quantity: number;
   /** How quantity was determined */
@@ -91,8 +91,8 @@ export interface CostEstimate {
   notes: string;
   /** Detailed line items from CYPE database */
   lineItems?: CostLineItem[];
-  /** CYPE reference code */
-  cypeCode?: string;
+  /** Price reference code */
+  priceCode?: string;
 }
 
 export interface CostSummary {
@@ -101,7 +101,7 @@ export interface CostSummary {
   totalMaxCost: number;
   byArea: { area: RegulationArea; areaName: string; minCost: number; maxCost: number; count: number }[];
   currency: string;
-  /** Detailed CYPE line items */
+  /** Detailed price line items */
   lineItems: CostLineItem[];
   /** Location adjustment factor applied */
   locationFactor: number;
@@ -116,16 +116,16 @@ export interface CostSummary {
   totalWithContingency: { min: number; max: number };
   /** Number of line items where bulk discount was applied */
   scaledLineItems: number;
-  /** How many items came from the full CYPE database (vs curated) */
+  /** How many items came from the full price database (vs curated) */
   databaseItemsUsed: number;
 }
 
 // ============================================================
-// CYPE Reference Price Database
+// Reference Price Database
 // ============================================================
 
 /**
- * CYPE work items database. Prices are reference values from
+ * Price work items database. Prices are reference values from
  * geradordeprecos.info for Portugal (2024-2025 market).
  *
  * Code structure: 3 letters (chapter/subchapter/section) + 3 digits (item)
@@ -133,7 +133,7 @@ export interface CostSummary {
  *   Z = Reabilitação energética, F = Fachadas, F = ETICS = ZFF
  *   I = Instalações, E = Elétricas, I = Interiores = IEI
  */
-const CURATED_ITEMS: CypeWorkItem[] = [
+const CURATED_ITEMS: PriceWorkItem[] = [
   // ─── FIRE SAFETY (IO) ──────────────────────────────────────
   {
     code: "IOD010", description: "Central de deteção de incêndio analógica",
@@ -378,28 +378,28 @@ const CURATED_ITEMS: CypeWorkItem[] = [
     code: "ILA010", description: "Armário de Telecomunicações de Edifício (ATE)",
     chapter: "Instalações > Telecomunicações > ITED",
     unit: "Ud", unitCost: 2200, breakdown: { materials: 1700, labor: 420, machinery: 80 },
-    isRehab: false, areas: ["ited_itur"],
+    isRehab: false, areas: ["telecommunications"],
     patterns: [/ATE|armário.*telecomunicações.*edifício/i],
   },
   {
     code: "ILA020", description: "Armário de Telecomunicações Individual (ATI)",
     chapter: "Instalações > Telecomunicações > ITED",
     unit: "Ud", unitCost: 450, breakdown: { materials: 320, labor: 110, machinery: 20 },
-    isRehab: false, areas: ["ited_itur"],
+    isRehab: false, areas: ["telecommunications"],
     patterns: [/ATI|armário.*telecomunicações.*individual/i],
   },
   {
     code: "ILA050", description: "Cabo de fibra óptica monomodo (ITED por fração)",
     chapter: "Instalações > Telecomunicações > Cablagem",
     unit: "Ud", unitCost: 380, breakdown: { materials: 250, labor: 110, machinery: 20 },
-    isRehab: false, areas: ["ited_itur"],
+    isRehab: false, areas: ["telecommunications"],
     patterns: [/fibra.*óptica|fiber.*optic|monomodo/i],
   },
   {
     code: "ILA080", description: "Certificação ITED por fração (instalador credenciado ANACOM)",
     chapter: "Instalações > Telecomunicações > Certificação",
     unit: "Ud", unitCost: 350, breakdown: { materials: 0, labor: 350, machinery: 0 },
-    isRehab: false, areas: ["ited_itur"],
+    isRehab: false, areas: ["telecommunications"],
     patterns: [/certificação.*ITED|ITED.*certif/i],
   },
 
@@ -491,21 +491,21 @@ const CURATED_ITEMS: CypeWorkItem[] = [
     code: "IVV010", description: "Ventilador de extração para cozinha (300 m³/h)",
     chapter: "Instalações > Ventilação > Extração",
     unit: "Ud", unitCost: 320, breakdown: { materials: 240, labor: 65, machinery: 15 },
-    isRehab: false, areas: ["avac"],
+    isRehab: false, areas: ["hvac"],
     patterns: [/extração.*cozinha|ventilador.*cozinha/i],
   },
   {
     code: "IVV020", description: "Ventilador de extração para WC (150 m³/h)",
     chapter: "Instalações > Ventilação > Extração",
     unit: "Ud", unitCost: 185, breakdown: { materials: 135, labor: 40, machinery: 10 },
-    isRehab: false, areas: ["avac"],
+    isRehab: false, areas: ["hvac"],
     patterns: [/extração.*WC|ventilador.*WC|extração.*sanitári/i],
   },
   {
     code: "IVC010", description: "Unidade de ventilação mecânica com recuperação de calor (VMC)",
     chapter: "Instalações > Ventilação > VMC",
     unit: "Ud", unitCost: 3800, breakdown: { materials: 2900, labor: 750, machinery: 150 },
-    isRehab: true, areas: ["avac", "thermal"],
+    isRehab: true, areas: ["hvac", "thermal"],
     patterns: [/VMC|recuperação.*calor|ventilação.*mecânica.*controlada|HRV/i],
   },
 
@@ -564,7 +564,7 @@ const CURATED_ITEMS: CypeWorkItem[] = [
     code: "NOB010", description: "Barreira anti-radão em laje térrea (membrana + selagem)",
     chapter: "Isolamentos > Proteção contra radão",
     unit: "m2", unitCost: 18, breakdown: { materials: 12, labor: 5, machinery: 1 },
-    isRehab: true, areas: ["avac"],
+    isRehab: true, areas: ["hvac"],
     patterns: [/radão|radon/i],
   },
 
@@ -686,29 +686,29 @@ const CURATED_ITEMS: CypeWorkItem[] = [
 ];
 
 // ============================================================
-// Merged Database (curated + full CYPE)
+// Merged Database (curated + full price DB)
 // ============================================================
 
-let _mergedDb: CypeWorkItem[] | null = null;
+let _mergedDb: PriceWorkItem[] | null = null;
 
 /**
  * Get the cost estimation database, merging curated items (with hand-tuned
- * regex patterns) and the full 2,049-item CYPE database from the scraper.
+ * regex patterns) and the full 2,049-item price database from the scraper.
  * Curated items appear first for preferential matching; full DB items
  * that share a code with a curated item are skipped (curated version wins).
  */
-function getCostDatabase(): CypeWorkItem[] {
+function getCostDatabase(): PriceWorkItem[] {
   if (_mergedDb) return _mergedDb;
 
   const curatedCodes = new Set(CURATED_ITEMS.map(i => i.code));
 
   // Lazy require to keep fs/winston out of client bundle
-  let fullDb: CypeWorkItem[] = [];
+  let fullDb: PriceWorkItem[] = [];
   if (typeof window === "undefined") {
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { getCypeMatcherDatabase } = require("./cype-matcher-db-loader") as { getCypeMatcherDatabase: () => CypeWorkItem[] };
-      fullDb = getCypeMatcherDatabase();
+      const { getPriceMatcherDatabase } = require("./price-db-loader") as { getPriceMatcherDatabase: () => PriceWorkItem[] };
+      fullDb = getPriceMatcherDatabase();
     } catch {
       // Client-side or module unavailable — use curated items only
     }
@@ -748,11 +748,11 @@ const AREA_NAMES: Record<RegulationArea, string> = {
   architecture: "Arquitetura",
   structural: "Estruturas",
   fire_safety: "Segurança Contra Incêndio",
-  avac: "AVAC",
+  hvac: "AVAC",
   water_drainage: "Águas e Drenagem",
   gas: "Gás",
   electrical: "Instalações Elétricas",
-  ited_itur: "ITED/ITUR",
+  telecommunications: "ITED/ITUR",
   thermal: "Desempenho Térmico",
   acoustic: "Acústica",
   accessibility: "Acessibilidades",
@@ -760,7 +760,7 @@ const AREA_NAMES: Record<RegulationArea, string> = {
   elevators: "Ascensores",
   licensing: "Licenciamento",
   waste: "Resíduos",
-  local: "Municipal",
+  municipal: "Municipal",
   drawings: "Desenhos",
   general: "Geral",
 };
@@ -774,7 +774,7 @@ const AREA_NAMES: Record<RegulationArea, string> = {
  * Returns { quantity, source } where source indicates how it was determined.
  */
 function estimateQuantity(
-  item: CypeWorkItem,
+  item: PriceWorkItem,
   finding: Finding,
   project?: BuildingProject,
   ifcQuantities?: IfcQuantitySummary | null,
@@ -1020,10 +1020,10 @@ const ARCHITECTURAL_KEYWORDS: RegExp[] = [
 ];
 
 /**
- * Compute token similarity score between a finding text and a CYPE item.
+ * Compute token similarity score between a finding text and a price item.
  * Returns a value 0-100 based on overlapping significant words.
  */
-function tokenSimilarity(searchText: string, item: CypeWorkItem): number {
+function tokenSimilarity(searchText: string, item: PriceWorkItem): number {
   const textTokens = new Set(
     searchText.toLowerCase().split(/[\s,.:;()\-/]+/).filter(w => w.length > 3)
   );
@@ -1041,7 +1041,7 @@ function tokenSimilarity(searchText: string, item: CypeWorkItem): number {
 }
 
 /**
- * Match a finding to the most appropriate CYPE work item(s).
+ * Match a finding to the most appropriate price work item(s).
  *
  * Matching strategy (scored):
  * 1. Pattern match + area match → score 100 (curated items come first)
@@ -1051,9 +1051,9 @@ function tokenSimilarity(searchText: string, item: CypeWorkItem): number {
  *
  * Returns items sorted by score (best first).
  */
-export function matchFindingToCype(finding: Finding): CypeWorkItem[] {
+export function matchFindingToPrice(finding: Finding): PriceWorkItem[] {
   const searchText = `${finding.description} ${finding.regulation} ${finding.article ?? ""}`;
-  const scored: { item: CypeWorkItem; score: number }[] = [];
+  const scored: { item: PriceWorkItem; score: number }[] = [];
   const db = getCostDatabase();
 
   for (const item of db) {
@@ -1228,8 +1228,8 @@ export function estimateCosts(
   for (const finding of nonCompliant) {
     let matched = false;
 
-    // Try to match using the matchFindingToCype function (curated first, then full DB)
-    const matchedItems = matchFindingToCype(finding);
+    // Try to match using the matchFindingToPrice function (curated first, then full DB)
+    const matchedItems = matchFindingToPrice(finding);
 
     if (matchedItems.length > 0) {
       const item = matchedItems[0];
@@ -1275,7 +1275,7 @@ export function estimateCosts(
         confidence: lineItem.confidence,
         notes: `${item.code}: ${item.description} (${quantity.toFixed(1)} ${item.unit} × ${formatCost(scaledUnitCost)}/${item.unit}${scaled ? " c/ desconto" : ""})`,
         lineItems: [lineItem],
-        cypeCode: item.code,
+        priceCode: item.code,
       });
       matched = true;
     }

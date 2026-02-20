@@ -20,7 +20,7 @@ import {
   BarChart3,
 } from "lucide-react";
 import type { WbsProject, WbsChapter, WbsSubChapter, WbsArticle, MatchReport, ProjectSchedule, CriticalChainBuffer } from "@/lib/wbs-types";
-import type { CypeWorkItem } from "@/lib/cost-estimation";
+import type { PriceWorkItem } from "@/lib/cost-estimation";
 import { generateSchedule, type ScheduleOptions } from "@/lib/construction-sequencer";
 import { downloadMSProjectXML, generateScheduleSummary } from "@/lib/msproject-export";
 import { formatCost } from "@/lib/cost-estimation";
@@ -30,10 +30,10 @@ import { optimizeSchedule, getDefaultConstraints, type OptimizedSchedule, type S
 import { parseCsvWbs, parseJsonWbs } from "@/lib/wbs-parser";
 import ProjectUploader, { type UnifiedProject } from "@/components/ProjectUploader";
 import {
-  parseCypeExport, importCypePrices, getImportedCount,
+  parsePriceExport, importPrices, getImportedCount,
   getAllParametricItems, calculateParametricPrice,
   type PriceResult, type ParametricItem,
-} from "@/lib/cype-parametric";
+} from "@/lib/parametric-pricing";
 import {
   analyzeIfcSpecialty, detectSpecialty,
   type SpecialtyAnalysisResult, type IfcSpecialty,
@@ -68,7 +68,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
 
   // IFC specialty analysis
   const [ifcAnalyses, setIfcAnalyses] = useState<SpecialtyAnalysisResult[]>([]);
-  const [importedCypeCount, setImportedCypeCount] = useState(0);
+  const [importedPriceCount, setImportedPriceCount] = useState(0);
 
   // Parametric configurator
   const [showConfigurator, setShowConfigurator] = useState(false);
@@ -114,18 +114,18 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
     }
   }, [wbsProject]);
 
-  // ── CYPE Export Import ───────────────────────────────────────
-  const handleCypeImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // ── Price Export Import ───────────────────────────────────────
+  const handlePriceImport = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       const text = await file.text();
-      const rows = parseCypeExport(text);
-      const count = importCypePrices(rows);
-      setImportedCypeCount(prev => prev + count);
-      alert(`Importados ${count} preços do CYPE Gerador de Preços.`);
+      const rows = parsePriceExport(text);
+      const count = importPrices(rows);
+      setImportedPriceCount(prev => prev + count);
+      alert(`Importados ${count} preços da base de dados.`);
     } catch {
-      alert("Erro ao importar ficheiro CYPE.");
+      alert("Erro ao importar ficheiro de preços.");
     }
   }, []);
 
@@ -181,7 +181,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
     if (!wbsProject) return;
     setIsMatching(true);
     try {
-      const response = await fetch('/api/cype/match', {
+      const response = await fetch('/api/pricing/match', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(wbsProject),
@@ -194,7 +194,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
       setStep("match");
     } catch (error) {
       console.error('Matching error:', error);
-      alert(`Erro ao fazer correspondência CYPE: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      alert(`Erro ao fazer correspondência de preços: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     } finally {
       setIsMatching(false);
     }
@@ -261,8 +261,8 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
     setOptimizedSchedule(optimized);
   }, [schedule, resources, maxWorkersPerFloor]);
 
-  // ── CYPE Search ──────────────────────────────────────────────
-  const [searchResults, setSearchResults] = useState<CypeWorkItem[]>([]);
+  // ── Price Search ──────────────────────────────────────────────
+  const [searchResults, setSearchResults] = useState<PriceWorkItem[]>([]);
 
   useEffect(() => {
     if (!searchQuery || searchQuery.length < 2) {
@@ -273,7 +273,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
     const controller = new AbortController();
     setIsSearching(true);
 
-    fetch(`/api/cype/search?q=${encodeURIComponent(searchQuery)}&limit=8`, {
+    fetch(`/api/pricing/search?q=${encodeURIComponent(searchQuery)}&limit=8`, {
       signal: controller.signal,
     })
       .then(res => res.json())
@@ -515,19 +515,19 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
             </div>
           )}
 
-          {/* CYPE Import & Parametric Configurator */}
+          {/* Price Import & Parametric Configurator */}
           <div className="border-t border-gray-200 pt-4 mb-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="font-medium text-gray-800">Preços CYPE</h4>
+              <h4 className="font-medium text-gray-800">Base de Preços</h4>
               <div className="flex items-center gap-2">
-                {importedCypeCount > 0 && (
+                {importedPriceCount > 0 && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                    {importedCypeCount} preços importados
+                    {importedPriceCount} preços importados
                   </span>
                 )}
                 <label className="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 cursor-pointer text-xs font-medium border border-amber-200">
-                  <Upload className="w-3 h-3" /> Importar export CYPE
-                  <input type="file" accept=".csv,.tsv,.txt,.xls" onChange={handleCypeImport} className="hidden" />
+                  <Upload className="w-3 h-3" /> Importar preços
+                  <input type="file" accept=".csv,.tsv,.txt,.xls" onChange={handlePriceImport} className="hidden" />
                 </label>
                 <button
                   onClick={() => setShowConfigurator(!showConfigurator)}
@@ -538,7 +538,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
               </div>
             </div>
             <p className="text-xs text-gray-500 mb-3">
-              Os preços estáticos são estimativas. Importe um export do CYPE Gerador de Preços (.csv) para usar preços reais, ou use o configurador para ajustar parâmetros (tipo de abertura, vidro, espessura, etc.).
+              Os preços estáticos são estimativas. Importe um ficheiro de preços (.csv) para usar preços reais, ou use o configurador para ajustar parâmetros (tipo de abertura, vidro, espessura, etc.).
             </p>
 
             {/* Parametric Configurator */}
@@ -615,7 +615,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
                               ? "bg-green-100 text-green-700"
                               : "bg-accent-medium text-accent"
                           }`}>
-                            {configResult.source === "imported" ? "CYPE importado" : "Paramétrico"}
+                            {configResult.source === "imported" ? "Preço importado" : "Paramétrico"}
                           </span>
                         </div>
                         <code className="text-xs text-gray-500">{configResult.variantCode}</code>
@@ -640,10 +640,10 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
             )}
           </div>
 
-          {/* CYPE Search */}
+          {/* Price Search */}
           <div className="border-t border-gray-200 pt-4">
             <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
-              <Search className="w-4 h-4" /> Pesquisar Base de Dados CYPE
+              <Search className="w-4 h-4" /> Pesquisar Base de Preços
             </h4>
             <input
               type="text"
@@ -691,7 +691,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
                   className="inline-flex items-center gap-2 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors font-medium"
                 >
                   <Play className="w-4 h-4" />
-                  Mapear para CYPE
+                  Mapear preços
                 </button>
               </div>
 
@@ -719,7 +719,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
         <div className="space-y-4">
           {/* Stats */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">2. Correspondência CYPE</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">2. Correspondência de Preços</h3>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
               <StatCard label="Total Artigos" value={matchReport.stats.totalArticles} color="gray" />
@@ -752,17 +752,17 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono text-xs text-gray-500">{m.articleCode}</span>
                         <span className="text-gray-400">→</span>
-                        <code className="text-xs font-mono px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded">{m.cypeCode}</code>
+                        <code className="text-xs font-mono px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded">{m.priceCode}</code>
                         <ConfidenceBadge confidence={m.confidence} />
                       </div>
                       <p className="text-gray-700 mt-1">{m.articleDescription}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">CYPE: {m.cypeDescription}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Preço: {m.priceDescription}</p>
                       {m.warnings.length > 0 && (
                         <p className="text-xs text-amber-600 mt-0.5">{m.warnings.join("; ")}</p>
                       )}
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="font-medium text-gray-900">{formatCost(m.unitCost)}/{m.cypeUnit}</p>
+                      <p className="font-medium text-gray-900">{formatCost(m.unitCost)}/{m.priceUnit}</p>
                     </div>
                   </div>
                 </div>
@@ -1322,7 +1322,7 @@ export default function WbsSchedule({ onBack }: WbsScheduleProps) {
 function StepIndicator({ current }: { current: Step }) {
   const steps: { key: Step; label: string }[] = [
     { key: "import", label: "Importar WBS" },
-    { key: "match", label: "CYPE Match" },
+    { key: "match", label: "Price Match" },
     { key: "schedule", label: "Planeamento" },
   ];
   const idx = steps.findIndex(s => s.key === current);

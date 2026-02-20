@@ -5,6 +5,7 @@
  */
 
 import { getSupabase, isSupabaseConfigured } from "./supabase";
+import { isAllowedEmail } from "./auth-guard";
 import type { BuildingProject, AnalysisResult } from "./types";
 import * as localStorage from "./storage";
 import { recordHistory } from "./collaboration";
@@ -41,12 +42,18 @@ export async function getCurrentUser() {
 }
 
 export async function signInWithEmail(email: string, password: string) {
+  if (!isAllowedEmail(email)) {
+    return { data: { user: null, session: null }, error: { message: "Apenas emails @wallnut.pt são permitidos." } };
+  }
   const sb = getSupabase();
   if (!sb) throw new Error("Supabase not configured");
   return sb.auth.signInWithPassword({ email, password });
 }
 
 export async function signUpWithEmail(email: string, password: string) {
+  if (!isAllowedEmail(email)) {
+    return { data: { user: null, session: null }, error: { message: "Apenas emails @wallnut.pt são permitidos." } };
+  }
   const sb = getSupabase();
   if (!sb) throw new Error("Supabase not configured");
   return sb.auth.signUp({ email, password });

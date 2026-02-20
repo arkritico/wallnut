@@ -60,17 +60,17 @@ supabase db push
 
 Or manually run the SQL files in Supabase SQL Editor:
 1. `supabase/schema.sql` — projects + files tables with RLS
-2. `supabase/migrations/20260215_cype_prices.sql` — CYPE pricing tables
+2. `supabase/migrations/20260215_pricing_items.sql` — pricing tables
 
-### Seed CYPE data
+### Seed price data
 
 ```bash
-# From project root, seed the CYPE prices into Supabase
+# From project root, seed the prices into Supabase
 # (requires SUPABASE_SERVICE_KEY in .env.local)
-npm run scrape-cype -- --seed-only
+npm run scrape-prices -- --seed-only
 ```
 
-Or import `data/cype-full.json` via the Supabase dashboard Table Editor.
+Or import `data/price-db.json` via the Supabase dashboard Table Editor.
 
 ## 3. Verify
 

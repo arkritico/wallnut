@@ -438,7 +438,7 @@ export default function AnalysisResults({ result, calculations, project, onReset
       )}
 
       {/* ════════════════════════════════════════════════════════════
-           5. COST ESTIMATION (CYPE)
+           5. COST ESTIMATION
          ════════════════════════════════════════════════════════════ */}
       {hasCostData && (
         <Section
@@ -503,12 +503,12 @@ export default function AnalysisResults({ result, calculations, project, onReset
                   className="text-sm text-accent hover:text-accent-hover font-medium flex items-center gap-1"
                 >
                   {showCostDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  {showCostDetails ? "Ocultar detalhes CYPE" : `Ver detalhes CYPE (${costSummary.lineItems.length} rubricas)`}
+                  {showCostDetails ? "Ocultar detalhes de preços" : `Ver detalhes de preços (${costSummary.lineItems.length} rubricas)`}
                 </button>
                 {showCostDetails && (
                   <div className="mt-3 space-y-2">
                     {costSummary.lineItems.map((li, idx) => (
-                      <CypeLineItemCard key={`${li.workItem.code}-${idx}`} lineItem={li} />
+                      <PriceLineItemCard key={`${li.workItem.code}-${idx}`} lineItem={li} />
                     ))}
                   </div>
                 )}
@@ -516,7 +516,7 @@ export default function AnalysisResults({ result, calculations, project, onReset
             )}
 
             <p className="text-xs text-gray-500">
-              Valores de referência: <strong>geradordeprecos.info</strong> (CYPE, Portugal 2024-2025).
+              Valores de referência: <strong>geradordeprecos.info</strong> (Portugal 2024-2025).
               Custos reais variam conforme localização, acessibilidade e complexidade da obra.
             </p>
           </div>
@@ -1672,7 +1672,7 @@ function Section({ title, id, open, onToggle, children, icon }: {
   );
 }
 
-function CypeLineItemCard({ lineItem }: { lineItem: CostLineItem }) {
+function PriceLineItemCard({ lineItem }: { lineItem: CostLineItem }) {
   const { workItem: wi, quantity, quantitySource, adjustedCost, breakdown } = lineItem;
   const confidenceColors = { high: "bg-green-100 text-green-700", medium: "bg-amber-100 text-amber-700", low: "bg-gray-100 text-gray-600" };
   const confidenceLabels = { high: "Alta", medium: "Media", low: "Baixa" };
@@ -1785,11 +1785,11 @@ const AREA_TO_FORM_SECTION: Record<string, string> = {
   architecture: "architecture",
   structural: "structural",
   fire_safety: "fire",
-  avac: "avac",
+  hvac: "avac",
   water_drainage: "water",
   gas: "gas",
   electrical: "electrical",
-  ited_itur: "telecom",
+  telecommunications: "telecom",
   thermal: "envelope",
   acoustic: "acoustic",
   accessibility: "accessibility",
@@ -1797,7 +1797,7 @@ const AREA_TO_FORM_SECTION: Record<string, string> = {
   elevators: "elevators",
   licensing: "licensing",
   waste: "waste",
-  local: "local",
+  municipal: "local",
   drawings: "drawings",
   general: "general",
 };
@@ -1807,11 +1807,11 @@ const AREA_SHORT_LABELS: Record<string, string> = {
   architecture: "Arquitetura",
   structural: "Estruturas",
   fire_safety: "Incêndio",
-  avac: "AVAC",
+  hvac: "AVAC",
   water_drainage: "Águas",
   gas: "Gás",
   electrical: "Elétrico",
-  ited_itur: "ITED/ITUR",
+  telecommunications: "ITED/ITUR",
   thermal: "Térmico",
   acoustic: "Acústica",
   accessibility: "Acessibilidade",
@@ -1819,7 +1819,7 @@ const AREA_SHORT_LABELS: Record<string, string> = {
   elevators: "Ascensores",
   licensing: "Licenciamento",
   waste: "Resíduos",
-  local: "Municipal",
+  municipal: "Municipal",
   drawings: "Desenhos",
   general: "Geral",
 };
@@ -1829,11 +1829,11 @@ const AREA_ICONS: Record<string, React.ReactNode> = {
   architecture: <Ruler className="w-4 h-4 text-teal-600" />,
   structural: <Columns3 className="w-4 h-4 text-stone-600" />,
   fire_safety: <Flame className="w-4 h-4 text-orange-500" />,
-  avac: <Wind className="w-4 h-4 text-cyan-600" />,
+  hvac: <Wind className="w-4 h-4 text-cyan-600" />,
   water_drainage: <Droplets className="w-4 h-4 text-sky-500" />,
   gas: <Fuel className="w-4 h-4 text-red-500" />,
   electrical: <Plug className="w-4 h-4 text-amber-600" />,
-  ited_itur: <Wifi className="w-4 h-4 text-cyan-500" />,
+  telecommunications: <Wifi className="w-4 h-4 text-cyan-500" />,
   thermal: <Zap className="w-4 h-4 text-accent" />,
   acoustic: <Volume2 className="w-4 h-4 text-indigo-500" />,
   accessibility: <Accessibility className="w-4 h-4 text-purple-500" />,
@@ -1841,7 +1841,7 @@ const AREA_ICONS: Record<string, React.ReactNode> = {
   elevators: <ArrowUpDown className="w-4 h-4 text-violet-500" />,
   licensing: <FileText className="w-4 h-4 text-emerald-600" />,
   waste: <Recycle className="w-4 h-4 text-lime-600" />,
-  local: <MapPin className="w-4 h-4 text-rose-500" />,
+  municipal: <MapPin className="w-4 h-4 text-rose-500" />,
   drawings: <PenTool className="w-4 h-4 text-pink-500" />,
   general: <Building className="w-4 h-4 text-gray-500" />,
 };

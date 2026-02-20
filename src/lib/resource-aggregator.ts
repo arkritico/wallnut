@@ -1,14 +1,14 @@
 /**
  * Resource Aggregator
  *
- * Aggregates total project resources from matched CYPE items.
+ * Aggregates total project resources from matched price items.
  * Consolidates materials, labor by trade, and equipment across all WBS items.
  */
 
 import type {
   WbsProject,
   WbsArticle,
-  CypeMatch,
+  PriceMatch,
   ConstructionPhase,
   ProjectSchedule,
   ScheduleTask,
@@ -64,7 +64,7 @@ export interface EquipmentResource {
 
 /**
  * Extract trade/role from Portuguese labor description.
- * Patterns based on common CYPE Gerador de Preços conventions.
+ * Patterns based on common price database conventions.
  */
 function extractTrade(description: string): string {
   const patterns = [
@@ -186,7 +186,7 @@ function calculatePeakWorkers(
  */
 function collectUsedPhases(
   laborMap: Map<string, LaborResource>,
-  matches: CypeMatch[],
+  matches: PriceMatch[],
   project: WbsProject
 ): void {
   // For simplicity, we'll infer phases from chapter structure
@@ -214,16 +214,16 @@ function collectEquipmentPhases(
 // ============================================================
 
 /**
- * Aggregate total project resources from matched CYPE items.
+ * Aggregate total project resources from matched price items.
  *
  * @param project - The WBS project structure
- * @param matches - CYPE matches from the matcher
+ * @param matches - Price matches from the matcher
  * @param schedule - Optional schedule for peak worker calculation
  * @returns Aggregated project resources
  */
 export function aggregateProjectResources(
   project: WbsProject,
-  matches: CypeMatch[],
+  matches: PriceMatch[],
   schedule?: ProjectSchedule
 ): ProjectResources {
   const materialMap = new Map<string, MaterialResource>();
@@ -242,7 +242,7 @@ export function aggregateProjectResources(
     // WBS article quantity
     const wbsQuantity = wbsArticle.quantity || 1;
 
-    // Process each component in the CYPE breakdown
+    // Process each component in the price breakdown
     for (const component of breakdown) {
       // Skip header row or invalid entries (has null quantity or total)
       if (component.quantity === null || component.quantity === undefined) continue;

@@ -613,11 +613,11 @@ const ALL_REGULATION_AREAS: RegulationArea[] = [
   "architecture",
   "structural",
   "fire_safety",
-  "avac",
+  "hvac",
   "water_drainage",
   "gas",
   "electrical",
-  "ited_itur",
+  "telecommunications",
   "thermal",
   "acoustic",
   "accessibility",
@@ -625,7 +625,7 @@ const ALL_REGULATION_AREAS: RegulationArea[] = [
   "elevators",
   "licensing",
   "waste",
-  "local",
+  "municipal",
   "drawings",
   "general",
 ];
@@ -970,7 +970,7 @@ describe("E2E: Rehabilitation project", async () => {
     // isInARU=true should produce PDM findings about ARU benefits
     const aruFinding = rehabResult.findings.find(
       (f) =>
-        f.area === "local" &&
+        f.area === "municipal" &&
         f.description.toLowerCase().includes("aru"),
     );
     expect(aruFinding).toBeDefined();
@@ -1189,7 +1189,7 @@ describe("E2E: PDM compliance produces findings", async () => {
       f.id.startsWith("PDM-"),
     );
     for (const f of pdmFindings) {
-      expect(f.area).toBe("local");
+      expect(f.area).toBe("municipal");
     }
   });
 

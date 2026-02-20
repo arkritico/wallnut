@@ -239,10 +239,10 @@ describe("Budget Excel Export", () => {
       const { sheets } = parseExcel(buffer);
       const mat = sheets["Materiais"];
 
-      const headerRow = findRow(mat, "Código CYPE");
+      const headerRow = findRow(mat, "Código Preço");
       expect(headerRow).toBeGreaterThan(-1);
       expect(mat[headerRow]).toEqual(
-        expect.arrayContaining(["Código CYPE", "Descrição", "Unidade", "Quantidade", "Preço Unit. (€)", "Total (€)", "Artigos WBS"])
+        expect.arrayContaining(["Código Preço", "Descrição", "Unidade", "Quantidade", "Preço Unit. (€)", "Total (€)", "Artigos WBS"])
       );
     });
 
@@ -251,7 +251,7 @@ describe("Budget Excel Export", () => {
       const { sheets } = parseExcel(buffer);
       const mat = sheets["Materiais"];
 
-      const headerRow = findRow(mat, "Código CYPE");
+      const headerRow = findRow(mat, "Código Preço");
       const firstData = mat[headerRow + 1];
       expect(firstData[0]).toBe("mt08aaa010a");
       expect(firstData[1]).toBe("Betão C25/30");
@@ -378,7 +378,7 @@ describe("Budget Excel Export", () => {
 
       // Materials sheet should still have header row
       const mat = sheets["Materiais"];
-      const headerRow = findRow(mat, "Código CYPE");
+      const headerRow = findRow(mat, "Código Preço");
       expect(headerRow).toBeGreaterThan(-1);
     });
   });

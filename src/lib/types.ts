@@ -10,11 +10,11 @@ export type RegulationArea =
   | "architecture"
   | "structural"
   | "fire_safety"
-  | "avac"
+  | "hvac"
   | "water_drainage"
   | "gas"
   | "electrical"
-  | "ited_itur"
+  | "telecommunications"
   | "thermal"
   | "acoustic"
   | "accessibility"
@@ -22,7 +22,7 @@ export type RegulationArea =
   | "elevators"
   | "licensing"
   | "waste"
-  | "local"
+  | "municipal"
   | "drawings"
   | "general";
 

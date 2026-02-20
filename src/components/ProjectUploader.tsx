@@ -546,7 +546,7 @@ export default function ProjectUploader({ onProjectReady }: ProjectUploaderProps
                 onClick={() => onProjectReady(unifiedProject)}
                 className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
               >
-                Continuar para Correspondência CYPE →
+                Continuar para Correspondência de Preços →
               </button>
             </div>
           </div>

@@ -509,7 +509,7 @@ export function findOptimizations(
         type: "standardization",
         severity: "suggestion",
         title: `${uniqueWindowSizes} tamanhos de janela diferentes (${totalWindows} janelas)`,
-        description: `Muitas variações de dimensão de caixilharia encarecem o projeto. No CYPE/Gerador de Preços, cada variação gera um preço composto diferente. Considere normalizar para 3-5 tamanhos standard.`,
+        description: `Muitas variações de dimensão de caixilharia encarecem o projeto. No Gerador de Preços, cada variação gera um preço composto diferente. Considere normalizar para 3-5 tamanhos standard.`,
         affectedElements: quantities.filter(q => q.entityType.includes("WINDOW")).map(q => q.globalId ?? q.name),
         potentialSavings: "5-15% em caixilharias (produção em série vs. medida)",
       });
@@ -575,7 +575,7 @@ export function findOptimizations(
         type: "cost",
         severity: "info",
         title: `Volume total de betão estimado: ${totalConcreteVol.toFixed(1)} m³`,
-        description: `Com base nos elementos estruturais do modelo. Verificar no CYPE por classe de betão e taxa de armadura.`,
+        description: `Com base nos elementos estruturais do modelo. Verificar no Gerador de Preços por classe de betão e taxa de armadura.`,
         affectedElements: [],
       });
     }
@@ -815,7 +815,7 @@ export function ifcToWbsArticles(
   }
 
   if (specialty === "structure") {
-    // Portuguese CYPE measures structural elements in linear meters (m)
+    // Portuguese price database measures structural elements in linear meters (m)
     // Columns: m per storey height; Beams: m per span; Slabs: m per bay
     const ASSUMED_STOREY_HEIGHT = 3.0; // m - typical Portuguese residential
     const ASSUMED_BEAM_SPAN = 5.0;     // m - typical beam span
@@ -1159,7 +1159,7 @@ import type { WbsProject } from "./wbs-types";
  *
  * @param analyses - Array of specialty analysis results (Architecture, Structure, MEP, etc.)
  * @param projectName - Optional project name (defaults to "Projeto do Modelo IFC")
- * @returns Complete WbsProject ready for CYPE matching and scheduling
+ * @returns Complete WbsProject ready for price matching and scheduling
  */
 export function createWbsFromIfc(
   analyses: SpecialtyAnalysisResult[],

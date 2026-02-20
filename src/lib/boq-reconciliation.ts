@@ -10,7 +10,7 @@
  *      matches BOQ article code directly (confidence 98). This is the user's own
  *      explicit linkage and takes highest priority.
  *   1. Generated code match — IFC-generated article code matches BOQ code (confidence 90-95)
- *   2. CYPE code match — both items resolved to the same CYPE code (confidence 70-85)
+ *   2. Price code match — both items resolved to the same price code (confidence 70-85)
  *   3. Text similarity — Jaccard + domain boost on descriptions (confidence 40-70, threshold ≥ 50)
  *
  * Unmatched IFC items become AdditionArticle entries with isAddition: true.
@@ -18,7 +18,7 @@
 
 import type { BoqItem, ParsedBoq } from "./xlsx-parser";
 import type { WbsArticle } from "./wbs-types";
-import type { CypeMatch } from "./wbs-types";
+import type { PriceMatch } from "./wbs-types";
 import type { IfcQuantityData } from "./ifc-specialty-analyzer";
 import {
   normalizeText,
@@ -59,17 +59,17 @@ export interface ReconciledArticle {
   /** Description from IFC (for reference, never replaces original) */
   ifcDescription?: string;
 
-  // CYPE enrichment
-  /** Matched CYPE code */
-  cypeCode?: string;
-  /** CYPE unit cost */
-  cypeCost?: number;
+  // Price enrichment
+  /** Matched price code */
+  priceCode?: string;
+  /** Price unit cost */
+  priceCost?: number;
 
   // Matching metadata
   /** Confidence 0-100 */
   matchConfidence: number;
   /** How the match was determined */
-  matchMethod: "direct_keynote" | "keynote" | "text_similarity" | "cype_code" | "unmatched";
+  matchMethod: "direct_keynote" | "keynote" | "text_similarity" | "price_code" | "unmatched";
   /** Always "execution_boq" for reconciled articles */
   source: "execution_boq";
 }
@@ -86,9 +86,9 @@ export interface AdditionArticle {
   /** IFC element GUIDs */
   ifcElementIds: string[];
 
-  // CYPE enrichment
-  cypeCode?: string;
-  cypeCost?: number;
+  // Price enrichment
+  priceCode?: string;
+  priceCost?: number;
   estimatedCost?: number;
 
   /** Always "ifc" for addition articles */
@@ -249,26 +249,26 @@ function buildIfcKeynoteIndex(
 }
 
 /**
- * Build a map of IFC articles grouped by CYPE code (if matched).
+ * Build a map of IFC articles grouped by price code (if matched).
  */
-function buildCypeCodeIndex(
+function buildPriceCodeIndex(
   ifcArticles: WbsArticle[],
-  cypeMatches: CypeMatch[],
-): Map<string, { article: WbsArticle; cypeCode: string }[]> {
-  const index = new Map<string, { article: WbsArticle; cypeCode: string }[]>();
+  priceMatches: PriceMatch[],
+): Map<string, { article: WbsArticle; priceCode: string }[]> {
+  const index = new Map<string, { article: WbsArticle; priceCode: string }[]>();
 
-  // Build article code → CYPE code lookup
-  const articleToCype = new Map<string, string>();
-  for (const match of cypeMatches) {
-    articleToCype.set(match.articleCode, match.cypeCode);
+  // Build article code → price code lookup
+  const articleToPrice = new Map<string, string>();
+  for (const match of priceMatches) {
+    articleToPrice.set(match.articleCode, match.priceCode);
   }
 
   for (const art of ifcArticles) {
-    const cypeCode = articleToCype.get(art.code);
-    if (!cypeCode) continue;
-    const existing = index.get(cypeCode) ?? [];
-    existing.push({ article: art, cypeCode });
-    index.set(cypeCode, existing);
+    const priceCode = articleToPrice.get(art.code);
+    if (!priceCode) continue;
+    const existing = index.get(priceCode) ?? [];
+    existing.push({ article: art, priceCode });
+    index.set(priceCode, existing);
   }
 
   return index;
@@ -311,17 +311,17 @@ const TEXT_SIMILARITY_THRESHOLD = 0.45;
  *
  * @param executionBoq - Parsed BOQ from the execution project (canonical)
  * @param ifcArticles - Articles generated from IFC analysis
- * @param options - Optional CYPE matches and keynote mappings
+ * @param options - Optional price matches and keynote mappings
  * @returns ReconciledBoq with execution articles and additions
  */
 export function reconcileBoqs(
   executionBoq: ParsedBoq,
   ifcArticles: WbsArticle[],
   options?: {
-    /** CYPE matches for the execution BOQ articles */
-    executionCypeMatches?: CypeMatch[];
-    /** CYPE matches for the IFC-derived articles */
-    ifcCypeMatches?: CypeMatch[];
+    /** Price matches for the execution BOQ articles */
+    executionPriceMatches?: PriceMatch[];
+    /** Price matches for the IFC-derived articles */
+    ifcPriceMatches?: PriceMatch[];
     /**
      * Raw IFC elements with classification (Revit keynote) data.
      * When provided, enables direct keynote matching (Pass 0) which
@@ -331,8 +331,8 @@ export function reconcileBoqs(
     ifcElements?: IfcQuantityData[];
   },
 ): ReconciledBoq {
-  const executionCypeMatches = options?.executionCypeMatches ?? [];
-  const ifcCypeMatches = options?.ifcCypeMatches ?? [];
+  const executionPriceMatches = options?.executionPriceMatches ?? [];
+  const ifcPriceMatches = options?.ifcPriceMatches ?? [];
   const ifcElements = options?.ifcElements ?? [];
 
   // Build indices
@@ -340,12 +340,12 @@ export function reconcileBoqs(
     ? buildDirectKeynoteIndex(ifcElements)
     : new Map<string, KeynoteElementGroup>();
   const ifcByCode = buildIfcKeynoteIndex(ifcArticles);
-  const ifcByCype = buildCypeCodeIndex(ifcArticles, ifcCypeMatches);
+  const ifcByPrice = buildPriceCodeIndex(ifcArticles, ifcPriceMatches);
 
-  // Build execution BOQ → CYPE lookup
-  const execToCype = new Map<string, CypeMatch>();
-  for (const match of executionCypeMatches) {
-    execToCype.set(match.articleCode, match);
+  // Build execution BOQ → price lookup
+  const execToPrice = new Map<string, PriceMatch>();
+  for (const match of executionPriceMatches) {
+    execToPrice.set(match.articleCode, match);
   }
 
   // Track which IFC articles have been consumed (matched to execution BOQ)
@@ -363,14 +363,14 @@ export function reconcileBoqs(
     let ifcQuantity: number | undefined;
     let ifcElementIds: string[] | undefined;
     let ifcDescription: string | undefined;
-    let cypeCode: string | undefined;
-    let cypeCost: number | undefined;
+    let priceCode: string | undefined;
+    let priceCost: number | undefined;
 
-    // Get CYPE info for this execution article
-    const execCype = execToCype.get(boqItem.code);
-    if (execCype) {
-      cypeCode = execCype.cypeCode;
-      cypeCost = execCype.unitCost;
+    // Get price info for this execution article
+    const execPrice = execToPrice.get(boqItem.code);
+    if (execPrice) {
+      priceCode = execPrice.priceCode;
+      priceCost = execPrice.unitCost;
     }
 
     // ── Pass 0: Direct keynote match (from user's keynote master file) ──
@@ -403,12 +403,12 @@ export function reconcileBoqs(
       }
     }
 
-    // ── Pass 2: CYPE code match ────────────────────────────
-    if (!matched && cypeCode) {
-      const cypeMatchArticles = ifcByCype.get(cypeCode);
-      if (cypeMatchArticles && cypeMatchArticles.length > 0) {
+    // ── Pass 2: Price code match ────────────────────────────
+    if (!matched && priceCode) {
+      const priceMatchArticles = ifcByPrice.get(priceCode);
+      if (priceMatchArticles && priceMatchArticles.length > 0) {
         // Find unconsumed ones
-        const available = cypeMatchArticles.filter(
+        const available = priceMatchArticles.filter(
           (cm) => !consumedIfcCodes.has(cm.article.code),
         );
         if (available.length > 0) {
@@ -421,7 +421,7 @@ export function reconcileBoqs(
           // Confidence depends on unit compatibility
           const unitMatch = unitsCompatible(boqItem.unit, articles[0].unit);
           matchConfidence = unitMatch ? 80 : 70;
-          matchMethod = "cype_code";
+          matchMethod = "price_code";
 
           for (const a of articles) consumedIfcCodes.add(a.code);
           matched = true;
@@ -486,8 +486,8 @@ export function reconcileBoqs(
       quantityDelta: ifcCorroborated ? quantityDelta : undefined,
       ifcElementIds: ifcCorroborated ? ifcElementIds : undefined,
       ifcDescription: ifcCorroborated ? ifcDescription : undefined,
-      cypeCode,
-      cypeCost,
+      priceCode,
+      priceCost,
       matchConfidence: matched ? matchConfidence : 0,
       matchMethod,
       source: "execution_boq",
@@ -505,11 +505,11 @@ export function reconcileBoqs(
     // Skip IFC articles with no quantity
     if (ifcArt.quantity <= 0) continue;
 
-    // Find CYPE match for this IFC article
-    const ifcCype = ifcCypeMatches.find((m) => m.articleCode === ifcArt.code);
+    // Find price match for this IFC article
+    const ifcPrice = ifcPriceMatches.find((m) => m.articleCode === ifcArt.code);
 
-    const estimatedCost = ifcCype
-      ? ifcCype.unitCost * ifcArt.quantity
+    const estimatedCost = ifcPrice
+      ? ifcPrice.unitCost * ifcArt.quantity
       : ifcArt.unitPrice
         ? ifcArt.unitPrice * ifcArt.quantity
         : undefined;
@@ -520,8 +520,8 @@ export function reconcileBoqs(
       unit: ifcArt.unit,
       ifcQuantity: ifcArt.quantity,
       ifcElementIds: ifcArt.elementIds ?? [],
-      cypeCode: ifcCype?.cypeCode,
-      cypeCost: ifcCype?.unitCost,
+      priceCode: ifcPrice?.priceCode,
+      priceCost: ifcPrice?.unitCost,
       estimatedCost,
       source: "ifc",
       isAddition: true,

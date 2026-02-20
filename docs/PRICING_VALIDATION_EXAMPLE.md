@@ -1,4 +1,4 @@
-# 🔍 CYPE Price Validation - Exemplo de Uso
+# Price Validation - Exemplo de Uso
 
 ## Overview
 
@@ -7,12 +7,12 @@ O validador de preços compara dados do scraper com estimativas paramétricas e 
 ## Uso com Scraper
 
 ```typescript
-import { CypeUnifiedScraper } from './cype-unified-scraper';
-import { validateBatch } from './cype-price-validator';
+import { PriceScraper } from './price-scraper';
+import { validateBatch } from './price-validator';
 
 async function scrapeAndValidate() {
   // 1. Scrape data
-  const scraper = new CypeUnifiedScraper();
+  const scraper = new PriceScraper();
   await scraper.scrapeAll();
   const items = scraper.toJSON().items;
 
@@ -48,7 +48,7 @@ async function scrapeAndValidate() {
     }));
 
   // 5. Save validated data
-  fs.writeFileSync('data/cype-validated.json', JSON.stringify({
+  fs.writeFileSync('data/price-validated.json', JSON.stringify({
     metadata: {
       exportDate: new Date().toISOString(),
       totalItems: validated.length,
@@ -57,14 +57,14 @@ async function scrapeAndValidate() {
     items: validated,
   }, null, 2));
 
-  console.log('✅ Validated data saved to data/cype-validated.json');
+  console.log('✅ Validated data saved to data/price-validated.json');
 }
 ```
 
 ## Uso Individual
 
 ```typescript
-import { validateCypePrice } from './cype-price-validator';
+import { validatePrice } from './price-validator';
 
 const item = {
   code: 'SBP010',
@@ -79,7 +79,7 @@ const item = {
   },
 };
 
-const result = validateCypePrice(item);
+const result = validatePrice(item);
 
 if (result.isValid) {
   console.log(`✅ Preço válido (confiança: ${result.confidence}%)`);
@@ -186,7 +186,7 @@ if (result.isValid) {
 
 ## Estatísticas Típicas
 
-Com 2049 items do CYPE:
+Com 2049 items do Gerador de Precos:
 
 ```
 📊 Validation Stats:

@@ -1,5 +1,5 @@
 /**
- * API Route: Update CYPE Prices
+ * API Route: Update Prices
  * Triggers scraping and updates Supabase
  */
 
@@ -7,9 +7,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 function checkAdminAuth(request: NextRequest): boolean {
-  const key = process.env.CYPE_ADMIN_API_KEY;
-  if (!key) return true; // No key configured = auth disabled (dev mode)
-  const provided = request.headers.get('x-api-key') ?? request.nextUrl.searchParams.get('apiKey');
+  const key = process.env.PRICING_ADMIN_API_KEY;
+  if (!key) return false; // Fail-closed: no key configured = deny access
+  const provided = request.headers.get('x-api-key');
+  if (!provided) return false;
   return provided === key;
 }
 
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     // Create scraping job
     const { data: job, error: jobError } = await supabase
-      .from("cype_scraping_jobs")
+      .from("pricing_scraping_jobs")
       .insert({
         status: "running",
         triggered_by: "manual",
@@ -73,7 +74,7 @@ export async function GET(request: NextRequest) {
   if (jobId) {
     // Get job status
     const { data: job } = await supabase
-      .from("cype_scraping_jobs")
+      .from("pricing_scraping_jobs")
       .select("*")
       .eq("id", jobId)
       .single();
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
 
   // Get latest jobs
   const { data: jobs } = await supabase
-    .from("cype_scraping_jobs")
+    .from("pricing_scraping_jobs")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(10);
@@ -111,7 +112,7 @@ async function startScrapingBackground(
     // - Webhook to external service
 
     await supabase
-      .from("cype_scraping_jobs")
+      .from("pricing_scraping_jobs")
       .update({
         status: "completed",
         completed_at: new Date().toISOString(),
@@ -123,7 +124,7 @@ async function startScrapingBackground(
       .eq("id", jobId);
   } catch (error) {
     await supabase
-      .from("cype_scraping_jobs")
+      .from("pricing_scraping_jobs")
       .update({
         status: "failed",
         completed_at: new Date().toISOString(),

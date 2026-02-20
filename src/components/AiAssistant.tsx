@@ -34,7 +34,7 @@ const REGULATION_AREAS: { value: RegulationArea | ""; label: string }[] = [
   { value: "electrical", label: "Elétrica / RTIEBT" },
   { value: "water_drainage", label: "Águas / RGSPPDADAR" },
   { value: "gas", label: "Gás / DL 521/99" },
-  { value: "ited_itur", label: "ITED / ITUR" },
+  { value: "telecommunications", label: "ITED / ITUR" },
   { value: "accessibility", label: "Acessibilidade / DL 163" },
   { value: "energy", label: "Energia / SCE" },
   { value: "licensing", label: "Licenciamento / RJUE" },

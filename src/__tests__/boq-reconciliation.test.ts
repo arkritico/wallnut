@@ -11,7 +11,7 @@ import {
   type ReconciledBoq,
 } from "../lib/boq-reconciliation";
 import type { ParsedBoq, BoqItem } from "../lib/xlsx-parser";
-import type { WbsArticle, CypeMatch } from "../lib/wbs-types";
+import type { WbsArticle, PriceMatch } from "../lib/wbs-types";
 import type { IfcQuantityData } from "../lib/ifc-specialty-analyzer";
 
 // ============================================================
@@ -51,10 +51,10 @@ function makeWbsArticle(overrides: Partial<WbsArticle> & { code: string; descrip
   };
 }
 
-function makeCypeMatch(articleCode: string, cypeCode: string, unitCost: number = 50): CypeMatch {
+function makePriceMatch(articleCode: string, priceCode: string, unitCost: number = 50): PriceMatch {
   return {
     articleCode,
-    cypeCode,
+    priceCode,
     confidence: 75,
     unitCost,
     articleQuantity: 100,
@@ -113,7 +113,7 @@ describe("BOQ Reconciliation Engine", () => {
     expect(article.ifcElementIds).toEqual(["elem-1", "elem-2", "elem-3"]);
   });
 
-  it("Pass 2: CYPE code match when descriptions differ but codes match", () => {
+  it("Pass 2: price code match when descriptions differ but codes match", () => {
     const executionBoq = makeParsedBoq([
       makeBoqItem({
         code: "08.01.005",
@@ -133,25 +133,25 @@ describe("BOQ Reconciliation Engine", () => {
       }),
     ];
 
-    const executionCypeMatches: CypeMatch[] = [
-      makeCypeMatch("08.01.005", "ABT010"),
+    const executionPriceMatches: PriceMatch[] = [
+      makePriceMatch("08.01.005", "ABT010"),
     ];
-    const ifcCypeMatches: CypeMatch[] = [
-      makeCypeMatch("08.01.001", "ABT010"),
+    const ifcPriceMatches: PriceMatch[] = [
+      makePriceMatch("08.01.001", "ABT010"),
     ];
 
     const result = reconcileBoqs(executionBoq, ifcArticles, {
-      executionCypeMatches,
-      ifcCypeMatches,
+      executionPriceMatches,
+      ifcPriceMatches,
     });
 
     expect(result.executionArticles).toHaveLength(1);
     const article = result.executionArticles[0];
     expect(article.ifcCorroborated).toBe(true);
-    expect(article.matchMethod).toBe("cype_code");
+    expect(article.matchMethod).toBe("price_code");
     expect(article.matchConfidence).toBeGreaterThanOrEqual(70);
     expect(article.ifcQuantity).toBe(380);
-    expect(article.cypeCode).toBe("ABT010");
+    expect(article.priceCode).toBe("ABT010");
   });
 
   it("Pass 3: text similarity match with Portuguese construction terms", () => {

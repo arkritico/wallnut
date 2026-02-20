@@ -1,9 +1,9 @@
 /**
- * CYPE Fuzzy Matcher
+ * Price Fuzzy Matcher
  *
  * Matches WBS articles (with keynotes from BIM models) against the
- * CYPE database from cost-estimation.ts. Uses a multi-strategy approach:
- *   1. Exact CYPE code match (from user override or keynote)
+ * price database from cost-estimation.ts. Uses a multi-strategy approach:
+ *   1. Exact price code match (from user override or keynote)
  *   2. Keynote-based mapping (common BIM keynote conventions)
  *   3. Description similarity (token overlap + n-gram matching)
  *   4. Category/chapter matching as fallback
@@ -15,39 +15,39 @@ import type {
   WbsProject,
   WbsArticle,
   WbsChapter,
-  CypeMatch,
+  PriceMatch,
   MatchReport,
 } from "./wbs-types";
-import type { CypeWorkItem, CostComponent } from "./cost-estimation";
-import { getCypeMatcherDatabase } from "./cype-matcher-db-loader";
+import type { PriceWorkItem, CostComponent } from "./cost-estimation";
+import { getPriceMatcherDatabase } from "./price-db-loader";
 
 // ============================================================
-// Re-export CYPE database for matching
+// Re-export Price database for matching
 // ============================================================
 
 import type { RegulationArea } from "./types";
 
 /**
- * Cached CYPE database loaded from scraper output.
- * Auto-populated on first access using getCypeMatcherDatabase().
+ * Cached price database loaded from scraper output.
+ * Auto-populated on first access using getPriceMatcherDatabase().
  */
-let CYPE_CONSTRUCTION_DB: CypeWorkItem[] | null = null;
+let PRICE_CONSTRUCTION_DB: PriceWorkItem[] | null = null;
 
 /**
- * Get or load the CYPE construction database
+ * Get or load the price construction database
  */
-function getDatabase(): CypeWorkItem[] {
-  if (!CYPE_CONSTRUCTION_DB) {
-    CYPE_CONSTRUCTION_DB = getCypeMatcherDatabase();
+function getDatabase(): PriceWorkItem[] {
+  if (!PRICE_CONSTRUCTION_DB) {
+    PRICE_CONSTRUCTION_DB = getPriceMatcherDatabase();
   }
-  return CYPE_CONSTRUCTION_DB;
+  return PRICE_CONSTRUCTION_DB;
 }
 
 /**
  * FALLBACK: Hardcoded essential items (deprecated - kept for backwards compatibility).
  * Replaced by dynamic scraper data. This array is now only used if scraper data is unavailable.
  */
-const CYPE_CONSTRUCTION_DB_FALLBACK: CypeWorkItem[] = [
+const PRICE_CONSTRUCTION_DB_FALLBACK: PriceWorkItem[] = [
   // ─── SITE SETUP (E) ─────────────────────────────────────────
   {
     code: "EES010", description: "Montagem e desmontagem de estaleiro de obra",
@@ -552,14 +552,14 @@ const CYPE_CONSTRUCTION_DB_FALLBACK: CypeWorkItem[] = [
     code: "ILA010", description: "Armário de Telecomunicações de Edifício (ATE)",
     chapter: "Instalações > Telecomunicações > ITED",
     unit: "Ud", unitCost: 2200, breakdown: { materials: 1700, labor: 420, machinery: 80 },
-    isRehab: false, areas: ["ited_itur" as RegulationArea],
+    isRehab: false, areas: ["telecommunications" as RegulationArea],
     patterns: [/ATE|armário.*telecomunicações.*edifício/i],
   },
   {
     code: "ILA020", description: "Armário de Telecomunicações Individual (ATI)",
     chapter: "Instalações > Telecomunicações > ITED",
     unit: "Ud", unitCost: 450, breakdown: { materials: 320, labor: 110, machinery: 20 },
-    isRehab: false, areas: ["ited_itur" as RegulationArea],
+    isRehab: false, areas: ["telecommunications" as RegulationArea],
     patterns: [/ATI|armário.*telecomunicações.*individual/i],
   },
 
@@ -609,7 +609,7 @@ const CYPE_CONSTRUCTION_DB_FALLBACK: CypeWorkItem[] = [
     code: "IVC010", description: "Unidade de ventilação mecânica com recuperação de calor (VMC)",
     chapter: "Instalações > Ventilação > VMC",
     unit: "Ud", unitCost: 3800, breakdown: { materials: 2900, labor: 750, machinery: 150 },
-    isRehab: true, areas: ["avac" as RegulationArea, "thermal" as RegulationArea],
+    isRehab: true, areas: ["hvac" as RegulationArea, "thermal" as RegulationArea],
     patterns: [/VMC|recuperação.*calor|ventilação.*mecânica/i],
   },
 
@@ -756,8 +756,8 @@ function normalizeUnit(unit: string): string {
   return UNIT_ALIASES[unit.toLowerCase().trim()] ?? unit.toLowerCase().trim();
 }
 
-function unitsCompatible(articleUnit: string, cypeUnit: string): boolean {
-  return normalizeUnit(articleUnit) === normalizeUnit(cypeUnit);
+function unitsCompatible(articleUnit: string, priceUnit: string): boolean {
+  return normalizeUnit(articleUnit) === normalizeUnit(priceUnit);
 }
 
 // ============================================================
@@ -765,7 +765,7 @@ function unitsCompatible(articleUnit: string, cypeUnit: string): boolean {
 // ============================================================
 
 /**
- * Common BIM keynote prefixes and their CYPE chapter mapping.
+ * Common BIM keynote prefixes and their PRICE chapter mapping.
  * Keynotes are typically structured as: XX.YY.ZZZ
  * where XX = Uniformat/OmniClass major group.
  */
@@ -820,22 +820,22 @@ const KEYNOTE_MAP: Record<string, string[]> = {
 // ============================================================
 
 interface ScoredMatch {
-  item: CypeWorkItem;
+  item: PriceWorkItem;
   score: number;
-  method: CypeMatch["matchMethod"];
+  method: PriceMatch["matchMethod"];
   warnings: string[];
 }
 
 /**
- * Score a single CYPE item against a WBS article.
+ * Score a single PRICE item against a WBS article.
  */
-function scoreMatch(article: WbsArticle, item: CypeWorkItem): ScoredMatch {
+function scoreMatch(article: WbsArticle, item: PriceWorkItem): ScoredMatch {
   let score = 0;
-  let method: CypeMatch["matchMethod"] = "fallback";
+  let method: PriceMatch["matchMethod"] = "fallback";
   const warnings: string[] = [];
 
-  // 1. Exact CYPE code override
-  if (article.cypeCodeOverride && article.cypeCodeOverride === item.code) {
+  // 1. Exact PRICE code override
+  if (article.priceCodeOverride && article.priceCodeOverride === item.code) {
     return { item, score: 100, method: "exact_code", warnings: [] };
   }
 
@@ -850,7 +850,7 @@ function scoreMatch(article: WbsArticle, item: CypeWorkItem): ScoredMatch {
     }
   }
 
-  // 3. Pattern matching (from CYPE patterns)
+  // 3. Pattern matching (from PRICE patterns)
   const searchText = `${article.description} ${article.tags?.join(" ") ?? ""}`;
   const patternMatch = item.patterns.some(p => p.test(searchText));
   if (patternMatch) {
@@ -860,14 +860,14 @@ function scoreMatch(article: WbsArticle, item: CypeWorkItem): ScoredMatch {
 
   // 4. Token-based similarity
   const articleTokens = new Set(tokenize(article.description + " " + (article.tags?.join(" ") ?? "")));
-  const cypeTokens = new Set(tokenize(item.description + " " + item.chapter));
-  const tokenSim = jaccard(articleTokens, cypeTokens);
+  const priceTokens = new Set(tokenize(item.description + " " + item.chapter));
+  const tokenSim = jaccard(articleTokens, priceTokens);
   score += Math.round(tokenSim * 30);
 
   // 5. N-gram similarity (catches partial matches)
   const articleNgrams = ngrams(article.description, 3);
-  const cypeNgrams = ngrams(item.description, 3);
-  const ngramSim = jaccard(articleNgrams, cypeNgrams);
+  const priceNgrams = ngrams(item.description, 3);
+  const ngramSim = jaccard(articleNgrams, priceNgrams);
   score += Math.round(ngramSim * 15);
 
   // 6. Unit compatibility bonus/penalty
@@ -876,7 +876,7 @@ function scoreMatch(article: WbsArticle, item: CypeWorkItem): ScoredMatch {
       score += 10;
     } else {
       score -= 10;
-      warnings.push(`Unidade diferente: artigo=${article.unit}, CYPE=${item.unit}`);
+      warnings.push(`Unidade diferente: artigo=${article.unit}, PRICE=${item.unit}`);
     }
   }
 
@@ -897,7 +897,7 @@ function scoreMatch(article: WbsArticle, item: CypeWorkItem): ScoredMatch {
 }
 
 /**
- * Match a single WBS article against the CYPE database.
+ * Match a single WBS article against the PRICE database.
  * Returns the best match or null.
  */
 function matchArticle(article: WbsArticle): ScoredMatch | null {
@@ -919,11 +919,11 @@ function matchArticle(article: WbsArticle): ScoredMatch | null {
 // ============================================================
 
 /**
- * Match all WBS articles in a project against the CYPE database.
+ * Match all WBS articles in a project against the PRICE database.
  * Returns a full report with matches, unmatched items, and statistics.
  */
-export function matchWbsToCype(project: WbsProject): MatchReport {
-  const matches: CypeMatch[] = [];
+export function matchWbsToPrice(project: WbsProject): MatchReport {
+  const matches: PriceMatch[] = [];
   const unmatched: MatchReport["unmatched"] = [];
   let totalArticles = 0;
 
@@ -939,14 +939,14 @@ export function matchWbsToCype(project: WbsProject): MatchReport {
           matches.push({
             articleCode: article.code,
             articleDescription: article.description,
-            cypeCode: result.item.code,
-            cypeDescription: result.item.description,
-            cypeChapter: result.item.chapter,
+            priceCode: result.item.code,
+            priceDescription: result.item.description,
+            priceChapter: result.item.chapter,
             confidence: result.score,
             matchMethod: result.method,
             unitCost: result.item.unitCost,
             breakdown: { ...result.item.breakdown },
-            cypeUnit: result.item.unit,
+            priceUnit: result.item.unit,
             unitConversion,
             warnings: result.warnings,
             articleQuantity: article.quantity,
@@ -992,27 +992,27 @@ export function matchWbsToCype(project: WbsProject): MatchReport {
 }
 
 /**
- * Get the full CYPE construction database for browsing/searching.
- * Data is loaded from scraper output (data/cype-full.json).
+ * Get the full PRICE construction database for browsing/searching.
+ * Data is loaded from scraper output (data/price-full.json).
  */
-export function getCypeDatabase(): CypeWorkItem[] {
+export function getPriceDatabase(): PriceWorkItem[] {
   return getDatabase();
 }
 
 /**
- * Refresh the CYPE database from disk (call after scraping new data)
+ * Refresh the PRICE database from disk (call after scraping new data)
  */
-export function refreshCypeDatabase(): void {
-  CYPE_CONSTRUCTION_DB = null; // Clear cache
-  CYPE_CONSTRUCTION_DB = getCypeMatcherDatabase(); // Reload
-  console.log(`✅ CYPE database refreshed: ${CYPE_CONSTRUCTION_DB.length} items`);
+export function refreshPriceDatabase(): void {
+  PRICE_CONSTRUCTION_DB = null; // Clear cache
+  PRICE_CONSTRUCTION_DB = getPriceMatcherDatabase(); // Reload
+  console.log(`✅ PRICE database refreshed: ${PRICE_CONSTRUCTION_DB.length} items`);
 }
 
 /**
- * Search the CYPE database by text query.
+ * Search the PRICE database by text query.
  * Searches dynamically loaded scraper data.
  */
-export function searchCype(query: string, limit = 10): { item: CypeWorkItem; score: number }[] {
+export function searchPriceDb(query: string, limit = 10): { item: PriceWorkItem; score: number }[] {
   const queryTokens = new Set(tokenize(query));
   const queryNgrams = ngrams(query, 3);
   const database = getDatabase();

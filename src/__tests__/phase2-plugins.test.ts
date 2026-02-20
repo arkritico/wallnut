@@ -69,10 +69,10 @@ describe("Plugin Loader — All 18 plugins", () => {
     const expectedAreas = [
       "electrical", "fire_safety", "thermal",
       "acoustic", "structural", "water_drainage",
-      "gas", "avac", "ited_itur",
+      "gas", "hvac", "telecommunications",
       "accessibility", "energy", "elevators",
       "licensing", "waste", "drawings",
-      "architecture", "general", "local",
+      "architecture", "general", "municipal",
     ];
     for (const area of expectedAreas) {
       expect(allAreas).toContain(area);
@@ -118,8 +118,8 @@ describe("Phase 2 — Individual plugin loaders", () => {
     ["structural", loadStructuralPlugin, ["structural"]],
     ["water-drainage", loadWaterDrainagePlugin, ["water_drainage"]],
     ["gas", loadGasPlugin, ["gas"]],
-    ["hvac", loadHvacPlugin, ["avac"]],
-    ["telecommunications", loadTelecomPlugin, ["ited_itur"]],
+    ["hvac", loadHvacPlugin, ["hvac"]],
+    ["telecommunications", loadTelecomPlugin, ["telecommunications"]],
     ["accessibility", loadAccessibilityPlugin, ["accessibility"]],
     ["energy", loadEnergyPlugin, ["energy"]],
     ["elevators", loadElevatorsPlugin, ["elevators"]],
@@ -128,7 +128,7 @@ describe("Phase 2 — Individual plugin loaders", () => {
     ["drawings", loadDrawingsPlugin, ["drawings"]],
     ["architecture", loadArchitecturePlugin, ["architecture"]],
     ["general", loadGeneralPlugin, ["general"]],
-    ["municipal", loadMunicipalPlugin, ["local"]],
+    ["municipal", loadMunicipalPlugin, ["municipal"]],
   ];
 
   for (const [id, loader, areas] of loaders) {
@@ -228,8 +228,8 @@ describe("getPluginForArea — area lookup", () => {
     ["structural", "structural"],
     ["water_drainage", "water-drainage"],
     ["gas", "gas"],
-    ["avac", "hvac"],
-    ["ited_itur", "telecommunications"],
+    ["hvac", "hvac"],
+    ["telecommunications", "telecommunications"],
     ["accessibility", "accessibility"],
     ["energy", "energy"],
     ["elevators", "elevators"],
@@ -238,7 +238,7 @@ describe("getPluginForArea — area lookup", () => {
     ["drawings", "drawings"],
     ["architecture", "architecture"],
     ["general", "general"],
-    ["local", "municipal"],
+    ["municipal", "municipal"],
   ];
 
   for (const [area, expectedPluginId] of areaMappings) {

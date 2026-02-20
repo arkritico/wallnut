@@ -1,12 +1,12 @@
 /**
- * CYPE Matcher Database Loader
+ * Price Matcher Database Loader
  *
- * Dynamically loads CYPE data from scraper output and parametric fallback.
+ * Dynamically loads price data from scraper output and parametric fallback.
  * Replaces hardcoded 652-item database with live scraped data.
  *
  * Architecture:
- * 1. Load scraped data from JSON (data/cype-full.json)
- * 2. Convert to CypeWorkItem format
+ * 1. Load scraped data from JSON (data/price-db.json)
+ * 2. Convert to PriceWorkItem format
  * 3. Merge with parametric fallback items
  * 4. Generate patterns from descriptions
  * 5. Cache for performance
@@ -14,17 +14,17 @@
 
 import fs from 'fs';
 import path from 'path';
-import type { CypeWorkItem } from './cost-estimation';
+import type { PriceWorkItem } from './cost-estimation';
 import type { RegulationArea } from './types';
 import { createLogger } from './logger';
 
-const logger = createLogger('cype-matcher-db-loader');
+const logger = createLogger('price-db-loader');
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface ScrapedCypeItem {
+interface ScrapedPriceItem {
   code: string;
   description: string;
   fullDescription?: string;
@@ -61,7 +61,7 @@ interface ScrapedDataFile {
     region?: string;
     typologyCounts?: Record<string, number>;
   };
-  items: ScrapedCypeItem[];
+  items: ScrapedPriceItem[];
 }
 
 // ============================================================================
@@ -69,7 +69,7 @@ interface ScrapedDataFile {
 // ============================================================================
 
 /**
- * Maps CYPE categories to regulation areas for better matching
+ * Maps price categories to regulation areas for better matching
  */
 function inferRegulationAreas(category: string, description: string): RegulationArea[] {
   const areas: RegulationArea[] = [];
@@ -107,7 +107,7 @@ function inferRegulationAreas(category: string, description: string): Regulation
 
   // ITED
   if (lowerCat.includes('telecomunica') || lowerDesc.includes('ITED') || lowerDesc.includes('fibra')) {
-    areas.push('ited_itur');
+    areas.push('telecommunications');
   }
 
   // Acoustic
@@ -118,7 +118,7 @@ function inferRegulationAreas(category: string, description: string): Regulation
   // AVAC
   if (lowerCat.includes('ventilação') || lowerCat.includes('climatização') ||
       lowerDesc.includes('VMC') || lowerDesc.includes('ventilação')) {
-    areas.push('avac');
+    areas.push('hvac');
   }
 
   // Accessibility
@@ -156,7 +156,7 @@ function inferRegulationAreas(category: string, description: string): Regulation
 // ============================================================================
 
 /**
- * Generate search patterns from CYPE description
+ * Generate search patterns from Price description
  */
 function generatePatterns(description: string, category: string, code: string): RegExp[] {
   const patterns: RegExp[] = [];
@@ -205,7 +205,7 @@ function generatePatterns(description: string, category: string, code: string): 
 // ============================================================================
 
 /**
- * Load scraped CYPE data from JSON file
+ * Load scraped Price data from JSON file
  */
 function loadScrapedData(filePath: string): ScrapedDataFile | null {
   try {
@@ -232,9 +232,9 @@ function loadScrapedData(filePath: string): ScrapedDataFile | null {
 }
 
 /**
- * Convert scraped item to CypeWorkItem format
+ * Convert scraped item to PriceWorkItem format
  */
-function convertToWorkItems(item: ScrapedCypeItem): CypeWorkItem[] {
+function convertToWorkItems(item: ScrapedPriceItem): PriceWorkItem[] {
   // Calculate breakdown costs
   let materials = 0;
   let labor = 0;
@@ -270,7 +270,7 @@ function convertToWorkItems(item: ScrapedCypeItem): CypeWorkItem[] {
                   item.description.toLowerCase().includes('reabilita') ||
                   item.category.toLowerCase().includes('demoliç');
 
-  const base: CypeWorkItem = {
+  const base: PriceWorkItem = {
     code: item.code,
     description: item.description,
     chapter: item.category,
@@ -285,10 +285,10 @@ function convertToWorkItems(item: ScrapedCypeItem): CypeWorkItem[] {
     areas,
     patterns,
     detailedBreakdown: item.breakdown || [], // Preserve full breakdown for resource aggregation
-    typology: (item.typology as CypeWorkItem['typology']) || 'obra_nova',
+    typology: (item.typology as PriceWorkItem['typology']) || 'obra_nova',
   };
 
-  const result: CypeWorkItem[] = [base];
+  const result: PriceWorkItem[] = [base];
 
   // Expand variants into separate work items
   if (item.variants && item.variants.length > 0) {
@@ -315,11 +315,11 @@ function convertToWorkItems(item: ScrapedCypeItem): CypeWorkItem[] {
 }
 
 /**
- * Get the full CYPE database by merging scraped data with parametric fallback
+ * Get the full Price database by merging scraped data with parametric fallback
  */
-export function getCypeMatcherDatabase(): CypeWorkItem[] {
+export function getPriceMatcherDatabase(): PriceWorkItem[] {
   // Try to load scraped data
-  const scrapedData = loadScrapedData('data/cype-full.json');
+  const scrapedData = loadScrapedData('data/price-db.json');
 
   if (scrapedData && scrapedData.items.length > 0) {
     logger.info(`Building matcher database from ${scrapedData.items.length} scraped items`);
@@ -337,7 +337,7 @@ export function getCypeMatcherDatabase(): CypeWorkItem[] {
   // Fallback to empty array if no scraped data
   // In production, you might want to load from parametric engine here
   logger.warn('No scraped data available, returning empty database');
-  logger.warn('Run CYPE scraper to populate data/cype-full.json');
+  logger.warn('Run Price scraper to populate data/price-db.json');
 
   return [];
 }
@@ -345,9 +345,9 @@ export function getCypeMatcherDatabase(): CypeWorkItem[] {
 /**
  * Refresh the matcher database (call after scraping)
  */
-export function refreshMatcherDatabase(): CypeWorkItem[] {
+export function refreshMatcherDatabase(): PriceWorkItem[] {
   logger.info('Refreshing matcher database...');
-  const db = getCypeMatcherDatabase();
+  const db = getPriceMatcherDatabase();
   logger.info(`Database refreshed with ${db.length} items`);
   return db;
 }
@@ -356,7 +356,7 @@ export function refreshMatcherDatabase(): CypeWorkItem[] {
  * Get database statistics
  */
 export function getDatabaseStats() {
-  const db = getCypeMatcherDatabase();
+  const db = getPriceMatcherDatabase();
 
   const byArea = new Map<RegulationArea, number>();
   const byChapter = new Map<string, number>();

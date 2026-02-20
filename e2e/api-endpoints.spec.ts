@@ -82,8 +82,8 @@ test.describe("API Endpoints", () => {
     expect(body.error).toBeDefined();
   });
 
-  test("GET /api/cype/search returns results for 'pilar'", async ({ request }) => {
-    const response = await request.get("/api/cype/search?q=pilar&limit=5");
+  test("GET /api/pricing/search returns results for 'pilar'", async ({ request }) => {
+    const response = await request.get("/api/pricing/search?q=pilar&limit=5");
 
     expect(response.ok()).toBeTruthy();
     const body = await response.json();
@@ -91,7 +91,7 @@ test.describe("API Endpoints", () => {
     expect(Array.isArray(body.results)).toBeTruthy();
     expect(body.results.length).toBeGreaterThan(0);
 
-    // Each result has { item: CypeWorkItem, score: number }
+    // Each result has { item: PriceWorkItem, score: number }
     const first = body.results[0];
     expect(first.item).toBeDefined();
     expect(first.item.code).toBeDefined();
@@ -99,8 +99,8 @@ test.describe("API Endpoints", () => {
     expect(first.score).toBeGreaterThan(0);
   });
 
-  test("POST /api/cype/match returns cost estimation", async ({ request }) => {
-    const response = await request.post("/api/cype/match", {
+  test("POST /api/pricing/match returns cost estimation", async ({ request }) => {
+    const response = await request.post("/api/pricing/match", {
       data: {
         id: "e2e-test",
         name: "E2E Cost Test",

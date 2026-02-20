@@ -103,7 +103,10 @@ export const POST = withApiHandler("rules-ask", async (request) => {
   const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
   if (body.conversationHistory?.length) {
     for (const msg of body.conversationHistory.slice(-MAX_HISTORY_TURNS)) {
-      messages.push({ role: msg.role, content: msg.content });
+      // Only allow user/assistant roles — reject system or other roles
+      const role = msg.role === "assistant" ? "assistant" : "user";
+      const content = typeof msg.content === "string" ? msg.content.slice(0, MAX_RULES_CONTEXT) : "";
+      if (content) messages.push({ role, content });
     }
   }
   messages.push({ role: "user", content: userMessage });

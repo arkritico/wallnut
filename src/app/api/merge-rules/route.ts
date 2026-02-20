@@ -4,6 +4,9 @@
  * POST /api/merge-rules
  * Body: { pluginId: string, regulationId?: string, rules: ExtractedRuleInput[] }
  * Returns: { success: true, added: number, skipped: number, total: number }
+ *
+ * Security: Requires MERGE_RULES_API_KEY header in production.
+ * Plugin IDs are validated against a whitelist to prevent path traversal.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -13,7 +16,47 @@ import { transformAndMerge } from "@/lib/plugins/rule-transformer";
 import type { ExtractedRuleInput } from "@/lib/plugins/rule-transformer";
 import type { DeclarativeRule } from "@/lib/plugins/types";
 
+// Whitelist of valid plugin IDs — prevents path traversal
+const VALID_PLUGINS = new Set([
+  "accessibility",
+  "acoustic",
+  "architecture",
+  "drawings",
+  "electrical",
+  "elevators",
+  "energy",
+  "fire-safety",
+  "gas",
+  "general",
+  "hvac",
+  "licensing",
+  "municipal",
+  "structural",
+  "telecommunications",
+  "thermal",
+  "waste",
+  "water-drainage",
+]);
+
+// Only alphanumeric, hyphens, and underscores allowed in IDs
+const SAFE_ID_PATTERN = /^[a-zA-Z0-9_-]+$/;
+
+function checkAuth(request: NextRequest): boolean {
+  const key = process.env.MERGE_RULES_API_KEY;
+  if (!key) return false; // Fail-closed: no key configured = deny
+  const provided = request.headers.get("x-api-key");
+  return provided === key;
+}
+
 export async function POST(request: NextRequest) {
+  // Authentication check
+  if (process.env.NODE_ENV === "production" && !checkAuth(request)) {
+    return NextResponse.json(
+      { error: "Autenticação necessária." },
+      { status: 401 },
+    );
+  }
+
   try {
     const body = await request.json();
     const { pluginId, regulationId, rules } = body as {
@@ -29,11 +72,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate pluginId against whitelist (prevents path traversal)
+    if (!VALID_PLUGINS.has(pluginId)) {
+      return NextResponse.json(
+        { error: "Plugin inválido." },
+        { status: 400 },
+      );
+    }
+
+    // Validate regulationId format if provided (prevents path traversal)
+    if (regulationId && !SAFE_ID_PATTERN.test(regulationId)) {
+      return NextResponse.json(
+        { error: "ID de regulamento inválido." },
+        { status: 400 },
+      );
+    }
+
     // Find the plugin's rules directory
     const pluginDir = path.join(process.cwd(), "src", "data", "plugins", pluginId);
     if (!fs.existsSync(pluginDir)) {
       return NextResponse.json(
-        { error: `Plugin '${pluginId}' not found` },
+        { error: "Plugin não encontrado." },
         { status: 404 },
       );
     }
@@ -42,7 +101,7 @@ export async function POST(request: NextRequest) {
     const regsDir = path.join(pluginDir, "regulations");
     if (!fs.existsSync(regsDir)) {
       return NextResponse.json(
-        { error: `No regulations directory for plugin '${pluginId}'` },
+        { error: "Diretoria de regulamentos não encontrada." },
         { status: 404 },
       );
     }
@@ -57,12 +116,22 @@ export async function POST(request: NextRequest) {
 
     if (!targetRegDir) {
       return NextResponse.json(
-        { error: `Regulation directory not found in plugin '${pluginId}'` },
+        { error: "Diretoria de regulamento não encontrada." },
         { status: 404 },
       );
     }
 
     const rulesPath = path.join(regsDir, targetRegDir, "rules.json");
+
+    // Verify resolved path is still within plugins directory (defense-in-depth)
+    const resolvedPath = path.resolve(rulesPath);
+    const pluginsRoot = path.resolve(path.join(process.cwd(), "src", "data", "plugins"));
+    if (!resolvedPath.startsWith(pluginsRoot)) {
+      return NextResponse.json(
+        { error: "Caminho inválido." },
+        { status: 400 },
+      );
+    }
 
     // Read existing rules
     let existingRules: DeclarativeRule[] = [];
@@ -93,7 +162,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Merge rules error:", error);
     return NextResponse.json(
-      { error: "Internal server error", message: error instanceof Error ? error.message : String(error) },
+      { error: "Erro interno do servidor." },
       { status: 500 },
     );
   }

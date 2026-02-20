@@ -341,11 +341,11 @@ function resolveClassification(classification: string): { chapter: string; subCh
     }
   }
 
-  // CYPE item code (e.g., "EHS010" → chapter 06 for structures)
-  const cypeMatch = classification.match(/^([A-Z]{2,4})\d{3}/);
-  if (cypeMatch) {
-    const cypeChapter = CYPE_PREFIX_TO_PRONIC[cypeMatch[1]];
-    if (cypeChapter) return cypeChapter;
+  // Price item code (e.g., "EHS010" → chapter 06 for structures)
+  const priceMatch = classification.match(/^([A-Z]{2,4})\d{3}/);
+  if (priceMatch) {
+    const priceChapter = PRICE_PREFIX_TO_PRONIC[priceMatch[1]];
+    if (priceChapter) return priceChapter;
   }
 
   return null;
@@ -403,7 +403,7 @@ function resolveByName(
 }
 
 /** Maps CYPE 2-3 letter prefixes to ProNIC chapters */
-const CYPE_PREFIX_TO_PRONIC: Record<string, { chapter: string; subChapter: string }> = {
+const PRICE_PREFIX_TO_PRONIC: Record<string, { chapter: string; subChapter: string }> = {
   EHS: { chapter: "06", subChapter: "06.01" }, // Pilares
   EHV: { chapter: "06", subChapter: "06.02" }, // Vigas
   EHL: { chapter: "06", subChapter: "06.03" }, // Lajes maciças

@@ -14,7 +14,7 @@ const mockParseDocumentWithAI = vi.fn();
 const mockMergeExtractedData = vi.fn();
 const mockOcrPdfPages = vi.fn();
 const mockAnalyzeProject = vi.fn();
-const mockMatchWbsToCype = vi.fn();
+const mockMatchWbsToPrice = vi.fn();
 const mockInferMaxWorkers = vi.fn();
 const mockGenerateSchedule = vi.fn();
 const mockAggregateResources = vi.fn();
@@ -78,8 +78,8 @@ vi.mock("@/lib/analyzer", () => ({
   analyzeProject: (...args: unknown[]) => mockAnalyzeProject(...args),
 }));
 
-vi.mock("@/lib/cype-matcher", () => ({
-  matchWbsToCype: (...args: unknown[]) => mockMatchWbsToCype(...args),
+vi.mock("@/lib/price-matcher", () => ({
+  matchWbsToPrice: (...args: unknown[]) => mockMatchWbsToPrice(...args),
 }));
 
 vi.mock("@/lib/labor-constraints", () => ({
@@ -145,7 +145,7 @@ function setupFullMocks() {
   };
 
   const matchReport = {
-    matches: [{ articleCode: "06.01.001", cypeCode: "EHS010", confidence: 80, unitCost: 673, estimatedCost: 6730, matchMethod: "keynote", articleDescription: "", cypeDescription: "", cypeChapter: "", breakdown: { materials: 0, labor: 0, machinery: 0 }, cypeUnit: "m", unitConversion: 1, warnings: [] }],
+    matches: [{ articleCode: "06.01.001", priceCode: "EHS010", confidence: 80, unitCost: 673, estimatedCost: 6730, matchMethod: "keynote", articleDescription: "", priceDescription: "", priceChapter: "", breakdown: { materials: 0, labor: 0, machinery: 0 }, priceUnit: "m", unitConversion: 1, warnings: [] }],
     unmatched: [],
     stats: { totalArticles: 1, matched: 1, highConfidence: 1, mediumConfidence: 0, lowConfidence: 0, unmatched: 0, coveragePercent: 100, totalEstimatedCost: 6730 },
   };
@@ -186,7 +186,7 @@ function setupFullMocks() {
   mockParseCsvWbs.mockReturnValue(wbsProject);
   mockGenerateBoqFromIfc.mockReturnValue({ project: wbsProject, resolutions: [], stats: { totalElements: 1, resolved: 1, unresolved: 0, coveragePercent: 100 } });
   mockAnalyzeProject.mockResolvedValue(analysisResult);
-  mockMatchWbsToCype.mockReturnValue(matchReport);
+  mockMatchWbsToPrice.mockReturnValue(matchReport);
   mockInferMaxWorkers.mockReturnValue({ maxWorkers: 6, budgetRange: "< 500K €", rationale: "test" });
   mockGenerateSchedule.mockReturnValue(schedule);
   mockAggregateResources.mockReturnValue(resources);
@@ -300,7 +300,7 @@ describe("runUnifiedPipeline", () => {
 
     const result = await runUnifiedPipeline(input);
 
-    expect(mockMatchWbsToCype).toHaveBeenCalledTimes(1);
+    expect(mockMatchWbsToPrice).toHaveBeenCalledTimes(1);
     expect(mockInferMaxWorkers).toHaveBeenCalledTimes(1);
     expect(mockGenerateSchedule).toHaveBeenCalledTimes(1);
     expect(mockAggregateResources).toHaveBeenCalledTimes(1);
@@ -333,7 +333,7 @@ describe("runUnifiedPipeline", () => {
 
     const result = await runUnifiedPipeline(input);
 
-    expect(mockMatchWbsToCype).not.toHaveBeenCalled();
+    expect(mockMatchWbsToPrice).not.toHaveBeenCalled();
     expect(result.matchReport).toBeUndefined();
     // No schedule either (needs matchReport)
     expect(result.schedule).toBeUndefined();
@@ -349,7 +349,7 @@ describe("runUnifiedPipeline", () => {
     const result = await runUnifiedPipeline(input);
 
     // Cost still runs
-    expect(mockMatchWbsToCype).toHaveBeenCalledTimes(1);
+    expect(mockMatchWbsToPrice).toHaveBeenCalledTimes(1);
     expect(mockGenerateSchedule).not.toHaveBeenCalled();
     expect(result.schedule).toBeUndefined();
   });
@@ -434,9 +434,9 @@ describe("runUnifiedPipeline", () => {
     expect(result.ifcAnalyses).toBeUndefined();
   });
 
-  it("warns about unmatched CYPE articles", async () => {
+  it("warns about unmatched price database articles", async () => {
     setupFullMocks();
-    mockMatchWbsToCype.mockReturnValue({
+    mockMatchWbsToPrice.mockReturnValue({
       matches: [],
       unmatched: [{ articleCode: "99.01.001", description: "Unknown", suggestedSearch: "" }],
       stats: { totalArticles: 1, matched: 0, highConfidence: 0, mediumConfidence: 0, lowConfidence: 0, unmatched: 1, coveragePercent: 0 },
@@ -449,7 +449,7 @@ describe("runUnifiedPipeline", () => {
 
     const result = await runUnifiedPipeline(input);
 
-    expect(result.warnings.some(w => w.includes("sem correspondência CYPE"))).toBe(true);
+    expect(result.warnings.some(w => w.includes("sem correspondência") && (w.includes("preço") || w.includes("price")))).toBe(true);
   });
 
   it("handles PDF parse failure gracefully", async () => {

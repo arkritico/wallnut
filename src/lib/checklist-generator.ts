@@ -148,7 +148,7 @@ const SPECIALTY_CHECKLISTS: Record<string, (project: BuildingProject) => Checkli
     ci("Caixa de gorduras (espaços comerciais)", "RGSPPDADAR", "DL 23/95, Art. 230.º", false),
   ],
 
-  ited_itur: (p) => {
+  telecommunications: (p) => {
     const items: ChecklistItem[] = [
       ci("ATE (Armário Telecom. Edifício) instalado", "ITED", "4ª Ed., Cap. 3", p.numberOfFloors > 1),
       ci("ATI (Armário Telecom. Individual) por fração", "ITED", "4ª Ed., Cap. 3", true),
@@ -232,7 +232,7 @@ export function generateChecklists(
     { area: "electrical", title: "Instalações Elétricas (RTIEBT)" },
     { area: "water_drainage", title: "Águas e Drenagem (RGSPPDADAR)" },
     { area: "gas", title: "Instalações de Gás" },
-    { area: "ited_itur", title: "Telecomunicações (ITED/ITUR)" },
+    { area: "telecommunications", title: "Telecomunicações (ITED/ITUR)" },
     { area: "accessibility", title: "Acessibilidades (DL 163/2006)" },
     { area: "licensing", title: "Licenciamento (RJUE)" },
     { area: "waste", title: "Resíduos de Construção (RCD)" },

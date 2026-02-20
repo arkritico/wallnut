@@ -1,36 +1,36 @@
 /**
- * CYPE Variant Scraper (Playwright)
+ * Price Variant Scraper (Playwright)
  *
- * Uses headless Chromium to interact with the CYPE parametric configurator
+ * Uses headless Chromium to interact with the parametric configurator
  * at geradordeprecos.info. The site's `calculaprecio.asp` endpoint is
  * session-gated — direct HTTP requests return "Orden incorrecta" — so we
  * must drive a real browser session to select options and read updated prices.
  *
  * Usage:
- *   const scraper = new CypeVariantScraper();
+ *   const scraper = new PriceVariantScraper();
  *   await scraper.init();
  *   const variants = await scraper.scrapeItemVariants(url, code, 'obra_nova');
  *   await scraper.close();
  */
 
 import type { Browser, BrowserContext, Page } from "playwright";
-import type { CypeTypology, CypeBreakdown, CypeComponent } from "./cype-unified-scraper";
+import type { PriceTypology, PriceBreakdown, PriceComponent } from "./price-scraper";
 import { createLogger } from "./logger";
 
-const logger = createLogger("cype-variant-scraper");
+const logger = createLogger("price-variant-scraper");
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export interface CypeVariant {
+export interface PriceVariant {
   parentCode: string;
   variantId: string;
   parameters: Record<string, string>;
   description?: string;
   unit?: string;
   unitCost: number;
-  breakdown?: CypeBreakdown;
+  breakdown?: PriceBreakdown;
 }
 
 export interface VariantPreset {
@@ -117,7 +117,7 @@ export function generateCombinations(
 // MAIN VARIANT SCRAPER
 // ============================================================================
 
-export class CypeVariantScraper {
+export class PriceVariantScraper {
   private browser: Browser | null = null;
   private context: BrowserContext | null = null;
   private config: VariantScraperConfig;
@@ -180,15 +180,15 @@ export class CypeVariantScraper {
   async scrapeItemVariants(
     itemUrl: string,
     code: string,
-    typology: CypeTypology,
+    typology: PriceTypology,
     preset?: VariantPreset,
-  ): Promise<CypeVariant[]> {
+  ): Promise<PriceVariant[]> {
     if (!this.context) {
       throw new Error("Browser not initialized — call init() first");
     }
 
     const page = await this.context.newPage();
-    const variants: CypeVariant[] = [];
+    const variants: PriceVariant[] = [];
 
     try {
       logger.info(`Scraping variants for ${code}`, { url: itemUrl, typology });
@@ -265,11 +265,11 @@ export class CypeVariantScraper {
    * Scrape variants for multiple items using preset mappings.
    */
   async scrapeMultiple(
-    items: Array<{ url: string; code: string; typology: CypeTypology }>,
+    items: Array<{ url: string; code: string; typology: PriceTypology }>,
     presets: VariantPresetsFile,
     onProgress?: (message: string, stats: typeof this.stats) => void,
-  ): Promise<Map<string, CypeVariant[]>> {
-    const results = new Map<string, CypeVariant[]>();
+  ): Promise<Map<string, PriceVariant[]>> {
+    const results = new Map<string, PriceVariant[]>();
 
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
@@ -304,6 +304,48 @@ export class CypeVariantScraper {
     return results;
   }
 
+  /**
+   * Scrape variants for multiple items using AUTO-DISCOVERY (no presets needed).
+   *
+   * For each item, navigates to the page, discovers configurator options
+   * automatically, generates combinations from the first few values of each
+   * axis, and scrapes prices for each combination.
+   *
+   * This is the primary method for large-scale variant scraping — it covers
+   * ALL items, not just the ~30 with manual preset mappings.
+   */
+  async scrapeMultipleAutoDiscover(
+    items: Array<{ url: string; code: string; typology: PriceTypology }>,
+    onProgress?: (message: string, stats: typeof this.stats) => void,
+  ): Promise<Map<string, PriceVariant[]>> {
+    const results = new Map<string, PriceVariant[]>();
+
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+
+      if (onProgress) {
+        onProgress(
+          `[${i + 1}/${items.length}] ${item.code} (auto-discover)`,
+          this.stats,
+        );
+      }
+
+      // Pass no preset — scrapeItemVariants will auto-discover options
+      const variants = await this.scrapeItemVariants(
+        item.url,
+        item.code,
+        item.typology,
+        undefined, // no preset → auto-discover from page DOM
+      );
+
+      if (variants.length > 0) {
+        results.set(item.code, variants);
+      }
+    }
+
+    return results;
+  }
+
   // ==========================================================================
   // OPTION DISCOVERY
   // ==========================================================================
@@ -319,61 +361,70 @@ export class CypeVariantScraper {
         values: string[];
       }> = [];
 
-      // Find <select> elements (dropdowns for parameters)
-      document.querySelectorAll("select").forEach((sel, idx) => {
-        const options = Array.from(sel.options)
-          .filter((o) => o.value && o.value !== "" && !o.disabled)
-          .map((o) => o.text.trim() || o.value);
+      // NOTE: All <select> elements on CYPE item pages are chapter navigation
+      // dropdowns (e.g., "Trabalhos prévios", "Demolições", "Estruturas").
+      // They are NOT parametric variant selectors. We intentionally skip them.
 
-        if (options.length >= 2) {
-          const label =
-            sel.getAttribute("aria-label") ||
-            sel.getAttribute("title") ||
-            sel.previousElementSibling?.textContent?.trim() ||
-            `option_${idx}`;
-          groups.push({
-            label,
-            type: "select",
-            selector: `select:nth-of-type(${idx + 1})`,
-            values: options,
-          });
-        }
-      });
-
-      // Find configurator input buttons (input[onclick*='calculaprecio'])
       // The CYPE configurator uses <input> elements with onclick handlers
       // that call calculaprecio() to recalculate prices for each option.
-      const calcButtons = document.querySelectorAll<HTMLInputElement>(
-        "input[onclick*='calculaprecio']",
+      //
+      // Each button's onclick contains a Valor= parameter like:
+      //   "1|0_0_0_0|0|EHS010|ehs_altplant"
+      //
+      // The first segment (before the first |) is the option index within a group.
+      // The "tail" (everything after the first |) identifies the option GROUP/AXIS.
+      // Buttons with the same tail belong to the same axis (user picks one).
+      //
+      // We group buttons by tail and return each group as a separate option axis.
+
+      const allButtons = Array.from(
+        document.querySelectorAll<HTMLInputElement>("input[onclick*='calculaprecio']"),
       );
-      if (calcButtons.length >= 2) {
-        const values = Array.from(calcButtons)
-          .map((btn) => btn.value?.trim() || btn.title?.trim() || btn.getAttribute("alt")?.trim() || "")
-          .filter(Boolean);
+
+      if (allButtons.length === 0) return groups;
+
+      // Extract Valor from each button and group by tail
+      const tailGroups = new Map<string, Array<{ firstSeg: string; parentId: string }>>();
+
+      for (const btn of allButtons) {
+        const onclick = btn.getAttribute("onclick") || "";
+        const valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
+        if (!valorMatch) continue;
+
+        const valor = valorMatch[1];
+        const pipeIdx = valor.indexOf("|");
+        const firstSeg = pipeIdx >= 0 ? valor.substring(0, pipeIdx) : valor;
+        const tail = pipeIdx >= 0 ? valor.substring(pipeIdx + 1) : "";
+
+        if (!tailGroups.has(tail)) tailGroups.set(tail, []);
+        tailGroups.get(tail)!.push({
+          firstSeg,
+          parentId: btn.closest("[id]")?.id || "unknown",
+        });
+      }
+
+      // Only include groups with >1 option (a single button = no real choice)
+      let groupIdx = 0;
+      for (const [tail, entries] of tailGroups) {
+        if (entries.length <= 1) continue;
+
+        // The "values" for each option are the first segments (option indices)
+        // These are what we'll use to click the buttons during scraping
+        const values = entries.map((e) => e.firstSeg);
+
+        // Derive a label from the tail (last code segment is most descriptive)
+        const tailParts = tail.split("|");
+        const labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || `group_${groupIdx}`;
+        const label = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
 
         groups.push({
-          label: "configurator_buttons",
+          label: label || `axis_${groupIdx}`,
           type: "button",
           selector: "input[onclick*='calculaprecio']",
           values,
         });
-      }
 
-      // Find clickable variant links (often <a> tags within configurator sections)
-      const variantContainers = document.querySelectorAll(
-        '.configurador a, .opciones a, [class*="variant"] a, [class*="opcion"] a',
-      );
-      if (variantContainers.length >= 2) {
-        const values = Array.from(variantContainers).map(
-          (a) => a.textContent?.trim() || "",
-        ).filter(Boolean);
-
-        groups.push({
-          label: "variant_links",
-          type: "link",
-          selector: '.configurador a, .opciones a, [class*="variant"] a, [class*="opcion"] a',
-          values,
-        });
+        groupIdx++;
       }
 
       return groups;
@@ -405,7 +456,7 @@ export class CypeVariantScraper {
     page: Page,
     code: string,
     parameters: Record<string, string>,
-  ): Promise<CypeVariant | null> {
+  ): Promise<PriceVariant | null> {
     // Apply each parameter selection
     for (const [key, value] of Object.entries(parameters)) {
       await this.selectOption(page, key, value);
@@ -445,54 +496,84 @@ export class CypeVariantScraper {
   }
 
   /**
-   * Select an option on the page — either via <select> dropdown or clicking a link.
+   * Select an option on the page by clicking the corresponding configurator button.
+   *
+   * In the CYPE configurator, options are `input[onclick*='calculaprecio']` buttons.
+   * Each button's onclick contains a Valor= parameter like:
+   *   "1|0_0_0_0|0|EHS010|ehs_altplant"
+   *
+   * The `key` parameter is the group label (derived from the Valor tail).
+   * The `value` parameter is the first segment (option index) to select.
+   *
+   * We find the button whose Valor starts with `value|` and whose tail matches `key`.
    */
   private async selectOption(page: Page, key: string, value: string): Promise<void> {
-    // Try select dropdown first
-    const selectHandled = await page.evaluate(
+    // Primary: find calculaprecio button by Valor first segment + tail label match
+    const buttonClicked = await page.evaluate(
       ({ key: k, value: v }) => {
-        const selects = document.querySelectorAll("select");
-        for (const sel of selects) {
-          const label =
-            sel.getAttribute("aria-label") ||
-            sel.getAttribute("title") ||
-            sel.previousElementSibling?.textContent?.trim() ||
-            "";
-          if (label.includes(k) || sel.name?.includes(k)) {
-            for (const opt of sel.options) {
-              if (opt.text.trim().includes(v) || opt.value.includes(v)) {
-                sel.value = opt.value;
-                sel.dispatchEvent(new Event("change", { bubbles: true }));
-                return true;
-              }
-            }
+        const buttons = document.querySelectorAll<HTMLInputElement>(
+          "input[onclick*='calculaprecio']",
+        );
+
+        for (const btn of buttons) {
+          const onclick = btn.getAttribute("onclick") || "";
+          const valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
+          if (!valorMatch) continue;
+
+          const valor = valorMatch[1];
+          const pipeIdx = valor.indexOf("|");
+          if (pipeIdx < 0) continue;
+
+          const firstSeg = valor.substring(0, pipeIdx);
+          const tail = valor.substring(pipeIdx + 1);
+
+          // Match by first segment (the option index)
+          if (firstSeg !== v) continue;
+
+          // Match by tail — the group label is derived from the tail's last segment
+          // Reconstruct the label from the tail to match against key
+          const tailParts = tail.split("|");
+          const labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || "";
+          const derivedLabel = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
+
+          if (derivedLabel === k || tail.includes(k.replace(/ /g, "_"))) {
+            btn.click();
+            return true;
           }
         }
+
+        // Fallback: if only one button has this first segment, click it regardless of tail
+        let singleMatch: HTMLInputElement | null = null;
+        let matchCount = 0;
+        for (const btn of buttons) {
+          const onclick = btn.getAttribute("onclick") || "";
+          const valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
+          if (!valorMatch) continue;
+
+          const valor = valorMatch[1];
+          const pipeIdx = valor.indexOf("|");
+          if (pipeIdx < 0) continue;
+
+          const firstSeg = valor.substring(0, pipeIdx);
+          if (firstSeg === v) {
+            singleMatch = btn;
+            matchCount++;
+          }
+        }
+
+        if (matchCount === 1 && singleMatch) {
+          singleMatch.click();
+          return true;
+        }
+
         return false;
       },
       { key, value },
     );
 
-    if (selectHandled) return;
-
-    // Try clicking a configurator input button (input[onclick*='calculaprecio'])
-    const buttonClicked = await page.evaluate((v) => {
-      const buttons = document.querySelectorAll<HTMLInputElement>(
-        "input[onclick*='calculaprecio']",
-      );
-      for (const btn of buttons) {
-        const label = btn.value?.trim() || btn.title?.trim() || btn.getAttribute("alt")?.trim() || "";
-        if (label.includes(v)) {
-          btn.click();
-          return true;
-        }
-      }
-      return false;
-    }, value);
-
     if (buttonClicked) return;
 
-    // Try clicking a variant link containing the value text
+    // Legacy fallback: try clicking a variant link containing the value text
     const linkClicked = await page.evaluate((v) => {
       const links = document.querySelectorAll(
         '.configurador a, .opciones a, [class*="variant"] a, [class*="opcion"] a, a',
@@ -516,7 +597,7 @@ export class CypeVariantScraper {
    */
   private async readPrice(
     page: Page,
-  ): Promise<{ unitCost: number; unit?: string; description?: string; breakdown?: CypeBreakdown } | null> {
+  ): Promise<{ unitCost: number; unit?: string; description?: string; breakdown?: PriceBreakdown } | null> {
     return page.evaluate(() => {
       // Helper: parse a European-format price string like "1.234,56 €" → 1234.56
       const parseEurNum = (text: string | null | undefined): number => {
@@ -631,12 +712,12 @@ export class CypeVariantScraper {
         }
       });
 
-      const breakdown: CypeBreakdown | undefined =
+      const breakdown: PriceBreakdown | undefined =
         materials.length > 0 || labor.length > 0 || machinery.length > 0
           ? {
-              materials: materials as unknown as CypeBreakdown["materials"],
-              labor: labor as unknown as CypeBreakdown["labor"],
-              machinery: machinery as unknown as CypeBreakdown["machinery"],
+              materials: materials as unknown as PriceBreakdown["materials"],
+              labor: labor as unknown as PriceBreakdown["labor"],
+              machinery: machinery as unknown as PriceBreakdown["machinery"],
               materialCost: materials.reduce((s, m) => s + m.total, 0),
               laborCost: labor.reduce((s, l) => s + l.total, 0),
               machineryCost: machinery.reduce((s, m) => s + m.total, 0),

@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import {
   loadScraperConfig,
-  CypeUnifiedScraper,
-  type CypeTypology,
+  PriceScraper,
+  type PriceTypology,
   type TypologyConfig,
-} from "@/lib/cype-unified-scraper";
+} from "@/lib/price-scraper";
 
 // ── Config Loading ──────────────────────────────────────────
 
@@ -91,9 +91,9 @@ describe("loadScraperConfig", () => {
 
 // ── Dedup with Typology ─────────────────────────────────────
 
-describe("CypeUnifiedScraper dedup", () => {
+describe("PriceScraper dedup", () => {
   it("toJSON includes typology per item", () => {
-    const scraper = new CypeUnifiedScraper({ typology: "reabilitacao" });
+    const scraper = new PriceScraper({ typology: "reabilitacao" });
     const json = scraper.toJSON();
 
     // Empty scraper returns empty items with metadata
@@ -104,8 +104,8 @@ describe("CypeUnifiedScraper dedup", () => {
     expect(json.metadata.typologyCounts.espacos_urbanos).toBe(0);
   });
 
-  it("toCypeWorkItems sets isRehab=true for reabilitacao typology", () => {
-    const scraper = new CypeUnifiedScraper({ typology: "reabilitacao" });
+  it("toPriceWorkItems sets isRehab=true for reabilitacao typology", () => {
+    const scraper = new PriceScraper({ typology: "reabilitacao" });
     // Access internal results map to inject a test item
     const results = (scraper as unknown as { results: Map<string, unknown> }).results;
     results.set("TEST001:reabilitacao", {
@@ -116,18 +116,18 @@ describe("CypeUnifiedScraper dedup", () => {
       unitCost: 100,
       url: "https://test.com",
       lastUpdated: new Date(),
-      typology: "reabilitacao" as CypeTypology,
+      typology: "reabilitacao" as PriceTypology,
     });
 
-    const workItems = scraper.toCypeWorkItems();
+    const workItems = scraper.toPriceWorkItems();
     expect(workItems).toHaveLength(1);
     expect(workItems[0].isRehab).toBe(true);
     expect(workItems[0].typology).toBe("reabilitacao");
   });
 
   it("same code across different typology scrapers produces distinct items", () => {
-    const scraperA = new CypeUnifiedScraper({ typology: "obra_nova" });
-    const scraperB = new CypeUnifiedScraper({ typology: "reabilitacao" });
+    const scraperA = new PriceScraper({ typology: "obra_nova" });
+    const scraperB = new PriceScraper({ typology: "reabilitacao" });
 
     // Inject same code in both
     const resultsA = (scraperA as unknown as { results: Map<string, unknown> }).results;
@@ -139,7 +139,7 @@ describe("CypeUnifiedScraper dedup", () => {
       unitCost: 673.53,
       url: "https://test.com/obra_nova/EHS010",
       lastUpdated: new Date(),
-      typology: "obra_nova" as CypeTypology,
+      typology: "obra_nova" as PriceTypology,
     });
 
     const resultsB = (scraperB as unknown as { results: Map<string, unknown> }).results;
@@ -151,7 +151,7 @@ describe("CypeUnifiedScraper dedup", () => {
       unitCost: 750.00,
       url: "https://test.com/reabilitacao/EHS010",
       lastUpdated: new Date(),
-      typology: "reabilitacao" as CypeTypology,
+      typology: "reabilitacao" as PriceTypology,
     });
 
     const jsonA = scraperA.toJSON();
@@ -179,7 +179,7 @@ describe("merge key backward compat", () => {
       { code: "NAF010", description: "New item", unit: "m", totalCost: 12.50, category: "Test", url: "test", typology: "obra_nova" },
     ];
 
-    // Merge using the same logic as scrape-cype.ts
+    // Merge using the same logic as scrape-prices.ts
     const existingMap = new Map(
       oldItems.map((i: { code: string; typology?: string }) => [
         `${i.code}:${i.typology || "obra_nova"}`,

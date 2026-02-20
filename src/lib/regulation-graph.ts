@@ -94,7 +94,7 @@ export interface RegulationGraphData {
 // Constants
 // ============================================================
 
-const SPECIALTY_COLORS: Record<string, string> = {
+export const SPECIALTY_COLORS: Record<string, string> = {
   electrical: "#f59e0b",
   "fire-safety": "#ef4444",
   thermal: "#f97316",

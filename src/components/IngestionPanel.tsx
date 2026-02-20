@@ -103,11 +103,11 @@ const AREA_OPTIONS: { value: RegulationArea; label: string }[] = [
   { value: "architecture", label: "Arquitetura" },
   { value: "structural", label: "Estruturas" },
   { value: "fire_safety", label: "SCIE" },
-  { value: "avac", label: "AVAC" },
+  { value: "hvac", label: "AVAC" },
   { value: "water_drainage", label: "Águas e Drenagem" },
   { value: "gas", label: "Gás" },
   { value: "electrical", label: "Elétrico" },
-  { value: "ited_itur", label: "ITED/ITUR" },
+  { value: "telecommunications", label: "ITED/ITUR" },
   { value: "thermal", label: "Térmico" },
   { value: "acoustic", label: "Acústica" },
   { value: "accessibility", label: "Acessibilidade" },
@@ -116,7 +116,7 @@ const AREA_OPTIONS: { value: RegulationArea; label: string }[] = [
   { value: "licensing", label: "Licenciamento" },
   { value: "waste", label: "Resíduos" },
   { value: "drawings", label: "Desenhos" },
-  { value: "local", label: "Municipal" },
+  { value: "municipal", label: "Municipal" },
   { value: "general", label: "Geral" },
 ];
 

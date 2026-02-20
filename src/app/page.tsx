@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import ProjectForm from "@/components/ProjectForm";
 import ProjectWizard from "@/components/ProjectWizard";
 import AuthProvider from "@/components/AuthProvider";
+import AuthGate from "@/components/AuthGate";
 import AnalysisResults from "@/components/AnalysisResults";
 import { ErrorBoundary, ToastProvider } from "@/components/ErrorBoundary";
 import WbsSchedule from "@/components/WbsSchedule";
@@ -137,6 +138,7 @@ export default function Home() {
   // Auth state
   const [authUser, setAuthUser] = useState<{ email?: string } | null>(null);
   const [useCloud, setUseCloud] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // i18n
   const [lang, setLang] = useState<Language>("pt");
@@ -214,6 +216,9 @@ export default function Home() {
             })));
           });
         }
+        setAuthChecked(true);
+      }).catch(() => {
+        setAuthChecked(true);
       });
 
       const { data: { subscription } } = onAuthStateChange((user) => {
@@ -525,6 +530,7 @@ export default function Home() {
     <ErrorBoundary>
     <ToastProvider>
     <I18nContext.Provider value={{ lang, t, setLang: handleLanguageChange }}>
+    <AuthGate user={authUser} checked={!isSupabaseConfigured() || authUser !== null || authChecked} onAuthChange={handleAuthChange}>
       {/* Landing */}
       {view === "landing" && (
         <main className="min-h-screen bg-white">
@@ -1179,6 +1185,7 @@ export default function Home() {
           </div>
         </main>
       )}
+    </AuthGate>
     </I18nContext.Provider>
     </ToastProvider>
     </ErrorBoundary>

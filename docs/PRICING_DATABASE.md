@@ -1,8 +1,8 @@
-# 🗄️ Base de Dados CYPE - Sistema de Atualização Automática
+# Base de Dados de Precos - Sistema de Atualização Automática
 
 ## 📋 Visão Geral
 
-Sistema completo para manter preços de construção atualizados da CYPE (geradordeprecos.info) para a região de **Lisboa/Cascais**.
+Sistema completo para manter preços de construção atualizados do Gerador de Precos para a região de **Lisboa/Cascais**.
 
 **Features:**
 - ✅ Scraping completo com breakdown detalhado
@@ -19,10 +19,10 @@ Sistema completo para manter preços de construção atualizados da CYPE (gerado
 ### 1. **Base de Dados (Supabase)**
 
 **Tabelas:**
-- `cype_prices` - Preços principais
-- `cype_price_components` - Breakdown (materiais, MO, equipamento)
-- `cype_price_history` - Histórico de alterações
-- `cype_scraping_jobs` - Log de atualizações
+- `pricing_items` - Preços principais
+- `pricing_item_components` - Breakdown (materiais, MO, equipamento)
+- `pricing_item_history` - Histórico de alterações
+- `pricing_scraping_jobs` - Log de atualizações
 
 **Schema:**
 ```sql
@@ -44,25 +44,25 @@ supabase db push
 
 ### 3. **UI (Componente React)**
 
-**Componente:** `src/components/CypePriceUpdater.tsx`
+**Componente:** `src/components/PriceUpdater.tsx`
 - Botão de atualização manual
 - Progress tracking
 - Status em tempo real
 
 **Uso:**
 ```tsx
-import CypePriceUpdater from "@/components/CypePriceUpdater";
+import PriceUpdater from "@/components/PriceUpdater";
 
-<CypePriceUpdater />
+<PriceUpdater />
 ```
 
 ### 4. **API (Next.js)**
 
-**Endpoint:** `/api/cype/update`
+**Endpoint:** `/api/pricing/update`
 
 **POST** - Trigger atualização:
 ```javascript
-fetch("/api/cype/update", {
+fetch("/api/pricing/update", {
   method: "POST",
   body: JSON.stringify({
     categories: ["Isolamentos", "Fachadas"],
@@ -73,18 +73,18 @@ fetch("/api/cype/update", {
 
 **GET** - Status:
 ```javascript
-fetch("/api/cype/update?jobId=xxx")
+fetch("/api/pricing/update?jobId=xxx")
 ```
 
 ### 5. **Automação (GitHub Actions)**
 
-**Workflow:** `.github/workflows/update-cype-prices.yml`
+**Workflow:** `.github/workflows/update-prices.yml`
 
 **Schedule:** Dia 1 de cada mês às 02:00 UTC
 
 **Manual trigger:**
 ```bash
-# Via GitHub UI: Actions > Update CYPE Prices > Run workflow
+# Via GitHub UI: Actions > Update Prices > Run workflow
 ```
 
 ---
@@ -101,7 +101,7 @@ fetch("/api/cype/update?jobId=xxx")
 supabase db push
 
 # Ou manualmente:
-# Copiar SQL de supabase/migrations/20260215_cype_prices.sql
+# Copiar SQL de supabase/migrations/20260215_pricing_items.sql
 # Executar no SQL Editor do Supabase
 ```
 
@@ -124,10 +124,10 @@ SUPABASE_SERVICE_KEY=eyJxxx...  # Service role key para upload
 
 ```bash
 # 1. Scraping (com VPN se possível)
-npm run scrape-cype:v2
+npm run scrape-prices
 
 # 2. Upload para Supabase
-npx tsx scripts/upload-to-supabase.ts data/cype-breakdown.json Lisboa
+npx tsx scripts/upload-to-supabase.ts data/price-breakdown.json Lisboa
 
 # 3. Verificar no Supabase
 # https://supabase.com/dashboard/project/xxx/editor
@@ -150,7 +150,7 @@ npx tsx scripts/upload-to-supabase.ts data/cype-breakdown.json Lisboa
 Para evitar bloqueios:
 
 ```yaml
-# Em .github/workflows/update-cype-prices.yml
+# Em .github/workflows/update-prices.yml
 - name: Setup ProtonVPN
   run: |
     # Instalar ProtonVPN
@@ -166,18 +166,18 @@ Para evitar bloqueios:
 ### Monitorização
 
 **Ver execuções:**
-- GitHub: Actions tab > Update CYPE Prices
+- GitHub: Actions tab > Update Prices
 
 **Ver logs Supabase:**
 ```sql
-SELECT * FROM cype_scraping_jobs
+SELECT * FROM pricing_scraping_jobs
 ORDER BY created_at DESC
 LIMIT 10;
 ```
 
 **Verificar alterações de preços:**
 ```sql
-SELECT * FROM cype_price_history
+SELECT * FROM pricing_item_history
 WHERE change_percent > 5  -- Alterações > 5%
 ORDER BY changed_at DESC;
 ```
@@ -190,13 +190,13 @@ ORDER BY changed_at DESC;
 
 ```tsx
 // src/app/admin/page.tsx ou onde quiser
-import CypePriceUpdater from "@/components/CypePriceUpdater";
+import PriceUpdater from "@/components/PriceUpdater";
 
 export default function AdminPage() {
   return (
     <div>
       <h1>Administração</h1>
-      <CypePriceUpdater />
+      <PriceUpdater />
     </div>
   );
 }
@@ -215,7 +215,7 @@ export default async function AdminPage() {
     return <div>Acesso negado</div>;
   }
 
-  return <CypePriceUpdater />;
+  return <PriceUpdater />;
 }
 ```
 
@@ -239,20 +239,20 @@ const supabase = createClient(url, key);
 
 // Listar preços
 const { data: prices } = await supabase
-  .from("cype_prices")
+  .from("pricing_items")
   .select("*")
   .eq("region", "Lisboa")
   .order("code");
 
 // Preço com breakdown
 const { data: priceWithBreakdown } = await supabase
-  .from("cype_prices_with_breakdown")
+  .from("pricing_items_with_breakdown")
   .eq("code", "NAF010")
   .single();
 
 // Histórico de um preço
 const { data: history } = await supabase
-  .from("cype_price_history")
+  .from("pricing_item_history")
   .select("*")
   .eq("price_code", "NAF010")
   .order("changed_at", { ascending: false });
@@ -262,11 +262,11 @@ const { data: history } = await supabase
 
 ```sql
 -- Total de preços
-SELECT COUNT(*) FROM cype_prices;
+SELECT COUNT(*) FROM pricing_items;
 
 -- Preços por categoria
 SELECT category, COUNT(*) as count
-FROM cype_prices
+FROM pricing_items
 GROUP BY category
 ORDER BY count DESC;
 
@@ -277,7 +277,7 @@ SELECT
   new_total_cost,
   change_percent,
   changed_at
-FROM cype_price_history
+FROM pricing_item_history
 WHERE changed_at > NOW() - INTERVAL '30 days'
 ORDER BY ABS(change_percent) DESC
 LIMIT 20;
@@ -292,7 +292,7 @@ LIMIT 20;
 **Solução:** Usar VPN (ProtonVPN)
 ```bash
 protonvpn-cli connect PT
-npm run scrape-cype:v2
+npm run scrape-prices
 ```
 
 ### Upload falha
@@ -314,11 +314,11 @@ npm run scrape-cype:v2
 **Forçar atualização:**
 ```bash
 # Localmente
-npm run scrape-cype:v2
+npm run scrape-prices
 npx tsx scripts/upload-to-supabase.ts
 
 # Ou via GitHub
-# Actions > Update CYPE Prices > Run workflow
+# Actions > Update Prices > Run workflow
 ```
 
 ---
@@ -337,7 +337,7 @@ npx tsx scripts/upload-to-supabase.ts
 ## 💾 Backups
 
 **Automático:**
-- JSON versionado: `data/backups/cype-prices-YYYY-MM-DD.json`
+- JSON versionado: `data/backups/prices-YYYY-MM-DD.json`
 - GitHub Releases: Tagged releases por atualização
 - Supabase: Backup automático (plano pago)
 
@@ -347,7 +347,7 @@ npx tsx scripts/upload-to-supabase.ts
 supabase db dump > backup.sql
 
 # Backup JSON
-cp data/cype-breakdown.json "backups/backup-$(date +%Y%m%d).json"
+cp data/price-breakdown.json "backups/backup-$(date +%Y%m%d).json"
 ```
 
 ---

@@ -108,10 +108,22 @@ export function middleware(request: NextRequest) {
   // ── Email domain restriction (server-side defense-in-depth) ──
   const ALLOWED_DOMAIN = "wallnut.pt";
   const authToken = request.headers.get("authorization")?.replace("Bearer ", "");
-  if (process.env.REQUIRE_WALLNUT_EMAIL === "true" && authToken) {
+  if (authToken) {
     try {
-      // Decode JWT payload (middle segment) to check email domain
-      const payload = JSON.parse(atob(authToken.split(".")[1]));
+      // Proper base64url decode (JWT uses URL-safe base64 without padding)
+      const base64 = authToken.split(".")[1];
+      const padded = base64.replace(/-/g, "+").replace(/_/g, "/");
+      const payload = JSON.parse(atob(padded));
+
+      // Check token expiration
+      if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+        return NextResponse.json(
+          { error: "Token expirado. Faça login novamente." },
+          { status: 401, headers: SECURITY_HEADERS },
+        );
+      }
+
+      // Check email domain
       const email = payload.email ?? "";
       if (email && !email.endsWith(`@${ALLOWED_DOMAIN}`)) {
         return NextResponse.json(
@@ -130,8 +142,7 @@ export function middleware(request: NextRequest) {
     const authHeader = request.headers.get("authorization");
     const apiKeyHeader = request.headers.get("x-api-key");
     const hasAuth = !!(authHeader || apiKeyHeader);
-    // In production with Supabase configured, require auth on expensive AI routes
-    if (process.env.REQUIRE_API_AUTH === "true" && !hasAuth) {
+    if (!hasAuth) {
       return NextResponse.json(
         { error: "Autenticação necessária para este endpoint." },
         { status: 401, headers: SECURITY_HEADERS },

@@ -18,7 +18,7 @@
 
 import type { BuildingProject, AnalysisResult } from "./types";
 import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
-import type { WbsProject, WbsArticle, CypeMatch, MatchReport, ProjectSchedule } from "./wbs-types";
+import type { WbsProject, WbsArticle, PriceMatch, MatchReport, ProjectSchedule } from "./wbs-types";
 import type { ProjectResources } from "./resource-aggregator";
 import type { LaborConstraint } from "./labor-constraints";
 import type { GeneratedBoq } from "./keynote-resolver";
@@ -483,13 +483,13 @@ export async function runUnifiedPipeline(
 
   // ─── Stage 6: Estimate ─────────────────────────────────────
   if (opts.includeCosts !== false && wbsProject) {
-    progress.report("estimate", "A estimar custos com base CYPE...");
+    progress.report("estimate", "A estimar custos com base de preços...");
 
     try {
-      const { matchWbsToCype } = await import("./cype-matcher");
+      const { matchWbsToPrice } = await import("./price-matcher");
       const { inferMaxWorkers } = await import("./labor-constraints");
 
-      matchReport = matchWbsToCype(wbsProject);
+      matchReport = matchWbsToPrice(wbsProject);
 
       // Infer labor constraint from total estimated cost
       const totalCost = matchReport.stats.totalEstimatedCost ?? 0;
@@ -497,7 +497,7 @@ export async function runUnifiedPipeline(
 
       if (matchReport.unmatched.length > 0) {
         warnings.push(
-          `${matchReport.unmatched.length} artigos sem correspondência CYPE (cobertura: ${matchReport.stats.coveragePercent}%).`,
+          `${matchReport.unmatched.length} artigos sem correspondência de preços (cobertura: ${matchReport.stats.coveragePercent}%).`,
         );
       }
     } catch (err) {
@@ -529,8 +529,8 @@ export async function runUnifiedPipeline(
       const allIfcElements = ifcAnalyses.flatMap((a) => a.quantities);
 
       reconciledBoq = reconcileBoqs(parsedBoq, ifcArticles, {
-        executionCypeMatches: matchReport?.matches,
-        ifcCypeMatches: matchReport?.matches,
+        executionPriceMatches: matchReport?.matches,
+        ifcPriceMatches: matchReport?.matches,
         ifcElements: allIfcElements,
       });
 

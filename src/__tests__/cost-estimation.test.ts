@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   estimateCosts,
-  matchFindingToCype,
+  matchFindingToPrice,
   formatCost,
 } from "@/lib/cost-estimation";
 import type { Finding, BuildingProject } from "@/lib/types";
@@ -50,16 +50,16 @@ describe("formatCost", () => {
 });
 
 // ============================================================
-// matchFindingToCype
+// matchFindingToPrice
 // ============================================================
 
-describe("matchFindingToCype", () => {
+describe("matchFindingToPrice", () => {
   it("matches fire detection finding to IOD items", () => {
     const finding = makeFinding({
       area: "fire_safety",
       description: "Não possui central de deteção de incêndio",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some(m => m.code.startsWith("IOD"))).toBe(true);
   });
@@ -69,7 +69,7 @@ describe("matchFindingToCype", () => {
       area: "fire_safety",
       description: "Iluminação de emergência insuficiente",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some(m => m.code === "IOA010")).toBe(true);
   });
@@ -79,7 +79,7 @@ describe("matchFindingToCype", () => {
       area: "thermal",
       description: "Coeficiente de transmissão da parede exterior U > máximo",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some(m => m.code.startsWith("ZFF"))).toBe(true);
   });
@@ -89,7 +89,7 @@ describe("matchFindingToCype", () => {
       area: "thermal",
       description: "Envidraçado com U-value excessivo. Substituição de janela recomendada",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some(m => m.code.startsWith("ZBL"))).toBe(true);
   });
@@ -99,7 +99,7 @@ describe("matchFindingToCype", () => {
       area: "electrical",
       description: "Diferencial 30mA obrigatório para proteção",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some(m => m.code === "IEP020")).toBe(true);
   });
@@ -109,7 +109,7 @@ describe("matchFindingToCype", () => {
       area: "structural",
       description: "Reforço de pilar necessário para conformidade sísmica",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     expect(matches.length).toBeGreaterThan(0);
     expect(matches.some(m => m.areas.includes("structural"))).toBe(true);
   });
@@ -119,7 +119,7 @@ describe("matchFindingToCype", () => {
       area: "licensing",
       description: "Documentação incompleta no processo camarário",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     // licensing has very specific patterns - unrelated text should not match
     // (YPA010 matches "projeto.*arquitetura" which is not in this description)
     const hasLicensingItem = matches.some(m => m.areas.includes("licensing"));
@@ -133,7 +133,7 @@ describe("matchFindingToCype", () => {
       area: "acoustic",
       description: "Central de deteção de incêndio necessária",
     });
-    const matches = matchFindingToCype(finding);
+    const matches = matchFindingToPrice(finding);
     // IOD items have areas=["fire_safety"] — should NOT match for acoustic area
     const hasFireItem = matches.some(m => m.code.startsWith("IOD") && !m.areas.includes("acoustic"));
     expect(hasFireItem).toBe(false);
@@ -245,7 +245,7 @@ describe("estimateCosts", () => {
         id: "F-unmatch",
         area: "general",
         severity: "critical",
-        description: "Anomalia genérica sem correspondência CYPE",
+        description: "Anomalia genérica sem correspondência na base de preços",
       }),
     ];
     const result = estimateCosts(findings, makeProject());

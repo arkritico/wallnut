@@ -6,7 +6,7 @@ import {
   type TaskProgress,
 } from "@/lib/earned-value";
 import { generateSchedule } from "@/lib/construction-sequencer";
-import type { WbsProject, CypeMatch } from "@/lib/wbs-types";
+import type { WbsProject, PriceMatch } from "@/lib/wbs-types";
 
 // ============================================================
 // Helpers
@@ -44,18 +44,18 @@ function makeProject(overrides: Partial<WbsProject> = {}): WbsProject {
   };
 }
 
-function makeMatch(articleCode: string, cypeCode: string, unitCost = 100): CypeMatch {
+function makeMatch(articleCode: string, priceCode: string, unitCost = 100): PriceMatch {
   return {
     articleCode,
     articleDescription: "Test article",
-    cypeCode,
-    cypeDescription: "Test CYPE item",
-    cypeChapter: articleCode.substring(0, 2),
+    priceCode,
+    priceDescription: "Test price item",
+    priceChapter: articleCode.substring(0, 2),
     confidence: 80,
     matchMethod: "description",
     unitCost,
     breakdown: { materials: unitCost * 0.6, labor: unitCost * 0.3, machinery: unitCost * 0.1 },
-    cypeUnit: "m",
+    priceUnit: "m",
     unitConversion: 1,
     warnings: [],
     articleQuantity: 50,
@@ -71,7 +71,7 @@ function makeMatch(articleCode: string, cypeCode: string, unitCost = 100): CypeM
 describe("EVM E2E Integration", () => {
   it("runs full pipeline: schedule → baseline → progress → verify SPI/CPI", () => {
     const project = makeProject();
-    const matches: CypeMatch[] = [
+    const matches: PriceMatch[] = [
       makeMatch("06.01.001", "EHS010"),
       makeMatch("06.02.001", "EHB070"),
     ];
@@ -110,7 +110,7 @@ describe("EVM E2E Integration", () => {
     const project = makeProject({
       startDate: "2025-01-06", // Past dates for S-curve EV/AC
     });
-    const matches: CypeMatch[] = [
+    const matches: PriceMatch[] = [
       makeMatch("06.01.001", "EHS010"),
     ];
 

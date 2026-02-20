@@ -130,7 +130,7 @@ export function logScraperActivity(
   const { category, itemCode, url, error, duration, retryCount } = details;
 
   const meta = {
-    module: 'cype-scraper',
+    module: 'price-scraper',
     category,
     itemCode,
     url,

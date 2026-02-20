@@ -11,8 +11,8 @@
 | IFC quantity takeoff (measured quantities from BIM) | 90% | `ifc-quantity-takeoff.ts` |
 | IFC 3D viewer (Three.js, element selection, storey explorer) | 85% | `IfcViewer.tsx` |
 | 4D timeline player (schedule-driven animation) | 85% | `TimelinePlayer.tsx`, `element-task-mapper.ts` |
-| CYPE matcher (multi-strategy, scored matching, token similarity) | 85% | `cype-matcher.ts`, `cype-matcher-db-loader.ts` |
-| CYPE database (2,049 items with full breakdowns) | 5% | `data/cype-full.json` |
+| Price matcher (multi-strategy, scored matching, token similarity) | 85% | `price-matcher.ts`, `price-db-loader.ts` |
+| Price database (2,049 items with full breakdowns) | 5% | `data/price-db.json` |
 | Cost estimation (full DB + IFC quantities + scale factors + contingency) | 85% | `cost-estimation.ts` |
 | Construction sequencer (30 phases, Goldratt CCPM) | 90% | `construction-sequencer.ts` |
 | Site capacity optimizer (26 overlap rules, space constraints) | 75% | `site-capacity-optimizer.ts` |
@@ -41,7 +41,7 @@
 
 ### What's Missing for Production
 
-1. **CYPE database at 5% coverage** — 2,049 items scraped out of ~40,000 target. Scraper infrastructure removed; database expansion underway in parallel instance.
+1. **Price database at 5% coverage** — 2,049 items scraped out of ~40,000 target. Scraper infrastructure removed; database expansion underway in parallel instance.
 2. **No team-accessible staging** — Vercel + Supabase config ready but not connected.
 3. **Resource leveling has known UID collision bug** — `site-capacity-optimizer.ts` line ~250.
 4. **No Playwright E2E tests** — Unit tests comprehensive (998), but no browser-level integration tests.
@@ -72,7 +72,7 @@
           └────────┬───────┘                │
                    │ keynotes               │
             ┌──────▼──────┐                 │
-            │  CYPE Match │                 │
+            │  Price Match │                 │
             │  + Pricing  │                 │
             └──────┬──────┘                 │
                    │                        │
@@ -81,7 +81,7 @@
 ┌────▼────┐  ┌────▼────┐  ┌────▼──────────▼───┐
 │  Cost   │  │Schedule │  │    Regulatory     │
 │Estimate │  │  (CCPM) │  │    Compliance     │
-│  (CYPE) │  │         │  │  (1,964 rules)   │
+│  (Pricing) │  │         │  │  (1,964 rules)   │
 └────┬────┘  └────┬────┘  └────────┬──────────┘
      │            │                │
 ┌────▼────┐  ┌────▼────┐  ┌───────▼───────┐
@@ -118,9 +118,9 @@ The project already has `vercel.json` (CDG1/Paris region). Remaining manual setu
 ### 0.2 Staging Supabase Project
 
 - [ ] Create a separate Supabase project for staging (free tier is fine)
-- [ ] Run migrations: `supabase/schema.sql` + `supabase/migrations/20260215_cype_prices.sql`
+- [ ] Run migrations: `supabase/schema.sql` + `supabase/migrations/20260215_pricing_tables.sql`
 - [ ] Enable RLS policies
-- [ ] Seed CYPE prices from `data/cype-full.json`
+- [ ] Seed prices from `data/price-db.json`
 
 ### 0.3 Health Check Endpoint ✅
 
@@ -161,13 +161,13 @@ The project already has `vercel.json` (CDG1/Paris region). Remaining manual setu
 - [x] Parallel text extraction across chunks (concurrency control, default 3)
 - [x] Reassemble extracted text with page numbers preserved
 
-### 1.3 CYPE Database Completion — IN PROGRESS (parallel instance)
+### 1.3 Price Database Completion — IN PROGRESS (parallel instance)
 
 Current state: 2,049 items with full breakdowns (materials/labor/machinery). Target: 40,000+.
 
 - [ ] Expand database to cover all Portuguese construction categories
 - [ ] Validate scraped data (unit consistency, price ranges)
-- [ ] Update `data/cype-full.json`
+- [ ] Update `data/price-db.json`
 - [ ] Target: 40,000+ items covering all new construction and rehabilitation chapters
 
 ### 1.4 IFC ↔ BOQ Keynote Linking ✅
@@ -177,7 +177,7 @@ Current state: 2,049 items with full breakdowns (materials/labor/machinery). Tar
 - [x] Parse keynote annotations from IFC (`IfcClassificationReference`, `IfcExternalReference`)
 - [x] Map Uniformat/ProNIC/custom keynote codes to BOQ article codes
 - [x] When BOQ is present: match IFC elements to BOQ lines via shared keynotes
-- [x] When BOQ is absent: generate BOQ from IFC quantities + CYPE matching
+- [x] When BOQ is absent: generate BOQ from IFC quantities + Price matching
 - [x] Confidence scoring: 5 resolution methods (classification 95%, keynote 90%, type 70%, name 50%, boq_match 60%)
 - [x] Export mapping table for user review
 
@@ -189,7 +189,7 @@ Pipeline stages (all implemented):
 1. **Parse** — Extract data from all files (IFC text, PDF text, Excel BOQ)
 2. **Classify** — Detect IFC specialties, classify documents, identify BOQ format
 3. **Link** — Resolve keynotes, match IFC elements to BOQ articles
-4. **Match** — Match BOQ articles to CYPE work items for pricing
+4. **Match** — Match BOQ articles to price database work items for pricing
 5. **Estimate** — Calculate costs with district/type factors + IFC quantity takeoff
 6. **Sequence** — Generate schedule with CCPM and Portuguese phases
 7. **Optimize** — Apply site capacity constraints (max workers, phase overlaps)
@@ -299,7 +299,7 @@ The site-capacity-optimizer has 26 Portuguese phase overlap rules but known issu
 
 ### 3.5 Cost Estimation Accuracy ✅
 
-- [x] Full CYPE database matching (2,049 items merged with 79 curated items, scored matching with token similarity)
+- [x] Full Price database matching (2,049 items merged with 79 curated items, scored matching with token similarity)
 - [x] Quantity takeoff from IFC geometry (area, volume, length via `ifc-quantity-takeoff.ts`)
 - [x] Scale factors: bulk pricing discounts for large quantities (5-15% by unit type)
 - [x] Contingency buffers: 5-15% based on match confidence + project stage
@@ -389,7 +389,7 @@ Key test files:
 - `cashflow.test.ts` — Cash flow and S-curve generation
 - `collaboration.test.ts` — RBAC, comments, history
 - `context-builder.test.ts` — Namespace resolution, smart defaults
-- `cost-estimation.test.ts` — CYPE matching, quantity estimation, scale factors
+- `cost-estimation.test.ts` — Price matching, quantity estimation, scale factors
 - `e2e-api.test.ts` — End-to-end API integration (64 tests)
 - `earned-value.test.ts` — EVM calculations (16 tests)
 - `element-task-mapper.test.ts` — 4D mapping strategies
@@ -444,7 +444,7 @@ Key test files:
 
 | Item | Phase | Impact |
 |------|-------|--------|
-| CYPE database expansion (2,049 → 40,000+ items) | 1.3 | Cost estimates only cover ~5% of construction items |
+| Price database expansion (2,049 → 40,000+ items) | 1.3 | Cost estimates only cover ~5% of construction items |
 | Vercel + Supabase deployment setup | 0.1-0.2 | No team-accessible URL |
 
 ### Important (quality improvements)
@@ -473,7 +473,7 @@ Key test files:
 | Risk | Impact | Mitigation | Status |
 |------|--------|------------|--------|
 | Large IFC files (>100MB) crash browser | High | Stream via web-ifc WASM, dynamic import | Mitigated |
-| CYPE prices change, estimates become stale | Medium | Database expansion in progress | Active |
+| prices change, estimates become stale | Medium | Database expansion in progress | Active |
 | web-ifc WASM adds ~5MB to bundle | Medium | Dynamic import, only load when 3D viewer opened | Mitigated |
 | Portuguese holiday dates vary (Easter) | Low | Calculate Easter dynamically | Mitigated |
 | Keynote conventions vary between firms | High | 5 resolution methods with confidence scoring | Mitigated |
@@ -486,7 +486,7 @@ Key test files:
 
 ### MVP (Phase 1) ✅
 - [x] User uploads IFC + optional BOQ → receives all three outputs
-- [x] Budget Excel has real CYPE prices with material/labor/equipment breakdown
+- [x] Budget Excel has real prices with material/labor/equipment breakdown
 - [x] MS Project XML with correct dates and resources
 - [x] Compliance report covers all 18 specialties (1,964 rules)
 - [ ] Staging URL accessible to team
@@ -503,7 +503,7 @@ Key test files:
 - [x] Background processing for large projects
 - [x] Error monitoring active (Sentry-ready)
 - [x] Resource-leveled schedules respect 26 Portuguese phase overlap rules
-- [ ] Cost estimates within ±20% of manual CYPE pricing for benchmark projects (blocked by CYPE DB coverage)
+- [ ] Cost estimates within ±20% of manual price database for benchmark projects (blocked by price DB coverage)
 
 ### Advanced (Phase 4) ✅
 - [x] Cash flow projections with payment milestones

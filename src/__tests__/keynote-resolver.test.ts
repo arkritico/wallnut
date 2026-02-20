@@ -201,7 +201,7 @@ describe("generateBoqFromIfc", () => {
     expect(ch06).toBeDefined();
   });
 
-  it("uses classification reference when present (CYPE code)", () => {
+  it("uses classification reference when present (price database code)", () => {
     const analysis = makeAnalysis([
       makeElement({ entityType: "IFCBEAM", globalId: "b1", classification: "EHB070" }),
     ]);

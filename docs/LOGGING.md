@@ -71,10 +71,10 @@ logScraperActivity('success', { duration: 5000 });
 logScraperActivity('error', { error: err });
 ```
 
-## Exemplo: CypeUnifiedScraper
+## Exemplo: PriceScraper
 
 ```typescript
-private logger = createLogger('cype-unified-scraper');
+private logger = createLogger('price-scraper');
 
 async scrapeAll() {
   logScraperActivity('start', {});
@@ -107,7 +107,7 @@ Default: `info`
   "timestamp": "2026-02-16T14:32:45.123Z",
   "level": "info",
   "message": "Scraper started",
-  "module": "cype-unified-scraper",
+  "module": "price-scraper",
   "category": "NAF",
   "itemsScraped": 0
 }

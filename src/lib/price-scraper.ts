@@ -1,5 +1,5 @@
 /**
- * CYPE Unified Scraper
+ * Price Unified Scraper
  *
  * Scrapes Portuguese construction prices from geradordeprecos.info
  * using Cheerio HTML parsing. Supports:
@@ -11,16 +11,16 @@
  */
 
 import * as cheerio from "cheerio";
-import type { CypeWorkItem } from "./cost-estimation";
+import type { PriceWorkItem } from "./cost-estimation";
 import { createLogger, logScraperActivity } from "./logger";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type CypeTypology = "obra_nova" | "reabilitacao" | "espacos_urbanos";
+export type PriceTypology = "obra_nova" | "reabilitacao" | "espacos_urbanos";
 
-export interface CypeItem {
+export interface PriceItem {
   code: string;
   description: string;
   fullDescription?: string;
@@ -29,22 +29,22 @@ export interface CypeItem {
   unitCost: number;
   totalCost?: number;
   url: string;
-  breakdown?: CypeBreakdown;
+  breakdown?: PriceBreakdown;
   lastUpdated: Date;
-  typology: CypeTypology;
+  typology: PriceTypology;
 }
 
-export interface CypeBreakdown {
-  materials: CypeComponent[];
-  labor: CypeComponent[];
-  machinery: CypeComponent[];
+export interface PriceBreakdown {
+  materials: PriceComponent[];
+  labor: PriceComponent[];
+  machinery: PriceComponent[];
   materialCost: number;
   laborCost: number;
   machineryCost: number;
   totalCost: number;
 }
 
-export interface CypeComponent {
+export interface PriceComponent {
   code: string;
   description: string;
   unit: string;
@@ -61,7 +61,7 @@ export interface ScraperConfig {
   maxRetries: number;
   /** Max navigation depth from chapter level (default: 5) */
   maxDepth: number;
-  typology: CypeTypology;
+  typology: PriceTypology;
   extractBreakdowns: boolean;
   enableCache: boolean;
   cacheTTL: number;
@@ -89,7 +89,7 @@ export interface CategoryConfig {
 
 /** Per-typology entry as loaded from v2 config. */
 export interface TypologyConfig {
-  id: CypeTypology;
+  id: PriceTypology;
   name: string;
   path: string;
   enabled: boolean;
@@ -110,7 +110,7 @@ export function loadScraperConfig(data: Record<string, unknown>): TypologyConfig
       chapters: CategoryConfig[];
     }>;
     return Object.entries(typologies).map(([id, t]) => ({
-      id: id as CypeTypology,
+      id: id as PriceTypology,
       name: t.name,
       path: t.path,
       enabled: t.enabled,
@@ -121,7 +121,7 @@ export function loadScraperConfig(data: Record<string, unknown>): TypologyConfig
   // v1: flat chapters array, all belong to obra_nova
   const chapters = (data.chapters as CategoryConfig[]) ?? [];
   return [{
-    id: "obra_nova" as CypeTypology,
+    id: "obra_nova" as PriceTypology,
     name: "Obra nova",
     path: "obra_nova",
     enabled: true,
@@ -148,9 +148,9 @@ const DEFAULT_CONFIG: ScraperConfig = {
 // MAIN SCRAPER CLASS
 // ============================================================================
 
-export class CypeUnifiedScraper {
+export class PriceScraper {
   private config: ScraperConfig;
-  private results: Map<string, CypeItem>;
+  private results: Map<string, PriceItem>;
   private visitedUrls: Set<string>;
   private cache: Map<string, { data: string; timestamp: number }>;
   private stats: ScraperStats;
@@ -159,7 +159,7 @@ export class CypeUnifiedScraper {
     lastFailure: number;
     isOpen: boolean;
   };
-  private logger = createLogger("cype-unified-scraper");
+  private logger = createLogger("price-scraper");
   private aborted = false;
 
   constructor(config?: Partial<ScraperConfig>) {
@@ -191,7 +191,7 @@ export class CypeUnifiedScraper {
   async scrapeChapters(
     chapters?: CategoryConfig[],
     onProgress?: (message: string, stats: ScraperStats) => void,
-  ): Promise<CypeItem[]> {
+  ): Promise<PriceItem[]> {
     const startTime = Date.now();
     logScraperActivity("start", {});
     this.logger.info("Starting CYPE scraper");
@@ -228,7 +228,7 @@ export class CypeUnifiedScraper {
   /**
    * Scrape a single item by URL.
    */
-  async scrapeItem(url: string): Promise<CypeItem | null> {
+  async scrapeItem(url: string): Promise<PriceItem | null> {
     let html: string;
     try {
       html = await this.fetchWithRetry(url);
@@ -243,7 +243,7 @@ export class CypeUnifiedScraper {
     return { ...this.stats };
   }
 
-  getResults(): CypeItem[] {
+  getResults(): PriceItem[] {
     return Array.from(this.results.values());
   }
 
@@ -405,7 +405,7 @@ export class CypeUnifiedScraper {
     $: cheerio.CheerioAPI,
     url: string,
     categoryPath: string,
-  ): CypeItem | null {
+  ): PriceItem | null {
     try {
       // Extract code from URL (e.g., EHS010 from EHS010_Pilar...)
       const code = this.extractCodeFromUrl(url)
@@ -421,7 +421,7 @@ export class CypeUnifiedScraper {
       const price = this.extractPrice($);
       if (!price) return null;
 
-      const item: CypeItem = {
+      const item: PriceItem = {
         code,
         description,
         fullDescription: this.extractFullDescription($),
@@ -673,10 +673,10 @@ export class CypeUnifiedScraper {
     return match ? this.parseEurPrice(match[0]) : null;
   }
 
-  private extractBreakdown($: cheerio.CheerioAPI): CypeBreakdown | null {
-    const materials: CypeComponent[] = [];
-    const labor: CypeComponent[] = [];
-    const machinery: CypeComponent[] = [];
+  private extractBreakdown($: cheerio.CheerioAPI): PriceBreakdown | null {
+    const materials: PriceComponent[] = [];
+    const labor: PriceComponent[] = [];
+    const machinery: PriceComponent[] = [];
 
     // CYPE breakdown tables have rows with: code, unit, description, quantity, unitPrice, total
     $("table tr").each((_, row) => {
@@ -698,7 +698,7 @@ export class CypeUnifiedScraper {
 
       if (!desc || total === null) return;
 
-      const component: CypeComponent = {
+      const component: PriceComponent = {
         code,
         description: desc,
         unit,
@@ -937,7 +937,7 @@ export class CypeUnifiedScraper {
   // EXPORT UTILITIES
   // =========================================================================
 
-  toCypeWorkItems(): CypeWorkItem[] {
+  toPriceWorkItems(): PriceWorkItem[] {
     return Array.from(this.results.values()).map((item) => ({
       code: item.code,
       description: item.description,
@@ -1005,4 +1005,4 @@ export class CypeUnifiedScraper {
   }
 }
 
-export default CypeUnifiedScraper;
+export default PriceScraper;

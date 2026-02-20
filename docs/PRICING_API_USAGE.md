@@ -1,15 +1,15 @@
-# 🚀 CYPE Scraping API - Background Jobs
+# Pricing Scraping API - Background Jobs
 
 ## Overview
 
-API para executar scraping CYPE em background com tracking de progresso.
+API para executar scraping de precos em background com tracking de progresso.
 
 ## Endpoints
 
 ### 1. Iniciar Scraping Job
 
 ```http
-POST /api/cype/scrape
+POST /api/pricing/scrape
 Content-Type: application/json
 
 {
@@ -26,14 +26,14 @@ Content-Type: application/json
   "jobId": "job_1708089600_abc123",
   "status": "queued",
   "estimatedTime": "30 min",
-  "message": "Scraping job started. Use GET /api/cype/scrape/job_1708089600_abc123 to check status."
+  "message": "Scraping job started. Use GET /api/pricing/scrape/job_1708089600_abc123 to check status."
 }
 ```
 
 ### 2. Verificar Status do Job
 
 ```http
-GET /api/cype/scrape?jobId=job_1708089600_abc123
+GET /api/pricing/scrape?jobId=job_1708089600_abc123
 ```
 
 **Response (Running):**
@@ -65,7 +65,7 @@ GET /api/cype/scrape?jobId=job_1708089600_abc123
   "result": {
     "totalItems": 2049,
     "validItems": 1847,
-    "outputPath": "data/cype-full.json"
+    "outputPath": "data/price-db.json"
   }
 }
 ```
@@ -73,7 +73,7 @@ GET /api/cype/scrape?jobId=job_1708089600_abc123
 ### 3. Listar Todos os Jobs
 
 ```http
-GET /api/cype/scrape
+GET /api/pricing/scrape
 ```
 
 **Response:**
@@ -105,7 +105,7 @@ GET /api/cype/scrape
 
 ```bash
 # 1. Iniciar job
-curl -X POST http://localhost:3000/api/cype/scrape \
+curl -X POST http://localhost:3000/api/pricing/scrape \
   -H "Content-Type: application/json" \
   -d '{
     "fullScrape": true,
@@ -121,7 +121,7 @@ curl -X POST http://localhost:3000/api/cype/scrape \
 # }
 
 # 2. Verificar progresso (poll a cada 30s)
-curl http://localhost:3000/api/cype/scrape?jobId=job_1708089600_abc123
+curl http://localhost:3000/api/pricing/scrape?jobId=job_1708089600_abc123
 
 # 3. Quando completo, matcher DB é auto-atualizado
 ```
@@ -129,7 +129,7 @@ curl http://localhost:3000/api/cype/scrape?jobId=job_1708089600_abc123
 ### Exemplo 2: Scrape Apenas Categorias Específicas
 
 ```bash
-curl -X POST http://localhost:3000/api/cype/scrape \
+curl -X POST http://localhost:3000/api/pricing/scrape \
   -H "Content-Type: application/json" \
   -d '{
     "categories": ["NAF", "EAB", "IOD"],
@@ -147,8 +147,8 @@ app.post('/webhook/scrape-complete', (req, res) => {
 
   if (status === 'completed') {
     console.log(`Scraping job ${jobId} completed with ${totalItems} items`);
-    // Refresh your app's CYPE database
-    refreshCypeDatabase();
+    // Refresh your app's price database
+    refreshPriceDatabase();
   } else if (status === 'failed') {
     console.error(`Scraping job ${jobId} failed:`, req.body.error);
   }
@@ -164,13 +164,13 @@ app.post('/webhook/scrape-complete', (req, res) => {
 ```typescript
 import { useState, useEffect } from 'react';
 
-function CypeScrapeButton() {
+function PriceScrapeButton() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [status, setStatus] = useState<any>(null);
 
   // Start scraping
   const handleScrape = async () => {
-    const response = await fetch('/api/cype/scrape', {
+    const response = await fetch('/api/pricing/scrape', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -188,7 +188,7 @@ function CypeScrapeButton() {
     if (!jobId) return;
 
     const interval = setInterval(async () => {
-      const response = await fetch(`/api/cype/scrape?jobId=${jobId}`);
+      const response = await fetch(`/api/pricing/scrape?jobId=${jobId}`);
       const data = await response.json();
       setStatus(data);
 
@@ -202,7 +202,7 @@ function CypeScrapeButton() {
 
   return (
     <div>
-      <button onClick={handleScrape}>Start CYPE Scraping</button>
+      <button onClick={handleScrape}>Start Price Scraping</button>
 
       {status && (
         <div>

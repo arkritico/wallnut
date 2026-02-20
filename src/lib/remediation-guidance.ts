@@ -90,7 +90,7 @@ const REMEDIATION_RULES: Record<RegulationArea | "default", RemediationRule[]> =
     },
   ],
 
-  avac: [
+  hvac: [
     {
       pattern: /ventilação|ventilation/i,
       guidance: "Instalar sistema de ventilação mecânica (VMC) com caudais conforme EN 15251 / RECS. Prever extração em cozinhas (60 L/s) e instalações sanitárias (15 L/s por aparelho).",
@@ -158,7 +158,7 @@ const REMEDIATION_RULES: Record<RegulationArea | "default", RemediationRule[]> =
     },
   ],
 
-  ited_itur: [
+  telecommunications: [
     {
       pattern: /fibra|fiber/i,
       guidance: "Instalar infraestrutura de fibra óptica monomodo (OS2) desde o ATE até cada ATI, conforme manual ITED 4ª edição. Mínimo 2 fibras por fração residencial.",
@@ -298,7 +298,7 @@ const REMEDIATION_RULES: Record<RegulationArea | "default", RemediationRule[]> =
     },
   ],
 
-  local: [
+  municipal: [
     {
       pattern: /PDM|zoning|classificação/i,
       guidance: "Consultar a planta de ordenamento e regulamento do PDM no site da câmara municipal ou no SNIT (snit.dgterritorio.gov.pt). Verificar classificação do solo, índices urbanísticos e condicionantes.",

@@ -107,7 +107,7 @@ function buildMaterialsSheet(materials: MaterialResource[]): XLSX.WorkSheet {
   const rows: any[][] = [
     ["MATERIAIS"],
     [""],
-    ["Código CYPE", "Descrição", "Unidade", "Quantidade", "Preço Unit. (€)", "Total (€)", "Artigos WBS"],
+    ["Código Preço", "Descrição", "Unidade", "Quantidade", "Preço Unit. (€)", "Total (€)", "Artigos WBS"],
   ];
 
   for (const material of materials) {
@@ -196,7 +196,7 @@ function buildEquipmentSheet(equipment: EquipmentResource[]): XLSX.WorkSheet {
   const rows: any[][] = [
     ["EQUIPAMENTOS"],
     [""],
-    ["Código CYPE", "Descrição", "Unidade", "Quantidade", "Preço Unit. (€)", "Total (€)"],
+    ["Código Preço", "Descrição", "Unidade", "Quantidade", "Preço Unit. (€)", "Total (€)"],
   ];
 
   for (const eq of equipment) {
@@ -519,7 +519,7 @@ function buildAdditionsSheet(reconciledBoq: ReconciledBoq): XLSX.WorkSheet {
     [""],
     ["ARTIGOS ADICIONAIS (encontrados no IFC, ausentes no mapa de quantidades)"],
     [""],
-    ["Código", "Descrição", "Unidade", "Quantidade IFC", "Código CYPE", "Custo Unitário (€)", "Custo Estimado (€)", "Elementos IFC", "Observação"],
+    ["Código", "Descrição", "Unidade", "Quantidade IFC", "Código Preço", "Custo Unitário (€)", "Custo Estimado (€)", "Elementos IFC", "Observação"],
   ];
 
   for (const art of additionArticles) {
@@ -528,8 +528,8 @@ function buildAdditionsSheet(reconciledBoq: ReconciledBoq): XLSX.WorkSheet {
       art.description,
       art.unit,
       art.ifcQuantity,
-      art.cypeCode ?? "",
-      art.cypeCost ?? "",
+      art.priceCode ?? "",
+      art.priceCost ?? "",
       art.estimatedCost ?? "",
       art.ifcElementIds.length,
       art.additionReason,
@@ -552,7 +552,7 @@ function buildAdditionsSheet(reconciledBoq: ReconciledBoq): XLSX.WorkSheet {
     [""],
     ["ARTIGOS DE EXECUÇÃO COM COMPARAÇÃO IFC"],
     [""],
-    ["Código", "Descrição (Original)", "Unidade", "Qtd. Execução", "Qtd. IFC", "Delta", "Confiança", "Método", "Código CYPE"],
+    ["Código", "Descrição (Original)", "Unidade", "Qtd. Execução", "Qtd. IFC", "Delta", "Confiança", "Método", "Código Preço"],
   );
 
   for (const art of executionArticles) {
@@ -566,7 +566,7 @@ function buildAdditionsSheet(reconciledBoq: ReconciledBoq): XLSX.WorkSheet {
       art.quantityDelta ?? "",
       `${art.matchConfidence}%`,
       art.matchMethod,
-      art.cypeCode ?? "",
+      art.priceCode ?? "",
     ]);
   }
 

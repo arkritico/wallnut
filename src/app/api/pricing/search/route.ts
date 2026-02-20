@@ -1,12 +1,12 @@
 /**
- * CYPE Search API Route
+ * Price Search API Route
  *
- * Server-side endpoint for searching the CYPE database.
+ * Server-side endpoint for searching the price database.
  * Handles database loading (fs access) on the server only.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { searchCype } from '@/lib/cype-matcher';
+import { searchPriceDb } from '@/lib/price-matcher';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,17 +21,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const limit = limitStr ? parseInt(limitStr, 10) : 10;
+    const limit = Math.min(Math.max(parseInt(limitStr || "10", 10) || 10, 1), 100);
 
     // Perform search on server side (has access to fs)
-    const results = searchCype(query, limit);
+    const results = searchPriceDb(query, limit);
 
     return NextResponse.json({ results });
   } catch (error) {
-    console.error('CYPE search error:', error);
+    console.error('Price search error:', error);
     return NextResponse.json(
       {
-        error: 'Failed to search CYPE database',
+        error: 'Failed to search price database',
         details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }

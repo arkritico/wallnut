@@ -516,7 +516,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (zone === "unknown") {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: "PDM Municipal",
       article: "Classificação do Solo",
       description: `A classificação PDM do terreno não foi especificada. Verifique a planta de ordenamento do PDM de ${municipality || "do município"} para obter os parâmetros urbanísticos aplicáveis.`,
@@ -534,7 +534,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (!project.isRehabilitation && !constraints.newConstructionAllowed) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: `${constraints.label}`,
       description: `A zona ${constraints.label} não permite construção nova. ${constraints.notes || ""}`,
@@ -548,7 +548,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (project.isRehabilitation && !constraints.rehabilitationAllowed) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: `${constraints.label}`,
       description: `A zona ${constraints.label} não permite intervenções de reabilitação sem autorização especial.`,
@@ -563,7 +563,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
       const allowed = constraints.allowedTypes.join(", ");
       findings.push({
         id: `PDM-${++pdmFindingCounter}`,
-        area: "local",
+        area: "municipal",
         regulation: reg,
         article: "Usos Compatíveis",
         description: `O uso "${project.buildingType}" não é compatível com a zona ${constraints.label}. Usos permitidos: ${allowed}.`,
@@ -579,7 +579,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (constraints.maxHeight && project.buildingHeight > constraints.maxHeight) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Cércea Máxima",
       description: `A altura do edifício (${project.buildingHeight}m) excede a cércea máxima permitida na zona ${constraints.label}.`,
@@ -591,7 +591,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   } else if (constraints.maxHeight) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Cércea Máxima",
       description: `A altura do edifício cumpre a cércea máxima da zona ${constraints.label}.`,
@@ -605,7 +605,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (constraints.maxFloors && project.numberOfFloors > constraints.maxFloors) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Número Máximo de Pisos",
       description: `O número de pisos (${project.numberOfFloors}) excede o máximo permitido na zona ${constraints.label}.`,
@@ -617,7 +617,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   } else if (constraints.maxFloors) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Número Máximo de Pisos",
       description: `O número de pisos cumpre o limite da zona ${constraints.label}.`,
@@ -635,7 +635,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
     const minLotFromCos = estimatedFootprint / constraints.cos;
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "COS - Coeficiente de Ocupação do Solo",
       description: `COS máximo: ${constraints.cos}. Com a implantação estimada de ~${Math.round(estimatedFootprint)} m², o lote mínimo necessário seria ~${Math.round(minLotFromCos)} m². Verificar contra a área real do lote.`,
@@ -648,7 +648,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (constraints.requiresSpecialAuth) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Autorização Especial",
       description: `A zona ${constraints.label} requer autorização especial para intervenções. ${constraints.notes || ""}`,
@@ -661,7 +661,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (project.licensing.isProtectedArea) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Área Protegida / Património",
       description: "O projeto situa-se em área protegida ou zona de proteção de património classificado. Estão em vigor condicionantes específicas do POAP, ZEP ou regulamentação DGPC.",
@@ -674,7 +674,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (project.licensing.isInARU) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Área de Reabilitação Urbana (ARU)",
       description: "O projeto localiza-se numa ARU, beneficiando de incentivos fiscais (IVA 6%, IMI, IRC) e procedimento simplificado para obras de reabilitação (comunicação prévia).",
@@ -687,7 +687,7 @@ export function checkPdmCompliance(project: BuildingProject): Finding[] {
   if (municipalityData?.notes) {
     findings.push({
       id: `PDM-${++pdmFindingCounter}`,
-      area: "local",
+      area: "municipal",
       regulation: reg,
       article: "Notas Municipais",
       description: municipalityData.notes,
