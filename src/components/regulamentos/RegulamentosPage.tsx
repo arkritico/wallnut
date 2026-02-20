@@ -11,6 +11,7 @@ import RegulamentosHeader from "./RegulamentosHeader";
 import RegulamentosSidebar from "./RegulamentosSidebar";
 import RegulamentosDetail from "./RegulamentosDetail";
 import CrossSpecialtyDetail from "./detail/CrossSpecialtyDetail";
+import RegulationChatPanel from "./RegulationChatPanel";
 import IngestionPanel from "@/components/IngestionPanel";
 import { X } from "lucide-react";
 
@@ -218,6 +219,14 @@ export default function RegulamentosPage() {
             )}
           </main>
         </div>
+
+        <RegulationChatPanel
+          selectedSpecialtyIds={selectedSpecialtyIds}
+          selectedRegulationId={selectedRegulationId}
+          selectedRuleId={selectedRuleId}
+          onSelectRule={handleSelectRule}
+          plugins={plugins}
+        />
 
         {/* Ingestion slide-over */}
         {ingestionPluginId && (
