@@ -16,6 +16,7 @@ import type { WbsProject, ProjectSchedule, ScheduleTask } from "./wbs-types";
 import type { ProjectResources, MaterialResource, LaborResource, EquipmentResource } from "./resource-aggregator";
 import { formatCost } from "./cost-estimation";
 import type { CashFlowResult } from "./cashflow";
+import type { ReconciledBoq } from "./boq-reconciliation";
 
 // ============================================================
 // Export Options
@@ -456,6 +457,7 @@ export function generateBudgetExcel(
   resources: ProjectResources,
   options: BudgetExportOptions = {},
   cashFlow?: CashFlowResult,
+  reconciledBoq?: ReconciledBoq,
 ): Buffer {
   const workbook = XLSX.utils.book_new();
 
@@ -483,6 +485,12 @@ export function generateBudgetExcel(
   const phaseSheet = buildPhaseSheet(schedule, resources);
   XLSX.utils.book_append_sheet(workbook, phaseSheet, "Por Fase");
 
+  // Sheet 7: IFC Additions (if reconciliation was performed)
+  if (reconciledBoq && reconciledBoq.additionArticles.length > 0) {
+    const additionsSheet = buildAdditionsSheet(reconciledBoq);
+    XLSX.utils.book_append_sheet(workbook, additionsSheet, "Adições IFC");
+  }
+
   // Generate buffer
   return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
 }
@@ -490,6 +498,96 @@ export function generateBudgetExcel(
 /**
  * Download budget Excel file (browser-side).
  */
+// ============================================================
+// Sheet 7: IFC Additions (Adições IFC)
+// ============================================================
+
+function buildAdditionsSheet(reconciledBoq: ReconciledBoq): XLSX.WorkSheet {
+  const { additionArticles, executionArticles, stats } = reconciledBoq;
+
+  const rows: unknown[][] = [
+    ["ADIÇÕES IDENTIFICADAS NO MODELO IFC"],
+    [""],
+    ["Resumo da Reconciliação"],
+    ["Artigos de execução:", stats.totalExecution],
+    ["Confirmados pelo IFC:", stats.corroboratedByIfc],
+    ["Com desvio de quantidade:", stats.withQuantityDelta],
+    ["Adições IFC:", stats.totalAdditions],
+    ["Custo execução:", stats.executionCost],
+    ["Custo estimado adições:", stats.additionCost],
+    ["Confiança média:", `${stats.avgConfidence}%`],
+    [""],
+    ["ARTIGOS ADICIONAIS (encontrados no IFC, ausentes no mapa de quantidades)"],
+    [""],
+    ["Código", "Descrição", "Unidade", "Quantidade IFC", "Código CYPE", "Custo Unitário (€)", "Custo Estimado (€)", "Elementos IFC", "Observação"],
+  ];
+
+  for (const art of additionArticles) {
+    rows.push([
+      art.articleCode,
+      art.description,
+      art.unit,
+      art.ifcQuantity,
+      art.cypeCode ?? "",
+      art.cypeCost ?? "",
+      art.estimatedCost ?? "",
+      art.ifcElementIds.length,
+      art.additionReason,
+    ]);
+  }
+
+  // Add total row
+  const totalEstimated = additionArticles.reduce(
+    (sum, a) => sum + (a.estimatedCost ?? 0),
+    0,
+  );
+  rows.push(
+    [""],
+    ["", "", "", "", "", "TOTAL", totalEstimated, "", ""],
+  );
+
+  // Add reconciled execution articles with IFC comparison
+  rows.push(
+    [""],
+    [""],
+    ["ARTIGOS DE EXECUÇÃO COM COMPARAÇÃO IFC"],
+    [""],
+    ["Código", "Descrição (Original)", "Unidade", "Qtd. Execução", "Qtd. IFC", "Delta", "Confiança", "Método", "Código CYPE"],
+  );
+
+  for (const art of executionArticles) {
+    if (!art.ifcCorroborated) continue;
+    rows.push([
+      art.articleCode,
+      art.originalDescription,
+      art.unit,
+      art.executionQuantity,
+      art.ifcQuantity ?? "",
+      art.quantityDelta ?? "",
+      `${art.matchConfidence}%`,
+      art.matchMethod,
+      art.cypeCode ?? "",
+    ]);
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Set column widths
+  ws["!cols"] = [
+    { wch: 12 }, // Code
+    { wch: 50 }, // Description
+    { wch: 8 },  // Unit
+    { wch: 14 }, // Qty IFC
+    { wch: 12 }, // CYPE code
+    { wch: 14 }, // Unit cost
+    { wch: 14 }, // Estimated cost
+    { wch: 12 }, // Elements
+    { wch: 50 }, // Observation
+  ];
+
+  return ws;
+}
+
 export function downloadBudgetExcel(
   project: WbsProject,
   schedule: ProjectSchedule,

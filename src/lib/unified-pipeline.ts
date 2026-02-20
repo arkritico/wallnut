@@ -18,13 +18,15 @@
 
 import type { BuildingProject, AnalysisResult } from "./types";
 import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
-import type { WbsProject, CypeMatch, MatchReport, ProjectSchedule } from "./wbs-types";
+import type { WbsProject, WbsArticle, CypeMatch, MatchReport, ProjectSchedule } from "./wbs-types";
 import type { ProjectResources } from "./resource-aggregator";
 import type { LaborConstraint } from "./labor-constraints";
 import type { GeneratedBoq } from "./keynote-resolver";
 import type { CostSummary } from "./cost-estimation";
 import type { ElementTaskMappingResult } from "./element-task-mapper";
 import type { CashFlowResult } from "./cashflow";
+import type { ReconciledBoq } from "./boq-reconciliation";
+import type { ParsedBoq } from "./xlsx-parser";
 
 // ============================================================
 // Types
@@ -75,6 +77,8 @@ export interface UnifiedPipelineResult {
   ccpmGanttExcel?: ArrayBuffer;
   elementMapping?: ElementTaskMappingResult;
   cashFlow?: CashFlowResult;
+  reconciledBoq?: ReconciledBoq;
+  parsedBoq?: ParsedBoq;
   complianceExcel?: ArrayBuffer;
   /** Raw IFC file bytes for 4D viewer (client-side only, not serialized to server) */
   ifcFileData?: Uint8Array;
@@ -225,6 +229,8 @@ export async function runUnifiedPipeline(
   let msProjectXml: string | undefined;
   let complianceExcel: ArrayBuffer | undefined;
   let ccpmGanttExcel: ArrayBuffer | undefined;
+  let parsedBoq: ParsedBoq | undefined;
+  let reconciledBoq: ReconciledBoq | undefined;
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -302,6 +308,17 @@ export async function runUnifiedPipeline(
         const { parseExcelWbs } = await import("./wbs-parser");
         const buffer = await file.arrayBuffer();
         wbsProject = await parseExcelWbs(buffer);
+
+        // Also parse as ParsedBoq for reconciliation (needs raw BoqItem entries)
+        try {
+          const { parseExcelFile } = await import("./xlsx-parser");
+          const xlsResult = parseExcelFile(buffer);
+          if (xlsResult.boqs.length > 0) {
+            parsedBoq = xlsResult.boqs[0];
+          }
+        } catch {
+          // Non-critical: reconciliation will be skipped if parsedBoq is unavailable
+        }
       }
 
       // Set project name from WBS if project has no name
@@ -336,6 +353,18 @@ export async function runUnifiedPipeline(
       warnings.push(
         `Erro ao gerar BOQ a partir do IFC: ${err instanceof Error ? err.message : String(err)}`,
       );
+    }
+  }
+
+  // When both uploaded BOQ and IFC exist, also generate IFC-based BOQ for reconciliation
+  if (classified.boq.length > 0 && ifcAnalyses && ifcAnalyses.length > 0 && !generatedBoq) {
+    try {
+      const { generateBoqFromIfc } = await import("./keynote-resolver");
+      const projectName = project.name || "Projeto IFC";
+      const startDate = new Date().toISOString().slice(0, 10);
+      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
+    } catch {
+      // Non-critical: reconciliation will be skipped
     }
   }
 
@@ -479,6 +508,44 @@ export async function runUnifiedPipeline(
   }
 
   progress.completeStage("estimate");
+
+  // ─── Stage 6b: BOQ Reconciliation ──────────────────────────
+  // When both an uploaded BOQ and IFC analysis exist, reconcile them
+  if (parsedBoq && ifcAnalyses && ifcAnalyses.length > 0 && generatedBoq) {
+    try {
+      const { reconcileBoqs } = await import("./boq-reconciliation");
+
+      // Flatten IFC-generated WBS articles for reconciliation
+      const ifcArticles: WbsArticle[] = [];
+      for (const ch of generatedBoq.project.chapters) {
+        for (const sc of ch.subChapters) {
+          for (const art of sc.articles) {
+            ifcArticles.push(art);
+          }
+        }
+      }
+
+      // Collect raw IFC elements for direct keynote matching (Pass 0)
+      const allIfcElements = ifcAnalyses.flatMap((a) => a.quantities);
+
+      reconciledBoq = reconcileBoqs(parsedBoq, ifcArticles, {
+        executionCypeMatches: matchReport?.matches,
+        ifcCypeMatches: matchReport?.matches,
+        ifcElements: allIfcElements,
+      });
+
+      if (reconciledBoq.stats.totalAdditions > 0) {
+        warnings.push(
+          `Reconciliação BOQ: ${reconciledBoq.stats.corroboratedByIfc}/${reconciledBoq.stats.totalExecution} ` +
+          `artigos confirmados pelo IFC, ${reconciledBoq.stats.totalAdditions} adições identificadas.`,
+        );
+      }
+    } catch (err) {
+      warnings.push(
+        `Reconciliação BOQ falhou: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
 
   // ─── Stage 7: Schedule ─────────────────────────────────────
   if (opts.includeSchedule !== false && wbsProject && matchReport) {
@@ -634,6 +701,8 @@ export async function runUnifiedPipeline(
     ifcAnalyses,
     elementMapping,
     cashFlow,
+    reconciledBoq,
+    parsedBoq,
     budgetExcel,
     msProjectXml,
     ccpmGanttExcel,

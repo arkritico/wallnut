@@ -275,7 +275,7 @@ describe("runUnifiedPipeline", () => {
     expect(mockParseExcelWbs).not.toHaveBeenCalled();
   });
 
-  it("IFC + BOQ: uses uploaded BOQ, skips auto-generation", async () => {
+  it("IFC + BOQ: uses uploaded BOQ, also generates IFC BOQ for reconciliation", async () => {
     setupFullMocks();
     const input: UnifiedPipelineInput = {
       files: [makeFile("model.ifc"), makeFile("budget.xlsx")],
@@ -286,8 +286,9 @@ describe("runUnifiedPipeline", () => {
 
     expect(mockAnalyzeIfcSpecialty).toHaveBeenCalledTimes(1);
     expect(mockParseExcelWbs).toHaveBeenCalledTimes(1);
-    expect(mockGenerateBoqFromIfc).not.toHaveBeenCalled();
-    expect(result.generatedBoq).toBeUndefined();
+    // IFC BOQ is now generated for reconciliation even when BOQ is uploaded
+    expect(mockGenerateBoqFromIfc).toHaveBeenCalledTimes(1);
+    expect(result.generatedBoq).toBeDefined();
   });
 
   it("runs cost estimation and schedule when WBS available", async () => {
