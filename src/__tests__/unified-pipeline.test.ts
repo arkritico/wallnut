@@ -13,6 +13,7 @@ const mockSplitAndExtract = vi.fn();
 const mockParseDocumentWithAI = vi.fn();
 const mockMergeExtractedData = vi.fn();
 const mockOcrPdfPages = vi.fn();
+const mockFetch = vi.fn();
 const mockAnalyzeProject = vi.fn();
 const mockMatchWbsToPrice = vi.fn();
 const mockInferMaxWorkers = vi.fn();
@@ -193,6 +194,7 @@ function setupFullMocks() {
   mockGenerateBudgetExcel.mockReturnValue(Buffer.from("excel-data"));
   mockGenerateMSProjectXML.mockReturnValue("<Project/>");
   mockOcrPdfPages.mockResolvedValue([]);
+  mockFetch.mockResolvedValue(new Response(JSON.stringify({ texts: [], confidences: [] }), { status: 200 }));
   mockGenerateComplianceExcel.mockReturnValue(new ArrayBuffer(10));
   mockMapElementsToTasks.mockReturnValue({
     links: [],
@@ -207,6 +209,7 @@ function setupFullMocks() {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.stubGlobal("fetch", mockFetch);
 });
 
 describe("runUnifiedPipeline", () => {
@@ -549,10 +552,15 @@ describe("runUnifiedPipeline", () => {
       totalPages: 3,
       chunks: 1,
     });
-    mockOcrPdfPages.mockResolvedValue([
-      { pageNumber: 1, text: "Memória descritiva\nÁrea bruta: 250 m2", confidence: 85, processingTimeMs: 2000 },
-      { pageNumber: 3, text: "Projeto de estruturas", confidence: 78, processingTimeMs: 1500 },
-    ]);
+    mockFetch.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          texts: ["Memória descritiva\nÁrea bruta: 250 m2", "Projeto de estruturas"],
+          confidences: [85, 78],
+        }),
+        { status: 200 },
+      ),
+    );
     mockParseDocumentWithAI.mockResolvedValue({
       fields: {},
       confidence: {},
@@ -568,19 +576,18 @@ describe("runUnifiedPipeline", () => {
 
     const result = await runUnifiedPipeline(input);
 
-    // OCR was called for pages 1 and 3 (both < 50 chars)
-    expect(mockOcrPdfPages).toHaveBeenCalledTimes(1);
-    expect(mockOcrPdfPages).toHaveBeenCalledWith(
-      expect.any(Uint8Array),
-      [1, 3],
-      expect.objectContaining({ language: "por" }),
+    // OCR was called via fetch to /api/ocr for pages 1 and 3 (both < 50 chars)
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/ocr",
+      expect.objectContaining({ method: "POST" }),
     );
     // OCR text should be used for AI parsing
     expect(mockParseDocumentWithAI).toHaveBeenCalledTimes(1);
     expect(result.warnings.some(w => w.includes("OCR aplicado"))).toBe(true);
   });
 
-  it("continues without OCR if server-ocr import fails", async () => {
+  it("continues without OCR if OCR API fails", async () => {
     setupFullMocks();
     mockSplitAndExtract.mockResolvedValue({
       text: "",
@@ -588,10 +595,8 @@ describe("runUnifiedPipeline", () => {
       totalPages: 1,
       chunks: 1,
     });
-    // Simulate server-ocr module not available
-    mockOcrPdfPages.mockImplementation(() => {
-      throw new Error("Cannot find module './server-ocr'");
-    });
+    // Simulate OCR API returning error
+    mockFetch.mockResolvedValue(new Response("Internal Server Error", { status: 500 }));
 
     const input: UnifiedPipelineInput = {
       files: [makeFile("scanned.pdf")],

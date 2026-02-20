@@ -663,6 +663,152 @@ export function specialtyAnalysisToProjectFields(
     record("buildingHeight", estimatedHeight, `Estimativa: ${storeys.length} pisos x 3.0m`, "low");
   }
 
+  // ===========================================================
+  // Cross-specialty fallback enrichment
+  //
+  // The specialty-specific sections above only fire when the
+  // IFC is detected as that specialty. A real architectural IFC
+  // may contain structural elements (columns, beams, slabs) but
+  // won't trigger the "structure" block. This section extracts
+  // fields from ALL quantities regardless of detected specialty.
+  // It only sets fields that weren't already populated above.
+  // ===========================================================
+
+  /** Check if a dot-path field was already recorded */
+  const alreadySet = (path: string): boolean => {
+    const parts = path.split(".");
+    let obj: unknown = fields;
+    for (const part of parts) {
+      if (obj === undefined || obj === null || typeof obj !== "object") return false;
+      obj = (obj as Record<string, unknown>)[part];
+    }
+    return obj !== undefined && obj !== null;
+  };
+
+  // 1. Entity counts from any analysis
+  const crossSpecialtyEntities = [
+    { prefix: "IFCCOLUMN", field: "structural.columnCount", label: "pilares" },
+    { prefix: "IFCBEAM", field: "structural.beamCount", label: "vigas" },
+    { prefix: "IFCSLAB", field: "structural.slabCount", label: "lajes" },
+    { prefix: "IFCFOOTING", field: "structural.footingCount", label: "fundacoes" },
+    { prefix: "IFCWALL", field: "envelope.wallCount", label: "paredes" },
+    { prefix: "IFCWINDOW", field: "envelope.windowCount", label: "janelas" },
+    { prefix: "IFCDOOR", field: "accessibility.doorCount", label: "portas" },
+    { prefix: "IFCSTAIR", field: "accessibility.hasStairs", label: "escadas" },
+    { prefix: "IFCROOF", field: "envelope.roofCount", label: "coberturas" },
+    { prefix: "IFCRAMP", field: "accessibility.hasRamp", label: "rampas" },
+  ];
+
+  for (const { prefix, field, label } of crossSpecialtyEntities) {
+    if (alreadySet(field)) continue;
+    const count = countEntities(allQuantities, prefix);
+    if (count > 0) {
+      const isBoolean = field.includes("has");
+      record(field, isBoolean ? true : count, `${count} ${label} no modelo (cross-specialty)`, "medium");
+    }
+  }
+
+  // 2. Structural system inference
+  if (!alreadySet("structural.structuralSystem")) {
+    const cols = countEntities(allQuantities, "IFCCOLUMN");
+    const beams = countEntities(allQuantities, "IFCBEAM");
+    if (cols > 0 && beams > 0) {
+      record("structural.structuralSystem", "reinforced_concrete",
+        "Pilares + vigas detetados (cross-specialty)", "medium");
+    }
+  }
+
+  // 3. Gross floor area from slab areas
+  if (!alreadySet("grossFloorArea")) {
+    const allSlabs = getEntities(allQuantities, "IFCSLAB");
+    const totalArea = sumQuantity(allSlabs, "area");
+    if (totalArea > 0) {
+      record("grossFloorArea", Math.round(totalArea),
+        `Soma areas de laje: ${totalArea.toFixed(0)} m2 (cross-specialty)`, "low");
+    }
+  }
+
+  // 4. Concrete class + steel grade from ALL materials
+  if (!alreadySet("structural.concreteClass")) {
+    const concreteClass = extractConcreteClass(Array.from(allMaterials));
+    if (concreteClass) {
+      record("structural.concreteClass", concreteClass,
+        `Material "${concreteClass}" (cross-specialty)`, "medium");
+    }
+  }
+  if (!alreadySet("structural.steelGrade")) {
+    const steelGrade = extractSteelGrade(Array.from(allMaterials));
+    if (steelGrade) {
+      record("structural.steelGrade", steelGrade,
+        `Material "${steelGrade}" (cross-specialty)`, "medium");
+    }
+  }
+
+  // 5. Wall/window areas from ALL quantities
+  if (!alreadySet("envelope.externalWallArea")) {
+    const allWalls = getEntities(allQuantities, "IFCWALL")
+      .concat(getEntities(allQuantities, "IFCWALLSTANDARDCASE"));
+    const extWalls = allWalls.filter(w =>
+      w.properties._isExternal === true ||
+      w.name.toLowerCase().includes("ext") ||
+      w.name.toLowerCase().includes("fachada")
+    );
+    const wallArea = sumQuantity(extWalls.length > 0 ? extWalls : allWalls, "area");
+    if (wallArea > 0) {
+      record("envelope.externalWallArea", Math.round(wallArea),
+        `${allWalls.length} paredes, area ${wallArea.toFixed(0)} m2 (cross-specialty)`, "low");
+    }
+  }
+  if (!alreadySet("envelope.windowArea")) {
+    const allWindows = getEntities(allQuantities, "IFCWINDOW");
+    const winArea = sumQuantity(allWindows, "area");
+    if (winArea > 0) {
+      record("envelope.windowArea", Math.round(winArea * 100) / 100,
+        `${allWindows.length} janelas, area ${winArea.toFixed(1)} m2 (cross-specialty)`, "medium");
+    }
+  }
+
+  // 6. Door dimensions for accessibility (fallback)
+  if (!alreadySet("accessibility.doorWidths")) {
+    const allDoors = getEntities(allQuantities, "IFCDOOR");
+    const minDoorW = getMinDimension(allDoors, "width");
+    if (minDoorW !== undefined) {
+      record("accessibility.doorWidths", Math.round(minDoorW * 100) / 100,
+        `Largura minima porta: ${(minDoorW * 100).toFixed(0)} cm (cross-specialty)`, "medium");
+    }
+  }
+
+  // 7. Window-to-facade ratio (fallback)
+  if (!alreadySet("envelope.windowToFacadeRatio")) {
+    const wallAreaVal = fields.envelope && typeof fields.envelope === "object"
+      ? (fields.envelope as Record<string, unknown>).externalWallArea as number | undefined
+      : undefined;
+    const winAreaVal = fields.envelope && typeof fields.envelope === "object"
+      ? (fields.envelope as Record<string, unknown>).windowArea as number | undefined
+      : undefined;
+    if (wallAreaVal && winAreaVal && wallAreaVal > 0) {
+      const ratio = Math.round((winAreaVal / wallAreaVal) * 100);
+      record("envelope.windowToFacadeRatio", ratio,
+        `Racio envidracado/fachada: ${ratio}% (cross-specialty)`, "low");
+    }
+  }
+
+  // 8. Building type inference from entity mix
+  if (!alreadySet("buildingType")) {
+    const hasElevator = countEntities(allQuantities, "IFCTRANSPORTELEMENT") > 0;
+    const dwellingCount = allQuantities.filter(q =>
+      q.name.toLowerCase().includes("apartamento") ||
+      q.name.toLowerCase().includes("fração") ||
+      q.name.toLowerCase().includes("fracao") ||
+      q.name.toLowerCase().includes("dwelling")
+    ).length;
+    if (dwellingCount > 1) {
+      record("buildingType", "multi_family", `${dwellingCount} fracoes detetadas`, "low");
+    } else if (hasElevator && storeys.length > 3) {
+      record("buildingType", "multi_family", `Elevador + ${storeys.length} pisos`, "low");
+    }
+  }
+
   return {
     fields,
     report: {

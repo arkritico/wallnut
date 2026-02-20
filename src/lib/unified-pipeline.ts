@@ -459,29 +459,26 @@ export async function runUnifiedPipeline(
 
           if (scannedPages.length > 0) {
             try {
-              const { ocrPdfPages } = await import("./server-ocr");
-              const ocrResults = await ocrPdfPages(
-                new Uint8Array(buffer),
-                scannedPages.map((p) => p.page),
-                {
-                  language: "por",
-                  onProgress: (current, total) => {
-                    progress.reportPartial(
-                      "parse_pdf",
-                      (i + current / total) / classified.pdf.length,
-                      `OCR página ${current}/${total} de ${classified.pdf[i].name}`,
-                    );
-                  },
-                },
-              );
+              // OCR uses native @napi-rs/canvas — must run server-side via API route
+              // to keep the client/worker bundle free of Node.js-only dependencies.
+              const formData = new FormData();
+              formData.append("file", new Blob([buffer], { type: "application/pdf" }), classified.pdf[i].name);
+              formData.append("pages", JSON.stringify(scannedPages.map((p) => p.page)));
+              formData.append("language", "por");
+
+              const ocrResponse = await fetch("/api/ocr", { method: "POST", body: formData });
+              if (!ocrResponse.ok) throw new Error(`OCR API ${ocrResponse.status}`);
+
+              const ocrData = await ocrResponse.json() as { texts: string[]; confidences: number[] };
+              const pageNumbers = scannedPages.map((p) => p.page);
 
               // Merge OCR text back (replace sparse text with OCR text if longer)
-              for (const ocr of ocrResults) {
+              for (let j = 0; j < pageNumbers.length; j++) {
                 const pageText = extraction.pageTexts.find(
-                  (pt) => pt.page === ocr.pageNumber,
+                  (pt) => pt.page === pageNumbers[j],
                 );
-                if (pageText && ocr.text.length > pageText.text.length) {
-                  pageText.text = ocr.text;
+                if (pageText && ocrData.texts[j] && ocrData.texts[j].length > pageText.text.length) {
+                  pageText.text = ocrData.texts[j];
                 }
               }
 
@@ -490,7 +487,7 @@ export async function runUnifiedPipeline(
                 .map((pt) => `--- Página ${pt.page} ---\n${pt.text}`)
                 .join("\n\n");
 
-              const ocrCount = ocrResults.filter((r) => r.text.length > 0).length;
+              const ocrCount = ocrData.texts.filter((t) => t.length > 0).length;
               if (ocrCount > 0) {
                 warnings.push(
                   `OCR aplicado a ${ocrCount} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
