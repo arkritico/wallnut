@@ -11,7 +11,9 @@ import {
 
 interface BrowsePath {
   buildingType: string | null;
-  projectScope: "new" | "rehab" | null;
+  buildingCategory: string | null;
+  phase: string | null;
+  system: string | null;
   specialty: string | null;
   subTopic: string | null;
   regulationId: string | null;
@@ -180,7 +182,6 @@ export default function GraphChatPanel({ browsePath, onSelectRule }: GraphChatPa
           specialty: browsePath.specialty || undefined,
           buildingType: browsePath.buildingType && browsePath.buildingType !== "_all"
             ? browsePath.buildingType : undefined,
-          projectScope: browsePath.projectScope || undefined,
           regulationId: browsePath.regulationId || undefined,
           conversationHistory: history.slice(-8),
         }),

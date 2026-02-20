@@ -456,6 +456,7 @@ function evaluateRule(
   // Rule fires — produce finding
   return {
     id: nextPluginFindingId(),
+    sourceRuleId: rule.id,
     area: "general", // Will be set by caller from regulation document
     regulation: regulationRef,
     article: rule.article,

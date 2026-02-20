@@ -36,6 +36,10 @@ export interface GraphNode {
   applicableTypes?: string[];     // e.g. ["residential"] — empty = universal
   projectScope?: "new" | "rehab" | "all";
   subTopic?: string;              // derived from tags
+  // Layout metadata
+  constructionPhase?: "projeto" | "licenciamento" | "construcao" | "certificacao";
+  buildingSystem?: "estrutura" | "mep" | "envolvente" | "seguranca" | "administrativo";
+  specialtyColor?: string;  // Specialty color for rule nodes (separate from severity)
   // Full rule data (for detail display)
   conditions?: RuleConditionDisplay[];
   remediation?: string;
@@ -58,10 +62,12 @@ export interface RuleConditionDisplay {
 export interface GraphLink {
   source: string;
   target: string;
-  type: "contains" | "cross-specialty" | "amends";
+  type: "contains" | "cross-specialty" | "amends" | "field-dependency";
   fieldRef?: string;
   /** For cross-specialty: all shared non-generic field paths between the two specialties */
   sharedFields?: string[];
+  /** For field-dependency: the shared field that connects two rules */
+  sharedField?: string;
 }
 
 export interface GraphStats {
@@ -72,6 +78,8 @@ export interface GraphStats {
   crossSpecialtyLinks: number;
   /** Regulation amendment chain edges */
   amendmentLinks: number;
+  /** Rule-to-rule field dependency edges */
+  fieldDependencyLinks: number;
   /** Distinct building types found in rule conditions */
   buildingTypes: string[];
 }
@@ -112,6 +120,50 @@ const SEVERITY_COLORS: Record<string, string> = {
   warning: "#f59e0b",
   info: "#3b82f6",
   pass: "#22c55e",
+};
+
+/** Map specialty → construction phase for radial layout positioning */
+const SPECIALTY_PHASE: Record<string, "projeto" | "licenciamento" | "construcao" | "certificacao"> = {
+  architecture: "projeto",
+  structural: "projeto",
+  drawings: "projeto",
+  general: "projeto",
+  licensing: "licenciamento",
+  municipal: "licenciamento",
+  electrical: "construcao",
+  "fire-safety": "construcao",
+  "water-drainage": "construcao",
+  gas: "construcao",
+  hvac: "construcao",
+  telecommunications: "construcao",
+  accessibility: "construcao",
+  elevators: "construcao",
+  waste: "construcao",
+  thermal: "certificacao",
+  acoustic: "certificacao",
+  energy: "certificacao",
+};
+
+/** Map specialty → building system for angular clustering */
+const SPECIALTY_SYSTEM: Record<string, "estrutura" | "mep" | "envolvente" | "seguranca" | "administrativo"> = {
+  structural: "estrutura",
+  architecture: "envolvente",
+  electrical: "mep",
+  "water-drainage": "mep",
+  gas: "mep",
+  hvac: "mep",
+  elevators: "mep",
+  telecommunications: "mep",
+  thermal: "envolvente",
+  acoustic: "envolvente",
+  energy: "envolvente",
+  "fire-safety": "seguranca",
+  accessibility: "seguranca",
+  licensing: "administrativo",
+  municipal: "administrativo",
+  drawings: "administrativo",
+  waste: "administrativo",
+  general: "administrativo",
 };
 
 /** Generic top-level fields used by most plugins — not meaningful cross-specialty links */
@@ -367,21 +419,61 @@ function extractSubTopic(rule: DeclarativeRule): string | undefined {
   return rule.tags[0];
 }
 
-/** Human-readable labels for building types */
-export const BUILDING_TYPE_LABELS: Record<string, string> = {
-  residential: "Habitação",
-  commercial: "Comércio/Serviços",
-  mixed: "Misto",
-  industrial: "Industrial",
-  office: "Escritórios",
-  school: "Escolar",
-  hospital: "Hospitalar",
-  hotel: "Hotelaria",
-  retail: "Comércio",
-  restaurant: "Restauração",
-  housing: "Habitação",
-  habitacional: "Habitação",
+/** Portuguese building type taxonomy — grouped by category */
+export const BUILDING_TYPE_TAXONOMY: Record<string, { label: string; types: Record<string, string> }> = {
+  habitacao: {
+    label: "Habitação",
+    types: {
+      residential: "Habitação Unifamiliar",
+      housing: "Habitação Unifamiliar",
+      habitacional: "Habitação Multifamiliar",
+    },
+  },
+  servicos: {
+    label: "Comércio e Serviços",
+    types: {
+      commercial: "Comércio",
+      office: "Escritórios",
+      retail: "Comércio a Retalho",
+      restaurant: "Restauração",
+      hotel: "Hotelaria",
+    },
+  },
+  equipamentos: {
+    label: "Equipamentos",
+    types: {
+      school: "Escolar",
+      hospital: "Hospitalar",
+    },
+  },
+  industrial: {
+    label: "Industrial",
+    types: {
+      industrial: "Industrial",
+    },
+  },
+  misto: {
+    label: "Uso Misto",
+    types: {
+      mixed: "Misto",
+    },
+  },
 };
+
+/** Flat lookup for backward compat — derived from taxonomy */
+export const BUILDING_TYPE_LABELS: Record<string, string> = Object.fromEntries(
+  Object.values(BUILDING_TYPE_TAXONOMY).flatMap(cat =>
+    Object.entries(cat.types)
+  )
+);
+
+/** Reverse lookup: building type value → category key */
+export function getBuildingTypeCategory(typeValue: string): string | undefined {
+  for (const [catKey, cat] of Object.entries(BUILDING_TYPE_TAXONOMY)) {
+    if (typeValue in cat.types) return catKey;
+  }
+  return undefined;
+}
 
 // ============================================================
 // Main builder
@@ -407,6 +499,8 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
       label: plugin.name,
       specialtyId: plugin.id,
       color,
+      constructionPhase: SPECIALTY_PHASE[plugin.id] ?? "construcao",
+      buildingSystem: SPECIALTY_SYSTEM[plugin.id] ?? "administrativo",
       rulesCount: plugin.rules.length,
       val: 30,
     });
@@ -427,6 +521,8 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
         label: reg.shortRef,
         specialtyId: plugin.id,
         color,
+        constructionPhase: SPECIALTY_PHASE[plugin.id] ?? "construcao",
+        buildingSystem: SPECIALTY_SYSTEM[plugin.id] ?? "administrativo",
         regulationId: reg.id,
         shortRef: reg.shortRef,
         legalForce: reg.legalForce,
@@ -461,7 +557,10 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
           type: "rule",
           label: rule.id,
           specialtyId: plugin.id,
-          color: SEVERITY_COLORS[rule.severity] ?? "#6b7280",
+          color,  // Use specialty color instead of severity
+          specialtyColor: color,
+          constructionPhase: SPECIALTY_PHASE[plugin.id] ?? "construcao",
+          buildingSystem: SPECIALTY_SYSTEM[plugin.id] ?? "administrativo",
           regulationId: reg.id,
           severity: rule.severity,
           article: rule.article,
@@ -558,6 +657,63 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
     }
   }
 
+  // Build rule-to-rule field dependency links
+  // Index: specific non-generic field → rule node IDs that reference it
+  const fieldToRuleNodes = new Map<string, Set<string>>();
+  const ruleNodeSpecialty = new Map<string, string>(); // ruleNodeId → specialtyId
+
+  for (const node of nodes) {
+    if (node.type === "rule" && node.conditions) {
+      ruleNodeSpecialty.set(node.id, node.specialtyId);
+      for (const cond of node.conditions) {
+        const namespace = cond.field.split(".")[0];
+        if (GENERIC_FIELDS.has(namespace)) continue;
+        // Use the full dotted field path for specific connections
+        let ruleSet = fieldToRuleNodes.get(cond.field);
+        if (!ruleSet) {
+          ruleSet = new Set<string>();
+          fieldToRuleNodes.set(cond.field, ruleSet);
+        }
+        ruleSet.add(node.id);
+      }
+    }
+  }
+
+  // Create field-dependency links between rules across different specialties
+  let fieldDepLinkCount = 0;
+  const MAX_LINKS_PER_FIELD = 5;
+  const fieldDepPairs = new Set<string>(); // avoid duplicate rule pairs
+
+  for (const [field, ruleIds] of fieldToRuleNodes) {
+    if (ruleIds.size < 2) continue;
+
+    // Only connect rules from different specialties (same-specialty is already linked via containment)
+    const ruleArray = [...ruleIds];
+    let linksForField = 0;
+
+    for (let i = 0; i < ruleArray.length && linksForField < MAX_LINKS_PER_FIELD; i++) {
+      for (let j = i + 1; j < ruleArray.length && linksForField < MAX_LINKS_PER_FIELD; j++) {
+        const a = ruleArray[i];
+        const b = ruleArray[j];
+        // Only cross-specialty links
+        if (ruleNodeSpecialty.get(a) === ruleNodeSpecialty.get(b)) continue;
+
+        const pairKey = a < b ? `${a}|${b}` : `${b}|${a}`;
+        if (fieldDepPairs.has(pairKey)) continue;
+        fieldDepPairs.add(pairKey);
+
+        links.push({
+          source: a,
+          target: b,
+          type: "field-dependency",
+          sharedField: field,
+        });
+        fieldDepLinkCount++;
+        linksForField++;
+      }
+    }
+  }
+
   // Collect distinct building types from rule nodes
   const buildingTypesSet = new Set<string>();
   for (const node of nodes) {
@@ -580,6 +736,7 @@ export function buildRegulationGraph(plugins: SpecialtyPlugin[]): RegulationGrap
       severityCounts,
       crossSpecialtyLinks: crossPairFields.size,
       amendmentLinks: amendmentLinkCount,
+      fieldDependencyLinks: fieldDepLinkCount,
       buildingTypes: [...buildingTypesSet].sort(),
     },
   };

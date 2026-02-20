@@ -818,6 +818,8 @@ export interface AnalysisResult {
 
 export interface Finding {
   id: string;
+  /** Declarative rule ID that produced this finding (e.g. "PF-001") */
+  sourceRuleId?: string;
   area: RegulationArea;
   regulation: string;
   article: string;

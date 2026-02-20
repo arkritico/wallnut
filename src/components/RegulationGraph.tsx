@@ -3,15 +3,16 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import * as THREE from "three";
 import {
-  Search, X, Maximize2, ChevronDown, ChevronRight,
-  Home, Building2, Hammer, Layers, Tag, Eye,
+  Search, X, Maximize2, ChevronRight,
+  Home, Building2, Layers, Tag, Eye, Link2, Activity,
 } from "lucide-react";
 import { getAnnotations, type RuleAnnotation, type AnnotationStatus } from "@/lib/rule-annotations";
 import type {
   RegulationGraphData, GraphNode, GraphLink, RuleConditionDisplay,
 } from "@/lib/regulation-graph";
-import { BUILDING_TYPE_LABELS } from "@/lib/regulation-graph";
+import { BUILDING_TYPE_LABELS, BUILDING_TYPE_TAXONOMY } from "@/lib/regulation-graph";
 import type { ForceGraphMethods, NodeObject } from "react-force-graph-3d";
+import type { PluginEvaluationResult } from "@/lib/plugins/types";
 import GraphChatPanel from "./GraphChatPanel";
 
 // ============================================================
@@ -25,16 +26,21 @@ type SeverityFilter = "all" | "critical" | "warning" | "info" | "pass";
 
 interface RegulationGraphProps {
   className?: string;
+  evaluationResults?: PluginEvaluationResult[];
 }
 
 /** Breadcrumb path for tree navigation */
 interface BrowsePath {
   buildingType: string | null;   // null = all types
-  projectScope: "new" | "rehab" | null; // null = all
-  specialty: string | null;      // plugin ID
-  subTopic: string | null;       // tag-derived sub-topic
-  regulationId: string | null;   // filter to specific regulation (from 3D click)
+  buildingCategory: string | null; // taxonomy category
+  phase: string | null;           // construction phase
+  system: string | null;          // building system
+  specialty: string | null;       // plugin ID
+  subTopic: string | null;        // tag-derived sub-topic
+  regulationId: string | null;    // filter to specific regulation (from 3D click)
 }
+
+type EvalStatus = "pass" | "fail" | "skipped" | "not-evaluated";
 
 // ============================================================
 // Constants
@@ -42,7 +48,7 @@ interface BrowsePath {
 
 const SEVERITY_LABELS: Record<string, string> = {
   all: "Todas",
-  critical: "Cr\u00edtico",
+  critical: "Crítico",
   warning: "Aviso",
   info: "Info",
   pass: "OK",
@@ -55,16 +61,57 @@ const SEVERITY_COLORS: Record<string, string> = {
   pass: "#22c55e",
 };
 
-const PROJECT_SCOPE_LABELS: Record<string, string> = {
-  new: "Constru\u00e7\u00e3o nova",
-  rehab: "Reabilita\u00e7\u00e3o",
+const PHASE_LABELS: Record<string, string> = {
+  projeto: "Projeto",
+  licenciamento: "Licenciamento",
+  construcao: "Construção",
+  certificacao: "Certificação",
+};
+
+const PHASE_RADIUS: Record<string, number> = {
+  projeto: 100,
+  licenciamento: 200,
+  construcao: 300,
+  certificacao: 400,
+};
+
+const PHASE_COLORS: Record<string, string> = {
+  projeto: "#3b82f6",
+  licenciamento: "#8b5cf6",
+  construcao: "#f59e0b",
+  certificacao: "#22c55e",
+};
+
+const SYSTEM_LABELS: Record<string, string> = {
+  estrutura: "Estrutura",
+  mep: "MEP",
+  envolvente: "Envolvente",
+  seguranca: "Segurança",
+  administrativo: "Administrativo",
+};
+
+const EVAL_COLORS: Record<EvalStatus, string> = {
+  pass: "#22c55e",
+  fail: "#ef4444",
+  skipped: "#6b7280",
+  "not-evaluated": "transparent",
+};
+
+const DEFAULT_BROWSE: BrowsePath = {
+  buildingType: null,
+  buildingCategory: null,
+  phase: null,
+  system: null,
+  specialty: null,
+  subTopic: null,
+  regulationId: null,
 };
 
 // ============================================================
 // Component
 // ============================================================
 
-export default function RegulationGraph({ className = "" }: RegulationGraphProps) {
+export default function RegulationGraph({ className = "", evaluationResults }: RegulationGraphProps) {
   const fgRef = useRef<FGRef | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -79,13 +126,11 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   const [expandedRegulations, setExpandedRegulations] = useState<Set<string>>(new Set());
 
   // Tree browser
-  const [browsePath, setBrowsePath] = useState<BrowsePath>({
-    buildingType: null,
-    projectScope: null,
-    specialty: null,
-    subTopic: null,
-    regulationId: null,
-  });
+  const [browsePath, setBrowsePath] = useState<BrowsePath>({ ...DEFAULT_BROWSE });
+
+  // Toggles
+  const [showFieldDeps, setShowFieldDeps] = useState(true);
+  const [showEvalOverlay, setShowEvalOverlay] = useState(false);
 
   // ForceGraph3D loaded dynamically (no SSR)
   const [ForceGraph, setForceGraph] = useState<React.ComponentType<any> | null>(null);
@@ -96,6 +141,31 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   // Annotation overlay
   const [annotations, setAnnotationsState] = useState<Record<string, RuleAnnotation>>({});
   const [showAnnotations, setShowAnnotations] = useState(false);
+
+  // Phase rings refs (added to scene)
+  const phaseRingsRef = useRef<THREE.Group | null>(null);
+
+  // ── Build evaluation status map ─────────────────────────────
+  const evalStatusMap = useMemo(() => {
+    const map = new Map<string, EvalStatus>();
+    if (!evaluationResults) return map;
+
+    for (const result of evaluationResults) {
+      // Skipped rules
+      for (const ruleId of result.rulesSkipped) {
+        map.set(ruleId, "skipped");
+      }
+      // Fired rules (produced findings = fail)
+      for (const finding of result.findings) {
+        if (finding.sourceRuleId) {
+          map.set(finding.sourceRuleId, "fail");
+        }
+      }
+    }
+    // Rules that were evaluated but not skipped and not fired = pass
+    // We need to know which rules are active — derive from graph data later
+    return map;
+  }, [evaluationResults]);
 
   // ── Load ForceGraph3D dynamically ─────────────────────────
   useEffect(() => {
@@ -134,22 +204,125 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     return () => observer.disconnect();
   }, []);
 
+  // ── Apply radial layout forces ─────────────────────────────
+  useEffect(() => {
+    if (!fgRef.current || !graphData) return;
+
+    const fg = fgRef.current;
+
+    // Custom radial force: push nodes toward their phase ring radius
+    fg.d3Force("radial", (alpha: number) => {
+      for (const node of graphData.nodes as FGNode[]) {
+        if (!node.constructionPhase) continue;
+        const targetR = PHASE_RADIUS[node.constructionPhase] ?? 300;
+
+        const x = node.x ?? 0;
+        const y = node.y ?? 0;
+        const currentR = Math.sqrt(x * x + y * y) || 1;
+        const strength = 0.03 * alpha;
+        const dr = (targetR - currentR) * strength;
+
+        node.vx = (node.vx ?? 0) + (x / currentR) * dr;
+        node.vy = (node.vy ?? 0) + (y / currentR) * dr;
+      }
+    });
+
+    // Flatten Z axis slightly (2.5D feel)
+    fg.d3Force("flatten", (alpha: number) => {
+      for (const node of graphData.nodes as FGNode[]) {
+        node.vz = (node.vz ?? 0) - (node.z ?? 0) * 0.05 * alpha;
+      }
+    });
+
+    // Reheat simulation
+    fg.d3ReheatSimulation();
+  }, [graphData]);
+
+  // ── Add phase ring geometry to scene ────────────────────────
+  useEffect(() => {
+    if (!fgRef.current || !graphData) return;
+
+    const fg = fgRef.current;
+    const scene = fg.scene();
+    if (!scene) return;
+
+    // Remove old rings if re-rendering
+    if (phaseRingsRef.current) {
+      scene.remove(phaseRingsRef.current);
+    }
+
+    const group = new THREE.Group();
+
+    for (const [phase, radius] of Object.entries(PHASE_RADIUS)) {
+      // Torus ring
+      const ringGeo = new THREE.TorusGeometry(radius, 0.5, 8, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: PHASE_COLORS[phase] ?? "#666",
+        transparent: true,
+        opacity: 0.15,
+      });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2; // Flat on XY plane
+      group.add(ring);
+
+      // Phase label as sprite
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+      canvas.width = 512;
+      canvas.height = 64;
+      ctx.clearRect(0, 0, 512, 64);
+      ctx.font = "bold 32px system-ui, sans-serif";
+      ctx.fillStyle = PHASE_COLORS[phase] ?? "#888";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(PHASE_LABELS[phase]?.toUpperCase() ?? phase, 256, 32);
+
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.6, depthTest: false });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(60, 8, 1);
+      sprite.position.set(0, radius + 15, 0);
+      group.add(sprite);
+    }
+
+    scene.add(group);
+    phaseRingsRef.current = group;
+
+    return () => {
+      if (phaseRingsRef.current && scene) {
+        scene.remove(phaseRingsRef.current);
+      }
+    };
+  }, [graphData, loading]);
+
   // ── Rule matching logic for tree browsing ─────────────────
   const ruleMatchesBrowse = useCallback((node: GraphNode, path: BrowsePath): boolean => {
     if (node.type !== "rule") return false;
 
-    // Building type filter: rule matches if universal (no types) or includes the selected type
+    // Building type filter
     if (path.buildingType) {
       if (node.applicableTypes && node.applicableTypes.length > 0) {
         if (!node.applicableTypes.includes(path.buildingType)) return false;
       }
-      // Universal rules (empty applicableTypes) always match
     }
 
-    // Project scope filter
-    if (path.projectScope) {
-      if (node.projectScope !== "all" && node.projectScope !== path.projectScope) return false;
+    // Building category filter
+    if (path.buildingCategory && path.buildingCategory !== "_all") {
+      const cat = BUILDING_TYPE_TAXONOMY[path.buildingCategory];
+      if (cat) {
+        const catTypes = Object.keys(cat.types);
+        if (node.applicableTypes && node.applicableTypes.length > 0) {
+          if (!node.applicableTypes.some(t => catTypes.includes(t))) return false;
+        }
+      }
     }
+
+    // Phase filter
+    if (path.phase && node.constructionPhase !== path.phase) return false;
+
+    // System filter
+    if (path.system && node.buildingSystem !== path.system) return false;
 
     // Specialty filter
     if (path.specialty && node.specialtyId !== path.specialty) return false;
@@ -175,27 +348,61 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
 
   // ── Tree level data ───────────────────────────────────────
 
-  // Building type options with counts
-  const buildingTypeOptions = useMemo(() => {
+  // Building category options with counts (grouped taxonomy)
+  const buildingCategoryOptions = useMemo(() => {
     if (!graphData) return [];
-    const counts = new Map<string, number>();
-    for (const rule of allRules) {
-      if (rule.applicableTypes && rule.applicableTypes.length > 0) {
-        for (const t of rule.applicableTypes) {
-          counts.set(t, (counts.get(t) ?? 0) + 1);
+    return Object.entries(BUILDING_TYPE_TAXONOMY).map(([key, cat]) => {
+      const catTypes = Object.keys(cat.types);
+      let count = 0;
+      for (const rule of allRules) {
+        if (rule.applicableTypes && rule.applicableTypes.length > 0) {
+          if (rule.applicableTypes.some(t => catTypes.includes(t))) count++;
         }
       }
-    }
-    return [...counts.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .map(([type, count]) => ({
-        value: type,
-        label: BUILDING_TYPE_LABELS[type] || type,
-        count,
-      }));
+      return { value: key, label: cat.label, count };
+    }).filter(o => o.count > 0);
   }, [allRules, graphData]);
 
-  // Specialty options with counts (filtered by building type + project scope)
+  // Phase options with counts
+  const phaseOptions = useMemo(() => {
+    const partialPath = { ...browsePath, phase: null, system: null, specialty: null, subTopic: null };
+    const matching = allRules.filter(r => ruleMatchesBrowse(r, partialPath));
+    const counts = new Map<string, number>();
+    for (const rule of matching) {
+      if (rule.constructionPhase) {
+        counts.set(rule.constructionPhase, (counts.get(rule.constructionPhase) ?? 0) + 1);
+      }
+    }
+    return (["projeto", "licenciamento", "construcao", "certificacao"] as const)
+      .filter(p => counts.has(p))
+      .map(p => ({
+        value: p,
+        label: PHASE_LABELS[p],
+        color: PHASE_COLORS[p],
+        count: counts.get(p) ?? 0,
+      }));
+  }, [allRules, browsePath, ruleMatchesBrowse]);
+
+  // System options with counts
+  const systemOptions = useMemo(() => {
+    const partialPath = { ...browsePath, system: null, specialty: null, subTopic: null };
+    const matching = allRules.filter(r => ruleMatchesBrowse(r, partialPath));
+    const counts = new Map<string, number>();
+    for (const rule of matching) {
+      if (rule.buildingSystem) {
+        counts.set(rule.buildingSystem, (counts.get(rule.buildingSystem) ?? 0) + 1);
+      }
+    }
+    return (["estrutura", "mep", "envolvente", "seguranca", "administrativo"] as const)
+      .filter(s => counts.has(s))
+      .map(s => ({
+        value: s,
+        label: SYSTEM_LABELS[s],
+        count: counts.get(s) ?? 0,
+      }));
+  }, [allRules, browsePath, ruleMatchesBrowse]);
+
+  // Specialty options with counts
   const specialtyOptions = useMemo(() => {
     const partialPath = { ...browsePath, specialty: null, subTopic: null };
     const matching = allRules.filter(r => ruleMatchesBrowse(r, partialPath));
@@ -222,7 +429,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
       }));
   }, [allRules, browsePath, graphData, ruleMatchesBrowse]);
 
-  // Sub-topic options with counts (filtered by building type + project scope + specialty)
+  // Sub-topic options with counts
   const subTopicOptions = useMemo(() => {
     const partialPath = { ...browsePath, subTopic: null };
     const matching = allRules.filter(r => ruleMatchesBrowse(r, partialPath));
@@ -241,6 +448,20 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
       }));
   }, [allRules, browsePath, ruleMatchesBrowse]);
 
+  // ── Connected rules (for selected rule highlight) ──────────
+  const connectedRuleIds = useMemo(() => {
+    if (!selectedNode || selectedNode.type !== "rule" || !graphData) return new Set<string>();
+    const connected = new Set<string>();
+    for (const link of graphData.links) {
+      if (link.type !== "field-dependency") continue;
+      const srcId = typeof link.source === "string" ? link.source : (link.source as any)?.id;
+      const tgtId = typeof link.target === "string" ? link.target : (link.target as any)?.id;
+      if (srcId === selectedNode.id) connected.add(tgtId);
+      if (tgtId === selectedNode.id) connected.add(srcId);
+    }
+    return connected;
+  }, [selectedNode, graphData]);
+
   // ── Compute visible graph data ────────────────────────────
   const visibleData = useMemo(() => {
     if (!graphData) return { nodes: [] as GraphNode[], links: [] as GraphLink[] };
@@ -250,6 +471,12 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const visibleNodes = graphData.nodes.filter(node => {
       // Specialty filter from tree browser
       if (browsePath.specialty && node.specialtyId !== browsePath.specialty) return false;
+
+      // Phase filter for non-rule nodes too
+      if (browsePath.phase && node.constructionPhase !== browsePath.phase) return false;
+
+      // System filter
+      if (browsePath.system && node.buildingSystem !== browsePath.system) return false;
 
       if (node.type === "specialty") return true;
       if (node.type === "regulation") return true;
@@ -275,19 +502,22 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
 
     const visibleIds = new Set(visibleNodes.map(n => n.id));
     const visibleLinks = graphData.links.filter(l => {
+      // Hide field-dependency links if toggle is off
+      if (l.type === "field-dependency" && !showFieldDeps) return false;
+
       const srcId = typeof l.source === "string" ? l.source : (l.source as any)?.id;
       const tgtId = typeof l.target === "string" ? l.target : (l.target as any)?.id;
       return visibleIds.has(srcId) && visibleIds.has(tgtId);
     });
 
     return { nodes: visibleNodes, links: visibleLinks };
-  }, [graphData, expandedRegulations, severityFilter, browsePath, searchQuery, ruleMatchesBrowse]);
+  }, [graphData, expandedRegulations, severityFilter, browsePath, searchQuery, ruleMatchesBrowse, showFieldDeps]);
 
   // ── Annotation color helper ──────────────────────────────
   const ANNOTATION_RING_COLORS: Record<AnnotationStatus, string> = {
-    reviewed: "#10b981",   // emerald
-    irrelevant: "#6b7280", // gray
-    "needs-fix": "#f97316", // orange
+    reviewed: "#10b981",
+    irrelevant: "#6b7280",
+    "needs-fix": "#f97316",
   };
 
   // ── Custom node rendering ─────────────────────────────────
@@ -295,25 +525,45 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const n = node as unknown as GraphNode;
     const size = n.type === "specialty" ? 8 : n.type === "regulation" ? 4 : 1.5;
     const segments = n.type === "specialty" ? 24 : n.type === "regulation" ? 16 : 8;
-    const color = n.color;
 
     // Check annotation for rule nodes
     const ann = n.type === "rule" && showAnnotations ? annotations[n.label] : undefined;
     const isIrrelevant = ann?.status === "irrelevant";
 
+    // Check if connected to selected rule
+    const isConnected = n.type === "rule" && connectedRuleIds.has(n.id);
+    const isSelected = selectedNode?.id === n.id;
+
+    // Evaluation overlay
+    const evalSt = showEvalOverlay && n.type === "rule" ? (evalStatusMap.get(n.label) ?? "not-evaluated") : null;
+
     const group = new THREE.Group();
 
+    // Main sphere — use specialty color for rules
+    const nodeColor = isIrrelevant ? "#4b5563" : n.color;
     const geo = new THREE.SphereGeometry(size, segments, segments);
     const mat = new THREE.MeshPhongMaterial({
-      color: isIrrelevant ? "#4b5563" : color,
+      color: nodeColor,
       transparent: n.type === "rule",
-      opacity: isIrrelevant ? 0.2 : n.type === "rule" ? 0.75 : 1,
-      emissive: new THREE.Color(isIrrelevant ? "#4b5563" : color),
-      emissiveIntensity: n.type === "specialty" ? 0.3 : 0.1,
+      opacity: isIrrelevant ? 0.2 : (evalSt === "skipped" ? 0.3 : n.type === "rule" ? 0.75 : 1),
+      emissive: new THREE.Color(nodeColor),
+      emissiveIntensity: isConnected || isSelected ? 0.6 : n.type === "specialty" ? 0.3 : 0.1,
     });
     group.add(new THREE.Mesh(geo, mat));
 
-    // Add annotation ring for rule nodes
+    // Severity indicator (small offset sphere for rules)
+    if (n.type === "rule" && n.severity && n.severity !== "pass" && !isIrrelevant) {
+      const sevSize = 0.5;
+      const sevGeo = new THREE.SphereGeometry(sevSize, 6, 6);
+      const sevMat = new THREE.MeshBasicMaterial({
+        color: SEVERITY_COLORS[n.severity] ?? "#6b7280",
+      });
+      const sevMesh = new THREE.Mesh(sevGeo, sevMat);
+      sevMesh.position.set(size + 0.3, size + 0.3, 0);
+      group.add(sevMesh);
+    }
+
+    // Annotation ring
     if (ann && !isIrrelevant) {
       const ringColor = ANNOTATION_RING_COLORS[ann.status];
       const ringGeo = new THREE.RingGeometry(size + 0.3, size + 0.8, 32);
@@ -323,10 +573,34 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
         opacity: 0.8,
         side: THREE.DoubleSide,
       });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
-      group.add(ring);
+      group.add(new THREE.Mesh(ringGeo, ringMat));
     }
 
+    // Evaluation overlay ring
+    if (evalSt && evalSt !== "not-evaluated") {
+      const evalColor = EVAL_COLORS[evalSt];
+      const evalGeo = new THREE.RingGeometry(size + 1, size + 1.5, 32);
+      const evalMat = new THREE.MeshBasicMaterial({
+        color: evalColor,
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.DoubleSide,
+      });
+      group.add(new THREE.Mesh(evalGeo, evalMat));
+    }
+
+    // Connected rule glow
+    if (isConnected) {
+      const glowGeo = new THREE.SphereGeometry(size * 1.8, 16, 16);
+      const glowMat = new THREE.MeshBasicMaterial({
+        color: nodeColor,
+        transparent: true,
+        opacity: 0.15,
+      });
+      group.add(new THREE.Mesh(glowGeo, glowMat));
+    }
+
+    // Label sprite for non-rule nodes
     if (n.type !== "rule") {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d")!;
@@ -351,23 +625,25 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     }
 
     return group;
-  }, [showAnnotations, annotations]);
+  }, [showAnnotations, annotations, connectedRuleIds, selectedNode, showEvalOverlay, evalStatusMap]);
 
   // ── Node label for hover tooltip ──────────────────────────
   const nodeLabel = useCallback((node: FGNode) => {
     const n = node as unknown as GraphNode;
     if (n.type === "specialty") {
       return `<div style="background:#1e1e2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;max-width:280px">
-        <b>${n.label}</b><br/><span style="color:#94a3b8">${n.rulesCount} regras</span></div>`;
+        <b>${n.label}</b><br/><span style="color:#94a3b8">${n.rulesCount} regras</span>
+        <br/><span style="color:#64748b;font-size:11px">${PHASE_LABELS[n.constructionPhase ?? ""] ?? ""} · ${SYSTEM_LABELS[n.buildingSystem ?? ""] ?? ""}</span></div>`;
     }
     if (n.type === "regulation") {
       return `<div style="background:#1e1e2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;max-width:280px">
         <b>${n.shortRef || n.label}</b><br/><span style="color:#94a3b8">${n.rulesCount} regras</span><br/>
         <span style="color:#64748b;font-size:11px">Clique para expandir/colapsar</span></div>`;
     }
+    const sevBadge = n.severity ? `<span style="color:${SEVERITY_COLORS[n.severity] || '#fff'};font-size:10px;text-transform:uppercase">${SEVERITY_LABELS[n.severity] ?? n.severity}</span> · ` : "";
     return `<div style="background:#1e1e2e;color:#fff;padding:8px 12px;border-radius:8px;font-size:13px;max-width:320px">
-      <b style="color:${SEVERITY_COLORS[n.severity!] || '#fff'}">${n.label}</b><br/>
-      <span style="color:#cbd5e1">${n.article || ""}</span><br/>
+      <b>${n.label}</b><br/>
+      ${sevBadge}<span style="color:#cbd5e1">${n.article || ""}</span><br/>
       <span style="color:#94a3b8;font-size:12px">${(n.description || "").slice(0, 120)}${(n.description || "").length > 120 ? "..." : ""}</span></div>`;
   }, []);
 
@@ -376,32 +652,25 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const n = node as unknown as GraphNode;
 
     if (n.type === "regulation") {
-      // Always expand the regulation's rules in the 3D graph
       setExpandedRegulations(prev => {
         const next = new Set(prev);
         next.add(n.regulationId!);
         return next;
       });
-      // Navigate sidebar to show this regulation's rules
-      setBrowsePath({
-        buildingType: null,
-        projectScope: null,
+      setBrowsePath(prev => ({
+        ...prev,
         specialty: n.specialtyId,
-        subTopic: null,
         regulationId: n.regulationId!,
-      });
+      }));
     }
 
     if (n.type === "specialty") {
-      // Navigate sidebar to this specialty's rules
-      setBrowsePath({
-        buildingType: null,
-        projectScope: null,
+      setBrowsePath(prev => ({
+        ...prev,
         specialty: n.specialtyId,
         subTopic: null,
         regulationId: null,
-      });
-      // Expand all regulations for this specialty
+      }));
       if (graphData) {
         const regIds = graphData.nodes
           .filter(nd => nd.type === "regulation" && nd.specialtyId === n.specialtyId)
@@ -416,14 +685,11 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     }
 
     if (n.type === "rule") {
-      // Navigate to this rule's specialty + regulation context
-      setBrowsePath({
-        buildingType: null,
-        projectScope: null,
+      setBrowsePath(prev => ({
+        ...prev,
         specialty: n.specialtyId,
-        subTopic: null,
         regulationId: n.regulationId!,
-      });
+      }));
     }
 
     setSelectedNode(n);
@@ -441,11 +707,13 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   const linkColor = useCallback((link: GraphLink) => {
     if (link.type === "cross-specialty") return "#ff6b6b";
     if (link.type === "amends") return "#eab308";
+    if (link.type === "field-dependency") return "#06b6d4";
     return "#2a2a3a";
   }, []);
   const linkWidth = useCallback((link: GraphLink) => {
     if (link.type === "cross-specialty") return 2;
     if (link.type === "amends") return 1.5;
+    if (link.type === "field-dependency") return 0.8;
     return 0.3;
   }, []);
   const linkLabel = useCallback((link: GraphLink) => {
@@ -453,6 +721,10 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
       return `<div style="background:#1e1e2e;color:#ff6b6b;padding:6px 10px;border-radius:6px;font-size:11px;max-width:300px">
         <b>Campos partilhados (${link.sharedFields.length})</b><br/>
         <span style="color:#94a3b8">${link.sharedFields.slice(0, 8).join(", ")}${link.sharedFields.length > 8 ? ` (+${link.sharedFields.length - 8})` : ""}</span></div>`;
+    }
+    if (link.type === "field-dependency" && link.sharedField) {
+      return `<div style="background:#1e1e2e;color:#06b6d4;padding:6px 10px;border-radius:6px;font-size:11px">
+        <b>Campo partilhado</b><br/><span style="color:#94a3b8;font-family:monospace">${link.sharedField}</span></div>`;
     }
     if (link.type === "amends") {
       return `<div style="background:#1e1e2e;color:#eab308;padding:6px 10px;border-radius:6px;font-size:11px">Altera/Republica</div>`;
@@ -467,7 +739,6 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const node = graphData.nodes.find(n => n.type === "rule" && n.label === ruleLabel);
     if (!node) return;
 
-    // Expand parent regulation so rule is visible in 3D
     if (node.regulationId) {
       setExpandedRegulations(prev => {
         const next = new Set(prev);
@@ -476,18 +747,14 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
       });
     }
 
-    // Navigate sidebar to the rule's context
-    setBrowsePath({
-      buildingType: null,
-      projectScope: null,
+    setBrowsePath(prev => ({
+      ...prev,
       specialty: node.specialtyId,
-      subTopic: null,
       regulationId: node.regulationId!,
-    });
+    }));
 
     setSelectedNode(node);
 
-    // Camera focus (node may not have coordinates until force settles)
     const fgNode = node as unknown as FGNode;
     if (fgRef.current && fgNode.x != null && fgNode.y != null && fgNode.z != null) {
       fgRef.current.cameraPosition(
@@ -505,7 +772,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     return () => clearTimeout(timer);
   }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Specialties for graph sidebar ─────────────────────────
+  // ── Specialties for reference ─────────────────────────────
   const specialties = useMemo(() => {
     if (!graphData) return [];
     return graphData.nodes.filter(n => n.type === "specialty").sort((a, b) => (b.rulesCount ?? 0) - (a.rulesCount ?? 0));
@@ -516,17 +783,24 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
     const crumbs: Array<{ label: string; onClick: () => void }> = [];
     crumbs.push({
       label: "Todos",
-      onClick: () => setBrowsePath({ buildingType: null, projectScope: null, specialty: null, subTopic: null, regulationId: null }),
+      onClick: () => setBrowsePath({ ...DEFAULT_BROWSE }),
     });
-    if (browsePath.buildingType) {
+    if (browsePath.buildingCategory) {
+      const cat = BUILDING_TYPE_TAXONOMY[browsePath.buildingCategory];
       crumbs.push({
-        label: BUILDING_TYPE_LABELS[browsePath.buildingType] || browsePath.buildingType,
-        onClick: () => setBrowsePath(prev => ({ ...prev, projectScope: null, specialty: null, subTopic: null, regulationId: null })),
+        label: cat?.label ?? browsePath.buildingCategory,
+        onClick: () => setBrowsePath(prev => ({ ...prev, buildingType: null, phase: null, system: null, specialty: null, subTopic: null, regulationId: null })),
       });
     }
-    if (browsePath.projectScope) {
+    if (browsePath.phase) {
       crumbs.push({
-        label: PROJECT_SCOPE_LABELS[browsePath.projectScope],
+        label: PHASE_LABELS[browsePath.phase] ?? browsePath.phase,
+        onClick: () => setBrowsePath(prev => ({ ...prev, system: null, specialty: null, subTopic: null, regulationId: null })),
+      });
+    }
+    if (browsePath.system) {
+      crumbs.push({
+        label: SYSTEM_LABELS[browsePath.system] ?? browsePath.system,
         onClick: () => setBrowsePath(prev => ({ ...prev, specialty: null, subTopic: null, regulationId: null })),
       });
     }
@@ -554,13 +828,25 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
   }, [browsePath, specialties, graphData]);
 
   // ── Determine current tree level ──────────────────────────
-  // When a regulation is selected (from 3D click), jump straight to rules
   const currentLevel = browsePath.regulationId ? "rules"
-    : !browsePath.buildingType ? "buildingType"
-    : !browsePath.projectScope ? "projectScope"
+    : !browsePath.buildingCategory ? "buildingCategory"
+    : !browsePath.phase ? "phase"
+    : !browsePath.system ? "system"
     : !browsePath.specialty ? "specialty"
     : !browsePath.subTopic ? "subTopic"
     : "rules";
+
+  // ── Evaluation stats ──────────────────────────────────────
+  const evalStats = useMemo(() => {
+    if (!evaluationResults) return null;
+    let pass = 0, fail = 0, skipped = 0;
+    for (const result of evaluationResults) {
+      skipped += result.rulesSkipped.length;
+      fail += result.findings.length;
+      pass += result.totalActiveRules - result.rulesSkipped.length - result.findings.length;
+    }
+    return { pass: Math.max(0, pass), fail, skipped };
+  }, [evaluationResults]);
 
   // ── Render ────────────────────────────────────────────────
   if (error) {
@@ -599,24 +885,24 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
 
         {/* Tree level content */}
         <div className="flex-1 overflow-y-auto">
-          {/* Level 1: Building Type */}
-          {currentLevel === "buildingType" && (
+          {/* Level 1: Building Category (grouped taxonomy) */}
+          {currentLevel === "buildingCategory" && (
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Building2 className="w-4 h-4 text-gray-500" />
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo de Edif\u00edcio</label>
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Tipo de Edifício</label>
               </div>
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, buildingType: "_all", regulationId: null }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, buildingCategory: "_all", regulationId: null }))}
                 className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 bg-gray-800/50 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
               >
                 <span>Todos os tipos</span>
                 <span className="text-xs text-gray-500">{allRules.length}</span>
               </button>
-              {buildingTypeOptions.map(opt => (
+              {buildingCategoryOptions.map(opt => (
                 <button
                   key={opt.value}
-                  onClick={() => setBrowsePath(prev => ({ ...prev, buildingType: opt.value, regulationId: null }))}
+                  onClick={() => setBrowsePath(prev => ({ ...prev, buildingCategory: opt.value, regulationId: null }))}
                   className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
                 >
                   <span>{opt.label}</span>
@@ -626,44 +912,76 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             </div>
           )}
 
-          {/* Level 2: Project Scope */}
-          {currentLevel === "projectScope" && (
+          {/* Level 2: Construction Phase */}
+          {currentLevel === "phase" && (
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Hammer className="w-4 h-4 text-gray-500" />
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">\u00c2mbito do Projeto</label>
+                <Layers className="w-4 h-4 text-gray-500" />
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fase de Construção</label>
               </div>
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: null, specialty: null, subTopic: null, regulationId: null }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, phase: "_all", regulationId: null }))}
                 className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 bg-gray-800/50 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
               >
-                <span>Todos (novo + reabilita\u00e7\u00e3o)</span>
+                <span>Todas as fases</span>
                 <span className="text-xs text-gray-500">{filteredRules.length}</span>
               </button>
-              {(["new", "rehab"] as const).map(scope => {
-                const count = allRules.filter(r => ruleMatchesBrowse(r, { ...browsePath, projectScope: scope, specialty: null, subTopic: null })).length;
-                return (
-                  <button
-                    key={scope}
-                    onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: scope, regulationId: null }))}
-                    className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
-                  >
-                    <span>{PROJECT_SCOPE_LABELS[scope]}</span>
-                    <span className="text-xs text-gray-500">{count}</span>
-                  </button>
-                );
-              })}
-              {/* Skip button */}
+              {phaseOptions.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setBrowsePath(prev => ({ ...prev, phase: opt.value, regulationId: null }))}
+                  className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: opt.color }} />
+                    <span>{opt.label}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">{opt.count}</span>
+                </button>
+              ))}
               <button
-                onClick={() => setBrowsePath(prev => ({ ...prev, projectScope: null, regulationId: null }))}
+                onClick={() => setBrowsePath(prev => ({ ...prev, phase: "_all", regulationId: null }))}
                 className="w-full text-left px-3 py-1.5 text-xs rounded-lg mt-2 text-gray-600 hover:text-gray-400 transition-colors"
               >
-                Saltar \u2192 escolher especialidade
+                Saltar → escolher sistema
               </button>
             </div>
           )}
 
-          {/* Level 3: Specialty */}
+          {/* Level 3: Building System */}
+          {currentLevel === "system" && (
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Layers className="w-4 h-4 text-gray-500" />
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Sistema</label>
+              </div>
+              <button
+                onClick={() => setBrowsePath(prev => ({ ...prev, system: "_all", regulationId: null }))}
+                className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 bg-gray-800/50 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
+              >
+                <span>Todos os sistemas</span>
+                <span className="text-xs text-gray-500">{filteredRules.length}</span>
+              </button>
+              {systemOptions.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setBrowsePath(prev => ({ ...prev, system: opt.value, regulationId: null }))}
+                  className="w-full text-left px-3 py-2.5 text-sm rounded-lg mb-1 text-gray-300 hover:bg-gray-800 transition-colors flex items-center justify-between"
+                >
+                  <span>{opt.label}</span>
+                  <span className="text-xs text-gray-500">{opt.count}</span>
+                </button>
+              ))}
+              <button
+                onClick={() => setBrowsePath(prev => ({ ...prev, system: "_all", regulationId: null }))}
+                className="w-full text-left px-3 py-1.5 text-xs rounded-lg mt-2 text-gray-600 hover:text-gray-400 transition-colors"
+              >
+                Saltar → escolher especialidade
+              </button>
+            </div>
+          )}
+
+          {/* Level 4: Specialty */}
           {currentLevel === "specialty" && (
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -686,7 +1004,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             </div>
           )}
 
-          {/* Level 4: Sub-topic */}
+          {/* Level 5: Sub-topic */}
           {currentLevel === "subTopic" && (
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
@@ -716,7 +1034,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             </div>
           )}
 
-          {/* Level 5: Rule list */}
+          {/* Level 6: Rule list */}
           {currentLevel === "rules" && (
             <div className="p-4">
               <div className="flex items-center justify-between mb-3">
@@ -778,9 +1096,16 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                       <div className="flex items-center gap-2 mb-0.5">
                         <span
                           className="w-1.5 h-1.5 rounded-full shrink-0"
-                          style={{ backgroundColor: SEVERITY_COLORS[rule.severity!] }}
+                          style={{ backgroundColor: rule.specialtyColor ?? rule.color }}
                         />
                         <span className="text-xs font-mono text-gray-300 truncate">{rule.label}</span>
+                        {rule.severity && rule.severity !== "pass" && (
+                          <span
+                            className="w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ backgroundColor: SEVERITY_COLORS[rule.severity] }}
+                            title={SEVERITY_LABELS[rule.severity]}
+                          />
+                        )}
                       </div>
                       <p className="text-[11px] text-gray-500 truncate pl-3.5">
                         {rule.article || rule.description?.slice(0, 60)}
@@ -809,6 +1134,12 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
               <span className="text-right font-medium text-gray-400">{graphData.stats.totalRules}</span>
               <span className="text-gray-500">Filtradas</span>
               <span className="text-right font-medium text-blue-400">{filteredRules.length}</span>
+              {graphData.stats.fieldDependencyLinks > 0 && (
+                <>
+                  <span className="text-gray-500">Dependências</span>
+                  <span className="text-right font-medium text-cyan-400">{graphData.stats.fieldDependencyLinks}</span>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -839,10 +1170,11 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             linkWidth={linkWidth}
             linkLabel={linkLabel}
             linkOpacity={0.4}
-            linkDirectionalParticles={(link: GraphLink) => link.type === "cross-specialty" ? 2 : link.type === "amends" ? 1 : 0}
+            linkCurvature={(link: GraphLink) => link.type === "field-dependency" ? 0.2 : 0}
+            linkDirectionalParticles={(link: GraphLink) => link.type === "cross-specialty" ? 2 : link.type === "amends" ? 1 : link.type === "field-dependency" ? 1 : 0}
             linkDirectionalParticleSpeed={(link: GraphLink) => link.type === "amends" ? 0.005 : 0.003}
             linkDirectionalParticleWidth={2}
-            linkDirectionalParticleColor={(link: GraphLink) => link.type === "amends" ? "#eab308" : "#ff6b6b"}
+            linkDirectionalParticleColor={(link: GraphLink) => link.type === "amends" ? "#eab308" : link.type === "field-dependency" ? "#06b6d4" : "#ff6b6b"}
             warmupTicks={50}
             cooldownTime={3000}
             showNavInfo={false}
@@ -859,6 +1191,15 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             <Maximize2 className="w-4 h-4" />
           </button>
           <button
+            onClick={() => setShowFieldDeps(p => !p)}
+            className={`p-2 rounded-lg backdrop-blur-sm transition-colors ${
+              showFieldDeps ? "bg-cyan-800/80 text-cyan-300" : "bg-gray-800/80 hover:bg-gray-700 text-gray-300"
+            }`}
+            title={showFieldDeps ? "Ocultar dependências" : "Mostrar dependências"}
+          >
+            <Link2 className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => setShowAnnotations(p => !p)}
             className={`p-2 rounded-lg backdrop-blur-sm transition-colors ${
               showAnnotations ? "bg-emerald-800/80 text-emerald-300" : "bg-gray-800/80 hover:bg-gray-700 text-gray-300"
@@ -867,7 +1208,27 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
           >
             <Eye className="w-4 h-4" />
           </button>
+          {evaluationResults && (
+            <button
+              onClick={() => setShowEvalOverlay(p => !p)}
+              className={`p-2 rounded-lg backdrop-blur-sm transition-colors ${
+                showEvalOverlay ? "bg-green-800/80 text-green-300" : "bg-gray-800/80 hover:bg-gray-700 text-gray-300"
+              }`}
+              title={showEvalOverlay ? "Ocultar avaliação" : "Mostrar avaliação"}
+            >
+              <Activity className="w-4 h-4" />
+            </button>
+          )}
         </div>
+
+        {/* Evaluation stats bar */}
+        {showEvalOverlay && evalStats && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-gray-900/90 backdrop-blur-sm rounded-lg px-4 py-2 z-10 flex gap-4 text-xs">
+            <span className="text-green-400">{evalStats.pass} passaram</span>
+            <span className="text-red-400">{evalStats.fail} falharam</span>
+            <span className="text-gray-400">{evalStats.skipped} saltadas</span>
+          </div>
+        )}
 
         {/* Legend */}
         <div className="absolute bottom-4 left-4 bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 z-10">
@@ -879,21 +1240,17 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
             </div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-gray-500 inline-block" />
-              Regulamento (clique p/ expandir)
+              Regulamento
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: SEVERITY_COLORS.critical }} />
-              Cr\u00edtico
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: SEVERITY_COLORS.warning }} />
-              Aviso
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: SEVERITY_COLORS.info }} />
-              Info
+              <span className="w-2 h-2 rounded-full bg-blue-400 inline-block" />
+              Regra (cor = especialidade)
             </div>
             <div className="flex items-center gap-2 mt-1">
+              <span className="w-4 h-0.5 bg-cyan-400 inline-block" />
+              Dependência de campo
+            </div>
+            <div className="flex items-center gap-2">
               <span className="w-4 h-0.5 bg-red-400 inline-block" />
               Ligação cruzada
             </div>
@@ -914,6 +1271,22 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-gray-600 opacity-30 inline-block" />
                   Irrelevante
+                </div>
+              </>
+            )}
+            {showEvalOverlay && (
+              <>
+                <div className="flex items-center gap-2 mt-1 pt-1 border-t border-gray-700">
+                  <span className="w-2 h-2 rounded-full ring-2 ring-green-400 inline-block" />
+                  Passou
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full ring-2 ring-red-400 inline-block" />
+                  Falhou
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-gray-600 opacity-30 inline-block" />
+                  Saltada
                 </div>
               </>
             )}
@@ -943,34 +1316,53 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                 <>
                   <p className="text-gray-400 text-xs mb-2">Especialidade</p>
                   <p className="text-gray-300 mb-1">{selectedNode.label}</p>
-                  <p className="text-gray-500 text-xs">{selectedNode.rulesCount} regras</p>
+                  <p className="text-gray-500 text-xs mb-1">{selectedNode.rulesCount} regras</p>
+                  <div className="flex gap-2 mt-2">
+                    <span className="px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded text-[10px]">{PHASE_LABELS[selectedNode.constructionPhase ?? ""] ?? ""}</span>
+                    <span className="px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded text-[10px]">{SYSTEM_LABELS[selectedNode.buildingSystem ?? ""] ?? ""}</span>
+                  </div>
                 </>
               )}
               {selectedNode.type === "regulation" && (
                 <>
                   <p className="text-gray-400 text-xs mb-2">Regulamento</p>
                   <p className="text-gray-300 mb-1">{selectedNode.label}</p>
-                  {selectedNode.legalForce && <p className="text-gray-500 text-xs mb-1">Forca legal: {selectedNode.legalForce}</p>}
+                  {selectedNode.legalForce && <p className="text-gray-500 text-xs mb-1">Força legal: {selectedNode.legalForce}</p>}
                   <p className="text-gray-500 text-xs mb-2">{selectedNode.rulesCount} regras</p>
-                  <p className="text-[10px] text-blue-400">Regras visiveis na barra lateral</p>
+                  <p className="text-[10px] text-blue-400">Regras visíveis na barra lateral</p>
                 </>
               )}
               {selectedNode.type === "rule" && (
                 <>
-                  {/* Header: severity + article */}
+                  {/* Header: severity badge + article */}
                   <div className="flex items-center gap-2 mb-2">
-                    <span
-                      className="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
-                      style={{
-                        backgroundColor: SEVERITY_COLORS[selectedNode.severity!] + "22",
-                        color: SEVERITY_COLORS[selectedNode.severity!],
-                      }}
-                    >
-                      {selectedNode.severity}
-                    </span>
+                    {selectedNode.severity && (
+                      <span
+                        className="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                        style={{
+                          backgroundColor: SEVERITY_COLORS[selectedNode.severity] + "22",
+                          color: SEVERITY_COLORS[selectedNode.severity],
+                        }}
+                      >
+                        {SEVERITY_LABELS[selectedNode.severity] ?? selectedNode.severity}
+                      </span>
+                    )}
                     {selectedNode.article && (
                       <span className="text-gray-400 text-xs font-medium">{selectedNode.article}</span>
                     )}
+                  </div>
+
+                  {/* Phase + System badges */}
+                  <div className="flex gap-2 mb-2">
+                    <span className="px-1.5 py-0.5 rounded text-[10px]" style={{
+                      backgroundColor: (PHASE_COLORS[selectedNode.constructionPhase ?? ""] ?? "#666") + "22",
+                      color: PHASE_COLORS[selectedNode.constructionPhase ?? ""] ?? "#888",
+                    }}>
+                      {PHASE_LABELS[selectedNode.constructionPhase ?? ""] ?? ""}
+                    </span>
+                    <span className="px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded text-[10px]">
+                      {SYSTEM_LABELS[selectedNode.buildingSystem ?? ""] ?? ""}
+                    </span>
                   </div>
 
                   {/* Description */}
@@ -991,12 +1383,38 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                     )}
                     {selectedNode.projectScope !== "all" && (
                       <span className="px-1.5 py-0.5 bg-purple-900/30 text-purple-400 rounded text-[10px]">
-                        {selectedNode.projectScope === "new" ? "Construcao nova" : "Reabilitacao"}
+                        {selectedNode.projectScope === "new" ? "Construção nova" : "Reabilitação"}
                       </span>
                     )}
                   </div>
 
-                  {/* Conditions — the actual rule logic as readable questions */}
+                  {/* Connected rules via field dependencies */}
+                  {connectedRuleIds.size > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] font-semibold text-cyan-500 uppercase tracking-wide mb-1">
+                        Regras conectadas ({connectedRuleIds.size})
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        {[...connectedRuleIds].slice(0, 8).map(id => {
+                          const connNode = graphData?.nodes.find(n => n.id === id);
+                          return connNode ? (
+                            <button
+                              key={id}
+                              onClick={() => setSelectedNode(connNode)}
+                              className="px-1.5 py-0.5 bg-cyan-900/20 text-cyan-400 rounded text-[10px] hover:bg-cyan-900/40 transition-colors"
+                            >
+                              {connNode.label}
+                            </button>
+                          ) : null;
+                        })}
+                        {connectedRuleIds.size > 8 && (
+                          <span className="text-[10px] text-gray-600">+{connectedRuleIds.size - 8} mais</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Conditions */}
                   {selectedNode.conditions && selectedNode.conditions.length > 0 && (
                     <div className="mb-3">
                       <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
@@ -1026,7 +1444,7 @@ export default function RegulationGraph({ className = "" }: RegulationGraphProps
                   {/* Remediation */}
                   {selectedNode.remediation && (
                     <div className="mb-3">
-                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Remediacao</p>
+                      <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide mb-1">Remediação</p>
                       <p className="text-xs text-emerald-400/80 bg-emerald-900/10 rounded px-2 py-1.5 leading-relaxed">
                         {selectedNode.remediation}
                       </p>
