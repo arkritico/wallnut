@@ -353,87 +353,49 @@ export class PriceVariantScraper {
   private async discoverOptions(
     page: Page,
   ): Promise<Array<{ label: string; type: "select" | "link" | "button"; selector: string; values: string[] }>> {
-    // NOTE: Inside page.evaluate(), we use plain `function` declarations
-    // to avoid esbuild's `__name` decorator which doesn't exist in the browser.
-    return page.evaluate(function() {
-      var groups: Array<{
-        label: string;
-        type: "select" | "link" | "button";
-        selector: string;
-        values: string[];
-      }> = [];
+    // Use string-based evaluate to completely bypass esbuild's __name decorator.
+    //
+    // All <select> elements on CYPE item pages are chapter navigation dropdowns,
+    // NOT parametric variant selectors. We only extract calculaprecio buttons.
+    //
+    // Each button's onclick Valor parameter has structure: FIRST_SEG|...TAIL...
+    // Buttons sharing the same tail belong to the same option axis.
+    const result = await page.evaluate(`
+      (function() {
+        var groups = [];
+        var allButtons = document.querySelectorAll("input[onclick*='calculaprecio']");
+        if (allButtons.length === 0) return groups;
 
-      // NOTE: All <select> elements on CYPE item pages are chapter navigation
-      // dropdowns (e.g., "Trabalhos prévios", "Demolições", "Estruturas").
-      // They are NOT parametric variant selectors. We intentionally skip them.
-
-      // The CYPE configurator uses <input> elements with onclick handlers
-      // that call calculaprecio() to recalculate prices for each option.
-      //
-      // Each button's onclick contains a Valor= parameter like:
-      //   "1|0_0_0_0|0|EHS010|ehs_altplant"
-      //
-      // The first segment (before the first |) is the option index within a group.
-      // The "tail" (everything after the first |) identifies the option GROUP/AXIS.
-      // Buttons with the same tail belong to the same axis (user picks one).
-      //
-      // We group buttons by tail and return each group as a separate option axis.
-
-      var allButtons = Array.from(
-        document.querySelectorAll<HTMLInputElement>("input[onclick*='calculaprecio']"),
-      );
-
-      if (allButtons.length === 0) return groups;
-
-      // Extract Valor from each button and group by tail
-      var tailGroups = new Map<string, Array<{ firstSeg: string; parentId: string }>>();
-
-      for (var i = 0; i < allButtons.length; i++) {
-        var btn = allButtons[i];
-        var onclick = btn.getAttribute("onclick") || "";
-        var valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
-        if (!valorMatch) continue;
-
-        var valor = valorMatch[1];
-        var pipeIdx = valor.indexOf("|");
-        var firstSeg = pipeIdx >= 0 ? valor.substring(0, pipeIdx) : valor;
-        var tail = pipeIdx >= 0 ? valor.substring(pipeIdx + 1) : "";
-
-        if (!tailGroups.has(tail)) tailGroups.set(tail, []);
-        tailGroups.get(tail)!.push({
-          firstSeg: firstSeg,
-          parentId: btn.closest("[id]")?.id || "unknown",
-        });
-      }
-
-      // Only include groups with >1 option (a single button = no real choice)
-      var groupIdx = 0;
-      for (var [tail, entries] of tailGroups) {
-        if (entries.length <= 1) continue;
-
-        // The "values" for each option are the first segments (option indices)
-        var values: string[] = [];
-        for (var j = 0; j < entries.length; j++) {
-          values.push(entries[j].firstSeg);
+        var tailMap = {};
+        for (var i = 0; i < allButtons.length; i++) {
+          var btn = allButtons[i];
+          var oc = btn.getAttribute("onclick") || "";
+          var m = oc.match(/Valor=([^&'"\\)\\s]+)/);
+          if (!m) continue;
+          var valor = m[1];
+          var pi = valor.indexOf("|");
+          var fs = pi >= 0 ? valor.substring(0, pi) : valor;
+          var tail = pi >= 0 ? valor.substring(pi + 1) : "";
+          if (!tailMap[tail]) tailMap[tail] = [];
+          tailMap[tail].push(fs);
         }
 
-        // Derive a label from the tail (last code segment is most descriptive)
-        var tailParts = tail.split("|");
-        var labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || "group_" + groupIdx;
-        var label = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
-
-        groups.push({
-          label: label || "axis_" + groupIdx,
-          type: "button" as const,
-          selector: "input[onclick*='calculaprecio']",
-          values: values,
-        });
-
-        groupIdx++;
-      }
-
-      return groups;
-    });
+        var gIdx = 0;
+        var tails = Object.keys(tailMap);
+        for (var t = 0; t < tails.length; t++) {
+          var tail = tails[t];
+          var entries = tailMap[tail];
+          if (entries.length <= 1) continue;
+          var tp = tail.split("|");
+          var lp = tp[tp.length - 1] || tp[tp.length - 2] || ("group_" + gIdx);
+          var label = lp.replace(/:.*$/, "").replace(/_/g, " ").trim() || ("axis_" + gIdx);
+          groups.push({ label: label, type: "button", selector: "input[onclick*='calculaprecio']", values: entries });
+          gIdx++;
+        }
+        return groups;
+      })()
+    `);
+    return result as Array<{ label: string; type: "select" | "link" | "button"; selector: string; values: string[] }>;
   }
 
   /**
@@ -513,89 +475,61 @@ export class PriceVariantScraper {
    * We find the button whose Valor starts with `value|` and whose tail matches `key`.
    */
   private async selectOption(page: Page, key: string, value: string): Promise<void> {
-    // Primary: find calculaprecio button by Valor first segment + tail label match
-    // NOTE: use `function` form to avoid esbuild __name decorator in browser context
-    const buttonClicked = await page.evaluate(
-      function(args: { key: string; value: string }) {
-        var k = args.key;
-        var v = args.value;
-        var buttons = document.querySelectorAll<HTMLInputElement>(
-          "input[onclick*='calculaprecio']",
-        );
-
+    // Use string-based evaluate to completely bypass esbuild's __name decorator
+    // injection, which breaks page.evaluate() in the browser context.
+    const buttonClicked = await page.evaluate(`
+      (function() {
+        var k = ${JSON.stringify(key)};
+        var v = ${JSON.stringify(value)};
+        var buttons = document.querySelectorAll("input[onclick*='calculaprecio']");
         for (var i = 0; i < buttons.length; i++) {
           var btn = buttons[i];
           var onclick = btn.getAttribute("onclick") || "";
-          var valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
-          if (!valorMatch) continue;
-
-          var valor = valorMatch[1];
-          var pipeIdx = valor.indexOf("|");
-          if (pipeIdx < 0) continue;
-
-          var firstSeg = valor.substring(0, pipeIdx);
-          var tail = valor.substring(pipeIdx + 1);
-
-          // Match by first segment (the option index)
-          if (firstSeg !== v) continue;
-
-          // Match by tail — the group label is derived from the tail's last segment
-          var tailParts = tail.split("|");
-          var labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || "";
-          var derivedLabel = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
-
-          if (derivedLabel === k || tail.includes(k.replace(/ /g, "_"))) {
+          var m = onclick.match(/Valor=([^&'"\\)\\s]+)/);
+          if (!m) continue;
+          var valor = m[1];
+          var pi = valor.indexOf("|");
+          if (pi < 0) continue;
+          var fs = valor.substring(0, pi);
+          var tail = valor.substring(pi + 1);
+          if (fs !== v) continue;
+          var tp = tail.split("|");
+          var lp = tp[tp.length - 1] || tp[tp.length - 2] || "";
+          var dl = lp.replace(/:.*$/, "").replace(/_/g, " ").trim();
+          if (dl === k || tail.includes(k.replace(/ /g, "_"))) {
             btn.click();
             return true;
           }
         }
-
-        // Fallback: if only one button has this first segment, click it regardless of tail
-        var singleMatch: HTMLInputElement | null = null;
-        var matchCount = 0;
+        var single = null, mc = 0;
         for (var j = 0; j < buttons.length; j++) {
-          var btn2 = buttons[j];
-          var onclick2 = btn2.getAttribute("onclick") || "";
-          var valorMatch2 = onclick2.match(/Valor=([^&'")\s]+)/);
-          if (!valorMatch2) continue;
-
-          var valor2 = valorMatch2[1];
-          var pipeIdx2 = valor2.indexOf("|");
-          if (pipeIdx2 < 0) continue;
-
-          var firstSeg2 = valor2.substring(0, pipeIdx2);
-          if (firstSeg2 === v) {
-            singleMatch = btn2;
-            matchCount++;
-          }
+          var b2 = buttons[j];
+          var oc2 = b2.getAttribute("onclick") || "";
+          var m2 = oc2.match(/Valor=([^&'"\\)\\s]+)/);
+          if (!m2) continue;
+          var v2 = m2[1];
+          var pi2 = v2.indexOf("|");
+          if (pi2 < 0) continue;
+          if (v2.substring(0, pi2) === v) { single = b2; mc++; }
         }
-
-        if (matchCount === 1 && singleMatch) {
-          singleMatch.click();
-          return true;
-        }
-
+        if (mc === 1 && single) { single.click(); return true; }
         return false;
-      },
-      { key, value },
-    );
+      })()
+    `) as boolean;
 
     if (buttonClicked) return;
 
-    // Legacy fallback: try clicking a variant link containing the value text
-    const linkClicked = await page.evaluate(function(v: string) {
-      var links = document.querySelectorAll(
-        '.configurador a, .opciones a, [class*="variant"] a, [class*="opcion"] a, a',
-      );
-      for (var i = 0; i < links.length; i++) {
-        var link = links[i];
-        if (link.textContent?.trim().includes(v)) {
-          (link as HTMLElement).click();
-          return true;
+    const linkClicked = await page.evaluate(`
+      (function() {
+        var v = ${JSON.stringify(value)};
+        var links = document.querySelectorAll('.configurador a, .opciones a, [class*="variant"] a, [class*="opcion"] a, a');
+        for (var i = 0; i < links.length; i++) {
+          var t = links[i].textContent;
+          if (t && t.trim().includes(v)) { links[i].click(); return true; }
         }
-      }
-      return false;
-    }, value);
+        return false;
+      })()
+    `) as boolean;
 
     if (!linkClicked) {
       logger.debug(`Could not find option "${key}=${value}" on page`);
@@ -608,135 +542,88 @@ export class PriceVariantScraper {
   private async readPrice(
     page: Page,
   ): Promise<{ unitCost: number; unit?: string; description?: string; breakdown?: PriceBreakdown } | null> {
-    // NOTE: Inside page.evaluate(), we must use plain `function` declarations
-    // (not arrow functions or interfaces) because esbuild/tsx injects a `__name`
-    // decorator on `const fn = () => {}` forms, and that decorator doesn't exist
-    // in the browser's evaluation context.
-    return page.evaluate(() => {
-      // Helper: parse a European-format price string like "1.234,56 €" → 1234.56
-      function parseEurNum(text: string | null | undefined): number {
-        if (!text) return 0;
-        const match = text.match(/([\d.,]+)\s*€/);
-        if (!match) return 0;
-        let numStr = match[1];
-        if (numStr.includes(",")) {
-          numStr = numStr.replace(/\./g, "").replace(",", ".");
+    // Use string-based evaluate to completely bypass esbuild's __name decorator.
+    const result = await page.evaluate(`
+      (function() {
+        function parseEurNum(text) {
+          if (!text) return 0;
+          var m = text.match(/([\\d.,]+)\\s*€/);
+          if (!m) return 0;
+          var s = m[1];
+          if (s.includes(",")) s = s.replace(/\\./g, "").replace(",", ".");
+          var n = parseFloat(s);
+          return isNaN(n) ? 0 : n;
         }
-        const parsed = parseFloat(numStr);
-        return isNaN(parsed) ? 0 : parsed;
-      }
-
-      function parseNum(text: string | undefined): number {
-        if (!text) return 0;
-        const cleaned = text.replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
-        const n = parseFloat(cleaned);
-        return isNaN(n) ? 0 : n;
-      }
-
-      // Primary: h4 elements (current CYPE site uses h4 for the actual unit price)
-      let unitCost = 0;
-      let priceElement: Element | null = null;
-      const h4Elements = document.querySelectorAll("h4");
-      for (const h4 of h4Elements) {
-        const parsed = parseEurNum(h4.textContent);
-        if (parsed > 0) {
-          unitCost = parsed;
-          priceElement = h4;
-          break;
+        function parseNum(text) {
+          if (!text) return 0;
+          var s = text.replace(/\\s/g, "").replace(/\\./g, "").replace(",", ".");
+          var n = parseFloat(s);
+          return isNaN(n) ? 0 : n;
         }
-      }
+        function sumTotal(arr) {
+          var s = 0;
+          for (var i = 0; i < arr.length; i++) s += arr[i].total;
+          return s;
+        }
 
-      // Fallback: h6 elements (older CYPE layout)
-      if (unitCost <= 0) {
-        const h6Elements = document.querySelectorAll("h6");
-        for (const h6 of h6Elements) {
-          const parsed = parseEurNum(h6.textContent);
-          if (parsed > 0) {
-            unitCost = parsed;
-            priceElement = h6;
-            break;
+        var unitCost = 0;
+        var priceElement = null;
+        var h4s = document.querySelectorAll("h4");
+        for (var i = 0; i < h4s.length; i++) {
+          var p = parseEurNum(h4s[i].textContent);
+          if (p > 0) { unitCost = p; priceElement = h4s[i]; break; }
+        }
+        if (unitCost <= 0) {
+          var h6s = document.querySelectorAll("h6");
+          for (var j = 0; j < h6s.length; j++) {
+            var p2 = parseEurNum(h6s[j].textContent);
+            if (p2 > 0) { unitCost = p2; priceElement = h6s[j]; break; }
           }
         }
-      }
+        if (unitCost <= 0) return null;
 
-      if (unitCost <= 0) return null;
-
-      // Extract unit
-      let unit: string | undefined;
-      const unitPattern = /^(m[²³23]?|Ud|un|kg|t|h|l|conjunto|vg|sistema|projeto)$/i;
-      const nextSibling = priceElement?.nextElementSibling;
-      if (nextSibling && unitPattern.test(nextSibling.textContent?.trim() || "")) {
-        unit = nextSibling.textContent?.trim();
-      }
-
-      // Extract description from h1 or meta
-      const desc =
-        document.querySelector("h1")?.textContent?.trim() ||
-        document.querySelector('meta[name="description"]')?.getAttribute("content")?.trim();
-
-      // Extract breakdown from table
-      // Using 'any' for the array type since page.evaluate runs in the browser
-      // and the PriceBreakdown/PriceComponent types don't exist there.
-      const materials: any[] = [];
-      const labor: any[] = [];
-      const machinery: any[] = [];
-
-      document.querySelectorAll("table tr").forEach(function(row) {
-        const cells = row.querySelectorAll("td");
-        if (cells.length < 4) return;
-
-        const codeText = cells[0]?.textContent?.trim() || "";
-        if (!codeText || codeText === "Unitário" || codeText === "Código") return;
-
-        const cellTexts = Array.from(cells).map(function(c) { return c.textContent?.trim() || ""; });
-        const total = parseNum(cellTexts[5] || cellTexts[cellTexts.length - 1]);
-        if (total === 0) return;
-
-        // Infer type from code/description
-        const lc = (codeText + " " + (cellTexts[2] || "")).toLowerCase();
-        let type = "material";
-        if (lc.includes("oficial") || lc.includes("ajudante") || lc.includes("peão") || lc.match(/^mo\d/)) {
-          type = "labor";
-        } else if (lc.includes("grua") || lc.includes("bomba") || lc.includes("máquina") || lc.match(/^mq\d/)) {
-          type = "machinery";
+        var unit = undefined;
+        var unitPat = /^(m[²³23]?|Ud|un|kg|t|h|l|conjunto|vg|sistema|projeto)$/i;
+        var ns = priceElement ? priceElement.nextElementSibling : null;
+        if (ns && unitPat.test((ns.textContent || "").trim())) {
+          unit = ns.textContent.trim();
         }
 
-        const comp = {
-          code: codeText,
-          description: cellTexts[2] || cellTexts[1] || "",
-          unit: cellTexts[1] || "Ud",
-          quantity: parseNum(cellTexts[3]) || 1,
-          unitPrice: parseNum(cellTexts[4]) || total,
-          total,
-          type,
-        };
+        var h1 = document.querySelector("h1");
+        var meta = document.querySelector('meta[name="description"]');
+        var desc = (h1 ? h1.textContent.trim() : null) || (meta ? (meta.getAttribute("content") || "").trim() : null);
 
-        if (type === "material") materials.push(comp);
-        else if (type === "labor") labor.push(comp);
-        else machinery.push(comp);
-      });
+        var materials = [], labor = [], machinery = [];
+        var rows = document.querySelectorAll("table tr");
+        for (var r = 0; r < rows.length; r++) {
+          var cells = rows[r].querySelectorAll("td");
+          if (cells.length < 4) continue;
+          var code = (cells[0].textContent || "").trim();
+          if (!code || code === "Unitário" || code === "Código") continue;
+          var ct = [];
+          for (var c = 0; c < cells.length; c++) ct.push((cells[c].textContent || "").trim());
+          var total = parseNum(ct[5] || ct[ct.length - 1]);
+          if (total === 0) continue;
+          var lc = (code + " " + (ct[2] || "")).toLowerCase();
+          var type = "material";
+          if (lc.includes("oficial") || lc.includes("ajudante") || lc.includes("peão") || /^mo\\d/.test(lc)) type = "labor";
+          else if (lc.includes("grua") || lc.includes("bomba") || lc.includes("máquina") || /^mq\\d/.test(lc)) type = "machinery";
+          var comp = { code: code, description: ct[2]||ct[1]||"", unit: ct[1]||"Ud", quantity: parseNum(ct[3])||1, unitPrice: parseNum(ct[4])||total, total: total, type: type };
+          if (type === "material") materials.push(comp);
+          else if (type === "labor") labor.push(comp);
+          else machinery.push(comp);
+        }
 
-      function sumTotal(arr: any[]): number {
-        let s = 0;
-        for (let i = 0; i < arr.length; i++) s += arr[i].total;
-        return s;
-      }
-
-      const breakdown =
-        materials.length > 0 || labor.length > 0 || machinery.length > 0
-          ? {
-              materials,
-              labor,
-              machinery,
-              materialCost: sumTotal(materials),
-              laborCost: sumTotal(labor),
-              machineryCost: sumTotal(machinery),
-              totalCost: sumTotal(materials) + sumTotal(labor) + sumTotal(machinery),
-            }
+        var breakdown = (materials.length > 0 || labor.length > 0 || machinery.length > 0)
+          ? { materials: materials, labor: labor, machinery: machinery,
+              materialCost: sumTotal(materials), laborCost: sumTotal(labor), machineryCost: sumTotal(machinery),
+              totalCost: sumTotal(materials) + sumTotal(labor) + sumTotal(machinery) }
           : undefined;
 
-      return { unitCost, unit, description: desc, breakdown };
-    });
+        return { unitCost: unitCost, unit: unit, description: desc, breakdown: breakdown };
+      })()
+    `);
+    return result as { unitCost: number; unit?: string; description?: string; breakdown?: PriceBreakdown } | null;
   }
 
   // ==========================================================================
