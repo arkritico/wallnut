@@ -55,19 +55,16 @@ import {
 
 import MobileNav, { MobileNavLink } from "@/components/MobileNav";
 import CompareProjects from "@/components/CompareProjects";
-import IngestionDashboard from "@/components/IngestionDashboard";
-import IngestionPanel from "@/components/IngestionPanel";
 import CollaborationPanel from "@/components/CollaborationPanel";
 import type { ProjectRole } from "@/lib/collaboration";
 import { getUserRole } from "@/lib/collaboration";
-import { getAvailablePlugins } from "@/lib/plugins/loader";
-import type { SpecialtyPlugin, RegulationDocument, DeclarativeRule } from "@/lib/plugins/types";
 import { phaseColor } from "@/lib/phase-colors";
 import type { ConstructionPhase, ProjectSchedule } from "@/lib/wbs-types";
 import { generateMSProjectXML } from "@/lib/msproject-export";
 
 import UnifiedUpload from "@/components/UnifiedUpload";
 import type { UnifiedPipelineResult } from "@/lib/unified-pipeline";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 
 const IfcViewer = dynamic(() => import("@/components/IfcViewer"), {
@@ -82,16 +79,8 @@ const EvmDashboard = dynamic(() => import("@/components/EvmDashboard"), {
   ssr: false,
   loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar EVM...</div>,
 });
-const RegulationGraph = dynamic(() => import("@/components/RegulationGraph"), {
-  ssr: false,
-  loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar grafo 3D...</div>,
-});
-const RuleAuditDashboard = dynamic(() => import("@/components/RuleAuditDashboard"), {
-  ssr: false,
-  loading: () => <div className="flex items-center justify-center p-12 text-gray-400">A carregar auditoria...</div>,
-});
 
-type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "regulations" | "unified" | "viewer" | "fourd" | "evm" | "graph" | "audit";
+type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "unified" | "viewer" | "fourd" | "evm";
 
 const REGULATION_BADGES = [
   "Codigo Civil", "RGEU", "Eurocodigos EC0-EC8", "SCIE + NT01-NT22",
@@ -149,7 +138,6 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Regulation ingestion
-  const [ingestionPluginId, setIngestionPluginId] = useState<string | null>(null);
 
   // Unified pipeline exports (stored as blobs for download buttons)
   const [unifiedResult, setUnifiedResult] = useState<UnifiedPipelineResult | null>(null);
@@ -588,9 +576,9 @@ export default function Home() {
             <MobileNavLink onClick={() => { setView("wbs"); setMobileMenuOpen(false); }}>
               <Clock className="w-4 h-4" /> WBS
             </MobileNavLink>
-            <MobileNavLink onClick={() => { setView("regulations"); setMobileMenuOpen(false); }}>
+            <Link href="/regulamentos" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-2 px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors text-sm">
               <Hammer className="w-4 h-4" /> {lang === "pt" ? "Regulamentos" : "Regulations"}
-            </MobileNavLink>
+            </Link>
             <div className="border-t border-gray-100 my-2" />
             <MobileNavLink onClick={() => { toggleDarkMode(); }}>
               {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -664,9 +652,9 @@ export default function Home() {
                 WBS
               </button>
               <span className="text-gray-200">|</span>
-              <button onClick={() => setView("regulations")} className="hover:text-gray-500 transition-colors">
+              <Link href="/regulamentos" className="hover:text-gray-500 transition-colors">
                 {lang === "pt" ? "Regulamentos" : "Regulations"}
-              </button>
+              </Link>
             </div>
             {savedProjects.length > 0 && (
               <div className="mt-4">
@@ -965,134 +953,6 @@ export default function Home() {
         </main>
       )}
 
-      {/* Regulations Management */}
-      {view === "regulations" && (
-        <main className="min-h-screen bg-gray-50">
-          <AppHeader />
-          <div className="max-w-6xl mx-auto px-4 py-8">
-            <div className="mb-6">
-              <button
-                onClick={() => setView("landing")}
-                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                {t.back}
-              </button>
-              <div className="flex items-center justify-between mt-4 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {lang === "pt" ? "Gestão de Regulamentos" : "Regulations Management"}
-                </h1>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setView("audit")}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors text-sm font-medium"
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    {lang === "pt" ? "Auditoria" : "Audit"}
-                  </button>
-                  <button
-                    onClick={() => setView("graph")}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="8" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7"/><line x1="7.5" y1="8.5" x2="10.5" y2="16"/><line x1="15" y1="10.5" x2="13.5" y2="16"/></svg>
-                    {lang === "pt" ? "Ver Grafo 3D" : "View 3D Graph"}
-                  </button>
-                </div>
-              </div>
-              <p className="text-gray-600">
-                {lang === "pt"
-                  ? "Visão geral de todos os regulamentos por especialidade. Clique numa especialidade para adicionar novos regulamentos."
-                  : "Overview of all regulations by specialty. Click on a specialty to add new regulations."}
-              </p>
-            </div>
-            {!ingestionPluginId ? (
-              <IngestionDashboard
-                plugins={getAvailablePlugins()}
-                onStartIngestion={(pluginId) => {
-                  setIngestionPluginId(pluginId);
-                }}
-                onViewRules={(pluginId, _regulationId) => {
-                  // Start ingestion for this plugin to view/edit its rules
-                  setIngestionPluginId(pluginId);
-                }}
-              />
-            ) : (
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <IngestionPanel
-                  targetPlugin={getAvailablePlugins().find(p => p.id === ingestionPluginId)!}
-                  onRulesReady={async (regulation: RegulationDocument, rules: DeclarativeRule[]) => {
-                    try {
-                      const res = await fetch("/api/merge-rules", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          pluginId: ingestionPluginId,
-                          regulationId: regulation.id,
-                          rules,
-                        }),
-                      });
-                      const result = await res.json();
-                      if (result.success) {
-                        alert(`${result.added} regra(s) de ${regulation.shortRef} adicionadas ao plugin. ${result.skipped} duplicada(s) ignorada(s).`);
-                      } else {
-                        alert(`Erro: ${result.error}`);
-                      }
-                    } catch (err) {
-                      console.error("Merge error:", err);
-                      alert("Erro ao fundir regras.");
-                    }
-                    setIngestionPluginId(null);
-                  }}
-                  onCancel={() => {
-                    setIngestionPluginId(null);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </main>
-      )}
-      {/* 3D Regulation Graph */}
-      {view === "graph" && (
-        <main className="h-screen bg-gray-900 flex flex-col">
-          <div className="px-4 py-3 bg-gray-800 border-b border-gray-700 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setView("regulations")}
-                className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                {t.back}
-              </button>
-              <h1 className="text-lg font-bold text-white">
-                {lang === "pt" ? "Grafo de Regulamentos" : "Regulation Graph"}
-              </h1>
-            </div>
-            <span className="text-xs text-gray-500">
-              {lang === "pt" ? "Rodar: arrastar | Zoom: scroll | Pan: shift+arrastar" : "Rotate: drag | Zoom: scroll | Pan: shift+drag"}
-            </span>
-          </div>
-          <RegulationGraph className="flex-1" />
-        </main>
-      )}
-      {/* Rule Audit Dashboard */}
-      {view === "audit" && (
-        <main className="min-h-screen bg-gray-50">
-          <AppHeader />
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="mb-4">
-              <button
-                onClick={() => setView("regulations")}
-                className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                {t.back}
-              </button>
-            </div>
-            <RuleAuditDashboard />
-          </div>
-        </main>
-      )}
       {/* 3D IFC Viewer */}
       {view === "viewer" && (
         <main className="min-h-screen bg-gray-50 flex flex-col">

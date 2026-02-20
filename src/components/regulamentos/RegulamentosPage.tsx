@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { I18nContext, pt, en, type Language } from "@/lib/i18n";
+import { I18nContext, getTranslations, type Language } from "@/lib/i18n";
 import { getSettings, saveSettings } from "@/lib/storage";
 import { getAvailablePlugins } from "@/lib/plugins/loader";
 import type { SpecialtyPlugin, RegulationDocument, DeclarativeRule } from "@/lib/plugins/types";
@@ -29,26 +29,6 @@ const RegulationGraph = dynamic(() => import("@/components/RegulationGraph"), {
 type SeverityFilter = "all" | Severity;
 type ViewMode = "list" | "graph";
 
-export interface BrowsePath {
-  buildingType: string | null;
-  buildingCategory: string | null;
-  phase: string | null;
-  system: string | null;
-  specialty: string | null;
-  subTopic: string | null;
-  regulationId: string | null;
-}
-
-const DEFAULT_BROWSE: BrowsePath = {
-  buildingType: null,
-  buildingCategory: null,
-  phase: null,
-  system: null,
-  specialty: null,
-  subTopic: null,
-  regulationId: null,
-};
-
 // ============================================================
 // Component
 // ============================================================
@@ -59,7 +39,7 @@ export default function RegulamentosPage() {
     if (typeof window === "undefined") return "pt";
     return getSettings().language;
   });
-  const t = lang === "pt" ? pt : en;
+  const t = getTranslations(lang);
 
   function handleLanguageChange(newLang: Language) {
     setLang(newLang);
@@ -82,9 +62,6 @@ export default function RegulamentosPage() {
   // ── Ingestion ──
   const [ingestionPluginId, setIngestionPluginId] = useState<string | null>(null);
 
-  // ── Graph ──
-  const [browsePath, setBrowsePath] = useState<BrowsePath>(DEFAULT_BROWSE);
-
   // ── Derived data ──
   const selectedPlugin = useMemo(
     () => plugins.find((p) => p.id === selectedSpecialtyId) ?? null,
@@ -98,11 +75,7 @@ export default function RegulamentosPage() {
 
   const selectedRule = useMemo(() => {
     if (!selectedPlugin || !selectedRuleId) return null;
-    for (const reg of selectedPlugin.regulations) {
-      const rule = reg.rules?.find((r) => r.id === selectedRuleId);
-      if (rule) return rule;
-    }
-    return null;
+    return selectedPlugin.rules.find((r) => r.id === selectedRuleId) ?? null;
   }, [selectedPlugin, selectedRuleId]);
 
   // ── Handlers ──
@@ -110,18 +83,12 @@ export default function RegulamentosPage() {
     setSelectedSpecialtyId(id);
     setSelectedRegulationId(null);
     setSelectedRuleId(null);
-    if (id) {
-      setBrowsePath((prev) => ({ ...prev, specialty: id, regulationId: null }));
-    } else {
-      setBrowsePath(DEFAULT_BROWSE);
-    }
   }, []);
 
   const handleSelectRegulation = useCallback((specialtyId: string, regulationId: string | null) => {
     setSelectedSpecialtyId(specialtyId);
     setSelectedRegulationId(regulationId);
     setSelectedRuleId(null);
-    setBrowsePath((prev) => ({ ...prev, specialty: specialtyId, regulationId }));
   }, []);
 
   const handleSelectRule = useCallback((specialtyId: string, regulationId: string, ruleId: string | null) => {
@@ -208,12 +175,7 @@ export default function RegulamentosPage() {
                 />
               </div>
             ) : (
-              <RegulationGraph
-                className="h-full"
-                embedded
-                externalBrowsePath={browsePath}
-                onBrowsePathChange={setBrowsePath}
-              />
+              <RegulationGraph className="h-full" embedded />
             )}
           </main>
         </div>

@@ -27,10 +27,12 @@ type SeverityFilter = "all" | "critical" | "warning" | "info" | "pass";
 interface RegulationGraphProps {
   className?: string;
   evaluationResults?: PluginEvaluationResult[];
+  /** When true, hides the internal sidebar (for embedding in master-detail layouts) */
+  embedded?: boolean;
 }
 
 /** Breadcrumb path for tree navigation */
-interface BrowsePath {
+export interface BrowsePath {
   buildingType: string | null;   // null = all types
   buildingCategory: string | null; // taxonomy category
   phase: string | null;           // construction phase
@@ -111,7 +113,7 @@ const DEFAULT_BROWSE: BrowsePath = {
 // Component
 // ============================================================
 
-export default function RegulationGraph({ className = "", evaluationResults }: RegulationGraphProps) {
+export default function RegulationGraph({ className = "", evaluationResults, embedded = false }: RegulationGraphProps) {
   const fgRef = useRef<FGRef | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -859,8 +861,8 @@ export default function RegulationGraph({ className = "", evaluationResults }: R
 
   return (
     <div className={`relative flex ${className}`} style={{ minHeight: 600 }}>
-      {/* ── Sidebar ──────────────────────────────────────── */}
-      <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col text-gray-200 shrink-0">
+      {/* ── Sidebar (hidden in embedded mode) ──────────── */}
+      {!embedded && <div className="w-80 bg-gray-900 border-r border-gray-800 flex flex-col text-gray-200 shrink-0">
         {/* Breadcrumb */}
         <div className="px-4 pt-4 pb-2 border-b border-gray-800">
           <div className="flex items-center gap-1 flex-wrap text-xs">
@@ -1143,7 +1145,7 @@ export default function RegulationGraph({ className = "", evaluationResults }: R
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* ── 3D Viewport ──────────────────────────────────── */}
       <div ref={containerRef} className="flex-1 relative bg-[#0a0a0f]">

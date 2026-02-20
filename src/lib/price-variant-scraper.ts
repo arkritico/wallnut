@@ -353,8 +353,10 @@ export class PriceVariantScraper {
   private async discoverOptions(
     page: Page,
   ): Promise<Array<{ label: string; type: "select" | "link" | "button"; selector: string; values: string[] }>> {
-    return page.evaluate(() => {
-      const groups: Array<{
+    // NOTE: Inside page.evaluate(), we use plain `function` declarations
+    // to avoid esbuild's `__name` decorator which doesn't exist in the browser.
+    return page.evaluate(function() {
+      var groups: Array<{
         label: string;
         type: "select" | "link" | "button";
         selector: string;
@@ -377,51 +379,54 @@ export class PriceVariantScraper {
       //
       // We group buttons by tail and return each group as a separate option axis.
 
-      const allButtons = Array.from(
+      var allButtons = Array.from(
         document.querySelectorAll<HTMLInputElement>("input[onclick*='calculaprecio']"),
       );
 
       if (allButtons.length === 0) return groups;
 
       // Extract Valor from each button and group by tail
-      const tailGroups = new Map<string, Array<{ firstSeg: string; parentId: string }>>();
+      var tailGroups = new Map<string, Array<{ firstSeg: string; parentId: string }>>();
 
-      for (const btn of allButtons) {
-        const onclick = btn.getAttribute("onclick") || "";
-        const valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
+      for (var i = 0; i < allButtons.length; i++) {
+        var btn = allButtons[i];
+        var onclick = btn.getAttribute("onclick") || "";
+        var valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
         if (!valorMatch) continue;
 
-        const valor = valorMatch[1];
-        const pipeIdx = valor.indexOf("|");
-        const firstSeg = pipeIdx >= 0 ? valor.substring(0, pipeIdx) : valor;
-        const tail = pipeIdx >= 0 ? valor.substring(pipeIdx + 1) : "";
+        var valor = valorMatch[1];
+        var pipeIdx = valor.indexOf("|");
+        var firstSeg = pipeIdx >= 0 ? valor.substring(0, pipeIdx) : valor;
+        var tail = pipeIdx >= 0 ? valor.substring(pipeIdx + 1) : "";
 
         if (!tailGroups.has(tail)) tailGroups.set(tail, []);
         tailGroups.get(tail)!.push({
-          firstSeg,
+          firstSeg: firstSeg,
           parentId: btn.closest("[id]")?.id || "unknown",
         });
       }
 
       // Only include groups with >1 option (a single button = no real choice)
-      let groupIdx = 0;
-      for (const [tail, entries] of tailGroups) {
+      var groupIdx = 0;
+      for (var [tail, entries] of tailGroups) {
         if (entries.length <= 1) continue;
 
         // The "values" for each option are the first segments (option indices)
-        // These are what we'll use to click the buttons during scraping
-        const values = entries.map((e) => e.firstSeg);
+        var values: string[] = [];
+        for (var j = 0; j < entries.length; j++) {
+          values.push(entries[j].firstSeg);
+        }
 
         // Derive a label from the tail (last code segment is most descriptive)
-        const tailParts = tail.split("|");
-        const labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || `group_${groupIdx}`;
-        const label = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
+        var tailParts = tail.split("|");
+        var labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || "group_" + groupIdx;
+        var label = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
 
         groups.push({
-          label: label || `axis_${groupIdx}`,
-          type: "button",
+          label: label || "axis_" + groupIdx,
+          type: "button" as const,
           selector: "input[onclick*='calculaprecio']",
-          values,
+          values: values,
         });
 
         groupIdx++;
@@ -509,32 +514,35 @@ export class PriceVariantScraper {
    */
   private async selectOption(page: Page, key: string, value: string): Promise<void> {
     // Primary: find calculaprecio button by Valor first segment + tail label match
+    // NOTE: use `function` form to avoid esbuild __name decorator in browser context
     const buttonClicked = await page.evaluate(
-      ({ key: k, value: v }) => {
-        const buttons = document.querySelectorAll<HTMLInputElement>(
+      function(args: { key: string; value: string }) {
+        var k = args.key;
+        var v = args.value;
+        var buttons = document.querySelectorAll<HTMLInputElement>(
           "input[onclick*='calculaprecio']",
         );
 
-        for (const btn of buttons) {
-          const onclick = btn.getAttribute("onclick") || "";
-          const valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
+        for (var i = 0; i < buttons.length; i++) {
+          var btn = buttons[i];
+          var onclick = btn.getAttribute("onclick") || "";
+          var valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
           if (!valorMatch) continue;
 
-          const valor = valorMatch[1];
-          const pipeIdx = valor.indexOf("|");
+          var valor = valorMatch[1];
+          var pipeIdx = valor.indexOf("|");
           if (pipeIdx < 0) continue;
 
-          const firstSeg = valor.substring(0, pipeIdx);
-          const tail = valor.substring(pipeIdx + 1);
+          var firstSeg = valor.substring(0, pipeIdx);
+          var tail = valor.substring(pipeIdx + 1);
 
           // Match by first segment (the option index)
           if (firstSeg !== v) continue;
 
           // Match by tail — the group label is derived from the tail's last segment
-          // Reconstruct the label from the tail to match against key
-          const tailParts = tail.split("|");
-          const labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || "";
-          const derivedLabel = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
+          var tailParts = tail.split("|");
+          var labelPart = tailParts[tailParts.length - 1] || tailParts[tailParts.length - 2] || "";
+          var derivedLabel = labelPart.replace(/:.*$/, "").replace(/_/g, " ").trim();
 
           if (derivedLabel === k || tail.includes(k.replace(/ /g, "_"))) {
             btn.click();
@@ -543,20 +551,21 @@ export class PriceVariantScraper {
         }
 
         // Fallback: if only one button has this first segment, click it regardless of tail
-        let singleMatch: HTMLInputElement | null = null;
-        let matchCount = 0;
-        for (const btn of buttons) {
-          const onclick = btn.getAttribute("onclick") || "";
-          const valorMatch = onclick.match(/Valor=([^&'")\s]+)/);
-          if (!valorMatch) continue;
+        var singleMatch: HTMLInputElement | null = null;
+        var matchCount = 0;
+        for (var j = 0; j < buttons.length; j++) {
+          var btn2 = buttons[j];
+          var onclick2 = btn2.getAttribute("onclick") || "";
+          var valorMatch2 = onclick2.match(/Valor=([^&'")\s]+)/);
+          if (!valorMatch2) continue;
 
-          const valor = valorMatch[1];
-          const pipeIdx = valor.indexOf("|");
-          if (pipeIdx < 0) continue;
+          var valor2 = valorMatch2[1];
+          var pipeIdx2 = valor2.indexOf("|");
+          if (pipeIdx2 < 0) continue;
 
-          const firstSeg = valor.substring(0, pipeIdx);
-          if (firstSeg === v) {
-            singleMatch = btn;
+          var firstSeg2 = valor2.substring(0, pipeIdx2);
+          if (firstSeg2 === v) {
+            singleMatch = btn2;
             matchCount++;
           }
         }
@@ -574,11 +583,12 @@ export class PriceVariantScraper {
     if (buttonClicked) return;
 
     // Legacy fallback: try clicking a variant link containing the value text
-    const linkClicked = await page.evaluate((v) => {
-      const links = document.querySelectorAll(
+    const linkClicked = await page.evaluate(function(v: string) {
+      var links = document.querySelectorAll(
         '.configurador a, .opciones a, [class*="variant"] a, [class*="opcion"] a, a',
       );
-      for (const link of links) {
+      for (var i = 0; i < links.length; i++) {
+        var link = links[i];
         if (link.textContent?.trim().includes(v)) {
           (link as HTMLElement).click();
           return true;
@@ -598,9 +608,13 @@ export class PriceVariantScraper {
   private async readPrice(
     page: Page,
   ): Promise<{ unitCost: number; unit?: string; description?: string; breakdown?: PriceBreakdown } | null> {
+    // NOTE: Inside page.evaluate(), we must use plain `function` declarations
+    // (not arrow functions or interfaces) because esbuild/tsx injects a `__name`
+    // decorator on `const fn = () => {}` forms, and that decorator doesn't exist
+    // in the browser's evaluation context.
     return page.evaluate(() => {
       // Helper: parse a European-format price string like "1.234,56 €" → 1234.56
-      const parseEurNum = (text: string | null | undefined): number => {
+      function parseEurNum(text: string | null | undefined): number {
         if (!text) return 0;
         const match = text.match(/([\d.,]+)\s*€/);
         if (!match) return 0;
@@ -610,7 +624,14 @@ export class PriceVariantScraper {
         }
         const parsed = parseFloat(numStr);
         return isNaN(parsed) ? 0 : parsed;
-      };
+      }
+
+      function parseNum(text: string | undefined): number {
+        if (!text) return 0;
+        const cleaned = text.replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
+        const n = parseFloat(cleaned);
+        return isNaN(n) ? 0 : n;
+      }
 
       // Primary: h4 elements (current CYPE site uses h4 for the actual unit price)
       let unitCost = 0;
@@ -654,48 +675,33 @@ export class PriceVariantScraper {
         document.querySelector('meta[name="description"]')?.getAttribute("content")?.trim();
 
       // Extract breakdown from table
-      interface ComponentData {
-        code: string;
-        description: string;
-        unit: string;
-        quantity: number;
-        unitPrice: number;
-        total: number;
-        type: "material" | "labor" | "machinery";
-      }
+      // Using 'any' for the array type since page.evaluate runs in the browser
+      // and the PriceBreakdown/PriceComponent types don't exist there.
+      const materials: any[] = [];
+      const labor: any[] = [];
+      const machinery: any[] = [];
 
-      const materials: ComponentData[] = [];
-      const labor: ComponentData[] = [];
-      const machinery: ComponentData[] = [];
-
-      document.querySelectorAll("table tr").forEach((row) => {
+      document.querySelectorAll("table tr").forEach(function(row) {
         const cells = row.querySelectorAll("td");
         if (cells.length < 4) return;
 
         const codeText = cells[0]?.textContent?.trim() || "";
         if (!codeText || codeText === "Unitário" || codeText === "Código") return;
 
-        const parseNum = (text: string | undefined): number => {
-          if (!text) return 0;
-          const cleaned = text.replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
-          const n = parseFloat(cleaned);
-          return isNaN(n) ? 0 : n;
-        };
-
-        const cellTexts = Array.from(cells).map((c) => c.textContent?.trim() || "");
+        const cellTexts = Array.from(cells).map(function(c) { return c.textContent?.trim() || ""; });
         const total = parseNum(cellTexts[5] || cellTexts[cellTexts.length - 1]);
         if (total === 0) return;
 
         // Infer type from code/description
         const lc = (codeText + " " + (cellTexts[2] || "")).toLowerCase();
-        let type: "material" | "labor" | "machinery" = "material";
+        let type = "material";
         if (lc.includes("oficial") || lc.includes("ajudante") || lc.includes("peão") || lc.match(/^mo\d/)) {
           type = "labor";
         } else if (lc.includes("grua") || lc.includes("bomba") || lc.includes("máquina") || lc.match(/^mq\d/)) {
           type = "machinery";
         }
 
-        const comp: ComponentData = {
+        const comp = {
           code: codeText,
           description: cellTexts[2] || cellTexts[1] || "",
           unit: cellTexts[1] || "Ud",
@@ -705,26 +711,27 @@ export class PriceVariantScraper {
           type,
         };
 
-        switch (type) {
-          case "material": materials.push(comp); break;
-          case "labor": labor.push(comp); break;
-          case "machinery": machinery.push(comp); break;
-        }
+        if (type === "material") materials.push(comp);
+        else if (type === "labor") labor.push(comp);
+        else machinery.push(comp);
       });
 
-      const breakdown: PriceBreakdown | undefined =
+      function sumTotal(arr: any[]): number {
+        let s = 0;
+        for (let i = 0; i < arr.length; i++) s += arr[i].total;
+        return s;
+      }
+
+      const breakdown =
         materials.length > 0 || labor.length > 0 || machinery.length > 0
           ? {
-              materials: materials as unknown as PriceBreakdown["materials"],
-              labor: labor as unknown as PriceBreakdown["labor"],
-              machinery: machinery as unknown as PriceBreakdown["machinery"],
-              materialCost: materials.reduce((s, m) => s + m.total, 0),
-              laborCost: labor.reduce((s, l) => s + l.total, 0),
-              machineryCost: machinery.reduce((s, m) => s + m.total, 0),
-              totalCost:
-                materials.reduce((s, m) => s + m.total, 0) +
-                labor.reduce((s, l) => s + l.total, 0) +
-                machinery.reduce((s, m) => s + m.total, 0),
+              materials,
+              labor,
+              machinery,
+              materialCost: sumTotal(materials),
+              laborCost: sumTotal(labor),
+              machineryCost: sumTotal(machinery),
+              totalCost: sumTotal(materials) + sumTotal(labor) + sumTotal(machinery),
             }
           : undefined;
 
