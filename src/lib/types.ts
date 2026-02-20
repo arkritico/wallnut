@@ -795,6 +795,8 @@ export interface AnalysisResult {
   regulationSummary: RegulationSummary[];
   /** Per-specialty rule evaluation metrics */
   ruleEvaluation?: RuleEvaluationMetrics[];
+  /** Which specialty areas were actually analyzed (had real IFC/form data) */
+  analyzedAreas?: string[];
   /** Context builder coverage: how many rule fields are populated vs missing */
   contextCoverage?: {
     /** Total fields tracked by field mappings */

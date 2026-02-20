@@ -2,8 +2,10 @@
 
 import { Search, X, Plus, ChevronLeft, List, Box } from "lucide-react";
 import Link from "next/link";
+import type { SpecialtyPlugin } from "@/lib/plugins/types";
 import type { Severity } from "@/lib/types";
-import { SEVERITY_LABELS, SEVERITY_COLORS } from "@/lib/regulation-constants";
+import { SEVERITY_LABELS, SEVERITY_COLORS, SPECIALTY_NAMES } from "@/lib/regulation-constants";
+import { SPECIALTY_COLORS } from "@/lib/regulation-graph";
 
 type SeverityFilter = "all" | Severity;
 type ViewMode = "list" | "graph";
@@ -16,6 +18,10 @@ interface RegulamentosHeaderProps {
   viewMode: ViewMode;
   onViewModeChange: (m: ViewMode) => void;
   onAddRegulation: () => void;
+  plugins: SpecialtyPlugin[];
+  selectedSpecialtyIds: Set<string>;
+  onToggleSpecialty: (id: string) => void;
+  onClearSpecialties: () => void;
 }
 
 const SEVERITY_PILLS: SeverityFilter[] = ["all", "critical", "warning", "info", "pass"];
@@ -28,6 +34,10 @@ export default function RegulamentosHeader({
   viewMode,
   onViewModeChange,
   onAddRegulation,
+  plugins,
+  selectedSpecialtyIds,
+  onToggleSpecialty,
+  onClearSpecialties,
 }: RegulamentosHeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 shrink-0">
@@ -123,6 +133,58 @@ export default function RegulamentosHeader({
           );
         })}
       </div>
+
+      {/* Specialty filter chips */}
+      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+        <span className="text-xs text-gray-500 mr-1">Especialidades:</span>
+        {selectedSpecialtyIds.size > 0 && (
+          <button
+            onClick={onClearSpecialties}
+            className="px-2 py-0.5 text-xs rounded-full bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors flex items-center gap-1"
+          >
+            <X className="w-3 h-3" /> Limpar
+          </button>
+        )}
+        {plugins.map((plugin) => {
+          const isActive = selectedSpecialtyIds.has(plugin.id);
+          const color = SPECIALTY_COLORS[plugin.id] ?? "#6b7280";
+          const name = SPECIALTY_NAMES[plugin.id] ?? plugin.name;
+          return (
+            <button
+              key={plugin.id}
+              onClick={() => onToggleSpecialty(plugin.id)}
+              className={`px-2.5 py-1 text-xs font-medium rounded-full transition-colors flex items-center gap-1.5 ${
+                isActive
+                  ? "text-white shadow-sm"
+                  : "text-gray-600 bg-gray-100 hover:bg-gray-200"
+              }`}
+              style={isActive ? { backgroundColor: color } : undefined}
+            >
+              <span
+                className="w-2 h-2 rounded-full shrink-0"
+                style={{
+                  backgroundColor: isActive ? "white" : color,
+                  opacity: isActive ? 0.8 : 1,
+                }}
+              />
+              {name}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* AND mode indicator */}
+      {selectedSpecialtyIds.size >= 2 && (
+        <div className="mt-2 flex items-center gap-2 text-xs text-blue-600 bg-blue-50 rounded-lg px-3 py-1.5">
+          <span className="font-medium">Modo AND:</span>
+          <span>
+            A mostrar regras que cruzam{" "}
+            {[...selectedSpecialtyIds]
+              .map((id) => SPECIALTY_NAMES[id] ?? id)
+              .join(" + ")}
+          </span>
+        </div>
+      )}
     </header>
   );
 }

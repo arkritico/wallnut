@@ -20,6 +20,8 @@ interface RegulamentosSidebarProps {
   onSelectSpecialty: (id: string | null) => void;
   onSelectRegulation: (specialtyId: string, regulationId: string | null) => void;
   onSelectRule: (specialtyId: string, regulationId: string, ruleId: string | null) => void;
+  selectedSpecialtyIds?: Set<string>;
+  isMultiSelect?: boolean;
 }
 
 // ============================================================
@@ -83,6 +85,8 @@ export default function RegulamentosSidebar({
   onSelectSpecialty,
   onSelectRegulation,
   onSelectRule,
+  selectedSpecialtyIds,
+  isMultiSelect,
 }: RegulamentosSidebarProps) {
   const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(new Set());
   const [expandedRegulations, setExpandedRegulations] = useState<Set<string>>(new Set());
@@ -255,7 +259,9 @@ export default function RegulamentosSidebar({
           const specialtyColor = SPECIALTY_COLORS[plugin.id] ?? "#6b7280";
           const specialtyName = SPECIALTY_NAMES[plugin.id] ?? plugin.name;
           const expanded = isSpecialtyExpanded(plugin.id);
-          const isSelected = selectedSpecialtyId === plugin.id;
+          const isSelected = isMultiSelect && selectedSpecialtyIds
+            ? selectedSpecialtyIds.has(plugin.id)
+            : selectedSpecialtyId === plugin.id;
 
           return (
             <div key={plugin.id}>

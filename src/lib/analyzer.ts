@@ -18,8 +18,11 @@ import { analyzeFireSafetySCIE, canAnalyzeFireSafety, enrichProjectWithFireSafet
 import { buildProjectContext, type ContextBuildReport } from "./context-builder";
 
 // ── Determine which regulation areas have REAL data (IFC/form, not defaults) ──
-// This prevents false PASS findings for specialties with no project data.
+// Each specialty only runs when its project data is submitted.
+// Top-level wizard fields (buildingType, grossFloorArea, location) are context,
+// NOT a specialty submission — they don't trigger any area.
 const NAMESPACE_TO_AREAS: Record<string, string[]> = {
+  // Specialty namespaces
   gas: ["gas"],
   fireSafety: ["fire_safety"],
   electrical: ["electrical"],
@@ -41,8 +44,50 @@ const NAMESPACE_TO_AREAS: Record<string, string[]> = {
   licensing: ["licensing"],
   waste: ["waste"],
   drawings: ["drawings"],
+  drawingQuality: ["drawings"],
   structure: ["structural"],
   structural: ["structural"],
+  // Architecture project enables architecture + general (RGEU) + municipal (PDM)
+  architecture: ["architecture", "general", "municipal"],
+  localRegulations: ["municipal"],
+};
+
+// ── Cross-specialty dependency map ──────────────────────────────────
+// Portuguese construction specialties have interfaces: fire safety needs
+// architecture floor plans + structural fire resistance, energy needs
+// thermal envelope, etc. When a specialty is submitted but its dependency
+// is NOT, we warn which regulations can't be fully verified.
+const SPECIALTY_DEPENDENCIES: Record<string, Array<{
+  area: string;
+  label: string;
+  unverifiable: string;
+}>> = {
+  fire_safety: [
+    { area: "architecture", label: "Projeto de Arquitetura",
+      unverifiable: "classificação UT, efetivo, distâncias de evacuação, larguras de vias" },
+    { area: "structural", label: "Projeto de Estruturas",
+      unverifiable: "resistência ao fogo da estrutura (REI), compartimentação corta-fogo" },
+  ],
+  energy: [
+    { area: "thermal", label: "Projeto de Térmica / Envolvente",
+      unverifiable: "valores U de paredes/cobertura/pavimento, necessidades Nic/Nvc" },
+  ],
+  thermal: [
+    { area: "architecture", label: "Projeto de Arquitetura",
+      unverifiable: "áreas de fachada, orientações, vãos envidraçados" },
+  ],
+  acoustic: [
+    { area: "architecture", label: "Projeto de Arquitetura",
+      unverifiable: "compartimentação entre frações, isolamento de fachada" },
+  ],
+  accessibility: [
+    { area: "architecture", label: "Projeto de Arquitetura",
+      unverifiable: "larguras de portas/corredores, inclinação de rampas, WC acessíveis" },
+  ],
+  electrical: [
+    { area: "architecture", label: "Projeto de Arquitetura",
+      unverifiable: "classificação de locais, zonas de banho, potência por utilização" },
+  ],
 };
 
 function getAnalyzedAreas(report: ContextBuildReport): Set<string> {
@@ -55,8 +100,7 @@ function getAnalyzedAreas(report: ContextBuildReport): Set<string> {
     if (dotIdx > 0) namespaces.add(field.substring(0, dotIdx));
   }
 
-  // Architecture, general, and municipal use generic building data — always analyzable
-  const areas = new Set<string>(["architecture", "general", "municipal"]);
+  const areas = new Set<string>();
 
   for (const ns of namespaces) {
     const mapped = NAMESPACE_TO_AREAS[ns];
@@ -64,6 +108,34 @@ function getAnalyzedAreas(report: ContextBuildReport): Set<string> {
   }
 
   return areas;
+}
+
+/**
+ * Check cross-specialty dependencies and generate warnings for missing interfaces.
+ * Only warns when a specialty IS submitted but a dependency is NOT.
+ */
+function checkSpecialtyDependencies(analyzedAreas: Set<string>): Finding[] {
+  const warnings: Finding[] = [];
+
+  for (const [area, deps] of Object.entries(SPECIALTY_DEPENDENCIES)) {
+    if (!analyzedAreas.has(area)) continue; // specialty not submitted → no warning
+
+    for (const dep of deps) {
+      if (analyzedAreas.has(dep.area)) continue; // dependency satisfied
+
+      warnings.push({
+        id: `DEP-${area}-${dep.area}`,
+        area: area as RegulationArea,
+        regulation: "Dependências entre Especialidades",
+        article: "",
+        description: `${dep.label} não submetido — não é possível verificar: ${dep.unverifiable}.`,
+        severity: "info",
+        remediation: `Submeta o ${dep.label} para verificação completa desta especialidade.`,
+      });
+    }
+  }
+
+  return warnings;
 }
 
 // ── Missing-field helpers for actionable SKIPPED findings ──────────
@@ -142,6 +214,10 @@ export async function analyzeProject(project: BuildingProject): Promise<Analysis
     applySmartDefaults: true,
   });
 
+  // Determine which specialty areas have real data (IFC or form, not defaults)
+  // This gates plugin evaluation — irrelevant specialties are skipped entirely.
+  const analyzedAreas = getAnalyzedAreas(contextReport);
+
   // ── Global computed fields (runs BEFORE all rules) ────────
   // Pre-compute ALL computed fields from ALL plugins into shared context.
   // This enables cross-plugin dependencies (e.g., fire-safety rule referencing
@@ -160,131 +236,164 @@ export async function analyzeProject(project: BuildingProject): Promise<Analysis
   // Computes Ntc/Nt, energy class, thermal compliance, and injects
   // results into the project context so energy/thermal rules can
   // reference fields like energy.ntcNtRatio, energy.energyClass, etc.
-  if (canAnalyzeEnergy(enriched)) {
-    try {
-      const energyResult = analyzeEnergySCE(enriched);
-      findings.push(...energyResult.findings);
-      enrichProjectWithEnergyCalculations(enriched, energyResult);
-    } catch (e) {
+  if (analyzedAreas.has("energy")) {
+    if (canAnalyzeEnergy(enriched)) {
+      try {
+        const energyResult = analyzeEnergySCE(enriched);
+        findings.push(...energyResult.findings);
+        enrichProjectWithEnergyCalculations(enriched, energyResult);
+      } catch (e) {
+        findings.push({
+          id: "SCE-UNAVAIL",
+          area: "energy",
+          regulation: "SCE (DL 101-D/2020)",
+          article: "",
+          description: "Analisador SCE falhou durante a execução.",
+          severity: "info",
+          remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        });
+      }
+    } else {
+      const missing = getMissingFieldsSCE(enriched);
       findings.push({
-        id: "SCE-UNAVAIL",
+        id: "SCE-SKIPPED",
         area: "energy",
         regulation: "SCE (DL 101-D/2020)",
         article: "",
-        description: "Analisador SCE falhou durante a execução.",
+        description: `Análise energética SCE não executada — ${missing.length} campo(s) em falta.`,
         severity: "info",
-        remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        remediation: `Preencha: ${missing.join(", ")}`,
       });
     }
-  } else {
-    const missing = getMissingFieldsSCE(enriched);
-    findings.push({
-      id: "SCE-SKIPPED",
-      area: "energy",
-      regulation: "SCE (DL 101-D/2020)",
-      article: "",
-      description: `Análise energética SCE não executada — ${missing.length} campo(s) em falta.`,
-      severity: "info",
-      remediation: `Preencha: ${missing.join(", ")}`,
-    });
   }
 
-  // All 18 specialties evaluated via declarative plugin engine
-  const { findings: pluginFindings, metrics: ruleEvaluation } = evaluatePluginRulesWithMetrics(enriched);
+  // ── Strip default-sourced fields for rule evaluation ───────
+  // Smart defaults (e.g. behaviourFactor=3.0, liveLoad=2.0) fill gaps so
+  // deep analyzers have baselines, but rules should NOT evaluate against
+  // assumed values. Create a copy without defaults so the rule engine's
+  // existing skip mechanism works correctly: undefined field → rule skipped.
+  const enrichedForRules = JSON.parse(JSON.stringify(enriched)) as BuildingProject;
+  {
+    const rec = enrichedForRules as unknown as Record<string, unknown>;
+    for (const fieldPath of contextReport.fromDefaults) {
+      const parts = fieldPath.split(".");
+      let current: unknown = rec;
+      for (let i = 0; i < parts.length - 1; i++) {
+        if (current === null || current === undefined || typeof current !== "object") { current = null; break; }
+        current = (current as Record<string, unknown>)[parts[i]];
+      }
+      if (current && typeof current === "object") {
+        delete (current as Record<string, unknown>)[parts[parts.length - 1]];
+      }
+    }
+  }
+
+  // Plugin rules only see IFC + form data (no defaults)
+  const { findings: pluginFindings, metrics: ruleEvaluation } = evaluatePluginRulesWithMetrics(enrichedForRules, analyzedAreas);
   findings.push(...pluginFindings);
 
   // Deep analyzers use the enriched project for consistent field resolution
-  if (canAnalyzeElectrical(enriched)) {
-    try {
-      const electricalResult = await analyzeElectricalRTIEBT(enriched);
-      findings.push(...electricalResult.findings);
-    } catch (e) {
+  if (analyzedAreas.has("electrical")) {
+    if (canAnalyzeElectrical(enriched)) {
+      try {
+        const electricalResult = await analyzeElectricalRTIEBT(enriched);
+        findings.push(...electricalResult.findings);
+      } catch (e) {
+        findings.push({
+          id: "RTIEBT-UNAVAIL",
+          area: "electrical",
+          regulation: "RTIEBT",
+          article: "",
+          description: "Analisador RTIEBT falhou durante a execução.",
+          severity: "info",
+          remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        });
+      }
+    } else {
+      const missing = getMissingFieldsRTIEBT(enriched);
       findings.push({
-        id: "RTIEBT-UNAVAIL",
+        id: "RTIEBT-SKIPPED",
         area: "electrical",
         regulation: "RTIEBT",
         article: "",
-        description: "Analisador RTIEBT falhou durante a execução.",
+        description: `Análise elétrica RTIEBT não executada — ${missing.length} campo(s) em falta.`,
         severity: "info",
-        remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        remediation: `Preencha: ${missing.join(", ")}`,
       });
     }
-  } else {
-    const missing = getMissingFieldsRTIEBT(enriched);
-    findings.push({
-      id: "RTIEBT-SKIPPED",
-      area: "electrical",
-      regulation: "RTIEBT",
-      article: "",
-      description: `Análise elétrica RTIEBT não executada — ${missing.length} campo(s) em falta.`,
-      severity: "info",
-      remediation: `Preencha: ${missing.join(", ")}`,
-    });
   }
 
-  if (canAnalyzePlumbing(enriched)) {
-    try {
-      const plumbingResult = await analyzePlumbingRGSPPDADAR(enriched);
-      findings.push(...plumbingResult.findings);
-    } catch (e) {
+  if (analyzedAreas.has("water_drainage")) {
+    if (canAnalyzePlumbing(enriched)) {
+      try {
+        const plumbingResult = await analyzePlumbingRGSPPDADAR(enriched);
+        findings.push(...plumbingResult.findings);
+      } catch (e) {
+        findings.push({
+          id: "RGSPPDADAR-UNAVAIL",
+          area: "water_drainage",
+          regulation: "RGSPPDADAR",
+          article: "",
+          description: "Analisador RGSPPDADAR falhou durante a execução.",
+          severity: "info",
+          remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        });
+      }
+    } else {
+      const missing = getMissingFieldsPlumbing(enriched);
       findings.push({
-        id: "RGSPPDADAR-UNAVAIL",
+        id: "RGSPPDADAR-SKIPPED",
         area: "water_drainage",
         regulation: "RGSPPDADAR",
         article: "",
-        description: "Analisador RGSPPDADAR falhou durante a execução.",
+        description: `Análise de canalização RGSPPDADAR não executada — ${missing.length} campo(s) em falta.`,
         severity: "info",
-        remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        remediation: `Preencha: ${missing.join(", ")}`,
       });
     }
-  } else {
-    const missing = getMissingFieldsPlumbing(enriched);
-    findings.push({
-      id: "RGSPPDADAR-SKIPPED",
-      area: "water_drainage",
-      regulation: "RGSPPDADAR",
-      article: "",
-      description: `Análise de canalização RGSPPDADAR não executada — ${missing.length} campo(s) em falta.`,
-      severity: "info",
-      remediation: `Preencha: ${missing.join(", ")}`,
-    });
   }
 
   // Fire Safety deep analyzer (RT-SCIE calculation-based checks)
-  if (canAnalyzeFireSafety(enriched)) {
-    try {
-      const fireResult = analyzeFireSafetySCIE(enriched);
-      findings.push(...fireResult.findings);
-      enrichProjectWithFireSafetyCalculations(enriched, fireResult);
-    } catch (e) {
+  if (analyzedAreas.has("fire_safety")) {
+    if (canAnalyzeFireSafety(enriched)) {
+      try {
+        const fireResult = analyzeFireSafetySCIE(enriched);
+        findings.push(...fireResult.findings);
+        enrichProjectWithFireSafetyCalculations(enriched, fireResult);
+      } catch (e) {
+        findings.push({
+          id: "SCIE-UNAVAIL",
+          area: "fire_safety",
+          regulation: "RT-SCIE (DL 220/2008)",
+          article: "",
+          description: "Analisador SCIE falhou durante a execução.",
+          severity: "info",
+          remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        });
+      }
+    } else {
+      const missing = getMissingFieldsSCIE(enriched);
       findings.push({
-        id: "SCIE-UNAVAIL",
+        id: "SCIE-SKIPPED",
         area: "fire_safety",
         regulation: "RT-SCIE (DL 220/2008)",
         article: "",
-        description: "Analisador SCIE falhou durante a execução.",
+        description: `Análise SCIE não executada — ${missing.length} campo(s) em falta.`,
         severity: "info",
-        remediation: `Erro interno: ${e instanceof Error ? e.message : String(e)}`,
+        remediation: `Preencha: ${missing.join(", ")}`,
       });
     }
-  } else {
-    const missing = getMissingFieldsSCIE(enriched);
-    findings.push({
-      id: "SCIE-SKIPPED",
-      area: "fire_safety",
-      regulation: "RT-SCIE (DL 220/2008)",
-      article: "",
-      description: `Análise SCIE não executada — ${missing.length} campo(s) em falta.`,
-      severity: "info",
-      remediation: `Preencha: ${missing.join(", ")}`,
-    });
   }
 
   // PDM / Municipal Zoning (municipality-specific database checks)
-  findings.push(...checkPdmCompliance(enriched));
+  if (analyzedAreas.has("municipal")) {
+    findings.push(...checkPdmCompliance(enriched));
+  }
+
+  // Cross-specialty dependency warnings (e.g. fire safety without architecture)
+  findings.push(...checkSpecialtyDependencies(analyzedAreas));
 
   // Generate pass/not-analyzed findings for areas based on real data availability
-  const analyzedAreas = getAnalyzedAreas(contextReport);
   findings.push(...generatePassFindings(findings, analyzedAreas));
 
   // Enrich findings with remediation guidance
@@ -312,6 +421,7 @@ export async function analyzeProject(project: BuildingProject): Promise<Analysis
     recommendations,
     regulationSummary,
     ruleEvaluation,
+    analyzedAreas: Array.from(analyzedAreas),
     contextCoverage: fieldMappings.length > 0 ? {
       total: contextReport.coverage.total,
       populated: contextReport.coverage.populated,
@@ -327,7 +437,10 @@ export async function analyzeProject(project: BuildingProject): Promise<Analysis
   };
 }
 
-function evaluatePluginRulesWithMetrics(project: BuildingProject): {
+function evaluatePluginRulesWithMetrics(
+  project: BuildingProject,
+  analyzedAreas: Set<string>,
+): {
   findings: Finding[];
   metrics: RuleEvaluationMetrics[];
 } {
@@ -339,6 +452,25 @@ function evaluatePluginRulesWithMetrics(project: BuildingProject): {
     const plugins = getAvailablePlugins();
 
     for (const plugin of plugins) {
+      const primaryArea = plugin.areas[0];
+
+      // Skip plugins whose specialty has no real project data
+      if (!analyzedAreas.has(primaryArea)) {
+        const enabledRules = plugin.rules.filter(r => r.enabled !== false);
+        metrics.push({
+          pluginId: plugin.id,
+          pluginName: plugin.name,
+          area: primaryArea as RegulationArea,
+          totalRules: enabledRules.length,
+          evaluatedRules: 0,
+          skippedRules: enabledRules.length,
+          firedRules: 0,
+          coveragePercent: 0,
+          skippedRuleIds: enabledRules.map(r => r.id),
+        });
+        continue;
+      }
+
       const result = evaluatePlugin(plugin, project);
       findings.push(...result.findings);
 
@@ -350,7 +482,7 @@ function evaluatePluginRulesWithMetrics(project: BuildingProject): {
       metrics.push({
         pluginId: plugin.id,
         pluginName: plugin.name,
-        area: plugin.areas[0] as RegulationArea,
+        area: primaryArea as RegulationArea,
         totalRules,
         evaluatedRules,
         skippedRules,

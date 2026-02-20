@@ -249,3 +249,157 @@ describe("analyzeProject — silent failure handling", () => {
     expect(Array.isArray(result.findings)).toBe(true);
   });
 });
+
+// ============================================================
+// 12. Specialty filtering — only analyze areas with real data
+// ============================================================
+
+describe("analyzeProject — specialty filtering", () => {
+  it("structural-only project produces no critical/warning findings for unrelated specialties", async () => {
+    // Minimal project with only structural data (simulates IFC-only upload)
+    const structuralOnly = {
+      name: "Structural Only",
+      buildingType: "residential",
+      location: { municipality: "Lisboa", district: "Lisboa", altitude: 0, distanceToCoast: 5, climateZoneWinter: "I1", climateZoneSummer: "V2" },
+      grossFloorArea: 500,
+      usableFloorArea: 400,
+      numberOfFloors: 3,
+      buildingHeight: 9,
+      isRehabilitation: false,
+      structural: {
+        structuralSystem: "reinforced_concrete",
+        seismicZone: "1.3",
+        soilType: "B",
+        importanceClass: "II",
+        hasStructuralProject: true,
+        hasGeotechnicalStudy: true,
+        foundationType: "shallow",
+        hasSeismicDesign: true,
+        ductilityClass: "DCM",
+      },
+    } as unknown as BuildingProject;
+
+    const result = await analyzeProject(structuralOnly);
+
+    // These specialties should NOT produce critical/warning findings
+    // because no real data was provided for them
+    const irrelevantAreas = [
+      "architecture", "general", "municipal",
+      "gas", "hvac", "telecommunications", "acoustic",
+      "elevators", "waste", "drawings",
+    ];
+
+    const badFindings = result.findings.filter(
+      f => irrelevantAreas.includes(f.area) &&
+           (f.severity === "critical" || f.severity === "warning"),
+    );
+
+    expect(badFindings).toEqual([]);
+  });
+
+  it("structural-only project does NOT include architecture/general/municipal in analyzedAreas", async () => {
+    const structuralOnly = {
+      name: "Structural Only",
+      buildingType: "residential",
+      structural: { structuralSystem: "reinforced_concrete", seismicZone: "1.3", soilType: "B",
+        importanceClass: "II", hasStructuralProject: true, hasGeotechnicalStudy: true,
+        foundationType: "shallow", hasSeismicDesign: true, ductilityClass: "DCM" },
+    } as unknown as BuildingProject;
+
+    const result = await analyzeProject(structuralOnly);
+
+    expect(result.analyzedAreas).toContain("structural");
+    expect(result.analyzedAreas).not.toContain("architecture");
+    expect(result.analyzedAreas).not.toContain("general");
+    expect(result.analyzedAreas).not.toContain("municipal");
+  });
+
+  it("returns analyzedAreas in the result (DEFAULT_PROJECT has architecture data)", async () => {
+    const project = createProject({ name: "Analyzed Areas" });
+    const result = await analyzeProject(project);
+
+    expect(result.analyzedAreas).toBeDefined();
+    expect(Array.isArray(result.analyzedAreas)).toBe(true);
+    // DEFAULT_PROJECT has architecture.* fields → triggers architecture + general + municipal
+    expect(result.analyzedAreas).toContain("architecture");
+    expect(result.analyzedAreas).toContain("general");
+    expect(result.analyzedAreas).toContain("municipal");
+  });
+
+  it("emits dependency warnings when fire_safety submitted without architecture/structural", async () => {
+    const fireSafetyOnly = {
+      name: "Fire Safety Only",
+      buildingType: "residential",
+      grossFloorArea: 500,
+      numberOfFloors: 3,
+      buildingHeight: 9,
+      fireSafety: {
+        utilizationType: "I",
+        riskCategory: "1",
+        fireResistanceOfStructure: 60,
+        hasFireDetection: true,
+        hasFireAlarm: true,
+        evacuationRouteWidth: 1.2,
+        numberOfExits: 2,
+        maxEvacuationDistance: 30,
+        hasEmergencyLighting: true,
+        hasFireExtinguishers: true,
+        hasSprinklers: false,
+      },
+    } as unknown as BuildingProject;
+
+    const result = await analyzeProject(fireSafetyOnly);
+
+    // Should have dependency warnings for missing architecture and structural
+    const depWarnings = result.findings.filter(f => f.id.startsWith("DEP-"));
+    expect(depWarnings.length).toBe(2);
+
+    const archDep = depWarnings.find(f => f.id === "DEP-fire_safety-architecture");
+    expect(archDep).toBeDefined();
+    expect(archDep!.severity).toBe("info");
+    expect(archDep!.description).toContain("Projeto de Arquitetura");
+
+    const structDep = depWarnings.find(f => f.id === "DEP-fire_safety-structural");
+    expect(structDep).toBeDefined();
+    expect(structDep!.description).toContain("Projeto de Estruturas");
+  });
+
+  it("full DEFAULT_PROJECT has no dependency warnings", async () => {
+    const project = createProject({ name: "Full Project" });
+    const result = await analyzeProject(project);
+
+    const depWarnings = result.findings.filter(f => f.id.startsWith("DEP-"));
+    expect(depWarnings).toEqual([]);
+  });
+
+  it("rules do not fire on smart-default values (only real IFC/form data)", async () => {
+    // A project with only structural form data — structural rules should skip
+    // fields that come from smart defaults (e.g. liveLoad, behaviourFactor)
+    const structuralOnly = {
+      name: "Defaults Test",
+      buildingType: "residential",
+      structural: {
+        structuralSystem: "reinforced_concrete",
+        seismicZone: "1.3",
+        soilType: "B",
+        importanceClass: "II",
+        hasStructuralProject: true,
+        hasGeotechnicalStudy: true,
+        foundationType: "shallow",
+        hasSeismicDesign: true,
+        ductilityClass: "DCM",
+      },
+    } as unknown as BuildingProject;
+
+    const result = await analyzeProject(structuralOnly);
+    const structMetrics = result.ruleEvaluation?.filter(m => m.area === "structural") ?? [];
+
+    // With defaults stripped, most structural rules should be skipped
+    // (only ~9 form-provided fields vs 288 total structural fields)
+    const totalStructRules = structMetrics.reduce((s, m) => s + m.totalRules, 0);
+    const skippedStructRules = structMetrics.reduce((s, m) => s + m.skippedRules, 0);
+
+    // More than half the rules should be skipped (no default data to evaluate)
+    expect(skippedStructRules).toBeGreaterThan(totalStructRules * 0.5);
+  });
+});

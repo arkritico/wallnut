@@ -167,7 +167,7 @@ const SPECIALTY_SYSTEM: Record<string, "estrutura" | "mep" | "envolvente" | "seg
 };
 
 /** Generic top-level fields used by most plugins — not meaningful cross-specialty links */
-const GENERIC_FIELDS = new Set([
+export const GENERIC_FIELDS = new Set([
   "buildingType",
   "numberOfFloors",
   "grossFloorArea",
@@ -188,7 +188,7 @@ const GENERIC_FIELDS = new Set([
  * Map field namespace (first segment of dotted path) to plugin ID.
  * Rules use camelCase namespaces, plugins use kebab-case IDs.
  */
-const NAMESPACE_TO_PLUGIN: Record<string, string> = {
+export const NAMESPACE_TO_PLUGIN: Record<string, string> = {
   fireSafety: "fire-safety",
   waterDrainage: "water-drainage",
   elevator: "elevators",

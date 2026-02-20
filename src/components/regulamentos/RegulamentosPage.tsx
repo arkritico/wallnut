@@ -10,6 +10,7 @@ import type { Severity } from "@/lib/types";
 import RegulamentosHeader from "./RegulamentosHeader";
 import RegulamentosSidebar from "./RegulamentosSidebar";
 import RegulamentosDetail from "./RegulamentosDetail";
+import CrossSpecialtyDetail from "./detail/CrossSpecialtyDetail";
 import IngestionPanel from "@/components/IngestionPanel";
 import { X } from "lucide-react";
 
@@ -50,9 +51,10 @@ export default function RegulamentosPage() {
   const plugins = useMemo(() => getAvailablePlugins(), []);
 
   // ── Selection ──
-  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState<string | null>(null);
+  const [selectedSpecialtyIds, setSelectedSpecialtyIds] = useState<Set<string>>(new Set());
   const [selectedRegulationId, setSelectedRegulationId] = useState<string | null>(null);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
+  const isMultiSelect = selectedSpecialtyIds.size >= 2;
 
   // ── View ──
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -63,8 +65,10 @@ export default function RegulamentosPage() {
   const [ingestionPluginId, setIngestionPluginId] = useState<string | null>(null);
 
   // ── Derived data ──
+  const selectedSpecialtyId = selectedSpecialtyIds.size === 1 ? [...selectedSpecialtyIds][0] : null;
+
   const selectedPlugin = useMemo(
-    () => plugins.find((p) => p.id === selectedSpecialtyId) ?? null,
+    () => (selectedSpecialtyId ? plugins.find((p) => p.id === selectedSpecialtyId) ?? null : null),
     [plugins, selectedSpecialtyId],
   );
 
@@ -79,20 +83,40 @@ export default function RegulamentosPage() {
   }, [selectedPlugin, selectedRuleId]);
 
   // ── Handlers ──
+
+  // Sidebar single-select (for drill-down navigation)
   const handleSelectSpecialty = useCallback((id: string | null) => {
-    setSelectedSpecialtyId(id);
+    setSelectedSpecialtyIds(id ? new Set([id]) : new Set());
+    setSelectedRegulationId(null);
+    setSelectedRuleId(null);
+  }, []);
+
+  // Header chip toggle (for multi-select AND filtering)
+  const handleToggleSpecialty = useCallback((id: string) => {
+    setSelectedSpecialtyIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setSelectedRegulationId(null);
+    setSelectedRuleId(null);
+  }, []);
+
+  const handleClearSpecialties = useCallback(() => {
+    setSelectedSpecialtyIds(new Set());
     setSelectedRegulationId(null);
     setSelectedRuleId(null);
   }, []);
 
   const handleSelectRegulation = useCallback((specialtyId: string, regulationId: string | null) => {
-    setSelectedSpecialtyId(specialtyId);
+    setSelectedSpecialtyIds(new Set([specialtyId]));
     setSelectedRegulationId(regulationId);
     setSelectedRuleId(null);
   }, []);
 
   const handleSelectRule = useCallback((specialtyId: string, regulationId: string, ruleId: string | null) => {
-    setSelectedSpecialtyId(specialtyId);
+    setSelectedSpecialtyIds(new Set([specialtyId]));
     setSelectedRegulationId(regulationId);
     setSelectedRuleId(ruleId);
   }, []);
@@ -141,6 +165,10 @@ export default function RegulamentosPage() {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           onAddRegulation={handleAddRegulation}
+          plugins={plugins}
+          selectedSpecialtyIds={selectedSpecialtyIds}
+          onToggleSpecialty={handleToggleSpecialty}
+          onClearSpecialties={handleClearSpecialties}
         />
 
         <div className="flex flex-1 overflow-hidden">
@@ -154,25 +182,36 @@ export default function RegulamentosPage() {
             onSelectSpecialty={handleSelectSpecialty}
             onSelectRegulation={handleSelectRegulation}
             onSelectRule={handleSelectRule}
+            selectedSpecialtyIds={selectedSpecialtyIds}
+            isMultiSelect={isMultiSelect}
           />
 
           <main className={`flex-1 overflow-hidden ${viewMode === "graph" ? "bg-gray-900" : ""}`}>
             {viewMode === "list" ? (
               <div className="h-full overflow-y-auto">
-                <RegulamentosDetail
-                  plugins={plugins}
-                  selectedPlugin={selectedPlugin}
-                  selectedRegulation={selectedRegulation}
-                  selectedRule={selectedRule}
-                  selectedSpecialtyId={selectedSpecialtyId}
-                  selectedRegulationId={selectedRegulationId}
-                  severityFilter={severityFilter}
-                  searchQuery={searchQuery}
-                  onSelectSpecialty={handleSelectSpecialty}
-                  onSelectRegulation={handleSelectRegulation}
-                  onSelectRule={handleSelectRule}
-                  onStartIngestion={(pluginId) => setIngestionPluginId(pluginId)}
-                />
+                {isMultiSelect ? (
+                  <CrossSpecialtyDetail
+                    plugins={plugins}
+                    selectedSpecialtyIds={selectedSpecialtyIds}
+                    severityFilter={severityFilter}
+                    searchQuery={searchQuery}
+                  />
+                ) : (
+                  <RegulamentosDetail
+                    plugins={plugins}
+                    selectedPlugin={selectedPlugin}
+                    selectedRegulation={selectedRegulation}
+                    selectedRule={selectedRule}
+                    selectedSpecialtyId={selectedSpecialtyId}
+                    selectedRegulationId={selectedRegulationId}
+                    severityFilter={severityFilter}
+                    searchQuery={searchQuery}
+                    onSelectSpecialty={handleSelectSpecialty}
+                    onSelectRegulation={handleSelectRegulation}
+                    onSelectRule={handleSelectRule}
+                    onStartIngestion={(pluginId) => setIngestionPluginId(pluginId)}
+                  />
+                )}
               </div>
             ) : (
               <RegulationGraph className="h-full" embedded />
