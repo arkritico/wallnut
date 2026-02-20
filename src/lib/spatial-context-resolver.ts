@@ -16,6 +16,7 @@
  */
 
 import type { SpecialtyAnalysisResult, IfcQuantityData } from "./ifc-specialty-analyzer";
+import { buildSpatialGraph } from "./ifc-relationship-graph";
 
 // ============================================================
 // Types
@@ -403,7 +404,7 @@ export function aggregate(
 // Space Pattern Matching (Portuguese + English)
 // ============================================================
 
-const SPACE_PATTERNS: Record<string, string[]> = {
+export const SPACE_PATTERNS: Record<string, string[]> = {
   bedroom:   ["quarto", "bedroom", "suite", "dormit"],
   bathroom:  ["wc", "banho", "bathroom", "toilet", "sanitár", "i.s."],
   kitchen:   ["cozinha", "kitchen"],
@@ -415,7 +416,7 @@ const SPACE_PATTERNS: Record<string, string[]> = {
   lobby:     ["hall", "lobby", "entrada", "vestíbulo", "átrio", "entry"],
 };
 
-function spaceMatchesType(space: IfcQuantityData, type: string): boolean {
+export function spaceMatchesType(space: IfcQuantityData, type: string): boolean {
   const patterns = SPACE_PATTERNS[type];
   if (!patterns) return false;
   const name = space.name.toLowerCase();
@@ -424,7 +425,7 @@ function spaceMatchesType(space: IfcQuantityData, type: string): boolean {
   return patterns.some(p => name.includes(p) || longName.includes(p) || objectType.includes(p));
 }
 
-function getSpaceArea(space: IfcQuantityData): number | undefined {
+export function getSpaceArea(space: IfcQuantityData): number | undefined {
   const net = space.properties["NetFloorArea"] as number | undefined;
   if (net && net > 0) return net;
   const gross = space.properties["GrossFloorArea"] as number | undefined;
@@ -500,6 +501,18 @@ const COMPUTED_TO_RULE_FIELDS: [string, string[]][] = [
   ["computed.guardRailHeight",    ["general.guardRailHeight", "architecture.balconyGuardHeight"]],
   // Floor counts
   ["computed.floorsBelowGround",  ["general.floorsBelowGround"]],
+  // === Spatial graph computed fields ===
+  // Per-room natural light (RGEU Art. 71, Portaria 349-B/2013)
+  ["computed.allBedroomsHaveNaturalLight", ["general.allBedroomsHaveNaturalLight", "architecture.bedroomsHaveNaturalLight"]],
+  ["computed.kitchenHasNaturalLight",      ["general.kitchenHasNaturalLight", "architecture.kitchenHasNaturalLight"]],
+  ["computed.roomsWithoutNaturalLight",    ["general.roomsWithoutLight"]],
+  // Ventilation (RGEU Art. 73, RECS, REH)
+  ["computed.minVentilationRatio",         ["general.ventilationRatio", "architecture.ventilationRatio"]],
+  // Evacuation paths (SCIE RT-SCIE Art. 56-61)
+  ["computed.evacuationPathWidth",         ["fireSafety.evacuationPathWidth"]],
+  ["computed.maxEvacuationDistance",        ["fireSafety.maxEvacuationDistance", "fireSafety.horizontalRouteLength"]],
+  // Accessibility routes (DL 163/2006)
+  ["computed.accessibilityPathWidth",      ["accessibility.pathWidth", "accessibility.commonCorridorWidth"]],
 ];
 
 function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
@@ -507,6 +520,9 @@ function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
   const spaces = index.getByType("IFCSPACE");
   const doors = index.getByType("IFCDOOR");
   const windows = index.getByType("IFCWINDOW");
+
+  // Build spatial relationship graph for cross-entity analysis
+  const graph = buildSpatialGraph(index.getAllQuantities());
   const walls = index.getByType("IFCWALL");
   const stairs = index.getByType("IFCSTAIRFLIGHT");
   const ramps = index.getByType("IFCRAMP");
@@ -677,28 +693,82 @@ function computeSpatialRelationships(index: EntityIndex): ResolvedField[] {
     }
   }
 
-  // --- Natural light ratio (min window/floor per habitable room) ---
-  const habitableTypes = ["bedroom", "living", "kitchen"];
-  const lightRatios: number[] = [];
-  for (const type of habitableTypes) {
-    const matching = spaces.filter(s => spaceMatchesType(s, type));
-    for (const space of matching) {
-      const floorArea = getSpaceArea(space);
-      if (!floorArea || floorArea <= 0) continue;
-      const spaceWindows = windows.filter(w => w.storey === space.storey);
-      const habitableOnStorey = spaces.filter(s =>
-        s.storey === space.storey && habitableTypes.some(t => spaceMatchesType(s, t))
-      ).length || 1;
-      const storeyWindowArea = spaceWindows.reduce((s, w) => s + (w.quantities.area || 0), 0);
-      const approxRoomWindowArea = storeyWindowArea / habitableOnStorey;
-      if (approxRoomWindowArea > 0) {
-        lightRatios.push(approxRoomWindowArea / floorArea);
+  // --- Per-room natural light (from spatial relationship graph) ---
+  if (graph.rooms.length > 0) {
+    const habitableGraphRooms = graph.rooms.filter(r =>
+      r.roomType && ["bedroom", "living", "kitchen"].includes(r.roomType)
+    );
+
+    if (habitableGraphRooms.length > 0) {
+      const ratios = habitableGraphRooms
+        .map(r => r.metrics.naturalLightRatio)
+        .filter(r => r > 0);
+      if (ratios.length > 0) {
+        add("computed.naturalLightRatioMin", Math.min(...ratios),
+          `min(window/floor) across ${ratios.length} habitable rooms (graph-based)`);
       }
     }
+
+    // Boolean natural light checks
+    add("computed.allBedroomsHaveNaturalLight", graph.summary.allBedroomsHaveLight,
+      `bedroom natural light check`);
+    add("computed.kitchenHasNaturalLight", graph.summary.kitchenHasLight,
+      `kitchen natural light check`);
+
+    if (graph.summary.roomsWithoutLight > 0) {
+      add("computed.roomsWithoutNaturalLight", graph.summary.roomsWithoutLight,
+        `${graph.summary.roomsWithoutLight} habitable rooms have no windows`);
+    }
+  } else {
+    // Fallback: no IFCSPACE entities — use storey-level estimation
+    const habitableTypes = ["bedroom", "living", "kitchen"];
+    const lightRatios: number[] = [];
+    for (const type of habitableTypes) {
+      const matching = spaces.filter(s => spaceMatchesType(s, type));
+      for (const space of matching) {
+        const floorArea = getSpaceArea(space);
+        if (!floorArea || floorArea <= 0) continue;
+        const spaceWindows = windows.filter(w => w.storey === space.storey);
+        const habitableOnStorey = spaces.filter(s =>
+          s.storey === space.storey && habitableTypes.some(t => spaceMatchesType(s, t))
+        ).length || 1;
+        const storeyWindowArea = spaceWindows.reduce((s, w) => s + (w.quantities.area || 0), 0);
+        const approxRoomWindowArea = storeyWindowArea / habitableOnStorey;
+        if (approxRoomWindowArea > 0) {
+          lightRatios.push(approxRoomWindowArea / floorArea);
+        }
+      }
+    }
+    if (lightRatios.length > 0) {
+      add("computed.naturalLightRatioMin", Math.min(...lightRatios),
+        `min(window area / floor area) across ${lightRatios.length} habitable rooms (storey-level fallback)`);
+    }
   }
-  if (lightRatios.length > 0) {
-    add("computed.naturalLightRatioMin", Math.min(...lightRatios),
-      `min(window area / floor area) across ${lightRatios.length} habitable rooms`);
+
+  // --- Evacuation path analysis (from spatial graph) ---
+  if (graph.evacuation.minPathWidth !== undefined) {
+    add("computed.evacuationPathWidth", graph.evacuation.minPathWidth,
+      `narrowest bottleneck in evacuation path`);
+  }
+  if (graph.evacuation.maxEstimatedDistance !== undefined) {
+    add("computed.maxEvacuationDistance", graph.evacuation.maxEstimatedDistance,
+      `estimated max distance to exit (sum of corridor lengths)`);
+  }
+
+  // --- Ventilation ratio (from spatial graph) ---
+  if (graph.summary.minHabitableVentRatio !== undefined) {
+    add("computed.minVentilationRatio", graph.summary.minHabitableVentRatio,
+      `min ventilation area ratio across habitable rooms`);
+  }
+
+  // --- Accessibility path width (uses corridor widths as proxy) ---
+  const corridorSpaces = spaces.filter(s => spaceMatchesType(s, "corridor"));
+  const accessibilityWidths = corridorSpaces
+    .map(c => c.quantities.width)
+    .filter((w): w is number => w !== undefined && w > 0);
+  if (accessibilityWidths.length > 0) {
+    add("computed.accessibilityPathWidth", Math.min(...accessibilityWidths),
+      `min corridor width as accessibility path proxy`);
   }
 
   // --- Number of floors (from IFCBUILDINGSTOREY) ---

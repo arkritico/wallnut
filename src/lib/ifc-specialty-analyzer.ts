@@ -135,8 +135,12 @@ export interface IfcQuantityData {
   materials: string[];
   /** Classification references (keynotes) */
   classification?: string;
-  /** Hosting element reference */
+  /** Host element entity ID (wall/slab) — resolved via IFCRELVOIDSELEMENT+IFCRELFILLSELEMENT chain */
   hostElement?: string;
+  /** IFC entity ID of the opening this window/door fills (from IFCRELFILLSELEMENT) */
+  fillsOpeningId?: string;
+  /** Child entity IDs in aggregation hierarchy (from IFCRELAGGREGATES) */
+  aggregatedChildren?: string[];
   /** Storey/level */
   storey?: string;
 }
@@ -157,6 +161,39 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
     if (match) {
       // Strip trailing semicolon so reference regexes like /(#\d+)\)$/ work correctly
       entities.set(match[1], match[2].replace(/;$/, ''));
+    }
+  }
+
+  // Pre-pass: build relationship maps for O(1) lookup during entity extraction
+  // These resolve the window→opening→wall chain and building→storey→space hierarchy
+  const fillsOpening = new Map<string, string>();        // fillingElementId → openingId
+  const voidsHost = new Map<string, string>();            // openingId → hostElementId
+  const aggregateChildren = new Map<string, string[]>();  // parentId → [childId, ...]
+
+  for (const [, val] of entities) {
+    if (val.startsWith("IFCRELFILLSELEMENT(")) {
+      // IFCRELFILLSELEMENT('guid',#owner,$,$,#openingElement,#fillingElement)
+      const refs = val.match(/#\d+/g);
+      if (refs && refs.length >= 3) {
+        fillsOpening.set(refs[refs.length - 1], refs[refs.length - 2]);
+      }
+    } else if (val.startsWith("IFCRELVOIDSELEMENT(")) {
+      // IFCRELVOIDSELEMENT('guid',#owner,$,$,#hostElement,#openingElement)
+      const refs = val.match(/#\d+/g);
+      if (refs && refs.length >= 3) {
+        voidsHost.set(refs[refs.length - 1], refs[refs.length - 2]);
+      }
+    } else if (val.startsWith("IFCRELAGGREGATES(")) {
+      // IFCRELAGGREGATES('guid',#owner,$,$,#parent,(#child1,#child2,...))
+      const parentMatch = val.match(/,\s*(#\d+)\s*,\s*\(/);
+      if (parentMatch) {
+        const parentId = parentMatch[1];
+        const childPart = val.slice(val.lastIndexOf("("));
+        const children = childPart.match(/#\d+/g) || [];
+        if (children.length > 0) {
+          aggregateChildren.set(parentId, children);
+        }
+      }
     }
   }
 
@@ -239,6 +276,24 @@ export function extractDetailedQuantities(content: string): IfcQuantityData[] {
         const typicalLength = entityType.startsWith("IFCCOLUMN") ? 3.0 : 5.0;
         item.quantities.volume = Math.round(dim1 * dim2 * typicalLength * 1000) / 1000;
       }
+    }
+
+    // Resolve window/door → host wall chain via fills+voids maps
+    if (entityType.startsWith("IFCWINDOW") || entityType.startsWith("IFCDOOR")) {
+      const openingId = fillsOpening.get(id);
+      if (openingId) {
+        item.fillsOpeningId = openingId;
+        const hostId = voidsHost.get(openingId);
+        if (hostId) {
+          item.hostElement = hostId;
+        }
+      }
+    }
+
+    // Resolve aggregation children (for IFCBUILDINGSTOREY → IFCSPACE hierarchy)
+    const aggChildren = aggregateChildren.get(id);
+    if (aggChildren && aggChildren.length > 0) {
+      item.aggregatedChildren = aggChildren;
     }
 
     // Find associated property sets via IFCRELDEFINESBYPROPERTIES

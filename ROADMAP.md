@@ -7,7 +7,8 @@
 | System | Maturity | Key Files |
 |--------|----------|-----------|
 | Unified pipeline (9-stage, multi-file, progress tracking) | 95% | `unified-pipeline.ts`, `UnifiedUpload.tsx` |
-| IFC text parser (8 specialties, 65+ field enrichments) | 90% | `ifc-specialty-analyzer.ts`, `ifc-enrichment.ts` |
+| IFC text parser (30+ entity types, 150+ field enrichments) | 90% | `ifc-specialty-analyzer.ts`, `ifc-enrichment.ts` |
+| IFC spatial reasoning (window→room, adjacency, evacuation) | 85% | `ifc-relationship-graph.ts`, `spatial-context-resolver.ts` |
 | IFC quantity takeoff (measured quantities from BIM) | 90% | `ifc-quantity-takeoff.ts` |
 | IFC 3D viewer (Three.js, element selection, storey explorer) | 85% | `IfcViewer.tsx` |
 | 4D timeline player (schedule-driven animation) | 85% | `TimelinePlayer.tsx`, `element-task-mapper.ts` |
@@ -19,8 +20,12 @@
 | MS Project XML export (Portuguese calendar, resources) | 95% | `msproject-export.ts` |
 | Resource aggregation (labor trades, materials, equipment) | 75% | `resource-aggregator.ts` |
 | Budget Excel export (6 sheets, IVA, district factors) | 80% | `budget-export.ts` |
-| Regulatory rules engine (1,964 rules, 18 specialties) | 90% | `src/data/plugins/*/rules.json` |
+| Regulatory rules engine (7,161 rules, 18 specialties, 59 regulation files) | 95% | `src/data/plugins/*/rules.json` |
+| Spatial context resolver (46 computed fields, IFC→rule bridge) | 90% | `spatial-context-resolver.ts` |
 | Context builder (namespace aliases, virtual namespaces, smart defaults) | 90% | `context-builder.ts` |
+| Field mappings (3,273 fields across 18 plugins) | 90% | `src/data/plugins/*/field-mappings.json` |
+| IFC-to-project enrichment (structural, arch, MEP, fire safety) | 85% | `ifc-enrichment.ts` |
+| Deep analyzers (energy, electrical, plumbing, fire safety) | 85% | `*-analyzer.ts` |
 | PDF text extraction + splitting (pdfjs-dist, pdf-lib) | 85% | `document-parser.ts`, `pdf-splitter.ts` |
 | OCR for scanned PDFs (server-side, Portuguese lang) | 80% | `ocr-processor.ts`, `server-ocr.ts` |
 | Keynote resolver (5 resolution methods, BOQ generation) | 85% | `keynote-resolver.ts` |
@@ -37,14 +42,14 @@
 | CI/CD (lint, test, build, tsc --noEmit) | 90% | `.github/workflows/ci.yml` |
 | Docker + Vercel deployment configs | 80% | `Dockerfile`, `vercel.json` |
 
-**Test suite**: 998 tests across 37 files (34 test files + 3 config). All passing.
+**Test suite**: 1,376 tests across 54 files (51 test files). All passing.
 
 ### What's Missing for Production
 
-1. **Price database at 5% coverage** — 2,049 items scraped out of ~40,000 target. Scraper infrastructure removed; database expansion underway in parallel instance.
+1. **Price database at 5% coverage** — 2,049 items out of ~40,000 target.
 2. **No team-accessible staging** — Vercel + Supabase config ready but not connected.
 3. **Resource leveling has known UID collision bug** — `site-capacity-optimizer.ts` line ~250.
-4. **No Playwright E2E tests** — Unit tests comprehensive (998), but no browser-level integration tests.
+4. **No Playwright E2E tests** — Unit tests comprehensive (1,376), but no browser-level integration tests.
 5. **Export fidelity unvalidated** — Budget Excel and MS Project XML not verified against real MS Project / LibreOffice.
 
 ---
@@ -69,30 +74,33 @@
     │  Extractor │   │  Parser   │   │  Text/OCR │
     └─────┬─────┘   └─────┬─────┘   └─────┬─────┘
           │                │                │
-          └────────┬───────┘                │
-                   │ keynotes               │
-            ┌──────▼──────┐                 │
-            │  Price Match │                 │
-            │  + Pricing  │                 │
-            └──────┬──────┘                 │
-                   │                        │
-     ┌─────────────┼─────────────┐          │
-     │             │             │          │
-┌────▼────┐  ┌────▼────┐  ┌────▼──────────▼───┐
-│  Cost   │  │Schedule │  │    Regulatory     │
-│Estimate │  │  (CCPM) │  │    Compliance     │
-│  (Pricing) │  │         │  │  (1,964 rules)   │
-└────┬────┘  └────┬────┘  └────────┬──────────┘
-     │            │                │
-┌────▼────┐  ┌────▼────┐  ┌───────▼───────┐
-│ Budget  │  │MS Proj  │  │  Compliance   │
-│  Excel  │  │  XML    │  │    Report     │
-└─────────┘  └────┬────┘  └──────────────-┘
-                   │
-            ┌──────▼──────┐
-            │  4D Viewer  │  IFC elements shown/hidden
-            │  (browser)  │  by schedule timeline
-            └─────────────┘
+    ┌─────▼──────┐         │                │
+    │  Spatial   │         │                │
+    │  Graph +   │  keynotes               │
+    │  Enrichment│─────────┤                │
+    └─────┬──────┘         │                │
+          │         ┌──────▼──────┐         │
+          │         │ Price Match │         │
+          │         │  + Pricing  │         │
+          │         └──────┬──────┘         │
+          │                │                │
+     ┌────┼────────────────┼─────────┐      │
+     │    │                │         │      │
+┌────▼────┤──┐  ┌────▼────┐  ┌─────▼──────▼───┐
+│  Cost     │  │Schedule │  │   Regulatory    │
+│  Estimate │  │  (CCPM) │  │   Compliance    │
+│           │  │         │  │  (7,161 rules)  │
+└────┬──────┘  └────┬────┘  └───────┬─────────┘
+     │              │               │
+┌────▼────┐  ┌─────▼────┐  ┌───────▼───────┐
+│ Budget  │  │ MS Proj  │  │  Compliance   │
+│  Excel  │  │  XML     │  │    Report     │
+└─────────┘  └─────┬────┘  └───────────────┘
+                    │
+             ┌──────▼──────┐
+             │  4D Viewer  │  IFC elements shown/hidden
+             │  (browser)  │  by schedule timeline
+             └─────────────┘
 ```
 
 ---
@@ -130,7 +138,7 @@ The project already has `vercel.json` (CDG1/Paris region). Remaining manual setu
 ### 0.4 CI Hardening ✅
 
 - [x] Add TypeScript strict check step: `npx tsc --noEmit`
-- [x] Vitest fully configured and working (998 tests passing)
+- [x] Vitest fully configured and working (1,376 tests passing)
 - [ ] Add staging deploy step (Vercel CLI deploy on `develop` branch)
 
 **Status**: Code complete. Deployment infrastructure (Vercel + Supabase) requires manual setup.
@@ -193,7 +201,7 @@ Pipeline stages (all implemented):
 5. **Estimate** — Calculate costs with district/type factors + IFC quantity takeoff
 6. **Sequence** — Generate schedule with CCPM and Portuguese phases
 7. **Optimize** — Apply site capacity constraints (max workers, phase overlaps)
-8. **Comply** — Run 1,964 regulatory rules against enriched project
+8. **Comply** — Run 7,161 regulatory rules against enriched project
 9. **Export** — Generate Budget Excel + MS Project XML + Compliance Excel
 
 - [x] Pipeline orchestrator with stage-by-stage progress
@@ -299,7 +307,7 @@ The site-capacity-optimizer has 26 Portuguese phase overlap rules but known issu
 
 ### 3.5 Cost Estimation Accuracy ✅
 
-- [x] Full Price database matching (2,049 items merged with 79 curated items, scored matching with token similarity)
+- [x] Full price database matching (2,049 items with full breakdowns, scored matching with token similarity)
 - [x] Quantity takeoff from IFC geometry (area, volume, length via `ifc-quantity-takeoff.ts`)
 - [x] Scale factors: bulk pricing discounts for large quantities (5-15% by unit type)
 - [x] Contingency buffers: 5-15% based on match confidence + project stage
@@ -352,12 +360,16 @@ These were implemented but not in the original roadmap:
 | Feature | Module | Description |
 |---------|--------|-------------|
 | IFC quantity takeoff | `ifc-quantity-takeoff.ts` | Measured quantities from BIM model replace heuristic estimates |
+| IFC spatial reasoning graph | `ifc-relationship-graph.ts` | Cross-entity relationships: window→room assignment, room adjacency, evacuation path analysis, per-room natural light ratios |
+| IFC relationship parsing | `ifc-specialty-analyzer.ts` | IFCRELFILLSELEMENT (window→wall), IFCRELVOIDSELEMENT (opening→host), IFCRELAGGREGATES (hierarchy) |
+| Spatial context resolver | `spatial-context-resolver.ts` | 46 computed fields bridged to rule paths: room areas, ceiling heights, stair dimensions, fire risk category, building height, typology |
+| Regulation context builder | `context-builder.ts` | Namespace aliases, virtual namespaces, smart defaults for 18 specialties |
+| IFC-to-project enrichment | `ifc-enrichment.ts` | 150+ fields: wall/window U-values, fire ratings, room areas, accessibility flags, MEP counts from IFC |
+| Deep analyzers | `energy-analyzer.ts`, etc. | Iterative calculation engines for electrical, plumbing, energy, fire safety |
+| 7,161 regulation rules | `src/data/plugins/*/rules.json` | 59 regulation files across 18 specialties, 127 registry entries |
+| 3,273 field mappings | `field-mappings.json` × 18 | Maps regulation fields to project data paths across all plugins |
 | EVM dashboard UI | `EvmDashboard.tsx` | Interactive EVM dashboard with S-curve chart, KPI grid |
 | Brand identity | `globals.css`, `page.tsx` | PP Mori font, SVG Wallnut logo, editorial splash page |
-| Regulation context builder | `context-builder.ts` | Namespace aliases, virtual namespaces, smart defaults for 18 specialties |
-| IFC-to-regulation bridge | `ifc-enrichment.ts` | Wall/window U-values, fire ratings, room areas, accessibility flags from IFC |
-| Deep analyzers | `energy-analyzer.ts`, etc. | Iterative calculation engines for electrical, plumbing, energy, fire safety |
-| 1,050 field mappings | `field-mappings.json` × 18 | Maps regulation fields to project data paths across all plugins |
 | DWFx parser | `dwfx-parser.ts` | ZIP-based OPC format extraction (foundational, deferred) |
 
 ---
@@ -381,9 +393,9 @@ No paid APIs or SaaS dependencies. Everything runs self-hosted.
 
 ### Current Coverage
 
-**998 tests across 37 files** (all passing as of 2026-02-18).
+**1,376 tests across 54 files** (all passing as of 2026-02-20).
 
-Key test files:
+Key test files (51 test files):
 - `analyzer.test.ts` — Full regulation analysis pipeline
 - `calculations.test.ts` — Thermal, acoustic, energy calculations
 - `cashflow.test.ts` — Cash flow and S-curve generation
@@ -394,9 +406,12 @@ Key test files:
 - `earned-value.test.ts` — EVM calculations (16 tests)
 - `element-task-mapper.test.ts` — 4D mapping strategies
 - `ifc-quantity-takeoff.test.ts` — IFC quantity aggregation (26 tests)
+- `ifc-relationship-graph.test.ts` — Spatial graph: window→room, adjacency, evacuation (30 tests)
+- `spatial-context-resolver.test.ts` — Computed fields, bridge, performance
 - `keynote-resolver.test.ts` — Keynote resolution methods
 - `labor-constraints.test.ts` — Workforce inference
 - `pdf-splitter.test.ts` — PDF splitting (15 tests)
+- `phase1-features.test.ts` through `phase4-pipeline.test.ts` — Plugin rule validation
 - `unified-pipeline.test.ts` — Pipeline orchestration
 
 ### Still Missing
@@ -455,6 +470,8 @@ Key test files:
 | Playwright E2E tests | Testing | No browser-level integration verification |
 | Export fidelity validation | 1.5 | Budget Excel / MS Project XML not tested in real software |
 | Benchmark projects for ±20% cost accuracy | 3.5 | No ground truth for cost estimation accuracy |
+| IFC test fixtures with real .ifc files | Testing | No real IFC files in test suite, only mock data |
+| IFC spatial reasoning with IFCRELSPACEBOUNDARY | 5 | More precise room-to-surface adjacency (currently uses storey heuristic) |
 
 ### Nice to Have
 
@@ -465,6 +482,7 @@ Key test files:
 | Screenshot/recording export from 4D player | 2.3 | Presentation material |
 | Phase labels in 3D space (floating text) | 2.3 | Visual polish |
 | CCPM buffer visualization in timeline | 2.3 | Advanced schedule insight |
+| IFC field mappings expansion (51/3,273 have ifcMapping) | 5 | More fields auto-resolved from BIM |
 
 ---
 
@@ -488,7 +506,7 @@ Key test files:
 - [x] User uploads IFC + optional BOQ → receives all three outputs
 - [x] Budget Excel has real prices with material/labor/equipment breakdown
 - [x] MS Project XML with correct dates and resources
-- [x] Compliance report covers all 18 specialties (1,964 rules)
+- [x] Compliance report covers all 18 specialties (7,161 rules)
 - [ ] Staging URL accessible to team
 - [x] CI pipeline green on every PR
 
@@ -510,3 +528,12 @@ Key test files:
 - [x] Earned Value Management with interactive dashboard
 - [x] Multi-user collaboration with role-based access
 - [x] IFC quantity takeoff replaces heuristic estimates
+
+### IFC Intelligence (Phase 5) ✅
+- [x] 7,161 declarative regulation rules across 59 regulation files
+- [x] 3,273 field mappings across 18 plugins
+- [x] Spatial context resolver with 46 computed→rule field bridges
+- [x] IFC relationship graph: window→room, room adjacency, evacuation paths
+- [x] Per-room natural light ratio, ventilation area, fire compartment analysis
+- [x] IFC enrichment: 150+ project fields from BIM (structural, arch, MEP, fire safety)
+- [ ] IFCRELSPACEBOUNDARY parsing for exact room-surface adjacency

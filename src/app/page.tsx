@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import ProjectForm from "@/components/ProjectForm";
 import ProjectWizard from "@/components/ProjectWizard";
 import AuthProvider from "@/components/AuthProvider";
@@ -66,6 +66,8 @@ import UnifiedUpload from "@/components/UnifiedUpload";
 import type { UnifiedPipelineResult } from "@/lib/unified-pipeline";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { getAvailablePlugins } from "@/lib/plugins/loader";
+import { SPECIALTY_NAMES } from "@/lib/regulation-constants";
 
 const IfcViewer = dynamic(() => import("@/components/IfcViewer"), {
   ssr: false,
@@ -82,12 +84,6 @@ const EvmDashboard = dynamic(() => import("@/components/EvmDashboard"), {
 
 type AppView = "landing" | "dashboard" | "wizard" | "form" | "results" | "wbs" | "compare" | "unified" | "viewer" | "fourd" | "evm";
 
-const REGULATION_BADGES = [
-  "Codigo Civil", "RGEU", "Eurocodigos EC0-EC8", "SCIE + NT01-NT22",
-  "REH", "RECS", "RGSPPDADAR", "DL 521/99", "RTIEBT", "ITED/ITUR 4a Ed.",
-  "RRAE", "DL 163/2006", "SCE", "DL 320/2002", "RJUE", "DL 46/2008",
-  "Portaria 701-H/2008", "ISO 3098",
-];
 
 function WallnutLogo({ className }: { className?: string }) {
   return (
@@ -137,7 +133,18 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Regulation ingestion
+  // Plugin stats for landing page footer
+  const pluginStats = useMemo(() => {
+    const plugins = getAvailablePlugins();
+    return {
+      total: plugins.reduce((sum, p) => sum + p.rules.length, 0),
+      specialties: plugins.map(p => ({
+        id: p.id,
+        name: SPECIALTY_NAMES[p.id] ?? p.name,
+        count: p.rules.length,
+      })),
+    };
+  }, []);
 
   // Unified pipeline exports (stored as blobs for download buttons)
   const [unifiedResult, setUnifiedResult] = useState<UnifiedPipelineResult | null>(null);
@@ -668,13 +675,15 @@ export default function Home() {
             )}
           </section>
 
-          {/* Regulation badges */}
+          {/* Specialty badges */}
           <footer className="max-w-5xl mx-auto px-6 pb-16">
             <div className="border-t border-gray-100 pt-8">
               <p className="text-center text-[0.65rem] text-gray-300 mb-4 uppercase tracking-[0.2em]">{t.regulationsCovered}</p>
               <div className="flex flex-wrap justify-center gap-2 text-xs text-gray-400">
-                {REGULATION_BADGES.map(reg => (
-                  <span key={reg} className="px-3 py-1 border border-gray-100 rounded-full">{reg}</span>
+                {pluginStats.specialties.map(s => (
+                  <span key={s.id} className="px-3 py-1 border border-gray-100 rounded-full">
+                    {s.name}
+                  </span>
                 ))}
               </div>
             </div>

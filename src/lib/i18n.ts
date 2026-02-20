@@ -305,7 +305,7 @@ const pt: Translations = {
   appName: "Wallnut",
   appSubtitle: "Analise e melhore projetos de edifícios em Portugal",
   appDescription: "Verificação abrangente de conformidade com a regulamentação portuguesa de edifícios.",
-  regulationsCovered: "Regulamentação abrangida",
+  regulationsCovered: "18 especialidades · 7.000+ regras",
 
   startAnalysis: "Iniciar Análise",
   newAnalysis: "Nova Análise",
@@ -527,9 +527,9 @@ const pt: Translations = {
   capCostTitle: "Estimativa de Custos",
   capCostDesc: "Base de preços com mão de obra, materiais e equipamentos. Ligação automática entre modelo IFC e Mapa de Quantidades por keynotes — ou MQT extrapolado com máximo rigor quando ausente.",
   capScheduleTitle: "Planeamento de Obra",
-  capScheduleDesc: "Ficheiro MS Project com feriados portugueses, custos por recurso e mão de obra dimensionada à realidade da obra. Pronto para execução.",
+  capScheduleDesc: "Ficheiro MS Project com feriados portugueses, custos por recurso e mão de obra dimensionada à realidade da obra. Simulação 4D sobre o modelo BIM e gestão de valor ganho (EVM).",
   capComplianceTitle: "Conformidade Regulamentar",
-  capComplianceDesc: "1.964 regras em 18 especialidades. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocódigos, DL 163/2006 e regulamentação municipal — verificação automática.",
+  capComplianceDesc: "Mais de 7.000 regras em 18 especialidades. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocódigos, DL 163/2006 e regulamentação municipal — verificação automática.",
 
   evmTitle: "Valor Ganho (EVM)",
   evmBaseline: "Linha de Base",
@@ -576,7 +576,7 @@ const en: Translations = {
   appName: "Wallnut",
   appSubtitle: "Analyze and improve building projects in Portugal",
   appDescription: "Comprehensive compliance verification with Portuguese building regulations.",
-  regulationsCovered: "Regulations covered",
+  regulationsCovered: "18 specialties · 7,000+ rules",
 
   startAnalysis: "Start Analysis",
   newAnalysis: "New Analysis",
@@ -798,9 +798,9 @@ const en: Translations = {
   capCostTitle: "Cost Estimation",
   capCostDesc: "Price database with labor, materials, and equipment. Automatic linking between IFC model and Bill of Quantities via keynotes — or BOQ extrapolated with maximum rigor when absent.",
   capScheduleTitle: "Construction Scheduling",
-  capScheduleDesc: "MS Project file with Portuguese holidays, resource costs, and workforce sized to the project's reality. Ready for execution.",
+  capScheduleDesc: "MS Project file with Portuguese holidays, resource costs, and workforce sized to the project's reality. 4D simulation over BIM model and Earned Value Management (EVM).",
   capComplianceTitle: "Regulatory Compliance",
-  capComplianceDesc: "1,964 rules across 18 specialties. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocodes, DL 163/2006, and municipal regulations — automatically verified.",
+  capComplianceDesc: "Over 7,000 rules across 18 specialties. RGEU, SCIE, REH, RECS, RRAE, RTIEBT, ITED/ITUR, Eurocodes, DL 163/2006, and municipal regulations — automatically verified.",
 
   evmTitle: "Earned Value (EVM)",
   evmBaseline: "Baseline",
