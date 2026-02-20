@@ -281,9 +281,11 @@ function FieldInput({
           className={`${inputClasses} ${!hasValue ? "text-gray-400" : ""}`}
         >
           <option value="">-- Selecionar --</option>
-          {options.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
+          {options.map(opt => {
+            const val = typeof opt === "string" ? opt : opt.value;
+            const lbl = typeof opt === "string" ? opt : opt.label;
+            return <option key={val} value={val}>{lbl}</option>;
+          })}
         </select>
       </div>
     );

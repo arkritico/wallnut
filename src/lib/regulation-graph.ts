@@ -239,7 +239,9 @@ export function buildFieldLookup(): Map<string, { label: string; unit?: string; 
   try {
     const mappings = getFieldMappings();
     for (const m of mappings) {
-      const optMap = m.options ? new Map(m.options.map(o => [o.value, o.label])) : undefined;
+      const optMap = m.options ? new Map(m.options.map(o =>
+        typeof o === "string" ? [o, o] : [o.value, o.label]
+      )) : undefined;
       lookup.set(m.field, {
         label: m.label,
         unit: m.unit && m.unit !== "\u2014" ? m.unit : undefined,

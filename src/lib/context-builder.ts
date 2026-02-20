@@ -18,6 +18,7 @@ import type { IfcExtractedData } from "./ifc-parser";
 import { ifcToProjectFields } from "./ifc-parser";
 import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
 import { specialtyAnalysisToProjectFields } from "./ifc-enrichment";
+import { resolveSpatialContext } from "./spatial-context-resolver";
 import { resolveLocationParams } from "./municipality-lookup";
 
 // ----------------------------------------------------------
@@ -38,13 +39,22 @@ export interface FieldMapping {
   /** Unit of measurement (if applicable) */
   unit?: string;
   /** Select options (if type is "select") */
-  options?: { value: string; label: string }[];
+  options?: { value: string; label: string }[] | string[];
   /** Ordered priority: where to look first for this field's value */
   sources: FieldSource[];
-  /** IFC property set and property name to extract from */
+  /** IFC property extraction config — supports both basic and entity-based patterns */
   ifcMapping?: {
-    propertySet: string;
-    propertyName: string;
+    // Basic parser (property set lookup)
+    propertySet?: string;
+    propertyName?: string;
+    // Entity-based (specialty analyzer)
+    entityType?: string;
+    entity?: string;
+    filter?: Record<string, unknown>;
+    property?: string;
+    pset?: string;
+    psetProperty?: string;
+    method?: "count" | "minValue" | "maxValue" | "sum" | "sumArea" | "sumByZone" | "average" | "countPerFacade";
     /** Optional transform: e.g. "parseFloat", "boolean" */
     transform?: string;
   };
@@ -52,6 +62,8 @@ export interface FieldMapping {
   defaults?: Partial<Record<BuildingType, unknown>> & { _default?: unknown };
   /** Is this field required for rule evaluation? */
   required?: boolean;
+  /** Group header (for field-mappings.json structure) */
+  _group?: string;
 }
 
 /** Field mappings configuration for one specialty plugin */
@@ -77,6 +89,13 @@ export interface ContextBuildReport {
   aliasesApplied: string[];
   /** Total fields expected vs populated */
   coverage: { total: number; populated: number; percentage: number };
+  /** Spatial resolution stats (when IFC data is available) */
+  spatialResolution?: {
+    resolved: number;
+    computed: number;
+    fieldConfidence: Record<string, "high" | "medium" | "low">;
+    durationMs: number;
+  };
 }
 
 // ----------------------------------------------------------
@@ -1074,14 +1093,20 @@ export function buildProjectContext(
     enriched = deepMerge(enriched, specialtyFields);
     report.fromIfc.push(...ifcEnrichReport.populatedFields.map(f => f.field));
 
-    // Step 2c: Declarative entity-based extraction from field-mappings ifcMapping
-    const declarativeFields = extractFromSpecialtyAnalyses(ifcSpecialtyAnalyses, fieldMappings);
-    const beforeDecl = countDefinedFields(enriched, fieldMappings);
-    enriched = deepMerge(enriched, declarativeFields);
-    const afterDecl = countDefinedFields(enriched, fieldMappings);
-    if (afterDecl > beforeDecl) {
-      report.fromIfc.push(`(${afterDecl - beforeDecl} declarative IFC fields)`);
-    }
+    // Step 2c: Spatial context resolution — full ifcMapping support with filters,
+    // aggregation methods, and computed spatial relationships
+    const spatialResult = resolveSpatialContext(ifcSpecialtyAnalyses, fieldMappings);
+    enriched = deepMerge(enriched, spatialResult.fields);
+    report.fromIfc.push(...spatialResult.resolved.map(f => f.field));
+    report.fromIfc.push(...spatialResult.computed.map(f => f.field));
+    report.spatialResolution = {
+      resolved: spatialResult.stats.fromIfc,
+      computed: spatialResult.stats.computed,
+      fieldConfidence: Object.fromEntries(
+        [...spatialResult.resolved, ...spatialResult.computed].map(f => [f.field, f.confidence])
+      ),
+      durationMs: spatialResult.stats.durationMs,
+    };
   }
 
   // Step 2d: Municipality auto-derivation
