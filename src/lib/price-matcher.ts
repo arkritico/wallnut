@@ -34,11 +34,11 @@ import type { RegulationArea } from "./types";
 let PRICE_CONSTRUCTION_DB: PriceWorkItem[] | null = null;
 
 /**
- * Get or load the price construction database
+ * Get or load the price construction database (async, cached)
  */
-function getDatabase(): PriceWorkItem[] {
+async function getDatabase(): Promise<PriceWorkItem[]> {
   if (!PRICE_CONSTRUCTION_DB) {
-    PRICE_CONSTRUCTION_DB = getPriceMatcherDatabase();
+    PRICE_CONSTRUCTION_DB = await getPriceMatcherDatabase();
   }
   return PRICE_CONSTRUCTION_DB;
 }
@@ -900,9 +900,9 @@ function scoreMatch(article: WbsArticle, item: PriceWorkItem): ScoredMatch {
  * Match a single WBS article against the PRICE database.
  * Returns the best match or null.
  */
-function matchArticle(article: WbsArticle): ScoredMatch | null {
+async function matchArticle(article: WbsArticle): Promise<ScoredMatch | null> {
   let best: ScoredMatch | null = null;
-  const database = getDatabase();
+  const database = await getDatabase();
 
   for (const item of database) {
     const scored = scoreMatch(article, item);
@@ -922,7 +922,7 @@ function matchArticle(article: WbsArticle): ScoredMatch | null {
  * Match all WBS articles in a project against the PRICE database.
  * Returns a full report with matches, unmatched items, and statistics.
  */
-export function matchWbsToPrice(project: WbsProject): MatchReport {
+export async function matchWbsToPrice(project: WbsProject): Promise<MatchReport> {
   const matches: PriceMatch[] = [];
   const unmatched: MatchReport["unmatched"] = [];
   let totalArticles = 0;
@@ -931,7 +931,7 @@ export function matchWbsToPrice(project: WbsProject): MatchReport {
     for (const sub of chapter.subChapters) {
       for (const article of sub.articles) {
         totalArticles++;
-        const result = matchArticle(article);
+        const result = await matchArticle(article);
 
         if (result) {
           const unitConversion = unitsCompatible(article.unit, result.item.unit) ? 1 : 1;
@@ -995,27 +995,26 @@ export function matchWbsToPrice(project: WbsProject): MatchReport {
  * Get the full PRICE construction database for browsing/searching.
  * Data is loaded from scraper output (data/price-full.json).
  */
-export function getPriceDatabase(): PriceWorkItem[] {
+export async function getPriceDatabase(): Promise<PriceWorkItem[]> {
   return getDatabase();
 }
 
 /**
- * Refresh the PRICE database from disk (call after scraping new data)
+ * Refresh the PRICE database (call after scraping new data)
  */
-export function refreshPriceDatabase(): void {
+export async function refreshPriceDatabase(): Promise<void> {
   PRICE_CONSTRUCTION_DB = null; // Clear cache
-  PRICE_CONSTRUCTION_DB = getPriceMatcherDatabase(); // Reload
-  console.log(`✅ PRICE database refreshed: ${PRICE_CONSTRUCTION_DB.length} items`);
+  PRICE_CONSTRUCTION_DB = await getPriceMatcherDatabase(); // Reload
 }
 
 /**
  * Search the PRICE database by text query.
  * Searches dynamically loaded scraper data.
  */
-export function searchPriceDb(query: string, limit = 10): { item: PriceWorkItem; score: number }[] {
+export async function searchPriceDb(query: string, limit = 10): Promise<{ item: PriceWorkItem; score: number }[]> {
   const queryTokens = new Set(tokenize(query));
   const queryNgrams = ngrams(query, 3);
-  const database = getDatabase();
+  const database = await getDatabase();
 
   return database
     .map(item => {

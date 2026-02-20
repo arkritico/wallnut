@@ -489,7 +489,7 @@ export async function runUnifiedPipeline(
       const { matchWbsToPrice } = await import("./price-matcher");
       const { inferMaxWorkers } = await import("./labor-constraints");
 
-      matchReport = matchWbsToPrice(wbsProject);
+      matchReport = await matchWbsToPrice(wbsProject);
 
       // Infer labor constraint from total estimated cost
       const totalCost = matchReport.stats.totalEstimatedCost ?? 0;

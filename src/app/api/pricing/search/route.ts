@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(Math.max(parseInt(limitStr || "10", 10) || 10, 1), 100);
 
     // Perform search on server side (has access to fs)
-    const results = searchPriceDb(query, limit);
+    const results = await searchPriceDb(query, limit);
 
     return NextResponse.json({ results });
   } catch (error) {

@@ -1,24 +1,14 @@
 /**
- * Price Matcher Database Loader
+ * Price Matcher Database Loader (Isomorphic)
  *
- * Dynamically loads price data from scraper output and parametric fallback.
- * Replaces hardcoded 652-item database with live scraped data.
- *
- * Architecture:
- * 1. Load scraped data from JSON (data/price-db.json)
- * 2. Convert to PriceWorkItem format
- * 3. Merge with parametric fallback items
- * 4. Generate patterns from descriptions
- * 5. Cache for performance
+ * Loads price data from scraper output. Works in both Node.js (server)
+ * and browser/Worker contexts:
+ *   - Node.js: reads from filesystem (data/price-db.json)
+ *   - Browser/Worker: fetches from /data/price-db.json (public dir)
  */
 
-import fs from 'fs';
-import path from 'path';
 import type { PriceWorkItem } from './cost-estimation';
 import type { RegulationArea } from './types';
-import { createLogger } from './logger';
-
-const logger = createLogger('price-db-loader');
 
 // ============================================================================
 // TYPES
@@ -63,6 +53,12 @@ interface ScrapedDataFile {
   };
   items: ScrapedPriceItem[];
 }
+
+// ============================================================================
+// RUNTIME DETECTION
+// ============================================================================
+
+const isNode = typeof process !== 'undefined' && !!process.versions?.node;
 
 // ============================================================================
 // CATEGORY TO REGULATION AREA MAPPING
@@ -201,32 +197,38 @@ function generatePatterns(description: string, category: string, code: string): 
 }
 
 // ============================================================================
-// DATA LOADING
+// DATA LOADING (Isomorphic)
 // ============================================================================
 
+let _cachedItems: PriceWorkItem[] | null = null;
+
 /**
- * Load scraped Price data from JSON file
+ * Load scraped Price data — filesystem on Node.js, fetch on browser/Worker
  */
-function loadScrapedData(filePath: string): ScrapedDataFile | null {
+async function loadScrapedData(): Promise<ScrapedDataFile | null> {
   try {
-    const fullPath = path.join(process.cwd(), filePath);
-    if (!fs.existsSync(fullPath)) {
-      logger.warn(`Scraped data file not found: ${filePath}`);
-      return null;
+    if (isNode) {
+      // Server: read from filesystem
+      const fs = await import('fs');
+      const pathMod = await import('path');
+      const fullPath = pathMod.join(process.cwd(), 'data/price-db.json');
+      if (!fs.existsSync(fullPath)) {
+        console.warn('[price-db-loader] data/price-db.json not found');
+        return null;
+      }
+      const jsonData = fs.readFileSync(fullPath, 'utf-8');
+      return JSON.parse(jsonData);
+    } else {
+      // Browser/Worker: fetch from public directory
+      const res = await fetch('/data/price-db.json');
+      if (!res.ok) {
+        console.warn(`[price-db-loader] fetch /data/price-db.json failed: ${res.status}`);
+        return null;
+      }
+      return await res.json();
     }
-
-    const jsonData = fs.readFileSync(fullPath, 'utf-8');
-    const data: ScrapedDataFile = JSON.parse(jsonData);
-
-    logger.info(`Loaded ${data.items.length} items from ${filePath}`, {
-      source: data.metadata.source,
-      version: data.metadata.version,
-      exportDate: data.metadata.exportDate
-    });
-
-    return data;
   } catch (error) {
-    logger.error(`Failed to load scraped data from ${filePath}`, { error });
+    console.warn('[price-db-loader] Failed to load price data:', error);
     return null;
   }
 }
@@ -315,48 +317,43 @@ function convertToWorkItems(item: ScrapedPriceItem): PriceWorkItem[] {
 }
 
 /**
- * Get the full Price database by merging scraped data with parametric fallback
+ * Get already-loaded price data (sync). Returns null if not yet loaded.
+ * Use this from code that cannot be async (e.g. cost-estimation fallback).
  */
-export function getPriceMatcherDatabase(): PriceWorkItem[] {
-  // Try to load scraped data
-  const scrapedData = loadScrapedData('data/price-db.json');
+export function getCachedPriceDatabase(): PriceWorkItem[] | null {
+  return _cachedItems;
+}
+
+/**
+ * Get the full Price database (async, cached after first load)
+ */
+export async function getPriceMatcherDatabase(): Promise<PriceWorkItem[]> {
+  if (_cachedItems) return _cachedItems;
+
+  const scrapedData = await loadScrapedData();
 
   if (scrapedData && scrapedData.items.length > 0) {
-    logger.info(`Building matcher database from ${scrapedData.items.length} scraped items`);
-    const workItems = scrapedData.items.flatMap(convertToWorkItems);
-
-    logger.info('Matcher database built successfully', {
-      totalItems: workItems.length,
-      source: 'scraper',
-      hasBreakdowns: workItems.filter(i => i.breakdown.materials > 0 || i.breakdown.labor > 0).length
-    });
-
-    return workItems;
+    _cachedItems = scrapedData.items.flatMap(convertToWorkItems);
+    return _cachedItems;
   }
 
-  // Fallback to empty array if no scraped data
-  // In production, you might want to load from parametric engine here
-  logger.warn('No scraped data available, returning empty database');
-  logger.warn('Run Price scraper to populate data/price-db.json');
-
+  console.warn('[price-db-loader] No scraped data available, returning empty database');
   return [];
 }
 
 /**
  * Refresh the matcher database (call after scraping)
  */
-export function refreshMatcherDatabase(): PriceWorkItem[] {
-  logger.info('Refreshing matcher database...');
-  const db = getPriceMatcherDatabase();
-  logger.info(`Database refreshed with ${db.length} items`);
-  return db;
+export async function refreshMatcherDatabase(): Promise<PriceWorkItem[]> {
+  _cachedItems = null;
+  return getPriceMatcherDatabase();
 }
 
 /**
  * Get database statistics
  */
-export function getDatabaseStats() {
-  const db = getPriceMatcherDatabase();
+export async function getDatabaseStats() {
+  const db = await getPriceMatcherDatabase();
 
   const byArea = new Map<RegulationArea, number>();
   const byChapter = new Map<string, number>();

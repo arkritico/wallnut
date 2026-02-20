@@ -702,16 +702,14 @@ function getCostDatabase(): PriceWorkItem[] {
 
   const curatedCodes = new Set(CURATED_ITEMS.map(i => i.code));
 
-  // Lazy require to keep fs/winston out of client bundle
+  // Use pre-loaded price data if available (cached by price-matcher in pipeline)
   let fullDb: PriceWorkItem[] = [];
-  if (typeof window === "undefined") {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { getPriceMatcherDatabase } = require("./price-db-loader") as { getPriceMatcherDatabase: () => PriceWorkItem[] };
-      fullDb = getPriceMatcherDatabase();
-    } catch {
-      // Client-side or module unavailable — use curated items only
-    }
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getCachedPriceDatabase } = require("./price-db-loader") as { getCachedPriceDatabase: () => PriceWorkItem[] | null };
+    fullDb = getCachedPriceDatabase() ?? [];
+  } catch {
+    // Module unavailable — use curated items only
   }
 
   // Full DB items that don't overlap with curated items

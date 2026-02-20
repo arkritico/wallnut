@@ -7,17 +7,21 @@
  * the unified pipeline to produce Budget Excel, MS Project XML,
  * and Compliance Excel outputs.
  *
- * Follows PipelineUpload.tsx patterns — Tailwind, lucide icons, useI18n().
+ * Features:
+ * - Pre-warmed Pipeline Worker with price database prefetch
+ * - Result caching (IndexedDB) — same files = instant results
+ * - Cancel button for in-flight processing
+ * - Elapsed timer + granular stage progress
+ * - File deduplication
+ * - Graceful worker crash recovery
  */
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useI18n } from "@/lib/i18n";
 import type { UnifiedPipelineResult, UnifiedStage } from "@/lib/unified-pipeline";
 import type { BuildingProject } from "@/lib/types";
-import type { JobStatus } from "@/lib/job-store";
-import type { SpecialtyAnalysisResult } from "@/lib/ifc-specialty-analyzer";
 import type { ClientIfcProgress } from "@/lib/client-ifc-parser";
-import type { UploadProgress } from "@/lib/pipeline-file-upload";
+import type { ClientPipelineHandle } from "@/lib/client-pipeline";
 import {
   Upload,
   Loader2,
@@ -32,6 +36,7 @@ import {
   FileSpreadsheet,
   Download,
   Box,
+  Zap,
 } from "lucide-react";
 
 // ============================================================
@@ -105,15 +110,27 @@ export default function UnifiedUpload({
   } | null>(null);
   const [result, setResult] = useState<UnifiedPipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ifcBytesRef = useRef<{ data: Uint8Array; name: string } | null>(null);
   const [ifcParsingProgress, setIfcParsingProgress] = useState<ClientIfcProgress | null>(null);
-  const [storageUploadProgress, setStorageUploadProgress] = useState<UploadProgress | null>(null);
 
   // Output toggles
   const [includeCosts, setIncludeCosts] = useState(true);
   const [includeSchedule, setIncludeSchedule] = useState(true);
   const [includeCompliance, setIncludeCompliance] = useState(true);
+
+  // New: dedup warning
+  const [dedupWarning, setDedupWarning] = useState<string | null>(null);
+
+  // New: cached result indicator
+  const [isCachedResult, setIsCachedResult] = useState(false);
+
+  // New: elapsed timer
+  const [elapsedMs, setElapsedMs] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startTimeRef = useRef(0);
+
+  // New: pre-warmed pipeline handle
+  const pipelineRef = useRef<ClientPipelineHandle | null>(null);
 
   const stageLabels = lang === "pt" ? STAGE_LABELS_PT : STAGE_LABELS_EN;
 
@@ -136,6 +153,7 @@ export default function UnifiedUpload({
     viewResults: lang === "pt" ? "Ver Resultados" : "View Results",
     retry: lang === "pt" ? "Tentar Novamente" : "Try Again",
     cancel: lang === "pt" ? "Cancelar" : "Cancel",
+    cancelProcessing: lang === "pt" ? "Cancelar processamento" : "Cancel processing",
     success: lang === "pt" ? "Pipeline concluída com sucesso" : "Pipeline completed successfully",
     downloadBudget: lang === "pt" ? "Descarregar Orçamento" : "Download Budget",
     downloadSchedule: lang === "pt" ? "Descarregar Cronograma" : "Download Schedule",
@@ -147,7 +165,38 @@ export default function UnifiedUpload({
     workforce: lang === "pt" ? "Equipa máx." : "Max. workforce",
     workers: lang === "pt" ? "trabalhadores" : "workers",
     noFiles: lang === "pt" ? "Adicione pelo menos 1 ficheiro" : "Add at least 1 file",
+    cachedResult: lang === "pt" ? "Resultado em cache (instantâneo)" : "Cached result (instant)",
+    crashHint: lang === "pt"
+      ? "O processamento falhou — tente remover ficheiros grandes."
+      : "Processing failed — try removing large files.",
   };
+
+  // ── Pre-warm pipeline worker + prefetch price DB ──────────
+
+  useEffect(() => {
+    let cancelled = false;
+
+    import("@/lib/client-pipeline").then(({ createClientPipeline }) => {
+      if (cancelled) return;
+      const handle = createClientPipeline();
+      handle.prefetch();
+      pipelineRef.current = handle;
+    });
+
+    return () => {
+      cancelled = true;
+      pipelineRef.current?.terminate();
+      pipelineRef.current = null;
+    };
+  }, []);
+
+  // ── Timer cleanup on unmount ──────────────────────────────
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
   // ── File handling ─────────────────────────────────────────
 
@@ -155,15 +204,39 @@ export default function UnifiedUpload({
 
   const addFiles = useCallback((newFiles: FileList | File[]) => {
     const accepted: File[] = [];
-    for (const f of Array.from(newFiles)) {
-      const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
-      if (ACCEPTED_EXTENSIONS.has(ext)) {
-        accepted.push(f);
+    const skipped: string[] = [];
+
+    setFiles((prev) => {
+      for (const f of Array.from(newFiles)) {
+        const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
+        if (!ACCEPTED_EXTENSIONS.has(ext)) continue;
+
+        // Dedup: same name + same size = duplicate
+        const isDuplicate = prev.some(
+          (existing) => existing.name === f.name && existing.size === f.size,
+        ) || accepted.some(
+          (existing) => existing.name === f.name && existing.size === f.size,
+        );
+
+        if (isDuplicate) {
+          skipped.push(f.name);
+        } else {
+          accepted.push(f);
+        }
       }
+
+      return accepted.length > 0 ? [...prev, ...accepted] : prev;
+    });
+
+    if (skipped.length > 0) {
+      const msg = lang === "pt"
+        ? `Ficheiro(s) duplicado(s) ignorado(s): ${skipped.join(", ")}`
+        : `Duplicate file(s) skipped: ${skipped.join(", ")}`;
+      setDedupWarning(msg);
+      setTimeout(() => setDedupWarning(null), 4000);
     }
-    setFiles((prev) => [...prev, ...accepted]);
     setError(null);
-  }, []);
+  }, [lang]);
 
   function removeFile(index: number) {
     setFiles((prev) => prev.filter((_, i) => i !== index));
@@ -181,56 +254,24 @@ export default function UnifiedUpload({
     }
   }
 
-  // ── Cleanup polling on unmount ──────────────────────────
+  // ── Timer helpers ─────────────────────────────────────────
 
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
+  function startTimer() {
+    startTimeRef.current = performance.now();
+    setElapsedMs(0);
+    timerRef.current = setInterval(() => {
+      setElapsedMs(performance.now() - startTimeRef.current);
+    }, 100);
+  }
 
-  // ── Process ───────────────────────────────────────────────
-
-  function stopPolling() {
-    if (pollRef.current) {
-      clearInterval(pollRef.current);
-      pollRef.current = null;
+  function stopTimer() {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     }
   }
 
-  function base64ToArrayBuffer(b64: string): ArrayBuffer {
-    const binary = atob(b64);
-    const buf = new ArrayBuffer(binary.length);
-    const view = new Uint8Array(buf);
-    for (let i = 0; i < binary.length; i++) view[i] = binary.charCodeAt(i);
-    return buf;
-  }
-
-  function deserializeResult(json: Record<string, unknown>): UnifiedPipelineResult {
-    return {
-      project: json.project,
-      wbsProject: json.wbsProject,
-      analysis: json.analysis,
-      matchReport: json.matchReport,
-      schedule: json.schedule,
-      laborConstraint: json.laborConstraint,
-      resources: json.resources,
-      generatedBoq: json.generatedBoq,
-      cashFlow: json.cashFlow,
-      budgetExcel: json.budgetExcelBase64
-        ? base64ToArrayBuffer(json.budgetExcelBase64 as string)
-        : undefined,
-      msProjectXml: json.msProjectXml as string | undefined,
-      ccpmGanttExcel: json.ccpmGanttExcelBase64
-        ? base64ToArrayBuffer(json.ccpmGanttExcelBase64 as string)
-        : undefined,
-      complianceExcel: json.complianceExcelBase64
-        ? base64ToArrayBuffer(json.complianceExcelBase64 as string)
-        : undefined,
-      warnings: (json.warnings as string[]) ?? [],
-      processingTimeMs: (json.processingTimeMs as number) ?? 0,
-    } as UnifiedPipelineResult;
-  }
+  // ── Process ───────────────────────────────────────────────
 
   const handleProcess = useCallback(async () => {
     if (files.length === 0) return;
@@ -240,188 +281,118 @@ export default function UnifiedUpload({
     setProgress(null);
     setResult(null);
     setIfcParsingProgress(null);
-    setStorageUploadProgress(null);
+    setIsCachedResult(false);
+    startTimer();
 
     try {
-      // 1. Separate IFC files from non-IFC files
-      const ifcFiles = files.filter((f) => f.name.toLowerCase().endsWith(".ifc"));
-      const nonIfcFiles = files.filter((f) => !f.name.toLowerCase().endsWith(".ifc"));
+      // Check cache first
+      const { computeFingerprint, getCachedResult } = await import("@/lib/pipeline-cache");
+      const fingerprint = await computeFingerprint(files, {
+        includeCosts, includeSchedule, includeCompliance,
+      });
+      const cached = await getCachedResult(fingerprint);
 
-      // 2. Parse IFC files client-side (avoids Vercel 4.5 MB body limit)
-      let ifcAnalyses: SpecialtyAnalysisResult[] | undefined;
+      if (cached) {
+        // Re-read IFC bytes from File objects (not cached — too large)
+        const firstIfc = files.find((f) => f.name.toLowerCase().endsWith(".ifc"));
+        if (firstIfc) {
+          const rawBuffer = await firstIfc.arrayBuffer();
+          cached.ifcFileData = new Uint8Array(rawBuffer);
+          cached.ifcFileName = firstIfc.name;
+        }
+        setResult(cached);
+        setIsCachedResult(true);
+        return;
+      }
 
-      if (ifcFiles.length > 0) {
-        const { parseIfcFilesClient } = await import("@/lib/client-ifc-parser");
+      // Use pre-warmed pipeline handle (or create on-demand)
+      let handle = pipelineRef.current;
+      if (!handle) {
+        const { createClientPipeline } = await import("@/lib/client-pipeline");
+        handle = createClientPipeline();
+        handle.prefetch();
+        pipelineRef.current = handle;
+      }
 
-        // Preserve raw IFC bytes for 4D viewer
-        const firstIfc = ifcFiles[0];
+      // Preserve raw IFC bytes for 4D viewer
+      const firstIfc = files.find((f) => f.name.toLowerCase().endsWith(".ifc"));
+      if (firstIfc) {
         const rawBuffer = await firstIfc.arrayBuffer();
         ifcBytesRef.current = { data: new Uint8Array(rawBuffer), name: firstIfc.name };
-
-        const clientResult = await parseIfcFilesClient(ifcFiles, (p) => {
-          setIfcParsingProgress(p);
-        });
-
-        setIfcParsingProgress(null);
-
-        if (clientResult.errors.length > 0) {
-          for (const err of clientResult.errors) {
-            console.warn(`IFC parse failed for ${err.fileName}: ${err.error}`);
-          }
-        }
-
-        if (clientResult.analyses.length > 0) {
-          ifcAnalyses = clientResult.analyses;
-        } else if (ifcFiles.length > 0) {
-          // All IFC files failed client-side parsing
-          const totalIfcSize = ifcFiles.reduce((sum, f) => sum + f.size, 0);
-          if (totalIfcSize > 4 * 1024 * 1024) {
-            throw new Error(
-              lang === "pt"
-                ? "Análise IFC falhou no browser e o ficheiro é demasiado grande para enviar ao servidor."
-                : "Browser IFC analysis failed and the file is too large to upload to server.",
-            );
-          }
-          // Small enough to fall back to server-side parsing
-        }
       }
 
-      // 3. Upload large non-IFC files to Supabase Storage (avoids Vercel 4.5 MB body limit)
-      const { uploadLargeFilesToStorage, LARGE_FILE_THRESHOLD } = await import("@/lib/pipeline-file-upload");
-
-      // Files to upload: non-IFC files + (IFC files that failed client parse and are small)
-      const filesToUpload = [...nonIfcFiles];
-      if (ifcFiles.length > 0 && !ifcAnalyses) {
-        // IFC parse failed — include small IFC files for server fallback
-        for (const file of ifcFiles) {
-          filesToUpload.push(file);
-        }
-      }
-
-      const uploadResult = await uploadLargeFilesToStorage(filesToUpload, (p) => {
-        setStorageUploadProgress(p);
-      });
-
-      setStorageUploadProgress(null);
-
-      if (uploadResult.errors.length > 0) {
-        const failedNames = uploadResult.errors.map((e) => e.fileName).join(", ");
-        console.warn("Storage upload errors:", uploadResult.errors);
-        throw new Error(
-          lang === "pt"
-            ? `Erro ao carregar ficheiros grandes: ${failedNames}. Tente novamente.`
-            : `Error uploading large files: ${failedNames}. Please try again.`,
-        );
-      }
-
-      // 4. Build FormData — only small files go as binary, large files via storage paths
-      const formData = new FormData();
-      for (const file of uploadResult.smallFiles) {
-        formData.append("files", file);
-      }
-
-      // Attach storage paths for large files
-      if (uploadResult.storagePaths.length > 0) {
-        formData.append("storagePaths", JSON.stringify(uploadResult.storagePaths));
-
-        // Log for debugging
-        const totalStorageSize = uploadResult.storagePaths.reduce((sum, p) => sum + p.fileSize, 0);
-        console.log(
-          `Uploaded ${uploadResult.storagePaths.length} large file(s) to Storage ` +
-          `(${(totalStorageSize / 1024 / 1024).toFixed(1)} MB total). ` +
-          `${uploadResult.smallFiles.length} small file(s) via FormData.`
-        );
-      }
-
-      formData.append("options", JSON.stringify({
+      const pipelineResult = await handle.run(files, {
         includeCosts,
         includeSchedule,
         includeCompliance,
-      }));
+        existingProject,
+        onProgress: (p) => {
+          if (p.phase === "ifc_parse" && p.ifcProgress) {
+            setIfcParsingProgress(p.ifcProgress);
+          } else if (p.phase === "pipeline" && p.pipelineProgress) {
+            setIfcParsingProgress(null);
+            setProgress(p.pipelineProgress);
+          }
+        },
+      });
 
-      // 5. Attach pre-parsed IFC analyses as JSON
-      if (ifcAnalyses) {
-        formData.append("ifcAnalyses", JSON.stringify(ifcAnalyses));
+      // Attach raw IFC bytes for 4D viewer
+      if (ifcBytesRef.current) {
+        pipelineResult.ifcFileData = ifcBytesRef.current.data;
+        pipelineResult.ifcFileName = ifcBytesRef.current.name;
       }
 
-      // 6. Submit job
-      const response = await fetch("/api/pipeline", { method: "POST", body: formData });
-      const json = await response.json();
+      setResult(pipelineResult);
 
-      if (!response.ok) {
-        throw new Error(json.error ?? `HTTP ${response.status}`);
-      }
-
-      const jobId = json.jobId as string;
-
-      // 6. Poll for progress
-      pollRef.current = setInterval(async () => {
-        try {
-          const pollRes = await fetch(`/api/pipeline/${jobId}`);
-          if (!pollRes.ok) return;
-
-          const job = await pollRes.json();
-          const status = job.status as JobStatus;
-
-          // Update progress display
-          if (job.stage) {
-            setProgress({
-              stage: job.stage as UnifiedStage,
-              percent: job.progress ?? 0,
-              message:
-                job.stageProgress?.[job.stage]?.message ??
-                (lang === "pt" ? "A processar..." : "Processing..."),
-              stagesCompleted: job.stagesCompleted ?? [],
-            });
-          }
-
-          if (status === "completed" && job.result) {
-            stopPolling();
-            const pipelineResult = deserializeResult(job.result);
-            // Attach raw IFC bytes for 4D viewer (client-side only)
-            if (ifcBytesRef.current) {
-              pipelineResult.ifcFileData = ifcBytesRef.current.data;
-              pipelineResult.ifcFileName = ifcBytesRef.current.name;
-            }
-            setResult(pipelineResult);
-            setIsProcessing(false);
-          } else if (status === "failed") {
-            stopPolling();
-            setError(
-              job.error ??
-                (lang === "pt"
-                  ? "Erro ao processar os ficheiros."
-                  : "Error processing files."),
-            );
-            setIsProcessing(false);
-          }
-        } catch {
-          // Silently retry on network blips
-        }
-      }, 1500);
+      // Cache result (without large IFC bytes)
+      const { cacheResult } = await import("@/lib/pipeline-cache");
+      const summary = files.map((f) => f.name).join(", ");
+      cacheResult(fingerprint, pipelineResult, summary).catch(() => {
+        // Cache failure is non-fatal
+      });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : lang === "pt"
-            ? "Erro ao processar os ficheiros."
-            : "Error processing files.",
-      );
+      // Don't show error for user-initiated cancel
+      const msg = err instanceof Error ? err.message : String(err);
+      if (msg !== "Pipeline cancelled") {
+        setError(
+          err instanceof Error
+            ? err.message
+            : lang === "pt"
+              ? "Erro ao processar os ficheiros."
+              : "Error processing files.",
+        );
+      }
+    } finally {
       setIsProcessing(false);
       setIfcParsingProgress(null);
+      stopTimer();
     }
-  }, [files, includeCosts, includeSchedule, includeCompliance, lang]);
+  }, [files, includeCosts, includeSchedule, includeCompliance, existingProject, lang]);
+
+  // ── Cancel ────────────────────────────────────────────────
+
+  const handleCancel = useCallback(() => {
+    pipelineRef.current?.cancel();
+    setIsProcessing(false);
+    setProgress(null);
+    setIfcParsingProgress(null);
+    stopTimer();
+  }, []);
+
+  // ── Reset ─────────────────────────────────────────────────
 
   function handleReset() {
-    stopPolling();
     setIsProcessing(false);
     setProgress(null);
     setResult(null);
     setError(null);
     setFiles([]);
     setIfcParsingProgress(null);
-    setStorageUploadProgress(null);
+    setIsCachedResult(false);
+    setElapsedMs(0);
+    setDedupWarning(null);
     ifcBytesRef.current = null;
+    stopTimer();
   }
 
   // ── Download helpers ──────────────────────────────────────
@@ -490,15 +461,6 @@ export default function UnifiedUpload({
                         ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
                         : `${(file.size / 1024).toFixed(0)} KB`}
                     </span>
-                    {file.size > 4 * 1024 * 1024 && (
-                      <span className="text-xs text-amber-500" title={
-                        lang === "pt"
-                          ? "Será carregado via armazenamento cloud"
-                          : "Will be uploaded via cloud storage"
-                      }>
-                        {lang === "pt" ? "via storage" : "via storage"}
-                      </span>
-                    )}
                   </div>
                   <button
                     onClick={(e) => {
@@ -512,6 +474,14 @@ export default function UnifiedUpload({
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Dedup warning */}
+        {dedupWarning && (
+          <div className="p-2 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700 flex items-center gap-2">
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+            {dedupWarning}
           </div>
         )}
 
@@ -553,9 +523,14 @@ export default function UnifiedUpload({
 
         {/* Error */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2">
-            <XCircle className="w-4 h-4 flex-shrink-0" />
-            {error}
+          <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 space-y-1">
+            <div className="flex items-center gap-2">
+              <XCircle className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+            {error.includes("crashed") && (
+              <p className="text-xs text-red-500">{txt.crashHint}</p>
+            )}
           </div>
         )}
 
@@ -621,31 +596,16 @@ export default function UnifiedUpload({
           </div>
         )}
 
-        {storageUploadProgress && (
-          <div className="p-3 bg-blue-900/30 border border-blue-500/30 rounded-lg">
-            <div className="flex items-center gap-2 text-sm text-blue-300">
-              <Upload className="w-4 h-4 animate-pulse" />
-              <span className="font-medium">
-                {storageUploadProgress.fileName}
-              </span>
-            </div>
-            <div className="text-xs text-blue-400 mt-1">
-              {storageUploadProgress.phase === "uploading"
-                ? (lang === "pt" ? "A carregar ficheiro grande para armazenamento..." : "Uploading large file to storage...")
-                : storageUploadProgress.phase === "done"
-                  ? (lang === "pt" ? "Carregado com sucesso" : "Uploaded successfully")
-                  : (lang === "pt" ? "Erro no carregamento" : "Upload error")}
-              {storageUploadProgress.totalFiles > 1 &&
-                ` (${storageUploadProgress.fileIndex + 1}/${storageUploadProgress.totalFiles})`}
-            </div>
-          </div>
-        )}
-
-        {/* Progress bar */}
+        {/* Progress bar with elapsed timer */}
         <div>
           <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
             <span>{progress ? stageLabels[progress.stage] : txt.processing}</span>
-            <span>{progress?.percent ?? 0}%</span>
+            <span className="flex items-center gap-2">
+              <span className="text-gray-400">
+                {(elapsedMs / 1000).toFixed(1)}s
+              </span>
+              <span>{progress?.percent ?? 0}%</span>
+            </span>
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -699,6 +659,15 @@ export default function UnifiedUpload({
             );
           })}
         </div>
+
+        {/* Cancel button */}
+        <button
+          onClick={handleCancel}
+          className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 font-medium rounded-xl border border-red-200 hover:bg-red-100 transition-colors"
+        >
+          <XCircle className="w-4 h-4" />
+          {txt.cancelProcessing}
+        </button>
       </div>
     );
   }
@@ -721,13 +690,19 @@ export default function UnifiedUpload({
         {/* Success header */}
         <div className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-200">
           <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
-          <div>
+          <div className="flex-1">
             <p className="font-semibold text-green-800">{txt.success}</p>
             <p className="text-xs text-green-600 flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {txt.processingTime}: {(result.processingTimeMs / 1000).toFixed(1)}s
             </p>
           </div>
+          {isCachedResult && (
+            <span className="inline-flex items-center gap-1 text-xs text-blue-600 bg-blue-50 rounded-full px-2.5 py-1 border border-blue-200">
+              <Zap className="w-3 h-3" />
+              {txt.cachedResult}
+            </span>
+          )}
         </div>
 
         {/* Key metrics */}

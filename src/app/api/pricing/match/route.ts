@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Perform matching on server side (has access to fs)
-    const matchReport: MatchReport = matchWbsToPrice(wbsProject);
+    const matchReport: MatchReport = await matchWbsToPrice(wbsProject);
 
     return NextResponse.json(matchReport);
   } catch (error) {
