@@ -14650,6 +14650,1434 @@
           "value": 50
         }
       ]
+    },
+    {
+      "id": "REH-AQS-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 11.º — Sistema Solar Térmico Obrigatório (Esolar)",
+      "description": "O edifício não dispõe de sistema solar térmico ou sistema equivalente para preparação de águas quentes sanitárias (AQS). O REH exige uma contribuição de energia renovável para AQS (Esolar) em edifícios novos e grandes reabilitações, preferencialmente através de colectores solares térmicos.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.hasSolarThermal",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Instalar sistema solar térmico para preparação de AQS. A base de cálculo é 1.0 m2 de colector por ocupante convencional. Alternativas equivalentes: bomba de calor dedicada para AQS com COP >= 2.5, sistema fotovoltaico com termoacumulador eléctrico (potência equivalente), caldeira a biomassa. A contribuição Esolar deve cumprir o mínimo regulamentar.",
+      "currentValueTemplate": "Sistema solar térmico: {energy.hasSolarThermal}",
+      "requiredValue": "Sistema solar térmico ou equivalente obrigatório para AQS (1.0 m2 colector/ocupante)",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "solar térmico",
+        "energia renovável",
+        "Esolar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-AQS-COLLECTOR-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 11.º — Área Mínima de Colectores Solares",
+      "description": "A área de colectores solares térmicos instalada ({energy.solarCollectorArea} m2) é inferior ao mínimo regulamentar de 1.0 m2 por ocupante convencional. Para {energy.conventionalOccupants} ocupantes, a área mínima é {energy.conventionalOccupants} m2.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hasSolarThermal",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.solarCollectorArea",
+          "operator": "<",
+          "value": 1
+        }
+      ],
+      "remediation": "Aumentar a área de colectores solares térmicos para cumprir o mínimo de 1.0 m2 por ocupante convencional. O número de ocupantes convencionais é definido pelo REH como: T0 = 2, T1 = 2, T2 = 3, T3 = 4, T4 = 5, Tn = n+1 ocupantes. A orientação ideal dos colectores é Sul, com inclinação entre latitude-5 e latitude+5 graus.",
+      "currentValueTemplate": "Área colectores = {energy.solarCollectorArea} m2",
+      "requiredValue": ">= 1.0 m2 por ocupante convencional",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "solar térmico",
+        "colectores",
+        "área",
+        "Esolar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-AQS-HEATPUMP-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 11.º — Bomba de Calor AQS (COP mínimo)",
+      "description": "O COP da bomba de calor para AQS ({energy.dhwHeatPumpCOP}) é inferior ao mínimo de 2.5. A bomba de calor só é considerada como alternativa válida ao solar térmico se o COP for >= 2.5 (condições de referência conforme EN 16147).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.dhwHeatPumpCOP",
+          "operator": "<",
+          "value": 2.5
+        },
+        {
+          "field": "energy.hasSolarThermal",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "remediation": "Substituir a bomba de calor por um modelo com COP >= 2.5 nas condições de referência (EN 16147), ou instalar sistema solar térmico. Bombas de calor aerotérmicas com COP >= 2.5 são aceites como alternativa ao solar térmico. O COP deve ser certificado pelo fabricante nas condições nominais (A7/W55 ou A20/W55 conforme o tipo).",
+      "currentValueTemplate": "COP bomba de calor AQS = {energy.dhwHeatPumpCOP}",
+      "requiredValue": "COP >= 2.5 (condições de referência EN 16147)",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "bomba de calor",
+        "COP",
+        "alternativa solar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-AQS-LEGIONELLA-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 11.º — Temperatura Acumulação AQS (Anti-Legionella)",
+      "description": "A temperatura de acumulação de AQS ({energy.dhwStorageTemperature} C) é inferior a 60 C. Para prevenção da Legionella, a temperatura no depósito de AQS deve ser mantida a >= 60 C. A bactéria Legionella pneumophila prolifera entre 20 C e 50 C e é eliminada acima de 60 C.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.dhwStorageTemperature",
+          "operator": "<",
+          "value": 60
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Aumentar a temperatura de acumulação de AQS para >= 60 C no depósito. O termostato do acumulador deve ser regulado para 60-65 C. Em sistemas solares térmicos, garantir que o apoio (resistência eléctrica, caldeira) mantém 60 C quando a energia solar é insuficiente. Efectuar ciclos de aquecimento a 70 C semanalmente para desinfecção térmica. A distribuição deve garantir >= 50 C no ponto mais afastado.",
+      "currentValueTemplate": "Temperatura acumulação = {energy.dhwStorageTemperature} C",
+      "requiredValue": ">= 60 C (prevenção Legionella)",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "Legionella",
+        "temperatura",
+        "acumulação",
+        "saúde"
+      ]
+    },
+    {
+      "id": "REH-NIC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 3.º — Necessidades de Aquecimento (Nic ≤ Ni)",
+      "description": "As necessidades nominais de energia útil para aquecimento Nic ({energy.heatingNeeds} kWh/(m2.ano)) excedem o valor limite Ni ({energy.heatingNeedsLimit} kWh/(m2.ano)). A verificação Nic <= Ni é obrigatória para conformidade regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.heatingNeeds",
+          "operator": "formula_gt",
+          "value": "energy.heatingNeedsLimit"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Reduzir as necessidades de aquecimento (Nic). Medidas: reforçar o isolamento térmico da envolvente (paredes, cobertura, pavimentos, envidraçados), corrigir pontes térmicas, melhorar a estanquidade ao ar, optimizar os ganhos solares de inverno (envidraçados a sul sem sombreamento excessivo), instalar sistema de ventilação com recuperação de calor.",
+      "currentValueTemplate": "Nic = {energy.heatingNeeds} kWh/(m2.ano)",
+      "requiredValue": "<= Ni = {energy.heatingNeedsLimit} kWh/(m2.ano) (Nic/Ni <= 1.0)",
+      "enabled": true,
+      "tags": [
+        "necessidades energéticas",
+        "aquecimento",
+        "Nic",
+        "Ni",
+        "verificação regulamentar"
+      ]
+    },
+    {
+      "id": "REH-NVC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 4.º — Necessidades de Arrefecimento (Nvc ≤ Nv)",
+      "description": "As necessidades nominais de energia útil para arrefecimento Nvc ({energy.coolingNeeds} kWh/(m2.ano)) excedem o valor limite Nv ({energy.coolingNeedsLimit} kWh/(m2.ano)). A verificação Nvc <= Nv é obrigatória para conformidade regulamentar.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.coolingNeeds",
+          "operator": "formula_gt",
+          "value": "energy.coolingNeedsLimit"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Reduzir as necessidades de arrefecimento (Nvc). Medidas: instalar protecções solares exteriores eficazes (estores, portadas, palas, vegetação), utilizar vidros de controlo solar, promover ventilação natural nocturna (free-cooling), melhorar a inércia térmica do edifício, utilizar cores claras nas fachadas.",
+      "currentValueTemplate": "Nvc = {energy.coolingNeeds} kWh/(m2.ano)",
+      "requiredValue": "<= Nv = {energy.coolingNeedsLimit} kWh/(m2.ano) (Nvc/Nv <= 1.0)",
+      "enabled": true,
+      "tags": [
+        "necessidades energéticas",
+        "arrefecimento",
+        "Nvc",
+        "Nv",
+        "verificação regulamentar"
+      ]
+    },
+    {
+      "id": "REH-NAQC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 5.º — Necessidades de AQS (Nac)",
+      "description": "As necessidades de energia para preparação de AQS Nac ({energy.dhwNeeds} kWh/(m2.ano)) excedem o valor de referência. O cálculo de Nac considera o consumo de referência de 40 litros/pessoa.dia a 60 C e o contributo do sistema solar (Esolar).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.dhwNeeds",
+          "operator": "formula_gt",
+          "value": "energy.dhwNeedsLimit"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Reduzir as necessidades de energia para AQS. Medidas: aumentar a contribuição solar (mais colectores ou melhor orientação), instalar bomba de calor para AQS (COP >= 2.5), melhorar o isolamento do depósito e tubagens de distribuição, instalar torneiras eficientes (com arejadores), considerar recirculação com temporização.",
+      "currentValueTemplate": "Nac = {energy.dhwNeeds} kWh/(m2.ano)",
+      "requiredValue": "<= Nac_ref = {energy.dhwNeedsLimit} kWh/(m2.ano)",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "necessidades energéticas",
+        "Nac",
+        "solar térmico"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-NTC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 6.º — Necessidades Globais de Energia Primária (Ntc ≤ Nt)",
+      "description": "As necessidades nominais globais de energia primária Ntc ({energy.primaryEnergyNeeds} kWhEP/(m2.ano)) excedem o valor limite Nt ({energy.primaryEnergyLimit} kWhEP/(m2.ano)). A razão Ntc/Nt determina a classe energética do edifício. Ntc/Nt <= 1.0 é necessário para obter a classe energética mínima B-.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.primaryEnergyNeeds",
+          "operator": "formula_gt",
+          "value": "energy.primaryEnergyLimit"
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Reduzir as necessidades globais de energia primária (Ntc). Medidas combinadas: melhorar a envolvente térmica (reduz Nic e Nvc), instalar sistemas de climatização eficientes (bomba de calor, caldeira de condensação), instalar sistema solar térmico para AQS, integrar fontes de energia renovável (fotovoltaico, biomassa). O Ntc combina aquecimento, arrefecimento, AQS e ventilação.",
+      "currentValueTemplate": "Ntc = {energy.primaryEnergyNeeds} kWhEP/(m2.ano)",
+      "requiredValue": "<= Nt = {energy.primaryEnergyLimit} kWhEP/(m2.ano) (Ntc/Nt <= 1.0 para classe B-)",
+      "enabled": true,
+      "tags": [
+        "energia primária",
+        "Ntc",
+        "Nt",
+        "classe energética",
+        "verificação regulamentar"
+      ]
+    },
+    {
+      "id": "REH-CERT-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 3.º — Certificação Energética Obrigatória",
+      "description": "O edifício não possui certificado energético válido. O DL 118/2013 (SCE) exige certificação energética obrigatória para edifícios novos, grandes intervenções de reabilitação, e edifícios existentes aquando da venda ou arrendamento.",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.energyClass",
+          "operator": "==",
+          "value": null
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Obter certificado energético emitido por perito qualificado (PQ) da ADENE. O certificado tem validade de 10 anos e classifica o edifício de A+ (mais eficiente) a F (menos eficiente). É obrigatório para: novos edifícios (licenciamento), grandes reabilitações, venda, arrendamento, e edifícios de serviços com Ap > 1000 m2.",
+      "currentValueTemplate": "Classe energética: {energy.energyClass}",
+      "requiredValue": "Certificado energético obrigatório (DL 118/2013 -- SCE)",
+      "enabled": true,
+      "tags": [
+        "certificação energética",
+        "SCE",
+        "ADENE",
+        "classe energética"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-CLASS-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Anexo I — Classe Energética Mínima B-",
+      "description": "A classe energética do edifício ({energy.energyClass}) não atinge o mínimo regulamentar. Os edifícios novos e grandes reabilitações devem obter, no mínimo, a classe energética B- (correspondente a Ntc/Nt <= 1.0).",
+      "severity": "critical",
+      "conditions": [
+        {
+          "field": "energy.energyClass",
+          "operator": "ordinal_gt",
+          "value": "B-",
+          "scale": [
+            "A+",
+            "A",
+            "B",
+            "B-",
+            "C",
+            "D",
+            "E",
+            "F"
+          ]
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Melhorar o desempenho energético global do edifício para atingir no mínimo a classe B-. A classe depende da razão Ntc/Nt: A+ (<=0.25), A (0.26-0.50), B (0.51-0.75), B- (0.76-1.00), C (1.01-1.50), D (1.51-2.00), E (2.01-2.50), F (>2.50). Medidas: reforçar envolvente, sistemas eficientes, energias renováveis.",
+      "currentValueTemplate": "Classe energética: {energy.energyClass}",
+      "requiredValue": ">= B- (Ntc/Nt <= 1.0) para edifícios novos e grandes reabilitações",
+      "enabled": true,
+      "tags": [
+        "classe energética",
+        "Ntc/Nt",
+        "edifícios novos",
+        "reabilitação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-CLASS-APLUS-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Anexo I — Escala Classe A+ (Ntc/Nt ≤ 0.25)",
+      "description": "O edifício atinge a classe energética A+ ({energy.energyClass}), correspondente a Ntc/Nt <= 0.25. Este é o nível máximo de eficiência energética na escala de certificação.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.energyClassRatio",
+          "operator": "<=",
+          "value": 0.25
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "O edifício já atinge a classe máxima A+. Manter as boas práticas: monitorizar consumos, garantir manutenção dos sistemas de climatização e AQS, verificar periodicamente o estado do isolamento e dos sistemas de energia renovável.",
+      "currentValueTemplate": "Ntc/Nt = {energy.energyClassRatio}",
+      "requiredValue": "A+ corresponde a Ntc/Nt <= 0.25",
+      "enabled": true,
+      "tags": [
+        "classe energética",
+        "A+",
+        "Ntc/Nt",
+        "certificação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "REH-CLASS-A-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Anexo I — Escala Classe A (0.26 ≤ Ntc/Nt ≤ 0.50)",
+      "description": "O edifício atinge a classe energética A ({energy.energyClass}), correspondente a 0.26 <= Ntc/Nt <= 0.50. Este é um nível elevado de eficiência energética.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.energyClassRatio",
+          "operator": ">",
+          "value": 0.25
+        },
+        {
+          "field": "energy.energyClassRatio",
+          "operator": "<=",
+          "value": 0.5
+        }
+      ],
+      "remediation": "O edifício atinge a classe A. Para atingir A+, considerar: aumentar a produção de energia renovável (fotovoltaico), melhorar ainda mais a eficiência dos sistemas de climatização, reforçar o isolamento da envolvente. A diferença entre A e A+ é tipicamente conseguida com mais energia renovável.",
+      "currentValueTemplate": "Ntc/Nt = {energy.energyClassRatio}",
+      "requiredValue": "A corresponde a 0.26 <= Ntc/Nt <= 0.50",
+      "enabled": true,
+      "tags": [
+        "classe energética",
+        "A",
+        "Ntc/Nt",
+        "certificação"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "REH-RENOV-01",
+      "regulationId": "dl-118-2013-sce",
+      "article": "DL 118/2013 Art. 16.º — Contribuição de Energias Renováveis",
+      "description": "O edifício não dispõe de sistemas de aproveitamento de energias renováveis ({energy.hasRenewableSystem} = false). O DL 118/2013 exige a integração de sistemas de energias renováveis em edifícios novos.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hasRenewableSystem",
+          "operator": "==",
+          "value": false
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Instalar sistemas de aproveitamento de energias renováveis. Opções: painéis solares térmicos (AQS), painéis fotovoltaicos (electricidade para autoconsumo), bomba de calor (aerotérmica, geotérmica), caldeira a biomassa. A combinação de solar térmico para AQS e fotovoltaico para autoconsumo é a solução mais comum em edifícios residenciais.",
+      "currentValueTemplate": "Sistema renovável instalado: {energy.hasRenewableSystem}",
+      "requiredValue": "Sistema de energia renovável obrigatório em edifícios novos",
+      "enabled": true,
+      "tags": [
+        "energias renováveis",
+        "solar",
+        "fotovoltaico",
+        "nZEB"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-INERT-FRACA-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 Secção I.6 — Inércia Térmica Fraca (It < 150 kg/m2)",
+      "description": "A classe de inércia térmica do edifício é fraca (It = {energy.thermalInertiaMass} kg/m2 < 150 kg/m2). Inércia fraca penaliza significativamente o desempenho no verão (maior Nvc) e pode originar desconforto térmico por sobreaquecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.thermalInertiaMass",
+          "operator": "<",
+          "value": 150
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Considerar soluções que aumentem a inércia térmica do edifício para classe média (>= 150 kg/m2) ou forte (> 400 kg/m2). Soluções: paredes interiores em alvenaria de tijolo (em vez de gesso cartonado), lajes maciças em betão (expostas sem tecto falso), pavimentos cerâmicos sobre betonilha espessa. Inércia forte reduz Nvc e melhora o conforto térmico de verão.",
+      "currentValueTemplate": "It = {energy.thermalInertiaMass} kg/m2 (classe fraca)",
+      "requiredValue": "Recomendado: It >= 150 kg/m2 (classe média ou forte)",
+      "enabled": true,
+      "tags": [
+        "inércia térmica",
+        "massa térmica",
+        "conforto térmico",
+        "classe fraca"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-INERT-MEDIA-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 Secção I.6 — Inércia Térmica Média (150 ≤ It ≤ 400 kg/m2)",
+      "description": "A classe de inércia térmica do edifício é média (It = {energy.thermalInertiaMass} kg/m2, entre 150 e 400 kg/m2). Inércia média oferece bom compromisso entre conforto térmico e flexibilidade construtiva.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.thermalInertiaMass",
+          "operator": ">=",
+          "value": 150
+        },
+        {
+          "field": "energy.thermalInertiaMass",
+          "operator": "<=",
+          "value": 400
+        }
+      ],
+      "remediation": "A inércia média é adequada para a maioria das situações. Para melhorar ainda mais o conforto de verão, considerar aumentar a inércia para classe forte (> 400 kg/m2) através de lajes maciças expostas, paredes interiores pesadas, e pavimentos com massa significativa.",
+      "currentValueTemplate": "It = {energy.thermalInertiaMass} kg/m2 (classe média)",
+      "requiredValue": "Classe média: 150 <= It <= 400 kg/m2",
+      "enabled": true,
+      "tags": [
+        "inércia térmica",
+        "massa térmica",
+        "classe média"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "REH-INERT-FORTE-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Despacho 15793-K/2013 Secção I.6 — Inércia Térmica Forte (It > 400 kg/m2)",
+      "description": "A classe de inércia térmica do edifício é forte (It = {energy.thermalInertiaMass} kg/m2 > 400 kg/m2). Inércia forte beneficia significativamente o comportamento térmico, reduzindo Nvc e melhorando o conforto térmico.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.thermalInertiaMass",
+          "operator": ">",
+          "value": 400
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "O edifício possui inércia térmica forte, o que é benéfico para o desempenho energético. Manter as massas térmicas expostas (evitar tecto falso sobre laje maciça, manter paredes interiores pesadas) para maximizar o efeito de regulação térmica.",
+      "currentValueTemplate": "It = {energy.thermalInertiaMass} kg/m2 (classe forte)",
+      "requiredValue": "Classe forte: It > 400 kg/m2",
+      "enabled": true,
+      "tags": [
+        "inércia térmica",
+        "massa térmica",
+        "classe forte"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "REH-HEATING-EFF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Tabela I.03 — Eficiência do Sistema de Aquecimento",
+      "description": "A eficiência do sistema de aquecimento ({energy.heatingSystemEfficiency}%) é inferior ao mínimo de referência. Sistemas de aquecimento ineficientes aumentam significativamente o Ntc e penalizam a classe energética.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.heatingSystemEfficiency",
+          "operator": "<",
+          "value": 85
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Substituir o sistema de aquecimento por um mais eficiente. Opções por ordem de eficiência: bomba de calor ar-ar/ar-água (COP 3.0-5.0, equivalente a 300-500%), caldeira de condensação a gás (eficiência 95-107%), caldeira convencional a gás (eficiência 85-92%), aquecimento eléctrico por efeito de Joule (eficiência 100% mas penalizado pelo factor de conversão em energia primária). Os sistemas de referência REH variam por tipo.",
+      "currentValueTemplate": "Eficiência aquecimento = {energy.heatingSystemEfficiency}%",
+      "requiredValue": ">= 85% (referência para caldeira convencional) / COP >= 3.0 (bomba de calor)",
+      "enabled": true,
+      "tags": [
+        "aquecimento",
+        "eficiência",
+        "sistema AVAC",
+        "caldeira",
+        "bomba de calor"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-COOLING-EFF-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Tabela I.03 — Eficiência do Sistema de Arrefecimento",
+      "description": "O EER/SEER do sistema de arrefecimento ({energy.coolingSystemEER}) é inferior ao mínimo de referência de 2.5. Sistemas de arrefecimento com baixo EER aumentam o consumo de energia primária para arrefecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.coolingSystemEER",
+          "operator": "<",
+          "value": 2.5
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Substituir o sistema de arrefecimento por um mais eficiente. O EER (Energy Efficiency Ratio) mede a eficiência em arrefecimento. Opções: bomba de calor reversível classe A ou superior (EER/SEER >= 3.5-5.0), sistema multi-split inverter, sistema VRF. Complementar com medidas passivas: protecção solar, ventilação nocturna, inércia térmica. O REH utiliza EER de referência para o cálculo de Ntc.",
+      "currentValueTemplate": "EER = {energy.coolingSystemEER}",
+      "requiredValue": "EER >= 2.5 (referência REH) / recomendado >= 3.5",
+      "enabled": true,
+      "tags": [
+        "arrefecimento",
+        "EER",
+        "eficiência",
+        "sistema AVAC",
+        "bomba de calor"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-HEATING-HEATPUMP-COP-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Tabela I.03 — COP Mínimo Bomba de Calor Aquecimento",
+      "description": "O COP da bomba de calor para aquecimento ({energy.heatingHeatPumpCOP}) é inferior a 3.0. Para que a bomba de calor seja considerada eficiente no cálculo REH, o COP deve ser >= 3.0 nas condições de referência.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.heatingHeatPumpCOP",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Substituir a bomba de calor por um modelo com COP >= 3.0 nas condições de referência. Bombas de calor ar-água modernas atingem COP de 3.5-5.0. Bombas de calor geotérmicas atingem COP de 4.0-5.5. O COP deve ser certificado conforme EN 14511 (ar-água) ou EN 14825 (SCOP sazonal). COP mais elevado reduz significativamente o Ntc.",
+      "currentValueTemplate": "COP = {energy.heatingHeatPumpCOP}",
+      "requiredValue": "COP >= 3.0 (condições de referência)",
+      "enabled": true,
+      "tags": [
+        "bomba de calor",
+        "COP",
+        "aquecimento",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-FPU-ELEC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Tabela 01 — Factor de Conversão Energia Primária (Electricidade)",
+      "description": "O factor de conversão de energia primária utilizado para a electricidade da rede ({energy.primaryEnergyFactorElectricity}) difere do valor regulamentar de 2.5 kWhEP/kWh. O factor Fpu = 2.5 é obrigatório para converter o consumo eléctrico da rede em energia primária no cálculo de Ntc.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.primaryEnergyFactorElectricity",
+          "operator": "!=",
+          "value": 2.5
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "Corrigir o factor de conversão de energia primária para electricidade da rede. O valor regulamentar é Fpu = 2.5 kWhEP/kWh (Portaria 349-B/2013). Este factor penaliza o aquecimento eléctrico por efeito de Joule (resistências). Para gás natural, Fpu = 1.0 kWhEP/kWh. Para biomassa sólida (pellets, lenha), Fpu = 1.0. Para energia renovável em autoconsumo, Fpu = 0.",
+      "currentValueTemplate": "Fpu (electricidade) = {energy.primaryEnergyFactorElectricity} kWhEP/kWh",
+      "requiredValue": "Fpu = 2.5 kWhEP/kWh (electricidade da rede, Portaria 349-B/2013)",
+      "enabled": true,
+      "tags": [
+        "energia primária",
+        "factor conversão",
+        "Fpu",
+        "electricidade"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-BIOMASS-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 349-B/2013 Art. 11.º — Caldeira a Biomassa como Alternativa Solar",
+      "description": "O edifício utiliza caldeira a biomassa ({energy.hasBiomassBoiler} = true) como fonte de energia renovável. A caldeira a biomassa (pellets, lenha) é aceite como alternativa ao solar térmico para AQS e aquecimento, com factor de energia primária Fpu = 1.0 kWhEP/kWh.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.hasBiomassBoiler",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "remediation": "A caldeira a biomassa é uma solução válida de energia renovável. Verificar: eficiência mínima da caldeira (>= 85% para pellets, >= 75% para lenha), conformidade com norma EN 303-5 (classe 5 para emissões), armazenamento adequado de combustível, chaminé com altura e secção conforme regulamentação. O factor Fpu = 1.0 beneficia significativamente o cálculo de Ntc.",
+      "currentValueTemplate": "Caldeira biomassa: {energy.hasBiomassBoiler}",
+      "requiredValue": "Caldeira biomassa aceite como energia renovável (Fpu = 1.0 kWhEP/kWh)",
+      "enabled": true,
+      "tags": [
+        "biomassa",
+        "caldeira",
+        "pellets",
+        "energia renovável",
+        "alternativa solar"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-15793K-FPU-01",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-K/2013 Tabela I.04 — Fatores de Conversão de Energia Primária",
+      "description": "Os fatores de conversão de energia primária (Fpu) utilizados no cálculo de Ntc devem corresponder aos valores regulamentares: eletricidade = 2.5 kWhEP/kWh, gás natural = 1.0, biomassa = 1.0.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "energy.primaryEnergyNtc",
+          "operator": ">",
+          "value": 100
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "requiredValue": "Fpu eletricidade = 2.5 / gás = 1.0 / biomassa = 1.0 kWhEP/kWh",
+      "remediation": "Verificar que os fatores de conversão de energia primária estão corretos: (1) Eletricidade da rede: Fpu = 2.5 kWhEP/kWh (penalizante — reflete perdas na produção e transporte). (2) Gás natural: Fpu = 1.0 kWhEP/kWh. (3) GPL: Fpu = 1.0 kWhEP/kWh. (4) Biomassa (pellets, lenha): Fpu = 1.0 kWhEP/kWh (fonte renovável). (5) Eletricidade de produção local (PV): Fpu = 2.5 para consumo, abate em Ntc. (6) Solar térmico: sem Fpu (energia diretamente contabilizada como renovável). (7) Estes fatores são críticos para o cálculo de Ntc e a determinação da classe energética.",
+      "enabled": true,
+      "tags": [
+        "Fpu",
+        "energia primária",
+        "conversão",
+        "Ntc"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-15793K-HEATING-SYSTEM-EFF-01",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-K/2013 Tabela I.05 — Eficiência de Referência dos Sistemas de Aquecimento",
+      "description": "A eficiência do sistema de aquecimento ({energy.heatingSystemEfficiency}%) é inferior à eficiência de referência para o tipo de sistema instalado, penalizando o cálculo de Ntc.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.heatingSystemEfficiency",
+          "operator": "<",
+          "value": 89
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Eficiência: {energy.heatingSystemEfficiency}%",
+      "requiredValue": "Referência: caldeira a gás 89%, bomba de calor COP 3.0, resistência elétrica 1.0",
+      "remediation": "Melhorar a eficiência do sistema de aquecimento: (1) Caldeira a gás de condensação: η ≥ 92-98% (vs. referência 89%). (2) Bomba de calor ar-ar: COP ≥ 3.5 (vs. referência COP 3.0). (3) Bomba de calor ar-água: COP ≥ 3.0. (4) Piso radiante com bomba de calor: maximiza COP (água a 35°C). (5) Evitar resistência elétrica como sistema principal (Fpu = 2.5 × 1.0 = 2.5 kWhEP/kWh útil). (6) A eficiência de referência define o limite para Nt — sistemas abaixo da referência aumentam Ntc acima de Nt.",
+      "enabled": true,
+      "tags": [
+        "aquecimento",
+        "eficiência",
+        "sistema",
+        "referência",
+        "Ntc"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "THERM-15793K-COOLING-SYSTEM-EFF-01",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-K/2013 Tabela I.05 — Eficiência de Referência dos Sistemas de Arrefecimento",
+      "description": "A eficiência do sistema de arrefecimento (EER = {energy.coolingSystemEER}) é inferior ao valor de referência de EER 3.0, penalizando o cálculo de necessidades de energia primária para arrefecimento.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.coolingSystemEER",
+          "operator": "<",
+          "value": 3
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "currentValueTemplate": "EER = {energy.coolingSystemEER}",
+      "requiredValue": "Referência: EER ≥ 3.0 para sistemas de arrefecimento",
+      "remediation": "Melhorar a eficiência do sistema de arrefecimento: (1) Bomba de calor ar-ar com EER ≥ 3.5 (classe A ou superior). (2) VRV/VRF: EER sazonal ≥ 4.0-5.0. (3) Chiller com condensação a água: EER ≥ 4.0-5.0. (4) Free-cooling: aproveitamento do ar exterior quando Text < Tint (sem consumo de compressão). (5) Estratégias passivas: sombreamento exterior, ventilação noturna, inércia térmica forte — podem reduzir ou eliminar necessidade de arrefecimento mecânico.",
+      "enabled": true,
+      "tags": [
+        "arrefecimento",
+        "EER",
+        "eficiência",
+        "sistema",
+        "referência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "THERM-15793K-DHW-SYSTEM-EFF-01",
+      "regulationId": "despacho-15793i-2013",
+      "article": "Despacho 15793-K/2013 Tabela I.05 — Eficiência de Referência do Sistema de AQS",
+      "description": "A eficiência do sistema de preparação de águas quentes sanitárias (AQS) é inferior à eficiência de referência, aumentando as necessidades de energia primária para AQS (Nac).",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.dhwSystemEfficiency",
+          "operator": "<",
+          "value": 82
+        },
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "residential",
+            "commercial",
+            "mixed"
+          ]
+        }
+      ],
+      "currentValueTemplate": "Eficiência AQS: {energy.dhwSystemEfficiency}%",
+      "requiredValue": "Referência: esquentador/caldeira 82%, bomba de calor COP 2.5",
+      "remediation": "Melhorar a eficiência do sistema de AQS: (1) Esquentador modulante: η ≥ 85-90%. (2) Caldeira de condensação para AQS: η ≥ 92%. (3) Bomba de calor dedicada para AQS: COP ≥ 2.5-3.5. (4) Solar térmico: contribuição mínima de 1.0 m²/ocupante (obrigatório em edifícios novos). (5) Termoacumulador elétrico: penalizante (Fpu = 2.5, η = 90%) — substituir por bomba de calor ou solar.",
+      "enabled": true,
+      "tags": [
+        "AQS",
+        "eficiência",
+        "sistema",
+        "referência",
+        "Nac"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "THERM-379A-AQS-SOLAR-CALC-01",
+      "regulationId": "portaria-349b-2013-reh",
+      "article": "Portaria 379-A/2015 + DL 118/2013 Art. 27 — Cálculo Solar Térmico (SCE.ER)",
+      "description": "O cálculo da contribuição do sistema solar térmico não foi realizado com a ferramenta SCE.ER (Solar térmico – Cálculos de Eficiência Regulamentar) ou programa equivalente validado.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "energy.hasSolarThermal",
+          "operator": "==",
+          "value": true
+        },
+        {
+          "field": "energy.hasSCEERCalculation",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "requiredValue": "Cálculo SCE.ER obrigatório para validação da contribuição solar",
+      "remediation": "Realizar cálculo SCE.ER para o sistema solar térmico: (1) Utilizar a ferramenta SCE.ER (disponível no portal SCE da ADENE). (2) Dados necessários: localização, orientação e inclinação dos coletores, área de captação, volume do depósito, tipo de coletor (certificação Solar Keymark). (3) O programa calcula: Esolar (contribuição anual de energia solar) e fração solar. (4) Regra: Esolar ≥ Qa × 0.50 (50% das necessidades de AQS cobertas por solar). (5) Se < 50%: justificar (sombreamento, orientação adversa, área de cobertura insuficiente) e compensar com outro renovável.",
+      "enabled": true,
+      "tags": [
+        "solar térmico",
+        "SCE.ER",
+        "cálculo",
+        "AQS",
+        "ADENE"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "THERM-RECS-IEE-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Art. 32.º — IEE Previsto vs. IEE de Referência",
+      "description": "O Indicador de Eficiência Energética previsto (IEEpr = {energy.ieeActual} kWhEP/(m².ano)) excede o IEE de referência (IEEref = {energy.ieeReference}), não cumprindo o requisito RECS. (Nota: verificação de conformidade principal no plugin 'energy' — SCE-IEE-01.)",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.ieeActual",
+          "operator": "formula_gt",
+          "value": "energy.ieeReference"
+        }
+      ],
+      "currentValueTemplate": "IEEpr = {energy.ieeActual} kWhEP/(m².ano)",
+      "requiredValue": "IEEpr ≤ IEEref (IEE de referência por tipologia)",
+      "remediation": "Reduzir o IEE previsto para cumprir o RECS: (1) O IEE agrega: aquecimento + arrefecimento + ventilação + iluminação + AQS + outros. (2) Iluminação (tipicamente 30-40% do IEE em escritórios): LED, controlo por presença/luminosidade, DPIE ≤ 10 W/m². (3) AVAC: bomba de calor eficiente, free-cooling, recuperação de calor. (4) Envolvente: além dos Umáx, minimizar ganhos solares com proteção exterior. (5) Renováveis: PV para autoconsumo — reduz diretamente IEEpr.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "IEE",
+        "energia primária",
+        "referência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-RECS-LIGHTING-DPIE-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Portaria 349-D + EN 12464-1 — Densidade de Potência de Iluminação (DPIE)",
+      "description": "A densidade de potência de iluminação efetiva (DPIE = {energy.lightingPowerDensity} W/m²) excede o valor máximo regulamentar para a tipologia do edifício. (Nota: verificação detalhada por tipologia no plugin 'energy' — SCE-ILUM-01..05.)",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.lightingPowerDensity",
+          "operator": ">",
+          "value": 12
+        }
+      ],
+      "currentValueTemplate": "DPIE = {energy.lightingPowerDensity} W/m²",
+      "requiredValue": "DPIE máximo: escritórios 10 W/m², escolas 12 W/m², comércio 15 W/m², hospitais 15 W/m²",
+      "remediation": "Reduzir a densidade de potência de iluminação: (1) Iluminação LED: eficácia luminosa 100-150 lm/W (vs. 50-80 lm/W fluorescente). (2) Controlo por presença: desligar em zonas desocupadas (redução 20-40%). (3) Aproveitamento de luz natural: controlo por luminosidade (daylight harvesting) — redução 30-60% junto a fachadas. (4) Luminárias eficientes: UGR < 19 para escritórios, refletores otimizados. (5) DPIE = Potência instalada / Área — inclui toda a iluminação interior.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "iluminação",
+        "DPIE",
+        "LED",
+        "eficiência"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-RECS-QAI-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS + Portaria 353-A/2013 — Qualidade do Ar Interior em Edifícios de Serviços",
+      "description": "O edifício de comércio e serviços não dispõe de plano de monitorização da qualidade do ar interior (QAI) conforme Portaria 353-A/2013, obrigatório para edifícios com sistemas de climatização. (Nota: verificação de conformidade principal no plugin 'energy' — SCE-QAI-01.)",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.hasQAIMonitoring",
+          "operator": "not_exists",
+          "value": null
+        }
+      ],
+      "requiredValue": "Monitorização QAI conforme Portaria 353-A: CO₂ ≤ 1250 ppm, PM10 ≤ 50 μg/m³",
+      "remediation": "Implementar monitorização de QAI (Portaria 353-A/2013): (1) Parâmetros: CO₂ (≤ 1250 ppm), PM2.5 (≤ 25 μg/m³), PM10 (≤ 50 μg/m³), formaldeído (≤ 100 μg/m³), COV totais (≤ 600 μg/m³). (2) Frequência: monitorização anual para GES, bienal para PES (Pequeno Edifício de Serviços). (3) Empresa: técnico acreditado pelo IPAC. (4) Pontos de medição: 1 por cada 250 m² ou por cada zona climática distinta. (5) Ações corretivas: aumento de caudal de ar novo, melhoria de filtragem, eliminação de fontes de emissão.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "QAI",
+        "qualidade do ar",
+        "Portaria 353-A",
+        "monitorização"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-RECS-ELEVATOR-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Art. 35.º — Eficiência Energética de Elevadores",
+      "description": "Os elevadores do edifício de serviços não possuem classificação energética (EN ISO 25745) e não incorporam medidas de eficiência obrigatórias pelo RECS.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.hasElevatorEfficiency",
+          "operator": "not_exists",
+          "value": null
+        },
+        {
+          "field": "numberOfFloors",
+          "operator": ">",
+          "value": 3
+        }
+      ],
+      "requiredValue": "Elevadores com classe ≥ B (EN ISO 25745) e modo stand-by",
+      "remediation": "Implementar medidas de eficiência energética em elevadores: (1) Acionamento com VFD (variador de frequência): redução de 30-40% vs. 2 velocidades. (2) Iluminação LED na cabina com desligamento automático. (3) Modo stand-by: desligar iluminação e ventilação após período de inatividade. (4) Regeneração de energia: freio regenerativo que devolve energia à rede (em edifícios altos). (5) Classificação EN ISO 25745: classe A a G, objetivo ≥ B. (6) O consumo de elevadores representa 5-10% do consumo total em edifícios de escritórios.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "elevadores",
+        "eficiência",
+        "EN 25745",
+        "stand-by"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-RECS-HVAC-EFFICIENCY-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Portaria 349-D Art. 8.º — Eficiência Mínima de Sistemas AVAC em Edifícios de Serviços",
+      "description": "Os equipamentos AVAC instalados no edifício de serviços não atingem os valores mínimos de eficiência regulamentar: COP ≥ 2.0 para aquecimento, EER ≥ 2.0 para arrefecimento. (Nota: verificação detalhada por tipo de sistema no plugin 'energy'.)",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.hvacCOP",
+          "operator": "<",
+          "value": 2
+        }
+      ],
+      "currentValueTemplate": "COP do sistema AVAC = {energy.hvacCOP}",
+      "requiredValue": "COP ≥ 2.0 (aquecimento), EER ≥ 2.0 (arrefecimento) — valores mínimos RECS",
+      "remediation": "Atingir eficiência mínima AVAC para RECS: (1) COP mínimo: 2.0 (aquecimento) — qualquer bomba de calor moderna ultrapassa. (2) EER mínimo: 2.0 (arrefecimento) — mesmo splits básicos atingem EER 2.5-3.0. (3) Valores de referência (para Nt): COP 3.0, EER 3.0. (4) Para GES: considerar VRV/VRF (COP sazonal 4.0-5.0) ou chiller eficiente. (5) Sistemas com eficiência abaixo da referência aumentam o IEEpr e pioram a classe energética.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "AVAC",
+        "COP",
+        "EER",
+        "eficiência",
+        "sistemas"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "THERM-RECS-SGCIE-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS + DL 71/2008 (SGCIE) — Consumo Intensivo de Energia",
+      "description": "O edifício de serviços com consumo energético anual superior a 500 tep (toneladas equivalentes de petróleo) é um consumidor intensivo de energia (CIE), sujeito ao SGCIE e a auditorias obrigatórias.",
+      "severity": "info",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.annualEnergyConsumptionTep",
+          "operator": ">",
+          "value": 500
+        }
+      ],
+      "currentValueTemplate": "Consumo anual = {energy.annualEnergyConsumptionTep} tep",
+      "requiredValue": "CIE (> 500 tep): auditoria SGCIE + ARCE + metas de redução",
+      "remediation": "Requisitos para Consumidores Intensivos de Energia (SGCIE): (1) Registo na ADENE como CIE. (2) Auditoria energética obrigatória a cada 6 anos (8 anos para < 1000 tep). (3) Plano de Racionalização (ARCE): metas de redução de consumo específico e intensidade carbónica. (4) Metas: redução de 6% da intensidade energética em 6 anos, 4% da intensidade carbónica. (5) Conversão: 1 tep ≈ 11630 kWh. 500 tep ≈ 5815 MWh/ano.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "SGCIE",
+        "CIE",
+        "auditoria",
+        "consumo intensivo"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        },
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "industrial"
+        }
+      ]
+    },
+    {
+      "id": "REH-RECS-01",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Portaria 349-D — Necessidades Maximas de Aquecimento por m2 em Escritorios",
+      "description": "As necessidades de aquecimento ({energy.officeHeatingDemand} kWh/(m2.ano)) no edificio de escritorios excedem o valor maximo de referencia.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "==",
+          "value": "commercial"
+        },
+        {
+          "field": "energy.officeHeatingDemand",
+          "operator": ">",
+          "value": 25
+        }
+      ],
+      "currentValueTemplate": "Necessidades de aquecimento = {energy.officeHeatingDemand} kWh/(m2.ano)",
+      "requiredValue": "<= 25 kWh/(m2.ano) em I1 / <= 35 em I2 / <= 50 em I3",
+      "remediation": "Reduzir aquecimento em escritorios: (1) U paredes <= 0.40, cobertura <= 0.35, janelas <= 2.0. (2) Ganhos internos 20-30 W/m2. (3) Recuperacao de calor >= 60%. (4) n50 <= 3.0 h-1.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "escritorios",
+        "aquecimento",
+        "necessidades"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-RECS-02",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Portaria 349-D — Necessidades Maximas de Arrefecimento por m2 em Comercio",
+      "description": "As necessidades de arrefecimento ({energy.commercialCoolingDemand} kWh/(m2.ano)) no edificio comercial excedem o valor maximo de referencia.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.commercialCoolingDemand",
+          "operator": ">",
+          "value": 40
+        }
+      ],
+      "currentValueTemplate": "Necessidades de arrefecimento = {energy.commercialCoolingDemand} kWh/(m2.ano)",
+      "requiredValue": "<= 40 kWh/(m2.ano) em V1/V2 / <= 55 em V3",
+      "remediation": "Reduzir arrefecimento: (1) Protecao solar exterior, vidro selectivo g <= 0.25. (2) LED eficiente. (3) Free-cooling. (4) Cool-roof SRI > 80. (5) Envidracados/fachada <= 50%.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "comercio",
+        "arrefecimento",
+        "necessidades",
+        "ganhos solares"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
+    },
+    {
+      "id": "REH-RECS-04",
+      "regulationId": "portaria-349d-2013",
+      "article": "RECS Portaria 349-D Art. 12 — Reducao Noturna de Temperatura (Night Setback)",
+      "description": "O edificio de servicos nao dispoe de controlo de temperatura com reducao noturna durante nao-ocupacao.",
+      "severity": "warning",
+      "conditions": [
+        {
+          "field": "buildingType",
+          "operator": "in",
+          "value": [
+            "commercial",
+            "mixed"
+          ]
+        },
+        {
+          "field": "energy.hasNightSetback",
+          "operator": "==",
+          "value": false
+        }
+      ],
+      "currentValueTemplate": "Reducao noturna: nao implementada",
+      "requiredValue": "Night setback obrigatorio para edificios de servicos com sistemas centralizados",
+      "remediation": "Implementar night setback: (1) Aquecimento: reduzir para 12-15 C na nao-ocupacao. (2) Arrefecimento: desligar ou 30-35 C. (3) Optimum start. (4) Poupanca 15-25% aquecimento, 10-15% arrefecimento. (5) Protecao anti-gelo: minimo 5-8 C.",
+      "enabled": true,
+      "tags": [
+        "RECS",
+        "night setback",
+        "reducao noturna",
+        "controlo temperatura"
+      ],
+      "exclusions": [
+        {
+          "field": "projectType",
+          "operator": "==",
+          "value": "demolition"
+        }
+      ]
     }
   ]
 }
