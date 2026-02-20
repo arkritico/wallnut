@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useMemo, useCallback, useRef } from "react";
-import { Upload, ChevronDown, ChevronRight, X } from "lucide-react";
+import { Upload, ChevronDown, ChevronRight, X, AlertTriangle, Trash2 } from "lucide-react";
 import type { ProjectSchedule, ConstructionPhase } from "@/lib/wbs-types";
 import {
   captureBaseline,
   computeEvmSnapshot,
   generateSCurveData,
+  validateBaseline,
   type EvmBaseline,
   type TaskProgress,
   type ProjectEvmSnapshot,
   type SCurvePoint,
+  type BaselineValidation,
 } from "@/lib/earned-value";
 import { parseProgressCSV, parseProgressXML } from "@/lib/progress-import";
 import { phaseColor, phaseLabel } from "@/lib/phase-colors";
@@ -84,6 +86,35 @@ export default function ProgressPanel({
     return generateSCurveData(baseline, progress);
   }, [baseline, progress]);
 
+  // Baseline staleness check
+  const baselineValidation: BaselineValidation | null = useMemo(
+    () => (baseline ? validateBaseline(baseline, schedule) : null),
+    [baseline, schedule],
+  );
+
+  // ── localStorage persistence ──────────────────────────
+  // Load stored progress on mount (only if no progress yet)
+  const storageKey = `wallnut_progress_${schedule.projectName}`;
+
+  // Save progress to localStorage whenever it changes
+  // (skip empty arrays to avoid overwriting with nothing)
+  const handleProgressPersist = useCallback(
+    (entries: TaskProgress[]) => {
+      onProgressChange(entries);
+      if (entries.length > 0) {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(entries));
+        } catch { /* quota exceeded — ignore */ }
+      }
+    },
+    [onProgressChange, storageKey],
+  );
+
+  const handleClearProgress = useCallback(() => {
+    localStorage.removeItem(storageKey);
+    onProgressChange(detailTasks.map((t) => ({ taskUid: t.uid, percentComplete: 0 })));
+  }, [storageKey, onProgressChange, detailTasks]);
+
   // ── Handlers ──────────────────────────────────────────
 
   const handleCaptureBaseline = useCallback(() => {
@@ -106,9 +137,9 @@ export default function ProgressPanel({
       if (!updated.find((p) => p.taskUid === taskUid)) {
         updated.push({ taskUid, percentComplete: Math.min(100, Math.max(0, pct)) });
       }
-      onProgressChange(updated);
+      handleProgressPersist(updated);
     },
-    [progress, onProgressChange],
+    [progress, handleProgressPersist],
   );
 
   const handleBulkPhaseUpdate = useCallback(
@@ -118,9 +149,9 @@ export default function ProgressPanel({
       const updated = progress.map((p) =>
         phaseUids.has(p.taskUid) ? { ...p, percentComplete: pct } : p,
       );
-      onProgressChange(updated);
+      handleProgressPersist(updated);
     },
-    [progress, phaseGroups, onProgressChange],
+    [progress, phaseGroups, handleProgressPersist],
   );
 
   const handleCSVImport = useCallback(
@@ -132,7 +163,7 @@ export default function ProgressPanel({
         const result = parseProgressCSV(reader.result as string, schedule);
         setLastUnmatched(result.unmatched);
         if (result.entries.length > 0) {
-          onProgressChange(result.entries);
+          handleProgressPersist(result.entries);
           setImportStatus(
             result.unmatched.length > 0
               ? `${result.matched} importadas (${result.unmatched.length} não correspondidas)`
@@ -158,7 +189,7 @@ export default function ProgressPanel({
         const result = parseProgressXML(reader.result as string, schedule);
         setLastUnmatched(result.unmatched);
         if (result.entries.length > 0) {
-          onProgressChange(result.entries);
+          handleProgressPersist(result.entries);
           setImportStatus(
             result.unmatched.length > 0
               ? `${result.matched} importadas (${result.unmatched.length} não correspondidas)`
@@ -187,7 +218,7 @@ export default function ProgressPanel({
   // ── Render ──────────────────────────────────────────
 
   return (
-    <div className="absolute top-12 left-3 bg-white rounded-lg shadow-lg border border-gray-200 w-80 z-20 max-h-[calc(100%-64px)] flex flex-col">
+    <div className="absolute top-12 left-0 sm:left-3 bg-white rounded-lg shadow-lg border border-gray-200 w-full sm:w-80 z-20 max-h-[50vh] sm:max-h-[calc(100%-64px)] flex flex-col overflow-y-auto">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100 flex-shrink-0">
         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
@@ -215,6 +246,29 @@ export default function ProgressPanel({
 
       {baseline && (
         <>
+          {/* Baseline staleness warning */}
+          {baselineValidation?.isStale && (
+            <div className="px-3 py-2 bg-amber-50 border-b border-amber-200 flex-shrink-0">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-medium text-amber-800">
+                    Baseline desatualizada
+                  </p>
+                  <p className="text-[10px] text-amber-700 mt-0.5">
+                    {baselineValidation.reason}
+                  </p>
+                  <button
+                    onClick={handleCaptureBaseline}
+                    className="mt-1.5 text-[10px] bg-amber-600 text-white px-2.5 py-0.5 rounded hover:bg-amber-700 transition-colors"
+                  >
+                    Recapturar baseline
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Data date + import buttons */}
           <div className="px-3 py-2 border-b border-gray-100 flex-shrink-0">
             <div className="flex items-center gap-2 mb-2">
@@ -384,13 +438,23 @@ export default function ProgressPanel({
                 )}
               </div>
 
-              {/* S-curve toggle */}
-              <button
-                onClick={() => setShowSCurve(!showSCurve)}
-                className="mt-1 text-[10px] text-accent hover:underline"
-              >
-                {showSCurve ? "Ocultar S-Curve" : "Mostrar S-Curve"}
-              </button>
+              {/* S-curve toggle + clear */}
+              <div className="flex items-center gap-3 mt-1">
+                <button
+                  onClick={() => setShowSCurve(!showSCurve)}
+                  className="text-[10px] text-accent hover:underline"
+                >
+                  {showSCurve ? "Ocultar S-Curve" : "Mostrar S-Curve"}
+                </button>
+                <button
+                  onClick={handleClearProgress}
+                  className="text-[10px] text-gray-400 hover:text-red-500 flex items-center gap-0.5 transition-colors"
+                  title="Limpar progresso guardado"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Limpar
+                </button>
+              </div>
 
               {showSCurve && sCurveData.length > 1 && (
                 <div className="mt-2">

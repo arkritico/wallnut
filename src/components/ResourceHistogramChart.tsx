@@ -25,6 +25,8 @@ interface ResourceHistogramChartProps {
   onSeekToWeek?: (weekStartMs: number) => void;
   /** Chart height in pixels */
   height?: number;
+  /** Capacity threshold line (max workers) — renders dashed red line */
+  capacityThreshold?: number;
   className?: string;
 }
 
@@ -65,6 +67,7 @@ export default function ResourceHistogramChart({
   currentMs,
   onSeekToWeek,
   height = 160,
+  capacityThreshold,
   className = "",
 }: ResourceHistogramChartProps) {
   const [hoveredWeek, setHoveredWeek] = useState<number | null>(null);
@@ -324,6 +327,31 @@ export default function ResourceHistogramChart({
           strokeDasharray="4,3"
           opacity={0.5}
         />
+
+        {/* Capacity threshold line */}
+        {capacityThreshold != null && capacityThreshold > 0 && (
+          <g>
+            <line
+              x1={PAD.left}
+              y1={yLabor(capacityThreshold)}
+              x2={SVG_W - PAD.right}
+              y2={yLabor(capacityThreshold)}
+              stroke="#DC2626"
+              strokeWidth={1.5}
+              strokeDasharray="6,3"
+              opacity={0.7}
+            />
+            <text
+              x={SVG_W - PAD.right + 4}
+              y={yLabor(capacityThreshold) + 3}
+              fontSize={8}
+              fill="#DC2626"
+              opacity={0.8}
+            >
+              Limite: {capacityThreshold}
+            </text>
+          </g>
+        )}
 
         {/* S-curve lines (cumulative cost) */}
         {sCurveLines.pvPath && (

@@ -131,6 +131,62 @@ interface BaselineTask {
 }
 
 // ============================================================
+// Baseline Validation
+// ============================================================
+
+/** Result of checking whether a baseline is still valid. */
+export interface BaselineValidation {
+  isStale: boolean;
+  reason?: string;
+  originalFinishDate: string;
+  currentFinishDate: string;
+  taskCountChanged: boolean;
+}
+
+/**
+ * Check whether a previously captured baseline is still aligned with the current schedule.
+ * Detects: finish date change, task count change, any task shifted >7 days.
+ */
+export function validateBaseline(
+  baseline: EvmBaseline,
+  currentSchedule: ProjectSchedule,
+): BaselineValidation {
+  const currentDetailTasks = currentSchedule.tasks.filter(t => !t.isSummary);
+  const taskCountChanged = baseline.tasks.length !== currentDetailTasks.length;
+  const finishChanged = baseline.finishDate !== currentSchedule.finishDate;
+
+  // Check if any baseline task shifted >7 days
+  const taskMap = new Map(currentDetailTasks.map(t => [t.uid, t]));
+  let majorShift = false;
+  for (const bt of baseline.tasks) {
+    const current = taskMap.get(bt.uid);
+    if (!current) continue;
+    const bMs = new Date(bt.finishDate).getTime();
+    const cMs = new Date(current.finishDate).getTime();
+    if (Math.abs(cMs - bMs) > 7 * 86_400_000) {
+      majorShift = true;
+      break;
+    }
+  }
+
+  const isStale = finishChanged || taskCountChanged || majorShift;
+
+  return {
+    isStale,
+    reason: isStale
+      ? finishChanged
+        ? "Data de conclusão do projeto alterada"
+        : taskCountChanged
+          ? "Número de tarefas alterado"
+          : "Datas de tarefas alteradas significativamente"
+      : undefined,
+    originalFinishDate: baseline.finishDate,
+    currentFinishDate: currentSchedule.finishDate,
+    taskCountChanged,
+  };
+}
+
+// ============================================================
 // Baseline Capture
 // ============================================================
 

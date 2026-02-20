@@ -48,6 +48,8 @@ export interface TimelinePlayerProps {
   externalSeekMs?: number | null;
   /** Callback exposing toggle play/pause to parent (for keyboard shortcuts) */
   onTogglePlayRef?: React.MutableRefObject<(() => void) | null>;
+  /** Bottleneck markers to show on the Gantt timeline */
+  bottlenecks?: { date: string; severity: string; reason: string }[];
   className?: string;
 }
 
@@ -87,6 +89,7 @@ export default function TimelinePlayer({
   progressEntries,
   externalSeekMs,
   onTogglePlayRef,
+  bottlenecks,
   className = "",
 }: TimelinePlayerProps) {
   const startMs = useMemo(() => toMs(schedule.startDate), [schedule.startDate]);
@@ -263,6 +266,7 @@ export default function TimelinePlayer({
           progressEntries={progressEntries}
           buffers={ccpmBuffers.length > 0 ? ccpmBuffers : undefined}
           milestones={milestoneTasks.length > 0 ? milestoneTasks : undefined}
+          bottlenecks={bottlenecks}
         />
         <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
           <span>{formatPT(startMs)}</span>
@@ -271,43 +275,45 @@ export default function TimelinePlayer({
       </div>
 
       {/* Transport controls */}
-      <div className="flex items-center gap-3 px-4 py-2">
-        <button
-          onClick={handleSkipBack}
-          className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          title="Início"
-        >
-          <SkipBack className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => setIsPlaying(!isPlaying)}
-          className="p-2 bg-accent text-white rounded-full hover:bg-accent-hover transition-colors"
-          title={isPlaying ? "Pausar" : "Reproduzir"}
-        >
-          {isPlaying ? (
-            <Pause className="w-4 h-4" />
-          ) : (
-            <Play className="w-4 h-4 ml-0.5" />
-          )}
-        </button>
-        <button
-          onClick={handleSkipForward}
-          className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          title="Fim"
-        >
-          <SkipForward className="w-4 h-4" />
-        </button>
+      <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-4 py-2">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            onClick={handleSkipBack}
+            className="p-2 sm:p-1 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+            title="Início"
+          >
+            <SkipBack className="w-5 h-5 sm:w-4 sm:h-4" />
+          </button>
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="p-3 sm:p-2 min-h-[44px] min-w-[44px] bg-accent text-white rounded-full hover:bg-accent-hover transition-colors flex items-center justify-center"
+            title={isPlaying ? "Pausar" : "Reproduzir"}
+          >
+            {isPlaying ? (
+              <Pause className="w-5 h-5 sm:w-4 sm:h-4" />
+            ) : (
+              <Play className="w-5 h-5 sm:w-4 sm:h-4 ml-0.5" />
+            )}
+          </button>
+          <button
+            onClick={handleSkipForward}
+            className="p-2 sm:p-1 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+            title="Fim"
+          >
+            <SkipForward className="w-5 h-5 sm:w-4 sm:h-4" />
+          </button>
 
-        <button
-          onClick={cycleSpeed}
-          className="px-2 py-0.5 text-xs font-mono font-medium text-gray-500 bg-gray-100 rounded hover:bg-gray-200 transition-colors min-w-[3rem]"
-          title="Velocidade"
-        >
-          {speed}x
-        </button>
+          <button
+            onClick={cycleSpeed}
+            className="px-3 py-1.5 sm:px-2 sm:py-0.5 text-xs font-mono font-medium text-gray-500 bg-gray-100 rounded hover:bg-gray-200 transition-colors min-w-[3rem] min-h-[44px] sm:min-h-0"
+            title="Velocidade"
+          >
+            {speed}x
+          </button>
+        </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <div className="text-right">
+        <div className="sm:ml-auto flex items-center gap-2">
+          <div className="text-center sm:text-right">
             <p className="text-sm font-semibold text-gray-800">
               {formatPT(currentMs)}
             </p>
@@ -315,8 +321,8 @@ export default function TimelinePlayer({
               {timelineState.completedTasks}/{timelineState.totalTasks} tarefas
             </p>
           </div>
-          <label className="relative cursor-pointer" title="Saltar para data">
-            <Calendar className="w-4 h-4 text-gray-400 hover:text-gray-600 transition-colors" />
+          <label className="relative cursor-pointer min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center" title="Saltar para data">
+            <Calendar className="w-5 h-5 sm:w-4 sm:h-4 text-gray-400 hover:text-gray-600 transition-colors" />
             <input
               type="date"
               className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"

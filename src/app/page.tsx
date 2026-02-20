@@ -49,8 +49,10 @@ import {
   BookOpen,
   Play,
   Users,
+  Menu,
 } from "lucide-react";
 
+import MobileNav, { MobileNavLink } from "@/components/MobileNav";
 import CompareProjects from "@/components/CompareProjects";
 import IngestionDashboard from "@/components/IngestionDashboard";
 import IngestionPanel from "@/components/IngestionPanel";
@@ -60,7 +62,8 @@ import { getUserRole } from "@/lib/collaboration";
 import { getAvailablePlugins } from "@/lib/plugins/loader";
 import type { SpecialtyPlugin, RegulationDocument, DeclarativeRule } from "@/lib/plugins/types";
 import { phaseColor } from "@/lib/phase-colors";
-import type { ConstructionPhase } from "@/lib/wbs-types";
+import type { ConstructionPhase, ProjectSchedule } from "@/lib/wbs-types";
+import { generateMSProjectXML } from "@/lib/msproject-export";
 
 import UnifiedUpload from "@/components/UnifiedUpload";
 import type { UnifiedPipelineResult } from "@/lib/unified-pipeline";
@@ -141,6 +144,7 @@ export default function Home() {
 
   // Dark mode
   const [darkMode, setDarkMode] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Regulation ingestion
   const [ingestionPluginId, setIngestionPluginId] = useState<string | null>(null);
@@ -372,6 +376,15 @@ export default function Home() {
     setView("landing");
   }
 
+  /** When capacity optimizer applies changes, regenerate MS Project XML */
+  const handleScheduleOptimized = useCallback((optimizedSchedule: ProjectSchedule) => {
+    if (!unifiedResult) return;
+    const xml = generateMSProjectXML(optimizedSchedule);
+    setUnifiedResult((prev) =>
+      prev ? { ...prev, schedule: optimizedSchedule, msProjectXml: xml } : prev,
+    );
+  }, [unifiedResult]);
+
   async function handleUnifiedComplete(pipelineResult: UnifiedPipelineResult) {
     setUnifiedResult(pipelineResult);
     setCurrentProject(pipelineResult.project);
@@ -465,11 +478,11 @@ export default function Home() {
   function AppHeader({ showBack, showEdit }: { showBack?: boolean; showEdit?: boolean }) {
     return (
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 py-3 md:py-4 flex items-center justify-between">
           <button onClick={handleReset} className="text-gray-900 hover:text-accent transition-colors">
             <WallnutLogo className="h-6 w-auto" />
           </button>
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             {showEdit && (
               <button onClick={() => handleBackToForm()} className="text-sm text-accent hover:text-accent-hover font-medium">
                 {t.editProject}
@@ -496,6 +509,13 @@ export default function Home() {
               <Globe className="w-4 h-4" />{lang === "pt" ? "EN" : "PT"}
             </button>
           </div>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+          >
+            <Menu className="w-5 h-5 text-gray-600" />
+          </button>
         </div>
       </header>
     );
@@ -509,9 +529,19 @@ export default function Home() {
       {view === "landing" && (
         <main className="min-h-screen bg-white">
           {/* Navigation */}
-          <nav className="max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+          <nav className="max-w-6xl mx-auto px-6 py-4 md:py-6 flex items-center justify-between">
             <WallnutLogo className="h-7 w-auto text-gray-900" />
-            <div className="flex items-center gap-4">
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            >
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-4">
               {useCloud && (
                 <span className="flex items-center gap-1 text-xs text-green-600">
                   <Cloud className="w-3 h-3" />
@@ -538,6 +568,32 @@ export default function Home() {
               )}
             </div>
           </nav>
+
+          {/* Mobile navigation drawer */}
+          <MobileNav isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)}>
+            {savedProjects.length > 0 && (
+              <MobileNavLink onClick={() => { refreshProjects(); setView("dashboard"); setMobileMenuOpen(false); }}>
+                <FolderOpen className="w-4 h-4" /> {t.myProjects}
+              </MobileNavLink>
+            )}
+            <MobileNavLink onClick={() => { setView("viewer"); setMobileMenuOpen(false); }}>
+              <BookOpen className="w-4 h-4" /> {lang === "pt" ? "Visualizador 3D" : "3D Viewer"}
+            </MobileNavLink>
+            <MobileNavLink onClick={() => { setView("wbs"); setMobileMenuOpen(false); }}>
+              <Clock className="w-4 h-4" /> WBS
+            </MobileNavLink>
+            <MobileNavLink onClick={() => { setView("regulations"); setMobileMenuOpen(false); }}>
+              <Hammer className="w-4 h-4" /> {lang === "pt" ? "Regulamentos" : "Regulations"}
+            </MobileNavLink>
+            <div className="border-t border-gray-100 my-2" />
+            <MobileNavLink onClick={() => { toggleDarkMode(); }}>
+              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {darkMode ? "Modo claro" : "Modo escuro"}
+            </MobileNavLink>
+            <MobileNavLink onClick={() => { handleLanguageChange(lang === "pt" ? "en" : "pt"); setMobileMenuOpen(false); }}>
+              <Globe className="w-4 h-4" /> {lang === "pt" ? "English" : "Português"}
+            </MobileNavLink>
+          </MobileNav>
 
           {/* Hero */}
           <section className="max-w-4xl mx-auto px-6 pt-24 pb-12 text-center">
@@ -1079,6 +1135,7 @@ export default function Home() {
               elementMapping={unifiedResult.elementMapping}
               ifcData={unifiedResult.ifcFileData}
               ifcName={unifiedResult.ifcFileName}
+              onScheduleOptimized={handleScheduleOptimized}
               className="flex-1 min-h-[700px] border border-gray-200 rounded-xl overflow-hidden"
             />
           </div>

@@ -173,6 +173,12 @@ export interface Translations {
   templateMultifamiliarDesc: string;
   templateReabilitacao: string;
   templateReabilitacaoDesc: string;
+  templateMoradiaT4: string;
+  templateMoradiaT4Desc: string;
+  templateArmazemIndustrial: string;
+  templateArmazemIndustrialDesc: string;
+  templateEdificioPublico: string;
+  templateEdificioPublicoDesc: string;
 
   // Wizard
   wizardTitle: string;
@@ -447,6 +453,12 @@ const pt: Translations = {
   templateMultifamiliarDesc: "Edifício de 8 pisos com 24 fogos. Todas as especialidades.",
   templateReabilitacao: "Reabilitação",
   templateReabilitacaoDesc: "Reabilitação de edifício existente. ARU, estrutura em alvenaria.",
+  templateMoradiaT4: "Moradia T4",
+  templateMoradiaT4Desc: "Moradia unifamiliar de 3 pisos com 280m². Bomba de calor, solar PV 5kW, carregamento EV.",
+  templateArmazemIndustrial: "Armazém Industrial",
+  templateArmazemIndustrialDesc: "Armazém de 1500m² em estrutura metálica. Trifásico 100kVA, sprinklers, pé-direito 6m.",
+  templateEdificioPublico: "Edifício Público",
+  templateEdificioPublicoDesc: "Escola ou clínica de 800m², 2 pisos. Elevador, AVAC mecânico, acessibilidade reforçada.",
 
   wizardTitle: "Como deseja começar?",
   useTemplate: "Usar Modelo",
@@ -712,6 +724,12 @@ const en: Translations = {
   templateMultifamiliarDesc: "8-storey building with 24 dwellings. All specialties included.",
   templateReabilitacao: "Rehabilitation",
   templateReabilitacaoDesc: "Existing building rehabilitation. ARU, masonry structure.",
+  templateMoradiaT4: "T4 Detached House",
+  templateMoradiaT4Desc: "3-storey single-family house, 280m². Heat pump, 5kW solar PV, EV charging.",
+  templateArmazemIndustrial: "Industrial Warehouse",
+  templateArmazemIndustrialDesc: "1500m² steel-frame warehouse. Three-phase 100kVA, sprinklers, 6m ceiling height.",
+  templateEdificioPublico: "Public Building",
+  templateEdificioPublicoDesc: "800m² school or clinic, 2 storeys. Elevator, mechanical HVAC, enhanced accessibility.",
 
   wizardTitle: "How would you like to start?",
   useTemplate: "Use Template",

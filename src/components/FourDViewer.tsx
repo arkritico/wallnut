@@ -7,6 +7,7 @@ import {
   GitCompareArrows,
   BarChart3,
   Film,
+  Settings,
 } from "lucide-react";
 import type { FragmentsModel } from "@thatopen/fragments";
 import type { ProjectSchedule, ScheduleTask, ConstructionPhase } from "@/lib/wbs-types";
@@ -28,6 +29,8 @@ import FourDLegend from "./FourDLegend";
 import ProgressPanel from "./ProgressPanel";
 import ResourceHistogramChart from "./ResourceHistogramChart";
 import VideoExportDialog from "./VideoExportDialog";
+import CapacityPanel from "./CapacityPanel";
+import type { OptimizedSchedule } from "@/lib/site-capacity-optimizer";
 
 const IfcViewer = dynamic(() => import("./IfcViewer"), { ssr: false });
 
@@ -40,6 +43,8 @@ export interface FourDViewerProps {
   elementMapping: ElementTaskMappingResult;
   ifcData?: Uint8Array;
   ifcName?: string;
+  /** Called when user applies an optimized schedule (for MS Project re-export) */
+  onScheduleOptimized?: (optimizedSchedule: ProjectSchedule) => void;
   className?: string;
 }
 
@@ -197,6 +202,7 @@ export default function FourDViewer({
   elementMapping,
   ifcData,
   ifcName,
+  onScheduleOptimized,
   className = "",
 }: FourDViewerProps) {
   const [modelId, setModelId] = useState<string | null>(null);
@@ -217,6 +223,8 @@ export default function FourDViewer({
   const [showProgress, setShowProgress] = useState(false);
   const [comparisonMode, setComparisonMode] = useState<ComparisonMode>("off");
   const [showHistogram, setShowHistogram] = useState(false);
+  const [showCapacity, setShowCapacity] = useState(false);
+  const [optimizedResult, setOptimizedResult] = useState<OptimizedSchedule | null>(null);
   const [showVideoExport, setShowVideoExport] = useState(false);
   const [videoSeekMs, setVideoSeekMs] = useState<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -626,6 +634,32 @@ export default function FourDViewer({
     setShowHistogram((prev) => !prev);
   }, []);
 
+  const handleToggleCapacity = useCallback(() => {
+    setShowCapacity((prev) => !prev);
+  }, []);
+
+  /** Store optimization result and notify parent with optimized schedule */
+  const handleOptimized = useCallback((result: OptimizedSchedule) => {
+    setOptimizedResult(result);
+    if (onScheduleOptimized) {
+      // Build a new ProjectSchedule with the optimized tasks
+      const optimizedSchedule: ProjectSchedule = {
+        ...schedule,
+        tasks: result.optimizedTasks,
+        totalDurationDays: result.optimizedDuration,
+      };
+      // Recompute finish date from optimized tasks
+      const finishes = result.optimizedTasks
+        .filter((t) => !t.isSummary)
+        .map((t) => t.finishDate)
+        .sort();
+      if (finishes.length > 0) {
+        optimizedSchedule.finishDate = finishes[finishes.length - 1];
+      }
+      onScheduleOptimized(optimizedSchedule);
+    }
+  }, [schedule, onScheduleOptimized]);
+
   const handleToggleVideoExport = useCallback(() => {
     setShowVideoExport((prev) => !prev);
   }, []);
@@ -656,17 +690,20 @@ export default function FourDViewer({
         case "KeyR":
           handleToggleHistogram();
           break;
+        case "KeyO":
+          handleToggleCapacity();
+          break;
       }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleToggleProgress, handleCycleComparison, handleToggleHistogram, progressEntries.length]);
+  }, [handleToggleProgress, handleCycleComparison, handleToggleHistogram, handleToggleCapacity, progressEntries.length]);
 
   // ── Render ─────────────────────────────────────────────────
   return (
     <div className={`flex flex-col ${className}`}>
       {/* 3D viewport with overlays */}
-      <div className="flex-1 min-h-0 relative">
+      <div className="flex-1 min-h-[400px] md:min-h-0 relative">
         <IfcViewer
           ifcData={ifcData}
           ifcName={ifcName}
@@ -718,28 +755,37 @@ export default function FourDViewer({
           />
         )}
 
+        {/* Capacity optimizer panel (left side) */}
+        {showCapacity && (
+          <CapacityPanel
+            schedule={schedule}
+            onOptimized={handleOptimized}
+            onClose={() => setShowCapacity(false)}
+          />
+        )}
+
         {/* Synchro 4D toolbar (top-center) */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-1.5 py-1">
           {/* Progress panel toggle */}
           <button
             onClick={handleToggleProgress}
-            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
               showProgress
                 ? "bg-accent text-white"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
             title="Painel de progresso"
           >
-            <ClipboardList className="w-3.5 h-3.5" />
-            Progresso
+            <ClipboardList className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">Progresso</span>
           </button>
 
-          <span className="w-px h-4 bg-gray-200" />
+          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
 
           {/* Comparison mode toggle */}
           <button
             onClick={handleCycleComparison}
-            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
               comparisonMode !== "off"
                 ? "bg-accent text-white"
                 : progressEntries.length === 0
@@ -749,8 +795,8 @@ export default function FourDViewer({
             disabled={progressEntries.length === 0}
             title={`Plano vs Real: ${COMPARISON_LABELS[comparisonMode]}`}
           >
-            <GitCompareArrows className="w-3.5 h-3.5" />
-            <span>
+            <GitCompareArrows className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">
               Plano vs Real
               {comparisonMode !== "off" && (
                 <span className="ml-1 opacity-75">({COMPARISON_LABELS[comparisonMode]})</span>
@@ -758,36 +804,52 @@ export default function FourDViewer({
             </span>
           </button>
 
-          <span className="w-px h-4 bg-gray-200" />
+          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
 
           {/* Resource histogram toggle */}
           <button
             onClick={handleToggleHistogram}
-            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
               showHistogram
                 ? "bg-accent text-white"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
             title="Histograma de recursos"
           >
-            <BarChart3 className="w-3.5 h-3.5" />
-            Recursos
+            <BarChart3 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">Recursos</span>
           </button>
 
-          <span className="w-px h-4 bg-gray-200" />
+          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
 
           {/* Video export */}
           <button
             onClick={handleToggleVideoExport}
-            className={`flex items-center gap-1.5 px-2 py-1 text-[10px] font-medium rounded transition-colors ${
+            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
               showVideoExport
                 ? "bg-accent text-white"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
             title="Exportar vídeo 4D"
           >
-            <Film className="w-3.5 h-3.5" />
-            Vídeo
+            <Film className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">Vídeo</span>
+          </button>
+
+          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
+
+          {/* Capacity optimizer */}
+          <button
+            onClick={handleToggleCapacity}
+            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
+              showCapacity
+                ? "bg-accent text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            title="Capacidade do estaleiro (O)"
+          >
+            <Settings className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">Capacidade</span>
           </button>
         </div>
 
@@ -836,7 +898,7 @@ export default function FourDViewer({
       </div>
 
       {/* Info bar */}
-      <div className="flex items-center gap-3 px-4 py-1.5 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-500">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-4 py-1.5 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-500">
         {mappingStatus && <span>{mappingStatus}</span>}
         {phaseStats && (
           <>
@@ -894,6 +956,7 @@ export default function FourDViewer({
           currentMs={new Date(timelineState.currentDate).getTime()}
           onSeekToWeek={handleVideoSeek}
           height={160}
+          capacityThreshold={optimizedResult?.originalSchedule.teamSummary.maxWorkers}
         />
       )}
 
@@ -907,6 +970,11 @@ export default function FourDViewer({
         progressEntries={progressEntries.length > 0 ? progressEntries : undefined}
         externalSeekMs={videoSeekMs}
         onTogglePlayRef={togglePlayRef}
+        bottlenecks={optimizedResult?.bottlenecks.map((b) => ({
+          date: b.date.toISOString().split("T")[0],
+          severity: b.severity,
+          reason: b.reason,
+        }))}
       />
 
       {/* Video export dialog (modal) */}

@@ -199,9 +199,9 @@ export class CypeVariantScraper {
         timeout: this.config.navigationTimeout,
       });
 
-      // Wait for price display
-      await page.waitForSelector("h6", { timeout: 10000 }).catch(() => {
-        logger.warn(`No h6 price element found for ${code}`);
+      // Wait for price display (h4 on current CYPE site, h6 on older layout)
+      await page.waitForSelector("h4, h6", { timeout: 10000 }).catch(() => {
+        logger.warn(`No h4/h6 price element found for ${code}`);
       });
 
       // Discover available configurator options on this page
@@ -310,11 +310,11 @@ export class CypeVariantScraper {
 
   private async discoverOptions(
     page: Page,
-  ): Promise<Array<{ label: string; type: "select" | "link"; selector: string; values: string[] }>> {
+  ): Promise<Array<{ label: string; type: "select" | "link" | "button"; selector: string; values: string[] }>> {
     return page.evaluate(() => {
       const groups: Array<{
         label: string;
-        type: "select" | "link";
+        type: "select" | "link" | "button";
         selector: string;
         values: string[];
       }> = [];
@@ -339,6 +339,25 @@ export class CypeVariantScraper {
           });
         }
       });
+
+      // Find configurator input buttons (input[onclick*='calculaprecio'])
+      // The CYPE configurator uses <input> elements with onclick handlers
+      // that call calculaprecio() to recalculate prices for each option.
+      const calcButtons = document.querySelectorAll<HTMLInputElement>(
+        "input[onclick*='calculaprecio']",
+      );
+      if (calcButtons.length >= 2) {
+        const values = Array.from(calcButtons)
+          .map((btn) => btn.value?.trim() || btn.title?.trim() || btn.getAttribute("alt")?.trim() || "")
+          .filter(Boolean);
+
+        groups.push({
+          label: "configurator_buttons",
+          type: "button",
+          selector: "input[onclick*='calculaprecio']",
+          values,
+        });
+      }
 
       // Find clickable variant links (often <a> tags within configurator sections)
       const variantContainers = document.querySelectorAll(
@@ -456,6 +475,23 @@ export class CypeVariantScraper {
 
     if (selectHandled) return;
 
+    // Try clicking a configurator input button (input[onclick*='calculaprecio'])
+    const buttonClicked = await page.evaluate((v) => {
+      const buttons = document.querySelectorAll<HTMLInputElement>(
+        "input[onclick*='calculaprecio']",
+      );
+      for (const btn of buttons) {
+        const label = btn.value?.trim() || btn.title?.trim() || btn.getAttribute("alt")?.trim() || "";
+        if (label.includes(v)) {
+          btn.click();
+          return true;
+        }
+      }
+      return false;
+    }, value);
+
+    if (buttonClicked) return;
+
     // Try clicking a variant link containing the value text
     const linkClicked = await page.evaluate((v) => {
       const links = document.querySelectorAll(
@@ -482,19 +518,40 @@ export class CypeVariantScraper {
     page: Page,
   ): Promise<{ unitCost: number; unit?: string; description?: string; breakdown?: CypeBreakdown } | null> {
     return page.evaluate(() => {
-      // Extract price from h6 elements
+      // Helper: parse a European-format price string like "1.234,56 €" → 1234.56
+      const parseEurNum = (text: string | null | undefined): number => {
+        if (!text) return 0;
+        const match = text.match(/([\d.,]+)\s*€/);
+        if (!match) return 0;
+        let numStr = match[1];
+        if (numStr.includes(",")) {
+          numStr = numStr.replace(/\./g, "").replace(",", ".");
+        }
+        const parsed = parseFloat(numStr);
+        return isNaN(parsed) ? 0 : parsed;
+      };
+
+      // Primary: h4 elements (current CYPE site uses h4 for the actual unit price)
       let unitCost = 0;
-      const h6Elements = document.querySelectorAll("h6");
-      for (const h6 of h6Elements) {
-        const match = h6.textContent?.match(/([\d.,]+)\s*€/);
-        if (match) {
-          let numStr = match[1];
-          if (numStr.includes(",")) {
-            numStr = numStr.replace(/\./g, "").replace(",", ".");
-          }
-          const parsed = parseFloat(numStr);
-          if (!isNaN(parsed) && parsed > 0) {
+      let priceElement: Element | null = null;
+      const h4Elements = document.querySelectorAll("h4");
+      for (const h4 of h4Elements) {
+        const parsed = parseEurNum(h4.textContent);
+        if (parsed > 0) {
+          unitCost = parsed;
+          priceElement = h4;
+          break;
+        }
+      }
+
+      // Fallback: h6 elements (older CYPE layout)
+      if (unitCost <= 0) {
+        const h6Elements = document.querySelectorAll("h6");
+        for (const h6 of h6Elements) {
+          const parsed = parseEurNum(h6.textContent);
+          if (parsed > 0) {
             unitCost = parsed;
+            priceElement = h6;
             break;
           }
         }
@@ -505,9 +562,9 @@ export class CypeVariantScraper {
       // Extract unit
       let unit: string | undefined;
       const unitPattern = /^(m[²³23]?|Ud|un|kg|t|h|l|conjunto|vg|sistema|projeto)$/i;
-      const h6Next = h6Elements[0]?.nextElementSibling;
-      if (h6Next && unitPattern.test(h6Next.textContent?.trim() || "")) {
-        unit = h6Next.textContent?.trim();
+      const nextSibling = priceElement?.nextElementSibling;
+      if (nextSibling && unitPattern.test(nextSibling.textContent?.trim() || "")) {
+        unit = nextSibling.textContent?.trim();
       }
 
       // Extract description from h1 or meta

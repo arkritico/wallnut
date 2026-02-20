@@ -28,6 +28,8 @@ export interface GanttTimelineProps {
   buffers?: CriticalChainBuffer[];
   /** Milestone tasks — rendered as diamond markers on the timeline */
   milestones?: ScheduleTask[];
+  /** Bottleneck markers — red circles above phase rows */
+  bottlenecks?: { date: string; severity: string; reason: string }[];
 }
 
 interface PhaseBar {
@@ -48,7 +50,7 @@ interface HoverInfo {
 // Helpers
 // ============================================================
 
-const ROW_H = 16;
+const ROW_H = 24; // taller rows for touch targets on mobile
 const LABEL_W = 72;
 
 function formatShortPT(ms: number): string {
@@ -115,6 +117,7 @@ export default function GanttTimeline({
   progressEntries,
   buffers,
   milestones,
+  bottlenecks,
 }: GanttTimelineProps) {
   const ganttRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
@@ -156,9 +159,9 @@ export default function GanttTimeline({
     return rows;
   }, [tasks, totalMs, startMs]);
 
-  // Click-to-seek on the Gantt area
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+  // Click/tap-to-seek on the Gantt area (pointer events for touch + mouse)
+  const handlePointerSeek = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
       const gantt = ganttRef.current;
       if (!gantt) return;
       const rect = gantt.getBoundingClientRect();
@@ -193,7 +196,7 @@ export default function GanttTimeline({
 
   // Bar click handler — select bar (stop propagation to prevent seek)
   const handleBarClick = useCallback(
-    (e: React.MouseEvent, bar: PhaseBar) => {
+    (e: React.PointerEvent, bar: PhaseBar) => {
       e.stopPropagation();
       if (!onBarSelect) return;
       // Toggle: if already selected, deselect
@@ -222,9 +225,9 @@ export default function GanttTimeline({
     [criticalPathUids],
   );
 
-  // Hover handler
+  // Hover handler (pointer events for cross-device support)
   const handleBarHover = useCallback(
-    (e: React.MouseEvent, bar: PhaseBar) => {
+    (e: React.PointerEvent, bar: PhaseBar) => {
       const taskNames = bar.tasks.map((t) => t.name).join(", ");
       const earliest = Math.min(...bar.tasks.map((t) => new Date(t.startDate).getTime()));
       const latest = Math.max(...bar.tasks.map((t) => new Date(t.finishDate).getTime()));
@@ -247,10 +250,10 @@ export default function GanttTimeline({
   return (
     <div
       ref={ganttRef}
-      className="relative select-none cursor-pointer"
+      className="relative select-none cursor-pointer touch-none"
       style={{ height: ganttHeight + (hiddenCount > 0 ? 14 : 0) + (hasActualDates ? 14 : 0) }}
-      onClick={handleClick}
-      onMouseLeave={() => setHover(null)}
+      onPointerDown={handlePointerSeek}
+      onPointerLeave={() => setHover(null)}
     >
       {/* Phase rows */}
       {visibleRows.map((row, i) => (
@@ -261,7 +264,7 @@ export default function GanttTimeline({
         >
           {/* Phase label */}
           <div
-            className="flex-shrink-0 text-[9px] text-gray-500 truncate pr-1"
+            className="flex-shrink-0 text-[11px] sm:text-[9px] text-gray-500 truncate pr-1"
             style={{ width: LABEL_W }}
             title={phaseLabel(row.phase)}
           >
@@ -335,10 +338,10 @@ export default function GanttTimeline({
                       zIndex: selected ? 10 : undefined,
                       borderBottom: critical ? "2px solid #ef4444" : "none",
                     }}
-                    onClick={(e) => handleBarClick(e, bar)}
-                    onMouseEnter={(e) => handleBarHover(e, bar)}
-                    onMouseMove={(e) => handleBarHover(e, bar)}
-                    onMouseLeave={() => setHover(null)}
+                    onPointerDown={(e) => handleBarClick(e, bar)}
+                    onPointerEnter={(e) => handleBarHover(e, bar)}
+                    onPointerMove={(e) => handleBarHover(e, bar)}
+                    onPointerLeave={() => setHover(null)}
                   />
 
                   {/* Actual date diamond markers */}
@@ -428,6 +431,39 @@ export default function GanttTimeline({
                   style={{
                     backgroundColor: "#F59E0B",
                     borderColor: "#D97706",
+                  }}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Bottleneck markers (red circles above timeline) */}
+      {bottlenecks && bottlenecks.length > 0 && (
+        <div className="absolute pointer-events-none" style={{ top: -6, left: LABEL_W, right: 0, height: 12 }}>
+          {bottlenecks.map((b, bi) => {
+            const bMs = new Date(b.date).getTime();
+            const bPct = ((bMs - startMs) / totalMs) * 100;
+            if (bPct < 0 || bPct > 100) return null;
+            return (
+              <div
+                key={`bn-${bi}`}
+                className="absolute"
+                style={{
+                  left: `${bPct}%`,
+                  top: 0,
+                  zIndex: 25,
+                }}
+                title={b.reason}
+              >
+                <div
+                  className="w-2.5 h-2.5 rounded-full border border-white"
+                  style={{
+                    backgroundColor:
+                      b.severity === "high" ? "#DC2626" :
+                      b.severity === "medium" ? "#D97706" : "#FBBF24",
+                    marginLeft: -5,
                   }}
                 />
               </div>
