@@ -194,7 +194,14 @@ function setupFullMocks() {
   mockGenerateBudgetExcel.mockReturnValue(Buffer.from("excel-data"));
   mockGenerateMSProjectXML.mockReturnValue("<Project/>");
   mockOcrPdfPages.mockResolvedValue([]);
-  mockFetch.mockResolvedValue(new Response(JSON.stringify({ texts: [], confidences: [] }), { status: 200 }));
+  // Default fetch mock: handle both /api/ocr and /api/ai-estimate
+  mockFetch.mockImplementation((url: string) => {
+    if (url === "/api/ai-estimate") {
+      return Promise.resolve(new Response(JSON.stringify({ available: false, fallbackReason: "test" }), { status: 200 }));
+    }
+    // Default: OCR response
+    return Promise.resolve(new Response(JSON.stringify({ texts: [], confidences: [] }), { status: 200 }));
+  });
   mockGenerateComplianceExcel.mockReturnValue(new ArrayBuffer(10));
   mockMapElementsToTasks.mockReturnValue({
     links: [],
@@ -552,15 +559,19 @@ describe("runUnifiedPipeline", () => {
       totalPages: 3,
       chunks: 1,
     });
-    mockFetch.mockResolvedValue(
-      new Response(
+    mockFetch.mockImplementation((url: string) => {
+      if (url === "/api/ai-estimate") {
+        return Promise.resolve(new Response(JSON.stringify({ available: false }), { status: 200 }));
+      }
+      // OCR response
+      return Promise.resolve(new Response(
         JSON.stringify({
           texts: ["Memória descritiva\nÁrea bruta: 250 m2", "Projeto de estruturas"],
           confidences: [85, 78],
         }),
         { status: 200 },
-      ),
-    );
+      ));
+    });
     mockParseDocumentWithAI.mockResolvedValue({
       fields: {},
       confidence: {},
@@ -577,7 +588,6 @@ describe("runUnifiedPipeline", () => {
     const result = await runUnifiedPipeline(input);
 
     // OCR was called via fetch to /api/ocr for pages 1 and 3 (both < 50 chars)
-    expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(mockFetch).toHaveBeenCalledWith(
       "/api/ocr",
       expect.objectContaining({ method: "POST" }),
@@ -595,8 +605,13 @@ describe("runUnifiedPipeline", () => {
       totalPages: 1,
       chunks: 1,
     });
-    // Simulate OCR API returning error
-    mockFetch.mockResolvedValue(new Response("Internal Server Error", { status: 500 }));
+    // Simulate OCR API returning error, AI estimate returns unavailable
+    mockFetch.mockImplementation((url: string) => {
+      if (url === "/api/ai-estimate") {
+        return Promise.resolve(new Response(JSON.stringify({ available: false }), { status: 200 }));
+      }
+      return Promise.resolve(new Response("Internal Server Error", { status: 500 }));
+    });
 
     const input: UnifiedPipelineInput = {
       files: [makeFile("scanned.pdf")],

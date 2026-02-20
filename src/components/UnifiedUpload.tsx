@@ -59,7 +59,9 @@ const STAGE_LABELS_PT: Record<UnifiedStage, string> = {
   parse_boq: "Mapa de Quantidades",
   parse_pdf: "Documentos PDF",
   analyze: "Análise Regulamentar",
-  estimate: "Estimativa de Custos",
+  ai_estimate: "Estimativa Inteligente",
+  estimate: "Base de Preços",
+  reconcile: "Reconciliação",
   schedule: "Cronograma",
   export: "Exportação",
 };
@@ -70,7 +72,9 @@ const STAGE_LABELS_EN: Record<UnifiedStage, string> = {
   parse_boq: "Bill of Quantities",
   parse_pdf: "PDF Documents",
   analyze: "Regulatory Analysis",
-  estimate: "Cost Estimation",
+  ai_estimate: "AI Estimate",
+  estimate: "Price Database",
+  reconcile: "Reconciliation",
   schedule: "Scheduling",
   export: "Export",
 };

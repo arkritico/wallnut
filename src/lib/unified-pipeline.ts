@@ -29,6 +29,8 @@ import type { CashFlowResult } from "./cashflow";
 import type { ReconciledBoq } from "./boq-reconciliation";
 import type { ParsedBoq } from "./xlsx-parser";
 import type { ScheduleDiagnostic } from "./msproject-import";
+import type { AIEstimateResult, ReconciliationReport } from "./ai-estimate-types";
+import type { AIReviewResult } from "./ai-feedback-types";
 
 // ============================================================
 // Types
@@ -40,7 +42,9 @@ export type UnifiedStage =
   | "parse_boq"
   | "parse_pdf"
   | "analyze"
+  | "ai_estimate"
   | "estimate"
+  | "reconcile"
   | "schedule"
   | "export";
 
@@ -57,6 +61,8 @@ export interface UnifiedPipelineInput {
     includeCosts?: boolean;
     includeSchedule?: boolean;
     includeCompliance?: boolean;
+    /** Enable AI-first estimation (default: true). Falls back to algorithmic if API unavailable. */
+    includeAIEstimate?: boolean;
     existingProject?: Partial<BuildingProject>;
     /** Pre-parsed IFC analyses from client-side Web Worker. Skips server parse_ifc stage. */
     ifcAnalyses?: SpecialtyAnalysisResult[];
@@ -82,6 +88,12 @@ export interface UnifiedPipelineResult {
   reconciledBoq?: ReconciledBoq;
   parsedBoq?: ParsedBoq;
   complianceExcel?: ArrayBuffer;
+  /** AI-driven cost estimate (work packages, risks, assumptions) */
+  aiEstimate?: AIEstimateResult;
+  /** Reconciliation between AI and algorithmic estimates */
+  reconciliation?: ReconciliationReport;
+  /** AI review of algorithmic matches (Pass 3 — THE JUDGE) */
+  aiReview?: AIReviewResult;
   /** Imported schedule from MS Project XML (before optimization) */
   importedSchedule?: ProjectSchedule;
   /** Import diagnostics/suggestions from XML schedule */
@@ -112,12 +124,14 @@ interface ClassifiedFiles {
 
 const STAGE_WEIGHTS: Record<UnifiedStage, number> = {
   classify: 5,
-  parse_ifc: 20,
-  parse_boq: 15,
-  parse_pdf: 20,
-  analyze: 10,
-  estimate: 10,
-  schedule: 10,
+  parse_ifc: 18,
+  parse_boq: 12,
+  parse_pdf: 18,
+  analyze: 7,
+  ai_estimate: 15,
+  estimate: 5,
+  reconcile: 3,
+  schedule: 7,
   export: 10,
 };
 
@@ -243,6 +257,10 @@ export async function runUnifiedPipeline(
   let reconciledBoq: ReconciledBoq | undefined;
   let importedSchedule: ProjectSchedule | undefined;
   let scheduleDiagnostics: ScheduleDiagnostic[] | undefined;
+  let aiEstimate: AIEstimateResult | undefined;
+  let reconciliation: ReconciliationReport | undefined;
+  let aiReview: AIReviewResult | undefined;
+  const collectedPdfTexts: string[] = [];
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -501,6 +519,9 @@ export async function runUnifiedPipeline(
           }
 
           if (enrichedText.trim().length > 50) {
+            // Collect for AI estimation summary
+            collectedPdfTexts.push(enrichedText);
+
             try {
               const parsed = await parseDocumentWithAI(enrichedText, project);
               project = mergeExtractedData(project, parsed);
@@ -540,9 +561,56 @@ export async function runUnifiedPipeline(
 
   progress.completeStage("analyze");
 
-  // ─── Stage 6: Estimate ─────────────────────────────────────
+  // ─── Stage 5.5: AI Estimate ──────────────────────────────────
+  if (opts.includeAIEstimate !== false) {
+    progress.report("ai_estimate", "A gerar estimativa inteligente...");
+
+    try {
+      const { buildProjectSummaryForAI } = await import("./ai-estimate-prompts");
+      const pdfText = collectedPdfTexts.join("\n\n");
+      let summary = buildProjectSummaryForAI(project, ifcAnalyses, wbsProject, pdfText || undefined);
+
+      // Inject few-shot examples from match history (compounding learning)
+      try {
+        const { getTopPatterns, formatPatternsForPrompt } = await import("./ai-feedback-store");
+        const patterns = await getTopPatterns(10, project.buildingType);
+        if (patterns.length > 0) {
+          summary += "\n" + formatPatternsForPrompt(patterns);
+        }
+      } catch {
+        // Non-critical: no historical patterns available yet
+      }
+
+      const response = await fetch("/api/ai-estimate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectSummary: summary }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.available !== false) {
+          aiEstimate = data as AIEstimateResult;
+
+          // If no BOQ was uploaded, use AI work packages as the WBS
+          if (!wbsProject && aiEstimate) {
+            const { aiEstimateToWbs } = await import("./ai-estimate-converter");
+            wbsProject = aiEstimateToWbs(aiEstimate);
+          }
+        }
+      }
+    } catch (err) {
+      warnings.push(
+        `Estimativa AI indisponível: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  progress.completeStage("ai_estimate");
+
+  // ─── Stage 6: Estimate (algorithmic) ─────────────────────────
   if (opts.includeCosts !== false && wbsProject) {
-    progress.report("estimate", "A estimar custos com base de preços...");
+    progress.report("estimate", "A enriquecer com base de preços...");
 
     try {
       const { matchWbsToPrice } = await import("./price-matcher");
@@ -567,6 +635,67 @@ export async function runUnifiedPipeline(
   }
 
   progress.completeStage("estimate");
+
+  // ─── Stage 6.5: Reconcile ────────────────────────────────────
+  if (aiEstimate && matchReport) {
+    progress.report("reconcile", "A reconciliar estimativas...");
+
+    try {
+      const { reconcileEstimates } = await import("./ai-estimate-reconciler");
+      reconciliation = reconcileEstimates(aiEstimate, matchReport, wbsProject);
+
+      if (reconciliation.verdict === "major_divergence") {
+        warnings.push(
+          `Divergência significativa (${reconciliation.overallDivergencePercent}%) entre estimativa AI e algorítmica.`,
+        );
+      }
+    } catch (err) {
+      warnings.push(
+        `Reconciliação falhou: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  progress.completeStage("reconcile");
+
+  // ─── Pass 3: AI Review (fire-and-forget feedback loop) ────
+  // Runs in parallel with remaining stages. Records match quality
+  // for the compounding learning loop (few-shot examples in future runs).
+  let aiReviewPromise: Promise<void> | undefined;
+  if (aiEstimate && matchReport && reconciliation && opts.includeAIEstimate !== false) {
+    aiReviewPromise = (async () => {
+      try {
+        const response = await fetch("/api/ai-review", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ aiEstimate, matchReport, reconciliation }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.matchReviews) {
+            aiReview = data as AIReviewResult;
+
+            // Store feedback for future learning
+            try {
+              const { recordMatchFeedback } = await import("./ai-feedback-store");
+              await recordMatchFeedback(
+                project.name || "unknown",
+                project.buildingType || "residential",
+                project.isRehabilitation || false,
+                matchReport.matches,
+                aiReview.matchReviews,
+              );
+            } catch {
+              // Non-critical: feedback store failure doesn't affect pipeline
+            }
+          }
+        }
+      } catch {
+        // Non-critical: AI review failure doesn't affect pipeline
+      }
+    })();
+  }
 
   // ─── Stage 6b: BOQ Reconciliation ──────────────────────────
   // When both an uploaded BOQ and IFC analysis exist, reconcile them
@@ -784,6 +913,11 @@ export async function runUnifiedPipeline(
 
   progress.completeStage("export");
 
+  // Await AI review if it was launched (non-blocking during scheduling/export)
+  if (aiReviewPromise) {
+    try { await aiReviewPromise; } catch { /* already handled inside */ }
+  }
+
   const processingTimeMs = Math.round(performance.now() - startTime);
 
   return {
@@ -804,6 +938,9 @@ export async function runUnifiedPipeline(
     msProjectXml,
     ccpmGanttExcel,
     complianceExcel,
+    aiEstimate,
+    reconciliation,
+    aiReview,
     importedSchedule,
     scheduleDiagnostics,
     warnings,
