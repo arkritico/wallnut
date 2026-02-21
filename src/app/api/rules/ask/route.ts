@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withApiHandler } from "@/lib/api-error-handler";
 import { retrieveRulesForChat } from "@/lib/rule-retriever";
 import type { RuleFilter } from "@/lib/rule-retriever";
+import { sanitizeConversationHistory } from "@/lib/sanitize-messages";
 
 // ============================================================
 // Types
@@ -100,14 +101,15 @@ export const POST = withApiHandler("rules-ask", async (request) => {
     + `\n\n=== PERGUNTA ===\n${body.question.slice(0, MAX_QUESTION_LENGTH)}`;
 
   // Build messages array (multi-turn support)
+  // Sanitize conversation history to strip any tool_use/tool_result content
+  // blocks that could cause "tool_use ids must be unique" API errors.
   const messages: Array<{ role: "user" | "assistant"; content: string }> = [];
   if (body.conversationHistory?.length) {
-    for (const msg of body.conversationHistory.slice(-MAX_HISTORY_TURNS)) {
-      // Only allow user/assistant roles — reject system or other roles
-      const role = msg.role === "assistant" ? "assistant" : "user";
-      const content = typeof msg.content === "string" ? msg.content.slice(0, MAX_RULES_CONTEXT) : "";
-      if (content) messages.push({ role, content });
-    }
+    const sanitized = sanitizeConversationHistory(body.conversationHistory, {
+      maxContentLength: MAX_RULES_CONTEXT,
+      maxMessages: MAX_HISTORY_TURNS,
+    });
+    messages.push(...sanitized);
   }
   messages.push({ role: "user", content: userMessage });
 
