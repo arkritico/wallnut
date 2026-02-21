@@ -7,10 +7,10 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@napi-rs/canvas', 'winston'],
   // Disable the x-powered-by header to reduce information leakage
   poweredByHeader: false,
-  // Increase body size limit for PDF uploads (10MB)
+  // Increase body size limit for large uploads (IFC files, PDFs)
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb',
+      bodySizeLimit: '50mb',
     },
   },
   headers: async () => [

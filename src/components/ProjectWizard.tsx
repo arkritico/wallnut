@@ -9,7 +9,6 @@ import { getAllMunicipalities, resolveLocationParams } from "@/lib/municipality-
 import { extractTextFromFile, parseDocumentWithAI, mergeExtractedData, type ParsedProjectData } from "@/lib/document-parser";
 import { analyzeIfcSpecialty, type SpecialtyAnalysisResult } from "@/lib/ifc-specialty-analyzer";
 import { mergeIfcFieldsIntoProject, type IfcEnrichmentReport } from "@/lib/ifc-enrichment";
-import type { IfcAnalyzeResponse } from "@/app/api/ifc-analyze/route";
 import ZipUpload from "@/components/ZipUpload";
 import { useI18n } from "@/lib/i18n";
 import type { ChecklistResult } from "@/lib/document-checklist";
@@ -133,43 +132,16 @@ export default function ProjectWizard({ onComplete, onCancel, onStartUnified }: 
     setUploadError(null);
 
     try {
-      let newAnalyses: SpecialtyAnalysisResult[];
-      let names: string[];
+      // Always parse IFC client-side — files can be 50-500MB which exceeds
+      // serverless payload limits. The text parser is fast and runs fine in the browser.
+      const newAnalyses: SpecialtyAnalysisResult[] = [];
+      const names: string[] = [];
 
-      // Delegate to server for large files (> 2MB total) to avoid blocking the UI
-      const totalSize = Array.from(files).reduce((sum, f) => sum + f.size, 0);
-      const useServer = totalSize > 2 * 1024 * 1024;
-
-      if (useServer) {
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-          formData.append("files", files[i]);
-        }
-
-        const response = await fetch("/api/ifc-analyze", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          const err = await response.json().catch(() => ({ error: "Erro de servidor" }));
-          throw new Error(err.error || "Erro ao processar ficheiros IFC no servidor");
-        }
-
-        const result: IfcAnalyzeResponse = await response.json();
-        newAnalyses = result.analyses;
-        names = result.fileNames;
-      } else {
-        // Client-side path for small files (no network round-trip)
-        newAnalyses = [];
-        names = [];
-
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          names.push(file.name);
-          const content = await file.text();
-          newAnalyses.push(analyzeIfcSpecialty(content));
-        }
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        names.push(file.name);
+        const content = await file.text();
+        newAnalyses.push(analyzeIfcSpecialty(content));
       }
 
       setIfcAnalyses(newAnalyses);

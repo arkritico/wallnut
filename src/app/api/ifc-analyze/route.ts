@@ -3,6 +3,10 @@ import { analyzeIfcSpecialty, type SpecialtyAnalysisResult } from "@/lib/ifc-spe
 import { specialtyAnalysisToProjectFields, type IfcEnrichmentReport } from "@/lib/ifc-enrichment";
 import { withApiHandler } from "@/lib/api-error-handler";
 
+// ── Route config — allow large IFC uploads ───────────────────
+export const maxDuration = 60; // seconds (Vercel Pro: up to 300)
+export const dynamic = "force-dynamic";
+
 // ── Limits ──────────────────────────────────────────────────
 const MAX_TOTAL_SIZE = 50 * 1024 * 1024; // 50 MB
 const MAX_FILES = 10;
