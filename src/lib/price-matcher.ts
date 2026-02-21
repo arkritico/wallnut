@@ -1132,34 +1132,85 @@ export async function refreshPriceDatabase(): Promise<void> {
  * Find the closest scraped items to an unmatched article description.
  * Returns top-N near-matches with scores, even below the match threshold.
  * Used to provide reference context to the AI price estimator.
+ *
+ * Collapses variant items back to their parent code and reports the full
+ * price range across all variants, giving the AI a calibrated range.
  */
 export async function findNearestScrapedItems(
   description: string,
   unit: string,
   limit = 5,
-): Promise<Array<{ code: string; description: string; unitCost: number; unit: string; score: number; url?: string; breakdown?: { materials: number; labor: number; machinery: number } }>> {
+): Promise<Array<{ code: string; description: string; unitCost: number; unit: string; score: number; breakdown?: { materials: number; labor: number; machinery: number }; variantRange?: { min: number; max: number; count: number } }>> {
   const database = await getDatabase();
   const queryTokens = new Set(tokenize(description));
   const queryNgrams = ngrams(description, 3);
 
-  return database
-    .map(item => {
-      const itemTokens = new Set(tokenize(item.description + " " + item.chapter));
-      const itemNgrams = ngrams(item.description, 3);
-      let score = jaccard(queryTokens, itemTokens) * 60;
-      score += jaccard(queryNgrams, itemNgrams) * 30;
-      if (item.patterns.some(p => p.test(description))) score += 40;
-      if (unit && unitsCompatible(unit, item.unit)) score += 10;
-      return {
-        code: item.code,
+  // Score all items
+  const scored = database.map(item => {
+    const itemTokens = new Set(tokenize(item.description + " " + item.chapter));
+    const itemNgrams = ngrams(item.description, 3);
+    let score = jaccard(queryTokens, itemTokens) * 60;
+    score += jaccard(queryNgrams, itemNgrams) * 30;
+    if (item.patterns.some(p => p.test(description))) score += 40;
+    if (unit && unitsCompatible(unit, item.unit)) score += 10;
+    return { item, score: Math.round(score * 10) / 10 };
+  }).filter(r => r.score > 5);
+
+  // Collapse variants back to parent code for cleaner reference data.
+  // A variant code looks like "EHS010_C30_37" — parent is "EHS010".
+  const parentMap = new Map<string, {
+    bestScore: number;
+    description: string;
+    unitCost: number;
+    unit: string;
+    breakdown?: { materials: number; labor: number; machinery: number };
+    prices: number[];
+  }>();
+
+  for (const { item, score } of scored) {
+    const parentCode = item.code.includes("_")
+      ? item.code.split("_")[0]
+      : item.code;
+
+    const existing = parentMap.get(parentCode);
+    if (!existing) {
+      parentMap.set(parentCode, {
+        bestScore: score,
         description: item.description,
         unitCost: item.unitCost,
         unit: item.unit,
-        score: Math.round(score * 10) / 10,
         breakdown: item.breakdown,
+        prices: [item.unitCost],
+      });
+    } else {
+      existing.prices.push(item.unitCost);
+      if (score > existing.bestScore) {
+        existing.bestScore = score;
+        // Prefer the base item description (no variant suffix)
+        if (!item.code.includes("_")) {
+          existing.description = item.description;
+          existing.unitCost = item.unitCost;
+          existing.breakdown = item.breakdown;
+        }
+      }
+    }
+  }
+
+  return Array.from(parentMap.entries())
+    .map(([code, data]) => {
+      const prices = data.prices.filter(p => p > 0);
+      const min = prices.length > 0 ? Math.min(...prices) : data.unitCost;
+      const max = prices.length > 0 ? Math.max(...prices) : data.unitCost;
+      return {
+        code,
+        description: data.description,
+        unitCost: data.unitCost,
+        unit: data.unit,
+        score: data.bestScore,
+        breakdown: data.breakdown,
+        variantRange: prices.length > 1 ? { min, max, count: prices.length } : undefined,
       };
     })
-    .filter(r => r.score > 5)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 }

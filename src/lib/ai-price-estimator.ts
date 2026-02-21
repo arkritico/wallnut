@@ -54,6 +54,7 @@ interface ScrapedReference {
   unit: string;
   score: number;
   breakdown?: { materials: number; labor: number; machinery: number };
+  variantRange?: { min: number; max: number; count: number };
 }
 
 /**
@@ -107,7 +108,9 @@ For each article, provide:
    - Labor yields: CYPE labor tables, ProNIC productivity data, ACT collective agreements
    - Equipment: Loxam, Zeppelin, Hertz Equipamentos, etc.
 
-IMPORTANT: When reference items are provided, use their prices as anchors. If the reference is very similar, adjust proportionally. If no reference is close, state that in your rationale.
+IMPORTANT:
+- When reference items are provided, use their prices as anchors. If the reference is very similar, adjust proportionally. If no reference is close, state that in your rationale.
+- When a reference item includes a variantPriceRange, this represents the full market spread from our database of 10k+ scraped price variants. Use this range to place your estimate — e.g., if the range is 6.90€-14.11€ with 3 variants, pick where the requested article falls (económico/padrão/premium).
 
 Respond with ONLY a JSON object:
 {
@@ -148,6 +151,12 @@ Respond with ONLY a JSON object:
           materials: r.breakdown.materials,
           labor: r.breakdown.labor,
           machinery: r.breakdown.machinery,
+        } : undefined,
+        // Include variant price range so AI knows the full market spread
+        variantPriceRange: r.variantRange ? {
+          min: r.variantRange.min,
+          max: r.variantRange.max,
+          variants: r.variantRange.count,
         } : undefined,
       })),
     };
