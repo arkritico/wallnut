@@ -30,7 +30,7 @@ export default function StoreyFilter({
   if (sorted.length === 0) return null;
 
   return (
-    <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 overflow-x-auto max-w-[90%]">
+    <div className="absolute top-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 overflow-x-auto max-w-[90%]">
       <button
         onClick={() => onSelect(null)}
         className={`px-2.5 py-0.5 text-[10px] font-medium rounded-full whitespace-nowrap transition-colors ${

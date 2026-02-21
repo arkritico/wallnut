@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
 import * as THREE from "three";
 import {
   Components,
@@ -45,6 +45,18 @@ export interface PhaseHighlight {
   elements: Record<string, Set<number>>; // modelId → localIds
 }
 
+/** Imperative handle exposed via ref for parent toolbar integration */
+export interface IfcViewerHandle {
+  fitToModel: () => void;
+  showAll: () => void;
+  screenshot: () => void;
+  togglePanel: (panel: "models" | "clipper" | "properties" | "categories") => void;
+  getActivePanel: () => PanelType;
+  /** Create a horizontal section cut at the model center (Dalux-style level cut) */
+  createSectionCut: () => void;
+  hasModel: boolean;
+}
+
 export interface IfcViewerProps {
   /** Optional IFC file data to load immediately */
   ifcData?: Uint8Array;
@@ -66,6 +78,8 @@ export interface IfcViewerProps {
   externalVisibilityControl?: boolean;
   /** Ref to expose the underlying WebGL canvas element (for video capture) */
   canvasRef?: React.MutableRefObject<HTMLCanvasElement | null>;
+  /** Hide the built-in toolbar (parent renders its own) */
+  hideToolbar?: boolean;
   /** CSS class for the container */
   className?: string;
 }
@@ -76,7 +90,7 @@ type PanelType = "models" | "clipper" | "properties" | "categories" | null;
 // Component
 // ============================================================
 
-export default function IfcViewer({
+const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer({
   ifcData,
   ifcName,
   onElementSelect,
@@ -87,8 +101,9 @@ export default function IfcViewer({
   flyToTarget,
   externalVisibilityControl = false,
   canvasRef,
+  hideToolbar = false,
   className = "",
-}: IfcViewerProps) {
+}, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const componentsRef = useRef<Components | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,6 +127,17 @@ export default function IfcViewer({
   // Stable ref for loadedModels to use in event handlers
   const loadedModelsRef = useRef<LoadedModelInfo[]>([]);
   loadedModelsRef.current = loadedModels;
+
+  // Imperative handle for parent toolbar integration
+  useImperativeHandle(ref, () => ({
+    fitToModel: () => handleFitToModel(),
+    showAll: () => handleShowAll(),
+    screenshot: () => handleScreenshot(),
+    togglePanel: (panel: "models" | "clipper" | "properties" | "categories") => togglePanel(panel),
+    getActivePanel: () => activePanel,
+    createSectionCut: () => handleCreateSectionCut(),
+    hasModel: loadedModels.length > 0,
+  }), [activePanel, loadedModels.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Toggle panel (only one open at a time) ──────────────────
   function togglePanel(panel: PanelType) {
@@ -540,6 +566,28 @@ export default function IfcViewer({
     a.click();
   }
 
+  /** Create a horizontal section cut through the center of the model (Dalux-style level cut) */
+  function handleCreateSectionCut() {
+    const clip = clipperRef.current;
+    const world = worldRef.current;
+    if (!clip || !world || loadedModelsRef.current.length === 0) return;
+
+    // Compute combined bounding box of all models
+    const box = new THREE.Box3();
+    for (const m of loadedModelsRef.current) {
+      const modelBox = m.model.box;
+      if (!modelBox.isEmpty()) box.union(modelBox);
+    }
+    if (box.isEmpty()) return;
+
+    const center = box.getCenter(new THREE.Vector3());
+    // Place clip plane at the vertical center (cuts building in half horizontally)
+    const normal = new THREE.Vector3(0, 1, 0);
+    clip.createFromNormalAndCoplanarPoint(world, normal, center);
+    // Open the clipper panel so user can adjust
+    setActivePanel("clipper");
+  }
+
   // ── Model manager handlers ──────────────────────────────────
   function handleToggleModelVisibility(modelId: string) {
     const model = loadedModels.find((m) => m.model.modelId === modelId);
@@ -643,8 +691,8 @@ export default function IfcViewer({
 
   return (
     <div className={`relative flex flex-col bg-gray-100 rounded-lg overflow-hidden ${className}`}>
-      {/* Toolbar */}
-      <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200 text-sm">
+      {/* Toolbar (hidden when parent provides its own) */}
+      {!hideToolbar && <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200 text-sm">
         {/* Upload IFC button */}
         <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium">
           <Upload className="w-3.5 h-3.5" />
@@ -734,7 +782,7 @@ export default function IfcViewer({
             #{selectedElement}
           </span>
         )}
-      </div>
+      </div>}
 
       {/* 3D viewport */}
       <div
@@ -821,7 +869,9 @@ export default function IfcViewer({
       )}
     </div>
   );
-}
+});
+
+export default IfcViewer;
 
 // ============================================================
 // Sub-components
