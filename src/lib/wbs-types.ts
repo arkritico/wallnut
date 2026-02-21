@@ -250,6 +250,8 @@ export interface ProjectSchedule {
   };
   /** Critical Chain (Goldratt) data — present when CCPM mode is used */
   criticalChain?: CriticalChainData;
+  /** AI construction strategy explanation (when AI sequencing was used) */
+  aiRationale?: string;
 }
 
 // ============================================================

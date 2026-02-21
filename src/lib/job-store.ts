@@ -55,6 +55,13 @@ export interface SerializedPipelineResult {
   generatedBoq?: { stats: unknown };
   ifcAnalyses?: unknown;
   elementMapping?: unknown;
+  aiSequence?: {
+    steps: unknown[];
+    aiRationale: string;
+    unmappedCount: number;
+    mappedCount: number;
+    tokenUsage: { input: number; output: number };
+  };
   cashFlow?: unknown;
   budgetExcelBase64?: string;
   msProjectXml?: string;

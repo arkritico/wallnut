@@ -23,6 +23,7 @@ import {
   type KeynoteResolution,
   type GeneratedBoq,
 } from "./keynote-resolver";
+import type { AiSequenceResult } from "./ai-construction-sequencer";
 
 // ============================================================
 // Types
@@ -42,7 +43,7 @@ export interface ElementTaskLink {
   /** Confidence 0-100 */
   confidence: number;
   /** How the link was determined */
-  method: "keynote" | "type_storey" | "system" | "fallback";
+  method: "ai" | "keynote" | "type_storey" | "system" | "fallback";
   /** Storey where element is located */
   storey?: string;
   /** ProNIC chapter code (for traceability) */
@@ -517,6 +518,8 @@ export function mapElementsToTasks(
   options?: {
     resolutions?: KeynoteResolution[];
     boq?: GeneratedBoq;
+    /** AI-generated construction sequence (highest priority mapping) */
+    aiSequence?: AiSequenceResult;
   },
 ): ElementTaskMappingResult {
   // Step 1: Get or compute resolutions
@@ -559,14 +562,39 @@ export function mapElementsToTasks(
   const links: ElementTaskLink[] = [];
   const unmapped: ElementTaskMappingResult["unmapped"] = [];
 
+  const aiMapping = options?.aiSequence?.elementMapping;
+
   for (const element of allElements) {
     const elementId = element.globalId ?? element.name;
     const resolution = resolutionMap.get(elementId);
 
     let link: ElementTaskLink | null = null;
 
+    // Strategy 0: AI sequence (highest confidence)
+    if (aiMapping) {
+      const aiEntry = aiMapping.get(elementId);
+      if (aiEntry) {
+        const phaseTasks = tasksByPhase.get(aiEntry.phase);
+        const task = phaseTasks
+          ? findStoreyTask(phaseTasks, element.storey)
+          : summaryByPhase.get(aiEntry.phase);
+        if (task) {
+          link = {
+            elementId,
+            entityType: element.entityType,
+            taskUid: task.uid,
+            taskName: task.name,
+            phase: aiEntry.phase,
+            confidence: aiEntry.confidence,
+            method: "ai",
+            storey: element.storey,
+          };
+        }
+      }
+    }
+
     // Strategy 1: Keynote
-    if (resolution) {
+    if (!link && resolution) {
       link = mapViaKeynote(
         resolution,
         element,

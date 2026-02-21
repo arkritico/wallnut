@@ -56,6 +56,7 @@ interface UnifiedUploadProps {
 const STAGE_LABELS_PT: Record<UnifiedStage, string> = {
   classify: "Classificação",
   parse_ifc: "Análise IFC",
+  ai_sequence: "Sequência IA",
   parse_boq: "Mapa de Quantidades",
   parse_pdf: "Documentos PDF",
   analyze: "Análise Regulamentar",
@@ -69,6 +70,7 @@ const STAGE_LABELS_PT: Record<UnifiedStage, string> = {
 const STAGE_LABELS_EN: Record<UnifiedStage, string> = {
   classify: "Classification",
   parse_ifc: "IFC Analysis",
+  ai_sequence: "AI Sequencing",
   parse_boq: "Bill of Quantities",
   parse_pdf: "PDF Documents",
   analyze: "Regulatory Analysis",

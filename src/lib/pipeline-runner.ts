@@ -55,6 +55,15 @@ export function serializeResult(
     elementMapping: result.elementMapping
       ? { stats: result.elementMapping.stats }
       : undefined,
+    aiSequence: result.aiSequence
+      ? {
+          steps: result.aiSequence.steps,
+          aiRationale: result.aiSequence.aiRationale,
+          unmappedCount: result.aiSequence.unmappedElements.length,
+          mappedCount: result.aiSequence.elementMapping.size,
+          tokenUsage: result.aiSequence.tokenUsage,
+        }
+      : undefined,
     cashFlow: result.cashFlow,
     budgetExcelBase64: result.budgetExcel
       ? toBase64(result.budgetExcel)

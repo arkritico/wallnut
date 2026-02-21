@@ -8,6 +8,8 @@ import {
   BarChart3,
   Film,
   Settings,
+  Layers,
+  Brain,
 } from "lucide-react";
 import type { FragmentsModel } from "@thatopen/fragments";
 import type { ProjectSchedule, ScheduleTask, ConstructionPhase } from "@/lib/wbs-types";
@@ -45,6 +47,8 @@ export interface FourDViewerProps {
   ifcName?: string;
   /** Called when user applies an optimized schedule (for MS Project re-export) */
   onScheduleOptimized?: (optimizedSchedule: ProjectSchedule) => void;
+  /** AI-generated construction strategy explanation */
+  aiRationale?: string;
   className?: string;
 }
 
@@ -53,6 +57,9 @@ type TaskLocalIdMap = Map<number, Set<number>>;
 
 /** Comparison mode for planned vs actual overlay */
 export type ComparisonMode = "off" | "overlay" | "heatmap";
+
+/** Visualization mode: how elements appear during timeline playback */
+export type VisualizationMode = "phase" | "cumulative";
 
 // ============================================================
 // Comparison color helpers
@@ -107,9 +114,16 @@ interface VisualState {
 
 /**
  * Determine which elements to show and their visual status.
+ *
+ * Phase mode (default):
  * - Task finished → completed (solid)
  * - Task started but not finished → in-progress (ghosted)
  * - Task not started → ghost (faint wireframe preview)
+ *
+ * Cumulative mode:
+ * - Task finished → completed (solid, always visible)
+ * - Task started but not finished → in-progress (semi-transparent)
+ * - Task not started → hidden (building grows from ground up)
  */
 function computeVisualState(
   modelId: string,
@@ -118,6 +132,7 @@ function computeVisualState(
   taskLocalIds: TaskLocalIdMap,
   storeyFilter: string | null,
   localIdToLinks: Map<number, ElementTaskLink[]>,
+  vizMode: VisualizationMode = "phase",
 ): VisualState | undefined {
   if (taskLocalIds.size === 0) return undefined;
 
@@ -128,6 +143,7 @@ function computeVisualState(
   const futureIds = new Set<number>();
 
   const normFilter = storeyFilter ? normalizeStorey(storeyFilter) : null;
+  const isCumulative = vizMode === "cumulative";
 
   for (const [taskUid, localIds] of taskLocalIds) {
     const task = taskByUid.get(taskUid);
@@ -150,12 +166,17 @@ function computeVisualState(
         }
       }
 
-      allVisible.add(id);
-
       if (notStarted) {
+        if (isCumulative) {
+          // Cumulative: future elements are hidden — building grows progressively
+          continue;
+        }
+        allVisible.add(id);
         futureIds.add(id);
         continue;
       }
+
+      allVisible.add(id);
 
       // Determine phase
       const links = localIdToLinks.get(id);
@@ -203,6 +224,7 @@ export default function FourDViewer({
   ifcData,
   ifcName,
   onScheduleOptimized,
+  aiRationale,
   className = "",
 }: FourDViewerProps) {
   const [modelId, setModelId] = useState<string | null>(null);
@@ -227,6 +249,9 @@ export default function FourDViewer({
   const [optimizedResult, setOptimizedResult] = useState<OptimizedSchedule | null>(null);
   const [showVideoExport, setShowVideoExport] = useState(false);
   const [videoSeekMs, setVideoSeekMs] = useState<number | null>(null);
+  // Default to cumulative mode when AI rationale is available (AI-driven sequence)
+  const [vizMode, setVizMode] = useState<VisualizationMode>(aiRationale ? "cumulative" : "phase");
+  const [showAiRationale, setShowAiRationale] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const togglePlayRef = useRef<(() => void) | null>(null);
 
@@ -365,8 +390,9 @@ export default function FourDViewer({
       taskLocalIds,
       storeyFilter,
       localIdToLinksRef.current,
+      vizMode,
     );
-  }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter]);
+  }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter, vizMode]);
 
   // ── Apply phase isolation filter ──────────────────────────────
   const visibilityMap = useMemo(() => {
@@ -664,6 +690,14 @@ export default function FourDViewer({
     setShowVideoExport((prev) => !prev);
   }, []);
 
+  const handleToggleVizMode = useCallback(() => {
+    setVizMode((prev) => prev === "phase" ? "cumulative" : "phase");
+  }, []);
+
+  const handleToggleAiRationale = useCallback(() => {
+    setShowAiRationale((prev) => !prev);
+  }, []);
+
   /** Video export seeks timeline by updating currentMs in TimelinePlayer via state */
   const handleVideoSeek = useCallback((dateMs: number) => {
     setVideoSeekMs(dateMs);
@@ -764,8 +798,66 @@ export default function FourDViewer({
           />
         )}
 
+        {/* AI Construction Strategy panel (bottom-right) */}
+        {showAiRationale && aiRationale && (
+          <div className="absolute bottom-3 right-3 z-20 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-4 max-w-sm max-h-[300px] overflow-y-auto">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <Brain className="w-4 h-4 text-accent" />
+                <h3 className="text-xs font-semibold text-gray-700">Estratégia Construtiva (IA)</h3>
+              </div>
+              <button
+                onClick={() => setShowAiRationale(false)}
+                className="text-gray-400 hover:text-gray-600 text-sm"
+              >
+                &times;
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+              {aiRationale}
+            </p>
+          </div>
+        )}
+
         {/* Synchro 4D toolbar (top-center) */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-1.5 py-1">
+          {/* Cumulative / Phase mode toggle */}
+          <button
+            onClick={handleToggleVizMode}
+            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
+              vizMode === "cumulative"
+                ? "bg-accent text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+            title={vizMode === "cumulative" ? "Construção cumulativa (ativo)" : "Modo fase ativa"}
+          >
+            <Layers className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span className="hidden sm:inline">
+              {vizMode === "cumulative" ? "Cumulativo" : "Fases"}
+            </span>
+          </button>
+
+          {/* AI rationale toggle (only shown when AI sequence is available) */}
+          {aiRationale && (
+            <>
+              <span className="w-px h-4 bg-gray-200 hidden sm:block" />
+              <button
+                onClick={handleToggleAiRationale}
+                className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
+                  showAiRationale
+                    ? "bg-accent text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+                title="Estratégia de construção (IA)"
+              >
+                <Brain className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                <span className="hidden sm:inline">IA</span>
+              </button>
+            </>
+          )}
+
+          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
+
           {/* Progress panel toggle */}
           <button
             onClick={handleToggleProgress}
@@ -921,6 +1013,18 @@ export default function FourDViewer({
           <>
             <span className="w-px h-3 bg-gray-200" />
             <span>{coverageStats.mapped}/{coverageStats.total} fases com 3D</span>
+          </>
+        )}
+        {aiRationale && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span className="text-accent font-medium">IA</span>
+          </>
+        )}
+        {vizMode === "cumulative" && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span>Modo cumulativo</span>
           </>
         )}
         {progressEntries.length > 0 && (

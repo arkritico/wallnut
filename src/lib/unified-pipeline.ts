@@ -32,6 +32,7 @@ import type { ScheduleDiagnostic } from "./msproject-import";
 import type { AIEstimateResult, ReconciliationReport } from "./ai-estimate-types";
 import type { AIReviewResult } from "./ai-feedback-types";
 import { resolveUrl } from "./resolve-url";
+import type { AiSequenceResult } from "./ai-construction-sequencer";
 
 // ============================================================
 // Types
@@ -40,6 +41,7 @@ import { resolveUrl } from "./resolve-url";
 export type UnifiedStage =
   | "classify"
   | "parse_ifc"
+  | "ai_sequence"
   | "parse_boq"
   | "parse_pdf"
   | "analyze"
@@ -99,6 +101,8 @@ export interface UnifiedPipelineResult {
   importedSchedule?: ProjectSchedule;
   /** Import diagnostics/suggestions from XML schedule */
   scheduleDiagnostics?: ScheduleDiagnostic[];
+  /** AI-generated construction sequence (when available) */
+  aiSequence?: AiSequenceResult;
   /** Raw IFC file bytes for 4D viewer (client-side only, not serialized to server) */
   ifcFileData?: Uint8Array;
   /** Original IFC file name */
@@ -125,11 +129,12 @@ interface ClassifiedFiles {
 
 const STAGE_WEIGHTS: Record<UnifiedStage, number> = {
   classify: 5,
-  parse_ifc: 18,
-  parse_boq: 12,
-  parse_pdf: 18,
+  parse_ifc: 15,
+  parse_boq: 10,
+  parse_pdf: 15,
   analyze: 7,
-  ai_estimate: 15,
+  ai_estimate: 12,
+  ai_sequence: 8,
   estimate: 5,
   reconcile: 3,
   schedule: 7,
@@ -262,6 +267,7 @@ export async function runUnifiedPipeline(
   let reconciliation: ReconciliationReport | undefined;
   let aiReview: AIReviewResult | undefined;
   const collectedPdfTexts: string[] = [];
+  let aiSequence: AiSequenceResult | undefined;
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -321,6 +327,32 @@ export async function runUnifiedPipeline(
   }
 
   progress.completeStage("parse_ifc");
+
+  // ─── Stage 2b: AI Construction Sequence ──────────────────────
+  if (ifcAnalyses && ifcAnalyses.length > 0 && process.env.ANTHROPIC_API_KEY) {
+    progress.report("ai_sequence", "IA a analisar sequência construtiva...");
+    try {
+      const { generateAiSequence } = await import("./ai-construction-sequencer");
+      aiSequence = await generateAiSequence(ifcAnalyses, project);
+
+      const aiCoverage = aiSequence.elementMapping.size;
+      const aiTotal = aiCoverage + aiSequence.unmappedElements.length;
+      if (aiSequence.unmappedElements.length > 0) {
+        warnings.push(
+          `IA sequenciou ${aiCoverage}/${aiTotal} elementos ` +
+          `(cobertura: ${aiTotal > 0 ? Math.round((aiCoverage / aiTotal) * 100) : 0}%).`,
+        );
+      } else {
+        warnings.push(`IA sequenciou ${aiCoverage} elementos com sucesso.`);
+      }
+    } catch (err) {
+      warnings.push(
+        `Sequenciamento IA indisponível: ${err instanceof Error ? err.message : String(err)}. ` +
+        `A usar sequência padrão.`,
+      );
+    }
+  }
+  progress.completeStage("ai_sequence");
 
   // ─── Stage 3: Parse BOQ ────────────────────────────────────
   progress.report("parse_boq", "A processar mapa de quantidades...");
@@ -839,6 +871,7 @@ export async function runUnifiedPipeline(
       const { mapElementsToTasks } = await import("./element-task-mapper");
       elementMapping = mapElementsToTasks(ifcAnalyses, schedule, {
         boq: generatedBoq,
+        aiSequence,
       });
     } catch (err) {
       warnings.push(
@@ -944,6 +977,7 @@ export async function runUnifiedPipeline(
     generatedBoq,
     ifcAnalyses,
     elementMapping,
+    aiSequence,
     cashFlow,
     reconciledBoq,
     parsedBoq,
