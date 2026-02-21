@@ -32,14 +32,30 @@ import type { ScheduleDiagnostic } from "./msproject-import";
 import type { AIEstimateResult, ReconciliationReport } from "./ai-estimate-types";
 import type { AIReviewResult } from "./ai-feedback-types";
 import { resolveUrl } from "./resolve-url";
+import type { AiSequenceResult } from "./ai-construction-sequencer";
+import type { ReviewedFinding } from "./ai-deep-analyzer";
 
 // ============================================================
 // Types
 // ============================================================
 
+/**
+ * Analysis depth controls how much AI investment is made per pipeline run.
+ *
+ * - `quick`    — Fast preliminary. Sonnet for sequencing, skip AI PDF parsing.
+ *                Good for initial scoping. (~€0.10-0.50)
+ * - `standard` — Balanced. Opus single-pass, AI PDF parsing. (~€2-8)
+ * - `deep`     — Multi-pass. Opus + extended thinking always on.
+ *                PDFs parsed first, enriched context fed to sequencer,
+ *                validation + refinement passes, regulatory double-check.
+ *                For bid preparation. (~€15-40)
+ */
+export type AnalysisDepth = "quick" | "standard" | "deep";
+
 export type UnifiedStage =
   | "classify"
   | "parse_ifc"
+  | "ai_sequence"
   | "parse_boq"
   | "parse_pdf"
   | "analyze"
@@ -67,6 +83,8 @@ export interface UnifiedPipelineInput {
     existingProject?: Partial<BuildingProject>;
     /** Pre-parsed IFC analyses from client-side Web Worker. Skips server parse_ifc stage. */
     ifcAnalyses?: SpecialtyAnalysisResult[];
+    /** Analysis depth: quick (preliminary) | standard (default) | deep (bid-ready). */
+    analysisDepth?: AnalysisDepth;
     onProgress?: (progress: UnifiedProgress) => void;
   };
 }
@@ -99,6 +117,12 @@ export interface UnifiedPipelineResult {
   importedSchedule?: ProjectSchedule;
   /** Import diagnostics/suggestions from XML schedule */
   scheduleDiagnostics?: ScheduleDiagnostic[];
+  /** AI-generated construction sequence (when available) */
+  aiSequence?: AiSequenceResult;
+  /** AI regulatory review of findings — ranked by severity and relevance (deep mode) */
+  regulatoryReview?: ReviewedFinding[];
+  /** Analysis depth used for this run */
+  analysisDepth?: AnalysisDepth;
   /** Raw IFC file bytes for 4D viewer (client-side only, not serialized to server) */
   ifcFileData?: Uint8Array;
   /** Original IFC file name */
@@ -125,11 +149,12 @@ interface ClassifiedFiles {
 
 const STAGE_WEIGHTS: Record<UnifiedStage, number> = {
   classify: 5,
-  parse_ifc: 18,
-  parse_boq: 12,
-  parse_pdf: 18,
+  parse_ifc: 15,
+  parse_boq: 10,
+  parse_pdf: 15,
   analyze: 7,
-  ai_estimate: 15,
+  ai_estimate: 12,
+  ai_sequence: 8,
   estimate: 5,
   reconcile: 3,
   schedule: 7,
@@ -262,6 +287,10 @@ export async function runUnifiedPipeline(
   let reconciliation: ReconciliationReport | undefined;
   let aiReview: AIReviewResult | undefined;
   const collectedPdfTexts: string[] = [];
+  let aiSequence: AiSequenceResult | undefined;
+  let regulatoryReview: ReviewedFinding[] | undefined;
+  let pdfTexts: string[] = [];
+  const depth: AnalysisDepth = opts.analysisDepth ?? "standard";
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -322,84 +351,169 @@ export async function runUnifiedPipeline(
 
   progress.completeStage("parse_ifc");
 
-  // ─── Stage 3: Parse BOQ ────────────────────────────────────
-  progress.report("parse_boq", "A processar mapa de quantidades...");
+  // ─── Deep mode: parse BOQ + PDF BEFORE AI sequencing ─────────
+  // In deep mode we reorder stages so the AI sequencer has full context
+  // from all documents. In standard/quick mode, the original order is kept.
+  const isDeep = depth === "deep";
 
-  if (classified.boq.length > 0) {
-    // User uploaded a BOQ — parse it
+  if (isDeep) {
+    // Deep mode: parse BOQ first (Stage 3 early)
+    progress.report("parse_boq", "A processar mapa de quantidades...");
+    const boqResult = await parseBoqStage(classified, ifcAnalyses, project, warnings, progress);
+    wbsProject = boqResult.wbsProject;
+    generatedBoq = boqResult.generatedBoq;
+    parsedBoq = boqResult.parsedBoq;
+    progress.completeStage("parse_boq");
+
+    // Deep mode: parse PDFs next (Stage 4 early)
+    progress.report("parse_pdf", "A extrair texto de documentos PDF...");
+    const pdfResult = await parsePdfStage(classified, project, warnings, progress, depth);
+    project = pdfResult.project;
+    pdfTexts = pdfResult.pdfTexts;
+    progress.completeStage("parse_pdf");
+  }
+
+  // ─── Stage 2b: AI Construction Sequence ──────────────────────
+  if (ifcAnalyses && ifcAnalyses.length > 0 && process.env.ANTHROPIC_API_KEY) {
+    progress.report("ai_sequence", "IA a analisar sequência construtiva...");
     try {
-      const file = classified.boq[0];
-      const ext = file.name.split(".").pop()?.toLowerCase();
+      const { generateAiSequence } = await import("./ai-construction-sequencer");
 
-      if (ext === "csv") {
-        const { parseCsvWbs } = await import("./wbs-parser");
-        const text = await file.text();
-        wbsProject = parseCsvWbs(text);
-      } else {
-        const { parseExcelWbs } = await import("./wbs-parser");
-        const buffer = await file.arrayBuffer();
-        wbsProject = await parseExcelWbs(buffer);
+      // In deep mode, assemble enriched context from all parsed data
+      let enrichedContext: string | undefined;
+      if (isDeep) {
+        progress.reportPartial("ai_sequence", 0.05, "IA: Montando contexto do projeto...");
+        const { assembleEnrichedContext } = await import("./ai-deep-analyzer");
+        enrichedContext = assembleEnrichedContext({
+          project,
+          ifcAnalyses,
+          wbsProject,
+          pdfTexts,
+          apiKey: process.env.ANTHROPIC_API_KEY!,
+        });
+      }
 
-        // Also parse as ParsedBoq for reconciliation (needs raw BoqItem entries)
+      progress.reportPartial("ai_sequence", 0.1, "IA: Gerando sequência construtiva...");
+      aiSequence = await generateAiSequence(ifcAnalyses, project, {
+        analysisDepth: depth,
+        enrichedContext,
+      });
+
+      const aiCoverage = aiSequence.elementMapping.size;
+      const aiTotal = aiCoverage + aiSequence.unmappedElements.length;
+
+      // Deep mode: validate + refine the sequence
+      if (isDeep && aiSequence.steps.length > 0) {
         try {
-          const { parseExcelFile } = await import("./xlsx-parser");
-          const xlsResult = parseExcelFile(buffer);
-          if (xlsResult.boqs.length > 0) {
-            parsedBoq = xlsResult.boqs[0];
+          progress.reportPartial("ai_sequence", 0.5, "IA: Validando sequência...");
+          const { validateSequence, refineSequence } = await import("./ai-deep-analyzer");
+          const validation = await validateSequence(
+            aiSequence,
+            enrichedContext ?? "",
+            process.env.ANTHROPIC_API_KEY!,
+          );
+
+          aiSequence.tokenUsage.input += validation.tokenUsage.input;
+          aiSequence.tokenUsage.output += validation.tokenUsage.output;
+
+          const actionableFindings = validation.findings.filter(f => f.severity !== "info");
+          if (actionableFindings.length > 0) {
+            progress.reportPartial("ai_sequence", 0.7, "IA: Refinando sequência...");
+
+            // Collect all element IDs for validation
+            const allElementIds = new Set<string>();
+            for (const step of aiSequence.steps) {
+              for (const id of step.elementIds) allElementIds.add(id);
+            }
+            for (const id of aiSequence.unmappedElements) allElementIds.add(id);
+
+            try {
+              const refined = await refineSequence(
+                aiSequence,
+                validation.findings,
+                enrichedContext ?? "",
+                allElementIds,
+                process.env.ANTHROPIC_API_KEY!,
+              );
+
+              // Rebuild element mapping from refined steps
+              const newMapping = new Map<string, { stepId: string; phase: import("./wbs-types").ConstructionPhase; confidence: number }>();
+              const newMappedIds = new Set<string>();
+              for (const step of refined.steps) {
+                for (const elementId of step.elementIds) {
+                  newMapping.set(elementId, { stepId: step.stepId, phase: step.phase, confidence: 92 });
+                  newMappedIds.add(elementId);
+                }
+              }
+
+              aiSequence = {
+                ...aiSequence,
+                steps: refined.steps,
+                aiRationale: refined.rationale,
+                elementMapping: newMapping,
+                unmappedElements: Array.from(allElementIds).filter(id => !newMappedIds.has(id)),
+                tokenUsage: {
+                  input: aiSequence.tokenUsage.input + refined.tokenUsage.input,
+                  output: aiSequence.tokenUsage.output + refined.tokenUsage.output,
+                },
+              };
+
+              warnings.push(
+                `IA profunda: ${validation.findings.length} constatações na validação → ` +
+                `sequência refinada (${actionableFindings.length} problemas corrigidos).`,
+              );
+            } catch (refineErr) {
+              warnings.push(
+                `Refinamento IA falhou: ${refineErr instanceof Error ? refineErr.message : String(refineErr)}. ` +
+                `Sequência original mantida.`,
+              );
+            }
+          } else {
+            warnings.push(
+              `Validação IA: sequência aprovada sem problemas significativos ` +
+              `(${validation.findings.length} observações informativas).`,
+            );
           }
-        } catch {
-          // Non-critical: reconciliation will be skipped if parsedBoq is unavailable
+        } catch (valErr) {
+          warnings.push(
+            `Validação IA indisponível: ${valErr instanceof Error ? valErr.message : String(valErr)}.`,
+          );
         }
       }
 
-      // Set project name from WBS if project has no name
-      if (wbsProject.name && !project.name) {
-        project.name = wbsProject.name;
-      }
-
-      if (classified.boq.length > 1) {
+      if (aiSequence.unmappedElements.length > 0) {
         warnings.push(
-          `Múltiplos ficheiros BOQ enviados. Apenas o primeiro (${file.name}) foi utilizado.`,
+          `IA sequenciou ${aiCoverage}/${aiTotal} elementos ` +
+          `(cobertura: ${aiTotal > 0 ? Math.round((aiCoverage / aiTotal) * 100) : 0}%).`,
         );
-      }
-    } catch (err) {
-      warnings.push(`Erro ao processar BOQ: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  } else if (ifcAnalyses && ifcAnalyses.length > 0) {
-    // No BOQ uploaded, but IFC available — generate from IFC
-    try {
-      const { generateBoqFromIfc } = await import("./keynote-resolver");
-      const projectName = project.name || "Projeto IFC";
-      const startDate = new Date().toISOString().slice(0, 10);
-      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
-      wbsProject = generatedBoq.project;
-
-      if (generatedBoq.stats.unresolved > 0) {
-        warnings.push(
-          `${generatedBoq.stats.unresolved} elementos IFC sem mapeamento ProNIC ` +
-          `(cobertura: ${generatedBoq.stats.coveragePercent}%).`,
-        );
+      } else {
+        warnings.push(`IA sequenciou ${aiCoverage} elementos com sucesso.`);
       }
     } catch (err) {
       warnings.push(
-        `Erro ao gerar BOQ a partir do IFC: ${err instanceof Error ? err.message : String(err)}`,
+        `Sequenciamento IA indisponível: ${err instanceof Error ? err.message : String(err)}. ` +
+        `A usar sequência padrão.`,
       );
     }
   }
+  progress.completeStage("ai_sequence");
 
-  // When both uploaded BOQ and IFC exist, also generate IFC-based BOQ for reconciliation
-  if (classified.boq.length > 0 && ifcAnalyses && ifcAnalyses.length > 0 && !generatedBoq) {
-    try {
-      const { generateBoqFromIfc } = await import("./keynote-resolver");
-      const projectName = project.name || "Projeto IFC";
-      const startDate = new Date().toISOString().slice(0, 10);
-      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
-    } catch {
-      // Non-critical: reconciliation will be skipped
-    }
+  // ─── Stage 3: Parse BOQ (standard/quick — already done in deep) ──
+  if (!isDeep) {
+    progress.report("parse_boq", "A processar mapa de quantidades...");
+    const boqResult = await parseBoqStage(classified, ifcAnalyses, project, warnings, progress);
+    wbsProject = boqResult.wbsProject;
+    generatedBoq = boqResult.generatedBoq;
+    parsedBoq = boqResult.parsedBoq;
+    progress.completeStage("parse_boq");
+
+    // ─── Stage 4: Parse PDF (standard/quick — already done in deep) ──
+    progress.report("parse_pdf", "A extrair texto de documentos PDF...");
+    const pdfResult = await parsePdfStage(classified, project, warnings, progress, depth);
+    project = pdfResult.project;
+    pdfTexts = pdfResult.pdfTexts;
+    progress.completeStage("parse_pdf");
   }
-
-  progress.completeStage("parse_boq");
 
   // ─── Stage 3b: Parse Schedule XML ──────────────────────────
   if (classified.schedule.length > 0) {
@@ -451,101 +565,6 @@ export async function runUnifiedPipeline(
     }
   }
 
-  // ─── Stage 4: Parse PDF ────────────────────────────────────
-  progress.report("parse_pdf", "A extrair texto de documentos PDF...");
-
-  if (classified.pdf.length > 0) {
-    try {
-      const { splitAndExtract } = await import("./pdf-splitter");
-      const { parseDocumentWithAI, mergeExtractedData } = await import("./document-parser");
-
-      for (let i = 0; i < classified.pdf.length; i++) {
-        progress.reportPartial(
-          "parse_pdf",
-          i / classified.pdf.length,
-          `A processar ${classified.pdf[i].name}...`,
-        );
-
-        try {
-          const buffer = await classified.pdf[i].arrayBuffer();
-          const extraction = await splitAndExtract(buffer);
-
-          // Detect scanned pages and attempt OCR
-          let enrichedText = extraction.text;
-          const scannedPages = extraction.pageTexts.filter(
-            (pt) => pt.text.trim().length < 50,
-          );
-
-          if (scannedPages.length > 0) {
-            try {
-              // OCR uses native @napi-rs/canvas — must run server-side via API route
-              // to keep the client/worker bundle free of Node.js-only dependencies.
-              const formData = new FormData();
-              formData.append("file", new Blob([buffer], { type: "application/pdf" }), classified.pdf[i].name);
-              formData.append("pages", JSON.stringify(scannedPages.map((p) => p.page)));
-              formData.append("language", "por");
-
-              const ocrResponse = await fetch(resolveUrl("/api/ocr"), { method: "POST", body: formData });
-              if (!ocrResponse.ok) throw new Error(`OCR API ${ocrResponse.status}`);
-
-              const ocrData = await ocrResponse.json() as { texts: string[]; confidences: number[] };
-              const pageNumbers = scannedPages.map((p) => p.page);
-
-              // Merge OCR text back (replace sparse text with OCR text if longer)
-              for (let j = 0; j < pageNumbers.length; j++) {
-                const pageText = extraction.pageTexts.find(
-                  (pt) => pt.page === pageNumbers[j],
-                );
-                if (pageText && ocrData.texts[j] && ocrData.texts[j].length > pageText.text.length) {
-                  pageText.text = ocrData.texts[j];
-                }
-              }
-
-              // Rebuild full text with OCR-enriched pages
-              enrichedText = extraction.pageTexts
-                .map((pt) => `--- Página ${pt.page} ---\n${pt.text}`)
-                .join("\n\n");
-
-              const ocrCount = ocrData.texts.filter((t) => t.length > 0).length;
-              if (ocrCount > 0) {
-                warnings.push(
-                  `OCR aplicado a ${ocrCount} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
-                );
-              }
-            } catch {
-              warnings.push(
-                `OCR indisponível para ${scannedPages.length} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
-              );
-            }
-          }
-
-          if (enrichedText.trim().length > 50) {
-            // Collect for AI estimation summary
-            collectedPdfTexts.push(enrichedText);
-
-            try {
-              const parsed = await parseDocumentWithAI(enrichedText, project);
-              project = mergeExtractedData(project, parsed);
-              warnings.push(...parsed.warnings);
-            } catch {
-              warnings.push(
-                `Análise AI indisponível para ${classified.pdf[i].name} — texto extraído mas não interpretado.`,
-              );
-            }
-          }
-        } catch (err) {
-          warnings.push(
-            `Erro ao processar ${classified.pdf[i].name}: ${err instanceof Error ? err.message : String(err)}`,
-          );
-        }
-      }
-    } catch (err) {
-      warnings.push(`Erro no módulo PDF: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  progress.completeStage("parse_pdf");
-
   // ─── Stage 5: Analyze ──────────────────────────────────────
   if (opts.includeCompliance !== false) {
     progress.report("analyze", "A executar análise regulamentar...");
@@ -556,6 +575,45 @@ export async function runUnifiedPipeline(
     } catch (err) {
       warnings.push(
         `Análise regulamentar falhou: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // Deep mode: AI double-check of regulatory findings
+  if (isDeep && analysis && analysis.findings.length > 0 && process.env.ANTHROPIC_API_KEY) {
+    try {
+      const { reviewRegulatoryFindings } = await import("./ai-deep-analyzer");
+      const findingsForReview = analysis.findings.map(f => ({
+        id: f.id,
+        area: f.area,
+        description: f.description,
+        severity: f.severity,
+        regulation: f.regulation,
+        article: f.article,
+        currentValue: f.currentValue,
+        requiredValue: f.requiredValue,
+      }));
+
+      const review = await reviewRegulatoryFindings(
+        findingsForReview,
+        project,
+        pdfTexts,
+        process.env.ANTHROPIC_API_KEY!,
+      );
+
+      regulatoryReview = review.reviewedFindings;
+      const falsePositives = regulatoryReview.filter(r => !r.verified).length;
+      if (falsePositives > 0) {
+        warnings.push(
+          `Revisão IA: ${falsePositives}/${regulatoryReview.length} constatações identificadas como possíveis falsos positivos.`,
+        );
+      }
+      warnings.push(
+        `Revisão regulamentar IA: ${regulatoryReview.length} constatações revistas e priorizadas por relevância.`,
+      );
+    } catch (err) {
+      warnings.push(
+        `Revisão regulamentar IA indisponível: ${err instanceof Error ? err.message : String(err)}.`,
       );
     }
   }
@@ -634,6 +692,187 @@ export async function runUnifiedPipeline(
       // Infer labor constraint from total estimated cost
       const totalCost = matchReport.stats.totalEstimatedCost ?? 0;
       laborConstraint = inferMaxWorkers(totalCost);
+
+      // Deep mode: AI reviews low-confidence matches before gap-filling.
+      // The AI improves the MATCHING (pairing articles to prices), not the prices themselves.
+      // Prices always come from the scraped database — never from AI generation.
+      if (isDeep && matchReport.stats.lowConfidence > 0 && process.env.ANTHROPIC_API_KEY) {
+        try {
+          progress.reportPartial("estimate", 0.4,
+            `IA: Revisando ${matchReport.stats.lowConfidence} correspondências de baixa confiança...`,
+          );
+          const { reviewLowConfidenceMatches } = await import("./ai-deep-analyzer");
+          const { findNearestScrapedItems } = await import("./price-matcher");
+
+          // Collect low-confidence matches
+          const lowConf = matchReport.matches.filter(m => m.confidence < 40);
+
+          // Find alternatives for each
+          const alternatives = new Map<string, Array<{
+            code: string; description: string; unitCost: number; unit: string;
+            score: number; variantRange?: { min: number; max: number; count: number };
+          }>>();
+          for (const m of lowConf) {
+            const alts = await findNearestScrapedItems(m.articleDescription, m.articleUnit ?? "", 5);
+            alternatives.set(m.articleCode, alts);
+          }
+
+          const reviewResult = await reviewLowConfidenceMatches(
+            lowConf.map(m => ({
+              articleCode: m.articleCode,
+              articleDescription: m.articleDescription,
+              articleUnit: m.articleUnit ?? "",
+              priceCode: m.priceCode,
+              priceDescription: m.priceDescription,
+              confidence: m.confidence,
+              matchMethod: m.matchMethod,
+            })),
+            alternatives,
+            {
+              buildingType: project.buildingType,
+              location: project.location?.municipality ?? "Portugal",
+              isRehabilitation: project.isRehabilitation,
+            },
+            process.env.ANTHROPIC_API_KEY!,
+          );
+
+          // Apply decisions to match report
+          const { searchPriceDb } = await import("./price-matcher");
+          for (const decision of reviewResult.decisions) {
+            const matchIdx = matchReport.matches.findIndex(m => m.articleCode === decision.articleCode);
+            if (matchIdx < 0) continue;
+
+            if (decision.action === "confirm" && decision.newConfidence) {
+              // Bump confidence — the AI verified this match is correct
+              matchReport.matches[matchIdx].confidence = decision.newConfidence;
+              matchReport.matches[matchIdx].warnings.push(
+                `IA confirmou correspondência: ${decision.rationale}`,
+              );
+            } else if (decision.action === "swap" && decision.newPriceCode) {
+              // Swap to better candidate from the database
+              const dbResults = await searchPriceDb(decision.newPriceCode, 1);
+              if (dbResults.length > 0) {
+                const better = dbResults[0].item;
+                const existing = matchReport.matches[matchIdx];
+                const quantity = existing.articleQuantity ?? 1;
+                matchReport.matches[matchIdx] = {
+                  ...existing,
+                  priceCode: better.code,
+                  priceDescription: better.description,
+                  priceChapter: better.chapter,
+                  unitCost: better.unitCost,
+                  breakdown: { ...better.breakdown },
+                  priceUnit: better.unit,
+                  confidence: decision.newConfidence ?? 60,
+                  matchMethod: "description",
+                  estimatedCost: Math.round(better.unitCost * quantity * 100) / 100,
+                  fullBreakdown: better.detailedBreakdown,
+                  warnings: [
+                    `IA trocou correspondência (era: ${existing.priceCode}): ${decision.rationale}`,
+                  ],
+                };
+              }
+            } else if (decision.action === "reject") {
+              // Move to unmatched — the gap-fill estimator will handle it
+              const removed = matchReport.matches.splice(matchIdx, 1)[0];
+              matchReport.unmatched.push({
+                articleCode: removed.articleCode,
+                description: removed.articleDescription,
+                suggestedSearch: `IA rejeitou ${removed.priceCode}: ${decision.rationale}`,
+              });
+            }
+          }
+
+          // Recalculate stats after review
+          const hc = matchReport.matches.filter(m => m.confidence >= 70).length;
+          const mc = matchReport.matches.filter(m => m.confidence >= 40 && m.confidence < 70).length;
+          const lc = matchReport.matches.filter(m => m.confidence < 40).length;
+          matchReport.stats.matched = matchReport.matches.length;
+          matchReport.stats.highConfidence = hc;
+          matchReport.stats.mediumConfidence = mc;
+          matchReport.stats.lowConfidence = lc;
+          matchReport.stats.unmatched = matchReport.unmatched.length;
+          matchReport.stats.totalEstimatedCost = matchReport.matches.reduce(
+            (sum, m) => sum + (m.estimatedCost ?? 0), 0,
+          );
+          matchReport.stats.coveragePercent = matchReport.stats.totalArticles > 0
+            ? Math.round((matchReport.stats.matched / matchReport.stats.totalArticles) * 100)
+            : 0;
+
+          warnings.push(
+            `IA revisou ${lowConf.length} correspondências: ` +
+            `${reviewResult.stats.confirmed} confirmadas, ` +
+            `${reviewResult.stats.swapped} trocadas, ` +
+            `${reviewResult.stats.rejected} rejeitadas.`,
+          );
+        } catch (err) {
+          warnings.push(
+            `Revisão IA de correspondências falhou: ${err instanceof Error ? err.message : String(err)}.`,
+          );
+        }
+      }
+
+      // Deep mode: AI-powered price estimation for unmatched articles
+      // Uses the 8,500+ scraped prices/variants as reference context,
+      // with AI filling gaps and providing procurement suggestions
+      if (isDeep && matchReport.unmatched.length > 0 && process.env.ANTHROPIC_API_KEY) {
+        try {
+          progress.reportPartial("estimate", 0.6,
+            `IA: Estimando preços para ${matchReport.unmatched.length} artigos sem correspondência ` +
+            `(referência: ${matchReport.stats.matched} artigos da base de ${(await import("./price-matcher")).getPriceDatabase().then(db => db.length).catch(() => "8500+")} preços)...`,
+          );
+          const { estimateUnmatchedPrices, estimatesToPriceMatches } = await import("./ai-price-estimator");
+
+          // Build article quantities map
+          const articleQuantities = new Map<string, { quantity: number; unit: string }>();
+          for (const ch of wbsProject.chapters) {
+            for (const sc of ch.subChapters) {
+              for (const art of sc.articles) {
+                articleQuantities.set(art.code, { quantity: art.quantity, unit: art.unit });
+              }
+            }
+          }
+
+          const estimation = await estimateUnmatchedPrices(
+            matchReport.unmatched,
+            {
+              buildingType: project.buildingType,
+              location: project.location?.municipality ?? "Portugal",
+              area: project.grossFloorArea,
+              isRehabilitation: project.isRehabilitation,
+            },
+            process.env.ANTHROPIC_API_KEY!,
+          );
+
+          if (estimation.estimates.length > 0) {
+            const aiMatches = estimatesToPriceMatches(estimation.estimates, articleQuantities);
+            matchReport.matches.push(...aiMatches);
+
+            // Remove AI-estimated articles from unmatched
+            const estimatedCodes = new Set(estimation.estimates.map(e => e.articleCode));
+            matchReport.unmatched = matchReport.unmatched.filter(u => !estimatedCodes.has(u.articleCode));
+
+            // Recalculate stats
+            const newTotal = matchReport.matches.reduce((sum, m) => sum + (m.estimatedCost ?? 0), 0);
+            matchReport.stats.matched = matchReport.matches.length;
+            matchReport.stats.unmatched = matchReport.unmatched.length;
+            matchReport.stats.totalEstimatedCost = newTotal;
+            matchReport.stats.coveragePercent = Math.round(
+              (matchReport.stats.matched / matchReport.stats.totalArticles) * 100,
+            );
+
+            warnings.push(
+              `IA estimou preços para ${estimation.estimates.length} artigos sem correspondência CYPE ` +
+              `(${estimation.referenceGrounded} calibrados com preços reais da base, ` +
+              `${estimation.unestimable.length} não estimáveis).`,
+            );
+          }
+        } catch (err) {
+          warnings.push(
+            `Estimativa de preços IA falhou: ${err instanceof Error ? err.message : String(err)}.`,
+          );
+        }
+      }
 
       if (matchReport.unmatched.length > 0) {
         warnings.push(
@@ -839,6 +1078,7 @@ export async function runUnifiedPipeline(
       const { mapElementsToTasks } = await import("./element-task-mapper");
       elementMapping = mapElementsToTasks(ifcAnalyses, schedule, {
         boq: generatedBoq,
+        aiSequence,
       });
     } catch (err) {
       warnings.push(
@@ -944,6 +1184,9 @@ export async function runUnifiedPipeline(
     generatedBoq,
     ifcAnalyses,
     elementMapping,
+    aiSequence,
+    regulatoryReview,
+    analysisDepth: depth,
     cashFlow,
     reconciledBoq,
     parsedBoq,
@@ -959,6 +1202,199 @@ export async function runUnifiedPipeline(
     warnings,
     processingTimeMs,
   };
+}
+
+// ============================================================
+// Extracted stage helpers (for depth-aware reordering)
+// ============================================================
+
+type ProgressReporter = ReturnType<typeof createProgressReporter>;
+
+async function parseBoqStage(
+  classified: ClassifiedFiles,
+  ifcAnalyses: SpecialtyAnalysisResult[] | undefined,
+  project: BuildingProject,
+  warnings: string[],
+  progress: ProgressReporter,
+): Promise<{ wbsProject?: WbsProject; generatedBoq?: GeneratedBoq; parsedBoq?: ParsedBoq }> {
+  let wbsProject: WbsProject | undefined;
+  let generatedBoq: GeneratedBoq | undefined;
+  let parsedBoq: ParsedBoq | undefined;
+
+  if (classified.boq.length > 0) {
+    try {
+      const file = classified.boq[0];
+      const ext = file.name.split(".").pop()?.toLowerCase();
+
+      if (ext === "csv") {
+        const { parseCsvWbs } = await import("./wbs-parser");
+        const text = await file.text();
+        wbsProject = parseCsvWbs(text);
+      } else {
+        const { parseExcelWbs } = await import("./wbs-parser");
+        const buffer = await file.arrayBuffer();
+        wbsProject = await parseExcelWbs(buffer);
+
+        try {
+          const { parseExcelFile } = await import("./xlsx-parser");
+          const xlsResult = parseExcelFile(buffer);
+          if (xlsResult.boqs.length > 0) {
+            parsedBoq = xlsResult.boqs[0];
+          }
+        } catch {
+          // Non-critical
+        }
+      }
+
+      if (wbsProject.name && !project.name) {
+        project.name = wbsProject.name;
+      }
+
+      if (classified.boq.length > 1) {
+        warnings.push(
+          `Múltiplos ficheiros BOQ enviados. Apenas o primeiro (${file.name}) foi utilizado.`,
+        );
+      }
+    } catch (err) {
+      warnings.push(`Erro ao processar BOQ: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  } else if (ifcAnalyses && ifcAnalyses.length > 0) {
+    try {
+      const { generateBoqFromIfc } = await import("./keynote-resolver");
+      const projectName = project.name || "Projeto IFC";
+      const startDate = new Date().toISOString().slice(0, 10);
+      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
+      wbsProject = generatedBoq.project;
+
+      if (generatedBoq.stats.unresolved > 0) {
+        warnings.push(
+          `${generatedBoq.stats.unresolved} elementos IFC sem mapeamento ProNIC ` +
+          `(cobertura: ${generatedBoq.stats.coveragePercent}%).`,
+        );
+      }
+    } catch (err) {
+      warnings.push(
+        `Erro ao gerar BOQ a partir do IFC: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // When both uploaded BOQ and IFC exist, also generate IFC-based BOQ for reconciliation
+  if (classified.boq.length > 0 && ifcAnalyses && ifcAnalyses.length > 0 && !generatedBoq) {
+    try {
+      const { generateBoqFromIfc } = await import("./keynote-resolver");
+      const projectName = project.name || "Projeto IFC";
+      const startDate = new Date().toISOString().slice(0, 10);
+      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
+    } catch {
+      // Non-critical
+    }
+  }
+
+  return { wbsProject, generatedBoq, parsedBoq };
+}
+
+async function parsePdfStage(
+  classified: ClassifiedFiles,
+  project: BuildingProject,
+  warnings: string[],
+  progress: ProgressReporter,
+  depth: AnalysisDepth,
+): Promise<{ project: BuildingProject; pdfTexts: string[] }> {
+  const pdfTexts: string[] = [];
+
+  if (classified.pdf.length > 0) {
+    try {
+      const { splitAndExtract } = await import("./pdf-splitter");
+
+      for (let i = 0; i < classified.pdf.length; i++) {
+        progress.reportPartial(
+          "parse_pdf",
+          i / classified.pdf.length,
+          `A processar ${classified.pdf[i].name}...`,
+        );
+
+        try {
+          const buffer = await classified.pdf[i].arrayBuffer();
+          const extraction = await splitAndExtract(buffer);
+
+          let enrichedText = extraction.text;
+          const scannedPages = extraction.pageTexts.filter(
+            (pt) => pt.text.trim().length < 50,
+          );
+
+          if (scannedPages.length > 0) {
+            try {
+              // OCR uses native @napi-rs/canvas — must run server-side via API route
+              // to keep the client/worker bundle free of Node.js-only dependencies.
+              const formData = new FormData();
+              formData.append("file", new Blob([buffer], { type: "application/pdf" }), classified.pdf[i].name);
+              formData.append("pages", JSON.stringify(scannedPages.map((p) => p.page)));
+              formData.append("language", "por");
+
+              const { resolveUrl } = await import("./resolve-url");
+              const ocrResponse = await fetch(resolveUrl("/api/ocr"), { method: "POST", body: formData });
+              if (!ocrResponse.ok) throw new Error(`OCR API ${ocrResponse.status}`);
+
+              const ocrData = await ocrResponse.json() as { texts: string[]; confidences: number[] };
+              const pageNumbers = scannedPages.map((p) => p.page);
+
+              for (let j = 0; j < pageNumbers.length; j++) {
+                const pageText = extraction.pageTexts.find(
+                  (pt) => pt.page === pageNumbers[j],
+                );
+                if (pageText && ocrData.texts[j] && ocrData.texts[j].length > pageText.text.length) {
+                  pageText.text = ocrData.texts[j];
+                }
+              }
+
+              enrichedText = extraction.pageTexts
+                .map((pt) => `--- Página ${pt.page} ---\n${pt.text}`)
+                .join("\n\n");
+
+              const ocrCount = ocrData.texts.filter((t) => t.length > 0).length;
+              if (ocrCount > 0) {
+                warnings.push(
+                  `OCR aplicado a ${ocrCount} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
+                );
+              }
+            } catch {
+              warnings.push(
+                `OCR indisponível para ${scannedPages.length} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
+              );
+            }
+          }
+
+          // Collect PDF text for deep mode context assembly
+          if (enrichedText.trim().length > 50) {
+            pdfTexts.push(enrichedText);
+          }
+
+          // Quick mode skips AI PDF parsing (just extracts text)
+          if (depth !== "quick" && enrichedText.trim().length > 50) {
+            try {
+              const { parseDocumentWithAI, mergeExtractedData } = await import("./document-parser");
+              const parsed = await parseDocumentWithAI(enrichedText, project, depth);
+              project = mergeExtractedData(project, parsed);
+              warnings.push(...parsed.warnings);
+            } catch {
+              warnings.push(
+                `Análise AI indisponível para ${classified.pdf[i].name} — texto extraído mas não interpretado.`,
+              );
+            }
+          }
+        } catch (err) {
+          warnings.push(
+            `Erro ao processar ${classified.pdf[i].name}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
+    } catch (err) {
+      warnings.push(`Erro no módulo PDF: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  return { project, pdfTexts };
 }
 
 // ============================================================

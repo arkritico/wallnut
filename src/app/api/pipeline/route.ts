@@ -137,6 +137,7 @@ export const POST = withApiHandler("pipeline", async (request) => {
     includeCosts?: boolean;
     includeSchedule?: boolean;
     includeCompliance?: boolean;
+    analysisDepth?: "quick" | "standard" | "deep";
   } = {};
 
   const optionsStr = formData.get("options");

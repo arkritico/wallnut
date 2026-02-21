@@ -55,6 +55,15 @@ export function serializeResult(
     elementMapping: result.elementMapping
       ? { stats: result.elementMapping.stats }
       : undefined,
+    aiSequence: result.aiSequence
+      ? {
+          steps: result.aiSequence.steps,
+          aiRationale: result.aiSequence.aiRationale,
+          unmappedCount: result.aiSequence.unmappedElements.length,
+          mappedCount: result.aiSequence.elementMapping.size,
+          tokenUsage: result.aiSequence.tokenUsage,
+        }
+      : undefined,
     cashFlow: result.cashFlow,
     budgetExcelBase64: result.budgetExcel
       ? toBase64(result.budgetExcel)
@@ -88,6 +97,7 @@ export async function executePipelineJob(
     includeCosts?: boolean;
     includeSchedule?: boolean;
     includeCompliance?: boolean;
+    analysisDepth?: "quick" | "standard" | "deep";
     ifcAnalyses?: unknown[];
   },
 ): Promise<void> {
@@ -117,6 +127,7 @@ export async function executePipelineJob(
         includeCosts: options.includeCosts,
         includeSchedule: options.includeSchedule,
         includeCompliance: options.includeCompliance,
+        analysisDepth: options.analysisDepth,
         ifcAnalyses: options.ifcAnalyses as import("./ifc-specialty-analyzer").SpecialtyAnalysisResult[] | undefined,
         onProgress,
       },

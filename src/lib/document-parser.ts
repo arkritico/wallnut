@@ -60,6 +60,7 @@ export async function extractTextFromFile(
 export async function parseDocumentWithAI(
   text: string,
   currentProject: BuildingProject,
+  analysisDepth?: "quick" | "standard" | "deep",
 ): Promise<ParsedProjectData> {
   const prompt = buildExtractionPrompt(text);
 
@@ -70,6 +71,7 @@ export async function parseDocumentWithAI(
       documentText: text,
       currentProject,
       prompt,
+      analysisDepth,
     }),
   });
 

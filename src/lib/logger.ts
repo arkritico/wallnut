@@ -1,115 +1,159 @@
 /**
  * Structured Logger Configuration
  *
- * Uses Winston for structured logging with:
- * - Multiple log levels (error, warn, info, debug)
- * - Console and file transports
- * - Structured JSON format
- * - Timestamps and metadata
+ * In Node.js: uses Winston for structured logging with console + file transports.
+ * In browser/worker: falls back to console.log with module prefix.
  */
 
-import winston from 'winston';
-import path from 'path';
+const isServer =
+  typeof window === "undefined" &&
+  typeof (globalThis as Record<string, unknown>).WorkerGlobalScope === "undefined";
 
-// Define log levels
-const logLevels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  debug: 3,
-};
+// Minimal logger interface used throughout the codebase
+interface Logger {
+  error: (message: string, meta?: object | undefined) => void;
+  warn: (message: string, meta?: object | undefined) => void;
+  info: (message: string, meta?: object | undefined) => void;
+  debug: (message: string, meta?: object | undefined) => void;
+}
 
-// Define colors for console output
-const logColors = {
-  error: 'red',
-  warn: 'yellow',
-  info: 'green',
-  debug: 'blue',
-};
+// --- Browser / Web Worker fallback (no winston) ---
 
-winston.addColors(logColors);
+function createConsoleLogger(module?: string): Logger {
+  const prefix = module ? `[${module}]` : "";
+  return {
+    error: (msg, meta) => console.error(prefix, msg, meta ?? ""),
+    warn: (msg, meta) => console.warn(prefix, msg, meta ?? ""),
+    info: (msg, meta) => console.info(prefix, msg, meta ?? ""),
+    debug: (msg, meta) => console.debug(prefix, msg, meta ?? ""),
+  };
+}
 
-// Custom format for console (human-readable)
-const consoleFormat = winston.format.combine(
-  winston.format.colorize(),
-  winston.format.timestamp({ format: 'HH:mm:ss' }),
-  winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    let metaStr = '';
-    if (Object.keys(meta).length > 0) {
-      metaStr = ` ${JSON.stringify(meta)}`;
-    }
-    return `${timestamp} [${level}] ${message}${metaStr}`;
-  })
-);
+// Lazy-loaded winston logger (only resolved on the server)
+let _winstonLogger: Logger | null = null;
 
-// Custom format for file (JSON structured)
-const fileFormat = winston.format.combine(
-  winston.format.timestamp(),
-  winston.format.json()
-);
+async function getWinstonLogger(): Promise<Logger> {
+  if (_winstonLogger) return _winstonLogger;
 
-// Create logs directory path
-const logsDir = path.join(process.cwd(), 'logs');
-
-// Create transports
-const transports: winston.transport[] = [
-  // Console transport (always enabled)
-  new winston.transports.Console({
-    format: consoleFormat,
-    level: process.env.LOG_LEVEL || 'info',
-  }),
-];
-
-// Add file transports only in Node.js environment (not in browser/edge runtime)
-if (typeof window === 'undefined' && process.env.VERCEL !== '1') {
   try {
-    transports.push(
-      // Error log file
-      new winston.transports.File({
-        filename: path.join(logsDir, 'error.log'),
-        level: 'error',
-        format: fileFormat,
-        maxsize: 5242880, // 5MB
-        maxFiles: 5,
+    // Use variable-based imports to prevent Turbopack from bundling
+    // these Node.js-only modules into the client/worker chunk.
+    const winstonModule = "winston";
+    const pathModule = "path";
+    const winston = (await import(/* webpackIgnore: true */ winstonModule)).default;
+    const path = await import(/* webpackIgnore: true */ pathModule);
+
+    const logLevels = { error: 0, warn: 1, info: 2, debug: 3 };
+    const logColors = { error: "red", warn: "yellow", info: "green", debug: "blue" };
+
+    winston.addColors(logColors);
+
+    const consoleFormat = winston.format.combine(
+      winston.format.colorize(),
+      winston.format.timestamp({ format: "HH:mm:ss" }),
+      winston.format.printf(({ timestamp, level, message, ...meta }: { timestamp: string; level: string; message: string; [key: string]: unknown }) => {
+        let metaStr = "";
+        if (Object.keys(meta).length > 0) {
+          metaStr = ` ${JSON.stringify(meta)}`;
+        }
+        return `${timestamp} [${level}] ${message}${metaStr}`;
       }),
-      // Combined log file
-      new winston.transports.File({
-        filename: path.join(logsDir, 'combined.log'),
-        format: fileFormat,
-        maxsize: 5242880, // 5MB
-        maxFiles: 5,
-      })
     );
-  } catch (error) {
-    // Silently fail if file system is not available (e.g., in edge runtime)
-    console.warn('File logging unavailable:', error);
+
+    const fileFormat = winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json(),
+    );
+
+    const logsDir = path.join(process.cwd(), "logs");
+    const transports: import("winston").transport[] = [
+      new winston.transports.Console({
+        format: consoleFormat,
+        level: process.env.LOG_LEVEL || "info",
+      }),
+    ];
+
+    if (process.env.VERCEL !== "1") {
+      try {
+        transports.push(
+          new winston.transports.File({
+            filename: path.join(logsDir, "error.log"),
+            level: "error",
+            format: fileFormat,
+            maxsize: 5242880,
+            maxFiles: 5,
+          }),
+          new winston.transports.File({
+            filename: path.join(logsDir, "combined.log"),
+            format: fileFormat,
+            maxsize: 5242880,
+            maxFiles: 5,
+          }),
+        );
+      } catch {
+        // Silently fail if file system is not available
+      }
+    }
+
+    const logger = winston.createLogger({
+      levels: logLevels,
+      transports,
+      exitOnError: false,
+    });
+
+    _winstonLogger = {
+      error: (msg, meta) => logger.error(msg, meta),
+      warn: (msg, meta) => logger.warn(msg, meta),
+      info: (msg, meta) => logger.info(msg, meta),
+      debug: (msg, meta) => logger.debug(msg, meta),
+    };
+
+    return _winstonLogger;
+  } catch {
+    // Winston unavailable — fall back to console
+    _winstonLogger = createConsoleLogger();
+    return _winstonLogger;
   }
 }
 
-// Create logger instance
-const logger = winston.createLogger({
-  levels: logLevels,
-  transports,
-  // Don't exit on error
-  exitOnError: false,
-});
+// Synchronous default export: uses console initially, upgrades to winston on server
+const defaultLogger: Logger = createConsoleLogger();
 
-// Export logger and utility functions
-export default logger;
+if (isServer) {
+  // Fire-and-forget: upgrade to winston as soon as it loads
+  getWinstonLogger().then((wl) => {
+    Object.assign(defaultLogger, wl);
+  });
+}
+
+export default defaultLogger;
 
 /**
  * Create a child logger with a specific context/module name
  */
-export function createLogger(module: string) {
+export function createLogger(module: string): Logger {
+  if (!isServer) {
+    return createConsoleLogger(module);
+  }
+
+  // Return a proxy that lazily delegates to winston once loaded
+  const fallback = createConsoleLogger(module);
+  let resolved: Logger | null = null;
+
+  getWinstonLogger().then((wl) => {
+    resolved = {
+      error: (msg, meta) => wl.error(msg, { module, ...meta }),
+      warn: (msg, meta) => wl.warn(msg, { module, ...meta }),
+      info: (msg, meta) => wl.info(msg, { module, ...meta }),
+      debug: (msg, meta) => wl.debug(msg, { module, ...meta }),
+    };
+  });
+
   return {
-    error: (message: string, meta?: any) =>
-      logger.error(message, { module, ...meta }),
-    warn: (message: string, meta?: any) =>
-      logger.warn(message, { module, ...meta }),
-    info: (message: string, meta?: any) =>
-      logger.info(message, { module, ...meta }),
-    debug: (message: string, meta?: any) =>
-      logger.debug(message, { module, ...meta }),
+    error: (msg, meta) => (resolved ?? fallback).error(msg, meta),
+    warn: (msg, meta) => (resolved ?? fallback).warn(msg, meta),
+    info: (msg, meta) => (resolved ?? fallback).info(msg, meta),
+    debug: (msg, meta) => (resolved ?? fallback).debug(msg, meta),
   };
 }
 
@@ -117,20 +161,20 @@ export function createLogger(module: string) {
  * Log scraper activity with structured metadata
  */
 export function logScraperActivity(
-  action: 'start' | 'success' | 'error' | 'retry' | 'cache_hit',
+  action: "start" | "success" | "error" | "retry" | "cache_hit",
   details: {
     category?: string;
     itemCode?: string;
     url?: string;
-    error?: any;
+    error?: unknown;
     duration?: number;
     retryCount?: number;
-  }
+  },
 ) {
   const { category, itemCode, url, error, duration, retryCount } = details;
 
   const meta = {
-    module: 'price-scraper',
+    module: "price-scraper",
     category,
     itemCode,
     url,
@@ -139,20 +183,23 @@ export function logScraperActivity(
   };
 
   switch (action) {
-    case 'start':
-      logger.info('Scraper started', meta);
+    case "start":
+      defaultLogger.info("Scraper started", meta);
       break;
-    case 'success':
-      logger.info('Scraper completed successfully', meta);
+    case "success":
+      defaultLogger.info("Scraper completed successfully", meta);
       break;
-    case 'error':
-      logger.error('Scraper error', { ...meta, error: error?.message || String(error) });
+    case "error":
+      defaultLogger.error("Scraper error", {
+        ...meta,
+        error: error instanceof Error ? error.message : String(error),
+      });
       break;
-    case 'retry':
-      logger.warn('Scraper retry', meta);
+    case "retry":
+      defaultLogger.warn("Scraper retry", meta);
       break;
-    case 'cache_hit':
-      logger.debug('Cache hit', meta);
+    case "cache_hit":
+      defaultLogger.debug("Cache hit", meta);
       break;
   }
 }

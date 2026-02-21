@@ -8,6 +8,15 @@ import {
   BarChart3,
   Film,
   Settings,
+  Layers,
+  Brain,
+  Scissors,
+  SplitSquareHorizontal,
+  Info,
+  Maximize2,
+  Eye,
+  Camera,
+  Upload,
 } from "lucide-react";
 import type { FragmentsModel } from "@thatopen/fragments";
 import type { ProjectSchedule, ScheduleTask, ConstructionPhase } from "@/lib/wbs-types";
@@ -20,7 +29,7 @@ import {
   type EvmBaseline,
   type TaskProgress,
 } from "@/lib/earned-value";
-import type { PhaseHighlight } from "./IfcViewer";
+import type { PhaseHighlight, IfcViewerHandle } from "./IfcViewer";
 import type { LegendPhase } from "./FourDLegend";
 import TimelinePlayer, { type TimelineState } from "./TimelinePlayer";
 import StoreyFilter from "./StoreyFilter";
@@ -45,6 +54,8 @@ export interface FourDViewerProps {
   ifcName?: string;
   /** Called when user applies an optimized schedule (for MS Project re-export) */
   onScheduleOptimized?: (optimizedSchedule: ProjectSchedule) => void;
+  /** AI-generated construction strategy explanation */
+  aiRationale?: string;
   className?: string;
 }
 
@@ -53,6 +64,9 @@ type TaskLocalIdMap = Map<number, Set<number>>;
 
 /** Comparison mode for planned vs actual overlay */
 export type ComparisonMode = "off" | "overlay" | "heatmap";
+
+/** Visualization mode: how elements appear during timeline playback */
+export type VisualizationMode = "phase" | "cumulative";
 
 // ============================================================
 // Comparison color helpers
@@ -107,9 +121,16 @@ interface VisualState {
 
 /**
  * Determine which elements to show and their visual status.
+ *
+ * Phase mode (default):
  * - Task finished → completed (solid)
  * - Task started but not finished → in-progress (ghosted)
  * - Task not started → ghost (faint wireframe preview)
+ *
+ * Cumulative mode:
+ * - Task finished → completed (solid, always visible)
+ * - Task started but not finished → in-progress (semi-transparent)
+ * - Task not started → hidden (building grows from ground up)
  */
 function computeVisualState(
   modelId: string,
@@ -118,6 +139,7 @@ function computeVisualState(
   taskLocalIds: TaskLocalIdMap,
   storeyFilter: string | null,
   localIdToLinks: Map<number, ElementTaskLink[]>,
+  vizMode: VisualizationMode = "phase",
 ): VisualState | undefined {
   if (taskLocalIds.size === 0) return undefined;
 
@@ -128,6 +150,7 @@ function computeVisualState(
   const futureIds = new Set<number>();
 
   const normFilter = storeyFilter ? normalizeStorey(storeyFilter) : null;
+  const isCumulative = vizMode === "cumulative";
 
   for (const [taskUid, localIds] of taskLocalIds) {
     const task = taskByUid.get(taskUid);
@@ -150,12 +173,17 @@ function computeVisualState(
         }
       }
 
-      allVisible.add(id);
-
       if (notStarted) {
+        if (isCumulative) {
+          // Cumulative: future elements are hidden — building grows progressively
+          continue;
+        }
+        allVisible.add(id);
         futureIds.add(id);
         continue;
       }
+
+      allVisible.add(id);
 
       // Determine phase
       const links = localIdToLinks.get(id);
@@ -203,6 +231,7 @@ export default function FourDViewer({
   ifcData,
   ifcName,
   onScheduleOptimized,
+  aiRationale,
   className = "",
 }: FourDViewerProps) {
   const [modelId, setModelId] = useState<string | null>(null);
@@ -227,7 +256,11 @@ export default function FourDViewer({
   const [optimizedResult, setOptimizedResult] = useState<OptimizedSchedule | null>(null);
   const [showVideoExport, setShowVideoExport] = useState(false);
   const [videoSeekMs, setVideoSeekMs] = useState<number | null>(null);
+  // Default to cumulative mode when AI rationale is available (AI-driven sequence)
+  const [vizMode, setVizMode] = useState<VisualizationMode>(aiRationale ? "cumulative" : "phase");
+  const [showAiRationale, setShowAiRationale] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const viewerRef = useRef<IfcViewerHandle>(null);
   const togglePlayRef = useRef<(() => void) | null>(null);
 
   // ── Progress map for quick lookup ────────────────────────
@@ -365,8 +398,9 @@ export default function FourDViewer({
       taskLocalIds,
       storeyFilter,
       localIdToLinksRef.current,
+      vizMode,
     );
-  }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter]);
+  }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter, vizMode]);
 
   // ── Apply phase isolation filter ──────────────────────────────
   const visibilityMap = useMemo(() => {
@@ -664,6 +698,14 @@ export default function FourDViewer({
     setShowVideoExport((prev) => !prev);
   }, []);
 
+  const handleToggleVizMode = useCallback(() => {
+    setVizMode((prev) => prev === "phase" ? "cumulative" : "phase");
+  }, []);
+
+  const handleToggleAiRationale = useCallback(() => {
+    setShowAiRationale((prev) => !prev);
+  }, []);
+
   /** Video export seeks timeline by updating currentMs in TimelinePlayer via state */
   const handleVideoSeek = useCallback((dateMs: number) => {
     setVideoSeekMs(dateMs);
@@ -705,6 +747,7 @@ export default function FourDViewer({
       {/* 3D viewport with overlays */}
       <div className="flex-1 min-h-[400px] md:min-h-0 relative">
         <IfcViewer
+          ref={viewerRef}
           ifcData={ifcData}
           ifcName={ifcName}
           onModelLoaded={handleModelLoaded}
@@ -714,11 +757,198 @@ export default function FourDViewer({
           selectionHighlights={selectionHighlights}
           flyToTarget={flyToTarget}
           externalVisibilityControl
+          hideToolbar
           canvasRef={canvasRef}
           className="h-full"
         />
 
-        {/* Storey filter pills */}
+        {/* ── Unified toolbar (static, top of viewport) ─────────── */}
+        <div className="absolute top-0 inset-x-0 z-20 flex items-center gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-2 py-1 text-[10px] overflow-x-auto">
+          {/* ── Left: IFC model tools ── */}
+          <div className="flex items-center gap-px shrink-0">
+            <button
+              onClick={() => viewerRef.current?.togglePanel("models")}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                viewerRef.current?.getActivePanel() === "models"
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Gerir modelos IFC"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Modelos</span>
+            </button>
+            <button
+              onClick={() => viewerRef.current?.togglePanel("clipper")}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                viewerRef.current?.getActivePanel() === "clipper"
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Planos de corte"
+            >
+              <Scissors className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Cortes</span>
+            </button>
+            <button
+              onClick={() => viewerRef.current?.createSectionCut()}
+              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              title="Corte por piso — secção horizontal pelo centro do modelo"
+            >
+              <SplitSquareHorizontal className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Piso</span>
+            </button>
+            <button
+              onClick={() => viewerRef.current?.togglePanel("properties")}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                viewerRef.current?.getActivePanel() === "properties"
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Propriedades do elemento"
+            >
+              <Info className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Propriedades</span>
+            </button>
+          </div>
+
+          {/* Divider */}
+          <span className="w-px h-5 bg-gray-200 mx-1 shrink-0" />
+
+          {/* ── Center: 4D controls ── */}
+          <div className="flex items-center gap-px shrink-0">
+            <button
+              onClick={handleToggleVizMode}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                vizMode === "cumulative"
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title={vizMode === "cumulative" ? "Construção cumulativa (ativo)" : "Modo fase ativa"}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">{vizMode === "cumulative" ? "Cumulativo" : "Fases"}</span>
+            </button>
+
+            {aiRationale && (
+              <button
+                onClick={handleToggleAiRationale}
+                className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                  showAiRationale
+                    ? "bg-accent text-white"
+                    : "text-gray-500 hover:bg-gray-100"
+                }`}
+                title="Estratégia de construção (IA)"
+              >
+                <Brain className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">IA</span>
+              </button>
+            )}
+
+            <button
+              onClick={handleToggleProgress}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                showProgress
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Painel de progresso (P)"
+            >
+              <ClipboardList className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Progresso</span>
+            </button>
+
+            <button
+              onClick={handleCycleComparison}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                comparisonMode !== "off"
+                  ? "bg-accent text-white"
+                  : progressEntries.length === 0
+                    ? "text-gray-300 cursor-not-allowed"
+                    : "text-gray-500 hover:bg-gray-100"
+              }`}
+              disabled={progressEntries.length === 0}
+              title={`Plano vs Real: ${COMPARISON_LABELS[comparisonMode]} (C)`}
+            >
+              <GitCompareArrows className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">
+                Plan vs Real
+                {comparisonMode !== "off" && (
+                  <span className="ml-0.5 opacity-75">({COMPARISON_LABELS[comparisonMode]})</span>
+                )}
+              </span>
+            </button>
+
+            <button
+              onClick={handleToggleHistogram}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                showHistogram
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Histograma de recursos (R)"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Recursos</span>
+            </button>
+
+            <button
+              onClick={handleToggleVideoExport}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                showVideoExport
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Exportar vídeo 4D"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Vídeo</span>
+            </button>
+
+            <button
+              onClick={handleToggleCapacity}
+              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                showCapacity
+                  ? "bg-accent text-white"
+                  : "text-gray-500 hover:bg-gray-100"
+              }`}
+              title="Capacidade do estaleiro (O)"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Capacidade</span>
+            </button>
+          </div>
+
+          {/* Spacer */}
+          <div className="flex-1 min-w-2" />
+
+          {/* ── Right: Utility actions ── */}
+          <div className="flex items-center gap-px shrink-0">
+            <button
+              onClick={() => viewerRef.current?.fitToModel()}
+              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              title="Ajustar câmara ao modelo"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => viewerRef.current?.showAll()}
+              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              title="Mostrar todos os elementos"
+            >
+              <Eye className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => viewerRef.current?.screenshot()}
+              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              title="Captura de ecrã"
+            >
+              <Camera className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Storey filter pills (below toolbar) */}
         <StoreyFilter
           storeys={allStoreys}
           selected={storeyFilter}
@@ -764,98 +994,31 @@ export default function FourDViewer({
           />
         )}
 
-        {/* Synchro 4D toolbar (top-center) */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-1.5 py-1">
-          {/* Progress panel toggle */}
-          <button
-            onClick={handleToggleProgress}
-            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
-              showProgress
-                ? "bg-accent text-white"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            title="Painel de progresso"
-          >
-            <ClipboardList className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-            <span className="hidden sm:inline">Progresso</span>
-          </button>
+        {/* AI Construction Strategy panel (bottom-right) */}
+        {showAiRationale && aiRationale && (
+          <div className="absolute bottom-3 right-3 z-20 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-4 max-w-sm max-h-[300px] overflow-y-auto">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
+                <Brain className="w-4 h-4 text-accent" />
+                <h3 className="text-xs font-semibold text-gray-700">Estratégia Construtiva (IA)</h3>
+              </div>
+              <button
+                onClick={() => setShowAiRationale(false)}
+                className="text-gray-400 hover:text-gray-600 text-sm"
+              >
+                &times;
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-600 leading-relaxed whitespace-pre-wrap">
+              {aiRationale}
+            </p>
+          </div>
+        )}
 
-          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
 
-          {/* Comparison mode toggle */}
-          <button
-            onClick={handleCycleComparison}
-            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
-              comparisonMode !== "off"
-                ? "bg-accent text-white"
-                : progressEntries.length === 0
-                  ? "text-gray-300 cursor-not-allowed"
-                  : "text-gray-600 hover:bg-gray-100"
-            }`}
-            disabled={progressEntries.length === 0}
-            title={`Plano vs Real: ${COMPARISON_LABELS[comparisonMode]}`}
-          >
-            <GitCompareArrows className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-            <span className="hidden sm:inline">
-              Plano vs Real
-              {comparisonMode !== "off" && (
-                <span className="ml-1 opacity-75">({COMPARISON_LABELS[comparisonMode]})</span>
-              )}
-            </span>
-          </button>
-
-          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
-
-          {/* Resource histogram toggle */}
-          <button
-            onClick={handleToggleHistogram}
-            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
-              showHistogram
-                ? "bg-accent text-white"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            title="Histograma de recursos"
-          >
-            <BarChart3 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-            <span className="hidden sm:inline">Recursos</span>
-          </button>
-
-          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
-
-          {/* Video export */}
-          <button
-            onClick={handleToggleVideoExport}
-            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
-              showVideoExport
-                ? "bg-accent text-white"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            title="Exportar vídeo 4D"
-          >
-            <Film className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-            <span className="hidden sm:inline">Vídeo</span>
-          </button>
-
-          <span className="w-px h-4 bg-gray-200 hidden sm:block" />
-
-          {/* Capacity optimizer */}
-          <button
-            onClick={handleToggleCapacity}
-            className={`flex items-center gap-1.5 px-3 py-2 sm:px-2 sm:py-1 text-xs sm:text-[10px] font-medium rounded transition-colors min-h-[44px] sm:min-h-0 ${
-              showCapacity
-                ? "bg-accent text-white"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-            title="Capacidade do estaleiro (O)"
-          >
-            <Settings className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
-            <span className="hidden sm:inline">Capacidade</span>
-          </button>
-        </div>
-
-        {/* Comparison legend (top-right, shown in overlay/heatmap modes) */}
+        {/* Comparison legend (top-right, below toolbar) */}
         {comparisonMode !== "off" && progressEntries.length > 0 && (
-          <div className="absolute top-3 right-3 z-20 bg-white/90 backdrop-blur-sm rounded-lg shadow border border-gray-200 px-3 py-2">
+          <div className="absolute top-11 right-3 z-20 bg-white/90 backdrop-blur-sm rounded-lg shadow border border-gray-200 px-3 py-2">
             <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
               {comparisonMode === "overlay" ? "Progresso vs Plano" : "SPI por Tarefa"}
             </p>
@@ -884,7 +1047,7 @@ export default function FourDViewer({
 
         {/* No-geometry overlay for phases without 3D */}
         {!currentPhasesHave3D && timelineState && timelineState.activeTasks.length > 0 && (
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+          <div className="absolute top-20 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
             <div className="bg-gray-900/70 backdrop-blur-sm rounded-lg px-4 py-2.5 text-center">
               <p className="text-white/90 text-xs font-medium">
                 Fase sem geometria 3D
@@ -921,6 +1084,18 @@ export default function FourDViewer({
           <>
             <span className="w-px h-3 bg-gray-200" />
             <span>{coverageStats.mapped}/{coverageStats.total} fases com 3D</span>
+          </>
+        )}
+        {aiRationale && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span className="text-accent font-medium">IA</span>
+          </>
+        )}
+        {vizMode === "cumulative" && (
+          <>
+            <span className="w-px h-3 bg-gray-200" />
+            <span>Modo cumulativo</span>
           </>
         )}
         {progressEntries.length > 0 && (

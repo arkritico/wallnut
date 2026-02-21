@@ -3,6 +3,7 @@ import type { AIAnalysisRequest, AIAnalysisResponse } from "@/lib/ai-analysis";
 import { buildAnalysisSystemPrompt } from "@/lib/ai-analysis";
 import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
+import { getModelForDepth, buildApiRequestBody } from "@/lib/ai-model-selection";
 
 const log = createLogger("ai-analyze");
 
@@ -53,6 +54,14 @@ export const POST = withApiHandler("ai-analyze", async (request) => {
   }
 
   // ── Call Anthropic API ─────────────────────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const depth = (body as any).analysisDepth as string | undefined;
+  const modelConfig = getModelForDepth(
+    (depth === "quick" || depth === "standard" || depth === "deep") ? depth : "standard",
+    8192,
+    10000,
+  );
+
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -60,12 +69,11 @@ export const POST = withApiHandler("ai-analyze", async (request) => {
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 4096,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userMessage }],
-    }),
+    body: JSON.stringify(buildApiRequestBody(
+      modelConfig,
+      systemPrompt,
+      [{ role: "user", content: userMessage }],
+    )),
   });
 
   if (!response.ok) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withApiHandler } from "@/lib/api-error-handler";
 import { retrieveRulesForChat } from "@/lib/rule-retriever";
 import type { RuleFilter } from "@/lib/rule-retriever";
+import { getModelForDepth, buildApiRequestBody } from "@/lib/ai-model-selection";
 
 // ============================================================
 // Types
@@ -111,6 +112,12 @@ export const POST = withApiHandler("rules-ask", async (request) => {
   }
   messages.push({ role: "user", content: userMessage });
 
+  // Depth-aware model selection
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawDepth = (body as any).analysisDepth as string | undefined;
+  const depth = (rawDepth === "quick" || rawDepth === "standard" || rawDepth === "deep") ? rawDepth : "standard";
+  const modelConfig = getModelForDepth(depth, 8192, 10000);
+
   // Call Anthropic API
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -119,12 +126,7 @@ export const POST = withApiHandler("rules-ask", async (request) => {
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 4096,
-      system: SYSTEM_PROMPT,
-      messages,
-    }),
+    body: JSON.stringify(buildApiRequestBody(modelConfig, SYSTEM_PROMPT, messages)),
   });
 
   if (!response.ok) {

@@ -34,6 +34,7 @@ interface FingerprintOptions {
   includeCosts?: boolean;
   includeSchedule?: boolean;
   includeCompliance?: boolean;
+  analysisDepth?: string;
 }
 
 // ============================================================================
@@ -79,7 +80,7 @@ export async function computeFingerprint(
 ): Promise<string> {
   const sorted = [...files].sort((a, b) => a.name.localeCompare(b.name));
   const parts = sorted.map((f) => `${f.name}:${f.size}:${f.lastModified}`);
-  const optsSuffix = `|opts:${options?.includeCosts ?? true}:${options?.includeSchedule ?? true}:${options?.includeCompliance ?? true}`;
+  const optsSuffix = `|opts:${options?.includeCosts ?? true}:${options?.includeSchedule ?? true}:${options?.includeCompliance ?? true}:${options?.analysisDepth ?? "standard"}`;
   const raw = parts.join("|") + optsSuffix;
 
   const data = new TextEncoder().encode(raw);

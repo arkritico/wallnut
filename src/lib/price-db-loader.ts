@@ -307,13 +307,43 @@ function convertToWorkItems(item: ScrapedPriceItem): PriceWorkItem[] {
 
   const result: PriceWorkItem[] = [base];
 
-  // Expand variants into separate work items
+  // Expand variants into separate work items with meaningful descriptions
   if (item.variants && item.variants.length > 0) {
-    for (const variant of item.variants) {
+    // Sort variants by price to assign tier labels
+    const sortedVariants = [...item.variants].sort((a, b) => a.unitCost - b.unitCost);
+    const variantCount = sortedVariants.length;
+
+    // Clean the parent description (remove leading price patterns like "11,23€ ")
+    const cleanParentDesc = item.description.replace(/^\d[\d.,]*\s*€?\s*/, '').trim();
+
+    for (let vi = 0; vi < sortedVariants.length; vi++) {
+      const variant = sortedVariants[vi];
+
+      // Generate a tier label (económico/padrão/premium) based on position
+      let tierLabel: string;
+      if (variantCount <= 2) {
+        tierLabel = vi === 0 ? "económico" : "premium";
+      } else {
+        const position = vi / (variantCount - 1); // 0..1
+        if (position < 0.33) tierLabel = "económico";
+        else if (position < 0.67) tierLabel = "padrão";
+        else tierLabel = "premium";
+      }
+
+      // Use variant description only if it's meaningful (not generic CYPE boilerplate)
+      const variantDescIsUseful = variant.description
+        && !variant.description.includes("Gerador de Preços")
+        && variant.description.length > 10
+        && variant.description !== item.description;
+
+      const variantDesc = variantDescIsUseful
+        ? variant.description!
+        : `${cleanParentDesc} [variante ${tierLabel}, ${variant.unitCost.toFixed(2)}€/${variant.unit || base.unit}]`;
+
       result.push({
         ...base,
         code: `${item.code}_${variant.variantId}`,
-        description: variant.description || `${item.description} [${variant.variantId}]`,
+        description: variantDesc,
         unit: variant.unit || base.unit,
         unitCost: variant.unitCost,
         breakdown: { ...base.breakdown }, // Variants may override later if scraped
@@ -325,6 +355,15 @@ function convertToWorkItems(item: ScrapedPriceItem): PriceWorkItem[] {
             .map(v => new RegExp(v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')),
         ],
       });
+    }
+
+    // Annotate the base item with its variant price range
+    if (sortedVariants.length > 0) {
+      const minPrice = sortedVariants[0].unitCost;
+      const maxPrice = sortedVariants[sortedVariants.length - 1].unitCost;
+      if (minPrice !== maxPrice) {
+        base.description = `${base.description} [${sortedVariants.length} variantes: ${minPrice.toFixed(2)}€-${maxPrice.toFixed(2)}€]`;
+      }
     }
   }
 

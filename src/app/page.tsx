@@ -987,6 +987,7 @@ export default function Home() {
               ifcData={unifiedResult.ifcFileData}
               ifcName={unifiedResult.ifcFileName}
               onScheduleOptimized={handleScheduleOptimized}
+              aiRationale={unifiedResult.schedule.aiRationale}
               className="flex-1 min-h-[700px] border border-gray-200 rounded-xl overflow-hidden"
             />
           </div>
