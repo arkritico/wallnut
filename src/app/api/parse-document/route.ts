@@ -49,8 +49,8 @@ export const POST = withApiHandler("parse-document", async (request) => {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-5-20250929",
-        max_tokens: 4096,
+        model: "claude-opus-4-6",
+        max_tokens: 8192,
         system: `Você é um sistema de extração de dados de documentos de construção portugueses. Extraia dados estruturados de memórias descritivas, projetos de especialidade e documentos técnicos. Retorne APENAS JSON válido.`,
         messages: [
           {

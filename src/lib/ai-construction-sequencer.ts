@@ -362,8 +362,10 @@ export interface AiSequenceOptions {
   maxWorkers?: number;
   /** Override API key (for testing) */
   apiKey?: string;
-  /** Override model (defaults to claude-sonnet-4-5-20250929) */
+  /** Override model (defaults to claude-opus-4-6) */
   model?: string;
+  /** Enable extended thinking for complex projects (default: auto based on element count) */
+  enableThinking?: boolean;
   /** Abort signal for cancellation */
   signal?: AbortSignal;
 }
@@ -410,18 +412,32 @@ export async function generateAiSequence(
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt(analyses, project, summary);
 
-  // Choose model: opus for large projects, sonnet for smaller ones
-  const model = options?.model ?? (
-    summary.totalElements > 500
-      ? "claude-sonnet-4-5-20250929"
-      : "claude-sonnet-4-5-20250929"
-  );
+  const model = options?.model ?? "claude-opus-4-6";
+
+  // Enable extended thinking for complex projects (>200 elements) to let
+  // Opus reason deeply about construction dependencies and spatial logic.
+  const useThinking = options?.enableThinking ?? summary.totalElements > 200;
+  const thinkingBudget = summary.totalElements > 500 ? 32000 : 10000;
 
   log.info("Calling AI sequence API", {
     model,
+    thinking: useThinking,
+    thinkingBudget: useThinking ? thinkingBudget : 0,
     promptChars: userPrompt.length,
     elementCount: summary.totalElements,
   });
+
+  // Build request body — extended thinking adds a `thinking` parameter
+  // and requires a higher max_tokens to cover both thinking + output.
+  const requestBody: Record<string, unknown> = {
+    model,
+    max_tokens: useThinking ? 32768 : 16384,
+    system: systemPrompt,
+    messages: [{ role: "user", content: userPrompt }],
+  };
+  if (useThinking) {
+    requestBody.thinking = { type: "enabled", budget_tokens: thinkingBudget };
+  }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -430,12 +446,7 @@ export async function generateAiSequence(
       "x-api-key": apiKey,
       "anthropic-version": "2023-06-01",
     },
-    body: JSON.stringify({
-      model,
-      max_tokens: 16384,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    }),
+    body: JSON.stringify(requestBody),
     signal: options?.signal,
   });
 

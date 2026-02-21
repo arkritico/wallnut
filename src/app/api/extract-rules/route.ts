@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     // Call Claude
     console.log("🤖 Calling Claude to extract rules...");
     const response = await client.messages.create({
-      model: "claude-sonnet-4-5-20250929", // Updated to Claude Sonnet 4.5
+      model: "claude-opus-4-6",
       max_tokens: 16000,
       temperature: 0.2, // Low temperature for consistent extraction
       messages: [
