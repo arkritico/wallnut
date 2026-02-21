@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
+import { getModelForDepth, buildApiRequestBody } from "@/lib/ai-model-selection";
 
 const log = createLogger("parse-document");
 
@@ -19,7 +20,7 @@ export const POST = withApiHandler("parse-document", async (request) => {
       return NextResponse.json({ error: "Corpo do pedido inválido." }, { status: 400 });
     }
 
-    const { documentText, prompt, pageRange, totalPages } = body as Record<string, unknown>;
+    const { documentText, prompt, pageRange, totalPages, analysisDepth: rawDepth } = body as Record<string, unknown>;
 
     if (!documentText || typeof documentText !== "string") {
       return NextResponse.json({ error: "Campo 'documentText' é obrigatório." }, { status: 400 });
@@ -41,6 +42,10 @@ export const POST = withApiHandler("parse-document", async (request) => {
       return NextResponse.json(fallback);
     }
 
+    const depth = (rawDepth === "quick" || rawDepth === "standard" || rawDepth === "deep") ? rawDepth : "standard";
+    const modelConfig = getModelForDepth(depth, 8192, 8000);
+
+    const systemText = `Você é um sistema de extração de dados de documentos de construção portugueses. Extraia dados estruturados de memórias descritivas, projetos de especialidade e documentos técnicos. Retorne APENAS JSON válido.`;
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -48,17 +53,11 @@ export const POST = withApiHandler("parse-document", async (request) => {
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
       },
-      body: JSON.stringify({
-        model: "claude-opus-4-6",
-        max_tokens: 8192,
-        system: `Você é um sistema de extração de dados de documentos de construção portugueses. Extraia dados estruturados de memórias descritivas, projetos de especialidade e documentos técnicos. Retorne APENAS JSON válido.`,
-        messages: [
-          {
-            role: "user",
-            content: (safePrompt || buildDefaultPrompt(safeDocText)) + chunkInfo,
-          },
-        ],
-      }),
+      body: JSON.stringify(buildApiRequestBody(
+        modelConfig,
+        systemText,
+        [{ role: "user", content: (safePrompt || buildDefaultPrompt(safeDocText)) + chunkInfo }],
+      )),
     });
 
     if (!response.ok) {

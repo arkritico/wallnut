@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import fs from "fs";
 import path from "path";
+import { getModelForDepth } from "@/lib/ai-model-selection";
 
 // ============================================================================
 // TYPES
@@ -102,6 +103,7 @@ export async function POST(request: NextRequest) {
     // Handle JSON text input (PDF extraction now happens client-side)
     const body = await request.json();
     const text = body.text;
+    const rawDepth = body.analysisDepth;
 
     if (!text || typeof text !== "string") {
       return NextResponse.json(
@@ -125,12 +127,16 @@ export async function POST(request: NextRequest) {
     // Load extraction prompt
     const extractionPrompt = getExtractionPrompt();
 
+    // Select model based on depth
+    const depth = (rawDepth === "quick" || rawDepth === "standard" || rawDepth === "deep") ? rawDepth : "standard";
+    const modelConfig = getModelForDepth(depth, 16000, 12000);
+
     // Call Claude
-    console.log("🤖 Calling Claude to extract rules...");
-    const response = await client.messages.create({
-      model: "claude-opus-4-6",
-      max_tokens: 16000,
-      temperature: 0.2, // Low temperature for consistent extraction
+    console.log(`Calling Claude (${modelConfig.model}) to extract rules...`);
+    const createParams: Anthropic.MessageCreateParams = {
+      model: modelConfig.model,
+      max_tokens: modelConfig.maxTokens,
+      temperature: depth === "deep" ? undefined : 0.2, // No temperature with thinking
       messages: [
         {
           role: "user",
@@ -154,15 +160,24 @@ IMPORTANTE: Retorna APENAS um JSON array válido, sem texto adicional. Formato:
 }`,
         },
       ],
-    });
+    };
+    if (modelConfig.thinkingBudget) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (createParams as any).thinking = {
+        type: "enabled",
+        budget_tokens: modelConfig.thinkingBudget,
+      };
+    }
 
-    // Extract text from response
-    const content = response.content[0];
-    if (content.type !== "text") {
+    const response = await client.messages.create(createParams);
+
+    // Extract text from response (filter out thinking blocks)
+    const textBlocks = response.content.filter(block => block.type === "text");
+    if (textBlocks.length === 0) {
       throw new Error("Unexpected response type from Claude");
     }
 
-    let aiResponse = content.text.trim();
+    let aiResponse = textBlocks.map(b => (b as { text: string }).text).join("\n").trim();
 
     // Clean up response - remove markdown code blocks if present
     if (aiResponse.startsWith("```")) {

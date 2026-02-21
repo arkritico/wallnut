@@ -693,6 +693,62 @@ export async function runUnifiedPipeline(
       const totalCost = matchReport.stats.totalEstimatedCost ?? 0;
       laborConstraint = inferMaxWorkers(totalCost);
 
+      // Deep mode: AI-powered price estimation for unmatched articles
+      if (isDeep && matchReport.unmatched.length > 0 && process.env.ANTHROPIC_API_KEY) {
+        try {
+          progress.reportPartial("estimate", 0.6, "IA: Estimando preços para artigos sem correspondência...");
+          const { estimateUnmatchedPrices, estimatesToPriceMatches } = await import("./ai-price-estimator");
+
+          // Build article quantities map
+          const articleQuantities = new Map<string, { quantity: number; unit: string }>();
+          for (const ch of wbsProject.chapters) {
+            for (const sc of ch.subChapters) {
+              for (const art of sc.articles) {
+                articleQuantities.set(art.code, { quantity: art.quantity, unit: art.unit });
+              }
+            }
+          }
+
+          const estimation = await estimateUnmatchedPrices(
+            matchReport.unmatched,
+            {
+              buildingType: project.buildingType,
+              location: project.location?.municipality ?? "Portugal",
+              area: project.grossFloorArea,
+              isRehabilitation: project.isRehabilitation,
+            },
+            process.env.ANTHROPIC_API_KEY!,
+          );
+
+          if (estimation.estimates.length > 0) {
+            const aiMatches = estimatesToPriceMatches(estimation.estimates, articleQuantities);
+            matchReport.matches.push(...aiMatches);
+
+            // Remove AI-estimated articles from unmatched
+            const estimatedCodes = new Set(estimation.estimates.map(e => e.articleCode));
+            matchReport.unmatched = matchReport.unmatched.filter(u => !estimatedCodes.has(u.articleCode));
+
+            // Recalculate stats
+            const newTotal = matchReport.matches.reduce((sum, m) => sum + (m.estimatedCost ?? 0), 0);
+            matchReport.stats.matched = matchReport.matches.length;
+            matchReport.stats.unmatched = matchReport.unmatched.length;
+            matchReport.stats.totalEstimatedCost = newTotal;
+            matchReport.stats.coveragePercent = Math.round(
+              (matchReport.stats.matched / matchReport.stats.totalArticles) * 100,
+            );
+
+            warnings.push(
+              `IA estimou preços para ${estimation.estimates.length} artigos sem correspondência CYPE ` +
+              `(${estimation.unestimable.length} não estimáveis).`,
+            );
+          }
+        } catch (err) {
+          warnings.push(
+            `Estimativa de preços IA falhou: ${err instanceof Error ? err.message : String(err)}.`,
+          );
+        }
+      }
+
       if (matchReport.unmatched.length > 0) {
         warnings.push(
           `${matchReport.unmatched.length} artigos sem correspondência de preços (cobertura: ${matchReport.stats.coveragePercent}%).`,
@@ -1195,7 +1251,7 @@ async function parsePdfStage(
           if (depth !== "quick" && enrichedText.trim().length > 50) {
             try {
               const { parseDocumentWithAI, mergeExtractedData } = await import("./document-parser");
-              const parsed = await parseDocumentWithAI(enrichedText, project);
+              const parsed = await parseDocumentWithAI(enrichedText, project, depth);
               project = mergeExtractedData(project, parsed);
               warnings.push(...parsed.warnings);
             } catch {
