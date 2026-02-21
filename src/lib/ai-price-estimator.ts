@@ -1,14 +1,19 @@
 /**
  * AI Price Estimator — fills gaps in the CYPE price database.
  *
- * In deep mode, when the CYPE database can't match BOQ articles,
- * this module sends the unmatched articles to Claude for market-based
- * price estimation using Portuguese construction market knowledge.
+ * Strategy (layered):
+ * 1. Use the 8,500+ scraped items/variants as primary reference
+ * 2. For each unmatched article, find the closest scraped items and
+ *    provide them as context to the AI for calibrated estimation
+ * 3. AI cross-references Portuguese market data (ProNIC, CYPE, LNEC,
+ *    Construlink, supplier catalogs) to produce grounded estimates
+ * 4. Each estimate includes specific procurement suggestions with
+ *    real supplier references from the Portuguese market
  *
  * The AI estimates:
  *   - Unit costs (materials, labor, machinery breakdown)
  *   - Productivity rates for labor
- *   - Suggested suppliers/sources for verification
+ *   - Suggested suppliers/sources for verification and procurement
  */
 
 import type { PriceMatch, MatchReport } from "./wbs-types";
@@ -26,6 +31,10 @@ export interface AiPriceEstimate {
   rationale: string;
   /** Suggested sources for verification */
   verificationSources: string[];
+  /** Specific procurement suggestions with supplier names */
+  procurementSuggestions?: string[];
+  /** Reference scraped item that informed this estimate */
+  referenceItemCode?: string;
 }
 
 export interface AiPriceEstimationResult {
@@ -33,13 +42,26 @@ export interface AiPriceEstimationResult {
   /** Articles the AI couldn't estimate (too specialized or ambiguous) */
   unestimable: string[];
   tokenUsage: { input: number; output: number };
+  /** How many estimates were grounded in scraped reference data */
+  referenceGrounded: number;
+}
+
+/** Scraped reference item provided as context to the AI */
+interface ScrapedReference {
+  code: string;
+  description: string;
+  unitCost: number;
+  unit: string;
+  score: number;
+  breakdown?: { materials: number; labor: number; machinery: number };
 }
 
 /**
  * Use AI to estimate prices for BOQ articles that the CYPE database couldn't match.
  *
- * Sends unmatched articles + project context to Claude, which returns
- * market-based estimates with confidence levels and verification sources.
+ * For each unmatched article, first retrieves the closest scraped items from the
+ * 8,500+ price database to give the AI calibrated reference points. The AI then
+ * produces market-based estimates grounded in real Portuguese construction prices.
  */
 export async function estimateUnmatchedPrices(
   unmatched: MatchReport["unmatched"],
@@ -53,25 +75,39 @@ export async function estimateUnmatchedPrices(
   signal?: AbortSignal,
 ): Promise<AiPriceEstimationResult> {
   if (unmatched.length === 0) {
-    return { estimates: [], unestimable: [], tokenUsage: { input: 0, output: 0 } };
+    return { estimates: [], unestimable: [], tokenUsage: { input: 0, output: 0 }, referenceGrounded: 0 };
+  }
+
+  // Find nearest scraped items for each unmatched article
+  let referenceMap: Map<string, ScrapedReference[]> = new Map();
+  try {
+    const { findNearestScrapedItems } = await import("./price-matcher");
+    for (const article of unmatched.slice(0, 30)) {
+      const nearest = await findNearestScrapedItems(article.description, "", 3);
+      if (nearest.length > 0) {
+        referenceMap.set(article.articleCode, nearest);
+      }
+    }
+  } catch {
+    log.warn("Could not load scraped references for AI context");
   }
 
   const systemPrompt = `You are a Portuguese construction cost estimator (Medidor/Orçamentista) with deep knowledge of the Portuguese market.
 
-You are estimating unit costs for BOQ (Bill of Quantities) articles that weren't found in the standard CYPE price database.
+You are estimating unit costs for BOQ (Bill of Quantities) articles that weren't found in the CYPE Gerador de Preços database. For each article, you will receive nearby reference items from our scraped database of 8,500+ Portuguese construction prices — use these as calibration anchors.
 
 For each article, provide:
 1. Estimated unit cost in EUR (realistic Portuguese market prices, 2024-2025)
 2. Cost breakdown: materials %, labor %, machinery %
-3. Confidence level: high (you know this well), medium (reasonable estimate), low (educated guess)
-4. Brief rationale for the estimate
-5. Suggested sources for price verification (Portuguese suppliers, databases)
+3. Confidence level: high (reference item is very similar), medium (reasonable interpolation), low (educated guess)
+4. Brief rationale referencing the nearby items when applicable
+5. Verification sources (Portuguese suppliers, databases)
+6. Specific procurement suggestions — name real Portuguese suppliers, distributors, or online platforms where this item could be procured:
+   - Materials: Construlink, Saint-Gobain Weber, Leroy Merlin Pro, Sotecnisol, Secil, Cimpor, Sika, Hilti, etc.
+   - Labor yields: CYPE labor tables, ProNIC productivity data, ACT collective agreements
+   - Equipment: Loxam, Zeppelin, Hertz Equipamentos, etc.
 
-Key references for Portuguese construction pricing:
-- ProNIC database
-- CYPE Gerador de Preços
-- LNEC price indices
-- Supplier databases: Construlink, Leroy Merlin Profissional, Saint-Gobain
+IMPORTANT: When reference items are provided, use their prices as anchors. If the reference is very similar, adjust proportionally. If no reference is close, state that in your rationale.
 
 Respond with ONLY a JSON object:
 {
@@ -83,8 +119,10 @@ Respond with ONLY a JSON object:
       "breakdown": { "materials": 0.60, "labor": 0.30, "machinery": 0.10 },
       "unit": "m²",
       "confidence": "medium",
-      "rationale": "Why this price (Portuguese)",
-      "verificationSources": ["CYPE Gerador de Preços - similar item", "Construlink"]
+      "rationale": "Based on reference EHS010 (pilar betão C25/30 @ 420€/m³), adjusted for...",
+      "verificationSources": ["CYPE Gerador de Preços - EHS010", "Construlink"],
+      "procurementSuggestions": ["Betão pronto: Betão Liz / Unibetão", "Aço: Megasa / SN Seixal"],
+      "referenceItemCode": "EHS010"
     }
   ],
   "unestimable": ["codes of articles too specialized to estimate"]
@@ -92,15 +130,32 @@ Respond with ONLY a JSON object:
 
   // Limit to first 30 unmatched articles (token budget)
   const articlesToEstimate = unmatched.slice(0, 30);
-  const articlesJson = JSON.stringify(
-    articlesToEstimate.map(a => ({
+
+  // Build article data with reference context
+  const articlesWithRefs = articlesToEstimate.map(a => {
+    const refs = referenceMap.get(a.articleCode) ?? [];
+    return {
       code: a.articleCode,
       description: a.description,
       suggestedSearch: a.suggestedSearch,
-    })),
-    null,
-    2,
-  );
+      nearbyScrapedItems: refs.map(r => ({
+        code: r.code,
+        description: r.description.slice(0, 120),
+        unitCost: r.unitCost,
+        unit: r.unit,
+        similarity: r.score,
+        breakdown: r.breakdown ? {
+          materials: r.breakdown.materials,
+          labor: r.breakdown.labor,
+          machinery: r.breakdown.machinery,
+        } : undefined,
+      })),
+    };
+  });
+
+  const articlesJson = JSON.stringify(articlesWithRefs, null, 2);
+
+  const refsProvided = articlesWithRefs.filter(a => a.nearbyScrapedItems.length > 0).length;
 
   const userPrompt = `## Project Context
 - Building type: ${projectContext.buildingType}
@@ -108,14 +163,20 @@ Respond with ONLY a JSON object:
 - Area: ${projectContext.area ?? "Unknown"} m²
 - Rehabilitation: ${projectContext.isRehabilitation ? "Yes" : "No"}
 
+## Price Database Info
+Our scraped database contains 8,500+ items with variants from geradordeprecos.info (CYPE Portugal).
+${refsProvided} of ${articlesToEstimate.length} articles below have nearby reference items from this database.
+
 ## Unmatched BOQ Articles (${unmatched.length} total, showing ${articlesToEstimate.length})
 ${articlesJson}
 
-Estimate unit costs for each article based on current Portuguese market prices.`;
+Estimate unit costs for each article. Use the nearby scraped items as price anchors where available.
+For procurement, name specific Portuguese suppliers/distributors for the key materials.`;
 
   log.info("Estimating prices for unmatched articles", {
     total: unmatched.length,
     estimating: articlesToEstimate.length,
+    withReferences: refsProvided,
   });
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -187,6 +248,8 @@ Estimate unit costs for each article based on current Portuguese market prices.`
         ? e.confidence : "low",
       rationale: e.rationale ?? "",
       verificationSources: Array.isArray(e.verificationSources) ? e.verificationSources : [],
+      procurementSuggestions: Array.isArray(e.procurementSuggestions) ? e.procurementSuggestions : [],
+      referenceItemCode: typeof e.referenceItemCode === "string" ? e.referenceItemCode : undefined,
     }));
 
     unestimable = Array.isArray(parsed.unestimable) ? parsed.unestimable : [];
@@ -194,7 +257,9 @@ Estimate unit costs for each article based on current Portuguese market prices.`
     log.warn("Failed to parse price estimation response", { error: String(err) });
   }
 
-  return { estimates, unestimable, tokenUsage };
+  const referenceGrounded = estimates.filter(e => e.referenceItemCode).length;
+
+  return { estimates, unestimable, tokenUsage, referenceGrounded };
 }
 
 /**
@@ -211,6 +276,13 @@ export function estimatesToPriceMatches(
       const artInfo = articleQuantities.get(e.articleCode);
       const quantity = artInfo?.quantity ?? 1;
       const unitCost = e.estimatedUnitCost;
+
+      const procurementNote = e.procurementSuggestions?.length
+        ? ` Fornecedores: ${e.procurementSuggestions.join("; ")}.`
+        : "";
+      const refNote = e.referenceItemCode
+        ? ` Ref: ${e.referenceItemCode}.`
+        : "";
 
       return {
         articleCode: e.articleCode,
@@ -229,7 +301,7 @@ export function estimatesToPriceMatches(
         priceUnit: e.unit,
         unitConversion: 1,
         warnings: [
-          `Preço estimado por IA (${e.confidence}). Verificar com: ${e.verificationSources.join(", ") || "fornecedores locais"}.`,
+          `Preço estimado por IA (${e.confidence}).${refNote} Verificar com: ${e.verificationSources.join(", ") || "fornecedores locais"}.${procurementNote}`,
         ],
         articleQuantity: quantity,
         articleUnit: artInfo?.unit ?? e.unit,

@@ -694,9 +694,14 @@ export async function runUnifiedPipeline(
       laborConstraint = inferMaxWorkers(totalCost);
 
       // Deep mode: AI-powered price estimation for unmatched articles
+      // Uses the 8,500+ scraped prices/variants as reference context,
+      // with AI filling gaps and providing procurement suggestions
       if (isDeep && matchReport.unmatched.length > 0 && process.env.ANTHROPIC_API_KEY) {
         try {
-          progress.reportPartial("estimate", 0.6, "IA: Estimando preços para artigos sem correspondência...");
+          progress.reportPartial("estimate", 0.6,
+            `IA: Estimando preços para ${matchReport.unmatched.length} artigos sem correspondência ` +
+            `(referência: ${matchReport.stats.matched} artigos da base de ${(await import("./price-matcher")).getPriceDatabase().then(db => db.length).catch(() => "8500+")} preços)...`,
+          );
           const { estimateUnmatchedPrices, estimatesToPriceMatches } = await import("./ai-price-estimator");
 
           // Build article quantities map
@@ -739,7 +744,8 @@ export async function runUnifiedPipeline(
 
             warnings.push(
               `IA estimou preços para ${estimation.estimates.length} artigos sem correspondência CYPE ` +
-              `(${estimation.unestimable.length} não estimáveis).`,
+              `(${estimation.referenceGrounded} calibrados com preços reais da base, ` +
+              `${estimation.unestimable.length} não estimáveis).`,
             );
           }
         } catch (err) {

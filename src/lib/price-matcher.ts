@@ -1129,6 +1129,42 @@ export async function refreshPriceDatabase(): Promise<void> {
 }
 
 /**
+ * Find the closest scraped items to an unmatched article description.
+ * Returns top-N near-matches with scores, even below the match threshold.
+ * Used to provide reference context to the AI price estimator.
+ */
+export async function findNearestScrapedItems(
+  description: string,
+  unit: string,
+  limit = 5,
+): Promise<Array<{ code: string; description: string; unitCost: number; unit: string; score: number; url?: string; breakdown?: { materials: number; labor: number; machinery: number } }>> {
+  const database = await getDatabase();
+  const queryTokens = new Set(tokenize(description));
+  const queryNgrams = ngrams(description, 3);
+
+  return database
+    .map(item => {
+      const itemTokens = new Set(tokenize(item.description + " " + item.chapter));
+      const itemNgrams = ngrams(item.description, 3);
+      let score = jaccard(queryTokens, itemTokens) * 60;
+      score += jaccard(queryNgrams, itemNgrams) * 30;
+      if (item.patterns.some(p => p.test(description))) score += 40;
+      if (unit && unitsCompatible(unit, item.unit)) score += 10;
+      return {
+        code: item.code,
+        description: item.description,
+        unitCost: item.unitCost,
+        unit: item.unit,
+        score: Math.round(score * 10) / 10,
+        breakdown: item.breakdown,
+      };
+    })
+    .filter(r => r.score > 5)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+/**
  * Search the PRICE database by text query.
  * Searches dynamically loaded scraper data.
  */
