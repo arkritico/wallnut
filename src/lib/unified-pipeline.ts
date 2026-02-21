@@ -693,6 +693,125 @@ export async function runUnifiedPipeline(
       const totalCost = matchReport.stats.totalEstimatedCost ?? 0;
       laborConstraint = inferMaxWorkers(totalCost);
 
+      // Deep mode: AI reviews low-confidence matches before gap-filling.
+      // The AI improves the MATCHING (pairing articles to prices), not the prices themselves.
+      // Prices always come from the scraped database — never from AI generation.
+      if (isDeep && matchReport.stats.lowConfidence > 0 && process.env.ANTHROPIC_API_KEY) {
+        try {
+          progress.reportPartial("estimate", 0.4,
+            `IA: Revisando ${matchReport.stats.lowConfidence} correspondências de baixa confiança...`,
+          );
+          const { reviewLowConfidenceMatches } = await import("./ai-deep-analyzer");
+          const { findNearestScrapedItems } = await import("./price-matcher");
+
+          // Collect low-confidence matches
+          const lowConf = matchReport.matches.filter(m => m.confidence < 40);
+
+          // Find alternatives for each
+          const alternatives = new Map<string, Array<{
+            code: string; description: string; unitCost: number; unit: string;
+            score: number; variantRange?: { min: number; max: number; count: number };
+          }>>();
+          for (const m of lowConf) {
+            const alts = await findNearestScrapedItems(m.articleDescription, m.articleUnit ?? "", 5);
+            alternatives.set(m.articleCode, alts);
+          }
+
+          const reviewResult = await reviewLowConfidenceMatches(
+            lowConf.map(m => ({
+              articleCode: m.articleCode,
+              articleDescription: m.articleDescription,
+              articleUnit: m.articleUnit ?? "",
+              priceCode: m.priceCode,
+              priceDescription: m.priceDescription,
+              confidence: m.confidence,
+              matchMethod: m.matchMethod,
+            })),
+            alternatives,
+            {
+              buildingType: project.buildingType,
+              location: project.location?.municipality ?? "Portugal",
+              isRehabilitation: project.isRehabilitation,
+            },
+            process.env.ANTHROPIC_API_KEY!,
+          );
+
+          // Apply decisions to match report
+          const { searchPriceDb } = await import("./price-matcher");
+          for (const decision of reviewResult.decisions) {
+            const matchIdx = matchReport.matches.findIndex(m => m.articleCode === decision.articleCode);
+            if (matchIdx < 0) continue;
+
+            if (decision.action === "confirm" && decision.newConfidence) {
+              // Bump confidence — the AI verified this match is correct
+              matchReport.matches[matchIdx].confidence = decision.newConfidence;
+              matchReport.matches[matchIdx].warnings.push(
+                `IA confirmou correspondência: ${decision.rationale}`,
+              );
+            } else if (decision.action === "swap" && decision.newPriceCode) {
+              // Swap to better candidate from the database
+              const dbResults = await searchPriceDb(decision.newPriceCode, 1);
+              if (dbResults.length > 0) {
+                const better = dbResults[0].item;
+                const existing = matchReport.matches[matchIdx];
+                const quantity = existing.articleQuantity ?? 1;
+                matchReport.matches[matchIdx] = {
+                  ...existing,
+                  priceCode: better.code,
+                  priceDescription: better.description,
+                  priceChapter: better.chapter,
+                  unitCost: better.unitCost,
+                  breakdown: { ...better.breakdown },
+                  priceUnit: better.unit,
+                  confidence: decision.newConfidence ?? 60,
+                  matchMethod: "description",
+                  estimatedCost: Math.round(better.unitCost * quantity * 100) / 100,
+                  fullBreakdown: better.detailedBreakdown,
+                  warnings: [
+                    `IA trocou correspondência (era: ${existing.priceCode}): ${decision.rationale}`,
+                  ],
+                };
+              }
+            } else if (decision.action === "reject") {
+              // Move to unmatched — the gap-fill estimator will handle it
+              const removed = matchReport.matches.splice(matchIdx, 1)[0];
+              matchReport.unmatched.push({
+                articleCode: removed.articleCode,
+                description: removed.articleDescription,
+                suggestedSearch: `IA rejeitou ${removed.priceCode}: ${decision.rationale}`,
+              });
+            }
+          }
+
+          // Recalculate stats after review
+          const hc = matchReport.matches.filter(m => m.confidence >= 70).length;
+          const mc = matchReport.matches.filter(m => m.confidence >= 40 && m.confidence < 70).length;
+          const lc = matchReport.matches.filter(m => m.confidence < 40).length;
+          matchReport.stats.matched = matchReport.matches.length;
+          matchReport.stats.highConfidence = hc;
+          matchReport.stats.mediumConfidence = mc;
+          matchReport.stats.lowConfidence = lc;
+          matchReport.stats.unmatched = matchReport.unmatched.length;
+          matchReport.stats.totalEstimatedCost = matchReport.matches.reduce(
+            (sum, m) => sum + (m.estimatedCost ?? 0), 0,
+          );
+          matchReport.stats.coveragePercent = matchReport.stats.totalArticles > 0
+            ? Math.round((matchReport.stats.matched / matchReport.stats.totalArticles) * 100)
+            : 0;
+
+          warnings.push(
+            `IA revisou ${lowConf.length} correspondências: ` +
+            `${reviewResult.stats.confirmed} confirmadas, ` +
+            `${reviewResult.stats.swapped} trocadas, ` +
+            `${reviewResult.stats.rejected} rejeitadas.`,
+          );
+        } catch (err) {
+          warnings.push(
+            `Revisão IA de correspondências falhou: ${err instanceof Error ? err.message : String(err)}.`,
+          );
+        }
+      }
+
       // Deep mode: AI-powered price estimation for unmatched articles
       // Uses the 8,500+ scraped prices/variants as reference context,
       // with AI filling gaps and providing procurement suggestions

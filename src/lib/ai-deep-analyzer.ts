@@ -588,3 +588,210 @@ export interface ReviewedFinding {
   comment: string;
   falsePositiveReason: string | null;
 }
+
+// ============================================================
+// Price Match Review — AI improves matching, not pricing
+// ============================================================
+
+export interface MatchReviewDecision {
+  articleCode: string;
+  action: "confirm" | "swap" | "reject";
+  /** If action=swap, the better price code from the database */
+  newPriceCode?: string;
+  /** Updated confidence after AI review */
+  newConfidence?: number;
+  rationale: string;
+}
+
+export interface MatchReviewResult {
+  decisions: MatchReviewDecision[];
+  tokenUsage: { input: number; output: number };
+  /** How many matches were confirmed, swapped, or rejected */
+  stats: { confirmed: number; swapped: number; rejected: number };
+}
+
+/**
+ * AI reviews low-confidence price matches — improving the pairing,
+ * not the prices themselves. Prices always come from the scraped database.
+ *
+ * For each suspect match, the AI receives:
+ *   - The BOQ article description
+ *   - The current fuzzy match (with score and method)
+ *   - 3-5 alternative candidates from the database
+ * And decides: confirm (bump confidence), swap (use better candidate), or reject (send to unmatched).
+ */
+export async function reviewLowConfidenceMatches(
+  lowConfidenceMatches: Array<{
+    articleCode: string;
+    articleDescription: string;
+    articleUnit: string;
+    priceCode: string;
+    priceDescription: string;
+    confidence: number;
+    matchMethod: string;
+  }>,
+  alternatives: Map<string, Array<{
+    code: string;
+    description: string;
+    unitCost: number;
+    unit: string;
+    score: number;
+    variantRange?: { min: number; max: number; count: number };
+  }>>,
+  projectContext: { buildingType: string; location: string; isRehabilitation?: boolean },
+  apiKey: string,
+  signal?: AbortSignal,
+): Promise<MatchReviewResult> {
+  if (lowConfidenceMatches.length === 0) {
+    return {
+      decisions: [],
+      tokenUsage: { input: 0, output: 0 },
+      stats: { confirmed: 0, swapped: 0, rejected: 0 },
+    };
+  }
+
+  const systemPrompt = `You are a Portuguese Quantity Surveyor (Medidor-Orçamentista) reviewing automated price-matching results.
+
+Our system fuzzy-matched BOQ articles against a database of 8,500+ Portuguese construction price items (from CYPE Gerador de Preços). Some matches have low confidence scores. Your task: review each low-confidence match and decide whether it's actually correct, should be swapped for a better candidate, or should be rejected entirely.
+
+For each match, you receive:
+- The BOQ article (code, description, unit)
+- The current automated match (price code, description, confidence score, method)
+- Alternative candidates from the database (with scores and variant price ranges)
+
+For each, decide:
+- **confirm**: The current match is actually correct despite the low score. Suggest a new confidence (50-80).
+- **swap**: A listed alternative is a better match. Specify which price code. Give confidence 50-85.
+- **reject**: None of the candidates adequately match this article. It should go to AI estimation.
+
+Rules:
+1. ONLY swap to a candidate that is in the alternatives list. Never invent price codes.
+2. Units must be compatible (m² with m², Ud with Ud, etc.).
+3. Consider the full description, not just keywords. "Isolamento térmico" with EPS 40mm is different from XPS 60mm.
+4. When a candidate has a variantPriceRange, the price database has multiple specification options — a good sign of coverage.
+
+Respond with ONLY a JSON object:
+{
+  "decisions": [
+    {
+      "articleCode": "06.01.003",
+      "action": "confirm|swap|reject",
+      "newPriceCode": "EHS010 (only for swap)",
+      "newConfidence": 65,
+      "rationale": "Brief reason in Portuguese"
+    }
+  ]
+}`;
+
+  // Batch up to 20 matches per call
+  const batch = lowConfidenceMatches.slice(0, 20);
+
+  const matchesForReview = batch.map(m => {
+    const alts = alternatives.get(m.articleCode) ?? [];
+    return {
+      article: {
+        code: m.articleCode,
+        description: m.articleDescription,
+        unit: m.articleUnit,
+      },
+      currentMatch: {
+        priceCode: m.priceCode,
+        priceDescription: m.priceDescription,
+        confidence: m.confidence,
+        method: m.matchMethod,
+      },
+      alternatives: alts.map(a => ({
+        code: a.code,
+        description: a.description.slice(0, 120),
+        unitCost: a.unitCost,
+        unit: a.unit,
+        similarity: a.score,
+        variantPriceRange: a.variantRange ?? undefined,
+      })),
+    };
+  });
+
+  const userPrompt = `## Project Context
+- Type: ${projectContext.buildingType}
+- Location: ${projectContext.location}
+- Rehabilitation: ${projectContext.isRehabilitation ? "Yes" : "No"}
+
+## Low-Confidence Matches to Review (${batch.length} of ${lowConfidenceMatches.length})
+${JSON.stringify(matchesForReview, null, 2)}
+
+Review each match. Confirm, swap, or reject. Remember: only swap to codes listed in the alternatives.`;
+
+  log.info("Reviewing low-confidence matches", {
+    total: lowConfidenceMatches.length,
+    reviewing: batch.length,
+  });
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-opus-4-6",
+      max_tokens: 8192,
+      thinking: { type: "enabled", budget_tokens: 8000 },
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+    }),
+    signal,
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Match review API error ${response.status}: ${errText.slice(0, 200)}`);
+  }
+
+  const data = await response.json() as {
+    content?: Array<{ type: string; text?: string }>;
+    usage?: { input_tokens?: number; output_tokens?: number };
+  };
+
+  const answerText = (data.content ?? [])
+    .filter(block => block.type === "text")
+    .map(block => block.text ?? "")
+    .join("\n");
+
+  const tokenUsage = {
+    input: data.usage?.input_tokens ?? 0,
+    output: data.usage?.output_tokens ?? 0,
+  };
+
+  let decisions: MatchReviewDecision[] = [];
+  try {
+    let jsonStr = answerText.trim();
+    const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) jsonStr = jsonMatch[1].trim();
+    const braceStart = jsonStr.indexOf("{");
+    if (braceStart > 0) jsonStr = jsonStr.slice(braceStart);
+    const lastBrace = jsonStr.lastIndexOf("}");
+    if (lastBrace > 0) jsonStr = jsonStr.slice(0, lastBrace + 1);
+
+    const parsed = JSON.parse(jsonStr) as { decisions?: MatchReviewDecision[] };
+    decisions = (parsed.decisions ?? []).map(d => ({
+      articleCode: d.articleCode ?? "",
+      action: (d.action === "confirm" || d.action === "swap" || d.action === "reject")
+        ? d.action : "confirm",
+      newPriceCode: d.action === "swap" ? d.newPriceCode : undefined,
+      newConfidence: typeof d.newConfidence === "number"
+        ? Math.min(85, Math.max(15, d.newConfidence)) : undefined,
+      rationale: d.rationale ?? "",
+    }));
+  } catch (err) {
+    log.warn("Failed to parse match review response", { error: String(err) });
+  }
+
+  const stats = {
+    confirmed: decisions.filter(d => d.action === "confirm").length,
+    swapped: decisions.filter(d => d.action === "swap").length,
+    rejected: decisions.filter(d => d.action === "reject").length,
+  };
+
+  return { decisions, tokenUsage, stats };
+}
