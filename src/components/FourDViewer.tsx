@@ -244,7 +244,7 @@ export default function FourDViewer({
   const [selectedTaskUids, setSelectedTaskUids] = useState<Set<number>>(new Set());
   const [isolatedPhase, setIsolatedPhase] = useState<ConstructionPhase | null>(null);
   const modelRef = useRef<FragmentsModel | null>(null);
-  const localIdToLinksRef = useRef<Map<number, ElementTaskLink[]>>(new Map());
+  const [localIdToLinks, setLocalIdToLinks] = useState<Map<number, ElementTaskLink[]>>(new Map());
 
   // ── Progress tracking state ──────────────────────────────
   const [progressEntries, setProgressEntries] = useState<TaskProgress[]>([]);
@@ -259,6 +259,7 @@ export default function FourDViewer({
   // Default to cumulative mode when AI rationale is available (AI-driven sequence)
   const [vizMode, setVizMode] = useState<VisualizationMode>(aiRationale ? "cumulative" : "phase");
   const [showAiRationale, setShowAiRationale] = useState(false);
+  const [activePanel, setActivePanel] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const viewerRef = useRef<IfcViewerHandle>(null);
   const togglePlayRef = useRef<(() => void) | null>(null);
@@ -343,7 +344,7 @@ export default function FourDViewer({
           }
         }
 
-        localIdToLinksRef.current = localIdMap;
+        setLocalIdToLinks(localIdMap);
         setTaskLocalIds(taskMap);
         setMappingStatus(
           `${resolved}/${guids.length} elementos mapeados (${taskMap.size} tarefas)`,
@@ -365,7 +366,7 @@ export default function FourDViewer({
         setSelectedTaskUids(new Set());
         return;
       }
-      const links = localIdToLinksRef.current.get(localId);
+      const links = localIdToLinks.get(localId);
       if (links && links.length > 0) {
         const link = links[0];
         setSelectedLink(link);
@@ -377,7 +378,7 @@ export default function FourDViewer({
         setSelectedTaskUids(new Set());
       }
     },
-    [taskByUid],
+    [taskByUid, localIdToLinks],
   );
 
   // ── Gantt bar selection handler (Gantt → 3D) ─────────────
@@ -397,10 +398,10 @@ export default function FourDViewer({
       taskByUid,
       taskLocalIds,
       storeyFilter,
-      localIdToLinksRef.current,
+      localIdToLinks,
       vizMode,
     );
-  }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter, vizMode]);
+  }, [modelId, timelineState, taskByUid, taskLocalIds, storeyFilter, localIdToLinks, vizMode]);
 
   // ── Apply phase isolation filter ──────────────────────────────
   const visibilityMap = useMemo(() => {
@@ -513,7 +514,7 @@ export default function FourDViewer({
       for (const [phase, ids] of visualState.inProgressIds) {
         if (isolatedPhase && phase !== isolatedPhase) continue;
         for (const id of ids) {
-          const links = localIdToLinksRef.current.get(id);
+          const links = localIdToLinks.get(id);
           if (!links || links.length === 0) continue;
           const color = taskComparisonColors.get(links[0].taskUid) ?? phaseColor(phase);
           addToGroup(color, 0.35, id);
@@ -524,7 +525,7 @@ export default function FourDViewer({
       for (const [phase, ids] of visualState.completedIds) {
         if (isolatedPhase && phase !== isolatedPhase) continue;
         for (const id of ids) {
-          const links = localIdToLinksRef.current.get(id);
+          const links = localIdToLinks.get(id);
           if (!links || links.length === 0) continue;
           const color = taskComparisonColors.get(links[0].taskUid) ?? phaseColor(phase);
           addToGroup(color, 0.85, id);
@@ -565,7 +566,7 @@ export default function FourDViewer({
     }
 
     return highlights.length > 0 ? highlights : undefined;
-  }, [modelId, visualState, isolatedPhase, comparisonMode, progressEntries, taskComparisonColors]);
+  }, [modelId, visualState, isolatedPhase, comparisonMode, progressEntries, taskComparisonColors, localIdToLinks]);
 
   // ── Selection highlights (white glow on selected task elements) ──
   const selectedLocalIds = useMemo((): Set<number> => {
@@ -767,9 +768,9 @@ export default function FourDViewer({
           {/* ── Left: IFC model tools ── */}
           <div className="flex items-center gap-px shrink-0">
             <button
-              onClick={() => viewerRef.current?.togglePanel("models")}
+              onClick={() => { viewerRef.current?.togglePanel("models"); setActivePanel(p => p === "models" ? null : "models"); }}
               className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
-                viewerRef.current?.getActivePanel() === "models"
+                activePanel === "models"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
@@ -779,9 +780,9 @@ export default function FourDViewer({
               <span className="hidden md:inline">Modelos</span>
             </button>
             <button
-              onClick={() => viewerRef.current?.togglePanel("clipper")}
+              onClick={() => { viewerRef.current?.togglePanel("clipper"); setActivePanel(p => p === "clipper" ? null : "clipper"); }}
               className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
-                viewerRef.current?.getActivePanel() === "clipper"
+                activePanel === "clipper"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
@@ -799,9 +800,9 @@ export default function FourDViewer({
               <span className="hidden md:inline">Piso</span>
             </button>
             <button
-              onClick={() => viewerRef.current?.togglePanel("properties")}
+              onClick={() => { viewerRef.current?.togglePanel("properties"); setActivePanel(p => p === "properties" ? null : "properties"); }}
               className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
-                viewerRef.current?.getActivePanel() === "properties"
+                activePanel === "properties"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
@@ -1155,6 +1156,7 @@ export default function FourDViewer({
       {/* Video export dialog (modal) */}
       {showVideoExport && (
         <VideoExportDialog
+          // eslint-disable-next-line react-hooks/refs -- canvas ref is stable once Three.js renderer mounts
           canvas={canvasRef.current}
           startDate={schedule.startDate}
           finishDate={schedule.finishDate}

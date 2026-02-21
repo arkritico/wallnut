@@ -216,7 +216,7 @@ function FieldInput({
     hasValue ? "border-gray-300" : "border-gray-200"
   }`;
 
-  function FieldLabel({ showUnit }: { showUnit?: boolean }) {
+  function renderFieldLabel(showUnit?: boolean) {
     return (
       <div className="flex items-center gap-1 mb-1">
         <label htmlFor={id} className="block text-sm font-medium text-gray-700">
@@ -272,7 +272,7 @@ function FieldInput({
   if (type === "select" && options) {
     return (
       <div>
-        <FieldLabel />
+        {renderFieldLabel()}
         {showTooltip && helpText && <p className="text-xs text-gray-500 mb-1">{helpText}</p>}
         <select
           id={id}
@@ -294,7 +294,7 @@ function FieldInput({
   if (type === "number") {
     return (
       <div>
-        <FieldLabel showUnit />
+        {renderFieldLabel(true)}
         {showTooltip && helpText && <p className="text-xs text-gray-500 mb-1">{helpText}</p>}
         <input
           type="number"
@@ -317,7 +317,7 @@ function FieldInput({
   if (type === "textarea") {
     return (
       <div className="sm:col-span-2 lg:col-span-3">
-        <FieldLabel />
+        {renderFieldLabel()}
         {showTooltip && helpText && <p className="text-xs text-gray-500 mb-1">{helpText}</p>}
         <textarea
           id={id}
@@ -333,7 +333,7 @@ function FieldInput({
   // Default: string
   return (
     <div>
-      <FieldLabel />
+      {renderFieldLabel()}
       {showTooltip && helpText && <p className="text-xs text-gray-500 mb-1">{helpText}</p>}
       <input
         type="text"

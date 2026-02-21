@@ -177,7 +177,7 @@ export default function ProgressPanel({
       reader.readAsText(file);
       e.target.value = "";
     },
-    [schedule, onProgressChange],
+    [schedule, handleProgressPersist],
   );
 
   const handleXMLImport = useCallback(
@@ -203,7 +203,7 @@ export default function ProgressPanel({
       reader.readAsText(file);
       e.target.value = "";
     },
-    [schedule, onProgressChange],
+    [schedule, handleProgressPersist],
   );
 
   function togglePhase(phase: string) {

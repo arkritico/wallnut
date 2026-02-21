@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { X, Users, MessageSquare, Clock, UserPlus, Trash2, Check, RotateCcw } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import type { ProjectRole, ProjectMember, ProjectComment, ProjectHistoryEntry } from "@/lib/collaboration";
@@ -49,27 +49,20 @@ export default function CollaborationPanel({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loadMembers = useCallback(async () => {
-    const data = await getProjectMembers(projectId);
-    setMembers(data);
-  }, [projectId]);
-
-  const loadComments = useCallback(async () => {
-    const data = await getProjectComments(projectId);
-    setComments(data);
-  }, [projectId]);
-
-  const loadHistory = useCallback(async () => {
-    const data = await getProjectHistory(projectId);
-    setHistory(data);
-  }, [projectId]);
-
   useEffect(() => {
     if (!isOpen) return;
-    loadMembers();
-    loadComments();
-    loadHistory();
-  }, [isOpen, loadMembers, loadComments, loadHistory]);
+    const load = async () => {
+      const [m, c, h] = await Promise.all([
+        getProjectMembers(projectId),
+        getProjectComments(projectId),
+        getProjectHistory(projectId),
+      ]);
+      setMembers(m);
+      setComments(c);
+      setHistory(h);
+    };
+    load();
+  }, [isOpen, projectId]);
 
   const handleAddMember = async () => {
     if (!newEmail.trim() || isSubmitting) return;

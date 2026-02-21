@@ -139,7 +139,7 @@ export default function RuleAuditDashboard() {
   const [tab, setTab] = useState<Tab>("rules");
 
   // Annotations
-  const [annotations, setAnnotations] = useState<Record<string, RuleAnnotation>>({});
+  const [annotations, setAnnotations] = useState<Record<string, RuleAnnotation>>(() => getAnnotations());
 
   // Filters
   const [search, setSearch] = useState("");
@@ -174,9 +174,8 @@ export default function RuleAuditDashboard() {
   // Verification panel
   const [showVerification, setShowVerification] = useState(false);
 
-  // Fetch data + annotations
+  // Fetch data
   useEffect(() => {
-    setAnnotations(getAnnotations());
     fetch("/api/rule-audit")
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -350,9 +349,11 @@ export default function RuleAuditDashboard() {
   const totalPages = Math.ceil(filteredRules.length / PAGE_SIZE);
 
   // Reset page when filters change
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional derived-state reset
   useEffect(() => { setPage(0); }, [filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, filterAnnotation, search]);
 
   // Clear selection when page or filters change
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional derived-state reset
   useEffect(() => { setSelectedRules(new Set()); }, [page, filterSpecialty, filterSeverity, filterRegulation, filterScope, filterEnabled, filterAnnotation, search]);
 
   // Sort handler
@@ -1114,6 +1115,7 @@ function RuleRow({
   const [showNote, setShowNote] = useState(false);
 
   // Sync note text when annotation changes externally
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven state sync
   useEffect(() => { setNoteText(annotation?.note ?? ""); }, [annotation?.note]);
 
   return (

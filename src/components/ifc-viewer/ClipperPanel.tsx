@@ -119,12 +119,14 @@ export default function ClipperPanel({
     );
   }
 
-  // Toggle interactive creation mode
+  // Toggle interactive creation mode (clipper is an imperative OPC external system)
   function handleInteractiveCreate() {
     if (isCreating) {
+      // eslint-disable-next-line react-hooks/immutability -- imperative Three.js API
       clipper.enabled = false;
       setIsCreating(false);
     } else {
+      // eslint-disable-next-line react-hooks/immutability -- imperative Three.js API
       clipper.enabled = true;
       setIsCreating(true);
     }
@@ -153,6 +155,7 @@ export default function ClipperPanel({
     clipper.deleteAll();
     refreshPlanes();
     if (isCreating) {
+      // eslint-disable-next-line react-hooks/immutability -- imperative Three.js API
       clipper.enabled = false;
       setIsCreating(false);
     }

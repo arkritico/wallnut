@@ -176,6 +176,7 @@ export default function TimelinePlayer({
   // ── External seek (for video export) ──────────────────────
   useEffect(() => {
     if (externalSeekMs != null && externalSeekMs >= startMs && externalSeekMs <= finishMs) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- prop-driven state sync
       setCurrentMs(externalSeekMs);
     }
   }, [externalSeekMs, startMs, finishMs]);

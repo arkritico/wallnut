@@ -92,22 +92,22 @@ export default function ResourceHistogramChart({
   const plotH = SVG_H - PAD.top - PAD.bottom;
 
   const points = histogramData.points;
-  if (points.length === 0) return null;
 
   // ── Scales ────────────────────────────────────────────────
   const maxLabor = histogramData.peakLabor || 1;
   const maxCost = Math.max(
-    ...points.map((p) => p.cumulativeCost),
+    ...(points.length > 0 ? points.map((p) => p.cumulativeCost) : [0]),
     ...(sCurvePoints.length > 0 ? sCurvePoints.map((p) => p.plannedValue) : [0]),
   ) || 1;
 
-  const barW = plotW / points.length;
+  const barW = points.length > 0 ? plotW / points.length : 1;
   const yLabor = (val: number) => PAD.top + plotH - (val / maxLabor) * plotH;
   const yCost = (val: number) => PAD.top + plotH - (val / maxCost) * plotH;
   const xWeek = (i: number) => PAD.left + i * barW;
 
   // ── Current week playhead ────────────────────────────────
   const currentWeekIdx = useMemo(() => {
+    if (points.length === 0) return -1;
     const currentIso = new Date(currentMs).toISOString().split("T")[0];
     for (let i = 0; i < points.length; i++) {
       if (currentIso >= points[i].weekStart && currentIso <= points[i].weekEnd) return i;
@@ -181,6 +181,9 @@ export default function ResourceHistogramChart({
     }
     return labels;
   }, [points, barW]);
+
+  // ── Early exit after all hooks ────────────────────────────
+  if (points.length === 0) return null;
 
   return (
     <div className={`bg-white border-t border-gray-200 ${className}`}>
