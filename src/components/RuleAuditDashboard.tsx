@@ -21,7 +21,10 @@ import {
   Square,
   Minus,
   BarChart3,
+  Shield,
 } from "lucide-react";
+import RuleVerificationPanel from "./RuleVerificationPanel";
+import type { RuleToVerify } from "@/lib/rule-verification";
 import {
   getAnnotations,
   setAnnotation as saveAnnotation,
@@ -167,6 +170,9 @@ export default function RuleAuditDashboard() {
   // Import ref
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importMessage, setImportMessage] = useState<string | null>(null);
+
+  // Verification panel
+  const [showVerification, setShowVerification] = useState(false);
 
   // Fetch data + annotations
   useEffect(() => {
@@ -490,6 +496,25 @@ export default function RuleAuditDashboard() {
     URL.revokeObjectURL(url);
   }, [data, annotations]);
 
+  // Convert selected AuditRules to RuleToVerify for verification panel
+  const selectedRulesForVerification = useMemo((): RuleToVerify[] => {
+    if (!data || selectedRules.size === 0) return [];
+    return data.rules
+      .filter(r => selectedRules.has(r.id))
+      .slice(0, 5) // API max 5 per batch
+      .map(r => ({
+        id: r.id,
+        article: r.article,
+        regulationRef: r.regulationRef,
+        description: r.description,
+        severity: r.severity,
+        conditions: r.conditions,
+        remediation: r.remediation,
+        specialtyId: r.specialtyId,
+        sourceUrl: null,
+      }));
+  }, [data, selectedRules]);
+
   // Active filter count
   const activeFilterCount = [filterSpecialty, filterRegulation, filterScope, filterEnabled, filterAnnotation].filter(Boolean).length + filterSeverity.length;
 
@@ -674,6 +699,17 @@ export default function RuleAuditDashboard() {
                     </button>
                   );
                 })}
+                <div className="w-px h-5 bg-gray-300 mx-1" />
+                <button
+                  onClick={() => setShowVerification(true)}
+                  disabled={selectedRules.size > 5}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={selectedRules.size > 5 ? "Máximo 5 regras por verificação" : "Verificar regras com AI + Web Search"}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  Verificar
+                  {selectedRules.size > 5 && <span className="text-[10px]">(max 5)</span>}
+                </button>
                 <button onClick={() => setSelectedRules(new Set())} className="ml-2 text-xs text-gray-400 hover:text-gray-600">
                   <X className="w-4 h-4" />
                 </button>
@@ -1007,6 +1043,40 @@ export default function RuleAuditDashboard() {
                   </div>
                 );
               })}
+          </div>
+        </div>
+      )}
+
+      {/* Verification Panel Overlay */}
+      {showVerification && selectedRulesForVerification.length > 0 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+          <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <RuleVerificationPanel
+              rules={selectedRulesForVerification}
+              onVerified={(results) => {
+                // Auto-annotate verified rules
+                for (const r of results) {
+                  if (r.status === "verified" && r.confidence >= 0.8) {
+                    const ann: RuleAnnotation = {
+                      status: "reviewed",
+                      note: `Verificada por AI (${Math.round(r.confidence * 100)}% confiança)`,
+                      updatedAt: new Date().toISOString(),
+                    };
+                    saveAnnotation(r.ruleId, ann);
+                    setAnnotations((prev) => ({ ...prev, [r.ruleId]: ann }));
+                  } else if (r.status === "misinterpretation" || r.status === "discrepancy") {
+                    const ann: RuleAnnotation = {
+                      status: "needs-fix",
+                      note: `AI: ${r.explanation.slice(0, 200)}`,
+                      updatedAt: new Date().toISOString(),
+                    };
+                    saveAnnotation(r.ruleId, ann);
+                    setAnnotations((prev) => ({ ...prev, [r.ruleId]: ann }));
+                  }
+                }
+              }}
+              onClose={() => setShowVerification(false)}
+            />
           </div>
         </div>
       )}
