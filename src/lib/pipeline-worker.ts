@@ -23,6 +23,7 @@ export interface PipelineWorkerRequest {
     includeCosts?: boolean;
     includeSchedule?: boolean;
     includeCompliance?: boolean;
+    analysisDepth?: "quick" | "standard" | "deep";
     ifcAnalyses?: SpecialtyAnalysisResult[];
     existingProject?: Partial<BuildingProject>;
   };

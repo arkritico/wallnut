@@ -362,10 +362,14 @@ export interface AiSequenceOptions {
   maxWorkers?: number;
   /** Override API key (for testing) */
   apiKey?: string;
-  /** Override model (defaults to claude-opus-4-6) */
+  /** Override model (defaults based on analysisDepth) */
   model?: string;
   /** Enable extended thinking for complex projects (default: auto based on element count) */
   enableThinking?: boolean;
+  /** Analysis depth — affects model choice, thinking budget, and context */
+  analysisDepth?: "quick" | "standard" | "deep";
+  /** Enriched context from PDFs + BOQ for deep mode */
+  enrichedContext?: string;
   /** Abort signal for cancellation */
   signal?: AbortSignal;
 }
@@ -412,28 +416,51 @@ export async function generateAiSequence(
   const systemPrompt = buildSystemPrompt();
   const userPrompt = buildUserPrompt(analyses, project, summary);
 
-  const model = options?.model ?? "claude-opus-4-6";
+  const depth = options?.analysisDepth ?? "standard";
 
-  // Enable extended thinking for complex projects (>200 elements) to let
-  // Opus reason deeply about construction dependencies and spatial logic.
-  const useThinking = options?.enableThinking ?? summary.totalElements > 200;
-  const thinkingBudget = summary.totalElements > 500 ? 32000 : 10000;
+  // Model selection based on depth:
+  //   quick    → Sonnet (fast, cheap, good enough for scoping)
+  //   standard → Opus (default, extended thinking auto for complex)
+  //   deep     → Opus (always extended thinking, high budget)
+  const model = options?.model ?? (
+    depth === "quick" ? "claude-sonnet-4-6" : "claude-opus-4-6"
+  );
+
+  // Extended thinking:
+  //   quick    → never
+  //   standard → auto (>200 elements)
+  //   deep     → always, high budget
+  const useThinking = options?.enableThinking ?? (
+    depth === "quick" ? false :
+    depth === "deep" ? true :
+    summary.totalElements > 200
+  );
+  const thinkingBudget = depth === "deep"
+    ? (summary.totalElements > 500 ? 48000 : 24000)
+    : (summary.totalElements > 500 ? 32000 : 10000);
 
   log.info("Calling AI sequence API", {
     model,
+    depth,
     thinking: useThinking,
     thinkingBudget: useThinking ? thinkingBudget : 0,
     promptChars: userPrompt.length,
     elementCount: summary.totalElements,
   });
 
+  // In deep mode, append enriched context from PDFs + BOQ to the user prompt
+  const fullUserPrompt = options?.enrichedContext
+    ? `${userPrompt}\n\n# Additional Project Context (from documents and BOQ)\n${options.enrichedContext}`
+    : userPrompt;
+
   // Build request body — extended thinking adds a `thinking` parameter
   // and requires a higher max_tokens to cover both thinking + output.
+  const maxTokens = depth === "quick" ? 8192 : useThinking ? 32768 : 16384;
   const requestBody: Record<string, unknown> = {
     model,
-    max_tokens: useThinking ? 32768 : 16384,
+    max_tokens: maxTokens,
     system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
+    messages: [{ role: "user", content: fullUserPrompt }],
   };
   if (useThinking) {
     requestBody.thinking = { type: "enabled", budget_tokens: thinkingBudget };

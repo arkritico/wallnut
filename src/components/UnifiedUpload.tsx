@@ -125,6 +125,9 @@ export default function UnifiedUpload({
   const [includeSchedule, setIncludeSchedule] = useState(true);
   const [includeCompliance, setIncludeCompliance] = useState(true);
 
+  // Analysis depth
+  const [analysisDepth, setAnalysisDepth] = useState<"quick" | "standard" | "deep">("standard");
+
   // File validation warnings (IFC size, PDF pages)
   const [fileWarnings, setFileWarnings] = useState<Map<string, { type: "warn" | "block"; message: string }>>(new Map());
 
@@ -169,6 +172,13 @@ export default function UnifiedUpload({
     downloadSchedule: lang === "pt" ? "Descarregar Cronograma" : "Download Schedule",
     downloadCompliance: lang === "pt" ? "Descarregar Conformidade" : "Download Compliance",
     outputs: lang === "pt" ? "Saídas" : "Outputs",
+    analysisDepthLabel: lang === "pt" ? "Profundidade de Análise" : "Analysis Depth",
+    depthQuick: lang === "pt" ? "Rápido" : "Quick",
+    depthQuickDesc: lang === "pt" ? "Preliminar" : "Preliminary",
+    depthStandard: lang === "pt" ? "Padrão" : "Standard",
+    depthStandardDesc: lang === "pt" ? "Análise completa" : "Full analysis",
+    depthDeep: lang === "pt" ? "Profundo" : "Deep",
+    depthDeepDesc: lang === "pt" ? "Para concurso" : "Bid-ready",
     costEstimate: lang === "pt" ? "Custo Estimado" : "Estimated Cost",
     duration: lang === "pt" ? "Duração" : "Duration",
     days: lang === "pt" ? "dias" : "days",
@@ -378,7 +388,7 @@ export default function UnifiedUpload({
       // Check cache first
       const { computeFingerprint, getCachedResult } = await import("@/lib/pipeline-cache");
       const fingerprint = await computeFingerprint(files, {
-        includeCosts, includeSchedule, includeCompliance,
+        includeCosts, includeSchedule, includeCompliance, analysisDepth,
       });
       const cached = await getCachedResult(fingerprint);
 
@@ -415,6 +425,7 @@ export default function UnifiedUpload({
         includeCosts,
         includeSchedule,
         includeCompliance,
+        analysisDepth,
         existingProject,
         onProgress: (p) => {
           if (p.phase === "ifc_parse" && p.ifcProgress) {
@@ -457,7 +468,7 @@ export default function UnifiedUpload({
       setIfcParsingProgress(null);
       stopTimer();
     }
-  }, [files, includeCosts, includeSchedule, includeCompliance, existingProject, lang]);
+  }, [files, includeCosts, includeSchedule, includeCompliance, analysisDepth, existingProject, lang]);
 
   // ── Cancel ────────────────────────────────────────────────
 
@@ -629,6 +640,40 @@ export default function UnifiedUpload({
               />
               {txt.compliance}
             </label>
+
+            {/* Analysis depth selector */}
+            <div className="pt-2 border-t border-gray-200">
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                {txt.analysisDepthLabel}
+              </p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(["quick", "standard", "deep"] as const).map((level) => {
+                  const labels = {
+                    quick: { name: txt.depthQuick, desc: txt.depthQuickDesc, cost: "~€0.20" },
+                    standard: { name: txt.depthStandard, desc: txt.depthStandardDesc, cost: "~€5" },
+                    deep: { name: txt.depthDeep, desc: txt.depthDeepDesc, cost: "~€25" },
+                  };
+                  const l = labels[level];
+                  const isActive = analysisDepth === level;
+                  return (
+                    <button
+                      key={level}
+                      type="button"
+                      onClick={() => setAnalysisDepth(level)}
+                      className={`flex flex-col items-center px-2 py-2 rounded-lg border text-xs transition-colors ${
+                        isActive
+                          ? "border-accent bg-accent/10 text-accent font-semibold"
+                          : "border-gray-200 text-gray-500 hover:border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      <span>{l.name}</span>
+                      <span className="text-[10px] opacity-70">{l.desc}</span>
+                      <span className="text-[10px] opacity-50 mt-0.5">{l.cost}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 

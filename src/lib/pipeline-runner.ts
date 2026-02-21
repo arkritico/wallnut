@@ -97,6 +97,7 @@ export async function executePipelineJob(
     includeCosts?: boolean;
     includeSchedule?: boolean;
     includeCompliance?: boolean;
+    analysisDepth?: "quick" | "standard" | "deep";
     ifcAnalyses?: unknown[];
   },
 ): Promise<void> {
@@ -126,6 +127,7 @@ export async function executePipelineJob(
         includeCosts: options.includeCosts,
         includeSchedule: options.includeSchedule,
         includeCompliance: options.includeCompliance,
+        analysisDepth: options.analysisDepth,
         ifcAnalyses: options.ifcAnalyses as import("./ifc-specialty-analyzer").SpecialtyAnalysisResult[] | undefined,
         onProgress,
       },

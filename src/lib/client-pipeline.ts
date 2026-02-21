@@ -34,6 +34,8 @@ export interface ClientPipelineOptions {
   includeCosts?: boolean;
   includeSchedule?: boolean;
   includeCompliance?: boolean;
+  /** Analysis depth: quick (preliminary) | standard (default) | deep (bid-ready). */
+  analysisDepth?: "quick" | "standard" | "deep";
   existingProject?: Partial<BuildingProject>;
   onProgress?: (progress: ClientPipelineProgress) => void;
 }
@@ -170,6 +172,7 @@ export function createClientPipeline(): ClientPipelineHandle {
             includeCosts: options.includeCosts,
             includeSchedule: options.includeSchedule,
             includeCompliance: options.includeCompliance,
+            analysisDepth: options.analysisDepth,
             ifcAnalyses,
             existingProject: options.existingProject,
           },

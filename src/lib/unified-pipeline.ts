@@ -33,10 +33,24 @@ import type { AIEstimateResult, ReconciliationReport } from "./ai-estimate-types
 import type { AIReviewResult } from "./ai-feedback-types";
 import { resolveUrl } from "./resolve-url";
 import type { AiSequenceResult } from "./ai-construction-sequencer";
+import type { ReviewedFinding } from "./ai-deep-analyzer";
 
 // ============================================================
 // Types
 // ============================================================
+
+/**
+ * Analysis depth controls how much AI investment is made per pipeline run.
+ *
+ * - `quick`    — Fast preliminary. Sonnet for sequencing, skip AI PDF parsing.
+ *                Good for initial scoping. (~€0.10-0.50)
+ * - `standard` — Balanced. Opus single-pass, AI PDF parsing. (~€2-8)
+ * - `deep`     — Multi-pass. Opus + extended thinking always on.
+ *                PDFs parsed first, enriched context fed to sequencer,
+ *                validation + refinement passes, regulatory double-check.
+ *                For bid preparation. (~€15-40)
+ */
+export type AnalysisDepth = "quick" | "standard" | "deep";
 
 export type UnifiedStage =
   | "classify"
@@ -69,6 +83,8 @@ export interface UnifiedPipelineInput {
     existingProject?: Partial<BuildingProject>;
     /** Pre-parsed IFC analyses from client-side Web Worker. Skips server parse_ifc stage. */
     ifcAnalyses?: SpecialtyAnalysisResult[];
+    /** Analysis depth: quick (preliminary) | standard (default) | deep (bid-ready). */
+    analysisDepth?: AnalysisDepth;
     onProgress?: (progress: UnifiedProgress) => void;
   };
 }
@@ -103,6 +119,10 @@ export interface UnifiedPipelineResult {
   scheduleDiagnostics?: ScheduleDiagnostic[];
   /** AI-generated construction sequence (when available) */
   aiSequence?: AiSequenceResult;
+  /** AI regulatory review of findings — ranked by severity and relevance (deep mode) */
+  regulatoryReview?: ReviewedFinding[];
+  /** Analysis depth used for this run */
+  analysisDepth?: AnalysisDepth;
   /** Raw IFC file bytes for 4D viewer (client-side only, not serialized to server) */
   ifcFileData?: Uint8Array;
   /** Original IFC file name */
@@ -268,6 +288,9 @@ export async function runUnifiedPipeline(
   let aiReview: AIReviewResult | undefined;
   const collectedPdfTexts: string[] = [];
   let aiSequence: AiSequenceResult | undefined;
+  let regulatoryReview: ReviewedFinding[] | undefined;
+  let pdfTexts: string[] = [];
+  const depth: AnalysisDepth = opts.analysisDepth ?? "standard";
 
   // ─── Stage 2: Parse IFC ────────────────────────────────────
   progress.report("parse_ifc", "A analisar ficheiros IFC...");
@@ -328,15 +351,136 @@ export async function runUnifiedPipeline(
 
   progress.completeStage("parse_ifc");
 
+  // ─── Deep mode: parse BOQ + PDF BEFORE AI sequencing ─────────
+  // In deep mode we reorder stages so the AI sequencer has full context
+  // from all documents. In standard/quick mode, the original order is kept.
+  const isDeep = depth === "deep";
+
+  if (isDeep) {
+    // Deep mode: parse BOQ first (Stage 3 early)
+    progress.report("parse_boq", "A processar mapa de quantidades...");
+    const boqResult = await parseBoqStage(classified, ifcAnalyses, project, warnings, progress);
+    wbsProject = boqResult.wbsProject;
+    generatedBoq = boqResult.generatedBoq;
+    parsedBoq = boqResult.parsedBoq;
+    progress.completeStage("parse_boq");
+
+    // Deep mode: parse PDFs next (Stage 4 early)
+    progress.report("parse_pdf", "A extrair texto de documentos PDF...");
+    const pdfResult = await parsePdfStage(classified, project, warnings, progress, depth);
+    project = pdfResult.project;
+    pdfTexts = pdfResult.pdfTexts;
+    progress.completeStage("parse_pdf");
+  }
+
   // ─── Stage 2b: AI Construction Sequence ──────────────────────
   if (ifcAnalyses && ifcAnalyses.length > 0 && process.env.ANTHROPIC_API_KEY) {
     progress.report("ai_sequence", "IA a analisar sequência construtiva...");
     try {
       const { generateAiSequence } = await import("./ai-construction-sequencer");
-      aiSequence = await generateAiSequence(ifcAnalyses, project);
+
+      // In deep mode, assemble enriched context from all parsed data
+      let enrichedContext: string | undefined;
+      if (isDeep) {
+        progress.reportPartial("ai_sequence", 0.05, "IA: Montando contexto do projeto...");
+        const { assembleEnrichedContext } = await import("./ai-deep-analyzer");
+        enrichedContext = assembleEnrichedContext({
+          project,
+          ifcAnalyses,
+          wbsProject,
+          pdfTexts,
+          apiKey: process.env.ANTHROPIC_API_KEY!,
+        });
+      }
+
+      progress.reportPartial("ai_sequence", 0.1, "IA: Gerando sequência construtiva...");
+      aiSequence = await generateAiSequence(ifcAnalyses, project, {
+        analysisDepth: depth,
+        enrichedContext,
+      });
 
       const aiCoverage = aiSequence.elementMapping.size;
       const aiTotal = aiCoverage + aiSequence.unmappedElements.length;
+
+      // Deep mode: validate + refine the sequence
+      if (isDeep && aiSequence.steps.length > 0) {
+        try {
+          progress.reportPartial("ai_sequence", 0.5, "IA: Validando sequência...");
+          const { validateSequence, refineSequence } = await import("./ai-deep-analyzer");
+          const validation = await validateSequence(
+            aiSequence,
+            enrichedContext ?? "",
+            process.env.ANTHROPIC_API_KEY!,
+          );
+
+          aiSequence.tokenUsage.input += validation.tokenUsage.input;
+          aiSequence.tokenUsage.output += validation.tokenUsage.output;
+
+          const actionableFindings = validation.findings.filter(f => f.severity !== "info");
+          if (actionableFindings.length > 0) {
+            progress.reportPartial("ai_sequence", 0.7, "IA: Refinando sequência...");
+
+            // Collect all element IDs for validation
+            const allElementIds = new Set<string>();
+            for (const step of aiSequence.steps) {
+              for (const id of step.elementIds) allElementIds.add(id);
+            }
+            for (const id of aiSequence.unmappedElements) allElementIds.add(id);
+
+            try {
+              const refined = await refineSequence(
+                aiSequence,
+                validation.findings,
+                enrichedContext ?? "",
+                allElementIds,
+                process.env.ANTHROPIC_API_KEY!,
+              );
+
+              // Rebuild element mapping from refined steps
+              const newMapping = new Map<string, { stepId: string; phase: import("./wbs-types").ConstructionPhase; confidence: number }>();
+              const newMappedIds = new Set<string>();
+              for (const step of refined.steps) {
+                for (const elementId of step.elementIds) {
+                  newMapping.set(elementId, { stepId: step.stepId, phase: step.phase, confidence: 92 });
+                  newMappedIds.add(elementId);
+                }
+              }
+
+              aiSequence = {
+                ...aiSequence,
+                steps: refined.steps,
+                aiRationale: refined.rationale,
+                elementMapping: newMapping,
+                unmappedElements: Array.from(allElementIds).filter(id => !newMappedIds.has(id)),
+                tokenUsage: {
+                  input: aiSequence.tokenUsage.input + refined.tokenUsage.input,
+                  output: aiSequence.tokenUsage.output + refined.tokenUsage.output,
+                },
+              };
+
+              warnings.push(
+                `IA profunda: ${validation.findings.length} constatações na validação → ` +
+                `sequência refinada (${actionableFindings.length} problemas corrigidos).`,
+              );
+            } catch (refineErr) {
+              warnings.push(
+                `Refinamento IA falhou: ${refineErr instanceof Error ? refineErr.message : String(refineErr)}. ` +
+                `Sequência original mantida.`,
+              );
+            }
+          } else {
+            warnings.push(
+              `Validação IA: sequência aprovada sem problemas significativos ` +
+              `(${validation.findings.length} observações informativas).`,
+            );
+          }
+        } catch (valErr) {
+          warnings.push(
+            `Validação IA indisponível: ${valErr instanceof Error ? valErr.message : String(valErr)}.`,
+          );
+        }
+      }
+
       if (aiSequence.unmappedElements.length > 0) {
         warnings.push(
           `IA sequenciou ${aiCoverage}/${aiTotal} elementos ` +
@@ -354,84 +498,22 @@ export async function runUnifiedPipeline(
   }
   progress.completeStage("ai_sequence");
 
-  // ─── Stage 3: Parse BOQ ────────────────────────────────────
-  progress.report("parse_boq", "A processar mapa de quantidades...");
+  // ─── Stage 3: Parse BOQ (standard/quick — already done in deep) ──
+  if (!isDeep) {
+    progress.report("parse_boq", "A processar mapa de quantidades...");
+    const boqResult = await parseBoqStage(classified, ifcAnalyses, project, warnings, progress);
+    wbsProject = boqResult.wbsProject;
+    generatedBoq = boqResult.generatedBoq;
+    parsedBoq = boqResult.parsedBoq;
+    progress.completeStage("parse_boq");
 
-  if (classified.boq.length > 0) {
-    // User uploaded a BOQ — parse it
-    try {
-      const file = classified.boq[0];
-      const ext = file.name.split(".").pop()?.toLowerCase();
-
-      if (ext === "csv") {
-        const { parseCsvWbs } = await import("./wbs-parser");
-        const text = await file.text();
-        wbsProject = parseCsvWbs(text);
-      } else {
-        const { parseExcelWbs } = await import("./wbs-parser");
-        const buffer = await file.arrayBuffer();
-        wbsProject = await parseExcelWbs(buffer);
-
-        // Also parse as ParsedBoq for reconciliation (needs raw BoqItem entries)
-        try {
-          const { parseExcelFile } = await import("./xlsx-parser");
-          const xlsResult = parseExcelFile(buffer);
-          if (xlsResult.boqs.length > 0) {
-            parsedBoq = xlsResult.boqs[0];
-          }
-        } catch {
-          // Non-critical: reconciliation will be skipped if parsedBoq is unavailable
-        }
-      }
-
-      // Set project name from WBS if project has no name
-      if (wbsProject.name && !project.name) {
-        project.name = wbsProject.name;
-      }
-
-      if (classified.boq.length > 1) {
-        warnings.push(
-          `Múltiplos ficheiros BOQ enviados. Apenas o primeiro (${file.name}) foi utilizado.`,
-        );
-      }
-    } catch (err) {
-      warnings.push(`Erro ao processar BOQ: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  } else if (ifcAnalyses && ifcAnalyses.length > 0) {
-    // No BOQ uploaded, but IFC available — generate from IFC
-    try {
-      const { generateBoqFromIfc } = await import("./keynote-resolver");
-      const projectName = project.name || "Projeto IFC";
-      const startDate = new Date().toISOString().slice(0, 10);
-      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
-      wbsProject = generatedBoq.project;
-
-      if (generatedBoq.stats.unresolved > 0) {
-        warnings.push(
-          `${generatedBoq.stats.unresolved} elementos IFC sem mapeamento ProNIC ` +
-          `(cobertura: ${generatedBoq.stats.coveragePercent}%).`,
-        );
-      }
-    } catch (err) {
-      warnings.push(
-        `Erro ao gerar BOQ a partir do IFC: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
+    // ─── Stage 4: Parse PDF (standard/quick — already done in deep) ──
+    progress.report("parse_pdf", "A extrair texto de documentos PDF...");
+    const pdfResult = await parsePdfStage(classified, project, warnings, progress, depth);
+    project = pdfResult.project;
+    pdfTexts = pdfResult.pdfTexts;
+    progress.completeStage("parse_pdf");
   }
-
-  // When both uploaded BOQ and IFC exist, also generate IFC-based BOQ for reconciliation
-  if (classified.boq.length > 0 && ifcAnalyses && ifcAnalyses.length > 0 && !generatedBoq) {
-    try {
-      const { generateBoqFromIfc } = await import("./keynote-resolver");
-      const projectName = project.name || "Projeto IFC";
-      const startDate = new Date().toISOString().slice(0, 10);
-      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
-    } catch {
-      // Non-critical: reconciliation will be skipped
-    }
-  }
-
-  progress.completeStage("parse_boq");
 
   // ─── Stage 3b: Parse Schedule XML ──────────────────────────
   if (classified.schedule.length > 0) {
@@ -483,101 +565,6 @@ export async function runUnifiedPipeline(
     }
   }
 
-  // ─── Stage 4: Parse PDF ────────────────────────────────────
-  progress.report("parse_pdf", "A extrair texto de documentos PDF...");
-
-  if (classified.pdf.length > 0) {
-    try {
-      const { splitAndExtract } = await import("./pdf-splitter");
-      const { parseDocumentWithAI, mergeExtractedData } = await import("./document-parser");
-
-      for (let i = 0; i < classified.pdf.length; i++) {
-        progress.reportPartial(
-          "parse_pdf",
-          i / classified.pdf.length,
-          `A processar ${classified.pdf[i].name}...`,
-        );
-
-        try {
-          const buffer = await classified.pdf[i].arrayBuffer();
-          const extraction = await splitAndExtract(buffer);
-
-          // Detect scanned pages and attempt OCR
-          let enrichedText = extraction.text;
-          const scannedPages = extraction.pageTexts.filter(
-            (pt) => pt.text.trim().length < 50,
-          );
-
-          if (scannedPages.length > 0) {
-            try {
-              // OCR uses native @napi-rs/canvas — must run server-side via API route
-              // to keep the client/worker bundle free of Node.js-only dependencies.
-              const formData = new FormData();
-              formData.append("file", new Blob([buffer], { type: "application/pdf" }), classified.pdf[i].name);
-              formData.append("pages", JSON.stringify(scannedPages.map((p) => p.page)));
-              formData.append("language", "por");
-
-              const ocrResponse = await fetch(resolveUrl("/api/ocr"), { method: "POST", body: formData });
-              if (!ocrResponse.ok) throw new Error(`OCR API ${ocrResponse.status}`);
-
-              const ocrData = await ocrResponse.json() as { texts: string[]; confidences: number[] };
-              const pageNumbers = scannedPages.map((p) => p.page);
-
-              // Merge OCR text back (replace sparse text with OCR text if longer)
-              for (let j = 0; j < pageNumbers.length; j++) {
-                const pageText = extraction.pageTexts.find(
-                  (pt) => pt.page === pageNumbers[j],
-                );
-                if (pageText && ocrData.texts[j] && ocrData.texts[j].length > pageText.text.length) {
-                  pageText.text = ocrData.texts[j];
-                }
-              }
-
-              // Rebuild full text with OCR-enriched pages
-              enrichedText = extraction.pageTexts
-                .map((pt) => `--- Página ${pt.page} ---\n${pt.text}`)
-                .join("\n\n");
-
-              const ocrCount = ocrData.texts.filter((t) => t.length > 0).length;
-              if (ocrCount > 0) {
-                warnings.push(
-                  `OCR aplicado a ${ocrCount} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
-                );
-              }
-            } catch {
-              warnings.push(
-                `OCR indisponível para ${scannedPages.length} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
-              );
-            }
-          }
-
-          if (enrichedText.trim().length > 50) {
-            // Collect for AI estimation summary
-            collectedPdfTexts.push(enrichedText);
-
-            try {
-              const parsed = await parseDocumentWithAI(enrichedText, project);
-              project = mergeExtractedData(project, parsed);
-              warnings.push(...parsed.warnings);
-            } catch {
-              warnings.push(
-                `Análise AI indisponível para ${classified.pdf[i].name} — texto extraído mas não interpretado.`,
-              );
-            }
-          }
-        } catch (err) {
-          warnings.push(
-            `Erro ao processar ${classified.pdf[i].name}: ${err instanceof Error ? err.message : String(err)}`,
-          );
-        }
-      }
-    } catch (err) {
-      warnings.push(`Erro no módulo PDF: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  progress.completeStage("parse_pdf");
-
   // ─── Stage 5: Analyze ──────────────────────────────────────
   if (opts.includeCompliance !== false) {
     progress.report("analyze", "A executar análise regulamentar...");
@@ -588,6 +575,45 @@ export async function runUnifiedPipeline(
     } catch (err) {
       warnings.push(
         `Análise regulamentar falhou: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // Deep mode: AI double-check of regulatory findings
+  if (isDeep && analysis && analysis.findings.length > 0 && process.env.ANTHROPIC_API_KEY) {
+    try {
+      const { reviewRegulatoryFindings } = await import("./ai-deep-analyzer");
+      const findingsForReview = analysis.findings.map(f => ({
+        id: f.id,
+        area: f.area,
+        description: f.description,
+        severity: f.severity,
+        regulation: f.regulation,
+        article: f.article,
+        currentValue: f.currentValue,
+        requiredValue: f.requiredValue,
+      }));
+
+      const review = await reviewRegulatoryFindings(
+        findingsForReview,
+        project,
+        pdfTexts,
+        process.env.ANTHROPIC_API_KEY!,
+      );
+
+      regulatoryReview = review.reviewedFindings;
+      const falsePositives = regulatoryReview.filter(r => !r.verified).length;
+      if (falsePositives > 0) {
+        warnings.push(
+          `Revisão IA: ${falsePositives}/${regulatoryReview.length} constatações identificadas como possíveis falsos positivos.`,
+        );
+      }
+      warnings.push(
+        `Revisão regulamentar IA: ${regulatoryReview.length} constatações revistas e priorizadas por relevância.`,
+      );
+    } catch (err) {
+      warnings.push(
+        `Revisão regulamentar IA indisponível: ${err instanceof Error ? err.message : String(err)}.`,
       );
     }
   }
@@ -978,6 +1004,8 @@ export async function runUnifiedPipeline(
     ifcAnalyses,
     elementMapping,
     aiSequence,
+    regulatoryReview,
+    analysisDepth: depth,
     cashFlow,
     reconciledBoq,
     parsedBoq,
@@ -993,6 +1021,201 @@ export async function runUnifiedPipeline(
     warnings,
     processingTimeMs,
   };
+}
+
+// ============================================================
+// Extracted stage helpers (for depth-aware reordering)
+// ============================================================
+
+type ProgressReporter = ReturnType<typeof createProgressReporter>;
+
+async function parseBoqStage(
+  classified: ClassifiedFiles,
+  ifcAnalyses: SpecialtyAnalysisResult[] | undefined,
+  project: BuildingProject,
+  warnings: string[],
+  progress: ProgressReporter,
+): Promise<{ wbsProject?: WbsProject; generatedBoq?: GeneratedBoq; parsedBoq?: ParsedBoq }> {
+  let wbsProject: WbsProject | undefined;
+  let generatedBoq: GeneratedBoq | undefined;
+  let parsedBoq: ParsedBoq | undefined;
+
+  if (classified.boq.length > 0) {
+    try {
+      const file = classified.boq[0];
+      const ext = file.name.split(".").pop()?.toLowerCase();
+
+      if (ext === "csv") {
+        const { parseCsvWbs } = await import("./wbs-parser");
+        const text = await file.text();
+        wbsProject = parseCsvWbs(text);
+      } else {
+        const { parseExcelWbs } = await import("./wbs-parser");
+        const buffer = await file.arrayBuffer();
+        wbsProject = await parseExcelWbs(buffer);
+
+        try {
+          const { parseExcelFile } = await import("./xlsx-parser");
+          const xlsResult = parseExcelFile(buffer);
+          if (xlsResult.boqs.length > 0) {
+            parsedBoq = xlsResult.boqs[0];
+          }
+        } catch {
+          // Non-critical
+        }
+      }
+
+      if (wbsProject.name && !project.name) {
+        project.name = wbsProject.name;
+      }
+
+      if (classified.boq.length > 1) {
+        warnings.push(
+          `Múltiplos ficheiros BOQ enviados. Apenas o primeiro (${file.name}) foi utilizado.`,
+        );
+      }
+    } catch (err) {
+      warnings.push(`Erro ao processar BOQ: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  } else if (ifcAnalyses && ifcAnalyses.length > 0) {
+    try {
+      const { generateBoqFromIfc } = await import("./keynote-resolver");
+      const projectName = project.name || "Projeto IFC";
+      const startDate = new Date().toISOString().slice(0, 10);
+      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
+      wbsProject = generatedBoq.project;
+
+      if (generatedBoq.stats.unresolved > 0) {
+        warnings.push(
+          `${generatedBoq.stats.unresolved} elementos IFC sem mapeamento ProNIC ` +
+          `(cobertura: ${generatedBoq.stats.coveragePercent}%).`,
+        );
+      }
+    } catch (err) {
+      warnings.push(
+        `Erro ao gerar BOQ a partir do IFC: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  // When both uploaded BOQ and IFC exist, also generate IFC-based BOQ for reconciliation
+  if (classified.boq.length > 0 && ifcAnalyses && ifcAnalyses.length > 0 && !generatedBoq) {
+    try {
+      const { generateBoqFromIfc } = await import("./keynote-resolver");
+      const projectName = project.name || "Projeto IFC";
+      const startDate = new Date().toISOString().slice(0, 10);
+      generatedBoq = generateBoqFromIfc(ifcAnalyses, projectName, startDate);
+    } catch {
+      // Non-critical
+    }
+  }
+
+  return { wbsProject, generatedBoq, parsedBoq };
+}
+
+async function parsePdfStage(
+  classified: ClassifiedFiles,
+  project: BuildingProject,
+  warnings: string[],
+  progress: ProgressReporter,
+  depth: AnalysisDepth,
+): Promise<{ project: BuildingProject; pdfTexts: string[] }> {
+  const pdfTexts: string[] = [];
+
+  if (classified.pdf.length > 0) {
+    try {
+      const { splitAndExtract } = await import("./pdf-splitter");
+
+      for (let i = 0; i < classified.pdf.length; i++) {
+        progress.reportPartial(
+          "parse_pdf",
+          i / classified.pdf.length,
+          `A processar ${classified.pdf[i].name}...`,
+        );
+
+        try {
+          const buffer = await classified.pdf[i].arrayBuffer();
+          const extraction = await splitAndExtract(buffer);
+
+          let enrichedText = extraction.text;
+          const scannedPages = extraction.pageTexts.filter(
+            (pt) => pt.text.trim().length < 50,
+          );
+
+          if (scannedPages.length > 0) {
+            try {
+              const { ocrPdfPages } = await import("./server-ocr");
+              const ocrResults = await ocrPdfPages(
+                new Uint8Array(buffer),
+                scannedPages.map((p) => p.page),
+                {
+                  language: "por",
+                  onProgress: (current, total) => {
+                    progress.reportPartial(
+                      "parse_pdf",
+                      (i + current / total) / classified.pdf.length,
+                      `OCR página ${current}/${total} de ${classified.pdf[i].name}`,
+                    );
+                  },
+                },
+              );
+
+              for (const ocr of ocrResults) {
+                const pageText = extraction.pageTexts.find(
+                  (pt) => pt.page === ocr.pageNumber,
+                );
+                if (pageText && ocr.text.length > pageText.text.length) {
+                  pageText.text = ocr.text;
+                }
+              }
+
+              enrichedText = extraction.pageTexts
+                .map((pt) => `--- Página ${pt.page} ---\n${pt.text}`)
+                .join("\n\n");
+
+              const ocrCount = ocrResults.filter((r) => r.text.length > 0).length;
+              if (ocrCount > 0) {
+                warnings.push(
+                  `OCR aplicado a ${ocrCount} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
+                );
+              }
+            } catch {
+              warnings.push(
+                `OCR indisponível para ${scannedPages.length} página(s) digitalizada(s) de ${classified.pdf[i].name}.`,
+              );
+            }
+          }
+
+          // Collect PDF text for deep mode context assembly
+          if (enrichedText.trim().length > 50) {
+            pdfTexts.push(enrichedText);
+          }
+
+          // Quick mode skips AI PDF parsing (just extracts text)
+          if (depth !== "quick" && enrichedText.trim().length > 50) {
+            try {
+              const { parseDocumentWithAI, mergeExtractedData } = await import("./document-parser");
+              const parsed = await parseDocumentWithAI(enrichedText, project);
+              project = mergeExtractedData(project, parsed);
+              warnings.push(...parsed.warnings);
+            } catch {
+              warnings.push(
+                `Análise AI indisponível para ${classified.pdf[i].name} — texto extraído mas não interpretado.`,
+              );
+            }
+          }
+        } catch (err) {
+          warnings.push(
+            `Erro ao processar ${classified.pdf[i].name}: ${err instanceof Error ? err.message : String(err)}`,
+          );
+        }
+      }
+    } catch (err) {
+      warnings.push(`Erro no módulo PDF: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  return { project, pdfTexts };
 }
 
 // ============================================================
