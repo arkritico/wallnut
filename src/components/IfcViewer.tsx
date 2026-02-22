@@ -261,6 +261,11 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             absolute: true,
           },
           autoSetWasm: false,
+          webIfc: {
+            COORDINATE_TO_ORIGIN: true,
+            MEMORY_LIMIT: 2147483648, // 2GB for large models
+            CIRCLE_SEGMENTS: 12,
+          },
         });
         ifcLoaderRef.current = ifcLoader;
 
@@ -403,8 +408,17 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       const model = await ifcLoader.load(data, true, name);
       world.scene.three.add(model.object);
 
-      // Fit camera to model
+      // Adjust camera frustum to fit model bounds before fitting
       const camera = world.camera as SimpleCamera;
+      const perspCam = camera.three as THREE.PerspectiveCamera;
+      if (model.box && !model.box.isEmpty()) {
+        const size = model.box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        perspCam.far = Math.max(100000, maxDim * 100);
+        perspCam.near = Math.max(0.1, Math.min(1, maxDim * 0.001));
+        perspCam.updateProjectionMatrix();
+      }
+
       await camera.fitToItems();
 
       const categories = await model.getCategories();

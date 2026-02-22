@@ -16,6 +16,34 @@ import { analyzePlumbingRGSPPDADAR, canAnalyzePlumbing } from "./plumbing-analyz
 import { analyzeEnergySCE, canAnalyzeEnergy, enrichProjectWithEnergyCalculations } from "./energy-analyzer";
 import { analyzeFireSafetySCIE, canAnalyzeFireSafety, enrichProjectWithFireSafetyCalculations } from "./fire-safety-analyzer";
 import { buildProjectContext, type ContextBuildReport } from "./context-builder";
+import type { IfcSpecialty } from "./ifc-specialty-analyzer";
+
+/** Options for project analysis — controls which specialties are evaluated. */
+export interface AnalysisOptions {
+  /**
+   * IFC-detected specialties. When provided, only regulation areas relevant
+   * to these specialties will be evaluated. Without this, all areas with
+   * populated fields are evaluated (legacy behaviour).
+   */
+  detectedSpecialties?: Set<IfcSpecialty>;
+}
+
+/**
+ * Maps IFC specialty → allowed regulation analysis areas.
+ * Architecture IFC should NOT trigger electrical/plumbing/HVAC analysis.
+ */
+const IFC_SPECIALTY_TO_AREAS: Record<string, string[]> = {
+  architecture: ["architecture", "accessibility", "general", "municipal", "fire_safety", "acoustic", "thermal", "energy", "structural", "licensing", "waste", "drawings"],
+  structure: ["structural", "fire_safety", "general"],
+  mep: ["hvac", "water_drainage", "gas", "electrical", "fire_safety", "general"],
+  electrical: ["electrical", "fire_safety", "general"],
+  plumbing: ["water_drainage", "general"],
+  hvac: ["hvac", "general"],
+  fire_safety: ["fire_safety", "general"],
+  telecom: ["telecommunications", "general"],
+  gas: ["gas", "general"],
+  unknown: ["architecture", "general", "municipal"], // conservative default
+};
 
 // ── Determine which regulation areas have REAL data (IFC/form, not defaults) ──
 // Each specialty only runs when its project data is submitted.
@@ -196,7 +224,7 @@ function getMissingFieldsSCIE(project: BuildingProject): string[] {
   return missing;
 }
 
-export async function analyzeProject(project: BuildingProject): Promise<AnalysisResult> {
+export async function analyzeProject(project: BuildingProject, options?: AnalysisOptions): Promise<AnalysisResult> {
   const findings: Finding[] = [];
 
   // ── Context enrichment ──────────────────────────────────
@@ -216,7 +244,24 @@ export async function analyzeProject(project: BuildingProject): Promise<Analysis
 
   // Determine which specialty areas have real data (IFC or form, not defaults)
   // This gates plugin evaluation — irrelevant specialties are skipped entirely.
-  const analyzedAreas = getAnalyzedAreas(contextReport);
+  let analyzedAreas = getAnalyzedAreas(contextReport);
+
+  // ── IFC specialty gating ─────────────────────────────────
+  // When IFC specialties are known, restrict analysis to relevant areas only.
+  // E.g., architecture IFC should NOT trigger RTIEBT electrical checks.
+  if (options?.detectedSpecialties && options.detectedSpecialties.size > 0) {
+    const allowedAreas = new Set<string>();
+    for (const specialty of options.detectedSpecialties) {
+      const areas = IFC_SPECIALTY_TO_AREAS[specialty] ?? IFC_SPECIALTY_TO_AREAS.unknown;
+      for (const area of areas) allowedAreas.add(area);
+    }
+    // Intersect: only keep areas that are both data-populated AND allowed by IFC specialty
+    const filtered = new Set<string>();
+    for (const area of analyzedAreas) {
+      if (allowedAreas.has(area)) filtered.add(area);
+    }
+    analyzedAreas = filtered;
+  }
 
   // ── Global computed fields (runs BEFORE all rules) ────────
   // Pre-compute ALL computed fields from ALL plugins into shared context.

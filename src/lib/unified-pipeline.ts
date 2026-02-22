@@ -254,7 +254,8 @@ export async function runUnifiedPipeline(
   progress.report("classify", "A classificar ficheiros...");
   const classified = classifyFiles(input.files);
 
-  if (classified.ifc.length === 0 && classified.boq.length === 0 && classified.pdf.length === 0 && classified.schedule.length === 0) {
+  const hasPreParsedIfc = opts.ifcAnalyses && opts.ifcAnalyses.length > 0;
+  if (classified.ifc.length === 0 && classified.boq.length === 0 && classified.pdf.length === 0 && classified.schedule.length === 0 && !hasPreParsedIfc) {
     warnings.push("Nenhum ficheiro reconhecido (IFC, XLS/XLSX, PDF, XML).");
   }
 
@@ -302,8 +303,10 @@ export async function runUnifiedPipeline(
     try {
       const { specialtyAnalysisToProjectFields } = await import("./ifc-enrichment");
       const enrichment = specialtyAnalysisToProjectFields(ifcAnalyses);
-      for (const [key, value] of Object.entries(enrichment.fields)) {
-        setNestedField(project, key, value);
+      // Apply field-level overrides (dot-path) — IFC-detected fields always win
+      // over defaults, but don't replace entire sub-objects
+      for (const entry of enrichment.report.populatedFields) {
+        setNestedField(project, entry.field, entry.value);
       }
       if (enrichment.report.populatedFields.length > 0) {
         const fieldCount = enrichment.report.populatedFields.length;
@@ -332,10 +335,10 @@ export async function runUnifiedPipeline(
 
       ifcAnalyses = analyses;
 
-      // Enrich BuildingProject from IFC data
+      // Enrich BuildingProject from IFC data — field-level overrides
       const enrichment = specialtyAnalysisToProjectFields(analyses);
-      for (const [key, value] of Object.entries(enrichment.fields)) {
-        setNestedField(project, key, value);
+      for (const entry of enrichment.report.populatedFields) {
+        setNestedField(project, entry.field, entry.value);
       }
 
       // Report enriched field count
@@ -570,7 +573,19 @@ export async function runUnifiedPipeline(
 
     try {
       const { analyzeProject } = await import("./analyzer");
-      analysis = await analyzeProject(project);
+
+      // Build detected specialties from IFC analyses + file types for smart gating.
+      // Architecture IFC alone should NOT trigger electrical/plumbing/HVAC analysis.
+      let detectedSpecialties: Set<import("./ifc-specialty-analyzer").IfcSpecialty> | undefined;
+      if (ifcAnalyses && ifcAnalyses.length > 0) {
+        detectedSpecialties = new Set(ifcAnalyses.map(a => a.specialty));
+        // If BOQ or PDF files were also uploaded, assume full analysis is intended
+        if (classified.boq.length > 0 || classified.pdf.length > 0) {
+          detectedSpecialties = undefined; // no restriction — run all
+        }
+      }
+
+      analysis = await analyzeProject(project, { detectedSpecialties });
     } catch (err) {
       warnings.push(
         `Análise regulamentar falhou: ${err instanceof Error ? err.message : String(err)}`,
