@@ -5,11 +5,11 @@ import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const log = createLogger("ai-review");
 
-const FETCH_TIMEOUT_MS = 90_000;
+const FETCH_TIMEOUT_MS = 270_000;
 
 export const POST = withApiHandler("ai-review", async (request) => {
   const body = await request.json();
