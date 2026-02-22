@@ -26,7 +26,6 @@ import {
   Layers,
   Ruler,
   Box,
-  AlertTriangle,
 } from "lucide-react";
 import ModelManagerPanel from "./ifc-viewer/ModelManagerPanel";
 import type { LoadedModelInfo } from "./ifc-viewer/ModelManagerPanel";
@@ -137,8 +136,6 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   // Drag-and-drop state
   const [isDragging, setIsDragging] = useState(false);
 
-  // File size warning state
-  const [pendingFile, setPendingFile] = useState<{ data: Uint8Array; name: string; sizeMb: number } | null>(null);
 
   // Ortho/perspective toggle
   const [isOrtho, setIsOrtho] = useState(false);
@@ -512,30 +509,27 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   }, []);
 
   // ── Load IFC file ───────────────────────────────────────────
-  const loadIfcFile = useCallback(async (data: Uint8Array, name: string) => {
+  /** Load a single IFC file. Set `skipFitAndRebuild` to true when
+   *  loading in batch (the caller handles fit + rebuild after all files). */
+  const loadIfcFile = useCallback(async (data: Uint8Array, name: string, skipFitAndRebuild = false) => {
     const ifcLoader = ifcLoaderRef.current;
     const world = worldRef.current;
     if (!ifcLoader || !world) return;
 
     setIsLoading(true);
-    setLoadingProgress(null);
     setError(null);
 
     const sizeMb = (data.byteLength / (1024 * 1024)).toFixed(1);
     setLoadingProgress(`A analisar ${name} (${sizeMb} MB)...`);
 
     try {
-      setLoadingProgress("A processar geometria IFC...");
+      setLoadingProgress(`A processar geometria — ${name}...`);
       const model = await ifcLoader.load(data, true, name);
 
-      setLoadingProgress("A adicionar ao cenário 3D...");
+      setLoadingProgress(`A adicionar ao cenário — ${name}...`);
       world.scene.three.add(model.object);
 
-      // Fit camera to model
-      const camera = world.camera as SimpleCamera;
-      await camera.fitToItems();
-
-      setLoadingProgress("A extrair categorias...");
+      setLoadingProgress(`A extrair categorias — ${name}...`);
       const categories = await model.getCategories();
 
       const newModel: LoadedModelInfo = { model, name, categories };
@@ -543,16 +537,44 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       setModelVisibility((prev) => ({ ...prev, [model.modelId]: true }));
       onModelLoaded?.(model);
 
-      // Rebuild category tree with new model data
-      await rebuildCategoryTree();
+      if (!skipFitAndRebuild) {
+        const camera = world.camera as SimpleCamera;
+        await camera.fitToItems();
+        await rebuildCategoryTree();
+      }
     } catch (err) {
-      console.error("Failed to load IFC:", err);
-      setError(err instanceof Error ? err.message : "Falha ao carregar ficheiro IFC. O ficheiro pode estar corrompido ou num formato não suportado.");
+      console.error(`Failed to load IFC ${name}:`, err);
+      setError(`Falha ao carregar ${name}. O ficheiro pode estar corrompido ou num formato não suportado.`);
     } finally {
-      setIsLoading(false);
-      setLoadingProgress(null);
+      if (!skipFitAndRebuild) {
+        setIsLoading(false);
+        setLoadingProgress(null);
+      }
     }
   }, [onModelLoaded, rebuildCategoryTree]);
+
+  /** Load multiple IFC files sequentially with batched camera fit. */
+  const loadIfcBatch = useCallback(async (files: { data: Uint8Array; name: string }[]) => {
+    setIsLoading(true);
+    setError(null);
+
+    for (let i = 0; i < files.length; i++) {
+      setLoadingProgress(`Modelo ${i + 1}/${files.length}: ${files[i].name}`);
+      await loadIfcFile(files[i].data, files[i].name, true);
+    }
+
+    // After all files: fit camera + rebuild category tree once
+    const world = worldRef.current;
+    if (world) {
+      setLoadingProgress("A ajustar câmara...");
+      const camera = world.camera as SimpleCamera;
+      await camera.fitToItems();
+    }
+    await rebuildCategoryTree();
+
+    setIsLoading(false);
+    setLoadingProgress(null);
+  }, [loadIfcFile, rebuildCategoryTree]);
 
   // ── Load new IFC data when prop changes ─────────────────────
   useEffect(() => {
@@ -655,25 +677,56 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   // ── File upload handler ─────────────────────────────────────
   /** Size threshold (MB) above which we show a warning before loading */
   const FILE_SIZE_WARNING_MB = 30;
+  /** Max recommended models before performance degrades */
+  const MAX_RECOMMENDED_MODELS = 10;
 
-  function processFile(file: File) {
-    const sizeMb = file.size / (1024 * 1024);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const data = new Uint8Array(reader.result as ArrayBuffer);
-      if (sizeMb > FILE_SIZE_WARNING_MB) {
-        setPendingFile({ data, name: file.name, sizeMb: Math.round(sizeMb) });
-      } else {
-        loadIfcFile(data, file.name);
-      }
-    };
-    reader.readAsArrayBuffer(file);
+  /** Read multiple files from the file list, check sizes, then load */
+  async function processFiles(fileList: FileList) {
+    const ifcFiles = Array.from(fileList).filter((f) => f.name.toLowerCase().endsWith(".ifc"));
+    if (ifcFiles.length === 0) {
+      setError("Apenas ficheiros .ifc são suportados.");
+      return;
+    }
+
+    // Check model count
+    const totalAfterLoad = loadedModels.length + ifcFiles.length;
+    if (totalAfterLoad > MAX_RECOMMENDED_MODELS) {
+      const overWarning = `Vai ter ${totalAfterLoad} modelos carregados. Acima de ${MAX_RECOMMENDED_MODELS} modelos o desempenho pode degradar significativamente.`;
+      if (!window.confirm(overWarning)) return;
+    }
+
+    // Check total size
+    const totalSizeMb = ifcFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024);
+    if (totalSizeMb > FILE_SIZE_WARNING_MB) {
+      const sizeWarning = ifcFiles.length === 1
+        ? `${ifcFiles[0].name} tem ${Math.round(totalSizeMb)} MB. Ficheiros grandes podem causar lentidão. Continuar?`
+        : `${ifcFiles.length} ficheiros totalizando ${Math.round(totalSizeMb)} MB. Continuar?`;
+      if (!window.confirm(sizeWarning)) return;
+    }
+
+    // Read all files into Uint8Arrays
+    const fileDataArr: { data: Uint8Array; name: string }[] = [];
+    for (const file of ifcFiles) {
+      const data = await new Promise<Uint8Array>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(new Uint8Array(reader.result as ArrayBuffer));
+        reader.readAsArrayBuffer(file);
+      });
+      fileDataArr.push({ data, name: file.name });
+    }
+
+    // Single file → load directly, multiple → batch
+    if (fileDataArr.length === 1) {
+      loadIfcFile(fileDataArr[0].data, fileDataArr[0].name);
+    } else {
+      loadIfcBatch(fileDataArr);
+    }
   }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    processFile(file);
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    processFiles(files);
   }
 
   // ── Drag-and-drop handlers ──────────────────────────────────
@@ -696,13 +749,9 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
     e.stopPropagation();
     setIsDragging(false);
 
-    const file = e.dataTransfer.files?.[0];
-    if (!file) return;
-    if (!file.name.toLowerCase().endsWith(".ifc")) {
-      setError("Apenas ficheiros .ifc são suportados.");
-      return;
-    }
-    processFile(file);
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+    processFiles(files);
   }
 
   // ── Ortho/perspective toggle ────────────────────────────────
@@ -936,6 +985,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           <input
             type="file"
             accept=".ifc"
+            multiple
             onChange={handleFileUpload}
             className="hidden"
           />
@@ -1020,10 +1070,12 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
               <Ruler className="w-4 h-4" />
             </button>
 
-            {/* Model names */}
+            {/* Model count & names */}
             <div className="w-px h-5 bg-gray-200 mx-1" />
-            <span className="text-xs text-gray-400 truncate max-w-[200px]">
-              {loadedModels.map((m) => m.name).join(", ")}
+            <span className="text-xs text-gray-400 truncate max-w-[200px]" title={loadedModels.map((m) => m.name).join("\n")}>
+              {loadedModels.length === 1
+                ? loadedModels[0].name
+                : `${loadedModels.length} modelos`}
             </span>
           </>
         )}
@@ -1115,38 +1167,6 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             <p className="text-sm text-gray-600 font-medium">
               {loadingProgress ?? "A carregar modelo..."}
             </p>
-          </div>
-        </div>
-      )}
-
-      {/* File size warning dialog */}
-      {pendingFile && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm mx-4">
-            <div className="flex items-center gap-3 mb-3">
-              <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
-              <h3 className="text-sm font-semibold text-gray-800">Ficheiro grande</h3>
-            </div>
-            <p className="text-xs text-gray-600 mb-1">
-              <strong>{pendingFile.name}</strong> tem {pendingFile.sizeMb} MB.
-            </p>
-            <p className="text-xs text-gray-500 mb-4">
-              Ficheiros grandes podem causar lentidão ou falhas no navegador, especialmente em dispositivos móveis.
-            </p>
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={() => setPendingFile(null)}
-                className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => { loadIfcFile(pendingFile.data, pendingFile.name); setPendingFile(null); }}
-                className="px-3 py-1.5 text-xs text-white bg-accent rounded hover:bg-accent-hover transition-colors"
-              >
-                Carregar mesmo assim
-              </button>
-            </div>
           </div>
         </div>
       )}
