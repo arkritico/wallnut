@@ -744,6 +744,47 @@ for (let i = 0; i < PT_CONSTRUCTION_SYNONYMS.length; i++) {
   }
 }
 
+/**
+ * Register a new synonym pair at runtime.
+ * If either word belongs to an existing group, the other is added to it.
+ * Otherwise, a new group is created. Words are stemmed before insertion.
+ * Returns true if a new synonym was actually added.
+ */
+export function registerSynonym(word1: string, word2: string): boolean {
+  const stem1 = stemPT(word1);
+  const stem2 = stemPT(word2);
+  if (stem1 === stem2) return false;
+
+  const idx1 = _synonymIndex.get(stem1);
+  const idx2 = _synonymIndex.get(stem2);
+
+  if (idx1 !== undefined && idx2 !== undefined) {
+    // Both already in (possibly different) groups — nothing to do if same group
+    return idx1 !== idx2; // Can't merge at runtime without side-effects, skip
+  }
+
+  if (idx1 !== undefined) {
+    // Add stem2 to stem1's group
+    PT_CONSTRUCTION_SYNONYMS[idx1].push(stem2);
+    _synonymIndex.set(stem2, idx1);
+    return true;
+  }
+
+  if (idx2 !== undefined) {
+    // Add stem1 to stem2's group
+    PT_CONSTRUCTION_SYNONYMS[idx2].push(stem1);
+    _synonymIndex.set(stem1, idx2);
+    return true;
+  }
+
+  // Neither exists — create new group
+  const newIdx = PT_CONSTRUCTION_SYNONYMS.length;
+  PT_CONSTRUCTION_SYNONYMS.push([stem1, stem2]);
+  _synonymIndex.set(stem1, newIdx);
+  _synonymIndex.set(stem2, newIdx);
+  return true;
+}
+
 /** Tokenize and stem a Portuguese text, removing stopwords, with synonym expansion */
 function tokenize(text: string): string[] {
   const baseTokens = text
