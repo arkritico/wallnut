@@ -604,6 +604,105 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
     setLoadingProgress(null);
   }, [loadIfcFile, rebuildCategoryTree]);
 
+  /** Load a pre-converted Fragment binary (much faster than raw IFC). */
+  const loadFragmentFile = useCallback(async (data: Uint8Array, name: string, skipFitAndRebuild = false) => {
+    const components = componentsRef.current;
+    const world = worldRef.current;
+    if (!components || !world) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    const sizeMb = (data.byteLength / (1024 * 1024)).toFixed(1);
+    setLoadingProgress(`A carregar fragmento ${name} (${sizeMb} MB)...`);
+
+    try {
+      const fragmentsManager = components.get(FragmentsManager);
+      const camera = world.camera as SimpleCamera;
+      const modelId = `frag-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
+      const model = await fragmentsManager.core.load(data, {
+        modelId,
+        camera: camera.three as THREE.PerspectiveCamera,
+      });
+
+      setLoadingProgress(`A adicionar ao cenário — ${name}...`);
+      world.scene.three.add(model.object);
+
+      // Enable LOD
+      await model.setLodMode(LodMode.DEFAULT);
+
+      // Build BVH for raycasting
+      model.object.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (mesh.isMesh && mesh.geometry && (mesh.geometry as any).computeBoundsTree) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (mesh.geometry as any).computeBoundsTree();
+        }
+      });
+
+      setLoadingProgress(`A extrair categorias — ${name}...`);
+      const categories = await model.getCategories();
+
+      const newModel: LoadedModelInfo = { model, name, categories };
+      setLoadedModels((prev) => [...prev, newModel]);
+      setModelVisibility((prev) => ({ ...prev, [model.modelId]: true }));
+      onModelLoaded?.(model);
+
+      if (!skipFitAndRebuild) {
+        await camera.fitToItems();
+        await rebuildCategoryTree();
+      }
+    } catch (err) {
+      console.error(`Failed to load fragment ${name}:`, err);
+      setError(`Falha ao carregar fragmento ${name}.`);
+    } finally {
+      if (!skipFitAndRebuild) {
+        setIsLoading(false);
+        setLoadingProgress(null);
+      }
+    }
+  }, [onModelLoaded, rebuildCategoryTree]);
+
+  /** Convert IFC to Fragment via server API, then load the result. */
+  const convertAndLoadIfc = useCallback(async (data: Uint8Array, name: string, skipFitAndRebuild = false) => {
+    setIsLoading(true);
+    setError(null);
+    setLoadingProgress(`A converter ${name} no servidor...`);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", new Blob([data.buffer as ArrayBuffer], { type: "application/x-step" }), name);
+
+      const response = await fetch("/api/ifc-convert", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => ({}));
+        throw new Error((errBody as Record<string, string>).error || `HTTP ${response.status}`);
+      }
+
+      const fragBytes = new Uint8Array(await response.arrayBuffer());
+      const fragName = name.replace(/\.ifc$/i, ".frag");
+
+      setLoadingProgress(`A carregar fragmento convertido — ${fragName}...`);
+      await loadFragmentFile(fragBytes, fragName, skipFitAndRebuild);
+    } catch (err) {
+      console.error(`Server-side conversion failed for ${name}, falling back to client:`, err);
+      // Fallback: load IFC directly on client
+      setLoadingProgress(`Conversão no servidor falhou — a carregar localmente...`);
+      await loadIfcFile(data, name, skipFitAndRebuild);
+    } finally {
+      if (!skipFitAndRebuild) {
+        setIsLoading(false);
+        setLoadingProgress(null);
+      }
+    }
+  }, [loadFragmentFile, loadIfcFile]);
+
   // ── Load new IFC data when prop changes ─────────────────────
   useEffect(() => {
     if (ifcData && ifcLoaderRef.current && loadedModels.length === 0) {
@@ -708,47 +807,92 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   /** Max recommended models before performance degrades */
   const MAX_RECOMMENDED_MODELS = 10;
 
+  /** Size threshold (MB) above which IFC files are converted server-side */
+  const SERVER_CONVERT_THRESHOLD_MB = 50;
+
   /** Read multiple files from the file list, check sizes, then load */
   async function processFiles(fileList: FileList) {
-    const ifcFiles = Array.from(fileList).filter((f) => f.name.toLowerCase().endsWith(".ifc"));
-    if (ifcFiles.length === 0) {
-      setError("Apenas ficheiros .ifc são suportados.");
+    const allFiles = Array.from(fileList);
+    const ifcFiles = allFiles.filter((f) => f.name.toLowerCase().endsWith(".ifc"));
+    const fragFiles = allFiles.filter((f) => f.name.toLowerCase().endsWith(".frag"));
+
+    if (ifcFiles.length === 0 && fragFiles.length === 0) {
+      setError("Apenas ficheiros .ifc e .frag são suportados.");
       return;
     }
 
+    const totalFiles = ifcFiles.length + fragFiles.length;
+
     // Check model count
-    const totalAfterLoad = loadedModels.length + ifcFiles.length;
+    const totalAfterLoad = loadedModels.length + totalFiles;
     if (totalAfterLoad > MAX_RECOMMENDED_MODELS) {
       const overWarning = `Vai ter ${totalAfterLoad} modelos carregados. Acima de ${MAX_RECOMMENDED_MODELS} modelos o desempenho pode degradar significativamente.`;
       if (!window.confirm(overWarning)) return;
     }
 
-    // Check total size
-    const totalSizeMb = ifcFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024);
-    if (totalSizeMb > FILE_SIZE_WARNING_MB) {
+    // Check total size (IFC files only — frags are already optimized)
+    const totalIfcSizeMb = ifcFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024);
+    if (totalIfcSizeMb > FILE_SIZE_WARNING_MB) {
       const sizeWarning = ifcFiles.length === 1
-        ? `${ifcFiles[0].name} tem ${Math.round(totalSizeMb)} MB. Ficheiros grandes podem causar lentidão. Continuar?`
-        : `${ifcFiles.length} ficheiros totalizando ${Math.round(totalSizeMb)} MB. Continuar?`;
+        ? `${ifcFiles[0].name} tem ${Math.round(totalIfcSizeMb)} MB. Ficheiros grandes podem causar lentidão. Continuar?`
+        : `${ifcFiles.length} ficheiros IFC totalizando ${Math.round(totalIfcSizeMb)} MB. Continuar?`;
       if (!window.confirm(sizeWarning)) return;
     }
 
     // Read all files into Uint8Arrays
-    const fileDataArr: { data: Uint8Array; name: string }[] = [];
-    for (const file of ifcFiles) {
+    type FileEntry = { data: Uint8Array; name: string; type: "ifc" | "frag" };
+    const fileDataArr: FileEntry[] = [];
+
+    for (const file of [...fragFiles, ...ifcFiles]) {
       const data = await new Promise<Uint8Array>((resolve) => {
         const reader = new FileReader();
         reader.onload = () => resolve(new Uint8Array(reader.result as ArrayBuffer));
         reader.readAsArrayBuffer(file);
       });
-      fileDataArr.push({ data, name: file.name });
+      const type = file.name.toLowerCase().endsWith(".frag") ? "frag" as const : "ifc" as const;
+      fileDataArr.push({ data, name: file.name, type });
     }
 
-    // Single file → load directly, multiple → batch
+    // Single file → load directly
     if (fileDataArr.length === 1) {
-      loadIfcFile(fileDataArr[0].data, fileDataArr[0].name);
-    } else {
-      loadIfcBatch(fileDataArr);
+      const { data, name, type } = fileDataArr[0];
+      if (type === "frag") {
+        loadFragmentFile(data, name);
+      } else if (data.byteLength > SERVER_CONVERT_THRESHOLD_MB * 1024 * 1024) {
+        convertAndLoadIfc(data, name);
+      } else {
+        loadIfcFile(data, name);
+      }
+      return;
     }
+
+    // Multiple files → batch load sequentially
+    setIsLoading(true);
+    setError(null);
+
+    for (let i = 0; i < fileDataArr.length; i++) {
+      const { data, name, type } = fileDataArr[i];
+      setLoadingProgress(`Modelo ${i + 1}/${fileDataArr.length}: ${name}`);
+
+      if (type === "frag") {
+        await loadFragmentFile(data, name, true);
+      } else if (data.byteLength > SERVER_CONVERT_THRESHOLD_MB * 1024 * 1024) {
+        await convertAndLoadIfc(data, name, true);
+      } else {
+        await loadIfcFile(data, name, true);
+      }
+    }
+
+    // After all files: fit camera + rebuild once
+    const world = worldRef.current;
+    if (world) {
+      setLoadingProgress("A ajustar câmara...");
+      const camera = world.camera as SimpleCamera;
+      await camera.fitToItems();
+    }
+    await rebuildCategoryTree();
+    setIsLoading(false);
+    setLoadingProgress(null);
   }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -1012,7 +1156,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           IFC
           <input
             type="file"
-            accept=".ifc"
+            accept=".ifc,.frag"
             multiple
             onChange={handleFileUpload}
             className="hidden"
@@ -1171,7 +1315,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none mt-10">
           <div className="text-center text-gray-400">
             <Upload className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="text-sm font-medium">Carregar ficheiro IFC</p>
+            <p className="text-sm font-medium">Carregar ficheiro IFC ou Fragment</p>
             <p className="text-xs mt-1">Arraste ou use o botão acima</p>
           </div>
         </div>

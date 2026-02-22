@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   turbopack: {},
   // Prevent bundling native .node binaries (OCR canvas rendering)
-  serverExternalPackages: ['@napi-rs/canvas', 'winston'],
+  serverExternalPackages: ['@napi-rs/canvas', 'winston', 'three', '@thatopen/fragments', 'web-ifc'],
   // Disable the x-powered-by header to reduce information leakage
   poweredByHeader: false,
   // Increase body size limit for large uploads (IFC files, PDFs)
