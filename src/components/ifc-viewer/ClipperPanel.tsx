@@ -162,7 +162,11 @@ export default function ClipperPanel({
   }
 
   return (
-    <div className="absolute top-12 right-3 bg-white rounded-lg shadow-lg border border-gray-200 w-64 z-20">
+    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[55vh] md:max-h-none">
+      {/* Drag handle (mobile) */}
+      <div className="flex justify-center pt-2 pb-0 md:hidden">
+        <div className="w-8 h-1 rounded-full bg-gray-300" />
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
@@ -249,7 +253,7 @@ export default function ClipperPanel({
               {/* Delete */}
               <button
                 onClick={() => handleDelete(info)}
-                className="p-0.5 rounded text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                className="p-0.5 rounded text-gray-300 hover:text-red-500 md:opacity-0 md:group-hover:opacity-100 transition-all"
                 title="Remover plano"
               >
                 <Trash2 className="w-3 h-3" />

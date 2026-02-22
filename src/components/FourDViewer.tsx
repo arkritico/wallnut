@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
+import useIsMobile from "@/hooks/useIsMobile";
 import {
   ClipboardList,
   GitCompareArrows,
@@ -17,6 +18,7 @@ import {
   Eye,
   Camera,
   Upload,
+  RotateCcw,
 } from "lucide-react";
 import type { FragmentsModel } from "@thatopen/fragments";
 import type { ProjectSchedule, ScheduleTask, ConstructionPhase } from "@/lib/wbs-types";
@@ -234,6 +236,8 @@ export default function FourDViewer({
   aiRationale,
   className = "",
 }: FourDViewerProps) {
+  const isMobile = useIsMobile();
+  const [showLandscapeHint, setShowLandscapeHint] = useState(false);
   const [modelId, setModelId] = useState<string | null>(null);
   const [taskLocalIds, setTaskLocalIds] = useState<TaskLocalIdMap>(new Map());
   const [timelineState, setTimelineState] = useState<TimelineState | null>(null);
@@ -742,6 +746,17 @@ export default function FourDViewer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleToggleProgress, handleCycleComparison, handleToggleHistogram, handleToggleCapacity, progressEntries.length]);
 
+  // ── Landscape orientation hint (shown once on mobile in portrait) ──
+  useEffect(() => {
+    if (!isMobile || !modelId) return;
+    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+    if (isPortrait) {
+      setShowLandscapeHint(true);
+      const timer = setTimeout(() => setShowLandscapeHint(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile, modelId]);
+
   // ── Render ─────────────────────────────────────────────────
   return (
     <div className={`flex flex-col ${className}`}>
@@ -1055,6 +1070,21 @@ export default function FourDViewer({
               </p>
               <p className="text-white/50 text-[10px] mt-0.5">
                 Progresso no cronograma Gantt abaixo
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Landscape orientation hint (mobile portrait only) */}
+        {showLandscapeHint && (
+          <div
+            className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-fade-out-delayed"
+            onAnimationEnd={() => setShowLandscapeHint(false)}
+          >
+            <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg px-4 py-2.5 flex items-center gap-2">
+              <RotateCcw className="w-4 h-4 text-white/80" />
+              <p className="text-white/90 text-xs font-medium whitespace-nowrap">
+                Rode o ecrã para melhor visualização
               </p>
             </div>
           </div>

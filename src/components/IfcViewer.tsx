@@ -90,6 +90,18 @@ type PanelType = "models" | "clipper" | "properties" | "categories" | null;
 // Component
 // ============================================================
 
+// ============================================================
+// Performance helpers
+// ============================================================
+
+/** Reusable Vector2 for raycasting — avoids allocation per click */
+const _raycastMouse = new THREE.Vector2();
+
+/** Cap devicePixelRatio to avoid GPU overload on high-DPI screens */
+function clampedPixelRatio(max = 2): number {
+  return Math.min(window.devicePixelRatio ?? 1, max);
+}
+
 const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer({
   ifcData,
   ifcName,
@@ -124,9 +136,11 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   const [categoryTree, setCategoryTree] = useState<CategoryNode[]>([]);
   const [modelVisibility, setModelVisibility] = useState<Record<string, boolean>>({});
 
-  // Stable ref for loadedModels to use in event handlers
+  // Stable refs for use in event handlers (closure-safe)
   const loadedModelsRef = useRef<LoadedModelInfo[]>([]);
   loadedModelsRef.current = loadedModels;
+  const activePanelRef = useRef<PanelType>(null);
+  activePanelRef.current = activePanel;
 
   // Imperative handle for parent toolbar integration
   useImperativeHandle(ref, () => ({
@@ -216,10 +230,20 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         world.scene = scene;
 
         // 4. Setup renderer (must exist on world before camera is assigned)
+        //    - powerPreference: prefer discrete GPU when available
+        //    - preserveDrawingBuffer: needed for screenshot & video capture
+        //    - antialias: smooth edges (disabled on low-end / mobile GPUs)
+        const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
         const renderer = new SimpleRenderer(components, container, {
           preserveDrawingBuffer: true,
+          powerPreference: "high-performance",
+          antialias: !isMobileDevice,
         });
         world.renderer = renderer;
+
+        // Cap pixel ratio: 2 on desktop, 1.5 on mobile (big GPU savings)
+        const gl = renderer.three as THREE.WebGLRenderer;
+        gl.setPixelRatio(clampedPixelRatio(isMobileDevice ? 1.5 : 2));
 
         // Expose the canvas element for video capture
         if (canvasRef) {
@@ -287,18 +311,23 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         renderer.three.domElement.addEventListener("pointerdown", async (e) => {
           if (e.button !== 0) return; // left click only
 
+          // Auto-close non-properties panels on mobile when tapping the viewport
+          if (isMobileDevice && activePanelRef.current && activePanelRef.current !== "properties") {
+            setActivePanel(null);
+          }
+
           // Don't pick if Clipper is in interactive creation mode
           if (clipper.enabled) return;
 
           const rect = container.getBoundingClientRect();
-          const mouse = new THREE.Vector2(
+          _raycastMouse.set(
             ((e.clientX - rect.left) / rect.width) * 2 - 1,
             -((e.clientY - rect.top) / rect.height) * 2 + 1,
           );
 
           const result = await fragmentsManager.raycast({
             camera: camera.three as THREE.PerspectiveCamera,
-            mouse,
+            mouse: _raycastMouse,
             dom: renderer.three.domElement,
           });
 
@@ -354,12 +383,17 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           }
         });
 
-        // 13. Handle resize
+        // 13. Handle resize (throttled to avoid GPU stalls during drag-resize)
+        let resizeRaf = 0;
         const observer = new ResizeObserver(() => {
-          if (!disposed && renderer) {
-            renderer.resize();
-            camera.updateAspect();
-          }
+          if (disposed) return;
+          cancelAnimationFrame(resizeRaf);
+          resizeRaf = requestAnimationFrame(() => {
+            if (!disposed && renderer) {
+              renderer.resize();
+              camera.updateAspect();
+            }
+          });
         });
         observer.observe(container);
 
@@ -889,7 +923,7 @@ function ToolbarButton({ icon, label, badge, active, onClick }: ToolbarButtonPro
   return (
     <button
       onClick={onClick}
-      className={`relative inline-flex items-center gap-1 px-2 py-1.5 rounded text-xs transition-colors ${
+      className={`relative inline-flex items-center gap-1 px-2 py-2 md:py-1.5 rounded text-xs transition-colors min-h-[44px] md:min-h-0 ${
         active
           ? "bg-accent text-white"
           : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"

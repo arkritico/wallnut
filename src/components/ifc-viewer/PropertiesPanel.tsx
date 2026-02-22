@@ -183,13 +183,16 @@ export default function PropertiesPanel({
 
   if (!element) {
     return (
-      <div className="absolute top-12 right-3 bg-white rounded-lg shadow-lg border border-gray-200 w-72 z-20">
+      <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-72 z-20">
+        <div className="flex justify-center pt-2 pb-0 md:hidden">
+          <div className="w-8 h-1 rounded-full bg-gray-300" />
+        </div>
         <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
           <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
             Propriedades
           </p>
-          <button onClick={onClose} className="p-0.5 text-gray-400 hover:text-gray-600">
-            <X className="w-3.5 h-3.5" />
+          <button onClick={onClose} className="p-1 md:p-0.5 text-gray-400 hover:text-gray-600">
+            <X className="w-4 h-4 md:w-3.5 md:h-3.5" />
           </button>
         </div>
         <div className="px-3 py-6 text-center">
@@ -214,14 +217,18 @@ export default function PropertiesPanel({
   }
 
   return (
-    <div className="absolute top-12 right-3 bg-white rounded-lg shadow-lg border border-gray-200 w-72 z-20">
+    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-72 z-20 max-h-[55vh] md:max-h-none">
+      {/* Drag handle (mobile) */}
+      <div className="flex justify-center pt-2 pb-0 md:hidden">
+        <div className="w-8 h-1 rounded-full bg-gray-300" />
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
           Propriedades
         </p>
-        <button onClick={onClose} className="p-0.5 text-gray-400 hover:text-gray-600">
-          <X className="w-3.5 h-3.5" />
+        <button onClick={onClose} className="p-1 md:p-0.5 text-gray-400 hover:text-gray-600">
+          <X className="w-4 h-4 md:w-3.5 md:h-3.5" />
         </button>
       </div>
 
