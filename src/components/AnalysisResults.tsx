@@ -16,6 +16,7 @@ import {
   Lightbulb,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Plug,
   Wifi,
   Volume2,
@@ -44,6 +45,7 @@ import {
   FileSpreadsheet,
   Minus,
   TrendingUp,
+  Layers,
 } from "lucide-react";
 import { useState, useMemo, useCallback, lazy, Suspense } from "react";
 import type { RegulationArea } from "@/lib/types";
@@ -55,6 +57,7 @@ import { generateRemediationSummary, findingsToWbs } from "@/lib/findings-to-wbs
 import { generateLicensingPhases, type LicensingPhasesResult } from "@/lib/licensing-phases";
 import { phaseColor, phaseLabel } from "@/lib/phase-colors";
 import { generateCoverageReport, type CoverageReport, type AreaCoverage } from "@/lib/plugins/coverage";
+import { buildAnalysisHierarchy, type AnalysisHierarchy, type DomainGroup, type SpecialtyGroup, type RegulationGroup, DOMAINS } from "@/lib/analysis-hierarchy";
 
 const AiAssistant = lazy(() => import("@/components/AiAssistant"));
 const ConsultationTimelineView = lazy(() => import("@/components/ConsultationTimelineView"));
@@ -197,6 +200,55 @@ export default function AnalysisResults({ result, calculations, project, onReset
     if (areaFilter === "all") return result.findings;
     return result.findings.filter(f => f.area === areaFilter);
   }, [result.findings, areaFilter]);
+
+  // Hierarchical grouping: Domain → Specialty → Regulation → Finding
+  const hierarchy = useMemo(() => buildAnalysisHierarchy(result.findings), [result.findings]);
+
+  // Hierarchy for action items only (critical + warning)
+  const actionHierarchy = useMemo(
+    () => buildAnalysisHierarchy(result.findings.filter(f => f.severity === "critical" || f.severity === "warning")),
+    [result.findings],
+  );
+
+  // Track which hierarchy nodes are expanded
+  const [expandedDomains, setExpandedDomains] = useState<Set<string>>(() => {
+    // Auto-expand domains that have critical findings
+    const expanded = new Set<string>();
+    for (const dg of actionHierarchy.domains) {
+      if (dg.criticalCount > 0) expanded.add(dg.domain.id);
+    }
+    // If none are critical, expand the first domain
+    if (expanded.size === 0 && actionHierarchy.domains.length > 0) {
+      expanded.add(actionHierarchy.domains[0].domain.id);
+    }
+    return expanded;
+  });
+  const [expandedSpecialties, setExpandedSpecialties] = useState<Set<string>>(() => {
+    // Auto-expand specialties with critical findings
+    const expanded = new Set<string>();
+    for (const dg of actionHierarchy.domains) {
+      for (const sg of dg.specialties) {
+        if (sg.criticalCount > 0) expanded.add(`${dg.domain.id}:${sg.area}`);
+      }
+    }
+    return expanded;
+  });
+
+  const toggleDomain = useCallback((domainId: string) => {
+    setExpandedDomains(prev => {
+      const next = new Set(prev);
+      if (next.has(domainId)) next.delete(domainId); else next.add(domainId);
+      return next;
+    });
+  }, []);
+
+  const toggleSpecialty = useCallback((key: string) => {
+    setExpandedSpecialties(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }, []);
 
   const drillDownToArea = useCallback((area: RegulationArea) => {
     setAreaFilter(area);
@@ -367,44 +419,117 @@ export default function AnalysisResults({ result, calculations, project, onReset
       </div>
 
       {/* ════════════════════════════════════════════════════════════
-           3. ACTION ITEMS — auto-visible if there are issues
+           3. ACTION ITEMS — hierarchical: Domain → Specialty → Regulation
          ════════════════════════════════════════════════════════════ */}
       {actionItems.length > 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1 flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-red-500" />
             {actionItems.length} {actionItems.length === 1 ? "problema" : "problemas"} a resolver
           </h3>
-          {/* Regulation breakdown chips */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {regulationBreakdown.map(rb => (
-              <span
-                key={rb.regulation}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
-                  rb.critical > 0 ? "bg-red-50 text-red-800 border-red-200" : "bg-amber-50 text-amber-800 border-amber-200"
-                }`}
-              >
-                <Shield className="w-3 h-3" />
-                {rb.regulation}
-                <span className="font-bold">{rb.critical + rb.warning}</span>
-              </span>
-            ))}
-          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            Agrupados por domínio, especialidade e regulamento — mais críticos primeiro.
+          </p>
+
+          {/* Domain-level accordion */}
           <div className="space-y-3">
-            {(showAllActions ? actionItems : actionItems.slice(0, 5)).map(f => (
-              <FindingCard key={f.id} finding={f} costEstimate={costLookup.get(f.id)} projectId={projectId} userRole={userRole} />
-            ))}
+            {actionHierarchy.domains.map(dg => {
+              const domainExpanded = expandedDomains.has(dg.domain.id);
+              return (
+                <div key={dg.domain.id} className="border border-gray-200 rounded-lg overflow-hidden">
+                  {/* Domain header */}
+                  <button
+                    type="button"
+                    onClick={() => toggleDomain(dg.domain.id)}
+                    className={`w-full flex items-center justify-between px-4 py-3 transition-colors ${
+                      dg.criticalCount > 0 ? "bg-red-50 hover:bg-red-100" : "bg-amber-50 hover:bg-amber-100"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {domainExpanded ? <ChevronDown className="w-4 h-4 text-gray-500" /> : <ChevronRight className="w-4 h-4 text-gray-500" />}
+                      <Layers className="w-4 h-4 text-gray-600" />
+                      <span className="font-semibold text-sm text-gray-900">{dg.domain.label}</span>
+                      <span className="text-xs text-gray-500">{dg.domain.description}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {dg.criticalCount > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200">
+                          <XCircle className="w-3 h-3" /> {dg.criticalCount}
+                        </span>
+                      )}
+                      {dg.warningCount > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200">
+                          <AlertTriangle className="w-3 h-3" /> {dg.warningCount}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Specialty sub-groups */}
+                  {domainExpanded && (
+                    <div className="border-t border-gray-200">
+                      {dg.specialties.map(sg => {
+                        const specKey = `${dg.domain.id}:${sg.area}`;
+                        const specExpanded = expandedSpecialties.has(specKey);
+                        const specIcon = AREA_ICONS[sg.area];
+                        return (
+                          <div key={sg.area} className="border-b border-gray-100 last:border-b-0">
+                            {/* Specialty header */}
+                            <button
+                              type="button"
+                              onClick={() => toggleSpecialty(specKey)}
+                              className="w-full flex items-center justify-between px-4 py-2.5 pl-8 hover:bg-gray-50 transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                {specExpanded ? <ChevronDown className="w-3.5 h-3.5 text-gray-400" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-400" />}
+                                {specIcon ?? <Minus className="w-4 h-4 text-gray-400" />}
+                                <span className="font-medium text-sm text-gray-800">{AREA_SHORT_LABELS[sg.area] ?? sg.area}</span>
+                                <span className="text-xs text-gray-400">
+                                  {sg.regulations.length} {sg.regulations.length === 1 ? "regulamento" : "regulamentos"}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                {sg.criticalCount > 0 && (
+                                  <span className="text-xs font-bold text-red-600">{sg.criticalCount} críticas</span>
+                                )}
+                                {sg.warningCount > 0 && (
+                                  <span className="text-xs font-bold text-amber-600">{sg.warningCount} avisos</span>
+                                )}
+                              </div>
+                            </button>
+
+                            {/* Regulation groups with findings */}
+                            {specExpanded && (
+                              <div className="pl-14 pr-4 pb-3 space-y-3">
+                                {sg.regulations.map(rg => (
+                                  <div key={rg.regulation}>
+                                    {/* Regulation sub-header */}
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Shield className="w-3.5 h-3.5 text-gray-400" />
+                                      <span className="text-xs font-semibold text-gray-700">{rg.regulation}</span>
+                                      <span className="text-xs text-gray-400">
+                                        ({rg.findings.length} {rg.findings.length === 1 ? "constatação" : "constatações"})
+                                      </span>
+                                    </div>
+                                    {/* Findings */}
+                                    <div className="space-y-2">
+                                      {rg.findings.map(f => (
+                                        <FindingCard key={f.id} finding={f} costEstimate={costLookup.get(f.id)} projectId={projectId} userRole={userRole} />
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          {actionItems.length > 5 && (
-            <button
-              type="button"
-              onClick={() => setShowAllActions(!showAllActions)}
-              className="mt-4 text-sm text-accent hover:text-accent-hover font-medium flex items-center gap-1"
-            >
-              {showAllActions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              {showAllActions ? "Mostrar menos" : `Ver todos os ${actionItems.length} problemas`}
-            </button>
-          )}
         </div>
       ) : (
         <div className="bg-green-50 rounded-xl shadow-sm border border-green-200 p-6 text-center">
@@ -702,14 +827,16 @@ export default function AnalysisResults({ result, calculations, project, onReset
       )}
 
       {/* ════════════════════════════════════════════════════════════
-           7. ALL FINDINGS — detailed list with filters
+           7. ALL FINDINGS — hierarchical view: Domain → Specialty → Regulation
          ════════════════════════════════════════════════════════════ */}
       <Section
         title={`Todas as Constatações (${result.findings.length})`}
         id="findings"
+        icon={<Layers className="w-5 h-5 text-gray-500" />}
         open={openSections.has("findings")}
         onToggle={() => toggleSection("findings")}
       >
+        {/* Area filter chips — still useful for filtering the hierarchy */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <Filter className="w-4 h-4 text-gray-400" />
           <button
@@ -743,14 +870,26 @@ export default function AnalysisResults({ result, calculations, project, onReset
             );
           })}
         </div>
-        <div className="space-y-3">
-          {sortFindings(filteredFindings).map(finding => (
-            <FindingCard key={finding.id} finding={finding} costEstimate={costLookup.get(finding.id)} projectId={projectId} userRole={userRole} />
-          ))}
-          {filteredFindings.length === 0 && (
-            <p className="text-sm text-gray-500 text-center py-4">Nenhuma constatação nesta especialidade.</p>
-          )}
-        </div>
+
+        {/* Hierarchical findings tree */}
+        {areaFilter === "all" ? (
+          <HierarchicalFindings
+            hierarchy={hierarchy}
+            costLookup={costLookup}
+            projectId={projectId}
+            userRole={userRole}
+          />
+        ) : (
+          /* When filtering by a specific area, show a flat list for that area */
+          <div className="space-y-3">
+            {sortFindings(filteredFindings).map(finding => (
+              <FindingCard key={finding.id} finding={finding} costEstimate={costLookup.get(finding.id)} projectId={projectId} userRole={userRole} />
+            ))}
+            {filteredFindings.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">Nenhuma constatação nesta especialidade.</p>
+            )}
+          </div>
+        )}
       </Section>
 
       {/* ════════════════════════════════════════════════════════════
@@ -1771,6 +1910,197 @@ function CostDonut({ areas }: { areas: { area: string; areaName: string; maxCost
           <p className="text-[9px] text-gray-400">+{segments.length - 5} mais</p>
         )}
       </div>
+    </div>
+  );
+}
+
+/** Hierarchical findings view: Domain → Specialty → Regulation → Findings */
+function HierarchicalFindings({ hierarchy, costLookup, projectId, userRole }: {
+  hierarchy: AnalysisHierarchy;
+  costLookup: Map<string, { minCost: number; maxCost: number }>;
+  projectId?: string;
+  userRole?: import("@/lib/collaboration").ProjectRole | null;
+}) {
+  // Each domain section is independently expandable
+  const [openDomains, setOpenDomains] = useState<Set<string>>(() => {
+    // Auto-open domains with issues
+    const s = new Set<string>();
+    for (const dg of hierarchy.domains) {
+      if (dg.criticalCount > 0 || dg.warningCount > 0) s.add(dg.domain.id);
+    }
+    return s;
+  });
+  const [openSpecs, setOpenSpecs] = useState<Set<string>>(() => {
+    const s = new Set<string>();
+    for (const dg of hierarchy.domains) {
+      for (const sg of dg.specialties) {
+        if (sg.criticalCount > 0) s.add(`${dg.domain.id}:${sg.area}`);
+      }
+    }
+    return s;
+  });
+  const [openRegs, setOpenRegs] = useState<Set<string>>(() => {
+    const s = new Set<string>();
+    for (const dg of hierarchy.domains) {
+      for (const sg of dg.specialties) {
+        for (const rg of sg.regulations) {
+          if (rg.criticalCount > 0) s.add(`${dg.domain.id}:${sg.area}:${rg.regulation}`);
+        }
+      }
+    }
+    return s;
+  });
+
+  const toggleSet = (setter: React.Dispatch<React.SetStateAction<Set<string>>>, key: string) => {
+    setter(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  if (hierarchy.domains.length === 0) {
+    return <p className="text-sm text-gray-500 text-center py-4">Nenhuma constatação.</p>;
+  }
+
+  return (
+    <div className="space-y-2">
+      {hierarchy.domains.map(dg => {
+        const dOpen = openDomains.has(dg.domain.id);
+        return (
+          <div key={dg.domain.id} className="border border-gray-200 rounded-lg overflow-hidden">
+            {/* ── Domain header ── */}
+            <button
+              type="button"
+              onClick={() => toggleSet(setOpenDomains, dg.domain.id)}
+              className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {dOpen ? <ChevronDown className="w-4 h-4 text-gray-500" /> : <ChevronRight className="w-4 h-4 text-gray-500" />}
+                <Layers className="w-4 h-4 text-gray-600" />
+                <span className="font-semibold text-sm text-gray-900">{dg.domain.label}</span>
+                <span className="text-xs text-gray-400 hidden md:inline">{dg.domain.description}</span>
+              </div>
+              <SeverityBadges critical={dg.criticalCount} warning={dg.warningCount} pass={dg.passCount} info={dg.infoCount} />
+            </button>
+
+            {dOpen && (
+              <div className="border-t border-gray-200">
+                {dg.specialties.map(sg => {
+                  const sKey = `${dg.domain.id}:${sg.area}`;
+                  const sOpen = openSpecs.has(sKey);
+                  const specIcon = AREA_ICONS[sg.area];
+                  return (
+                    <div key={sg.area} className="border-b border-gray-100 last:border-b-0">
+                      {/* ── Specialty header ── */}
+                      <button
+                        type="button"
+                        onClick={() => toggleSet(setOpenSpecs, sKey)}
+                        className="w-full flex items-center justify-between px-4 py-2.5 pl-8 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          {sOpen ? <ChevronDown className="w-3.5 h-3.5 text-gray-400" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-400" />}
+                          {specIcon ?? <Minus className="w-4 h-4 text-gray-400" />}
+                          <span className="font-medium text-sm text-gray-800">{AREA_SHORT_LABELS[sg.area] ?? sg.area}</span>
+                          <span className="text-xs text-gray-400">
+                            {sg.totalFindings} {sg.totalFindings === 1 ? "constatação" : "constatações"}
+                          </span>
+                        </div>
+                        <SeverityBadges critical={sg.criticalCount} warning={sg.warningCount} pass={sg.passCount} info={sg.infoCount} />
+                      </button>
+
+                      {sOpen && (
+                        <div className="pl-12 pr-4 pb-3 space-y-4">
+                          {sg.regulations.map(rg => {
+                            const rKey = `${dg.domain.id}:${sg.area}:${rg.regulation}`;
+                            const rOpen = openRegs.has(rKey);
+                            return (
+                              <div key={rg.regulation}>
+                                {/* ── Regulation header ── */}
+                                <button
+                                  type="button"
+                                  onClick={() => toggleSet(setOpenRegs, rKey)}
+                                  className="w-full flex items-center justify-between py-1.5 hover:opacity-80 transition-opacity"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {rOpen ? <ChevronDown className="w-3 h-3 text-gray-400" /> : <ChevronRight className="w-3 h-3 text-gray-400" />}
+                                    <Shield className="w-3.5 h-3.5 text-gray-400" />
+                                    <span className="text-xs font-semibold text-gray-700">{rg.regulation}</span>
+                                    <span className="text-xs text-gray-400">
+                                      ({rg.findings.length})
+                                    </span>
+                                  </div>
+                                  <SeverityBadges critical={rg.criticalCount} warning={rg.warningCount} pass={rg.passCount} info={rg.infoCount} compact />
+                                </button>
+
+                                {rOpen && (
+                                  <div className="space-y-2 mt-2 ml-5">
+                                    {rg.findings.map(f => (
+                                      <FindingCard key={f.id} finding={f} costEstimate={costLookup.get(f.id)} projectId={projectId} userRole={userRole} />
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Ungrouped findings (if any) */}
+      {hierarchy.ungrouped.length > 0 && (
+        <div className="border border-gray-200 rounded-lg p-4">
+          <p className="text-xs font-medium text-gray-500 mb-2">Outras constatações</p>
+          <div className="space-y-2">
+            {hierarchy.ungrouped.map(f => (
+              <FindingCard key={f.id} finding={f} costEstimate={costLookup.get(f.id)} projectId={projectId} userRole={userRole} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Compact severity count badges for hierarchy headers */
+function SeverityBadges({ critical, warning, pass, info, compact }: {
+  critical: number;
+  warning: number;
+  pass: number;
+  info: number;
+  compact?: boolean;
+}) {
+  const size = compact ? "text-[10px]" : "text-xs";
+  const px = compact ? "px-1.5 py-0" : "px-2 py-0.5";
+  return (
+    <div className="flex items-center gap-1">
+      {critical > 0 && (
+        <span className={`inline-flex items-center gap-0.5 ${px} bg-red-100 text-red-700 rounded-full ${size} font-bold border border-red-200`}>
+          {!compact && <XCircle className="w-3 h-3" />} {critical}
+        </span>
+      )}
+      {warning > 0 && (
+        <span className={`inline-flex items-center gap-0.5 ${px} bg-amber-100 text-amber-700 rounded-full ${size} font-bold border border-amber-200`}>
+          {!compact && <AlertTriangle className="w-3 h-3" />} {warning}
+        </span>
+      )}
+      {info > 0 && (
+        <span className={`inline-flex items-center gap-0.5 ${px} bg-blue-50 text-blue-600 rounded-full ${size} font-medium border border-blue-200`}>
+          {info}
+        </span>
+      )}
+      {pass > 0 && (
+        <span className={`inline-flex items-center gap-0.5 ${px} bg-green-50 text-green-600 rounded-full ${size} font-medium border border-green-200`}>
+          {!compact && <CheckCircle className="w-3 h-3" />} {pass}
+        </span>
+      )}
     </div>
   );
 }

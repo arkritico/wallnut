@@ -44,3 +44,7 @@ export { getRemediation } from "../remediation-guidance";
 
 // Findings → WBS bridge
 export { findingsToWbs, generateRemediationSummary } from "../findings-to-wbs";
+
+// Analysis hierarchy — grouped, human-readable report structure
+export { buildAnalysisHierarchy, getDomainForArea, DOMAINS } from "../analysis-hierarchy";
+export type { AnalysisHierarchy, DomainGroup, SpecialtyGroup, RegulationGroup, DomainDefinition } from "../analysis-hierarchy";
