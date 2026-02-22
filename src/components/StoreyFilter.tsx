@@ -30,8 +30,10 @@ export default function StoreyFilter({
   if (sorted.length === 0) return null;
 
   return (
-    <div className="absolute top-12 sm:top-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 overflow-x-auto scrollbar-none max-w-[95%] sm:max-w-[90%]">
+    <div role="tablist" aria-label="Filtro de pisos" className="absolute top-12 sm:top-10 left-1/2 -translate-x-1/2 z-10 flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 overflow-x-auto scrollbar-none max-w-[95%] sm:max-w-[90%]">
       <button
+        role="tab"
+        aria-selected={selected === null}
         onClick={() => onSelect(null)}
         className={`px-2.5 py-1.5 sm:py-0.5 text-[11px] sm:text-[10px] font-medium rounded-full whitespace-nowrap transition-colors min-h-[36px] sm:min-h-0 ${
           selected === null
@@ -43,6 +45,8 @@ export default function StoreyFilter({
       </button>
       {sorted.map((storey) => (
         <button
+          role="tab"
+          aria-selected={selected === storey}
           key={storey}
           onClick={() => onSelect(selected === storey ? null : storey)}
           className={`px-2.5 py-1.5 sm:py-0.5 text-[11px] sm:text-[10px] font-medium rounded-full whitespace-nowrap transition-colors min-h-[36px] sm:min-h-0 ${

@@ -48,7 +48,7 @@ export default function ModelManagerPanel({
   onFitAll,
 }: ModelManagerPanelProps) {
   return (
-    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[60vh] md:max-h-none">
+    <div role="dialog" aria-label="Gestor de modelos" className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[60vh] md:max-h-none">
       {/* Drag handle (mobile) */}
       <div className="flex justify-center pt-2 pb-0 md:hidden cursor-grab" data-drag-handle>
         <div className="w-10 h-1 rounded-full bg-gray-300" />

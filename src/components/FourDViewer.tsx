@@ -746,15 +746,26 @@ export default function FourDViewer({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleToggleProgress, handleCycleComparison, handleToggleHistogram, handleToggleCapacity, progressEntries.length]);
 
-  // ── Landscape orientation hint (shown once on mobile in portrait) ──
+  // ── Landscape orientation hint (contextual: model loaded + portrait + narrow) ──
   useEffect(() => {
     if (!isMobile || !modelId) return;
-    const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-    if (isPortrait) {
-      setShowLandscapeHint(true);
-      const timer = setTimeout(() => setShowLandscapeHint(false), 4000);
-      return () => clearTimeout(timer);
+    // Don't show again in this session if already dismissed
+    if (sessionStorage.getItem("wallnut-landscape-dismissed")) return;
+
+    const portraitMql = window.matchMedia("(orientation: portrait)");
+    const narrowMql = window.matchMedia("(max-width: 500px)");
+
+    function check() {
+      if (portraitMql.matches && narrowMql.matches) {
+        setShowLandscapeHint(true);
+      }
     }
+
+    check();
+
+    // Also re-check on orientation change (user rotated back to portrait)
+    portraitMql.addEventListener("change", check);
+    return () => portraitMql.removeEventListener("change", check);
   }, [isMobile, modelId]);
 
   // ── Render ─────────────────────────────────────────────────
@@ -779,7 +790,7 @@ export default function FourDViewer({
         />
 
         {/* ── Unified toolbar (static, top of viewport) ─────────── */}
-        <div className="absolute top-0 inset-x-0 z-20 flex flex-wrap sm:flex-nowrap items-center gap-0.5 sm:gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] overflow-x-auto scrollbar-none safe-area-inset-x">
+        <div role="toolbar" aria-label="Ferramentas 4D" className="absolute top-0 inset-x-0 z-20 flex flex-wrap sm:flex-nowrap items-center gap-0.5 sm:gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] overflow-x-auto scrollbar-none safe-area-inset-x">
           {/* ── Left: IFC model tools ── */}
           <div className="flex items-center gap-0.5 sm:gap-px shrink-0">
             <button
@@ -1075,17 +1086,24 @@ export default function FourDViewer({
           </div>
         )}
 
-        {/* Landscape orientation hint (mobile portrait only) */}
+        {/* Landscape orientation hint (mobile portrait only, contextual) */}
         {showLandscapeHint && (
-          <div
-            className="absolute top-16 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-fade-out-delayed"
-            onAnimationEnd={() => setShowLandscapeHint(false)}
-          >
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30">
             <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg px-4 py-2.5 flex items-center gap-2">
-              <RotateCcw className="w-4 h-4 text-white/80" />
+              <RotateCcw className="w-4 h-4 text-white/80 shrink-0" />
               <p className="text-white/90 text-xs font-medium whitespace-nowrap">
                 Rode o ecrã para melhor visualização
               </p>
+              <button
+                onClick={() => {
+                  setShowLandscapeHint(false);
+                  sessionStorage.setItem("wallnut-landscape-dismissed", "1");
+                }}
+                className="text-white/50 hover:text-white/90 text-sm font-bold ml-1 shrink-0"
+                aria-label="Fechar dica"
+              >
+                &times;
+              </button>
             </div>
           </div>
         )}

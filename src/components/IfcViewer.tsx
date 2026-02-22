@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef } from "react";
+import { useEffect, useRef, useState, useCallback, useImperativeHandle, forwardRef, useMemo } from "react";
 import * as THREE from "three";
 import {
   Components,
@@ -37,6 +37,12 @@ import type { ElementProperties } from "./ifc-viewer/PropertiesPanel";
 import CategoryFilterPanel from "./ifc-viewer/CategoryFilterPanel";
 import type { CategoryNode } from "./ifc-viewer/CategoryFilterPanel";
 import { translateCategoryName } from "./ifc-viewer/CategoryFilterPanel";
+import useTouchGestures from "@/hooks/useTouchGestures";
+import useDynamicQuality from "@/hooks/useDynamicQuality";
+import useBatteryAware from "@/hooks/useBatteryAware";
+import PerfOverlay from "./PerfOverlay";
+import { cacheModel, modelCacheKey } from "@/lib/model-cache";
+import { readFileWithProgress, fetchWithProgress } from "@/lib/progressive-loader";
 
 // ============================================================
 // Types
@@ -149,6 +155,10 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   // Ortho/perspective toggle
   const [isOrtho, setIsOrtho] = useState(false);
 
+  // WebGL renderer ref for dynamic quality hook
+  const [glRenderer, setGlRenderer] = useState<THREE.WebGLRenderer | null>(null);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
   // Measurement mode
   const [isMeasuring, setIsMeasuring] = useState(false);
   const [measurements, setMeasurements] = useState<{ id: string; distance: string }[]>([]);
@@ -168,6 +178,38 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   activePanelRef.current = activePanel;
   const isMeasuringRef = useRef(false);
   isMeasuringRef.current = isMeasuring;
+
+  // Enhanced touch gestures: double-tap → fit, three-finger tap → show all
+  const touchGestureHandlers = useMemo(() => ({
+    onDoubleTap: () => handleFitToModel(),
+    onThreeFingerTap: () => handleShowAll(),
+  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  useTouchGestures(containerRef, touchGestureHandlers);
+
+  // Battery-aware throttling: reduce max quality when battery is low
+  const battery = useBatteryAware();
+
+  // Dynamic quality scaling: reduce pixel ratio when FPS drops on mobile
+  // When battery is low, use a more aggressive floor and lower ceiling
+  useDynamicQuality({
+    renderer: glRenderer,
+    enabled: isMobileDevice,
+    minPixelRatio: battery.shouldThrottle ? 0.5 : 0.75,
+    maxPixelRatio: battery.shouldThrottle ? 1.0 : 1.5,
+    fpsLow: battery.shouldThrottle ? 15 : 20,
+    fpsHigh: battery.shouldThrottle ? 24 : 30,
+  });
+
+  // Keyboard navigation: Escape closes active panel
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && activePanel) {
+        setActivePanel(null);
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activePanel]);
 
   // Imperative handle for parent toolbar integration
   useImperativeHandle(ref, () => ({
@@ -263,18 +305,20 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         //    - powerPreference: prefer discrete GPU when available
         //    - preserveDrawingBuffer: needed for screenshot & video capture
         //    - antialias: smooth edges (disabled on low-end / mobile GPUs)
-        const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
-        const isLowEndDevice = isMobileDevice && (navigator.hardwareConcurrency ?? 4) <= 4;
+        const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        const isLowEndDevice = mobile && (navigator.hardwareConcurrency ?? 4) <= 4;
+        setIsMobileDevice(mobile);
         const renderer = new SimpleRenderer(components, container, {
           preserveDrawingBuffer: true,
           powerPreference: "high-performance",
-          antialias: !isMobileDevice,
+          antialias: !mobile,
         });
         world.renderer = renderer;
 
         // Cap pixel ratio: 2 on desktop, 1.5 on mobile, 1 on low-end (big GPU savings)
         const gl = renderer.three as THREE.WebGLRenderer;
-        gl.setPixelRatio(clampedPixelRatio(isLowEndDevice ? 1 : isMobileDevice ? 1.5 : 2));
+        gl.setPixelRatio(clampedPixelRatio(isLowEndDevice ? 1 : mobile ? 1.5 : 2));
+        setGlRenderer(gl);
 
         // Expose the canvas element for video capture
         if (canvasRef) {
@@ -319,8 +363,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           autoSetWasm: false,
           webIfc: {
             COORDINATE_TO_ORIGIN: true,
-            CIRCLE_SEGMENTS: isMobileDevice ? 8 : 12,
-            MEMORY_LIMIT: isMobileDevice ? 256 : 512,
+            CIRCLE_SEGMENTS: mobile ? 8 : 12,
+            MEMORY_LIMIT: mobile ? 256 : 512,
           },
         });
         ifcLoaderRef.current = ifcLoader;
@@ -350,7 +394,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           if (e.button !== 0) return; // left click only
 
           // Auto-close non-properties panels on mobile when tapping the viewport
-          if (isMobileDevice && activePanelRef.current && activePanelRef.current !== "properties") {
+          if (mobile && activePanelRef.current && activePanelRef.current !== "properties") {
             setActivePanel(null);
           }
 
@@ -559,6 +603,9 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         }
       });
 
+      // Cache model for offline use (fire-and-forget)
+      cacheModel(modelCacheKey(name, data.byteLength), data);
+
       setLoadingProgress(`A extrair categorias — ${name}...`);
       const categories = await model.getCategories();
 
@@ -667,7 +714,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
     }
   }, [onModelLoaded, rebuildCategoryTree]);
 
-  /** Convert IFC to Fragment via server API, then load the result. */
+  /** Convert IFC to Fragment via server API, then load the result.
+   *  Uses streaming download with progress for large converted files. */
   const convertAndLoadIfc = useCallback(async (data: Uint8Array, name: string, skipFitAndRebuild = false) => {
     setIsLoading(true);
     setError(null);
@@ -677,18 +725,17 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       const formData = new FormData();
       formData.append("file", new Blob([data.buffer as ArrayBuffer], { type: "application/x-step" }), name);
 
-      const response = await fetch("/api/ifc-convert", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errBody = await response.json().catch(() => ({}));
-        throw new Error((errBody as Record<string, string>).error || `HTTP ${response.status}`);
-      }
-
-      const fragBytes = new Uint8Array(await response.arrayBuffer());
       const fragName = name.replace(/\.ifc$/i, ".frag");
+      const fragBytes = await fetchWithProgress(
+        "/api/ifc-convert",
+        { method: "POST", body: formData },
+        (loaded, total) => {
+          if (total > 0) {
+            const pct = Math.round((loaded / total) * 100);
+            setLoadingProgress(`A descarregar ${fragName} — ${pct}%`);
+          }
+        },
+      );
 
       setLoadingProgress(`A carregar fragmento convertido — ${fragName}...`);
       await loadFragmentFile(fragBytes, fragName, skipFitAndRebuild);
@@ -841,15 +888,20 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       if (!window.confirm(sizeWarning)) return;
     }
 
-    // Read all files into Uint8Arrays
+    // Read all files into Uint8Arrays with progress reporting
     type FileEntry = { data: Uint8Array; name: string; type: "ifc" | "frag" };
     const fileDataArr: FileEntry[] = [];
+    const filesToRead = [...fragFiles, ...ifcFiles];
 
-    for (const file of [...fragFiles, ...ifcFiles]) {
-      const data = await new Promise<Uint8Array>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(new Uint8Array(reader.result as ArrayBuffer));
-        reader.readAsArrayBuffer(file);
+    for (let fi = 0; fi < filesToRead.length; fi++) {
+      const file = filesToRead[fi];
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      setLoadingProgress(`A ler ${file.name} (${sizeMb} MB)...`);
+      setIsLoading(true);
+
+      const data = await readFileWithProgress(file, (loaded, total) => {
+        const pct = Math.round((loaded / total) * 100);
+        setLoadingProgress(`A ler ${file.name} — ${pct}%`);
       });
       const type = file.name.toLowerCase().endsWith(".frag") ? "frag" as const : "ifc" as const;
       fileDataArr.push({ data, name: file.name, type });
@@ -1146,14 +1198,16 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   return (
     <div
       className={`relative flex flex-col bg-gray-100 rounded-lg overflow-hidden ${className}`}
+      role="region"
+      aria-label="Visualizador 3D IFC"
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
       {/* Toolbar (hidden when parent provides its own) */}
-      {!hideToolbar && <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-3 py-1.5 sm:py-2 bg-white border-b border-gray-200 text-sm overflow-x-auto scrollbar-none">
+      {!hideToolbar && <div role="toolbar" aria-label="Ferramentas do visualizador 3D" className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-3 py-1.5 sm:py-2 bg-white border-b border-gray-200 text-sm overflow-x-auto scrollbar-none">
         {/* Upload IFC button */}
-        <label className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium min-h-[44px] sm:min-h-0">
+        <label aria-label="Carregar ficheiro IFC ou Fragment" className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium min-h-[44px] sm:min-h-0">
           <Upload className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span className="hidden sm:inline">IFC</span>
           <input
@@ -1208,6 +1262,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             {/* Utility buttons */}
             <button
               onClick={handleFitToModel}
+              aria-label="Encaixar modelo"
               className="p-2 sm:p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
               title="Encaixar modelo"
             >
@@ -1215,6 +1270,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             </button>
             <button
               onClick={handleShowAll}
+              aria-label="Mostrar tudo"
               className="p-2 sm:p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
               title="Mostrar tudo"
             >
@@ -1222,6 +1278,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             </button>
             <button
               onClick={handleScreenshot}
+              aria-label="Captura de ecrã"
               className="hidden sm:flex p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors items-center justify-center"
               title="Captura de ecrã (PNG)"
             >
@@ -1230,6 +1287,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
             <button
               onClick={handleToggleOrtho}
+              aria-label={isOrtho ? "Vista perspetiva" : "Vista ortográfica"}
+              aria-pressed={isOrtho}
               className={`hidden sm:flex p-1.5 rounded transition-colors items-center justify-center ${isOrtho ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
               title={isOrtho ? "Vista perspetiva" : "Vista ortográfica"}
             >
@@ -1238,6 +1297,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
             <button
               onClick={handleToggleMeasure}
+              aria-label={isMeasuring ? "Sair da medição" : "Medir distância"}
+              aria-pressed={isMeasuring}
               className={`hidden sm:flex p-1.5 rounded transition-colors items-center justify-center ${isMeasuring ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
               title={isMeasuring ? "Sair da medição" : "Medir distância"}
             >
@@ -1265,7 +1326,10 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       {/* 3D viewport */}
       <div
         ref={containerRef}
-        className="flex-1 min-h-[200px] sm:min-h-[350px] md:min-h-[400px]"
+        role="img"
+        aria-label="Modelo 3D interativo — use rato ou toque para navegar"
+        tabIndex={0}
+        className="flex-1 min-h-[200px] sm:min-h-[350px] md:min-h-[400px] focus:outline-2 focus:outline-accent focus:outline-offset-[-2px]"
         style={{ touchAction: "none" }}
       />
 
@@ -1391,6 +1455,9 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           </button>
         </div>
       )}
+
+      {/* Debug performance overlay (Shift+F) */}
+      <PerfOverlay renderer={glRenderer} />
     </div>
   );
 });
@@ -1413,6 +1480,8 @@ function ToolbarButton({ icon, label, badge, active, onClick }: ToolbarButtonPro
   return (
     <button
       onClick={onClick}
+      aria-label={label}
+      aria-pressed={active}
       className={`relative inline-flex items-center justify-center sm:justify-start gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded text-xs transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 shrink-0 ${
         active
           ? "bg-accent text-white"

@@ -42,7 +42,7 @@ export default function ElementInfoPanel({
   const color = phaseColor(link.phase);
 
   return (
-    <div className="absolute bottom-14 left-1 right-1 sm:bottom-auto sm:left-auto sm:top-2 sm:right-2 z-10 sm:w-56 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-xs">
+    <div role="dialog" aria-label="Informação do elemento" className="absolute bottom-14 left-1 right-1 sm:bottom-auto sm:left-auto sm:top-2 sm:right-2 z-10 sm:w-56 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-xs">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <div className="flex items-center gap-1.5 min-w-0">
