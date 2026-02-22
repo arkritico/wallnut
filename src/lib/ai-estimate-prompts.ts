@@ -7,7 +7,7 @@
  * condenses all parsed project data into a prompt-friendly format.
  */
 
-import type { BuildingProject } from "./types";
+import type { BuildingProject, Finding } from "./types";
 import type { SpecialtyAnalysisResult } from "./ifc-specialty-analyzer";
 import type { WbsProject } from "./wbs-types";
 
@@ -165,6 +165,7 @@ export function buildProjectSummaryForAI(
   ifcAnalyses?: SpecialtyAnalysisResult[],
   wbsProject?: WbsProject,
   pdfText?: string,
+  findings?: Finding[],
 ): string {
   const sections: string[] = [];
 
@@ -287,6 +288,27 @@ export function buildProjectSummaryForAI(
     sections.push(truncated);
     if (words.length > 3000) {
       sections.push(`[... truncado, ${words.length - 3000} palavras omitidas]`);
+    }
+  }
+
+  // ── Regulation Findings (compliance costs) ───────────────
+  if (findings && findings.length > 0) {
+    const critical = findings.filter(f => f.severity === "critical");
+    const warnings = findings.filter(f => f.severity === "warning");
+    if (critical.length > 0 || warnings.length > 0) {
+      sections.push("");
+      sections.push(`## CONFORMIDADE REGULAMENTAR`);
+      sections.push(`Total: ${findings.length} constatações (${critical.length} críticas, ${warnings.length} avisos)`);
+      // Show critical findings — these often imply mandatory corrective work
+      for (const f of critical.slice(0, 15)) {
+        const remedy = f.remediation ? ` → ${f.remediation}` : "";
+        sections.push(`- [CRÍTICO] ${f.area}: ${f.description} (${f.regulation} art.${f.article})${remedy}`);
+      }
+      // Show top warnings (up to 10)
+      for (const f of warnings.slice(0, 10)) {
+        sections.push(`- [AVISO] ${f.area}: ${f.description}`);
+      }
+      sections.push(`NOTA: Considere custos adicionais para corrigir não-conformidades críticas.`);
     }
   }
 

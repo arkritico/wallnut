@@ -286,7 +286,6 @@ export async function runUnifiedPipeline(
   let aiEstimate: AIEstimateResult | undefined;
   let reconciliation: ReconciliationReport | undefined;
   let aiReview: AIReviewResult | undefined;
-  const collectedPdfTexts: string[] = [];
   let aiSequence: AiSequenceResult | undefined;
   let regulatoryReview: ReviewedFinding[] | undefined;
   let pdfTexts: string[] = [];
@@ -626,8 +625,8 @@ export async function runUnifiedPipeline(
 
     try {
       const { buildProjectSummaryForAI } = await import("./ai-estimate-prompts");
-      const pdfText = collectedPdfTexts.join("\n\n");
-      let summary = buildProjectSummaryForAI(project, ifcAnalyses, wbsProject, pdfText || undefined);
+      const pdfText = pdfTexts.join("\n\n");
+      let summary = buildProjectSummaryForAI(project, ifcAnalyses, wbsProject, pdfText || undefined, analysis?.findings);
 
       // Inject few-shot examples from match history (compounding learning)
       try {
@@ -940,6 +939,24 @@ export async function runUnifiedPipeline(
               );
             } catch {
               // Non-critical: feedback store failure doesn't affect pipeline
+            }
+
+            // Auto-apply synonym suggestions to improve future matching
+            if (aiReview.matcherSuggestions?.length) {
+              try {
+                const { registerSynonym } = await import("./price-matcher");
+                let applied = 0;
+                for (const s of aiReview.matcherSuggestions) {
+                  if (s.type === "missing_synonym" && s.data?.word1 && s.data?.word2) {
+                    if (registerSynonym(s.data.word1, s.data.word2)) applied++;
+                  }
+                }
+                if (applied > 0) {
+                  console.log(`[wallnut] AI review: ${applied} novos sinónimos registados para matching futuro.`);
+                }
+              } catch {
+                // Non-critical: synonym registration failure doesn't affect pipeline
+              }
             }
           }
         }
