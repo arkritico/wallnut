@@ -966,8 +966,8 @@ export default function Home() {
       {view === "fourd" && unifiedResult?.schedule && unifiedResult?.elementMapping && (
         <main className="min-h-screen bg-gray-50 flex flex-col">
           <AppHeader />
-          <div className="flex-1 max-w-7xl w-full mx-auto px-4 py-4 flex flex-col">
-            <div className="mb-3 flex items-center justify-between">
+          <div className="flex-1 max-w-7xl w-full mx-auto px-2 sm:px-4 py-2 sm:py-4 flex flex-col">
+            <div className="mb-2 sm:mb-3 flex items-center justify-between">
               <div>
                 <button
                   onClick={() => setView("results")}
@@ -976,7 +976,7 @@ export default function Home() {
                   <ChevronLeft className="w-4 h-4" />
                   {t.back}
                 </button>
-                <h1 className="text-xl font-bold text-gray-900 mt-1">
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900 mt-1">
                   {lang === "pt" ? "Simulação 4D" : "4D Simulation"}
                 </h1>
               </div>
@@ -988,7 +988,7 @@ export default function Home() {
               ifcName={unifiedResult.ifcFileName}
               onScheduleOptimized={handleScheduleOptimized}
               aiRationale={unifiedResult.schedule.aiRationale}
-              className="flex-1 min-h-[700px] border border-gray-200 rounded-xl overflow-hidden"
+              className="flex-1 min-h-[calc(100dvh-140px)] sm:min-h-[600px] md:min-h-[700px] border border-gray-200 rounded-xl overflow-hidden"
             />
           </div>
         </main>

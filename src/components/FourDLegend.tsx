@@ -31,7 +31,7 @@ export default function FourDLegend({ phases, isolatedPhase, onPhaseClick }: Fou
   }
 
   return (
-    <div className="absolute bottom-2 left-2 z-10">
+    <div className="absolute bottom-14 sm:bottom-2 left-2 z-10">
       {open ? (
         <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-2 max-h-60 overflow-y-auto w-56">
           <div className="flex items-center justify-between mb-1.5">

@@ -188,8 +188,8 @@ export default function ResourceHistogramChart({
   return (
     <div className={`bg-white border-t border-gray-200 ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-1">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-2 sm:px-4 py-1 gap-0.5 sm:gap-0">
+        <div className="flex items-center gap-2 sm:gap-3">
           <span className="text-[10px] font-semibold text-gray-600 uppercase tracking-wide">
             Recursos
           </span>
@@ -202,14 +202,14 @@ export default function ResourceHistogramChart({
             }}
             title={onSeekToWeek ? "Clicar para saltar para semana de pico" : undefined}
           >
-            Pico: {histogramData.peakLabor} trabalhadores ({histogramData.peakWeek})
+            Pico: {histogramData.peakLabor} <span className="hidden sm:inline">trabalhadores ({histogramData.peakWeek})</span>
           </span>
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 text-[9px] text-gray-500">
-          {trades.slice(0, 6).map((trade, i) => (
-            <span key={trade} className="flex items-center gap-1">
+        <div className="flex items-center gap-2 sm:gap-3 text-[8px] sm:text-[9px] text-gray-500 overflow-x-auto scrollbar-none">
+          {trades.slice(0, 4).map((trade, i) => (
+            <span key={trade} className="flex items-center gap-1 shrink-0">
               <span
                 className="w-2 h-2 rounded-sm"
                 style={{ backgroundColor: getTradeColor(i) }}
@@ -217,22 +217,33 @@ export default function ResourceHistogramChart({
               {trade}
             </span>
           ))}
-          {trades.length > 6 && (
-            <span className="text-gray-300">+{trades.length - 6}</span>
+          <span className="hidden sm:contents">
+            {trades.slice(4, 6).map((trade, i) => (
+              <span key={trade} className="flex items-center gap-1 shrink-0">
+                <span
+                  className="w-2 h-2 rounded-sm"
+                  style={{ backgroundColor: getTradeColor(i + 4) }}
+                />
+                {trade}
+              </span>
+            ))}
+          </span>
+          {trades.length > 4 && (
+            <span className="text-gray-300 shrink-0">+{trades.length - 4}</span>
           )}
-          <span className="w-px h-3 bg-gray-200" />
-          <span className="flex items-center gap-1">
+          <span className="w-px h-3 bg-gray-200 shrink-0" />
+          <span className="flex items-center gap-1 shrink-0">
             <span className="w-3 border-b border-dashed" style={{ borderColor: SCURVE_COLORS.pv }} />
             PV
           </span>
           {sCurveLines.evPath && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 shrink-0">
               <span className="w-3 border-b" style={{ borderColor: SCURVE_COLORS.ev }} />
               EV
             </span>
           )}
           {sCurveLines.acPath && (
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 shrink-0">
               <span className="w-3 border-b" style={{ borderColor: SCURVE_COLORS.ac }} />
               AC
             </span>
@@ -446,16 +457,16 @@ export default function ResourceHistogramChart({
 
       {/* Hover tooltip */}
       {hoveredPoint && (
-        <div className="px-4 py-1 text-[10px] text-gray-500 flex items-center gap-3 border-t border-gray-100">
+        <div className="px-2 sm:px-4 py-1 text-[9px] sm:text-[10px] text-gray-500 flex flex-wrap items-center gap-x-2 sm:gap-x-3 gap-y-0.5 border-t border-gray-100">
           <span className="font-medium text-gray-700">
             Semana {hoveredPoint.weekStart}
           </span>
           <span>{hoveredPoint.labor} trabalhadores</span>
           {hoveredPoint.machinery > 0 && (
-            <span>{hoveredPoint.machinery} máquinas</span>
+            <span className="hidden sm:inline">{hoveredPoint.machinery} máquinas</span>
           )}
-          <span>{hoveredPoint.cost.toLocaleString("pt-PT")}\u20AC/semana</span>
-          <span className="text-gray-400">
+          <span>{hoveredPoint.cost.toLocaleString("pt-PT")}\u20AC/sem</span>
+          <span className="hidden sm:inline text-gray-400">
             Acumulado: {hoveredPoint.cumulativeCost.toLocaleString("pt-PT")}\u20AC
           </span>
           {hoveredPoint.actualCost !== undefined && (
@@ -463,16 +474,18 @@ export default function ResourceHistogramChart({
               Real: {hoveredPoint.actualCost.toLocaleString("pt-PT")}\u20AC
             </span>
           )}
-          {/* Trade breakdown */}
-          <span className="w-px h-3 bg-gray-200" />
-          {Object.entries(hoveredPoint.byTrade)
-            .filter(([, v]) => v > 0)
-            .slice(0, 5)
-            .map(([trade, count]) => (
-              <span key={trade} className="text-gray-400">
-                {trade}: {count}
-              </span>
-            ))}
+          {/* Trade breakdown (desktop only) */}
+          <span className="hidden md:contents">
+            <span className="w-px h-3 bg-gray-200" />
+            {Object.entries(hoveredPoint.byTrade)
+              .filter(([, v]) => v > 0)
+              .slice(0, 5)
+              .map(([trade, count]) => (
+                <span key={trade} className="text-gray-400">
+                  {trade}: {count}
+                </span>
+              ))}
+          </span>
         </div>
       )}
     </div>

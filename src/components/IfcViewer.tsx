@@ -787,7 +787,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       {/* 3D viewport */}
       <div
         ref={containerRef}
-        className="flex-1 min-h-[400px]"
+        className="flex-1 min-h-[250px] sm:min-h-[350px] md:min-h-[400px]"
         style={{ touchAction: "none" }}
       />
 

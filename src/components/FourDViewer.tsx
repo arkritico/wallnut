@@ -746,7 +746,7 @@ export default function FourDViewer({
   return (
     <div className={`flex flex-col ${className}`}>
       {/* 3D viewport with overlays */}
-      <div className="flex-1 min-h-[400px] md:min-h-0 relative">
+      <div className="flex-1 min-h-[250px] sm:min-h-[350px] md:min-h-0 relative">
         <IfcViewer
           ref={viewerRef}
           ifcData={ifcData}
@@ -764,104 +764,104 @@ export default function FourDViewer({
         />
 
         {/* ── Unified toolbar (static, top of viewport) ─────────── */}
-        <div className="absolute top-0 inset-x-0 z-20 flex items-center gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-2 py-1 text-[10px] overflow-x-auto">
+        <div className="absolute top-0 inset-x-0 z-20 flex items-center gap-0.5 sm:gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-1 sm:px-2 py-1 text-[10px] overflow-x-auto scrollbar-none">
           {/* ── Left: IFC model tools ── */}
-          <div className="flex items-center gap-px shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-px shrink-0">
             <button
               onClick={() => { viewerRef.current?.togglePanel("models"); setActivePanel(p => p === "models" ? null : "models"); }}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 activePanel === "models"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Gerir modelos IFC"
             >
-              <Upload className="w-3.5 h-3.5" />
+              <Upload className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden md:inline">Modelos</span>
             </button>
             <button
               onClick={() => { viewerRef.current?.togglePanel("clipper"); setActivePanel(p => p === "clipper" ? null : "clipper"); }}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 activePanel === "clipper"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Planos de corte"
             >
-              <Scissors className="w-3.5 h-3.5" />
+              <Scissors className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden md:inline">Cortes</span>
             </button>
             <button
               onClick={() => viewerRef.current?.createSectionCut()}
-              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start"
               title="Corte por piso — secção horizontal pelo centro do modelo"
             >
-              <SplitSquareHorizontal className="w-3.5 h-3.5" />
+              <SplitSquareHorizontal className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden md:inline">Piso</span>
             </button>
             <button
               onClick={() => { viewerRef.current?.togglePanel("properties"); setActivePanel(p => p === "properties" ? null : "properties"); }}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 activePanel === "properties"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Propriedades do elemento"
             >
-              <Info className="w-3.5 h-3.5" />
+              <Info className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden md:inline">Propriedades</span>
             </button>
           </div>
 
           {/* Divider */}
-          <span className="w-px h-5 bg-gray-200 mx-1 shrink-0" />
+          <span className="w-px h-5 bg-gray-200 mx-0.5 sm:mx-1 shrink-0" />
 
           {/* ── Center: 4D controls ── */}
-          <div className="flex items-center gap-px shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-px shrink-0">
             <button
               onClick={handleToggleVizMode}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 vizMode === "cumulative"
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title={vizMode === "cumulative" ? "Construção cumulativa (ativo)" : "Modo fase ativa"}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden md:inline">{vizMode === "cumulative" ? "Cumulativo" : "Fases"}</span>
             </button>
 
             {aiRationale && (
               <button
                 onClick={handleToggleAiRationale}
-                className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+                className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                   showAiRationale
                     ? "bg-accent text-white"
                     : "text-gray-500 hover:bg-gray-100"
                 }`}
                 title="Estratégia de construção (IA)"
               >
-                <Brain className="w-3.5 h-3.5" />
+                <Brain className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                 <span className="hidden md:inline">IA</span>
               </button>
             )}
 
             <button
               onClick={handleToggleProgress}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 showProgress
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Painel de progresso (P)"
             >
-              <ClipboardList className="w-3.5 h-3.5" />
+              <ClipboardList className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden md:inline">Progresso</span>
             </button>
 
             <button
               onClick={handleCycleComparison}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 comparisonMode !== "off"
                   ? "bg-accent text-white"
                   : progressEntries.length === 0
@@ -871,7 +871,7 @@ export default function FourDViewer({
               disabled={progressEntries.length === 0}
               title={`Plano vs Real: ${COMPARISON_LABELS[comparisonMode]} (C)`}
             >
-              <GitCompareArrows className="w-3.5 h-3.5" />
+              <GitCompareArrows className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden lg:inline">
                 Plan vs Real
                 {comparisonMode !== "off" && (
@@ -882,69 +882,69 @@ export default function FourDViewer({
 
             <button
               onClick={handleToggleHistogram}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 showHistogram
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Histograma de recursos (R)"
             >
-              <BarChart3 className="w-3.5 h-3.5" />
+              <BarChart3 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden lg:inline">Recursos</span>
             </button>
 
             <button
               onClick={handleToggleVideoExport}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 showVideoExport
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Exportar vídeo 4D"
             >
-              <Film className="w-3.5 h-3.5" />
+              <Film className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden lg:inline">Vídeo</span>
             </button>
 
             <button
               onClick={handleToggleCapacity}
-              className={`flex items-center gap-1 px-2 py-1.5 rounded font-medium transition-colors ${
+              className={`flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium transition-colors min-w-[36px] sm:min-w-0 justify-center sm:justify-start ${
                 showCapacity
                   ? "bg-accent text-white"
                   : "text-gray-500 hover:bg-gray-100"
               }`}
               title="Capacidade do estaleiro (O)"
             >
-              <Settings className="w-3.5 h-3.5" />
+              <Settings className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
               <span className="hidden lg:inline">Capacidade</span>
             </button>
           </div>
 
           {/* Spacer */}
-          <div className="flex-1 min-w-2" />
+          <div className="flex-1 min-w-1 sm:min-w-2" />
 
           {/* ── Right: Utility actions ── */}
-          <div className="flex items-center gap-px shrink-0">
+          <div className="flex items-center gap-0.5 sm:gap-px shrink-0">
             <button
               onClick={() => viewerRef.current?.fitToModel()}
-              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors min-w-[36px] sm:min-w-0 justify-center"
               title="Ajustar câmara ao modelo"
             >
-              <Maximize2 className="w-3.5 h-3.5" />
+              <Maximize2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             </button>
             <button
               onClick={() => viewerRef.current?.showAll()}
-              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors min-w-[36px] sm:min-w-0 justify-center"
               title="Mostrar todos os elementos"
             >
-              <Eye className="w-3.5 h-3.5" />
+              <Eye className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             </button>
             <button
               onClick={() => viewerRef.current?.screenshot()}
-              className="flex items-center gap-1 px-2 py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded font-medium text-gray-500 hover:bg-gray-100 transition-colors min-w-[36px] sm:min-w-0 justify-center"
               title="Captura de ecrã"
             >
-              <Camera className="w-3.5 h-3.5" />
+              <Camera className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             </button>
           </div>
         </div>
@@ -997,7 +997,7 @@ export default function FourDViewer({
 
         {/* AI Construction Strategy panel (bottom-right) */}
         {showAiRationale && aiRationale && (
-          <div className="absolute bottom-3 right-3 z-20 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-4 max-w-sm max-h-[300px] overflow-y-auto">
+          <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-auto sm:right-3 z-20 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 sm:p-4 sm:max-w-sm max-h-[200px] sm:max-h-[300px] overflow-y-auto">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-1.5">
                 <Brain className="w-4 h-4 text-accent" />
@@ -1019,7 +1019,7 @@ export default function FourDViewer({
 
         {/* Comparison legend (top-right, below toolbar) */}
         {comparisonMode !== "off" && progressEntries.length > 0 && (
-          <div className="absolute top-11 right-3 z-20 bg-white/90 backdrop-blur-sm rounded-lg shadow border border-gray-200 px-3 py-2">
+          <div className="absolute top-11 right-1 sm:right-3 z-20 bg-white/90 backdrop-blur-sm rounded-lg shadow border border-gray-200 px-2 sm:px-3 py-1.5 sm:py-2">
             <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
               {comparisonMode === "overlay" ? "Progresso vs Plano" : "SPI por Tarefa"}
             </p>
@@ -1062,15 +1062,11 @@ export default function FourDViewer({
       </div>
 
       {/* Info bar */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 px-4 py-1.5 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-500">
-        {mappingStatus && <span>{mappingStatus}</span>}
+      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 px-2 sm:px-4 py-1 sm:py-1.5 bg-gray-50 border-t border-gray-200 text-[9px] sm:text-[10px] text-gray-500">
+        {mappingStatus && <span className="hidden sm:inline">{mappingStatus}</span>}
         {phaseStats && (
           <>
-            <span className="w-px h-3 bg-gray-200" />
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-gray-300" />
-              {phaseStats.notStarted} por iniciar
-            </span>
+            <span className="hidden sm:block w-px h-3 bg-gray-200" />
             <span className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-accent" />
               {phaseStats.inProgress} em curso
@@ -1079,12 +1075,16 @@ export default function FourDViewer({
               <span className="w-2 h-2 rounded-full bg-green-500" />
               {phaseStats.completed} concluídas
             </span>
+            <span className="hidden sm:flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-gray-300" />
+              {phaseStats.notStarted} por iniciar
+            </span>
           </>
         )}
         {coverageStats.total > 0 && (
           <>
-            <span className="w-px h-3 bg-gray-200" />
-            <span>{coverageStats.mapped}/{coverageStats.total} fases com 3D</span>
+            <span className="hidden md:block w-px h-3 bg-gray-200" />
+            <span className="hidden md:inline">{coverageStats.mapped}/{coverageStats.total} fases com 3D</span>
           </>
         )}
         {aiRationale && (
@@ -1095,15 +1095,15 @@ export default function FourDViewer({
         )}
         {vizMode === "cumulative" && (
           <>
-            <span className="w-px h-3 bg-gray-200" />
-            <span>Modo cumulativo</span>
+            <span className="hidden sm:block w-px h-3 bg-gray-200" />
+            <span className="hidden sm:inline">Modo cumulativo</span>
           </>
         )}
         {progressEntries.length > 0 && (
           <>
             <span className="w-px h-3 bg-gray-200" />
             <span className="text-accent font-medium">
-              {progressEntries.filter((p) => p.percentComplete >= 100).length}/{progressEntries.length} concluídas (real)
+              {progressEntries.filter((p) => p.percentComplete >= 100).length}/{progressEntries.length} concluídas
             </span>
           </>
         )}
