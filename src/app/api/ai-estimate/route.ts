@@ -5,12 +5,12 @@ import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
 
 export const runtime = "nodejs";
-export const maxDuration = 120;
+export const maxDuration = 300;
 
 const log = createLogger("ai-estimate");
 
 const MAX_SUMMARY_LENGTH = 80_000; // ~20K tokens
-const FETCH_TIMEOUT_MS = 90_000; // 90s — leave headroom within maxDuration
+const FETCH_TIMEOUT_MS = 270_000; // 270s — leave headroom within maxDuration
 
 export const POST = withApiHandler("ai-estimate", async (request) => {
   const body = await request.json();
