@@ -4,9 +4,13 @@ import { buildEstimationSystemPrompt } from "@/lib/ai-estimate-prompts";
 import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
 
+export const runtime = "nodejs";
+export const maxDuration = 120;
+
 const log = createLogger("ai-estimate");
 
 const MAX_SUMMARY_LENGTH = 80_000; // ~20K tokens
+const FETCH_TIMEOUT_MS = 90_000; // 90s — leave headroom within maxDuration
 
 export const POST = withApiHandler("ai-estimate", async (request) => {
   const body = await request.json();
@@ -35,23 +39,40 @@ export const POST = withApiHandler("ai-estimate", async (request) => {
   const systemPrompt = buildEstimationSystemPrompt();
   const truncatedSummary = projectSummary.slice(0, MAX_SUMMARY_LENGTH);
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 8192,
-      system: systemPrompt,
-      messages: [{
-        role: "user",
-        content: `Analise o seguinte projeto e produza uma estimativa de custos completa.\n\n${truncatedSummary}`,
-      }],
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 16384,
+        system: systemPrompt,
+        messages: [{
+          role: "user",
+          content: `Analise o seguinte projeto e produza uma estimativa de custos completa.\n\n${truncatedSummary}`,
+        }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeout);
+    const isTimeout = err instanceof DOMException && err.name === "AbortError";
+    log.warn(isTimeout ? "Anthropic API timeout" : "Anthropic API fetch error", { error: String(err) });
+    return NextResponse.json({
+      available: false,
+      fallbackReason: isTimeout ? "API timeout (90s)" : `API fetch error: ${String(err)}`,
+    }, { status: 504 });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     const errText = await response.text();
@@ -121,16 +142,18 @@ export const POST = withApiHandler("ai-estimate", async (request) => {
  * Handles: bare JSON, markdown code fences, or JSON embedded in prose.
  */
 function extractJsonFromText(text: string): Omit<AIEstimateResult, "modelUsed" | "processingTimeMs"> | null {
+  // Normalize line endings (Windows \r\n → \n)
+  const normalized = text.replace(/\r\n/g, "\n").trim();
+
   // Try 1: Clean JSON (entire response is JSON)
   try {
-    const trimmed = text.trim();
-    if (trimmed.startsWith("{")) {
-      return JSON.parse(trimmed);
+    if (normalized.startsWith("{")) {
+      return JSON.parse(normalized);
     }
   } catch { /* not pure JSON */ }
 
-  // Try 2: Markdown code fence
-  const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+  // Try 2: Markdown code fence (greedy match for large responses)
+  const fenceMatch = normalized.match(/```(?:json)?\s*\n([\s\S]+)\n```/);
   if (fenceMatch) {
     try {
       return JSON.parse(fenceMatch[1].trim());
@@ -138,11 +161,11 @@ function extractJsonFromText(text: string): Omit<AIEstimateResult, "modelUsed" |
   }
 
   // Try 3: Find first { ... last }
-  const firstBrace = text.indexOf("{");
-  const lastBrace = text.lastIndexOf("}");
+  const firstBrace = normalized.indexOf("{");
+  const lastBrace = normalized.lastIndexOf("}");
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     try {
-      return JSON.parse(text.slice(firstBrace, lastBrace + 1));
+      return JSON.parse(normalized.slice(firstBrace, lastBrace + 1));
     } catch { /* not valid JSON */ }
   }
 
