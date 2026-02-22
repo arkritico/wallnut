@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback, useRef, useState } from "react";
+import { useMemo, useCallback, useRef, useState, useEffect } from "react";
 import type { ScheduleTask, ConstructionPhase, CriticalChainBuffer } from "@/lib/wbs-types";
 import type { TaskProgress } from "@/lib/earned-value";
 import { PHASE_ORDER } from "@/lib/construction-sequencer";
@@ -50,8 +50,10 @@ interface HoverInfo {
 // Helpers
 // ============================================================
 
-const ROW_H = 24; // taller rows for touch targets on mobile
-const LABEL_W = 72;
+const ROW_H_DESKTOP = 24;
+const ROW_H_MOBILE = 32; // taller rows for touch targets on mobile
+const LABEL_W_DESKTOP = 72;
+const LABEL_W_MOBILE = 56; // narrower labels on small screens
 
 function formatShortPT(ms: number): string {
   return new Date(ms).toLocaleDateString("pt-PT", {
@@ -121,6 +123,21 @@ export default function GanttTimeline({
 }: GanttTimelineProps) {
   const ganttRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
+  const [isMobileGantt, setIsMobileGantt] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 639px)").matches;
+  });
+
+  // Responsive dimensions
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 639px)");
+    function onChange(e: MediaQueryListEvent) { setIsMobileGantt(e.matches); }
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
+  const ROW_H = isMobileGantt ? ROW_H_MOBILE : ROW_H_DESKTOP;
+  const LABEL_W = isMobileGantt ? LABEL_W_MOBILE : LABEL_W_DESKTOP;
 
   const totalMs = finishMs - startMs || 1;
   const playheadPct = ((currentMs - startMs) / totalMs) * 100;
@@ -172,7 +189,7 @@ export default function GanttTimeline({
       const ms = startMs + pct * totalMs;
       onSeek(Math.max(startMs, Math.min(finishMs, ms)));
     },
-    [startMs, finishMs, totalMs, onSeek],
+    [startMs, finishMs, totalMs, onSeek, LABEL_W],
   );
 
   // Bar status for opacity

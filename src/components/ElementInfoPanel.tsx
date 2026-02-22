@@ -42,23 +42,23 @@ export default function ElementInfoPanel({
   const color = phaseColor(link.phase);
 
   return (
-    <div className="absolute top-2 right-2 z-10 w-56 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-xs">
+    <div role="dialog" aria-label="Informação do elemento" className="absolute bottom-14 left-1 right-1 sm:bottom-auto sm:left-auto sm:top-2 sm:right-2 z-10 sm:w-56 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 text-xs">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <div className="flex items-center gap-1.5 min-w-0">
           <span
-            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            className="w-3 h-3 sm:w-2.5 sm:h-2.5 rounded-full flex-shrink-0"
             style={{ backgroundColor: color }}
           />
-          <span className="font-semibold text-gray-800 truncate">
+          <span className="font-semibold text-gray-800 truncate text-sm sm:text-xs">
             {phaseLabel(link.phase)}
           </span>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 flex-shrink-0 ml-1"
+          className="text-gray-400 hover:text-gray-600 flex-shrink-0 ml-1 p-1.5 sm:p-0 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
         >
-          <X className="w-3.5 h-3.5" />
+          <X className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
         </button>
       </div>
 

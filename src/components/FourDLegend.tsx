@@ -31,7 +31,7 @@ export default function FourDLegend({ phases, isolatedPhase, onPhaseClick }: Fou
   }
 
   return (
-    <div className="absolute bottom-2 left-2 z-10">
+    <div className="absolute bottom-14 sm:bottom-2 left-2 z-10">
       {open ? (
         <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-2 max-h-60 overflow-y-auto w-56">
           <div className="flex items-center justify-between mb-1.5">
@@ -102,7 +102,7 @@ export default function FourDLegend({ phases, isolatedPhase, onPhaseClick }: Fou
       ) : (
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-1.5 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 text-[10px] font-medium text-gray-600 hover:bg-white transition-colors"
+          className="flex items-center gap-1.5 px-3 sm:px-2.5 py-1.5 sm:py-1 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-200 text-[11px] sm:text-[10px] font-medium text-gray-600 hover:bg-white transition-colors min-h-[36px] sm:min-h-0"
         >
           <span className="flex gap-0.5">
             {phases

@@ -58,6 +58,7 @@ function checkRateLimit(ip: string, path: string): { allowed: boolean; remaining
 const MAX_BODY_SIZE: Record<string, number> = {
   "/api/ai-analyze": 512_000,      // 500 KB
   "/api/ifc-analyze": 52_428_800,  // 50 MB (IFC files are large)
+  "/api/ifc-convert": 1_073_741_824, // 1 GB (large IFC to Fragment conversion)
   "/api/parse-document": 1_048_576, // 1 MB
   "/api/analyze": 256_000,         // 250 KB
   "/api/geo-proxy": 64_000,        // 64 KB
@@ -175,7 +176,7 @@ export function middleware(request: NextRequest) {
   const maxSize = MAX_BODY_SIZE[pathname] ?? DEFAULT_MAX_BODY;
   if (contentLength && parseInt(contentLength, 10) > maxSize) {
     return NextResponse.json(
-      { error: `Pedido demasiado grande. Máximo: ${Math.round(maxSize / 1024)} KB.` },
+      { error: `Pedido demasiado grande (${Math.round(parseInt(contentLength!, 10) / (1024 * 1024))} MB). Máximo: ${maxSize >= 1_048_576 ? `${Math.round(maxSize / (1024 * 1024))} MB` : `${Math.round(maxSize / 1024)} KB`}.` },
       {
         status: 413,
         headers: SECURITY_HEADERS,

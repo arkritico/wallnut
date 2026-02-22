@@ -254,7 +254,7 @@ export default function TimelinePlayer({
   return (
     <div className={`bg-white border-t border-gray-200 ${className}`}>
       {/* Gantt timeline */}
-      <div className="px-4 pt-3">
+      <div className="px-2 sm:px-4 pt-2 sm:pt-3">
         <GanttTimeline
           tasks={detailTasks}
           startMs={startMs}
@@ -276,7 +276,7 @@ export default function TimelinePlayer({
       </div>
 
       {/* Transport controls */}
-      <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-4 py-2">
+      <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 px-2 sm:px-4 py-1.5 sm:py-2">
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             onClick={handleSkipBack}
@@ -345,7 +345,7 @@ export default function TimelinePlayer({
 
       {/* Active phases & stats */}
       {timelineState.activePhases.length > 0 && (
-        <div className="px-4 pb-3 border-t border-gray-100 pt-2">
+        <div className="px-2 sm:px-4 pb-2 sm:pb-3 border-t border-gray-100 pt-1.5 sm:pt-2">
           <div className="flex flex-wrap gap-1.5">
             {timelineState.activePhases.map((phase) => (
               <span
