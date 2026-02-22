@@ -10,7 +10,7 @@ export const maxDuration = 300; // seconds (Vercel Pro)
 export const dynamic = "force-dynamic";
 
 // ── Limits ───────────────────────────────────────────────────
-const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500 MB
+const MAX_FILE_SIZE = 1024 * 1024 * 1024; // 1 GB
 const IFC_HEADER_PATTERN = /ISO-10303-21/;
 
 /**

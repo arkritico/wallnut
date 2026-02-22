@@ -221,7 +221,7 @@ export default function UnifiedUpload({
   // ── File size / page limits ─────────────────────────────
 
   const IFC_WARN_MB = 200;
-  const IFC_BLOCK_MB = 500;
+  const IFC_BLOCK_MB = 1024;
   const PDF_WARN_PAGES = 50;
   const PDF_BLOCK_PAGES = 200;
 
