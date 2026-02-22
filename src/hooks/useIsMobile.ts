@@ -10,11 +10,13 @@ const MOBILE_QUERY = "(max-width: 767px)";
  * breakpoint (< 768px). Uses `matchMedia` so it updates on resize/rotate.
  */
 export default function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia(MOBILE_QUERY).matches;
+  });
 
   useEffect(() => {
     const mql = window.matchMedia(MOBILE_QUERY);
-    setIsMobile(mql.matches);
 
     function onChange(e: MediaQueryListEvent) {
       setIsMobile(e.matches);

@@ -123,12 +123,14 @@ export default function GanttTimeline({
 }: GanttTimelineProps) {
   const ganttRef = useRef<HTMLDivElement>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
-  const [isMobileGantt, setIsMobileGantt] = useState(false);
+  const [isMobileGantt, setIsMobileGantt] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 639px)").matches;
+  });
 
   // Responsive dimensions
   useEffect(() => {
     const mql = window.matchMedia("(max-width: 639px)");
-    setIsMobileGantt(mql.matches);
     function onChange(e: MediaQueryListEvent) { setIsMobileGantt(e.matches); }
     mql.addEventListener("change", onChange);
     return () => mql.removeEventListener("change", onChange);
@@ -187,7 +189,7 @@ export default function GanttTimeline({
       const ms = startMs + pct * totalMs;
       onSeek(Math.max(startMs, Math.min(finishMs, ms)));
     },
-    [startMs, finishMs, totalMs, onSeek],
+    [startMs, finishMs, totalMs, onSeek, LABEL_W],
   );
 
   // Bar status for opacity

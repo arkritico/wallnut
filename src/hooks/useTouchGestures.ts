@@ -23,7 +23,10 @@ export default function useTouchGestures(
 ) {
   const lastTapRef = useRef(0);
   const handlersRef = useRef(handlers);
-  handlersRef.current = handlers;
+
+  useEffect(() => {
+    handlersRef.current = handlers;
+  });
 
   const onTouchEnd = useCallback((e: TouchEvent) => {
     // Three-finger tap detection (all fingers lifted at once)
