@@ -15,6 +15,8 @@ import {
   FragmentsManager,
 } from "@thatopen/components";
 import type { FragmentsModel, RaycastResult, RenderedFaces } from "@thatopen/fragments";
+import { LodMode } from "@thatopen/fragments";
+import { computeBoundsTree, disposeBoundsTree, acceleratedRaycast } from "three-mesh-bvh";
 import {
   Upload,
   Eye,
@@ -95,6 +97,13 @@ type PanelType = "models" | "clipper" | "properties" | "categories" | null;
 // ============================================================
 // Performance helpers
 // ============================================================
+
+/** Patch Three.js with BVH-accelerated raycasting (O(log n) vs O(n)) */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(THREE.BufferGeometry.prototype as any).computeBoundsTree = computeBoundsTree;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(THREE.BufferGeometry.prototype as any).disposeBoundsTree = disposeBoundsTree;
+THREE.Mesh.prototype.raycast = acceleratedRaycast;
 
 /** Reusable Vector2 for raycasting — avoids allocation per click */
 const _raycastMouse = new THREE.Vector2();
@@ -298,7 +307,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         const fragmentsManager = components.get(FragmentsManager);
         fragmentsManager.init("/wasm/fragments-worker.mjs");
 
-        // 8. Setup IFC loader with WASM path
+        // 8. Setup IFC loader with WASM path + optimized settings
         const ifcLoader = components.get(IfcLoader);
         await ifcLoader.setup({
           wasm: {
@@ -306,6 +315,11 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             absolute: true,
           },
           autoSetWasm: false,
+          webIfc: {
+            COORDINATE_TO_ORIGIN: true,
+            CIRCLE_SEGMENTS: 12,       // default 16; reduces curved geometry ~25%
+            MEMORY_LIMIT: 512,         // MB cap for web-ifc WASM heap
+          },
         });
         ifcLoaderRef.current = ifcLoader;
 
@@ -528,6 +542,20 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
       setLoadingProgress(`A adicionar ao cenário — ${name}...`);
       world.scene.three.add(model.object);
+
+      // Enable LOD: simplify distant geometry, full detail for nearby
+      setLoadingProgress(`A ativar LOD — ${name}...`);
+      await model.setLodMode(LodMode.DEFAULT);
+
+      // Build BVH acceleration structures for fast raycasting
+      model.object.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (mesh.isMesh && mesh.geometry && (mesh.geometry as any).computeBoundsTree) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (mesh.geometry as any).computeBoundsTree();
+        }
+      });
 
       setLoadingProgress(`A extrair categorias — ${name}...`);
       const categories = await model.getCategories();
