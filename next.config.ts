@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   // Increase body size limit for large uploads (IFC files, PDFs)
   experimental: {
     serverActions: {
-      bodySizeLimit: '50mb',
+      bodySizeLimit: '1gb',
     },
   },
   headers: async () => [

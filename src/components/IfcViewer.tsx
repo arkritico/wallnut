@@ -364,7 +364,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           webIfc: {
             COORDINATE_TO_ORIGIN: true,
             CIRCLE_SEGMENTS: mobile ? 8 : 12,
-            MEMORY_LIMIT: mobile ? 256 : 512,
+            MEMORY_LIMIT: mobile ? 512 : 2048,
           },
         });
         ifcLoaderRef.current = ifcLoader;
