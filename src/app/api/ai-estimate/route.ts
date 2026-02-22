@@ -44,7 +44,7 @@ export const POST = withApiHandler("ai-estimate", async (request) => {
     },
     body: JSON.stringify({
       model,
-      max_tokens: 8192,
+      max_tokens: 16384,
       system: systemPrompt,
       messages: [{
         role: "user",
@@ -121,16 +121,18 @@ export const POST = withApiHandler("ai-estimate", async (request) => {
  * Handles: bare JSON, markdown code fences, or JSON embedded in prose.
  */
 function extractJsonFromText(text: string): Omit<AIEstimateResult, "modelUsed" | "processingTimeMs"> | null {
+  // Normalize line endings (Windows \r\n → \n)
+  const normalized = text.replace(/\r\n/g, "\n").trim();
+
   // Try 1: Clean JSON (entire response is JSON)
   try {
-    const trimmed = text.trim();
-    if (trimmed.startsWith("{")) {
-      return JSON.parse(trimmed);
+    if (normalized.startsWith("{")) {
+      return JSON.parse(normalized);
     }
   } catch { /* not pure JSON */ }
 
-  // Try 2: Markdown code fence
-  const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+  // Try 2: Markdown code fence (greedy match for large responses)
+  const fenceMatch = normalized.match(/```(?:json)?\s*\n([\s\S]+)\n```/);
   if (fenceMatch) {
     try {
       return JSON.parse(fenceMatch[1].trim());
@@ -138,11 +140,11 @@ function extractJsonFromText(text: string): Omit<AIEstimateResult, "modelUsed" |
   }
 
   // Try 3: Find first { ... last }
-  const firstBrace = text.indexOf("{");
-  const lastBrace = text.lastIndexOf("}");
+  const firstBrace = normalized.indexOf("{");
+  const lastBrace = normalized.lastIndexOf("}");
   if (firstBrace !== -1 && lastBrace > firstBrace) {
     try {
-      return JSON.parse(text.slice(firstBrace, lastBrace + 1));
+      return JSON.parse(normalized.slice(firstBrace, lastBrace + 1));
     } catch { /* not valid JSON */ }
   }
 
