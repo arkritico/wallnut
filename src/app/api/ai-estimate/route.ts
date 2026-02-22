@@ -4,9 +4,13 @@ import { buildEstimationSystemPrompt } from "@/lib/ai-estimate-prompts";
 import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
 
+export const runtime = "nodejs";
+export const maxDuration = 120;
+
 const log = createLogger("ai-estimate");
 
 const MAX_SUMMARY_LENGTH = 80_000; // ~20K tokens
+const FETCH_TIMEOUT_MS = 90_000; // 90s — leave headroom within maxDuration
 
 export const POST = withApiHandler("ai-estimate", async (request) => {
   const body = await request.json();
@@ -35,23 +39,40 @@ export const POST = withApiHandler("ai-estimate", async (request) => {
   const systemPrompt = buildEstimationSystemPrompt();
   const truncatedSummary = projectSummary.slice(0, MAX_SUMMARY_LENGTH);
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 16384,
-      system: systemPrompt,
-      messages: [{
-        role: "user",
-        content: `Analise o seguinte projeto e produza uma estimativa de custos completa.\n\n${truncatedSummary}`,
-      }],
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 16384,
+        system: systemPrompt,
+        messages: [{
+          role: "user",
+          content: `Analise o seguinte projeto e produza uma estimativa de custos completa.\n\n${truncatedSummary}`,
+        }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeout);
+    const isTimeout = err instanceof DOMException && err.name === "AbortError";
+    log.warn(isTimeout ? "Anthropic API timeout" : "Anthropic API fetch error", { error: String(err) });
+    return NextResponse.json({
+      available: false,
+      fallbackReason: isTimeout ? "API timeout (90s)" : `API fetch error: ${String(err)}`,
+    }, { status: 504 });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     const errText = await response.text();

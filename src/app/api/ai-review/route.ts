@@ -4,7 +4,12 @@ import { buildReviewSystemPrompt, buildReviewMessage } from "@/lib/ai-review-pro
 import { withApiHandler } from "@/lib/api-error-handler";
 import { createLogger } from "@/lib/logger";
 
+export const runtime = "nodejs";
+export const maxDuration = 120;
+
 const log = createLogger("ai-review");
+
+const FETCH_TIMEOUT_MS = 90_000;
 
 export const POST = withApiHandler("ai-review", async (request) => {
   const body = await request.json();
@@ -32,20 +37,37 @@ export const POST = withApiHandler("ai-review", async (request) => {
   const userMessage = buildReviewMessage(aiEstimate, matchReport, reconciliation);
 
   // ── Call Anthropic ────────────────────────────────────────
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-5-20250929",
-      max_tokens: 8192,
-      system: systemPrompt,
-      messages: [{ role: "user", content: `Reveja as seguintes correspondências de preços:\n\n${userMessage}` }],
-    }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  let response: Response;
+  try {
+    response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-5-20250929",
+        max_tokens: 8192,
+        system: systemPrompt,
+        messages: [{ role: "user", content: `Reveja as seguintes correspondências de preços:\n\n${userMessage}` }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    clearTimeout(timeout);
+    const isTimeout = err instanceof DOMException && err.name === "AbortError";
+    log.warn(isTimeout ? "Anthropic API timeout" : "Anthropic API fetch error", { error: String(err) });
+    return NextResponse.json({
+      available: false,
+      fallbackReason: isTimeout ? "API timeout (90s)" : `API fetch error: ${String(err)}`,
+    }, { status: 504 });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!response.ok) {
     const errText = await response.text();
