@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Copy, Navigation, ChevronDown, ChevronRight, X } from "lucide-react";
 
 // ============================================================
@@ -181,21 +181,52 @@ export default function PropertiesPanel({
   });
   const [copied, setCopied] = useState(false);
 
+  // Swipe-to-dismiss for mobile bottom sheet
+  const dragStartY = useRef<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  const handleDragStart = useCallback((e: React.TouchEvent) => {
+    const target = e.target as HTMLElement;
+    // Only initiate drag from the handle area
+    if (target.closest("[data-drag-handle]")) {
+      dragStartY.current = e.touches[0].clientY;
+    }
+  }, []);
+
+  const handleDragMove = useCallback((e: React.TouchEvent) => {
+    if (dragStartY.current === null || !panelRef.current) return;
+    const dy = e.touches[0].clientY - dragStartY.current;
+    if (dy > 0) {
+      panelRef.current.style.transform = `translateY(${dy}px)`;
+    }
+  }, []);
+
+  const handleDragEnd = useCallback((e: React.TouchEvent) => {
+    if (dragStartY.current === null || !panelRef.current) return;
+    const dy = e.changedTouches[0].clientY - dragStartY.current;
+    dragStartY.current = null;
+    if (dy > 80) {
+      onClose();
+    } else {
+      panelRef.current.style.transform = "";
+    }
+  }, [onClose]);
+
   if (!element) {
     return (
       <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-72 z-20">
-        <div className="flex justify-center pt-2 pb-0 md:hidden">
-          <div className="w-8 h-1 rounded-full bg-gray-300" />
+        <div className="flex justify-center pt-2 pb-0 md:hidden" data-drag-handle>
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
         </div>
         <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
           <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
             Propriedades
           </p>
-          <button onClick={onClose} className="p-1 md:p-0.5 text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="p-2 md:p-0.5 text-gray-400 hover:text-gray-600 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center">
             <X className="w-4 h-4 md:w-3.5 md:h-3.5" />
           </button>
         </div>
-        <div className="px-3 py-6 text-center">
+        <div className="px-3 py-6 text-center pb-safe">
           <p className="text-xs text-gray-400 italic">
             Clique num elemento para ver as propriedades
           </p>
@@ -217,17 +248,23 @@ export default function PropertiesPanel({
   }
 
   return (
-    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-72 z-20 max-h-[55vh] md:max-h-none">
+    <div
+      ref={panelRef}
+      className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-72 z-20 max-h-[60vh] md:max-h-none will-change-transform"
+      onTouchStart={handleDragStart}
+      onTouchMove={handleDragMove}
+      onTouchEnd={handleDragEnd}
+    >
       {/* Drag handle (mobile) */}
-      <div className="flex justify-center pt-2 pb-0 md:hidden">
-        <div className="w-8 h-1 rounded-full bg-gray-300" />
+      <div className="flex justify-center pt-2 pb-0 md:hidden cursor-grab active:cursor-grabbing" data-drag-handle>
+        <div className="w-10 h-1 rounded-full bg-gray-300" />
       </div>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
           Propriedades
         </p>
-        <button onClick={onClose} className="p-1 md:p-0.5 text-gray-400 hover:text-gray-600">
+        <button onClick={onClose} className="p-2 md:p-0.5 text-gray-400 hover:text-gray-600 min-h-[44px] min-w-[44px] md:min-h-0 md:min-w-0 flex items-center justify-center">
           <X className="w-4 h-4 md:w-3.5 md:h-3.5" />
         </button>
       </div>
@@ -318,12 +355,12 @@ export default function PropertiesPanel({
       </div>
 
       {/* Footer actions */}
-      <div className="px-3 py-2 border-t border-gray-100 flex items-center gap-2">
+      <div className="px-3 py-2 pb-safe border-t border-gray-100 flex items-center gap-2">
         <button
           onClick={() => onFlyTo(element.modelId, element.localId)}
-          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-accent transition-colors"
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-accent transition-colors min-h-[44px] md:min-h-0"
         >
-          <Navigation className="w-3 h-3" />
+          <Navigation className="w-3.5 h-3.5 md:w-3 md:h-3" />
           Voar para elemento
         </button>
       </div>

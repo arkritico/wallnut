@@ -761,7 +761,7 @@ export default function FourDViewer({
   return (
     <div className={`flex flex-col ${className}`}>
       {/* 3D viewport with overlays */}
-      <div className="flex-1 min-h-[250px] sm:min-h-[350px] md:min-h-0 relative">
+      <div className="flex-1 min-h-[200px] sm:min-h-[300px] md:min-h-0 relative">
         <IfcViewer
           ref={viewerRef}
           ifcData={ifcData}
@@ -779,7 +779,7 @@ export default function FourDViewer({
         />
 
         {/* ── Unified toolbar (static, top of viewport) ─────────── */}
-        <div className="absolute top-0 inset-x-0 z-20 flex items-center gap-0.5 sm:gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-1 sm:px-2 py-1 text-[10px] overflow-x-auto scrollbar-none">
+        <div className="absolute top-0 inset-x-0 z-20 flex flex-wrap sm:flex-nowrap items-center gap-0.5 sm:gap-px bg-white/95 backdrop-blur-sm border-b border-gray-200 px-1 sm:px-2 py-0.5 sm:py-1 text-[10px] overflow-x-auto scrollbar-none safe-area-inset-x">
           {/* ── Left: IFC model tools ── */}
           <div className="flex items-center gap-0.5 sm:gap-px shrink-0">
             <button
@@ -1092,7 +1092,7 @@ export default function FourDViewer({
       </div>
 
       {/* Info bar */}
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 md:gap-3 px-2 sm:px-4 py-1 sm:py-1.5 bg-gray-50 border-t border-gray-200 text-[9px] sm:text-[10px] text-gray-500">
+      <div className="flex flex-wrap items-center gap-1 sm:gap-2 md:gap-3 px-1.5 sm:px-4 py-1 sm:py-1.5 bg-gray-50 border-t border-gray-200 text-[8px] sm:text-[10px] text-gray-500">
         {mappingStatus && <span className="hidden sm:inline">{mappingStatus}</span>}
         {phaseStats && (
           <>

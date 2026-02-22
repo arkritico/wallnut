@@ -264,6 +264,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         //    - preserveDrawingBuffer: needed for screenshot & video capture
         //    - antialias: smooth edges (disabled on low-end / mobile GPUs)
         const isMobileDevice = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+        const isLowEndDevice = isMobileDevice && (navigator.hardwareConcurrency ?? 4) <= 4;
         const renderer = new SimpleRenderer(components, container, {
           preserveDrawingBuffer: true,
           powerPreference: "high-performance",
@@ -271,9 +272,9 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         });
         world.renderer = renderer;
 
-        // Cap pixel ratio: 2 on desktop, 1.5 on mobile (big GPU savings)
+        // Cap pixel ratio: 2 on desktop, 1.5 on mobile, 1 on low-end (big GPU savings)
         const gl = renderer.three as THREE.WebGLRenderer;
-        gl.setPixelRatio(clampedPixelRatio(isMobileDevice ? 1.5 : 2));
+        gl.setPixelRatio(clampedPixelRatio(isLowEndDevice ? 1 : isMobileDevice ? 1.5 : 2));
 
         // Expose the canvas element for video capture
         if (canvasRef) {
@@ -308,6 +309,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         fragmentsManager.init("/wasm/fragments-worker.mjs");
 
         // 8. Setup IFC loader with WASM path + optimized settings
+        //    Mobile: fewer circle segments + lower memory for constrained devices
         const ifcLoader = components.get(IfcLoader);
         await ifcLoader.setup({
           wasm: {
@@ -317,8 +319,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
           autoSetWasm: false,
           webIfc: {
             COORDINATE_TO_ORIGIN: true,
-            CIRCLE_SEGMENTS: 12,       // default 16; reduces curved geometry ~25%
-            MEMORY_LIMIT: 512,         // MB cap for web-ifc WASM heap
+            CIRCLE_SEGMENTS: isMobileDevice ? 8 : 12,
+            MEMORY_LIMIT: isMobileDevice ? 256 : 512,
           },
         });
         ifcLoaderRef.current = ifcLoader;
@@ -1149,11 +1151,11 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       onDrop={handleDrop}
     >
       {/* Toolbar (hidden when parent provides its own) */}
-      {!hideToolbar && <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200 text-sm overflow-x-auto scrollbar-none">
+      {!hideToolbar && <div className="flex items-center gap-0.5 sm:gap-1 px-1.5 sm:px-3 py-1.5 sm:py-2 bg-white border-b border-gray-200 text-sm overflow-x-auto scrollbar-none">
         {/* Upload IFC button */}
-        <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium">
-          <Upload className="w-3.5 h-3.5" />
-          IFC
+        <label className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium min-h-[44px] sm:min-h-0">
+          <Upload className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+          <span className="hidden sm:inline">IFC</span>
           <input
             type="file"
             accept=".ifc,.frag"
@@ -1165,7 +1167,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
         {hasModel && (
           <>
-            <div className="w-px h-5 bg-gray-200 mx-1" />
+            <div className="w-px h-5 bg-gray-200 mx-0.5 sm:mx-1 shrink-0" />
 
             {/* Panel toggle buttons */}
             {!isExternalControl && (
@@ -1201,26 +1203,26 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
               />
             )}
 
-            <div className="w-px h-5 bg-gray-200 mx-1" />
+            <div className="w-px h-5 bg-gray-200 mx-0.5 sm:mx-1 shrink-0" />
 
             {/* Utility buttons */}
             <button
               onClick={handleFitToModel}
-              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 sm:p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
               title="Encaixar modelo"
             >
               <Maximize2 className="w-4 h-4" />
             </button>
             <button
               onClick={handleShowAll}
-              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 sm:p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex items-center justify-center"
               title="Mostrar tudo"
             >
               <Eye className="w-4 h-4" />
             </button>
             <button
               onClick={handleScreenshot}
-              className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+              className="hidden sm:flex p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors items-center justify-center"
               title="Captura de ecrã (PNG)"
             >
               <Camera className="w-4 h-4" />
@@ -1228,7 +1230,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
             <button
               onClick={handleToggleOrtho}
-              className={`p-1.5 rounded transition-colors ${isOrtho ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
+              className={`hidden sm:flex p-1.5 rounded transition-colors items-center justify-center ${isOrtho ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
               title={isOrtho ? "Vista perspetiva" : "Vista ortográfica"}
             >
               <Box className="w-4 h-4" />
@@ -1236,15 +1238,15 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
             <button
               onClick={handleToggleMeasure}
-              className={`p-1.5 rounded transition-colors ${isMeasuring ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
+              className={`hidden sm:flex p-1.5 rounded transition-colors items-center justify-center ${isMeasuring ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
               title={isMeasuring ? "Sair da medição" : "Medir distância"}
             >
               <Ruler className="w-4 h-4" />
             </button>
 
-            {/* Model count & names */}
-            <div className="w-px h-5 bg-gray-200 mx-1" />
-            <span className="text-xs text-gray-400 truncate max-w-[200px]" title={loadedModels.map((m) => m.name).join("\n")}>
+            {/* Model count & names (desktop only) */}
+            <div className="hidden sm:block w-px h-5 bg-gray-200 mx-1" />
+            <span className="hidden sm:inline text-xs text-gray-400 truncate max-w-[200px]" title={loadedModels.map((m) => m.name).join("\n")}>
               {loadedModels.length === 1
                 ? loadedModels[0].name
                 : `${loadedModels.length} modelos`}
@@ -1254,7 +1256,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
         {/* Selected element indicator */}
         {selectedElement != null && (
-          <span className="ml-auto text-xs text-accent font-mono">
+          <span className="ml-auto text-xs text-accent font-mono shrink-0">
             #{selectedElement}
           </span>
         )}
@@ -1263,7 +1265,7 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       {/* 3D viewport */}
       <div
         ref={containerRef}
-        className="flex-1 min-h-[250px] sm:min-h-[350px] md:min-h-[400px]"
+        className="flex-1 min-h-[200px] sm:min-h-[350px] md:min-h-[400px]"
         style={{ touchAction: "none" }}
       />
 
@@ -1345,17 +1347,17 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
       {/* Measurement info bar */}
       {isMeasuring && (
-        <div className="absolute top-12 left-3 z-20">
-          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-3 py-2">
+        <div className="absolute top-12 left-1 sm:left-3 z-20 max-w-[200px]">
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-2.5 sm:px-3 py-2">
             <div className="flex items-center gap-2 mb-1">
-              <Ruler className="w-3 h-3 text-accent" />
+              <Ruler className="w-3 h-3 text-accent shrink-0" />
               <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wide">
                 Medição
               </span>
               {measurements.length > 0 && (
                 <button
                   onClick={handleClearMeasurements}
-                  className="text-[10px] text-gray-400 hover:text-red-500 transition-colors ml-auto"
+                  className="text-[10px] text-gray-400 hover:text-red-500 transition-colors ml-auto min-h-[32px] sm:min-h-0 flex items-center"
                 >
                   Limpar
                 </button>
@@ -1411,7 +1413,7 @@ function ToolbarButton({ icon, label, badge, active, onClick }: ToolbarButtonPro
   return (
     <button
       onClick={onClick}
-      className={`relative inline-flex items-center gap-1 px-2 py-2 md:py-1.5 rounded text-xs transition-colors min-h-[44px] md:min-h-0 ${
+      className={`relative inline-flex items-center justify-center sm:justify-start gap-1 px-1.5 sm:px-2 py-2 sm:py-1.5 rounded text-xs transition-colors min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 shrink-0 ${
         active
           ? "bg-accent text-white"
           : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"

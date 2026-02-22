@@ -162,10 +162,10 @@ export default function ClipperPanel({
   }
 
   return (
-    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[55vh] md:max-h-none">
+    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[60vh] md:max-h-none">
       {/* Drag handle (mobile) */}
-      <div className="flex justify-center pt-2 pb-0 md:hidden">
-        <div className="w-8 h-1 rounded-full bg-gray-300" />
+      <div className="flex justify-center pt-2 pb-0 md:hidden cursor-grab" data-drag-handle>
+        <div className="w-10 h-1 rounded-full bg-gray-300" />
       </div>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
@@ -182,12 +182,12 @@ export default function ClipperPanel({
       {/* Preset buttons */}
       <div className="px-3 py-2 border-b border-gray-100">
         <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-1.5">Presets</p>
-        <div className="grid grid-cols-6 gap-1">
+        <div className="grid grid-cols-6 gap-1.5 sm:gap-1">
           {PRESETS.map((preset, idx) => (
             <button
               key={preset.label}
               onClick={() => handlePreset(idx)}
-              className="px-1.5 py-1 text-[10px] font-mono font-medium bg-gray-100 hover:bg-accent hover:text-white rounded transition-colors text-gray-600"
+              className="px-1.5 py-2 sm:py-1 text-[11px] sm:text-[10px] font-mono font-medium bg-gray-100 hover:bg-accent hover:text-white rounded transition-colors text-gray-600 min-h-[44px] sm:min-h-0"
               title={`Criar plano ${preset.label}`}
             >
               {preset.label}
@@ -200,13 +200,13 @@ export default function ClipperPanel({
       <div className="px-3 py-2 border-b border-gray-100">
         <button
           onClick={handleInteractiveCreate}
-          className={`flex items-center gap-1.5 w-full px-2 py-1.5 rounded text-xs transition-colors ${
+          className={`flex items-center gap-1.5 w-full px-2 py-2.5 sm:py-1.5 rounded text-xs transition-colors min-h-[44px] sm:min-h-0 ${
             isCreating
               ? "bg-accent text-white"
               : "bg-gray-100 text-gray-600 hover:bg-gray-200"
           }`}
         >
-          <MousePointerClick className="w-3.5 h-3.5" />
+          <MousePointerClick className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           {isCreating ? "A criar... (clique no modelo)" : "Criar interativo"}
         </button>
       </div>
@@ -221,7 +221,7 @@ export default function ClipperPanel({
           planes.map((info) => (
             <div
               key={info.id}
-              className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
+              className="flex items-center gap-1.5 px-2 py-1.5 sm:py-1 rounded hover:bg-gray-50 transition-colors group min-h-[44px] sm:min-h-0"
             >
               {/* Label */}
               <span className="flex-1 text-xs text-gray-600 truncate">
@@ -231,32 +231,32 @@ export default function ClipperPanel({
               {/* Toggle visibility */}
               <button
                 onClick={() => handleToggleVisibility(info)}
-                className="p-0.5 rounded text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-1.5 sm:p-0.5 rounded text-gray-400 hover:text-gray-600 transition-colors"
                 title={info.plane.visible ? "Ocultar plano" : "Mostrar plano"}
               >
                 {info.plane.visible ? (
-                  <Eye className="w-3 h-3" />
+                  <Eye className="w-4 h-4 sm:w-3 sm:h-3" />
                 ) : (
-                  <EyeOff className="w-3 h-3" />
+                  <EyeOff className="w-4 h-4 sm:w-3 sm:h-3" />
                 )}
               </button>
 
               {/* Flip */}
               <button
                 onClick={() => handleFlip(info)}
-                className="p-0.5 rounded text-gray-400 hover:text-accent transition-colors"
+                className="p-1.5 sm:p-0.5 rounded text-gray-400 hover:text-accent transition-colors"
                 title="Inverter plano"
               >
-                <FlipHorizontal className="w-3 h-3" />
+                <FlipHorizontal className="w-4 h-4 sm:w-3 sm:h-3" />
               </button>
 
               {/* Delete */}
               <button
                 onClick={() => handleDelete(info)}
-                className="p-0.5 rounded text-gray-300 hover:text-red-500 md:opacity-0 md:group-hover:opacity-100 transition-all"
+                className="p-1.5 sm:p-0.5 rounded text-gray-300 hover:text-red-500 md:opacity-0 md:group-hover:opacity-100 transition-all"
                 title="Remover plano"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-4 h-4 sm:w-3 sm:h-3" />
               </button>
             </div>
           ))
@@ -265,12 +265,12 @@ export default function ClipperPanel({
 
       {/* Footer */}
       {planes.length > 0 && (
-        <div className="px-3 py-2 border-t border-gray-100">
+        <div className="px-3 py-2 pb-safe border-t border-gray-100">
           <button
             onClick={handleDeleteAll}
-            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition-colors"
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-500 transition-colors min-h-[44px] sm:min-h-0"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-3.5 h-3.5 sm:w-3 sm:h-3" />
             Remover todos
           </button>
         </div>

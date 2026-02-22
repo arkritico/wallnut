@@ -94,10 +94,10 @@ export default function CategoryFilterPanel({
   const totalElements = categories.reduce((sum, c) => sum + c.count, 0);
 
   return (
-    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[55vh] md:max-h-none">
+    <div className="absolute inset-x-0 bottom-0 md:bottom-auto md:inset-x-auto md:top-12 md:right-3 bg-white rounded-t-2xl md:rounded-lg shadow-lg border border-gray-200 w-full md:w-64 z-20 max-h-[60vh] md:max-h-none">
       {/* Drag handle (mobile) */}
-      <div className="flex justify-center pt-2 pb-0 md:hidden">
-        <div className="w-8 h-1 rounded-full bg-gray-300" />
+      <div className="flex justify-center pt-2 pb-0 md:hidden cursor-grab" data-drag-handle>
+        <div className="w-10 h-1 rounded-full bg-gray-300" />
       </div>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
@@ -112,13 +112,13 @@ export default function CategoryFilterPanel({
       {/* Search filter */}
       <div className="px-3 py-2 border-b border-gray-100">
         <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-300" />
+          <Search className="absolute left-2.5 sm:left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-3 sm:h-3 text-gray-300" />
           <input
             type="text"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Filtrar categorias..."
-            className="w-full pl-6 pr-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 placeholder:text-gray-300"
+            className="w-full pl-7 sm:pl-6 pr-2 py-2 sm:py-1 text-sm sm:text-xs border border-gray-200 rounded focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/20 placeholder:text-gray-300"
           />
         </div>
       </div>
@@ -133,12 +133,12 @@ export default function CategoryFilterPanel({
           filteredCategories.map((cat) => (
             <div
               key={cat.name}
-              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-50 transition-colors group"
+              className="flex items-center gap-2 px-2 py-1.5 sm:py-1 rounded hover:bg-gray-50 transition-colors group min-h-[44px] sm:min-h-0"
             >
               {/* Visibility checkbox */}
               <button
                 onClick={() => onToggleCategory(cat.name)}
-                className={`p-0.5 rounded transition-colors ${
+                className={`p-1 sm:p-0.5 rounded transition-colors ${
                   cat.visible
                     ? "text-accent"
                     : "text-gray-300"
@@ -146,15 +146,15 @@ export default function CategoryFilterPanel({
                 title={cat.visible ? "Ocultar" : "Mostrar"}
               >
                 {cat.visible ? (
-                  <Eye className="w-3.5 h-3.5" />
+                  <Eye className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                 ) : (
-                  <EyeOff className="w-3.5 h-3.5" />
+                  <EyeOff className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                 )}
               </button>
 
               {/* Category name */}
               <span
-                className={`flex-1 text-xs truncate ${
+                className={`flex-1 text-sm sm:text-xs truncate ${
                   cat.visible ? "text-gray-700" : "text-gray-400"
                 }`}
                 title={`${cat.displayName} (${cat.name})`}
@@ -170,10 +170,10 @@ export default function CategoryFilterPanel({
               {/* Isolate button */}
               <button
                 onClick={() => onIsolateCategory(cat.name)}
-                className="p-0.5 rounded text-gray-300 hover:text-accent md:opacity-0 md:group-hover:opacity-100 transition-all"
+                className="p-1.5 sm:p-0.5 rounded text-gray-300 hover:text-accent md:opacity-0 md:group-hover:opacity-100 transition-all"
                 title="Isolar categoria"
               >
-                <Crosshair className="w-3 h-3" />
+                <Crosshair className="w-4 h-4 sm:w-3 sm:h-3" />
               </button>
             </div>
           ))
@@ -181,11 +181,11 @@ export default function CategoryFilterPanel({
       </div>
 
       {/* Footer actions */}
-      <div className="px-3 py-2 border-t border-gray-100 flex items-center gap-3">
+      <div className="px-3 py-2 pb-safe border-t border-gray-100 flex items-center gap-3">
         <button
           onClick={onShowAll}
           disabled={allVisible}
-          className={`text-xs transition-colors ${
+          className={`text-xs transition-colors min-h-[44px] sm:min-h-0 flex items-center ${
             allVisible
               ? "text-gray-300 cursor-not-allowed"
               : "text-gray-500 hover:text-accent"
