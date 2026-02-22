@@ -24,6 +24,9 @@ import {
   Info,
   Filter,
   Layers,
+  Ruler,
+  Box,
+  AlertTriangle,
 } from "lucide-react";
 import ModelManagerPanel from "./ifc-viewer/ModelManagerPanel";
 import type { LoadedModelInfo } from "./ifc-viewer/ModelManagerPanel";
@@ -127,8 +130,24 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
 
   const [loadedModels, setLoadedModels] = useState<LoadedModelInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedElement, setSelectedElement] = useState<number | null>(null);
+
+  // Drag-and-drop state
+  const [isDragging, setIsDragging] = useState(false);
+
+  // File size warning state
+  const [pendingFile, setPendingFile] = useState<{ data: Uint8Array; name: string; sizeMb: number } | null>(null);
+
+  // Ortho/perspective toggle
+  const [isOrtho, setIsOrtho] = useState(false);
+
+  // Measurement mode
+  const [isMeasuring, setIsMeasuring] = useState(false);
+  const [measurements, setMeasurements] = useState<{ id: string; distance: string }[]>([]);
+  const measureStartRef = useRef<THREE.Vector3 | null>(null);
+  const measureLinesRef = useRef<THREE.Group>(new THREE.Group());
 
   // New panel state
   const [activePanel, setActivePanel] = useState<PanelType>(null);
@@ -141,6 +160,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   loadedModelsRef.current = loadedModels;
   const activePanelRef = useRef<PanelType>(null);
   activePanelRef.current = activePanel;
+  const isMeasuringRef = useRef(false);
+  isMeasuringRef.current = isMeasuring;
 
   // Imperative handle for parent toolbar integration
   useImperativeHandle(ref, () => ({
@@ -229,6 +250,9 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         });
         world.scene = scene;
 
+        // 3b. Add measurement lines group to scene
+        scene.three.add(measureLinesRef.current);
+
         // 4. Setup renderer (must exist on world before camera is assigned)
         //    - powerPreference: prefer discrete GPU when available
         //    - preserveDrawingBuffer: needed for screenshot & video capture
@@ -307,7 +331,8 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         const classifier = components.get(Classifier);
         classifierRef.current = classifier;
 
-        // 12. Setup click picking with property fetching
+        // 12. Setup click picking with property fetching + measurement
+        const threeRaycaster = new THREE.Raycaster();
         renderer.three.domElement.addEventListener("pointerdown", async (e) => {
           if (e.button !== 0) return; // left click only
 
@@ -324,6 +349,68 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
             ((e.clientX - rect.left) / rect.width) * 2 - 1,
             -((e.clientY - rect.top) / rect.height) * 2 + 1,
           );
+
+          // ── Measurement mode: raycast against scene meshes ──
+          if (measureStartRef.current !== null || isMeasuringRef.current) {
+            threeRaycaster.setFromCamera(_raycastMouse, camera.three);
+            // Collect all mesh children (excluding measurement lines group)
+            const meshes: THREE.Object3D[] = [];
+            scene.three.traverse((child) => {
+              if (child !== measureLinesRef.current && (child as THREE.Mesh).isMesh) {
+                meshes.push(child);
+              }
+            });
+            const hits = threeRaycaster.intersectObjects(meshes, false);
+            if (hits.length > 0) {
+              const hitPoint = hits[0].point.clone();
+
+              if (measureStartRef.current === null) {
+                // First click: set start point, draw a small sphere marker
+                measureStartRef.current = hitPoint;
+                const dotGeo = new THREE.SphereGeometry(0.05);
+                const dotMat = new THREE.MeshBasicMaterial({ color: 0xff3333, depthTest: false });
+                const dot = new THREE.Mesh(dotGeo, dotMat);
+                dot.position.copy(hitPoint);
+                dot.renderOrder = 999;
+                dot.name = "__measure_start__";
+                measureLinesRef.current.add(dot);
+              } else {
+                // Second click: draw line + label, compute distance
+                const start = measureStartRef.current;
+                const end = hitPoint;
+                const distance = start.distanceTo(end);
+
+                // Line
+                const lineGeo = new THREE.BufferGeometry().setFromPoints([start, end]);
+                const lineMat = new THREE.LineBasicMaterial({ color: 0xff3333, depthTest: false, linewidth: 2 });
+                const line = new THREE.Line(lineGeo, lineMat);
+                line.renderOrder = 999;
+                measureLinesRef.current.add(line);
+
+                // End dot
+                const dotGeo = new THREE.SphereGeometry(0.05);
+                const dotMat = new THREE.MeshBasicMaterial({ color: 0xff3333, depthTest: false });
+                const dot = new THREE.Mesh(dotGeo, dotMat);
+                dot.position.copy(end);
+                dot.renderOrder = 999;
+                measureLinesRef.current.add(dot);
+
+                // Remove the __measure_start__ marker name tag
+                const startDot = measureLinesRef.current.children.find((c) => c.name === "__measure_start__");
+                if (startDot) startDot.name = "";
+
+                // Record measurement
+                const label = distance < 1
+                  ? `${(distance * 100).toFixed(1)} cm`
+                  : `${distance.toFixed(3)} m`;
+                setMeasurements((prev) => [...prev, { id: crypto.randomUUID(), distance: label }]);
+
+                // Reset for next measurement
+                measureStartRef.current = null;
+              }
+            }
+            return; // Don't do element selection while measuring
+          }
 
           const result = await fragmentsManager.raycast({
             camera: camera.three as THREE.PerspectiveCamera,
@@ -431,16 +518,24 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
     if (!ifcLoader || !world) return;
 
     setIsLoading(true);
+    setLoadingProgress(null);
     setError(null);
 
+    const sizeMb = (data.byteLength / (1024 * 1024)).toFixed(1);
+    setLoadingProgress(`A analisar ${name} (${sizeMb} MB)...`);
+
     try {
+      setLoadingProgress("A processar geometria IFC...");
       const model = await ifcLoader.load(data, true, name);
+
+      setLoadingProgress("A adicionar ao cenário 3D...");
       world.scene.three.add(model.object);
 
       // Fit camera to model
       const camera = world.camera as SimpleCamera;
       await camera.fitToItems();
 
+      setLoadingProgress("A extrair categorias...");
       const categories = await model.getCategories();
 
       const newModel: LoadedModelInfo = { model, name, categories };
@@ -452,9 +547,10 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
       await rebuildCategoryTree();
     } catch (err) {
       console.error("Failed to load IFC:", err);
-      setError(err instanceof Error ? err.message : "Failed to load IFC file");
+      setError(err instanceof Error ? err.message : "Falha ao carregar ficheiro IFC. O ficheiro pode estar corrompido ou num formato não suportado.");
     } finally {
       setIsLoading(false);
+      setLoadingProgress(null);
     }
   }, [onModelLoaded, rebuildCategoryTree]);
 
@@ -557,16 +653,117 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   }, [flyToTarget, loadedModels]);
 
   // ── File upload handler ─────────────────────────────────────
-  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  /** Size threshold (MB) above which we show a warning before loading */
+  const FILE_SIZE_WARNING_MB = 30;
 
+  function processFile(file: File) {
+    const sizeMb = file.size / (1024 * 1024);
     const reader = new FileReader();
     reader.onload = () => {
       const data = new Uint8Array(reader.result as ArrayBuffer);
-      loadIfcFile(data, file.name);
+      if (sizeMb > FILE_SIZE_WARNING_MB) {
+        setPendingFile({ data, name: file.name, sizeMb: Math.round(sizeMb) });
+      } else {
+        loadIfcFile(data, file.name);
+      }
     };
     reader.readAsArrayBuffer(file);
+  }
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    processFile(file);
+  }
+
+  // ── Drag-and-drop handlers ──────────────────────────────────
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  }
+
+  function handleDragLeave(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    // Only leave if we actually left the container (not a child element)
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setIsDragging(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith(".ifc")) {
+      setError("Apenas ficheiros .ifc são suportados.");
+      return;
+    }
+    processFile(file);
+  }
+
+  // ── Ortho/perspective toggle ────────────────────────────────
+  function handleToggleOrtho() {
+    const world = worldRef.current;
+    if (!world) return;
+    const camera = world.camera as SimpleCamera;
+    const threeCamera = camera.three;
+
+    if (isOrtho) {
+      // Switch to perspective
+      if (threeCamera instanceof THREE.OrthographicCamera) {
+        const aspect = threeCamera.right / threeCamera.top || 1;
+        const perspCam = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
+        perspCam.position.copy(threeCamera.position);
+        perspCam.quaternion.copy(threeCamera.quaternion);
+        camera.three = perspCam;
+      }
+    } else {
+      // Switch to orthographic
+      if (threeCamera instanceof THREE.PerspectiveCamera) {
+        const frustumSize = 50;
+        const aspect = threeCamera.aspect || 1;
+        const orthoCam = new THREE.OrthographicCamera(
+          -frustumSize * aspect / 2, frustumSize * aspect / 2,
+          frustumSize / 2, -frustumSize / 2, 0.1, 1000
+        );
+        orthoCam.position.copy(threeCamera.position);
+        orthoCam.quaternion.copy(threeCamera.quaternion);
+        camera.three = orthoCam;
+      }
+    }
+    setIsOrtho(!isOrtho);
+    camera.updateAspect();
+  }
+
+  // ── Measurement tool handlers ───────────────────────────────
+  function handleToggleMeasure() {
+    if (isMeasuring) {
+      // Exit measurement mode, clear pending start point
+      measureStartRef.current = null;
+    }
+    setIsMeasuring(!isMeasuring);
+  }
+
+  function handleClearMeasurements() {
+    const group = measureLinesRef.current;
+    while (group.children.length > 0) {
+      const child = group.children[0];
+      group.remove(child);
+      if (child instanceof THREE.Mesh || child instanceof THREE.Line) {
+        child.geometry.dispose();
+        if (Array.isArray(child.material)) {
+          child.material.forEach((m) => m.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    }
+    setMeasurements([]);
+    measureStartRef.current = null;
   }
 
   // ── Camera controls ─────────────────────────────────────────
@@ -724,9 +921,14 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
   const isExternalControl = externalVisibilityControl || !!visibilityMap;
 
   return (
-    <div className={`relative flex flex-col bg-gray-100 rounded-lg overflow-hidden ${className}`}>
+    <div
+      className={`relative flex flex-col bg-gray-100 rounded-lg overflow-hidden ${className}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Toolbar (hidden when parent provides its own) */}
-      {!hideToolbar && <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200 text-sm">
+      {!hideToolbar && <div className="flex items-center gap-1 px-3 py-2 bg-white border-b border-gray-200 text-sm overflow-x-auto scrollbar-none">
         {/* Upload IFC button */}
         <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent text-white rounded cursor-pointer hover:bg-accent-hover transition-colors text-xs font-medium">
           <Upload className="w-3.5 h-3.5" />
@@ -800,6 +1002,22 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
               title="Captura de ecrã (PNG)"
             >
               <Camera className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={handleToggleOrtho}
+              className={`p-1.5 rounded transition-colors ${isOrtho ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
+              title={isOrtho ? "Vista perspetiva" : "Vista ortográfica"}
+            >
+              <Box className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={handleToggleMeasure}
+              className={`p-1.5 rounded transition-colors ${isMeasuring ? "bg-accent text-white" : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"}`}
+              title={isMeasuring ? "Sair da medição" : "Medir distância"}
+            >
+              <Ruler className="w-4 h-4" />
             </button>
 
             {/* Model names */}
@@ -879,12 +1097,90 @@ const IfcViewer = forwardRef<IfcViewerHandle, IfcViewerProps>(function IfcViewer
         </div>
       )}
 
-      {/* Loading overlay */}
+      {/* Drag-and-drop overlay */}
+      {isDragging && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center bg-accent/10 border-2 border-dashed border-accent rounded-lg pointer-events-none">
+          <div className="text-center">
+            <Upload className="w-12 h-12 mx-auto mb-3 text-accent" />
+            <p className="text-sm font-semibold text-accent">Largar ficheiro IFC aqui</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading overlay with progress */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 mt-10">
-          <div className="text-center">
+          <div className="text-center max-w-xs">
             <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-sm text-gray-600 font-medium">A carregar modelo...</p>
+            <p className="text-sm text-gray-600 font-medium">
+              {loadingProgress ?? "A carregar modelo..."}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* File size warning dialog */}
+      {pendingFile && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm mx-4">
+            <div className="flex items-center gap-3 mb-3">
+              <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
+              <h3 className="text-sm font-semibold text-gray-800">Ficheiro grande</h3>
+            </div>
+            <p className="text-xs text-gray-600 mb-1">
+              <strong>{pendingFile.name}</strong> tem {pendingFile.sizeMb} MB.
+            </p>
+            <p className="text-xs text-gray-500 mb-4">
+              Ficheiros grandes podem causar lentidão ou falhas no navegador, especialmente em dispositivos móveis.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setPendingFile(null)}
+                className="px-3 py-1.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { loadIfcFile(pendingFile.data, pendingFile.name); setPendingFile(null); }}
+                className="px-3 py-1.5 text-xs text-white bg-accent rounded hover:bg-accent-hover transition-colors"
+              >
+                Carregar mesmo assim
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Measurement info bar */}
+      {isMeasuring && (
+        <div className="absolute top-12 left-3 z-20">
+          <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 px-3 py-2">
+            <div className="flex items-center gap-2 mb-1">
+              <Ruler className="w-3 h-3 text-accent" />
+              <span className="text-[10px] font-semibold text-gray-700 uppercase tracking-wide">
+                Medição
+              </span>
+              {measurements.length > 0 && (
+                <button
+                  onClick={handleClearMeasurements}
+                  className="text-[10px] text-gray-400 hover:text-red-500 transition-colors ml-auto"
+                >
+                  Limpar
+                </button>
+              )}
+            </div>
+            <p className="text-[10px] text-gray-500">
+              {measureStartRef.current ? "Clique no segundo ponto" : "Clique no primeiro ponto"}
+            </p>
+            {measurements.length > 0 && (
+              <div className="mt-1.5 space-y-0.5">
+                {measurements.map((m) => (
+                  <div key={m.id} className="text-xs text-gray-700 font-mono">
+                    {m.distance}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
